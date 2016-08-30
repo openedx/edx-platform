@@ -229,9 +229,9 @@ from student.helpers import (
                     % elif show_refund_option:
                       % if not is_course_blocked:
 
-                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course.id | h}" data-course-number="${course.number | h}" data-dashboard-index="${dashboard_index}"
+                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-dashboard-index="${dashboard_index}"
                          onclick="set_unenroll_message(
-                            '${_(u"Are you sure you want to unenroll from the certified course <strong>{course}</strong><br><br>?").format(course=course.display_name)}',
+                            '${_(u"Are you sure you want to unenroll from the certified course <strong>{course}</strong><br><br>?").format(course=course_overview.display_name)}',
                             '${_(u"In this case, click <strong>Unsubscribe</strong> and to request a refund please contact our support at the following address: <a href=mailto:{billing_email}>{billing_email}</a>").format(billing_email=billing_email)}'
                             )">
 
