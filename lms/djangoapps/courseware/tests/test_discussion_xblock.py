@@ -176,13 +176,13 @@ class TestViews(TestDiscussionXBlock):
         permission_dict = {
             'create_thread': permissions[0],
             'create_comment': permissions[1],
-            'create_subcomment': permissions[2]
+            'create_sub_comment': permissions[2]
         }
 
         expected_permissions = {
             'can_create_thread': permission_dict['create_thread'],
             'can_create_comment': permission_dict['create_comment'],
-            'can_create_subcomment': permission_dict['create_subcomment'],
+            'can_create_subcomment': permission_dict['create_sub_comment'],
         }
 
         self.block.has_permission = lambda perm: permission_dict[perm]
@@ -236,7 +236,7 @@ class TestTemplates(TestDiscussionXBlock):
         permission_dict = {
             'create_thread': permissions[0],
             'create_comment': permissions[1],
-            'create_subcomment': permissions[2]
+            'create_sub_comment': permissions[2]
         }
 
         self.block.has_permission = lambda perm: permission_dict[perm]
