@@ -936,16 +936,16 @@ div.problem .action {
     margin-bottom: $baseline / 2;
 
     @media (min-width: $bp-screen-md) {
-      position: absolute;
       @include right($baseline * 1.5);
       margin-top: -$baseline / 2;
+      position: absolute;
     }
 
   }
 
   .problem-action-button-wrapper {
     @include padding(($baseline / 10) 0 $baseline ($baseline / 4));
-    border-right: 1px solid $light-gray1;
+    @include border-right(1px solid $light-gray1);
     &:last-child {
       border: none;
     }

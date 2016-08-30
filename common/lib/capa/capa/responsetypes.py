@@ -345,14 +345,11 @@ class LoncapaResponse(object):
         if label is None:
             if correct:
                 correctness = _("Correct")
-                correctness_icon = 'check'
             else:
                 correctness = _("Incorrect")
-                correctness_icon = 'close'
 
-            label = u'<span class="icon fa fa-{correctness_icon}" aria-hidden="true"></span>{correctness}'.format(
-                correctness=Text(correctness),
-                correctness_icon=correctness_icon
+            label = HTML(u'{correctness}').format(
+                correctness=Text(correctness)
             )
 
         # self.runtime.track_function('get_demand_hint', event_info)

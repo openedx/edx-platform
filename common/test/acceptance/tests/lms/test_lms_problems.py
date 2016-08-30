@@ -142,7 +142,7 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
             number_of_matches=1
         )
         self.assert_events_match(
-            [{'event': {'hint_label': u'<span class="icon fa fa-close" aria-hidden="true"></span>Incorrect',
+            [{'event': {'hint_label': u'Incorrect',
                         'trigger_type': 'single',
                         'student_answer': [u'B'],
                         'correctness': False,
@@ -217,7 +217,7 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
             number_of_matches=1
         )
         self.assert_events_match(
-            [{'event': {'hint_label': u'<span class="icon fa fa-close" aria-hidden="true"></span>Incorrect',
+            [{'event': {'hint_label': u'Incorrect',
                         'trigger_type': 'single',
                         'student_answer': [u'C'],
                         'correctness': False,
