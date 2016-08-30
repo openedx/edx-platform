@@ -18,31 +18,45 @@ def get_field_on_block(block, field_name, default_value=None):
     return default_value
 
 
-def collect_containing_subsections(
-        block_structure,
-        transformer,
+def collect_unioned_set_field(
+    block_structure,
+    transformer,
+    merged_field_name,
+    base_case_predicate,
 ):
     """
-    TODO: take another editing pass at this docstring before merge
+    Recursively union a set field on the block structure.
 
-    Note: 'containing_subsections' is not the most applicable name, now that we're including self when applicable.
-    I'm just leaving the current name in place while we decide what the best new on is.
+    If a block matches base_case_predicate, it will be added to the
+    result set. This (potentially empty) set is unioned with the sets
+    contained in merged_field_name for all parents of the block.
+
+    This set union operation takes place during a topological traversal
+    of the block_structure, so all sets are inherited by descendants.
+
+    Parameters:
+        block_structure: BlockStructure to traverse
+        transformer: transformer that will be used for get_ and
+            set_transformer_block_field
+        merged_field_name: name of the field to store
+        base_case_predicate: a unary lambda that returns true if a given
+            block_key should be included in the result set
     """
     for block_key in block_structure.topological_traversal():
-        containing_subsections = {block_key} if block_key.block_type == 'sequential' else set()
+        result_set = {block_key} if base_case_predicate(block_key) else set()
         for parent in block_structure.get_parents(block_key):
-            containing_subsections |= block_structure.get_transformer_block_field(
+            result_set |= block_structure.get_transformer_block_field(
                 parent,
                 transformer,
-                'containing_subsections',
+                merged_field_name,
                 set(),
             )
 
         block_structure.set_transformer_block_field(
             block_key,
             transformer,
-            'containing_subsections',
-            containing_subsections,
+            merged_field_name,
+            result_set,
         )
 
 
