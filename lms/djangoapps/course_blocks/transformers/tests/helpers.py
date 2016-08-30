@@ -77,6 +77,7 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
         if parent:
             kwargs['parent'] = parent
 
+        print block_ref
         xblock = factory.create(
             display_name=self.create_block_id(block_type, block_ref),
             **kwargs
@@ -115,7 +116,10 @@ class CourseStructureTestCase(TransformerRegistryTestMixin, ModuleStoreTestCase)
             # It would be re-added to the course if the course was
             # explicitly listed in parents.
             course = modulestore().get_item(block_map['course'].location)
-            course.children.remove(block_key)
+            try:
+                course.children.remove(block_key)
+            except ValueError:
+                pass  # block_key was not a direct child of course, carry on
             block_map['course'] = update_block(course)
 
             # Add this to block to each listed parent.

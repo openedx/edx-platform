@@ -12,7 +12,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
+from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase, BlockParentsMapTestCase
 from openedx.core.djangoapps.content.block_structure.api import get_cache
 from ..transformer import GradesTransformer
 
@@ -101,6 +101,77 @@ class GradesTransformerTestCase(CourseStructureTestCase):
                 ]
             }
         ])
+
+    def build_complicated_hypothetical_course(self):
+        """
+        Create a test course with a very odd structure as a stress-test for various methods.
+
+        Current design is to test containing_subsection logic in collect_unioned_set_field.
+        I can't reasonably draw this in ascii art (due to intentional complexities), so here's an overview:
+            We have 1 course, containing 1 chapter, containing 2 subsections.
+
+            From here, it starts to get hairy. Call our subsections A and B.
+            Subsection A contains 3 verticals (call them 1, 2, and 3), and another subsection (C)
+            Subsection B contains vertical 3 and subsection C
+            Subsection C contains 1 problem (b)
+            Vertical 1 contains 1 vertical (11)
+            Vertical 2 contains no children
+            Vertical 3 contains no children
+            Vertical 11 contains 1 problem (aa) and vertical 2
+            Problem b contains no children
+        """
+        return self.build_course([
+            {
+                u'org': u'GradesTestOrg',
+                u'course': u'GB101',
+                u'run': u'cannonball',
+                u'metadata': {u'format': u'homework'},
+                u'#type': u'course',
+                u'#ref': u'course',
+                u'#children': [
+                    {
+                        u'#type': u'chapter',
+                        u'#ref': u'chapter',
+                        u'#children': [
+                            {
+                                u'#type': u'sequential',
+                                u'#ref': 'sub_A',
+                                u'#children': [
+                                    {
+                                        u'#type': u'vertical',
+                                        u'#ref': 'vert_1',
+                                        u'#children': [
+                                            {
+                                                u'#type': u'vertical',
+                                                u'#ref': u'vert_A11',
+                                                u'#children': [{u'#type': u'problem', u'#ref': u'prob_A1aa'}]
+                                            },
+                                        ]
+                                    },
+                                    {u'#type': u'vertical', u'#ref': 'vert_2', '#parents': [u'vert_A11']},
+                                ]
+                            },
+                            {
+                                u'#type': u'sequential',
+                                u'#ref': u'sub_B',
+                                u'#children': [
+                                    {u'#type': u'vertical', u'#ref': 'vert_3', '#parents': ['sub_A']},
+                                    {
+                                        u'#type': u'sequential',
+                                        u'#ref': 'sub_C',
+                                        '#parents': ['sub_A'],
+                                        u'#children': [{u'#type': u'problem', u'#ref': u'prob_BCb'}]
+                                    },
+                                ]
+                            },
+                        ]
+                    }
+                ]
+            }
+        ])
+
+    def test_collect_containing_subsection(self):
+        blocks = self.build_complicated_hypothetical_course()
 
     def test_ungraded_block_collection(self):
         blocks = self.build_course_with_problems()
