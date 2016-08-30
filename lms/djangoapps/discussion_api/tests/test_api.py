@@ -631,6 +631,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "page": ["1"],
             "per_page": ["1"],
             "recursive": ["False"],
+            "with_responses": ["True"],
             "commentable_ids": ["topic_x,topic_meow"]
         })
 
@@ -644,6 +645,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "page": ["6"],
             "per_page": ["14"],
             "recursive": ["False"],
+            "with_responses": ["True"],
         })
 
     def test_thread_content(self):
@@ -857,6 +859,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "page": ["1"],
             "per_page": ["10"],
             "recursive": ["False"],
+            "with_responses": ["True"],
             "text": ["test search string"],
         })
 
@@ -923,6 +926,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "per_page": ["11"],
             "recursive": ["False"],
             query: ["true"],
+            "with_responses": ["True"],
         })
 
     @ddt.data(
@@ -965,6 +969,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "page": ["1"],
             "per_page": ["11"],
             "recursive": ["False"],
+            "with_responses": ["True"],
         })
 
     @ddt.data("asc", "desc")
@@ -995,6 +1000,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "page": ["1"],
             "per_page": ["11"],
             "recursive": ["False"],
+            "with_responses": ["True"],
         })
 
 
@@ -1181,6 +1187,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
                 "mark_as_read": ["False"],
                 "resp_skip": ["70"],
                 "resp_limit": ["14"],
+                "with_responses": ["True"]
             }
         )
 
