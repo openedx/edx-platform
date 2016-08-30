@@ -28,6 +28,7 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action button').click @refreshAnswers
+    @notification = @$('.notification-response')
     @reviewButton = @$('.action .review-btn')
     @reviewButton.click @scroll_to_problem_meta
     @submitButton = @$('.action .submit')
@@ -354,7 +355,7 @@ class @Problem
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
-          #@notification.focus()
+          @notification.focus()
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
