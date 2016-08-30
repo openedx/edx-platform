@@ -1,14 +1,14 @@
-<%page expression_filter="h" args="notification_type, notification_icon, notification_message, hint_notification"/>
+<%page expression_filter="h" args="notification_name, notification_type, notification_icon, notification_message"/>
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.markup import HTML
 %>
 
-<div class="notification ${notification_type}" tabindex="-1">
+<div class="notification ${notification_name} ${notification_type}" tabindex="-1">
     <span class="icon fa fa-${notification_icon}" aria-hidden="true"></span>
     <span class="notification-message">${notification_message}</span>
     <div class="notification-btn-wrapper">
-        % if hint_notification:
+        % if notification_name == 'hint':
         <button class="btn btn-default btn-small notification-btn">${_('Next Hint')}</button>
         % endif
         <button class="btn btn-default btn-small notification-btn review-btn sr">${_('Review')}</button>

@@ -129,7 +129,7 @@ class CapaFields(object):
     force_save_button = Boolean(
         help=_("Whether to force the save button to appear on the page"),
         scope=Scope.settings,
-        default=False
+        default=True  # should be set back to false after done testing - Sofiya
     )
     reset_key = "DEFAULT_SHOW_RESET_BUTTON"
     default_reset_button = getattr(settings, reset_key) if hasattr(settings, reset_key) else False
@@ -604,7 +604,7 @@ class CapaMixin(CapaFields):
             'hint_index': hint_index
         }
 
-    def get_problem_html(self, encapsulate=True):
+    def get_problem_html(self, encapsulate=True, save_notification_present=False, notification_message=None):
         """
         Return html for the problem.
 
@@ -653,8 +653,14 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible
+            'demand_hint_possible': demand_hint_possible,
+            'save_notification_present': save_notification_present
         }
+
+        if save_notification_present:
+            context['save_notification_type'] = 'warning'
+            context['save_notification_icon'] = 'save'
+            context['notification_message'] = notification_message
 
         html = self.runtime.render_template('problem.html', context)
 
@@ -1399,8 +1405,7 @@ class CapaMixin(CapaFields):
             ).format(button_name=self.check_button_name())
         return {
             'success': True,
-            'msg': msg,
-            'html': self.get_problem_html(encapsulate=False),
+            'html': self.get_problem_html(encapsulate=False, save_notification_present=True, notification_message=msg),
         }
 
     def reset_problem(self, _data):

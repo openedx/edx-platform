@@ -121,8 +121,7 @@ class ProblemPage(PageObject):
         """
         Click the Save button.
         """
-        self.q(css='div.problem button.save').click()
-        self.wait_for_ajax()
+        click_css(self, '.problem .save', require_notification=False)
 
     def click_reset(self):
         """
@@ -140,6 +139,10 @@ class ProblemPage(PageObject):
     def is_reset_button_present(self):
         """ Check for the presence of the reset button. """
         return self.q(css='.problem .reset').present
+
+    def is_save_button_visible_disabled(self):
+        """ Check for the visibility of the disabled Save button """
+        return self.q(css='.problem .save.is-disabled').visible
 
     def is_focus_on_problem_meta(self):
         """

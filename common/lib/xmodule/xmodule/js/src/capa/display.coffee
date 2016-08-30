@@ -41,7 +41,8 @@ class @Problem
     @resetButton.click @reset
     @showButton = @$('div.action button.show')
     @showButton.click @show
-    @saveButton = @$('div.action button.save')
+    @saveButton = @$('.problem .problem-action-buttons-wrapper .save')
+    @saveButtonLabel = @$('.problem .problem-action-buttons-wrapper .save .save-label')
     @saveButton.click @save
 
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
@@ -177,7 +178,7 @@ class @Problem
     $.postWithPrefix "#{url}/input_ajax", data, callback
 
 
-  render: (content) ->
+  render: (content, callback) ->
     if content
       @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
@@ -186,6 +187,7 @@ class @Problem
         @bind()
         @queueing()
         @renderProgressState()
+        callback?()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -338,6 +340,7 @@ class @Problem
         Logger.log 'problem_graded', [@answers, response.contents], @id
 
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
+    @enableSaveButton false, false
 
   check: =>
     if not @check_save_waitfor(@check_internal)
@@ -357,6 +360,7 @@ class @Problem
           @$('div.action button.check').focus()
         else
           @gentle_alert response.success
+      @enableSaveButton false, false
       Logger.log 'problem_graded', [@answers, response.contents], @id
 
   reset: =>
@@ -437,14 +441,36 @@ class @Problem
     if not @check_save_waitfor(@save_internal)
       @disableAllButtonsWhileRunning @save_internal, false
 
+  focus_on_save_notification: =>
+    @saveNotificationArea = @$('.notification.save')
+    @saveNotificationArea.focus()
+    # TODO: Wait for render to complete to disable the save button and focus.
+    @enableSaveButton false, true
+
   save_internal: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
-      saveMessage = response.msg
       if response.success
         @el.trigger('contentChanged', [@id, response.html])
-      @gentle_alert saveMessage
+        @render(response.html, @focus_on_save_notification)
       @updateProgress response
+
+  enableSaveButton: (enable, changeText = false) =>
+    # Used to disable save button if there is no change to the submission and enable if there is.
+    # params:
+    #   'enable' is a boolean to determine enabling/disabling of check button.
+    #   'changeText' is a boolean to determine if there is need to change the
+    #    text of save button as well.
+    if enable
+      @saveButton.removeClass 'is-disabled'
+      @saveButton.removeAttr 'disabled'
+      if changeText
+        @saveButtonLabel.text('Save')
+    else
+      @saveButton.addClass 'is-disabled'
+      @saveButton.attr({'disabled': 'disabled'})
+      if changeText
+        @saveButtonLabel.text('Saved')
 
   refreshMath: (event, element) =>
     element = event.target unless element
@@ -485,7 +511,6 @@ class @Problem
     #   'bind' used on the first check to attach event handlers to input fields
     #     to change "Check"/"Final check" enable status in case of some manipulations with answers
     answered = true
-
     at_least_one_text_input_found = false
     one_text_input_filled = false
     @el.find("input:text").each (i, text_field) =>
@@ -527,8 +552,10 @@ class @Problem
 
     if answered
       @enableCheckButton true
+      @enableSaveButton true, true
     else
-      @enableCheckButton false, false
+      @enableCheckButton false
+      @enableSaveButton false
 
   bindResetCorrectness: ->
     # Loop through all input types
@@ -764,6 +791,10 @@ class @Problem
     operationCallback().always =>
       @enableAllButtons true, isFromCheckOperation
 
+  # Called by disableAllButtonsWhileRunning to automatically disable all buttons while check,reset,or save internal are running
+  # Then enable all the buttons again after it is done.
+  # We don't want the save button to automatically be enabled after the action has completed. We do want it to be automatically disabled, though
+  # (if a user tries to press save while the problem is submitting, maybe?).
   enableAllButtons: (enable, isFromCheckOperation) =>
     # Used to enable/disable all buttons in problem.
     # params:
@@ -771,9 +802,13 @@ class @Problem
     #   'isFromCheckOperation' is a boolean to keep track if operation was initiated
     #    from @check so that text of check button will also be changed while disabling/enabling
     #    the check button.
+
+    # Save button is not enabled here (only disabled)
+    # because the logic for enabling the save button is handled by the save method.
+    # It should not be automatically enabled along with the other buttons -
+    # only when the user has made a change to the problem submission.
     if enable
       @resetButton
-        .add(@saveButton)
         .add(@hintButton)
         .add(@showButton)
         .removeClass('is-disabled')
