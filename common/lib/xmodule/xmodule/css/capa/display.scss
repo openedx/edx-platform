@@ -374,12 +374,18 @@ div.problem {
       }
     }
 
+    .unanswered {
+      p.status.drag-and-drop--status {
+        @include margin(8px, 0, 0, ($baseline/2));
+        text-indent: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+    }
+
     &.correct, &.ui-icon-check {
       p.status {
-        display: inline-block;
-        width: 25px;
-        height: 20px;
-        background: url('#{$static-path}/images/correct-icon.png') center center no-repeat;
+        @include status-icon($correct, $checkmark-icon);
       }
 
       input {
@@ -389,10 +395,7 @@ div.problem {
 
     &.partially-correct, &.ui-icon-check {
       p.status {
-        display: inline-block;
-        width: 25px;
-        height: 20px;
-        background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
+        @include status-icon($partiallycorrect, $asterisk-icon);
       }
 
       input {

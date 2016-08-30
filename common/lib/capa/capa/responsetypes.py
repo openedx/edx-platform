@@ -368,20 +368,20 @@ class LoncapaResponse(object):
         self.capa_module.runtime.track_function('edx.problem.hint.feedback_displayed', event_info)
 
         # Form the div-wrapped hint texts
-        hints_wrap = u''.join(
-            [u'<div class="{question_hint_text_style}">{text}</div>'.format(
+        hints_wrap = HTML(u''.join(
+            [HTML(u'<div class="{question_hint_text_style}">{text}</div>').format(
                 question_hint_text_style=QUESTION_HINT_TEXT_STYLE,
-                text=dct.get('text')
+                text=Text(dct.get('text'))
             ) for dct in hint_log]
-        )
+        ))
         if multiline_mode:
-            hints_wrap = u'<div class="{question_hint_multiline}">{hints_wrap}</div>'.format(
+            hints_wrap = HTML(u'<div class="{question_hint_multiline}">{hints_wrap}</div>').format(
                 question_hint_multiline=QUESTION_HINT_MULTILINE,
                 hints_wrap=hints_wrap
             )
         label_wrap = ''
         if label:
-            label_wrap = u'<span class="{question_hint_label_style}">{label}: </span>'.format(
+            label_wrap = HTML(u'<span class="{question_hint_label_style}">{label}: </span>').format(
                 question_hint_label_style=QUESTION_HINT_LABEL_STYLE,
                 label=label
             )
@@ -393,10 +393,10 @@ class LoncapaResponse(object):
             style = QUESTION_HINT_INCORRECT_STYLE
 
         # Ready to go
-        return u'<div class="{style}"><div class="explanation-title">{text}</div>{labelwrap}{hintswrap}</div>'.format(
-            style=style,
+        return HTML(u'<div class="{st}"><div class="explanation-title">{text}</div>{lwrp}{hintswrap}</div>').format(
+            st=style,
             text=_("Answer:"),
-            labelwrap=label_wrap,
+            lwrp=label_wrap,
             hintswrap=hints_wrap
         )
 

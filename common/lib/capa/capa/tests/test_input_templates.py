@@ -858,7 +858,7 @@ class DragAndDropTemplateTest(TemplateTestCase):
             self.assert_has_xpath(xml, xpath, self.context)
 
             # Expect a <p> with the status
-            xpath = "//p[@class='status']"
+            xpath = "//p[@class='status drag-and-drop--status']"
             self.assert_has_text(xml, xpath, expected_text, exact=False)
 
     def test_drag_and_drop_json_html(self):
