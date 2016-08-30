@@ -96,10 +96,13 @@ class Status(object):
             'correct': _('This answer is correct.'),
             'incorrect': _('This answer is incorrect.'),
             'partially-correct': _('This answer is partially correct.'),
-            'unanswered': _('Not yet answered.'),
-            'unsubmitted': _('This answer is unanswered.'),
             'queued': _('This answer is being processed.'),
         }
+        tooltips.update(
+            dict.fromkeys(
+                ['incomplete', 'unanswered', 'unsubmitted'], _('Not yet answered.')
+            )
+        )
         self.display_name = names.get(status, unicode(status))
         self.display_tooltip = tooltips.get(status, u'')
         self._status = status or ''
