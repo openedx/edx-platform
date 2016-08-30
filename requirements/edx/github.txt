@@ -1,8 +1,8 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @nedbat to check licensing
-#   * @edx/devops to check system requirements
+#   * @edx/ospr - to check licensing
+#   * @edx/devops - to check system requirements
 #
 # A correct GitHub reference looks like this:
 #
