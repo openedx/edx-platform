@@ -6,9 +6,9 @@ from django.dispatch import receiver, Signal
 from logging import getLogger
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
-
 
 log = getLogger(__name__)
 
@@ -128,7 +128,6 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
 
     from lms.djangoapps.grades.transformer import GradesTransformer
     from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory
-    from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 
     course_id = kwargs.get('course_id', None)
     usage_id = kwargs.get('usage_id', None)
