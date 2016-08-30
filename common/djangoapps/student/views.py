@@ -1775,6 +1775,7 @@ def create_account_with_params(request, params):
         )
     )
     if send_email:
+        dest_addr = user.email
         context = {
             'name': profile.name,
             'key': registration.activation_key,
@@ -1799,7 +1800,12 @@ def create_account_with_params(request, params):
             else:
                 user.email_user(subject, message, from_address)
         except Exception:  # pylint: disable=broad-except
-            log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
+            log.error(
+                u'Unable to send activation email to user from "%s" to "%s"',
+                from_address,
+                dest_addr,
+                exc_info=True
+            )
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
