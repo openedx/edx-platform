@@ -123,40 +123,29 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
        - course_id: Unicode string representing the course
        - usage_id: Unicode string indicating the courseware instance
     """
-    def get_containing_subsections(usage_id):
-        """
-        Ensures that the we update the persistent *subsection* score for a
-        given signal, even if the signal was sent by a block "lower" on the
-        course structure tree.
-        """
-        sub_set = set()
-        usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
-        if usage_key.block_type == 'sequential':
-            sub_set.add(usage_key)
-
-        from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
-        from lms.djangoapps.grades.transformer import GradesTransformer
-        manager = get_block_structure_manager(course_key)
-        block_structure = manager.get_collected()
-        return sub_set.update(
-            block_structure.get_transformer_block_field(
-                usage_key,
-                GradesTransformer,
-                'containing_subsections',
-                set()
-            )
-        )
-
     if not settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED', False):
         return
+
+    from lms.djangoapps.grades.transformer import GradesTransformer
+    from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory
+    from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
+
     course_id = kwargs.get('course_id', None)
     usage_id = kwargs.get('usage_id', None)
     student = kwargs.get('user', None)
 
     course_key = CourseLocator.from_string(course_id)
-    subsections_to_update = get_containing_subsections(usage_id)
+    usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
+    manager = get_block_structure_manager(course_key)
+    block_structure = manager.get_collected()
 
-    from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory
+    subsections_to_update = block_structure.get_transformer_block_field(
+        usage_key,
+        GradesTransformer,
+        'containing_subsections',
+        set()
+    )
+
     for usage_key in subsections_to_update:
         try:
             SubsectionGradeFactory(student).update(usage_key, course_key)

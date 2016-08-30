@@ -24,20 +24,19 @@ def collect_containing_subsections(
 ):
     """
     TODO: take another editing pass at this docstring before merge
-    """
-    def combine_parent_values(parent):
-        """
-        Gets a block's containing_subsections set, and unions with the block itself if appropriate.
-        """
-        sub_set = block_structure.get_transformer_block_field(parent, transformer, 'containing_subsections', set())
-        if parent.block_type == 'sequential':
-            sub_set.add(parent)
-        return sub_set
 
+    Note: 'containing_subsections' is not the most applicable name, now that we're including self when applicable.
+    I'm just leaving the current name in place while we decide what the best new on is.
+    """
     for block_key in block_structure.topological_traversal():
-        containing_subsections = set()
+        containing_subsections = {block_key} if block_key.block_type == 'sequential' else set()
         for parent in block_structure.get_parents(block_key):
-            containing_subsections.update(combine_parent_values(parent))
+            containing_subsections |= block_structure.get_transformer_block_field(
+                parent,
+                transformer,
+                'containing_subsections',
+                set(),
+            )
 
         block_structure.set_transformer_block_field(
             block_key,
