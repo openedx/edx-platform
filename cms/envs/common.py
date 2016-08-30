@@ -921,7 +921,7 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
-    'lms.djangoapps.grades',
+    'lms.djangoapps.grades.apps.GradesConfig',
 
     # Microsite configuration application
     'microsite_configuration',

@@ -18,12 +18,7 @@ def get_field_on_block(block, field_name, default_value=None):
     return default_value
 
 
-def collect_unioned_set_field(
-        block_structure,
-        transformer,
-        merged_field_name,
-        base_case_predicate,
-):
+def collect_unioned_set_field(block_structure, transformer, merged_field_name, base_case_predicate):
     """
     Recursively union a set field on the block structure.
 
