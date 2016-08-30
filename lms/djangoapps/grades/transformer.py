@@ -5,7 +5,7 @@ from django.test.client import RequestFactory
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
-from lms.djangoapps.course_blocks.transformers.utils import collect_nearest_subsection
+from lms.djangoapps.course_blocks.transformers.utils import collect_containing_subsections
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
 
@@ -50,10 +50,7 @@ class GradesTransformer(BlockStructureTransformer):
         """
         block_structure.request_xblock_fields(*cls.FIELDS_TO_COLLECT)
         cls._collect_max_scores(block_structure)
-        collect_nearest_subsection(
-            block_structure,
-            transformer=cls,
-        )
+        collect_containing_subsections(block_structure, transformer=cls)
 
     def transform(self, block_structure, usage_context):
         """

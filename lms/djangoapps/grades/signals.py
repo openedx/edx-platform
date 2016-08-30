@@ -123,37 +123,46 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
        - course_id: Unicode string representing the course
        - usage_id: Unicode string indicating the courseware instance
     """
-    def ensure_subsection(usage_id):
+    def get_containing_subsections(usage_id):
         """
         Ensures that the we update the persistent *subsection* score for a
         given signal, even if the signal was sent by a block "lower" on the
         course structure tree.
         """
+        sub_set = set()
         usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
         if usage_key.block_type == 'sequential':
-            return usage_key
+            sub_set.add(usage_key)
 
         from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
         from lms.djangoapps.grades.transformer import GradesTransformer
         manager = get_block_structure_manager(course_key)
         block_structure = manager.get_collected()
-        return block_structure.get_transformer_block_field(usage_key, GradesTransformer, 'containing_subsection', None)
+        return sub_set.update(
+            block_structure.get_transformer_block_field(
+                usage_key,
+                GradesTransformer,
+                'containing_subsections',
+                set()
+            )
+        )
 
     if not settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED', False):
         return
-    try:
-        course_id = kwargs.get('course_id', None)
-        usage_id = kwargs.get('usage_id', None)
-        student = kwargs.get('user', None)
+    course_id = kwargs.get('course_id', None)
+    usage_id = kwargs.get('usage_id', None)
+    student = kwargs.get('user', None)
 
-        course_key = CourseLocator.from_string(course_id)
-        usage_key = ensure_subsection(usage_id)
+    course_key = CourseLocator.from_string(course_id)
+    subsections_to_update = get_containing_subsections(usage_id)
 
-        from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory
-        SubsectionGradeFactory(student).update(usage_key, course_key)
-    except Exception as ex:  # pylint: disable=broad-except
-        log.exception(
-            u"Failed to process SCORE_CHANGED signal. "
-            "user: %s, course_id: %s, "
-            "usage_id: %s. Exception: %s", unicode(student), course_id, usage_id, ex.message
-        )
+    from lms.djangoapps.grades.new.subsection_grade import SubsectionGradeFactory
+    for usage_key in subsections_to_update:
+        try:
+            SubsectionGradeFactory(student).update(usage_key, course_key)
+        except Exception as ex:  # pylint: disable=broad-except
+            log.exception(
+                u"Failed to process SCORE_CHANGED signal. "
+                "user: %s, course_id: %s, "
+                "usage_key: %s. Exception: %s", unicode(student), course_id, usage_key, ex.message
+            )

@@ -1,7 +1,6 @@
 """
 Common Helper utilities for transformers
 """
-from sys import maxsize as BIG_NUMBER
 
 
 def get_field_on_block(block, field_name, default_value=None):
@@ -19,68 +18,33 @@ def get_field_on_block(block, field_name, default_value=None):
     return default_value
 
 
-def collect_nearest_subsection(
+def collect_containing_subsections(
         block_structure,
         transformer,
 ):
     """
     TODO: take another editing pass at this docstring before merge
-    A very specialized (as in, I ought to see if we can generalize this or move it to the grading transformer's file)
-    collect method designed to calculate and store the nearest containing subsection for every block in the course
-    tree. This is done in 2 passes - the first will calculate and store a tuple, 'nearest_sub_dict', for each block
-    in a topological traversal of the tree. This tuple will store the closest containing subsection and its distance
-    from the block. On the second pass, we remove 'nearest_sub_dict' and only store the actual containing subsection,
-    where one exists.
     """
+    def combine_parent_values(parent):
+        """
+        Gets a block's containing_subsections set, and unions with the block itself if appropriate.
+        """
+        sub_set = block_structure.get_transformer_block_field(parent, transformer, 'containing_subsections', set())
+        if parent.block_type == 'sequential':
+            sub_set.add(parent)
+        return sub_set
+
     for block_key in block_structure.topological_traversal():
-        if block_key.block_type == 'sequential':
-            block_structure.set_transformer_block_field(
-                block_key,
-                transformer,
-                'nearest_sub_dict',
-                (0, block_key)
-            )
-            continue
-        parent_data = [
-            block_structure.get_transformer_block_field(
-                parent,
-                transformer,
-                'nearest_sub_dict',
-                (BIG_NUMBER, None),
-            ) for parent in block_structure.get_parents(block_key)
-        ]
-        nearest = (BIG_NUMBER, None)
-        for result_pair in parent_data:
-            if result_pair[1] and result_pair[0] < nearest[0]:
-                nearest = result_pair
-        if nearest[1]:
-            nearest = (nearest[0] + 1, nearest[1])
+        containing_subsections = set()
+        for parent in block_structure.get_parents(block_key):
+            containing_subsections.update(combine_parent_values(parent))
+
         block_structure.set_transformer_block_field(
             block_key,
             transformer,
-            'nearest_sub_dict',
-            nearest,
+            'containing_subsections',
+            containing_subsections,
         )
-
-    for block_key in block_structure.topological_traversal():
-        nearest = block_structure.get_transformer_block_field(
-            block_key,
-            transformer,
-            'nearest_sub_dict',
-            (BIG_NUMBER, None),
-        )
-        block_structure.remove_transformer_block_field(
-            block_key,
-            transformer,
-            'nearest_sub_dict'
-        )
-        if nearest[1]:
-            block_structure.set_transformer_block_field(
-                block_key,
-                transformer,
-                'containing_subsection',
-                nearest[1],
-            )
 
 
 def collect_merged_boolean_field(
