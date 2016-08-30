@@ -48,7 +48,8 @@ class Thread(models.Model):
         default_params = {'page': 1,
                           'per_page': 20,
                           'course_id': query_params['course_id'],
-                          'recursive': False}
+                          'recursive': False,
+                          'with_responses': True}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
 
         if query_params.get('text'):
@@ -131,6 +132,7 @@ class Thread(models.Model):
         url = self.url(action='get', params=self.attributes)
         request_params = {
             'recursive': kwargs.get('recursive'),
+            'with_responses': kwargs.get('with_responses', False),
             'user_id': kwargs.get('user_id'),
             'mark_as_read': kwargs.get('mark_as_read', True),
             'resp_skip': kwargs.get('response_skip'),
