@@ -237,9 +237,10 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
         super(StudentAccountLoginAndRegistrationTest, self).setUp()
 
         # For these tests, three third party auth providers are enabled by default:
-        self.configure_google_provider(enabled=True)
-        self.configure_facebook_provider(enabled=True)
+        self.configure_google_provider(enabled=True, visible=True)
+        self.configure_facebook_provider(enabled=True, visible=True)
         self.configure_dummy_provider(
+            visible=True,
             enabled=True,
             icon_class='',
             icon_image=SimpleUploadedFile('icon.svg', '<svg><rect width="50" height="100"/></svg>'),
@@ -482,8 +483,8 @@ class AccountSettingsViewTest(ThirdPartyAuthTestMixin, TestCase, ProgramsApiConf
         self.request.user = self.user
 
         # For these tests, two third party auth providers are enabled by default:
-        self.configure_google_provider(enabled=True)
-        self.configure_facebook_provider(enabled=True)
+        self.configure_google_provider(enabled=True, visible=True)
+        self.configure_facebook_provider(enabled=True, visible=True)
 
         # Python-social saves auth failure notifcations in Django messages.
         # See pipeline.get_duplicate_provider() for details.
