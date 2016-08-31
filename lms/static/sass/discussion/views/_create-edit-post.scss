@@ -25,7 +25,9 @@
         width: 100%;
         vertical-align: top;
         border-width: 0;
-        padding: 0 ($baseline/2);
+        &:not([type="text"]) {
+          padding: 0;
+        }
       }
 
       .field-label-text {
@@ -49,6 +51,9 @@
       width: 50%;
       font-size: $forum-small-font-size;
 
+      &#new-post-editor-description {
+          @include padding-left(0);
+      }
     }
   }
 
@@ -100,6 +105,11 @@
     color: $gray-d3;
     font-weight: 600;
     line-height: 36px;
+    @include float(left);
+
+    &:last-of-type {
+      @include float(right);
+    }
 
     .icon {
       @include margin-right($baseline/4);
