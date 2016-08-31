@@ -56,6 +56,9 @@ var edx = edx || {};
                 ),
                 upgrade: el.data('msg-key') === 'upgrade',
                 minPrice: el.data('course-mode-min-price'),
+                currencyCode: el.data('default-currency-code'),
+                currencySymbol: el.data('default-currency-symbol'),
+                minPrice: el.data('course-mode-min-price'),
                 sku: el.data('course-mode-sku'),
                 contributionAmount: el.data('contribution-amount'),
                 suggestedPrices: _.filter(
