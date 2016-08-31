@@ -40,9 +40,9 @@ data: |
           return test_add(10, ans)
 
       </script>
-            <p>Enter two integers that sum to 10.</p>
-            <textline size="40" correct_answer="3"/><br/>
-            <textline size="40" correct_answer="7"/>
+            <label>Enter two integers that sum to 10.</label>
+            <textline size="40" correct_answer="3" label="Enter first number" /><br/>
+            <textline size="40" correct_answer="7" label="Enter second number" />
             <solution>
                 <div class="detailed-solution">
                     <p>Explanation</p>
@@ -63,9 +63,9 @@ data: |
               return False
 
       </script>
-            <p>Enter two integers that sum to 20.</p>
-            <textline size="40" correct_answer="11"/><br/>
-            <textline size="40" correct_answer="9"/>
+            <label>Enter two integers that sum to 20.</label>
+            <textline size="40" correct_answer="11" label="Enter first number" /><br/>
+            <textline size="40" correct_answer="9" label="Enter second number" />
             <solution>
                 <div class="detailed-solution">
                     <p>Explanation</p>
