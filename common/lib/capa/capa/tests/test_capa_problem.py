@@ -339,24 +339,29 @@ class CAPAProblemTest(unittest.TestCase):
         """
         Verify that HTML is correctly rendered when there is single inputtype.
         """
-        xml = """
+        question = 'Enter sum of 1+2'
+        xml = textwrap.dedent("""
         <problem>
-            <choiceresponse>
-                <label>Select the correct synonym of paranoid?</label>
-                <description>Only the paranoid survive.</description>
-                <checkboxgroup>
-                    <choice correct="true">over-suspicious</choice>
-                    <choice correct="false">funny</choice>
-                </checkboxgroup>
-            </choiceresponse>
+            <customresponse cfn="test_sum" expect="3">
+        <script type="loncapa/python">
+        def test_sum(expect, ans):
+            return int(expect) == int(ans)
+        </script>
+                <label>{}</label>
+                <textline size="20" correct_answer="3" />
+            </customresponse>
         </problem>
-        """
+        """.format(question))
         problem = new_loncapa_problem(xml, use_capa_render_template=True)
         problem_html = etree.XML(problem.get_html())
 
         # verify that only no multi input group div is present
         multi_inputs_group = problem_html.xpath('//div[@class="multi-inputs-group"]')
         self.assertEqual(len(multi_inputs_group), 0)
+
+        # verify that question is rendered only once
+        question = problem_html.xpath("//*[normalize-space(text())='{}']".format(question))
+        self.assertEqual(len(question), 1)
 
 
 @ddt.ddt

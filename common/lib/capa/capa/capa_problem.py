@@ -36,14 +36,14 @@ from capa.safe_exec import safe_exec
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
 
-# fully accessible capa response types
-ACCESSIBLE_CAPA_RESPONSE_TYPES = [
-    'choiceresponse',
-    'multiplechoiceresponse',
-    'optionresponse',
-    'numericalresponse',
-    'stringresponse',
-    'formularesponse',
+# fully accessible capa input types
+ACCESSIBLE_CAPA_INPUT_TYPES = [
+    'checkboxgroup',
+    'radiogroup',
+    'choicegroup',
+    'optioninput',
+    'textline',
+    'formulaequationinput',
 ]
 
 # these get captured as student responses
@@ -911,6 +911,10 @@ class LoncapaProblem(object):
             responsetype_id (str): responsetype id
             problem_data (dict): dict to be filled with response data
         """
+        # if there are no inputtypes then don't do anything
+        if not inputfields:
+            return
+
         element_to_be_deleted = None
         label = ''
 
@@ -965,8 +969,8 @@ class LoncapaProblem(object):
                     label = label_tag[0].text
                     element_to_be_deleted = label_tag[0]
 
-            # delete label or p element only if responsetype is fully accessible
-            if response.tag in ACCESSIBLE_CAPA_RESPONSE_TYPES and element_to_be_deleted is not None:
+            # delete label or p element only if inputtype is fully accessible
+            if inputfields[0].tag in ACCESSIBLE_CAPA_INPUT_TYPES and element_to_be_deleted is not None:
                 element_to_be_deleted.getparent().remove(element_to_be_deleted)
 
             # Extract descriptions and set unique id on each description tag
@@ -981,6 +985,6 @@ class LoncapaProblem(object):
                 description_id += 1
 
             problem_data[inputfields[0].get('id')] = {
-                'label': label,
+                'label': label.strip(),
                 'descriptions': descriptions
             }
