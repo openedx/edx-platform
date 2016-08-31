@@ -58,42 +58,46 @@ html.video-fullscreen {
 
 .content-wrapper {
 
-  .course-license,
-  .xblock-license {
-    @include text-align(right);
-    @extend %t-title7;
-    display: block;
-    width: auto;
-    padding: ($baseline/4) 0;
-    color: $gray-d1;
+    .course-license,
+    .xblock-license {
+        @include text-align(right);
+        @extend %t-title7;
+        display: block;
+        width: auto;
+        padding: ($baseline/4) 0;
+        color: $base-font-color;
 
-    span {
-      color: inherit;
-    }
+        span {
+            color: inherit;
+        }
 
-    a:link, a:visited {
-      color: $gray;
-    }
-    a:active, a:hover {
-      color: $uxpl-blue-base;
-    }
+        a:link,
+        a:visited {
+            color: $base-font-color;
+        }
 
-    .license-label,
-    .license-value,
-    .license-actions {
-      display: inline-block;
-      vertical-align: middle;
-      margin-bottom: 0;
-    }
+        a:active,
+        a:hover {
+            color: $uxpl-blue-base;
+        }
 
-    i {
-      font-style: normal;
-    }
+        .license-label,
+        .license-value,
+        .license-actions {
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 0;
+        }
 
-    img {
-      display: inline;
+        i,
+        em {
+            font-style: normal;
+        }
+
+        img {
+            display: inline;
+        }
     }
-  }
 }
 
 // TO-DO should this be content wrapper?
@@ -205,7 +209,7 @@ html.video-fullscreen {
         }
       }
 
-      background-color: #F2F4F5;
+      background-color: #F2F8FB;
       padding: 30px;
       font-size: 16px;
       box-shadow: inset 1px 1px 2px rgba(0, 0, 0, .1);
@@ -283,7 +287,7 @@ html.video-fullscreen {
           display: block;
         }
         p {
-          color: rgb(63, 58, 59);
+          color: #414141;
           strong {
             font-weight: 600;
           }
@@ -555,6 +559,14 @@ html.video-fullscreen {
       p.success {
         color: $success-color;
       }
+    }
+
+    section.xqa-modal, section.staff-modal, section.history-modal {
+        width: 80%;
+        height: 80%;
+        left: left(20%);
+        overflow: auto;
+        display: none;
     }
 
     div.staff_info {

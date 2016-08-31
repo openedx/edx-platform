@@ -25,6 +25,7 @@ class TestHelpers(TestCase):
             Theme('red-theme', 'red-theme', get_theme_base_dir('red-theme')),
             Theme('edge.edx.org', 'edge.edx.org', get_theme_base_dir('edge.edx.org')),
             Theme('edx.org', 'edx.org', get_theme_base_dir('edx.org')),
+            Theme('example', 'example', get_theme_base_dir('example')),
             Theme('stanford-style', 'stanford-style', get_theme_base_dir('stanford-style')),
         ]
         actual_themes = get_themes()

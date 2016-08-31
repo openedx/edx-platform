@@ -21,12 +21,13 @@ $static-path: '../..' !default;
 @import '../shared-v2/help-tab';
 
 // Compatibility support for non-Pattern Library mixins and extensions
-@import 'utilities/v1-compatibility';
 @import 'utilities/variables-v2';
+@import 'utilities/v1-compatibility';
 
 // Discussion styling
 @import 'mixins';
 @import 'discussion'; // Process old file after definitions but before everything else, partial is deprecated.
+@import 'layouts';
 @import 'elements/actions';
 @import 'elements/editor';
 @import 'elements/labels';
@@ -35,5 +36,6 @@ $static-path: '../..' !default;
 @import 'views/thread';
 @import 'views/create-edit-post';
 @import 'views/response';
+@import 'views/search';
 @import 'utilities/developer';
 @import 'utilities/shame';

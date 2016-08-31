@@ -414,9 +414,8 @@ Many courses also offer a wiki for additional resources and materials: select
 **Wiki**.
 
 Other resources might also be available, such as a course-specific Facebook
-page or Twitter feed, or opportunities for Google Hangouts. Be sure to check
-the **Home** page for your course as well as the **Discussion** and
-**Wiki** pages.
+page or Twitter feed. Be sure to check the **Home** page for your course as
+well as the **Discussion** and **Wiki** pages.
 
 From time to time, the course team might send email messages to all students.
 While you can opt out of these messages, doing so means that you can miss
@@ -439,9 +438,9 @@ email message to info@edx.org.
 For opportunities to meet others who are interested in edX courses, check the
 edX Global Community meetup_ group.
 
-.. _Building and Running an edX Course: http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/
-.. _Building and Running an Open edX Course: http://edx.readthedocs.org/projects/open-edx-building-and-running-a-course/en/latest/
-.. _Building and Running an Open edX Course - latest: http://edx.readthedocs.org/projects/open-edx-building-and-running-a-course/en/latest/
+.. _Building and Running an edX Course: http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/
+.. _Building and Running an Open edX Course: http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/
+.. _Building and Running an Open edX Course - latest: http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/
 .. _docs@edx.org: docs@edx.org
 .. _edx101: https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VIIJbWTF_yM
 .. _StudioX: https://www.edx.org/course/creating-course-edx-studio-edx-studiox#.VRLYIJPF8kR
@@ -450,17 +449,17 @@ edX Global Community meetup_ group.
 .. _edX Partner Support: https://partners.edx.org/edx_zendesk
 .. _edx-code: http://groups.google.com/forum/#!forum/edx-code
 .. _edx/configuration: http://github.com/edx/configuration/wiki
-.. _edX Data Analytics API: http://edx.readthedocs.org/projects/edx-data-analytics-api/en/latest/index.html
+.. _edX Data Analytics API: http://edx.readthedocs.io/projects/edx-data-analytics-api/en/latest/index.html
 .. _docs.edx.org: http://docs.edx.org
 .. _edx/edx-analytics-dashboard: https://github.com/edx/edx-analytics-dashboard
 .. _edx/edx-platform: https://github.com/edx/edx-platform
 .. _EdX Learner's Guide: http://edx-guide-for-students.readthedocs.org/en/latest/
-.. _edX Open Learning XML Guide: http://edx-open-learning-xml.readthedocs.org/en/latest/index.html
+.. _edX Open Learning XML Guide: http://edx-open-learning-xml.readthedocs.io/en/latest/index.html
 .. _edX Partner Portal: https://partners.edx.org
-.. _edX Platform APIs: http://edx.readthedocs.org/projects/edx-platform-api/en/latest/
-.. _edX Platform Developer's Guide: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/
-.. _edX Research Guide: http://edx.readthedocs.org/projects/devdata/en/latest/
-.. _edX Release Notes: http://edx.readthedocs.org/projects/edx-release-notes/en/latest/
+.. _edX Platform APIs: http://edx.readthedocs.io/projects/edx-platform-api/en/latest/
+.. _edX Platform Developer's Guide: http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/
+.. _edX Research Guide: http://edx.readthedocs.io/projects/devdata/en/latest/
+.. _edX Release Notes: http://edx.readthedocs.io/projects/edx-release-notes/en/latest/
 .. _edX Status: http://status.edx.org/
 .. _edx-tools: https://github.com/edx/edx-tools/wiki
 .. _frequently asked questions: http://www.edx.org/student-faq
@@ -472,12 +471,12 @@ edX Global Community meetup_ group.
 .. _openedx-ops: http://groups.google.com/forum/#!forum/openedx-ops
 .. _Open edX Portal: https://open.edx.org
 .. _open.edx.org/user/register: https://open.edx.org/user/register
-.. _Open edX Release Notes: http://edx.readthedocs.org/projects/open-edx-release-notes/en/latest/
+.. _Open edX Release Notes: http://edx.readthedocs.io/projects/open-edx-release-notes/en/latest/
 .. _openedx-studio: http://groups.google.com/forum/#!forum/openedx-studio
 .. _openedx-translation: http://groups.google.com/forum/#!forum/openedx-translation
 .. _open Confluence wiki: http://openedx.atlassian.net/wiki/
 .. _partners.edx.org: https://partners.edx.org
 .. _Twitter:  http://twitter.com/edXstatus
-.. _Using edX Insights: http://edx-insights.readthedocs.org/en/latest/
-.. _Open EdX XBlock API Guide: http://edx.readthedocs.org/projects/xblock/en/latest/
-.. _Open edX XBlock Tutorial: http://edx.readthedocs.org/projects/xblock-tutorial/en/latest/index.html
+.. _Using edX Insights: http://edx-insights.readthedocs.io/en/latest/
+.. _Open EdX XBlock API Guide: http://edx.readthedocs.io/projects/xblock/en/latest/
+.. _Open edX XBlock Tutorial: http://edx.readthedocs.io/projects/xblock-tutorial/en/latest/index.html

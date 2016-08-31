@@ -14,7 +14,7 @@ class Program(factory.Factory):
     name = FuzzyText(prefix='Program ')
     subtitle = FuzzyText(prefix='Subtitle ')
     category = 'FooBar'
-    status = 'unpublished'
+    status = 'active'
     marketing_slug = FuzzyText(prefix='slug_')
     organizations = []
     course_codes = []

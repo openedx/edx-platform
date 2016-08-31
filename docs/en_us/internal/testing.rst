@@ -609,7 +609,7 @@ To start the debugger on failure, pass the ``--pdb`` option to the paver command
 
     paver test_acceptance -s lms --pdb --extra_args="lms/djangoapps/courseware/features/problems.feature"
 
-To run tests faster by not collecting static files, you can use
+To run tests faster by not collecting static files or compiling sass, you can use
 ``paver test_acceptance -s lms --fasttest`` and
 ``paver test_acceptance -s cms --fasttest``.
 

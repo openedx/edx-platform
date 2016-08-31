@@ -108,6 +108,12 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Returns true if the add response button is visible, false otherwise"""
         return self.is_element_visible(".add-response-btn")
 
+    def has_discussion_reply_editor(self):
+        """
+        Returns true if the discussion reply editor is is visible
+        """
+        return self.is_element_visible(".discussion-reply-new")
+
     def click_add_response_button(self):
         """
         Clicks the add response button and ensures that the response text
@@ -151,6 +157,13 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Returns true if the edit response button is present, false otherwise"""
         with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
             return self.is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
+
+    def is_response_deletable(self, response_id):
+        """
+        Returns true if the delete response button is present, false otherwise
+        """
+        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+            return self.is_element_visible(".response_{} .discussion-response .action-delete".format(response_id))
 
     def get_response_body(self, response_id):
         return self._get_element_text(".response_{} .response-body".format(response_id))
@@ -376,6 +389,10 @@ class DiscussionSortPreferencePage(CoursePage):
         """
         return self.q(css="body.discussion .forum-nav-sort-control").present
 
+    def show_all_discussions(self):
+        """ Show the list of all discussions. """
+        self.q(css=".all-topics").click()
+
     def get_selected_sort_preference(self):
         """
         Return the text of option that is selected for sorting.
@@ -417,6 +434,10 @@ class DiscussionTabSingleThreadPage(CoursePage):
     def __getattr__(self, name):
         return getattr(self.thread_page, name)
 
+    def show_all_discussions(self):
+        """ Show the list of all discussions. """
+        self.q(css=".all-topics").click()
+
     def close_open_thread(self):
         with self.thread_page.secondary_action_menu_open(".thread-main-wrapper"):
             self._find_within(".thread-main-wrapper .action-close").first.click()
@@ -435,6 +456,7 @@ class DiscussionTabSingleThreadPage(CoursePage):
         Click specific thread on the list.
         """
         thread_selector = "li[data-id='{}']".format(thread_id)
+        self.show_all_discussions()
         self.q(css=thread_selector).first.click()
         EmptyPromise(
             lambda: self._thread_is_rendered_successfully(thread_id),
@@ -569,11 +591,11 @@ class DiscussionUserProfilePage(CoursePage):
 
     def is_browser_on_page(self):
         return (
-            self.q(css='section.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
+            self.q(css='.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
             and
-            self.q(css='section.user-profile a.learner-profile-link').present
+            self.q(css='.user-profile .learner-profile-link').present
             and
-            self.q(css='section.user-profile a.learner-profile-link').text[0] == self.username
+            self.q(css='.user-profile .learner-profile-link').text[0] == self.username
         )
 
     @wait_for_js
@@ -670,7 +692,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         return self.q(css=".discussion-body section.home-header").present
 
     def perform_search(self, text="dummy"):
-        self.q(css=".forum-nav-search-input").fill(text + chr(10))
+        self.q(css=".search-input").fill(text + chr(10))
         EmptyPromise(
             self.is_ajax_finished,
             "waiting for server to return result"
@@ -713,7 +735,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         """
         Returns the new post button.
         """
-        elements = self.q(css="ol.course-tabs .new-post-btn")
+        elements = self.q(css=".new-post-btn")
         return elements.first if elements.visible and len(elements) == 1 else None
 
     @property
@@ -723,3 +745,17 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
         """
         elements = self.q(css=".forum-new-post-form")
         return elements[0] if elements.visible and len(elements) == 1 else None
+
+    def set_new_post_editor_value(self, new_body):
+        """
+        Set the Discussions new post editor (wmd) with the content in new_body
+        """
+        self.q(css=".wmd-input").fill(new_body)
+
+    def get_new_post_preview_value(self):
+        """
+        Get the rendered preview of the contents of the Discussions new post editor
+        Waits for content to appear, as the preview is triggered on debounced/delayed onchange
+        """
+        self.wait_for_element_visibility(".wmd-preview > *", "WMD preview pane has contents", timeout=10)
+        return self.q(css=".wmd-preview").html[0]

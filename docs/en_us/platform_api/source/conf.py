@@ -157,6 +157,11 @@ MOCK_MODULES = [
     'celery.signals',
     'edx_rest_framework_extensions',
     'edx_rest_framework_extensions.authentication',
+    'django_extensions',
+    'django_extensions.db',
+    'django_extensions.db.models',
+    'jsonfield',
+    'jsonfield.fields',
 ]
 
 for mod_name in MOCK_MODULES:

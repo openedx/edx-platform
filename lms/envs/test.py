@@ -78,6 +78,9 @@ FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
 
+# Enable persistent subsection grades, so that feature can be tested.
+FEATURES['ENABLE_SUBSECTION_GRADES_SAVED'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 

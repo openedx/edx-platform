@@ -31,7 +31,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
         # URL for email view
-        cls.email_link = '<a href="" data-section="send_email">Email</a>'
+        cls.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
 
     def setUp(self):
         super(TestNewInstructorDashboardEmailViewMongoBacked, self).setUp()
@@ -127,7 +127,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course_key.to_deprecated_string()})
         # URL for email view
-        cls.email_link = '<a href="" data-section="send_email">Email</a>'
+        cls.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
 
     def setUp(self):
         super(TestNewInstructorDashboardEmailViewXMLBacked, self).setUp()
@@ -139,7 +139,7 @@ class TestNewInstructorDashboardEmailViewXMLBacked(SharedModuleStoreTestCase):
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course_key.to_deprecated_string()})
         # URL for email view
-        self.email_link = '<a href="" data-section="send_email">Email</a>'
+        self.email_link = '<button type="button" class="btn-link" data-section="send_email">Email</button>'
 
     def tearDown(self):
         super(TestNewInstructorDashboardEmailViewXMLBacked, self).tearDown()

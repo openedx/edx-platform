@@ -1118,6 +1118,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         otherwise, do a case sensitive search
         """
         assert isinstance(course_key, CourseKey)
+
+        if not course_key.deprecated:  # split course_key
+            # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
+            return False
+
         if isinstance(course_key, LibraryLocator):
             return None  # Libraries require split mongo
         course_key = self.fill_in_run(course_key)

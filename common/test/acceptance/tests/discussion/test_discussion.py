@@ -21,6 +21,7 @@ from common.test.acceptance.pages.lms.discussion import (
     DiscussionSortPreferencePage,
 )
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
 
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.fixtures.discussion import (
@@ -218,6 +219,65 @@ class DiscussionHomePageTest(UniqueCourseTest):
 
 
 @attr(shard=2)
+class DiscussionNavigationTest(BaseDiscussionTestCase):
+    """
+    Tests for breadcrumbs navigation in the Discussions page nav bar
+    """
+
+    def setUp(self):
+        super(DiscussionNavigationTest, self).setUp()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        thread_id = "test_thread_{}".format(uuid4().hex)
+        thread_fixture = SingleThreadViewFixture(
+            Thread(
+                id=thread_id,
+                body=THREAD_CONTENT_WITH_LATEX,
+                commentable_id=self.discussion_id
+            )
+        )
+        thread_fixture.push()
+        self.thread_page = DiscussionTabSingleThreadPage(
+            self.browser,
+            self.course_id,
+            self.discussion_id,
+            thread_id
+        )
+        self.thread_page.visit()
+
+    def test_breadcrumbs_push_topic(self):
+        topic_button = self.thread_page.q(
+            css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
+        )
+        self.assertTrue(topic_button.visible)
+        topic_button.click()
+
+        # Verify the thread's topic has been pushed to breadcrumbs
+        breadcrumbs = self.thread_page.q(css=".breadcrumbs .nav-item")
+        self.assertEqual(len(breadcrumbs), 2)
+        self.assertEqual(breadcrumbs[1].text, "Test Discussion Topic")
+
+    def test_breadcrumbs_back_to_all_topics(self):
+        topic_button = self.thread_page.q(
+            css=".forum-nav-browse-menu-item[data-discussion-id='{}']".format(self.discussion_id)
+        )
+        self.assertTrue(topic_button.visible)
+        topic_button.click()
+
+        # Verify clicking the first breadcrumb takes you back to all topics
+        self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
+        self.assertEqual(len(self.thread_page.q(css=".breadcrumbs .nav-item")), 1)
+
+    def test_breadcrumbs_clear_search(self):
+        self.thread_page.q(css=".search-input").fill("search text")
+        self.thread_page.q(css=".search-btn").click()
+
+        # Verify that clicking the first breadcrumb clears your search
+        self.thread_page.q(css=".breadcrumbs .nav-item")[0].click()
+        self.assertEqual(self.thread_page.q(css=".search-input").text[0], "")
+
+
+@attr(shard=2)
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -226,6 +286,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
     def setUp(self):
         super(DiscussionTabSingleThreadTest, self).setUp()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.tab_nav = TabNavPage(self.browser)
 
     def setup_thread_page(self, thread_id):
         self.thread_page = self.create_single_thread_page(thread_id)  # pylint: disable=attribute-defined-outside-init
@@ -288,6 +349,53 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertTrue(self.thread_page.is_comment_visible(comment_id))
         self.assertTrue(self.thread_page.is_add_comment_visible(response_id))
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
+
+    def test_discussion_blackout_period(self):
+        """
+        Verify that new discussion can not be started during course blackout period.
+
+        Blackout period is the period between which students cannot post new or contribute
+        to existing discussions.
+        """
+        now = datetime.datetime.now(UTC)
+        # Update course advance settings with a valid blackout period.
+        self.course_fixture.add_advanced_settings(
+            {
+                u"discussion_blackouts": {
+                    "value": [
+                        [
+                            (now - datetime.timedelta(days=14)).isoformat(),
+                            (now + datetime.timedelta(days=2)).isoformat()
+                        ]
+                    ]
+                }
+            }
+        )
+        self.course_fixture._add_advanced_settings()  # pylint: disable=protected-access
+        self.browser.refresh()
+        thread = Thread(id=uuid4().hex, commentable_id=self.discussion_id)
+        thread_fixture = SingleThreadViewFixture(thread)
+        thread_fixture.addResponse(
+            Response(id="response1"),
+            [Comment(id="comment1")])
+        thread_fixture.push()
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
+
+        # Verify that `Add a Post` is not visible on course tab nav.
+        self.assertFalse(self.tab_nav.has_new_post_button_visible_on_tab())
+
+        # Verify that `Add a response` button is not visible.
+        self.assertFalse(self.thread_page.has_add_response_button())
+
+        # Verify user can not add new responses or modify existing responses.
+        self.assertFalse(self.thread_page.has_discussion_reply_editor())
+        self.assertFalse(self.thread_page.is_response_editable("response1"))
+        self.assertFalse(self.thread_page.is_response_deletable("response1"))
+
+        # Verify that user can not add new comment to a response or modify existing responses.
+        self.assertFalse(self.thread_page.is_add_comment_visible("response1"))
+        self.assertFalse(self.thread_page.is_comment_editable("comment1"))
+        self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
 
 
 @attr(shard=2)
@@ -838,6 +946,40 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
 
 
 @attr(shard=2)
+class DiscussionEditorPreviewTest(UniqueCourseTest):
+    def setUp(self):
+        super(DiscussionEditorPreviewTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.page = DiscussionTabHomePage(self.browser, self.course_id)
+        self.page.visit()
+        self.page.click_new_post_button()
+
+    def test_text_rendering(self):
+        """When I type plain text into the editor, it should be rendered as plain text in the preview box"""
+        self.page.set_new_post_editor_value("Some plain text")
+        self.assertEqual(self.page.get_new_post_preview_value(), "<p>Some plain text</p>")
+
+    def test_markdown_rendering(self):
+        """When I type Markdown into the editor, it should be rendered as formatted Markdown in the preview box"""
+        self.page.set_new_post_editor_value(
+            "Some markdown\n"
+            "\n"
+            "- line 1\n"
+            "- line 2"
+        )
+
+        self.assertEqual(self.page.get_new_post_preview_value(), (
+            "<p>Some markdown</p>\n"
+            "\n"
+            "<ul>\n"
+            "<li>line 1</li>\n"
+            "<li>line 2</li>\n"
+            "</ul>"
+        ))
+
+
+@attr(shard=2)
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for inline discussions
@@ -1002,7 +1144,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
     Tests for user profile page in discussion tab.
     """
 
-    PAGE_SIZE = 20  # django_comment_client.forum.views.THREADS_PER_PAGE
+    PAGE_SIZE = 20  # discussion.views.THREADS_PER_PAGE
     PROFILED_USERNAME = "profiled-user"
 
     def setUp(self):
@@ -1227,6 +1369,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
 
         self.sort_page = DiscussionSortPreferencePage(self.browser, self.course_id)
         self.sort_page.visit()
+        self.sort_page.show_all_discussions()
 
     def test_default_sort_preference(self):
         """
@@ -1259,5 +1402,6 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)
             self.sort_page.refresh_page()
+            self.sort_page.show_all_discussions()
             selected_sort = self.sort_page.get_selected_sort_preference()
             self.assertEqual(selected_sort, sort_type)

@@ -459,6 +459,8 @@
     padding: 1px;
     background: $transparent;
     background-image: none;
+    box-shadow: none;
+    text-shadow: none;
 
     @extend %t-action3;
     @extend %t-strong;

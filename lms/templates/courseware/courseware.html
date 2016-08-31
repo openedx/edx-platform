@@ -73,7 +73,8 @@ ${static.get_page_title_breadcrumbs(course_name())}
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
   <%static:js group='courseware'/>
-  <%static:js group='discussion'/>
+  <%include file="../discussion/_js_body_dependencies.html" />
+
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
         var courseId = $('.courseware-results').data('courseId');
@@ -85,7 +86,6 @@ ${static.get_page_title_breadcrumbs(course_name())}
     CoursewareFactory();
   </%static:require_module>
 
-  <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:
   	<%include file="xqa_interface.html"/>
   % endif
@@ -126,9 +126,7 @@ ${HTML(fragment.foot_html())}
                 <label for="course-search-input" class="sr">${_('Course Search')}</label>
                 <div class="search-field-wrapper">
                   <input id="course-search-input" type="text" class="search-field"/>
-                  <button type="submit" class="search-button">
-                    ${_('search')} <span class="icon fa fa-search" aria-hidden="true"></span>
-                  </button>
+                  <button type="submit" class="search-button">${_('Search')}</button>
                   <button type="button" class="cancel-button" title="${_('Clear search')}">
                     <span class="icon fa fa-remove" aria-hidden="true"></span>
                   </button>

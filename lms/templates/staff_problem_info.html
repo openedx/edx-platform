@@ -31,7 +31,7 @@ ${block_content}
 </div>
 %  endif
 
-<section aria-hidden="true" id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
+<section aria-hidden="true" role="dialog" tabindex="-1" id="${element_id}_xqa-modal" class="modal xqa-modal">
   <div class="inner-wrapper">
     <header>
       <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
@@ -39,7 +39,7 @@ ${block_content}
 
     <form id="${element_id}_xqa_form" class="xqa_form">
       <label for="${element_id}_xqa_entry">${_("Comment")}</label>
-      <input id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
+      <input tabindex="0" id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
       <label for="${element_id}_xqa_tag">${_("Tag")}</label>
       <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
       <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
@@ -53,8 +53,8 @@ ${block_content}
   </div>
 </section>
 
-<section aria-hidden="true" class="modal staff-modal" id="${element_id}_debug" style="width:80%; left:20%; height:80%; overflow:auto; display:none" >
-  <div class="inner-wrapper" style="color:black">
+<section aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
+  <div class="inner-wrapper">
     <header>
       <h2>${_('Staff Debug')}</h2>
     </header>
@@ -64,16 +64,20 @@ ${block_content}
       <h3>${_('Actions')}</h3>
       <div>
         <label for="sd_fu_${location.name | h}">${_('Username')}:</label>
-        <input type="text" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
+        <input type="text" tabindex="0" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
       </div>
       <div data-location="${location | h}" data-location-name="${location.name | h}">
         [
-        <a href="#" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
+        % if can_reset_attempts:
+        <button type="button" class="btn-link staff-debug-reset">${_('Reset Student Attempts')}</button>
+        |
+        % endif
         % if has_instructor_access:
+        <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Student State')}</button>
+        % if can_rescore_problem:
         |
-        <a href="#" class="staff-debug-sdelete">${_('Delete Student State')}</a>
-        |
-        <a href="#" class="staff-debug-rescore">${_('Rescore Student Submission')}</a>
+        <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Student Submission')}</button>
+        % endif
         % endif
         ]
       </div>
@@ -83,16 +87,17 @@ ${block_content}
     <div class="staff_info" style="display:block">
 is_released = ${is_released}
 location = ${location.to_deprecated_string() | h}
+
 <table summary="${_('Module Fields')}">
   <tr><th>${_('Module Fields')}</th></tr>
   %for name, field in fields:
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 <table>
   <tr><th>${_('XML attributes')}</th></tr>
   %for name, field in xml_attributes.items():
-  <tr><td>${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
+  <tr><td style="width:25%">${name}</td><td><pre style="display:inline-block; margin: 0;">${field | h}</pre></td></tr>
   %endfor
 </table>
 category = ${category | h}
@@ -103,14 +108,14 @@ category = ${category | h}
   </div>
 </section>
 
-<section aria-hidden="true" class="modal history-modal" id="${element_id}_history" style="width:80%; left:20%; height:80%; overflow:auto;" >
-  <div class="inner-wrapper" style="color:black">
+<section aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="${element_id}_history">
+  <div class="inner-wrapper">
     <header>
       <h2>${_("Submission History Viewer")}</h2>
     </header>
     <form id="${element_id}_history_form">
       <label for="${element_id}_history_student_username">${_("User:")}</label>
-      <input id="${element_id}_history_student_username" type="text" placeholder=""/>
+      <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder=""/>
       <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
@@ -143,4 +148,3 @@ $(function () {
 });
 </script>
 %endif
-

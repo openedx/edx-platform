@@ -77,6 +77,67 @@
                 }
 
             }),
+            TimeZoneFieldView: FieldViews.DropdownFieldView.extend({
+                fieldTemplate: field_dropdown_account_template,
+
+                initialize: function(options) {
+                    this.options = _.extend({}, options);
+                    _.bindAll(this, 'listenToCountryView', 'updateCountrySubheader', 'replaceOrAddGroupOption');
+                    this._super(options);  // eslint-disable-line no-underscore-dangle
+                },
+
+                listenToCountryView: function(view) {
+                    this.listenTo(view.model, 'change:country', this.updateCountrySubheader);
+                },
+
+                updateCountrySubheader: function(user) {
+                    var view = this;
+                    $.ajax({
+                        type: 'GET',
+                        url: '/user_api/v1/preferences/time_zones/',
+                        data: {country_code: user.attributes.country},
+                        success: function(data) {
+                            var countryTimeZones = $.map(data, function(timeZoneInfo) {
+                                return [[timeZoneInfo.time_zone, timeZoneInfo.description]];
+                            });
+                            view.replaceOrAddGroupOption(
+                                'Country Time Zones',
+                                countryTimeZones
+                            );
+                            view.render();
+                        }
+                    });
+                },
+
+                updateValueInField: function() {
+                    var options;
+                    if (this.modelValue()) {
+                        options = [[this.modelValue(), this.displayValue(this.modelValue())]];
+                        this.replaceOrAddGroupOption(
+                            'Currently Selected Time Zone',
+                            options
+                        );
+                    }
+                    this._super(); // eslint-disable-line no-underscore-dangle
+                },
+
+                replaceOrAddGroupOption: function(title, options) {
+                    var groupOption = {
+                        groupTitle: gettext(title),
+                        selectOptions: options
+                    };
+
+                    var index = _.findIndex(this.options.groupOptions, function(group) {
+                        return group.groupTitle === gettext(title);
+                    });
+                    if (index >= 0) {
+                        this.options.groupOptions[index] = groupOption;
+                    } else {
+                        this.options.groupOptions.unshift(groupOption);
+                    }
+                }
+
+            }),
             PasswordFieldView: FieldViews.LinkFieldView.extend({
                 fieldType: 'button',
                 fieldTemplate: field_link_account_template,
@@ -103,11 +164,19 @@
                         data: data,
                         success: function() {
                             view.showSuccessMessage();
+                            view.setMessageTimeout();
                         },
                         error: function(xhr) {
                             view.showErrorMessage(xhr);
+                            view.setMessageTimeout();
                         }
                     });
+                },
+                setMessageTimeout: function() {
+                    var view = this;
+                    setTimeout(function() {
+                        view.showHelpMessage();
+                    }, 6000);
                 },
                 successMessage: function() {
                     return HtmlUtils.joinHtml(

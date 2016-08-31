@@ -4,9 +4,9 @@
         <p class="note-excerpt-p"><%- message %>
           <% if (show_link) { %>
           <% if (is_expanded) { %>
-              <a href="#" class="note-excerpt-more-link"><%- gettext('Less') %></a>
+              <button type="button" class="note-excerpt-more-link"><%- gettext('Less') %></button>
           <% } else { %>
-              <a href="#" class="note-excerpt-more-link"><%- gettext('More') %></a>
+              <button type="button" class="note-excerpt-more-link"><%- gettext('More') %></button>
           <% } %>
           <% } %>
         </p>

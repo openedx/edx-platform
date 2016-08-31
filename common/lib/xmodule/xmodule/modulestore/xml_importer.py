@@ -30,6 +30,7 @@ import json
 import re
 from lxml import etree
 
+from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.xml import XMLModuleStore, LibraryXMLModuleStore, ImportSystem
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 from xmodule.x_module import XModuleDescriptor, XModuleMixin
@@ -739,10 +740,33 @@ def _update_and_import_module(
     fields = _update_module_references(module, source_course_id, dest_course_id)
     asides = module.get_asides() if isinstance(module, XModuleMixin) else None
 
-    return store.import_xblock(
+    block = store.import_xblock(
         user_id, dest_course_id, module.location.category,
         module.location.block_id, fields, runtime, asides=asides
     )
+
+    # TODO: Move this code once the following condition is met.
+    # Get to the point where XML import is happening inside the
+    # modulestore that is eventually going to store the data.
+    # Ticket: https://openedx.atlassian.net/browse/PLAT-1046
+    if block.location.category == 'library_content':
+        # if library exists, update source_library_version and children
+        # according to this existing library and library content block.
+        if store.get_library(block.source_library_key):
+
+            # Update library content block's children on draft branch
+            with store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
+                LibraryToolsService(store).update_children(
+                    block,
+                    user_id,
+                    version=block.source_library_version
+                )
+
+            # Publish it if importing the course for branch setting published_only.
+            if store.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+                store.publish(block.location, user_id)
+
+    return block
 
 
 def _import_course_draft(

@@ -124,6 +124,9 @@ FEATURES['ENABLE_TEAMS'] = True
 # Enable custom content licensing
 FEATURES['LICENSING'] = True
 
+# Enable persistent subsection grades, so that feature can be tested.
+FEATURES['ENABLE_SUBSECTION_GRADES_SAVED'] = True
+
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 

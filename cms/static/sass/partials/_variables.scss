@@ -42,7 +42,7 @@ $transparent: rgba(0,0,0,0); // used when color value is needed for UI width/tra
 // +Colors - UXPL new pattern library colors
 // ====================
 $uxpl-blue-base: rgb(0, 117, 180); // wcag2a compliant
-$uxpl-blue-hover-active: rgb(41, 145, 195); // wcag2a compliant
+$uxpl-blue-hover-active: rgb(6, 86, 131); // wcag2a compliant
 
 $uxpl-green-base: rgb(0, 129, 0); // wcag2a compliant
 $uxpl-green-hover-active: rgb(0, 155, 0); // wcag2a compliant
@@ -81,6 +81,17 @@ $gray-d1: shade($gray,20%);
 $gray-d2: shade($gray,40%);
 $gray-d3: shade($gray,60%);
 $gray-d4: shade($gray,80%);
+
+// These define button styles similar to LMS
+// The goal here is consistency (until we can overhaul all of this...)
+$btn-lms-border: #d2c9c9;
+$btn-lms-background: #f1f1f1;
+$btn-lms-gradient: #d9d1d1;
+$btn-lms-shadow: #fcfbfb;
+$btn-lms-shadow-hover: #fefefe;
+$btn-lms-background-hover: #e4e4e4;
+$btn-lms-gradient-hover: #d1c9c9;
+$btn-lms-shadow-active: #cac2c2;
 
 $blue: rgb(0, 159, 230);
 $blue-l1: tint($blue,20%);

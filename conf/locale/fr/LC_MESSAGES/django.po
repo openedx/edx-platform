@@ -48,7 +48,7 @@
 # rafcha <raphael.chay@gmail.com>, 2014-2015
 # Régis Millet <kulgar@ct2c.fr>, 2015
 # Richard Moch <richard.moch@gmail.com>, 2014
-# Richard Moch <richard.moch@gmail.com>, 2014-2015
+# Richard Moch <richard.moch@gmail.com>, 2014-2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # SLOG90 <slog90@gmail.com>, 2014
@@ -164,6 +164,7 @@
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014-2016
+# Richard Moch <richard.moch@gmail.com>, 2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # SLOG90 <slog90@gmail.com>, 2014
@@ -185,7 +186,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:48+0000\n"
+"POT-Creation-Date: 2016-08-18 18:02+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Richard Moch <richard.moch@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -199,8 +200,7 @@ msgstr ""
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 msgid "Discussion"
 msgstr "Discussion"
 
@@ -271,7 +271,7 @@ msgstr "En attente"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Revert to the selected configuration"
-msgstr ""
+msgstr "Retourner à la configuration sélectionnée"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Please select a single configuration to revert to."
@@ -279,7 +279,7 @@ msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Reverted configuration."
-msgstr ""
+msgstr "Configuration restaurée."
 
 #: common/djangoapps/config_models/admin.py
 msgid "Current Configuration"
@@ -287,7 +287,7 @@ msgstr "Configuration actuelle"
 
 #: common/djangoapps/config_models/admin.py
 msgid "All (Show History)"
-msgstr ""
+msgstr "Tous (Afficher l'historique)"
 
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
@@ -299,11 +299,11 @@ msgstr ""
 
 #: common/djangoapps/config_models/management/commands/populate_model.py
 msgid "A valid username must be specified."
-msgstr ""
+msgstr "Un nom d'utilisateur valide doit être spécifié"
 
 #: common/djangoapps/config_models/management/commands/populate_model.py
 msgid "File {0} does not exist"
-msgstr ""
+msgstr "Le fichier {0} n'existe pas"
 
 #: common/djangoapps/config_models/management/commands/populate_model.py
 msgid "Importing JSON data from file {0}"
@@ -342,7 +342,7 @@ msgstr "Mode"
 #: common/djangoapps/course_modes/admin.py
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Verification Deadline"
-msgstr ""
+msgstr "Date limite de vérification"
 
 #: common/djangoapps/course_modes/admin.py
 msgid ""
@@ -361,12 +361,13 @@ msgstr ""
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "ID verification pending"
-msgstr ""
+msgstr "En attente de vérification d'identité"
 
 #: common/djangoapps/course_modes/helpers.py
 msgid "You're enrolled as a verified student"
 msgstr ""
 
+#: common/djangoapps/course_modes/helpers.py
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
 msgstr "Vérifié"
@@ -472,7 +473,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
-msgstr ""
+msgstr "Inscriptions closes"
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
@@ -577,6 +578,14 @@ msgstr ""
 msgid ""
 "You have already created an account using an external login like WebAuth or "
 "Shibboleth. Please contact {tech_support_email} for support."
+msgstr ""
+
+#: common/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -909,7 +918,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "The course you are looking for is closed for enrollment as of {date}."
-msgstr ""
+msgstr "Les inscriptions au cours recherché sont fermées à dater du {date}."
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -1595,7 +1604,7 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "unanswered"
-msgstr ""
+msgstr "sans réponse"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "processing"
@@ -1617,7 +1626,7 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is unanswered."
-msgstr ""
+msgstr "Il n'a pas été répondu à cette question."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "This answer is being processed."
@@ -1721,6 +1730,7 @@ msgstr ""
 msgid "Execution of unsafe Javascript code is not allowed."
 msgstr ""
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 msgid "Checkboxes"
 msgstr "Question à choix multiple"
@@ -2000,35 +2010,35 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Always"
-msgstr ""
+msgstr "Toujours"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Answered"
-msgstr ""
+msgstr "Répondu"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Attempted"
-msgstr ""
+msgstr "Essayé"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Closed"
-msgstr ""
+msgstr "Fermé"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Finished"
-msgstr ""
+msgstr "Terminé"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct or Past Due"
-msgstr ""
+msgstr "Correct ou date d'échéance dépassée"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Past Due"
-msgstr ""
+msgstr "Date de rendu dépassée"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Never"
-msgstr ""
+msgstr "Jamais"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether to force the save button to appear on the page"
@@ -2081,7 +2091,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether the student has answered the problem"
-msgstr ""
+msgstr "Si l'étudiant a résolu le problème"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Random seed for this student"
@@ -2103,7 +2113,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem Weight"
-msgstr ""
+msgstr "Poids de l'exercice"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -2146,7 +2156,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
-msgstr ""
+msgstr "Valider"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Final Check"
@@ -2154,7 +2164,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Checking..."
-msgstr ""
+msgstr "Vérification en cours..."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
@@ -2186,7 +2196,7 @@ msgstr ""
 #. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem is closed."
-msgstr ""
+msgstr "Ce problème est maintenant fermé; la date limite est passée."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be reset before it can be checked again."
@@ -2234,6 +2244,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be answered before it can be graded again."
 msgstr ""
+"Il faut donner une réponse avant que ce problème puisse être noté à nouveau."
+" "
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
@@ -2301,7 +2313,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Date that enrollment for this class is closed"
-msgstr ""
+msgstr "Date de fin des inscriptions pour ce cours"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Start time when this module is visible"
@@ -3009,6 +3021,16 @@ msgstr ""
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Subsection Grades Saved"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, the robust grades feature of "
+"saving subsection grades is enabled for this course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5027,7 +5049,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "User {username} has never accessed problem {location}"
-msgstr ""
+msgstr "L'utilisateur {username} n'a jamais accédé au problème {location}"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "You must be signed in to {platform_name} to create a certificate."
@@ -5139,6 +5161,8 @@ msgstr ""
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr ""
+"Impossible de passer à la branche spécifiée. Veuillez s'il vous plaît "
+"vérifier le nom de votre branche."
 
 #: lms/djangoapps/dashboard/management/commands/git_add_course.py
 msgid ""
@@ -7491,10 +7515,6 @@ msgid "You do not have permission to view this page."
 msgstr ""
 
 #: lms/djangoapps/student_account/views.py
-msgid "No user with the provided email address exists."
-msgstr ""
-
-#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr ""
 
@@ -8209,7 +8229,7 @@ msgstr "Pièces jointes"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Upload new file"
-msgstr "Charger un nouveau fichier"
+msgstr "Téléverser un nouveau fichier"
 
 #: lms/templates/wiki/plugins/attachments/index.html
 msgid "Search and add file"
@@ -8625,6 +8645,10 @@ msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
 msgid "API Version"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
 msgstr ""
 
 #: openedx/core/djangoapps/programs/models.py
@@ -9055,7 +9079,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/utils.py
 msgid "Deleted group"
-msgstr ""
+msgstr "Groupe effacé"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid ""
@@ -9452,7 +9476,7 @@ msgstr "Page non trouvée"
 #: cms/templates/widgets/header.html lms/templates/static_htmlbook.html
 #: lms/templates/static_pdfbook.html lms/templates/staticbook.html
 msgid "Content"
-msgstr ""
+msgstr "Contenu"
 
 #: cms/templates/asset_index.html cms/templates/certificates.html
 #: cms/templates/container.html cms/templates/course_outline.html
@@ -9517,16 +9541,16 @@ msgstr "Cours"
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Programs"
-msgstr ""
+msgstr "Programmes"
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 #: themes/red-theme/cms/templates/login.html
 msgid "Sign In"
-msgstr ""
+msgstr "Se Connecter"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Sign In to {studio_name}"
-msgstr ""
+msgstr "Se connecter à {studio_name}"
 
 #: cms/templates/login.html themes/red-theme/cms/templates/login.html
 msgid "Don't have a {studio_name} Account? Sign up!"
@@ -9774,6 +9798,39 @@ msgstr "Soumettre"
 
 #: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "Discussion - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "Liste des discussions"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "Nouveau sujet "
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "Profil utilisateur"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
 msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -12218,7 +12275,7 @@ msgstr ""
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid "Checkout Cancelled"
-msgstr ""
+msgstr "Paiement Annulé"
 
 #: lms/templates/commerce/checkout_cancel.html
 msgid ""
@@ -12960,10 +13017,6 @@ msgstr ""
 "l'honneur {cert_name_short} vous a été délivré en remplacement. "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "{category} Program Course"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
 msgstr ""
 
@@ -13052,6 +13105,10 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "Paramètres de messagerie"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Related Programs"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -13249,28 +13306,9 @@ msgstr ""
 "Le compte {provider_name} choisi est déjà lié à un autre compte "
 "{platform_name}."
 
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "{category} Program: Interested in more courses in this subject?"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid ""
-"This course is 1 of {course_count} courses in the "
-"{link_start}{program_display_name}{link_end} {program_category}."
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "View {category} Details"
-msgstr ""
-
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
 msgstr "Résultats :"
-
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr ""
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
@@ -13295,21 +13333,12 @@ msgid "filter topics"
 msgstr "filtrer les sujets"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "Toutes les discussions"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Messages suivis"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr ""
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "Rechercher…"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -13380,34 +13409,6 @@ msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s commentaire"
 msgstr[1] "%s commentaires"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "Discussion - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "Liste des discussions"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "Nouveau sujet "
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "Nous sommes désolés"
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr ""
-"Les forums sont en maintenance. Ils seront bientôt de retour en ligne !"
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "Profil utilisateur"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -16483,7 +16484,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "The course you are enrolling for is closed."
-msgstr ""
+msgstr "Le cours auquel vous vous inscrivez est fermé."
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -16509,7 +16510,9 @@ msgid ""
 msgid_plural ""
 "{course_names} have been removed because the enrollment period has closed."
 msgstr[0] ""
+"{course_names} a été supprimé car la période d'inscription est terminée."
 msgstr[1] ""
+"{course_names} ont été supprimés car la période d'inscription est terminée."
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
@@ -17159,7 +17162,7 @@ msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/widgets/header.html
 msgid "Files & Uploads"
-msgstr ""
+msgstr "Fichiers & téléchargements"
 
 #: cms/templates/asset_index.html cms/templates/container.html
 #: cms/templates/course-create-rerun.html cms/templates/course_info.html
@@ -17172,7 +17175,7 @@ msgstr "Actions de la Page"
 
 #: cms/templates/asset_index.html cms/templates/videos_index.html
 msgid "Upload New File"
-msgstr "Charger un nouveau fichier"
+msgstr "Téléverser un nouveau fichier"
 
 #: cms/templates/asset_index.html
 msgid "Adding Files for Your Course"
@@ -17243,7 +17246,7 @@ msgstr "Taille maximale de fichier: {max_filesize}MB"
 
 #: cms/templates/asset_index.html
 msgid "URL:"
-msgstr ""
+msgstr "URL :"
 
 #: cms/templates/asset_index.html
 msgid "Choose File"
@@ -20171,7 +20174,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Verification Checkpoint"
-msgstr ""
+msgstr "Vérification intermédiaire"
 
 #: cms/templates/visibility_editor.html
 msgid "Verification checkpoint to complete"

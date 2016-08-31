@@ -5,9 +5,8 @@
 </a>
 
 <% if (is_closable) { %>
-  <a href="#" class="action-close">
+  <button type="button" class="action-close">
     <span class="icon fa fa-times-circle" aria-hidden="true"></span>
     <span class="sr"><%- gettext("Clear search results") %></span>
-  </a>
+  </button>
 <% } %>
-

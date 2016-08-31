@@ -10,7 +10,7 @@
     <object type="application/x-shockwave-flash"
       id="flash_video"
       name="flash_video"
-      data="js/verify_student/CameraCapture.swf"
+      data="/static/js/verify_student/CameraCapture.swf"
       width="500"
       height="375">
       <param name="quality" value="high">

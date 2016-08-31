@@ -1434,8 +1434,7 @@
             buttonRow = buttonBar.appendChild(buttonRow);
             var xPosition = 0;
             var makeButton = function(id, title, XShift, textOp) {
-                var button = document.createElement('span');
-                button.setAttribute('role', 'button');
+                var button = document.createElement('button');
                 button.tabIndex = 0;
                 button.className = 'wmd-button';
                 button.style.left = xPosition + 'px';

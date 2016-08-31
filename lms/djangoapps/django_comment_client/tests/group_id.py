@@ -24,10 +24,10 @@ class GroupIdAssertionMixin(object):
 
     def _assert_html_response_contains_group_info(self, response):
         group_info = {"group_id": None, "group_name": None}
-        match = re.search(r'&#34;group_id&#34;: ([\d]*)', response.content)
+        match = re.search(r'"group_id": (\d*),', response.content)
         if match and match.group(1) != '':
             group_info["group_id"] = int(match.group(1))
-        match = re.search(r'&#34;group_name&#34;: &#34;([^&]*)&#34;', response.content)
+        match = re.search(r'"group_name": "(\w*)",', response.content)
         if match:
             group_info["group_name"] = match.group(1)
         self._assert_thread_contains_group_info(group_info)

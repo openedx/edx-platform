@@ -1,0 +1,80 @@
+## mako
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='../static_content.html'/>
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("About Us")}</%block>
+
+<div class="page-heading">
+  <h1>${_("About Us")}</h1>
+</div>
+<section class="static-content">
+  <div class="grid-manual grid-container">
+    <div class="inner-container">
+      <div class="row">
+        <div class="col col-12 sm-col-8">
+          <h1>Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet</h1>
+          <h2>Lorem ipsum dolor sit amet</h2>
+          <p>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
+            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti sed.
+            Pro ei bonorum commune, ea impedit pericula cum. Ex mea dolor maiorum. Et oblique vocibus quo, atqui facete
+            doctus sed an. Ei sed denique periculis, ad error alterum duo. Veritus eligendi pri ne, cibo vocent abhorreant
+            ad eum, nam iuvaret electram prodesset ea. Sed in detracto pericula..</p>
+
+          <h2>Lorem ipsum dolor sit amet</h2>
+          <p>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
+            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti sed.
+            Pro ei bonorum commune, ea impedit pericula cum. Ex mea dolor maiorum. Et oblique vocibus quo, atqui facete
+            doctus sed an. Ei sed denique periculis, ad error alterum duo. Veritus eligendi pri ne, cibo vocent abhorreant
+            ad eum, nam iuvaret electram prodesset ea. Sed in detracto pericula..</p>
+
+          <h2>Lorem ipsum dolor sit amet</h2>
+          <p>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
+            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti sed.
+            Pro ei bonorum commune, ea impedit pericula cum. Ex mea dolor maiorum. Et oblique vocibus quo, atqui facete
+            doctus sed an. Ei sed denique periculis, ad error alterum duo. Veritus eligendi pri ne, cibo vocent abhorreant
+            ad eum, nam iuvaret electram prodesset ea. Sed in detracto pericula..</p>
+
+          <h3>Lorem ipsum dolor sit amet</h3>
+          <p>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
+            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti sed.
+            Pro ei bonorum commune, ea impedit pericula cum. Ex mea dolor maiorum. Et oblique vocibus quo, atqui facete
+            doctus sed an. Ei sed denique periculis, ad error alterum duo. Veritus eligendi pri ne, cibo vocent abhorreant
+            ad eum, nam iuvaret electram prodesset ea. Sed in detracto pericula..</p>
+
+          <h3>Lorem ipsum dolor sit amet</h3>
+          <p>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
+            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti sed.
+            Pro ei bonorum commune, ea impedit pericula cum. Ex mea dolor maiorum. Et oblique vocibus quo, atqui facete
+            doctus sed an. Ei sed denique periculis, ad error alterum duo. Veritus eligendi pri ne, cibo vocent abhorreant
+            ad eum, nam iuvaret electram prodesset ea. Sed in detracto pericula..</p>
+
+          <h3>Lorem ipsum dolor sit amet</h3>
+          <p>Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
+            Mel partem iudicabit te, an sed vocent offendit. Est prompta deserunt senserit et, ex ubique deleniti sed.
+            Pro ei bonorum commune, ea impedit pericula cum. Ex mea dolor maiorum. Et oblique vocibus quo, atqui facete
+            doctus sed an. Ei sed denique periculis, ad error alterum duo. Veritus eligendi pri ne, cibo vocent abhorreant
+            ad eum, nam iuvaret electram prodesset ea. Sed in detracto pericula..</p>
+
+          <h2>Media Inquiries</h2>
+          <p>Lorem ipsum dolor sit amet<br />
+              Tel.: 123-456-7890<br />
+              <a href="" class="brand-link">loremIpsem@lorem.edu</a><br />
+              Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet:
+              <a href="#" target="_blank" class="brand-link">Lorem ipsum dolor sit amet</a>.</p>
+          </p>
+        </div>
+        <div class="col col-12 sm-col-4 mission-statement">
+            <img src="${static.url('images/user-thumbnail.png')}" alt="Mission Statement">
+            <p>"Lorem ipsum dolor sit amet, sea te quaeque suscipiantur. Nullam vituperata at his, usu ad solum augue.
+            Mel partem iudicabit te, an sed vocent offendit."</p>
+            <p>
+              <strong>Lorem ipsum</strong><br/>
+              Lorem ipsum, Lorem ipsum
+            </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

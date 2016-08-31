@@ -49,7 +49,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
 # Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
-COPYRIGHT_YEAR = "2015"
+COPYRIGHT_YEAR = "2016"
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
@@ -1279,6 +1279,7 @@ base_application_js = [
     'js/src/utility.js',
     'js/src/logger.js',
     'js/my_courses_dropdown.js',
+    'js/dialog_tab_controls.js',
     'js/src/string_utils.js',
     'js/form.ext.js',
     'js/src/ie_shim.js',
@@ -1546,7 +1547,7 @@ PIPELINE_JS = {
             [
                 'js/sticky_filter.js',
                 'js/query-params.js',
-                'js/vendor/moment.min.js',
+                'js/vendor/moment-with-locales.min.js',
             ]
         ),
         'output_filename': 'js/lms-application.js',
@@ -1694,7 +1695,7 @@ REQUIRE_ENVIRONMENT = "node"
 REQUIRE_JS_PATH_OVERRIDES = {
     'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
-    'moment': 'js/vendor/moment.min.js',
+    'moment': 'js/vendor/moment-with-locales.min.js',
     'jquery.url': 'js/vendor/url.min.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
@@ -1892,7 +1893,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
-    'grades',
+    'lms.djangoapps.grades',
 
     # Student support tools
     'support',
@@ -1908,6 +1909,7 @@ INSTALLED_APPS = (
 
     # django-oauth-toolkit
     'oauth2_provider',
+    'lms.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
 
     'third_party_auth',
 
@@ -1942,8 +1944,10 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'discussion_api',
-    'notes',
+    'lms.djangoapps.discussion',
 
+    # Notes
+    'notes',
     'edxnotes',
 
     # Splash screen

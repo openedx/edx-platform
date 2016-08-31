@@ -1,4 +1,4 @@
-<li data-id="<%- id %>" class="forum-nav-thread<% if (typeof(read) != "undefined" && !read) { %> is-unread<% } %>">
+<li data-id="<%- id %>" class="forum-nav-thread<% if (neverRead) { %> never-read<% } %>">
   <a href="#" class="forum-nav-thread-link">
     <div class="forum-nav-thread-wrapper-0">
       <%
@@ -25,31 +25,31 @@
       <% if(pinned || subscribed || staff_authored || community_ta_authored) { %>
         <ul class="forum-nav-thread-labels">
         <% if (pinned) { %>
-          <li class="post-label-pinned">
+          <li class="post-label post-label-pinned">
             <span class="icon fa fa-thumb-tack" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that has been pinned %>
             <%- gettext("Pinned") %>
           </li>
         <% } %>
         <% if (subscribed) { %>
-          <li class="post-label-following">
+          <li class="post-label post-label-following">
             <span class="icon fa fa-star" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that the user is subscribed to %>
             <%- gettext("Following") %>
           </li>
         <% } %>
         <% if (staff_authored) { %>
-          <li class="post-label-by-staff">
+          <li class="post-label post-label-by-staff">
             <span class="icon fa fa-user" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that was authored by a member of the course staff %>
-            <%- gettext("By: Staff") %>
+            <%- gettext("Staff") %>
           </li>
         <% } %>
         <% if (community_ta_authored) { %>
-          <li class="post-label-by-community-ta">
+          <li class="post-label post-label-by-community-ta">
             <span class="icon fa fa-user" aria-hidden="true"></span>
             <% // Translators: This is a label for a forum thread that was authored by a community TA %>
-            <%- gettext("By: Community TA") %>
+            <%- gettext("Community TA") %>
           </li>
         <% } %>
         </ul>
@@ -72,7 +72,18 @@
       %>
       </span>
 
-      <span class="forum-nav-thread-comments-count <% if (unread_comments_count > 0) { %>is-unread<% } %>">
+      <% if (!neverRead && unread_comments_count > 0) { %>
+        <span class="forum-nav-thread-unread-comments-count">
+          <%-
+            StringUtils.interpolate(
+              gettext('{unread_comments_count} new'),
+              {unread_comments_count: unread_comments_count}
+            )
+          %>
+        </span>
+      <% } %>
+
+      <span class="forum-nav-thread-comments-count">
       <%
       var fmt;
       // Counts in data do not include the post itself, but the UI should

@@ -10,7 +10,7 @@
             </span><select aria-describedby="field_help_visible_to" class="field-input js-group-select" name="group_id" <% if (!is_commentable_cohorted) { print("disabled"); } %>>
                 <option value=""><%- gettext("All Groups") %></option>
                 <% _.each(cohort_options, function(opt) { %>
-                <option value="<%= opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
+                <option value="<%- opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
                 <% }); %>
              </select>
         </label><div class="field-help" id="field_help_visible_to">
@@ -52,7 +52,7 @@
         <% } %>
     </div>
     <div>
-        <input type="submit" class="submit" value="<%- gettext('Add Post') %>">
-        <button type="button" class="cancel"><%- gettext('Cancel') %></button>
+        <button type="submit" class="btn-brand submit"><%- gettext('Add Post') %></button>
+        <button type="button" class="btn cancel"><%- gettext('Cancel') %></button>
     </div>
 </form>

@@ -2,15 +2,16 @@
 Tests for pavelib/i18n.py.
 """
 
+import os
 import textwrap
 import unittest
 
 from mock import mock_open, patch
-from paver.easy import task
+from paver.easy import task, call_task
 
 import pavelib.i18n
-from pavelib.paver_tests.utils import PaverTestCase
 
+from pavelib.paver_tests.utils import PaverTestCase
 
 TX_CONFIG_SIMPLE = """\
 [main]
@@ -131,4 +132,37 @@ class ReleasePushPullTest(PaverTestCase):
         pavelib.i18n.i18n_release_pull()
         mock_sh.assert_called_once_with(
             'i18n_tool transifex pull edx-platform.release-zebrawood edx-platform.release-zebrawood-js'
+        )
+
+
+class TestI18nDummy(PaverTestCase):
+    """
+    Test the Paver i18n_dummy task.
+    """
+    def setUp(self):
+        super(TestI18nDummy, self).setUp()
+
+        # Mock the paver @needs decorator for i18n_extract
+        self._mock_paver_needs = patch.object(pavelib.i18n.i18n_extract, 'needs').start()
+        self._mock_paver_needs.return_value = 0
+
+        # Cleanup mocks
+        self.addCleanup(self._mock_paver_needs.stop)
+
+    def test_i18n_dummy(self):
+        """
+        Test the "i18n_dummy" task.
+        """
+        self.reset_task_messages()
+        os.environ['NO_PREREQ_INSTALL'] = "true"
+        call_task('pavelib.i18n.i18n_dummy', options={"settings": 'test'})
+        self.assertEquals(
+            self.task_messages,
+            [
+                u'i18n_tool extract',
+                u'i18n_tool dummy',
+                u'i18n_tool generate',
+                u'python manage.py lms --settings=test compilejsi18n',
+                u'python manage.py cms --settings=test compilejsi18n',
+            ]
         )

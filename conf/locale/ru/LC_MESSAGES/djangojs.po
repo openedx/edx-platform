@@ -39,7 +39,7 @@
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
-# Weyedide <weyedide@gmail.com>, 2014-2015
+# Weyedide <weyedide@gmail.com>, 2014-2016
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
 # YummyTranslations Edx <yummytranslations.edx@gmail.com>, 2015
@@ -68,6 +68,7 @@
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
+# Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2016
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Peter Markushin, 2014
@@ -88,6 +89,7 @@
 # Liubov Fomicheva <liubov.nelapa@gmail.com>, 2015-2016
 # Maksimenkova Olga <omaksimenkova@hse.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
+# Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Nikolay K Medvedev <elsin16@gmail.com>, 2015
 # Sergey <sergey.sapogin@gmail.com>, 2015
 # webslavic <webslavic@yahoo.com>, 2014
@@ -122,9 +124,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:47+0000\n"
-"PO-Revision-Date: 2016-08-04 08:16+0000\n"
-"Last-Translator: Weyedide <weyedide@gmail.com>\n"
+"POT-Creation-Date: 2016-08-18 18:01+0000\n"
+"PO-Revision-Date: 2016-08-17 20:23+0000\n"
+"Last-Translator: Natalia Berdnikov <nberdnikov@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1982,12 +1984,11 @@ msgstr "Показать Обсуждения"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "Извините"
 
@@ -2028,7 +2029,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
@@ -2170,7 +2170,6 @@ msgid "Current conversation"
 msgstr "Текущая беседа"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2200,7 +2199,6 @@ msgid "Show posts by %(username)s."
 msgstr "Показать сообщения пользователя %(username)s."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2213,7 +2211,6 @@ msgstr ""
 "Возникла проблема при загрузке ответов.  Пожалуйста, перезагрузите страницу."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
@@ -2265,7 +2262,7 @@ msgid "Are you sure you want to delete this post?"
 msgstr "Вы действительно хотите удалить это сообщение?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Возникла проблема при загрузке запрошенной вами страницы.  Пожалуйста, "
@@ -2365,14 +2362,6 @@ msgstr[0] "{numVotes} голос"
 msgstr[1] "{numVotes} голоса"
 msgstr[2] "{numVotes} голосов"
 msgstr[3] "{numVotes} голосов"
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
-msgstr[0] "{unread_count} новый комментарий"
-msgstr[1] "{unread_count} новых комментария"
-msgstr[2] "{unread_count} новых комментариев"
-msgstr[3] "{unread_count} новых комментариев"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
@@ -2565,6 +2554,7 @@ msgstr "Общий доступ"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -4451,6 +4441,13 @@ msgstr "Идёт загрузка ваших курсов"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
@@ -4545,6 +4542,10 @@ msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
 msgstr ""
 "Выберите часовой пояс для отображения даты курсов. Если вы не выберите"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5230,6 +5231,7 @@ msgstr ""
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Сотрудник"
 
@@ -5268,7 +5270,7 @@ msgstr ""
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
-msgstr ""
+msgstr "Внутренняя ошибка сервера."
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
@@ -5430,6 +5432,7 @@ msgstr "или"
 msgid "This component has validation issues."
 msgstr "Компонент имеет подтвержденный результат"
 
+#: cms/static/js/programs/models/course_model.js
 #: cms/templates/js/programs/course_details.underscore
 msgid "Course Code"
 msgstr "Код курса"
@@ -5455,39 +5458,39 @@ msgstr "Необходимо принять {0}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be greater than or equal to {1}"
-msgstr ""
+msgstr "Значение {0} должно быть больше или равно {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be less than or equal to {1}"
-msgstr ""
+msgstr "Значение {0} должно быть меньше или равно {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2}"
-msgstr ""
+msgstr "Значение {0} должно быть между {1} и {2}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be {1} characters"
-msgstr ""
+msgstr "поле {0} должно содержать {1} символов"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at least {1} characters"
-msgstr ""
+msgstr "поле {0} должно содержать по меньшей мере {1} символов"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at most {1} characters"
-msgstr ""
+msgstr "поле {0} не должно превышать {1} символов"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2} characters"
-msgstr ""
+msgstr "Поле {0} должно содержать от {1} до {2} символов"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be one of: {1}"
-msgstr ""
+msgstr "{0} должно быть в следующем списке: {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
-msgstr "{0} must be the same as {1}"
+msgstr "Значение {0} должно быть таким же как {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must only contain digits"
@@ -5515,13 +5518,15 @@ msgstr "подтвердить"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Publish this program?"
-msgstr ""
+msgstr "Опубликовать программу?"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid ""
 "After you publish this program, you cannot add or remove course codes or "
 "remove course runs."
 msgstr ""
+"Опубликовав программу, Вы не сможете добавлять или удалять условные "
+"обозначения курсов, а также удалять запуски курсов."
 
 #: cms/static/js/programs/views/program_details_view.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -5533,7 +5538,7 @@ msgstr "Опубликовать"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Marketing Slug is required."
-msgstr ""
+msgstr "Краткое торговое название - обязательное поле."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -6321,10 +6326,11 @@ msgid "Find discussions"
 msgstr "Находите обсуждения"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
-msgstr "Для поиска конкретных тем воспользуйтесь меню тем обсуждений."
+msgid "Use the All Topics menu to find specific topics."
+msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
 msgstr "Поиск по всем темам"
 
@@ -6464,6 +6470,7 @@ msgid "Add Post"
 msgstr "Добавить публикацию"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr "Староста сообщества"
 
@@ -6529,17 +6536,13 @@ msgid "Following"
 msgstr "Отслеживаемые"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr "   От: Администрация"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr "От: Староста сообщества"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
 msgstr "fmt"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
+msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
@@ -6655,7 +6658,7 @@ msgstr "Ответить"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a response:"
-msgstr ""
+msgstr "Добавить ответ:"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
@@ -6683,7 +6686,7 @@ msgstr ""
 "Поместите ваше сообщение в подходящую тему, чтобы упростить другим "
 "пользователям его поиск."
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr "Активные темы"
 
@@ -6887,7 +6890,7 @@ msgstr "Присоединиться к команде"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "Добавить тему"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 msgid "Team Details"
@@ -6927,10 +6930,12 @@ msgid ""
 "There was an error retrieving preview results for this catalog. Please check"
 " that your query is correct and try again."
 msgstr ""
+"При отображении результатов предварительного просмотра данного каталога "
+"произошла ошибка.  Проверьте правильность запроса и повторите попытку."
 
 #: lms/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
-msgstr ""
+msgstr "Курсы в данном каталоге:"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
@@ -7045,7 +7050,7 @@ msgstr "Получить зачёт"
 #, python-format
 msgid ""
 "Thank you %(full_name)s! We have received your payment for %(course_name)s."
-msgstr ""
+msgstr "Спасибо, %(full_name)s! Ваш платёж за курс %(course_name)s принят."
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -7254,7 +7259,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
-msgstr ""
+msgstr "Загрузить файл в формате CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -7317,25 +7322,23 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
-msgstr ""
+msgstr "Электронный адрес или имя пользователя студента"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
-msgstr ""
+msgstr "Заметки"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
 msgstr "Создать сертификаты для исключительных случаев"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
-msgstr ""
+msgid "All users on the Exception list who do not yet have a certificate"
+msgstr "Все пользователи из списка исключений, еще не получившие сертификаты"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
-msgstr "Создать сертификаты для всех пользователей в списке исключений"
+msgid "All users on the Exception list"
+msgstr "Все пользователи из списка исключений"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7587,24 +7590,24 @@ msgid "Valid"
 msgstr "Данные действительны"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
-msgstr "Сертификаты Программ XSeries"
+msgid "Program Certificates"
+msgstr "Сертификаты программ"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
-msgstr ""
+msgstr "certificate.credential_url"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.display_name"
-msgstr ""
+msgstr "certificate.display_name"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
-msgstr ""
+msgstr "Поздравляем! Вы получите сертификат об окончании курса."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
-msgstr ""
+msgid "View Certificate"
+msgstr "Просмотреть сертификат"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
@@ -7620,28 +7623,28 @@ msgstr "Посмотреть курс из архива"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "not enrolled"
-msgstr ""
+msgstr "не зачислен"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Please select a course date"
-msgstr ""
+msgstr "Пожалуйста, выберите дату"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Select Course Run"
-msgstr ""
+msgstr "Выберите запуск курса"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Choose Course Date"
-msgstr ""
+msgstr "Выбор даты курса"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #, python-format
 msgid "Starts %(start)s"
-msgstr ""
+msgstr "Начало %(start)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
-msgstr ""
+msgstr "Записаться"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Coming Soon"
@@ -7649,33 +7652,35 @@ msgstr "Скоро"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Enrollment Opens on"
-msgstr ""
+msgstr "Дата начала записи"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
-msgstr ""
+msgstr "Запись пока недоступна"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
-msgstr ""
+msgid "You are not enrolled in any programs yet."
+msgstr "Вы еще не зачислены ни на одну из программ."
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
-msgstr ""
+msgid "Explore Programs"
+msgstr "Просмотреть программы"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
 "Browse recently launched courses and see what\\'s new in your favorite "
 "subjects"
 msgstr ""
+"Ознакомьтесь с недавно запущенными курсами и новостями о Ваших любимых "
+"предметах"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
-msgstr ""
+msgid "Explore New Programs"
+msgstr "Просмотреть новые программы"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
-msgstr "тип"
+msgid "category"
+msgstr "категория"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7683,14 +7688,16 @@ msgid ""
 "You have earned certificates in %(completed_courses)s of the "
 "%(total_courses)s courses so far."
 msgstr ""
+"Вы получили сертификаты об окончании %(completed_courses)s из "
+"%(total_courses)s курсов."
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
-msgstr ""
+msgstr "логотип {organization}"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "You are here"
-msgstr ""
+msgstr "Вы здесь"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 msgid "Dashboard"
@@ -7705,10 +7712,12 @@ msgid ""
 "You need a certificate in this course to be eligible for a program "
 "certificate."
 msgstr ""
+"Для получения сертификата об успешном освоении программы необходим "
+"сертификат об окончании этого курса"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
-msgstr ""
+msgstr "Изменить статус слушателя"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -7813,12 +7822,6 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "Инструкции по сбросу пароля отправлены"
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr "Мы отправили инструкции по изменению пароля на ваш электронный адрес."
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
@@ -7937,32 +7940,32 @@ msgstr "Уже есть учётная запись?"
 #: lms/templates/student_profile/badge.underscore
 #, python-format
 msgid "Share your \"%(display_name)s\" award"
-msgstr ""
+msgstr "Рассказать о значке \"%(display_name)s\""
 
 #: lms/templates/student_profile/badge.underscore
 msgid "Share"
-msgstr ""
+msgstr "Поделиться"
 
 #: lms/templates/student_profile/badge.underscore
 #, python-format
 msgid "Earned %(created)s."
-msgstr ""
+msgstr "Получено %(created)s."
 
 #: lms/templates/student_profile/badge_placeholder.underscore
 msgid "What's Your Next Accomplishment?"
-msgstr ""
+msgstr "Каким будет Ваше следующее достижение?"
 
 #: lms/templates/student_profile/badge_placeholder.underscore
 msgid "Start working toward your next learning goal."
-msgstr ""
+msgstr "Начните продвигаться к своей следующей цели."
 
 #: lms/templates/student_profile/badge_placeholder.underscore
 msgid "Find a course"
-msgstr ""
+msgstr "Найти курс"
 
 #: lms/templates/student_profile/learner_profile.underscore
 msgid "An error occurred. Try loading the page again."
-msgstr ""
+msgstr "Произошла ошибка.  Попробуйте перезагрузить страницу."
 
 #: lms/templates/student_profile/section_two.underscore
 msgid "You are currently sharing a limited profile."
@@ -7970,11 +7973,11 @@ msgstr "Сейчас сокурсникам разрешен ограничен�
 
 #: lms/templates/student_profile/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
-msgstr ""
+msgstr "Доступ к профилю этого пользователя ограничен."
 
 #: lms/templates/student_profile/share_modal.underscore
 msgid "Share on Mozilla Backpack"
-msgstr ""
+msgstr "Поделиться в Mozilla Backpack"
 
 #: lms/templates/student_profile/share_modal.underscore
 msgid ""
@@ -7982,6 +7985,9 @@ msgid ""
 "Backpack account. Complete the following steps to add your certificate to "
 "Backpack."
 msgstr ""
+"Для того, чтобы поделиться своим достижением в Mozilla Backpack, Вам "
+"необходима учётная запись Backpack. Следуйте указаниям ниже, чтобы добавить "
+"свой сертификат на Backpack."
 
 #: lms/templates/student_profile/share_modal.underscore
 #, python-format
@@ -7989,6 +7995,8 @@ msgid ""
 "Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
 "your existing account"
 msgstr ""
+"Создайте учётную запись %(link_start)sMozilla Backpack%(link_end)s, или "
+"войдите со своими учётными данными"
 
 #: lms/templates/student_profile/share_modal.underscore
 #, python-format
@@ -7997,6 +8005,10 @@ msgid ""
 "save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to "
 "your backpack.</li>"
 msgstr ""
+"%(download_link_start)sСкачайте изображение (кликните правой кнопкой мыши "
+"или используйте клавишу выбора опции, выберите сохранить как)%(link_end)s, "
+"затем %(upload_link_start)sзагрузите%(link_end)s изображение в свой "
+"Backpack.</li>"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
@@ -8091,6 +8103,8 @@ msgid ""
 "When your face is in position, use the camera button {icon} below to take "
 "your photo."
 msgstr ""
+"Когда будете готовы, используйте кнопку с изображением камеры {icon}, чтобы "
+"сделать снимок."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
@@ -8113,6 +8127,8 @@ msgid ""
 "To use the current photo, select the camera button {icon}. To take another "
 "photo, select the retake button {icon}."
 msgstr ""
+"Чтобы использовать сделанный снимок, нажмите на кнопку с изображением камеры"
+" {icon}. Чтобы сделать другой снимок, нажмите кнопку {icon}."
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -8208,6 +8224,8 @@ msgstr "Убедитесь, что ваш документ хорошо осве
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Once in position, use the camera button {icon} to capture your ID"
 msgstr ""
+"Когда будете готовы, используйте кнопку с изображением камеры {icon}, чтобы "
+"сделать снимок Вашего удостоверения личности"
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
@@ -8242,6 +8260,8 @@ msgstr "Убедитесь, что всё ваше лицо находится �
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Once in position, use the camera button {icon} to capture your photo"
 msgstr ""
+"Когда будете готовы, используйте кнопку с изображением камеры {icon}, чтобы "
+"сделать снимок"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
@@ -8251,6 +8271,8 @@ msgstr ""
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr ""
+"Благодарим за подтверждение подлинности Вашего удостоверения личности на "
+"курсе: {courseName}"
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid ""
@@ -8288,11 +8310,11 @@ msgstr ""
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "You are enrolling in: {courseName}"
-msgstr ""
+msgstr "Вы регистрируетесь на курс: {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "You are upgrading your enrollment for: {courseName}"
-msgstr ""
+msgstr "Вы изменяете статус регистрации на курсе: {courseName}"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8320,13 +8342,15 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
-msgstr ""
+msgstr "Зачем нужна активация?"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
 "We ask you to activate your account to ensure it is really you creating the "
 "account and to prevent fraud."
 msgstr ""
+"Вам необходимо активировать свою учётную запись, чтобы предотвратить "
+"создание фальшивых учётных записей от Вашего имени."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8362,6 +8386,8 @@ msgstr "Вы уже подтвердили документ, удостовер�
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Your verification status is good until {verificationGoodUntil}."
 msgstr ""
+"Ваш статус подтверждённого слушателя действителен до "
+"{verificationGoodUntil}."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "price"
@@ -8388,11 +8414,11 @@ msgstr "Пожалуйста, проверьте почту - вам отпра�
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
-msgstr ""
+msgstr "Сертификат о повышении квалификации {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Verified Certificate for {courseName}"
-msgstr ""
+msgstr "Подтверждённый сертификат {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
@@ -8431,7 +8457,7 @@ msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Thank you! We have received your payment for {courseName}."
-msgstr ""
+msgstr "Благодарим Вас! Ваш платёж за курс {courseName} принят."
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
@@ -8647,16 +8673,16 @@ msgstr "Часто встречающиеся типы заданий"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 msgid "Supported"
-msgstr ""
+msgstr "Поддерживается"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 msgid "Provisional"
-msgstr ""
+msgstr "Частично поддерживается"
 
 #: cms/templates/js/add-xblock-component-support-legend.underscore
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Not Supported"
-msgstr ""
+msgstr "Не поддерживается"
 
 #: cms/templates/js/add-xblock-component-support-level.underscore
 msgid "Fully Supported"
@@ -8881,43 +8907,46 @@ msgstr ""
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Subsection Visibility"
-msgstr ""
+msgstr "Видимость подраздела"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Show entire subsection"
-msgstr ""
+msgstr "Показать весь подраздел"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Learners see the published subsection and can access its content."
-msgstr ""
+msgstr "Опубликованный подраздел и его содержимое доступны слушателям."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
-msgstr ""
+msgstr "Скрыть содержимое по истечении срока сдачи"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
 "After the subsection\\'s due date has passed, learners can no longer access "
 "its content. The subsection remains included in grade calculations."
 msgstr ""
+"По истечении срока сдачи подраздела у слушателей нет доступа к его "
+"содержимому.  Подраздел учитывается при выводе итоговой оценки."
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide entire subsection"
-msgstr ""
+msgstr "Скрыть весь подраздел"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
 "Learners do not see the subsection in the course outline. The subsection is "
 "not included in grade calculations."
 msgstr ""
+"Слушатели не видят подраздел в структуре курса.  Подраздел не учитывается "
+"при выводе итоговой оценки."
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore
@@ -8930,11 +8959,11 @@ msgstr "Пожалуйста добавьте имя преподавателя"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Title"
-msgstr ""
+msgstr "Форма обращения к преподавателю"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Please add the instructor's title"
-msgstr ""
+msgstr "Пожалуйста, укажите форму обращения к преподавателю"
 
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
@@ -8972,7 +9001,7 @@ msgstr "Фото преподавателя"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Photo URL"
-msgstr ""
+msgstr "Ссылка URL на фото преподавателя"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid ""
@@ -9067,7 +9096,7 @@ msgstr "Срок:"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"
-msgstr ""
+msgstr "Подраздел будет скрыт по истечении срока сдачи"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
@@ -9493,7 +9522,7 @@ msgstr "с %(section_or_subsection)s"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Staff and Learners"
-msgstr ""
+msgstr "Сотрудникам и слушателям"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Some content in this unit is visible only to particular content groups"
@@ -9504,11 +9533,13 @@ msgstr ""
 #: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Hide from learners"
-msgstr ""
+msgstr "Скрыть от слушателей"
 
 #: cms/templates/js/publish-xblock.underscore
 msgid "Note: Do not hide graded assignments after they have been released."
 msgstr ""
+"Примечание: не закрывайте доступ к заданиям, выполняемым на оценку, после их"
+" выпуска."
 
 #: cms/templates/js/release-date-editor.underscore
 msgid "Release Date and Time"
@@ -9601,17 +9632,20 @@ msgstr "Загрузить скан подписи"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Unit Visibility"
-msgstr ""
+msgstr "Видимость блока"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "Section Visibility"
-msgstr ""
+msgstr "Видимость раздела"
 
 #: cms/templates/js/staff-lock-editor.underscore
 msgid ""
 "If the unit was previously published and released to learners, any changes "
 "you made to the unit when it was hidden will now be visible to learners."
 msgstr ""
+"Если блок был прежде опубликован и доступен слушателям, все изменения, "
+"внесенные в него, пока он был скрыт, теперь будут отображаться для "
+"слушателей."
 
 #: cms/templates/js/staff-lock-editor.underscore
 #, python-format
@@ -9621,6 +9655,10 @@ msgid ""
 "the unit. Only units that are explicitly hidden from learners will remain "
 "hidden after you clear this option for the %(xblockType)s."
 msgstr ""
+"Если сделать этот %(xblockType)s видимым для слушателей, начиная с даты "
+"выпуска и публикации блока слушатели смогут просматривать его содержимое. "
+"Только блоки, намеренно помеченные как скрытые, останутся невидимыми, после "
+"того, как Вы отмените эту опцию для %(xblockType)s."
 
 #: cms/templates/js/team-member.underscore
 msgid "Current Role:"
@@ -9787,25 +9825,27 @@ msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr ""
+"Опубликованная версия, {published}, изменена на новую версию, {draft}."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
-msgstr ""
+msgstr "Удалить курс"
 
 #: cms/templates/js/programs/course_details.underscore
 #, python-format
 msgid "Remove %(name)s from the program"
-msgstr ""
+msgstr "Удалить %(name)s из программы"
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Add another run"
-msgstr ""
+msgstr "Добавить ещё один запуск"
 
 #: cms/templates/js/programs/course_details.underscore
 msgid ""
 "The unique number that identifies your course within your organization, e.g."
 " CS101."
 msgstr ""
+"Уникальный номер, присвоенный курсу Вашей организацией, например, CS101."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid ""
@@ -9813,114 +9853,119 @@ msgid ""
 " the course. It will be displayed on the XSeries progress page and in "
 "marketing presentations."
 msgstr ""
+"Наименование, предложенное здесь, заменит наименование, указанное для "
+"отдельного запуска данного курса.  Оно будет отображаться на странице "
+"\"Прогресс\" программы XSeries, а также в рекламных презентациях."
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Save Course"
-msgstr ""
+msgstr "Сохранить курс"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Run %(key)s"
-msgstr ""
+msgstr "Запустить %(key)s"
 
 #: cms/templates/js/programs/course_run.underscore
 msgid "Delete course run"
-msgstr ""
+msgstr "Удалить запуск курса"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Remove run %(key)s from the program"
-msgstr ""
+msgstr "Удалить запуск курса %(key)s из программы"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Start Date: %(date)s"
-msgstr ""
+msgstr "Начало: %(date)s"
 
 #: cms/templates/js/programs/course_run.underscore
 #, python-format
 msgid "Mode: %(mode)s"
-msgstr ""
+msgstr "Режим: %(mode)s"
 
 #: cms/templates/js/programs/course_run.underscore
 msgid "Please select a Course Run"
-msgstr ""
+msgstr "Пожалуйста, выберите запуск курса"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Create a New Program"
-msgstr ""
+msgstr "Создать новую программу"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Program type"
-msgstr ""
+msgstr "Вид программы"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select a type"
-msgstr ""
+msgstr "Выберите вид"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "XSeries"
-msgstr ""
+msgstr "XSeries"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "MicroMasters"
-msgstr ""
+msgstr "MicroMasters"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Select an organization"
-msgstr ""
+msgstr "Выберите организацию"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "The public display name of the program."
-msgstr ""
+msgstr "Официальное название программы."
 
 #: cms/templates/js/programs/program_creator_form.underscore
 #: cms/templates/js/programs/program_details.underscore
 msgid "Subtitle"
-msgstr ""
+msgstr "Подзаголовок"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid ""
 "A short description of the program, including concepts covered and expected "
 "outcomes (255 character limit)."
 msgstr ""
+"Краткое описание программы, включая понятия, которые будут изучены, и "
+"ожидаемые результаты (не более 255 знаков)."
 
 #: cms/templates/js/programs/program_creator_form.underscore
 #: cms/templates/js/programs/program_details.underscore
 msgid "Marketing Slug"
-msgstr ""
+msgstr "Краткое торговое название"
 
 #: cms/templates/js/programs/program_creator_form.underscore
 msgid "Slug used to generate links to the marketing site."
-msgstr ""
+msgstr "Краткое название для создания ссылок на страницу рекламы."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program title"
-msgstr ""
+msgstr "Редактировать название программы"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s name."
-msgstr ""
+msgstr "Редактировать название программы."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program subtitle"
-msgstr ""
+msgstr "Редактировать подзаголовок программы"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s subtitle."
-msgstr ""
+msgstr "Редактировать подзаголовок программы."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program marketing slug"
-msgstr ""
+msgstr "Редактировать краткое торговое название программы"
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Edit the program\\'s marketing slug."
-msgstr ""
+msgstr "Редактировать краткое торговое название программы."
 
 #: cms/templates/js/programs/program_details.underscore
 msgid "Add a course"
-msgstr ""
+msgstr "Добавить курс"
 
 #: cms/templates/js/video/transcripts/metadata-videolist-entry.underscore
 msgid "Add URLs for additional versions"

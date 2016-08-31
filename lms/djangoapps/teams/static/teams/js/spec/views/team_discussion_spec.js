@@ -1,8 +1,10 @@
 define([
-    'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'teams/js/views/team_discussion',
+    'underscore',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/spec_helpers/discussion_spec_helper',
     'teams/js/spec_helpers/team_spec_helpers',
-    'xmodule_js/common_static/common/js/spec_helpers/discussion_spec_helper'
-], function(_, AjaxHelpers, TeamDiscussionView, TeamSpecHelpers, DiscussionSpecHelper) {
+    'teams/js/views/team_discussion'
+], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamDiscussionView) {
     'use strict';
     xdescribe('TeamDiscussionView', function() {
         var discussionView, createDiscussionView, createPost, expandReplies, postReply;
@@ -115,7 +117,7 @@ define([
                     body: reply,
                     comments_count: 1
                 }),
-                'annotated_content_info': TeamSpecHelpers.createAnnotatedContentInfo()
+                annotated_content_info: TeamSpecHelpers.createAnnotatedContentInfo()
             });
         };
 
@@ -202,8 +204,7 @@ define([
 
         it('cannot move a new thread to a different topic', function() {
             var requests = AjaxHelpers.requests(this),
-                view = createDiscussionView(requests),
-                postTopicButton;
+                view = createDiscussionView(requests);
             createPost(requests, view);
             expandReplies(requests, view);
             view.$('.action-more .icon').first().click();

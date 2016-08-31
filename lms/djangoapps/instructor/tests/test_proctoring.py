@@ -27,7 +27,8 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
 
         # URL for instructor dash
         cls.url = reverse('instructor_dashboard', kwargs={'course_id': cls.course.id.to_deprecated_string()})
-        cls.proctoring_link = '<a href="" data-section="special_exams">Special Exams</a>'
+        button = '<button type="button" class="btn-link" data-section="special_exams">Special Exams</button>'
+        cls.proctoring_link = button
 
     def setUp(self):
         super(TestProctoringDashboardViews, self).setUp()

@@ -61,7 +61,6 @@ class TextbooksTest(StudioCourseTest):
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
                 'skip-link',  # AC-501
-                'link-href',  # AC-502
                 'section'  # AC-503
             ],
         })
@@ -77,13 +76,17 @@ class TextbooksTest(StudioCourseTest):
         self.textbook_view_page.visit()
 
         self.textbook_view_page.switch_to_pdf_frame(self)
+        self.textbook_view_page.a11y_audit.config.set_scope({
+            'exclude': [
+                '#viewer',  # PDF viewer (vendor file)
+            ]
+        })
         self.textbook_view_page.a11y_audit.config.set_rules({
             'ignore': [
                 'color-contrast',  # will always fail because pdf.js converts pdf to divs with transparent text
                 'html-lang',  # AC-504
                 'meta-viewport',  # AC-505
                 'skip-link',  # AC-506
-                'link-href',  # AC-507
             ],
         })
         self.textbook_view_page.a11y_audit.check_for_accessibility_errors()

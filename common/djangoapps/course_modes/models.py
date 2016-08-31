@@ -128,6 +128,9 @@ class CourseMode(models.Model):
     # Modes that allow a student to earn credit with a university partner
     CREDIT_MODES = [CREDIT_MODE]
 
+    # Modes that are eligible to purchase credit
+    CREDIT_ELIGIBLE_MODES = [VERIFIED, PROFESSIONAL, NO_ID_PROFESSIONAL_MODE]
+
     # Modes that are allowed to upsell
     UPSELL_TO_VERIFIED_MODES = [HONOR, AUDIT]
 
@@ -487,6 +490,18 @@ class CourseMode(models.Model):
 
         """
         return mode_slug in cls.VERIFIED_MODES
+
+    @classmethod
+    def is_credit_eligible_slug(cls, mode_slug):
+        """Check whether the given mode_slug is credit eligible or not.
+
+        Args:
+            mode_slug(str): Mode Slug
+
+        Returns:
+            bool: True iff the course mode slug is credit eligible else False.
+        """
+        return mode_slug in cls.CREDIT_ELIGIBLE_MODES
 
     @classmethod
     def is_credit_mode(cls, course_mode_tuple):

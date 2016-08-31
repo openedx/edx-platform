@@ -1877,6 +1877,7 @@ class TestGoogleRegistrationView(
 
 
 @ddt.ddt
+@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 

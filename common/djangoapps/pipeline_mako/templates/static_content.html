@@ -4,6 +4,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
+from edxmako.shortcuts import marketing_link
 
 from openedx.core.djangolib.js_utils import js_escaped_string
 from openedx.core.djangoapps.site_configuration.helpers import (
@@ -18,6 +19,11 @@ from openedx.core.djangoapps.theming.helpers import (
 from certificates.api import get_asset_url_by_slug
 from lang_pref.api import released_languages
 %>
+
+<%def name="marketing_link(name)"><%
+    link = marketing_link(name)
+    return "/" if link == "#" else link
+%></%def>
 
 <%def name='url(file, raw=False)'><%
 try:

@@ -35,12 +35,14 @@
 # Sarina Canelake <sarina@edx.org>, 2015
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
+# Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2016 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Anatoli F. Peña Castillo <anatoli1993@yahoo.com>, 2016
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
@@ -69,6 +71,7 @@
 # 
 # Translators:
 # Alex Dzul <alexexc2@gmail.com>, 2016
+# Anatoli F. Peña Castillo <anatoli1993@yahoo.com>, 2016
 # Claudio Anibal Barahona Flores <claudio.barahona@unah.edu.hn>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2016
 # Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
@@ -94,6 +97,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Anatoli F. Peña Castillo <anatoli1993@yahoo.com>, 2016
 # Morphyne <cirrosis60@gmail.com>, 2014
 # Cristian Guerra <cristian.guerra.maya@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
@@ -104,6 +108,7 @@
 # karlman72 <karlman72@gmail.com>, 2014
 # Laura Silva <lingison@edx.org>, 2016
 # Leandro Bohnhoff <leandro.bohnhoff@gmail.com>, 2015
+# Ned Batchelder <ned@edx.org>, 2016
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
 # Tala Aoun <talaaoun@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
@@ -111,9 +116,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:47+0000\n"
-"PO-Revision-Date: 2016-08-02 01:03+0000\n"
-"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
+"POT-Creation-Date: 2016-08-18 18:01+0000\n"
+"PO-Revision-Date: 2016-08-18 15:48+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -138,6 +143,7 @@ msgstr ""
 msgid "Saving"
 msgstr "Guardando"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js
@@ -145,6 +151,7 @@ msgstr "Guardando"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/coffee/src/discussion/utils.js
 #: lms/static/js/Markdown.Editor.js
+#: common/static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
 msgstr "Aceptar"
 
@@ -1957,12 +1964,11 @@ msgstr "Mostrar Discusión"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "Lo sentimos"
 
@@ -2002,7 +2008,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
@@ -2106,6 +2111,7 @@ msgstr ""
 "Tenemos problemas reabriendo esta discusión. Por favor intenta de nuevo."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+#: common/static/common/templates/discussion/nav-load-more-link.underscore
 msgid "Load more"
 msgstr "Cargar más"
 
@@ -2132,7 +2138,6 @@ msgid "Current conversation"
 msgstr "conversación actual"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2162,7 +2167,6 @@ msgid "Show posts by %(username)s."
 msgstr "Mostrar las publicaciones de %(username)s."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2178,7 +2182,6 @@ msgstr ""
 "intente recargar la página."
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
@@ -2224,7 +2227,7 @@ msgid "Are you sure you want to delete this post?"
 msgstr "¿Está seguro de que desea borrar esta publicación?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Ocurrió un problema al cargar la página solicitada. Por favor intente "
@@ -2320,12 +2323,6 @@ msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
 msgstr[0] "{numVotes} Voto"
 msgstr[1] "{numVotes} Votos"
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
-msgstr[0] "{unread_count} nuevo comentario"
-msgstr[1] "{unread_count} nuevos comentarios"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
@@ -2505,6 +2502,7 @@ msgstr "Público"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -2931,6 +2929,7 @@ msgid "Search teams"
 msgstr "Buscar equipos"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "Todos los temas"
 
@@ -4397,6 +4396,16 @@ msgstr "Cargando sus cursos"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+"Le hemos enviado un mensaje por correo electrónico con instrucciones sobre "
+"cómo reiniciar su contraseña a la dirección de correo que usted proveyó. Si "
+"no recibe este mensaje, {anchorStart}contacte a soporte técnico{anchorEnd}."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr ""
@@ -4496,6 +4505,10 @@ msgid ""
 msgstr ""
 "Seleccione la zona horaria en que quiere que se muestren las fechas del "
 "curso. Si no especifica una "
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
+msgstr "Todas las zonas horarias"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5177,6 +5190,7 @@ msgstr ""
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Equipo del curso"
 
@@ -5214,7 +5228,7 @@ msgstr "Tiene cambios no guardados. ¿Realmente desea abandonar esta página?"
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
-msgstr ""
+msgstr "Error interno del servidor."
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
@@ -5378,6 +5392,7 @@ msgstr "o"
 msgid "This component has validation issues."
 msgstr "El componente tiene errores de validación"
 
+#: cms/static/js/programs/models/course_model.js
 #: cms/templates/js/programs/course_details.underscore
 msgid "Course Code"
 msgstr "Código del curso"
@@ -5391,75 +5406,75 @@ msgstr "Título del curso"
 
 #: cms/static/js/programs/models/program_model.js
 msgid "Please select a valid organization."
-msgstr ""
+msgstr "Por favor seleccione una organización válida."
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is required"
-msgstr ""
+msgstr "{0} es requerido."
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be accepted"
-msgstr ""
+msgstr "{0} debe ser aceptado"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be greater than or equal to {1}"
-msgstr ""
+msgstr "{0} debe ser mayor o igual a {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be less than or equal to {1}"
-msgstr ""
+msgstr "{0} debe ser menor o igual a {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2}"
-msgstr ""
+msgstr "{0} debe ser entre {1} y {2}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be {1} characters"
-msgstr ""
+msgstr "{0} debe ser {1} caracteres"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at least {1} characters"
-msgstr ""
+msgstr "{0} debe ser al menos {1} caracteres"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at most {1} characters"
-msgstr ""
+msgstr "{0} debe ser máximo {1} caracteres "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2} characters"
-msgstr ""
+msgstr "{0} debe ser entre {1} y {2} caracteres"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be one of: {1}"
-msgstr ""
+msgstr "{0} debe ser uno de:{1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
-msgstr ""
+msgstr "{0} debe ser igual a {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must only contain digits"
-msgstr ""
+msgstr "{0} debe contener sólo dígitos"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a number"
-msgstr ""
+msgstr "{0} debe ser un número "
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid email"
-msgstr ""
+msgstr "{0} debe ser una dirección de correo electrónico válida"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid url"
-msgstr ""
+msgstr "{0} debe ser un url válido"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is invalid"
-msgstr ""
+msgstr "{0} no es válido"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "confirm"
-msgstr ""
+msgstr "confirmar"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Publish this program?"
@@ -5470,6 +5485,8 @@ msgid ""
 "After you publish this program, you cannot add or remove course codes or "
 "remove course runs."
 msgstr ""
+"Después de haber publicado este programa, no le será posible añadir o "
+"remover códigos de cursos ni remover ediciones de los cursos."
 
 #: cms/static/js/programs/views/program_details_view.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -5481,7 +5498,7 @@ msgstr "Publicar"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Marketing Slug is required."
-msgstr ""
+msgstr "Se requiere slug de marketing."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
@@ -5782,11 +5799,11 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "{display_name} Settings"
-msgstr ""
+msgstr "Ajustes de configuración para {display_name} "
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Change the settings for {display_name}"
-msgstr ""
+msgstr "Cambiar los ajustes para {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish {display_name}"
@@ -5794,7 +5811,7 @@ msgstr "Publicar {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
-msgstr ""
+msgstr "Publicar todos los cambios no publicados para este {item}?"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -6270,10 +6287,11 @@ msgid "Find discussions"
 msgstr "Encontrar discusiones"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
-msgstr "Use el menú de temas de discusión para encontrar un tema específico"
+msgid "Use the All Topics menu to find specific topics."
+msgstr "Use el menú de todos los temas para encontrar temas específicos."
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
 msgstr "Buscar todas las publicaciones"
 
@@ -6411,6 +6429,7 @@ msgid "Add Post"
 msgstr "Añadir entrada"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr "TA de la comunidad"
 
@@ -6476,17 +6495,13 @@ msgid "Following"
 msgstr "Siguiendo"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr "Por: Moderador"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr "Por: Tutor"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
 msgstr "fmt"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
+msgstr "{unread_comments_count} nuevos"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
@@ -6627,7 +6642,7 @@ msgid "Add your post to a relevant topic to help others find it."
 msgstr ""
 "Añade tu entrada a un tema relevante para ayudar a los demás a encontrarlo."
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr "Hilos Activos"
 
@@ -7206,7 +7221,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
-msgstr ""
+msgstr "Cargar un archivo CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -7269,27 +7284,25 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
-msgstr ""
+msgstr "Correo electrónico o nombre de usuario del estudiante"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
-msgstr ""
+msgstr "Notas libres"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
 msgstr "Generar excepciones de certificados"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
+msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
-"Producir certificados para todos los usuarios en la lista de excepciones que"
-" aún no tienen un certificado"
+"Todos los usuarios en la Lista de Excepción quienes aun no tienen un "
+"certificado"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
-msgstr "Generar un certificado para cada usuario en la lista de excepciones"
+msgid "All users on the Exception list"
+msgstr "Todos los usuarios en la Lista de Excepción"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7542,8 +7555,8 @@ msgid "Valid"
 msgstr "Válido"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
-msgstr "Certificados de programas de XSeries"
+msgid "Program Certificates"
+msgstr "Certificados de programa"
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -7558,8 +7571,8 @@ msgid "Congratulations! You have earned a certificate for this course."
 msgstr "Felicitaciones! Usted a ganado un certificado de este curso."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
-msgstr "Ver/compartir Certificado"
+msgid "View Certificate"
+msgstr "Ver certificado"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
@@ -7608,15 +7621,15 @@ msgstr "Inscripciones abiertas en"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
-msgstr ""
+msgstr "Actualmente no disponible"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
-msgstr "No se encuentra inscrito en ningún Programa de XSeries aún."
+msgid "You are not enrolled in any programs yet."
+msgstr "No se encuentra inscrito en ningún programa aún."
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
-msgstr "Explora Programas de XSeries nuevos"
+msgid "Explore Programs"
+msgstr "Explorar programas"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7627,12 +7640,12 @@ msgstr ""
 "en tus temas favoritos."
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
-msgstr "Explora XSeries nuevos"
+msgid "Explore New Programs"
+msgstr "Explorar programas nuevos"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
-msgstr "tipo"
+msgid "category"
+msgstr "categoría"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7772,14 +7785,6 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "El correo para restablecer contraseña ha sido enviado."
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr ""
-"Te hemos enviado las instrucciones para restablecer la contraseña a la "
-"dirección de correo electrónico que has proporcionado."
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
@@ -8895,18 +8900,16 @@ msgstr ""
 "no se incluye en los cálculos de calificaciones."
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
-"Las unidades heredan la configuración de visibilidad de la subsección a la "
-"que pertenecen. Si hace esta subsección visible para los alumnos, las "
-"unidades publicadas que anteriormente estaban ocultas también se harán "
-"visibles. Sólo las unidades que estaban ocultas explícitamente permanecerán "
-"ocultas independientemente de la opción que seleccione para esta subsección."
+"Si selecciona una opción distinta a \"%(hide_label)s\", después de que la "
+"fecha de liberación de la subsección haya pasado las unidades publicadas en "
+"esa subsección se encontrarán disponibles para los estudiantes a menos que "
+"las unidades estén explícitamente ocultas."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -9787,13 +9790,15 @@ msgid ""
 "You have done a dry run of force publishing the course. Nothing has changed."
 " Had you run it, the following course versions would have been change."
 msgstr ""
+"Ha corrido un simulacro de publicación del curso. No han habido cambios. Si "
+"lo hubiera hecho realmente, las siguientes versiones habrían tenido cambios."
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
 msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr ""
-"La versión publicada {published}, fué restablecida a la versión borrador "
+"La versión publicada, {published}, fue restablecida a la versión borrador, "
 "{draft}."
 
 #: cms/templates/js/programs/course_details.underscore

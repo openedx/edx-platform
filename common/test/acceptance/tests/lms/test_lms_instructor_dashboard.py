@@ -58,11 +58,6 @@ class LMSInstructorDashboardA11yTest(BaseInstructorDashboardTest):
         self.instructor_dashboard_page = self.visit_instructor_dashboard()
 
     def test_instructor_dashboard_a11y(self):
-        self.instructor_dashboard_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-491
-            ]
-        })
         self.instructor_dashboard_page.a11y_audit.check_for_accessibility_errors()
 
 

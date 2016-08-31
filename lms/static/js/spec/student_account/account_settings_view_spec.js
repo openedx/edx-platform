@@ -71,26 +71,16 @@ define(['backbone',
                 var accountSettingsView = createAccountSettingsView();
 
                 accountSettingsView.render();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 accountSettingsView.showLoadingError();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
             });
 
             it('renders all fields as expected', function() {
                 var accountSettingsView = createAccountSettingsView();
 
                 accountSettingsView.render();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
-                Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
-
-                accountSettingsView.renderFields();
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
                 Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView);
             });

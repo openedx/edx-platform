@@ -179,9 +179,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:47+0000\n"
-"PO-Revision-Date: 2016-07-31 08:47+0000\n"
-"Last-Translator: Yingying Zhang <1714277256@qq.com>\n"
+"POT-Creation-Date: 2016-08-18 18:01+0000\n"
+"PO-Revision-Date: 2016-08-16 19:42+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1982,12 +1982,11 @@ msgstr "显示讨论"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "抱歉"
 
@@ -2021,7 +2020,6 @@ msgstr "处理请求遇到问题，请重试。"
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
@@ -2131,7 +2129,6 @@ msgid "Current conversation"
 msgstr "当前对话"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2159,7 +2156,6 @@ msgid "Show posts by %(username)s."
 msgstr "按 %(username)s 显示帖子"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2171,7 +2167,6 @@ msgid "We had some trouble loading responses. Please reload the page."
 msgstr "载入回复时遇到麻烦，请重试。"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr "载入更多回复时遇到麻烦，请重试。"
@@ -2212,7 +2207,7 @@ msgid "Are you sure you want to delete this post?"
 msgstr "您确定要删除这个帖子？"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr "加载您的页面时出了一些问题，请重试。"
 
@@ -2296,11 +2291,6 @@ msgstr[0] ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
 msgstr[0] ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2473,6 +2463,7 @@ msgstr "公开"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -4167,6 +4158,13 @@ msgstr "正在加载您的课程"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
+"We have sent an email message with password reset instructions to the email "
+"address you provided.  If you do not receive this message, "
+"{anchorStart}contact technical support{anchorEnd}."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr "发生错误。请尝试刷新页面，或检查您的网络连接情况。"
@@ -4243,6 +4241,10 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "All Time Zones"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4866,6 +4868,7 @@ msgstr "您确定要从“{container}”的课程团队中删除{email}？"
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "教员"
 
@@ -5880,10 +5883,11 @@ msgid "Find discussions"
 msgstr "搜索讨论帖"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
-msgstr "使用“讨论话题”菜单找到特定话题。"
+msgid "Use the All Topics menu to find specific topics."
+msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
 msgstr "搜索所有帖子"
 
@@ -6016,6 +6020,7 @@ msgid "Add Post"
 msgstr "新增帖子"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr "社区助教"
 
@@ -6081,17 +6086,13 @@ msgid "Following"
 msgstr "关注"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr "由：教员"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr "由社区助教发表"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
 msgstr "fmt"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
+msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
@@ -6228,7 +6229,7 @@ msgstr "过滤话题"
 msgid "Add your post to a relevant topic to help others find it."
 msgstr "把你的帖子发布到相应的话题里以帮助别人快速找到它。"
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr "活跃的帖子"
 
@@ -6848,14 +6849,12 @@ msgid "Generate Exception Certificates"
 msgstr "生成特例证书"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid ""
-"Generate certificates for all users on the Exception list who do not yet "
-"have a certificate"
-msgstr "为特殊处理列表中尚无证书的所有用户生成证书"
+msgid "All users on the Exception list who do not yet have a certificate"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Generate a Certificate for all users on the Exception list"
-msgstr "为特殊处理列表中的所有用户生成证书"
+msgid "All users on the Exception list"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
@@ -7081,8 +7080,8 @@ msgid "Valid"
 msgstr "有效"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-msgid "XSeries Program Certificates"
-msgstr "XSeries 课程证书"
+msgid "Program Certificates"
+msgstr ""
 
 #: lms/templates/learner_dashboard/certificate.underscore
 msgid "certificate.credential_url"
@@ -7097,8 +7096,8 @@ msgid "Congratulations! You have earned a certificate for this course."
 msgstr "恭喜！您已经获得了这门课程的证书。"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-msgid "View/Share Certificate"
-msgstr "查看／分享证书"
+msgid "View Certificate"
+msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
@@ -7150,12 +7149,12 @@ msgid "Not Currently Available"
 msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "You are not enrolled in any XSeries Programs yet."
-msgstr "你尚未选择任何 XSeries 课程。"
+msgid "You are not enrolled in any programs yet."
+msgstr ""
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-msgid "Explore XSeries Programs"
-msgstr "探索 XSeries 课程"
+msgid "Explore Programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
@@ -7164,12 +7163,12 @@ msgid ""
 msgstr "浏览最新上线的课程并查看您最喜爱科目的更新情况"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-msgid "Explore New XSeries"
-msgstr "探索新的 XSeries"
+msgid "Explore New Programs"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
-msgid "type"
-msgstr "类型"
+msgid "category"
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #, python-format
@@ -7302,12 +7301,6 @@ msgstr ""
 #: lms/templates/student_account/login.underscore
 msgid "Password Reset Email Sent"
 msgstr "密码重置邮件已发送"
-
-#: lms/templates/student_account/login.underscore
-msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
-msgstr "我们已经向您提供的电子邮件发送了重置密码的说明。"
 
 #: lms/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
@@ -8312,12 +8305,11 @@ msgid ""
 msgstr ""
 
 #: cms/templates/js/content-visibility-editor.underscore
+#, python-format
 msgid ""
-"Units inherit the visibility setting of the subsection they are in. If you "
-"make this subsection visible to learners, published units that were "
-"previously hidden also become visible. Only units that were explicitly "
-"hidden remain hidden regardless of the option you select for this "
-"subsection."
+"If you select an option other than \"%(hide_label)s\", after the subsection "
+"release date has passed, published units in this subsection will become "
+"available to learners unless units are explicitly hidden."
 msgstr ""
 
 #: cms/templates/js/course-instructor-details.underscore

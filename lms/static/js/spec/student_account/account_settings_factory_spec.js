@@ -73,18 +73,14 @@ define(['backbone',
 
                 var accountSettingsView = createAccountSettingsPage();
 
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 var request = requests[0];
                 expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_ACCOUNTS_API_URL);
 
                 AjaxHelpers.respondWithError(requests, 500);
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
             });
 
 
@@ -93,27 +89,26 @@ define(['backbone',
 
                 var accountSettingsView = createAccountSettingsPage();
 
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 var request = requests[0];
                 expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_ACCOUNTS_API_URL);
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 request = requests[1];
+                expect(request.method).toBe('GET');
+                expect(request.url).toBe('/user_api/v1/preferences/time_zones/?country_code=1');
+                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
+
+                request = requests[2];
                 expect(request.method).toBe('GET');
                 expect(request.url).toBe(Helpers.USER_PREFERENCES_API_URL);
 
                 AjaxHelpers.respondWithError(requests, 500);
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, true);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
             });
 
             it('renders fields after the models are successfully fetched', function() {
@@ -121,14 +116,14 @@ define(['backbone',
 
                 var accountSettingsView = createAccountSettingsPage();
 
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, true);
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
-                Helpers.expectSettingsSectionsButNotFieldsToBeRendered(accountSettingsView);
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
+                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
 
-                Helpers.expectLoadingIndicatorIsVisible(accountSettingsView, false);
+                accountSettingsView.render();
+
                 Helpers.expectLoadingErrorIsVisible(accountSettingsView, false);
                 Helpers.expectSettingsSectionsAndFieldsToBeRendered(accountSettingsView);
             });
@@ -141,6 +136,7 @@ define(['backbone',
                 var accountSettingsView = createAccountSettingsPage();
 
                 AjaxHelpers.respondWithJson(requests, Helpers.createAccountSettingsData());
+                AjaxHelpers.respondWithJson(requests, Helpers.TIME_ZONE_RESPONSE);
                 AjaxHelpers.respondWithJson(requests, Helpers.createUserPreferencesData());
                 AjaxHelpers.respondWithJson(requests, {});  // Page viewed analytics event
 

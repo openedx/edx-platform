@@ -229,5 +229,6 @@ class AdvancedSettingsPage(CoursePage):
             'instructor_info',
             'create_zendesk_tickets',
             'ccx_connector',
-            'enable_ccx'
+            'enable_ccx',
+            'enable_subsection_grades_saved',
         ]

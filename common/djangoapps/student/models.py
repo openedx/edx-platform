@@ -34,7 +34,7 @@ from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.utils.translation import ugettext_noop
 from django.core.cache import cache
 from django_countries.fields import CountryField
@@ -1519,6 +1519,15 @@ class CourseEnrollment(models.Model):
             attribute = self.attributes.get(namespace='order', name='order_number')
         except ObjectDoesNotExist:
             return None
+        except MultipleObjectsReturned:
+            # If there are multiple attributes then return the last one.
+            enrollment_id = self.get_enrollment(self.user, self.course_id).id
+            log.warning(
+                u"Multiple CourseEnrollmentAttributes found for user %s with enrollment-ID %s",
+                self.user.id,
+                enrollment_id
+            )
+            attribute = self.attributes.filter(namespace='order', name='order_number').last()
 
         order_number = attribute.value
         order = ecommerce_api_client(self.user).orders(order_number).get()

@@ -4,6 +4,7 @@ Unit tests for gating.signals module
 from mock import patch
 
 from opaque_keys.edx.keys import UsageKey
+from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
@@ -18,7 +19,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     def setUp(self):
         super(TestHandleScoreChanged, self).setUp()
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')
-        self.test_user_id = 0
+        self.user = UserFactory()
         self.test_usage_key = UsageKey.from_string('i4x://the/content/key/12345678')
 
     @patch('gating.signals.gating_api.evaluate_prerequisite')
@@ -30,11 +31,11 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             sender=None,
             points_possible=1,
             points_earned=1,
-            user_id=self.test_user_id,
+            user=self.user,
             course_id=unicode(self.course.id),
             usage_id=unicode(self.test_usage_key)
         )
-        mock_evaluate.assert_called_with(self.course, self.test_usage_key, self.test_user_id)
+        mock_evaluate.assert_called_with(self.course, self.test_usage_key, self.user.id)  # pylint: disable=no-member
 
     @patch('gating.signals.gating_api.evaluate_prerequisite')
     def test_gating_disabled(self, mock_evaluate):
@@ -43,7 +44,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             sender=None,
             points_possible=1,
             points_earned=1,
-            user_id=self.test_user_id,
+            user=self.user,
             course_id=unicode(self.course.id),
             usage_id=unicode(self.test_usage_key)
         )

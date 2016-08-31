@@ -120,8 +120,8 @@ from notification_prefs.views import enable_notifications
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.programs.utils import get_programs_for_dashboard
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs import utils as programs_utils
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 
@@ -609,10 +609,11 @@ def dashboard(request):
         and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
     )
 
-    # Get any programs associated with courses being displayed.
-    # This is passed along in the template context to allow rendering of
-    # program-related information on the dashboard.
-    course_programs = _get_course_programs(user, [enrollment.course_id for enrollment in course_enrollments])
+    # Find programs associated with courses being displayed. This information
+    # is passed in the template context to allow rendering of program-related
+    # information on the dashboard.
+    meter = programs_utils.ProgramProgressMeter(user, enrollments=course_enrollments)
+    programs_by_run = meter.engaged_programs(by_run=True)
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -736,9 +737,9 @@ def dashboard(request):
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
-        'course_programs': course_programs,
-        'disable_courseware_js': True,
+        'programs_by_run': programs_by_run,
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
+        'disable_courseware_js': True,
     }
 
     ecommerce_service = EcommerceService()
@@ -1774,6 +1775,7 @@ def create_account_with_params(request, params):
         )
     )
     if send_email:
+        dest_addr = user.email
         context = {
             'name': profile.name,
             'key': registration.activation_key,
@@ -1798,7 +1800,12 @@ def create_account_with_params(request, params):
             else:
                 user.email_user(subject, message, from_address)
         except Exception:  # pylint: disable=broad-except
-            log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
+            log.error(
+                u'Unable to send activation email to user from "%s" to "%s"',
+                from_address,
+                dest_addr,
+                exc_info=True
+            )
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
@@ -2476,44 +2483,6 @@ def change_email_settings(request):
         )
 
     return JsonResponse({"success": True})
-
-
-def _get_course_programs(user, user_enrolled_courses):  # pylint: disable=invalid-name
-    """Build a dictionary of program data required for display on the student dashboard.
-
-    Given a user and an iterable of course keys, find all programs relevant to the
-    user and return them in a dictionary keyed by course key.
-
-    Arguments:
-        user (User): The user to authenticate as when requesting programs.
-        user_enrolled_courses (list): List of course keys representing the courses in which
-            the given user has active enrollments.
-
-    Returns:
-        dict, containing programs keyed by course.
-    """
-    course_programs = get_programs_for_dashboard(user, user_enrolled_courses)
-    programs_data = {}
-
-    for course_key, programs in course_programs.viewitems():
-        for program in programs:
-            if program.get('status') == 'active' and program.get('category') == 'XSeries':
-                try:
-                    programs_for_course = programs_data.setdefault(course_key, {})
-                    programs_for_course.setdefault('course_program_list', []).append({
-                        'course_count': len(program['course_codes']),
-                        'display_name': program['name'],
-                        'program_id': program['id'],
-                        'program_marketing_url': urljoin(
-                            settings.MKTG_URLS.get('ROOT'),
-                            'xseries' + '/{}'
-                        ).format(program['marketing_slug'])
-                    })
-                    programs_for_course['category'] = program.get('category')
-                except KeyError:
-                    log.warning('Program structure is invalid, skipping display: %r', program)
-
-    return programs_data
 
 
 class LogoutView(TemplateView):

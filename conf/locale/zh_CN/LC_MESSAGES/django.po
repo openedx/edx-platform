@@ -301,6 +301,7 @@
 # 刘知远 <liuliudong@163.com>, 2013
 # Zhang Meng <zmlarry@foxmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 兆镒 黄 <1002423907@qq.com>, 2016
 # 刘家骅 <alphaf52@gmail.com>, 2013
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # 刘知远 <liuliudong@163.com>, 2013
@@ -341,7 +342,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-07-30 10:48+0000\n"
+"POT-Creation-Date: 2016-08-18 18:02+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -355,8 +356,7 @@ msgstr ""
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 msgid "Discussion"
 msgstr "讨论"
 
@@ -739,6 +739,14 @@ msgid ""
 "You have already created an account using an external login like WebAuth or "
 "Shibboleth. Please contact {tech_support_email} for support."
 msgstr "你已经创建使用外部登录类似的WebAuth或Shibboleth的帐户。请联系{tech_support_email}支持。"
+
+#: common/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
+msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -3190,6 +3198,16 @@ msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
 msgstr "输入 true 或 false。如果该值为 true，你可以隐藏某分段，直到学习者获得最低分数为止。"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Enable Subsection Grades Saved"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, the robust grades feature of "
+"saving subsection grades is enabled for this course."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Learning Information"
@@ -7880,10 +7898,6 @@ msgid "You do not have permission to view this page."
 msgstr "你没有访问此页面的权限。"
 
 #: lms/djangoapps/student_account/views.py
-msgid "No user with the provided email address exists."
-msgstr "根据提供的邮件地址来查找该用户并不存在。"
-
-#: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
 msgstr "未提供Email地址。"
 
@@ -9000,6 +9014,10 @@ msgid "API Version"
 msgstr "API版本"
 
 #: openedx/core/djangoapps/programs/models.py
+msgid "Path used to construct URLs to programs marketing pages (e.g., \"/foo\")."
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
 msgid "Path to authoring app's JS"
 msgstr "指向应用创作的JS的路径"
 
@@ -10113,6 +10131,39 @@ msgstr "提交"
 
 #: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "讨论 - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr "添加一个讨论帖"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "讨论列表"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "新主题表格"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "用户资料"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
 msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -13325,10 +13376,6 @@ msgstr ""
 " 。"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "{category} Program Course"
-msgstr "{category} 项目课程"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course details"
 msgstr ""
 
@@ -13418,6 +13465,10 @@ msgstr "由于该课程的退款期限已过，你将无法获得退款。"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "电子邮件设置"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Related Programs"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Verification not yet complete."
@@ -13613,30 +13664,9 @@ msgid ""
 "{platform_name} account."
 msgstr "你选择的 {provider_name}账户已经和{platform_name}账户相关联。"
 
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "{category} Program: Interested in more courses in this subject?"
-msgstr "{category} 项目：对此科目的更多课程感兴趣？"
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid ""
-"This course is 1 of {course_count} courses in the "
-"{link_start}{program_display_name}{link_end} {program_category}."
-msgstr ""
-"此课程是 {link_start}{program_display_name}{link_end} {program_category} 的 "
-"{course_count} 个课程中的一个。"
-
-#: lms/templates/dashboard/_dashboard_xseries_info.html
-msgid "View {category} Details"
-msgstr "查看{category}详细信息"
-
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
 msgstr "结果："
-
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr "添加一个讨论帖"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
@@ -13659,21 +13689,12 @@ msgid "filter topics"
 msgstr "过滤主题"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "所有讨论"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "我关注的讨论帖"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr "讨论话题；当前列出："
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "搜索所有帖子"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -13742,33 +13763,6 @@ msgstr[0] "%s 场讨论已开始"
 msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s 条评论"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "讨论 - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "讨论列表"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "新主题表格"
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "很抱歉"
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr "论坛现在正在维护，将尽快恢复正常。"
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "用户资料"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"

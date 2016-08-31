@@ -23,7 +23,7 @@ from courseware.models import StudentModule
 from certificates.models import GeneratedCertificate
 from django.db.models import Count
 from certificates.models import CertificateStatuses
-from grades.context import grading_context_for_course
+from lms.djangoapps.grades.context import grading_context_for_course
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
