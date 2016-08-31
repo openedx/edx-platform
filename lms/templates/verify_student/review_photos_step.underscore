@@ -49,9 +49,9 @@
           <div class="copy">
             <p>
               <%- gettext( "Photos don't meet the requirements?" ) %>
-              <a id="retake_photos_button" class="retake-photos">
+              <button id="retake_photos_button" class="retake-photos">
                 <%- gettext( "Retake Your Photos" ) %>
-              </a>
+              </button>
             </p>
           </div>
         </div>
