@@ -405,7 +405,7 @@ class PayAndVerifyView(View):
             # transaction will be conducted using legacy shopping cart
             processors = [settings.CC_PROCESSOR_NAME]
 
-        default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY or ['usd', '$'];
+        default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY or ['usd', '$']
 
         # Render the top-level page
         context = {
