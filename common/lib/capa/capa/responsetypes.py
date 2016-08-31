@@ -263,6 +263,15 @@ class LoncapaResponse(object):
         tree.set('tabindex', '-1')
         tree.set('aria-label', response_label)
 
+        if self.xml.get('multiple_inputtypes'):
+            # add <div> to wrap all inputtypes
+            content = etree.SubElement(tree, 'div')
+            content.set('class', 'multi-inputs-group')
+            content.set('role', 'group')
+            content.set('aria-labelledby', self.xml.get('id'))
+        else:
+            content = tree
+
         # problem author can make this span display:inline
         if self.xml.get('inline', ''):
             tree.set('class', 'inline')
@@ -271,12 +280,12 @@ class LoncapaResponse(object):
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
             if item_xhtml is not None:
-                tree.append(item_xhtml)
+                content.append(item_xhtml)
         tree.tail = self.xml.tail
 
         # Add a <div> for the message at the end of the response
         if response_msg:
-            tree.append(self._render_response_msg_html(response_msg))
+            content.append(self._render_response_msg_html(response_msg))
 
         return tree
 

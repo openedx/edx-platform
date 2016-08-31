@@ -267,6 +267,9 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
 
         *answer_attr*: The "answer" attribute on the tag itself (treated as an
         alias to "expect", though "expect" takes priority if both are given)
+
+        *group_label*: Text to represent group of inputs when there are
+        multiple inputs.
         """
 
         # Retrieve **kwargs
@@ -276,6 +279,7 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         answer = kwargs.get('answer', None)
         options = kwargs.get('options', None)
         cfn_extra_args = kwargs.get('cfn_extra_args', None)
+        group_label = kwargs.get('group_label', None)
 
         # Create the response element
         response_element = etree.Element("customresponse")
@@ -292,6 +296,10 @@ class CustomResponseXMLFactory(ResponseXMLFactory):
         if answer:
             answer_element = etree.SubElement(response_element, "answer")
             answer_element.text = str(answer)
+
+        if group_label:
+            group_label_element = etree.SubElement(response_element, "label")
+            group_label_element.text = group_label
 
         if options:
             response_element.set('options', str(options))
