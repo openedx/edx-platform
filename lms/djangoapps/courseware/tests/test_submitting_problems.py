@@ -79,7 +79,7 @@ class ProblemSubmissionTestMixin(TestCase):
         """
 
         problem_location = self.problem_location(problem_url_name)
-        modx_url = self.modx_url(problem_location, 'problem_submit')
+        modx_url = self.modx_url(problem_location, 'problem_check')
 
         answer_key_prefix = 'input_{}_'.format(problem_location.html_id())
 

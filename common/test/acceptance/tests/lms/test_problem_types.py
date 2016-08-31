@@ -147,8 +147,8 @@ class ProblemTypeTestMixin(object):
         When I answer a "<ProblemType>" problem "correctly"
         Then my "<ProblemType>" answer is marked "correct"
         And The "<ProblemType>" problem displays a "correct" answer
-        And a "problem_submit" server event is emitted
-        And a "problem_submit" browser event is emitted
+        And a "problem_check" server event is emitted
+        And a "problem_check" browser event is emitted
         """
         # Make sure we're looking at the right problem
         self.assertEqual(self.problem_page.problem_name, self.problem_name)
@@ -164,11 +164,11 @@ class ProblemTypeTestMixin(object):
         expected_events = [
             {
                 'event_source': 'server',
-                'event_type': 'problem_submit',
+                'event_type': 'problem_check',
                 'username': self.username,
             }, {
                 'event_source': 'browser',
-                'event_type': 'problem_submit',
+                'event_type': 'problem_check',
                 'username': self.username,
             },
         ]

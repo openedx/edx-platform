@@ -672,7 +672,7 @@ class CapaModuleTest(unittest.TestCase):
         post_data.append((CapaFactoryWithFiles.input_key(response_num=3), 'None'))
         request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
 
-        module.handle('xmodule_handler', request, 'problem_submit')
+        module.handle('xmodule_handler', request, 'problem_check')
 
         self.assertEqual(xqueue_interface._http_post.call_count, 1)
         _, kwargs = xqueue_interface._http_post.call_args
@@ -1004,20 +1004,20 @@ class CapaModuleTest(unittest.TestCase):
 
         attempts = random.randint(1, 10)
 
-        # If we're after the deadline, do NOT show check button
+        # If we're after the deadline, disable the submit button
         module = CapaFactory.create(due=self.yesterday_str)
         self.assertFalse(module.should_enable_submit_button())
 
-        # If user is out of attempts, do NOT show the check button
+        # If user is out of attempts, disable the submit button
         module = CapaFactory.create(attempts=attempts, max_attempts=attempts)
         self.assertFalse(module.should_enable_submit_button())
 
-        # If survey question (max_attempts = 0), do NOT show the check button
+        # If survey question (max_attempts = 0), disable the submit button
         module = CapaFactory.create(max_attempts=0)
         self.assertFalse(module.should_enable_submit_button())
 
         # If user submitted a problem but hasn't reset,
-        # do NOT show the check button
+        # disable the submit button
         # Note:  we can only reset when rerandomize="always" or "true"
         module = CapaFactory.create(rerandomize=RANDOMIZATION.ALWAYS, done=True)
         self.assertFalse(module.should_enable_submit_button())
@@ -1025,12 +1025,12 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(rerandomize="true", done=True)
         self.assertFalse(module.should_enable_submit_button())
 
-        # Otherwise, DO show the check button
+        # Otherwise, enable the submit button
         module = CapaFactory.create()
         self.assertTrue(module.should_enable_submit_button())
 
         # If the user has submitted the problem
-        # and we do NOT have a reset button, then we can show the check button
+        # and we do NOT have a reset button, then we can enable the submit button
         # Setting rerandomize to "never" or "false" ensures that the reset button
         # is not shown
         module = CapaFactory.create(rerandomize=RANDOMIZATION.NEVER, done=True)

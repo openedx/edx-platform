@@ -69,7 +69,7 @@ class CapaModule(CapaMixin, XModule):
         handlers = {
             'hint_button': self.hint_button,
             'problem_get': self.get_problem,
-            'problem_submit': self.submit_problem,
+            'problem_check': self.submit_problem,
             'problem_reset': self.reset_problem,
             'problem_save': self.save_problem,
             'problem_show': self.get_answer,

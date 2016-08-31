@@ -176,13 +176,13 @@ describe 'Problem', ->
       @problem = new Problem($('.xblock-student_view'))
       @problem.answers = 'foo=1&bar=2'
 
-    it 'log the problem_submit event', ->
+    it 'log the problem_check event', ->
       spyOn($, 'postWithPrefix').and.callFake (url, answers, callback) ->
         promise =
           always: (callable) -> callable()
           done: (callable) -> callable()
       @problem.submit()
-      expect(Logger.log).toHaveBeenCalledWith 'problem_submit', 'foo=1&bar=2'
+      expect(Logger.log).toHaveBeenCalledWith 'problem_check', 'foo=1&bar=2'
 
     it 'log the problem_graded event, after the problem is done grading.', ->
       spyOn($, 'postWithPrefix').and.callFake (url, answers, callback) ->
@@ -202,7 +202,7 @@ describe 'Problem', ->
           always: (callable) -> callable()
           done: (callable) -> callable()
       @problem.submit()
-      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_submit',
+      expect($.postWithPrefix).toHaveBeenCalledWith '/problem/Problem1/problem_check',
           'foo=1&bar=2', jasmine.any(Function)
 
     describe 'when the response is correct', ->

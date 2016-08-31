@@ -178,7 +178,7 @@ class @Problem
     $.postWithPrefix "#{url}/input_ajax", data, callback
 
 
-  render: (content) ->
+  render: (content, callback) ->
     if content
       @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
@@ -187,6 +187,7 @@ class @Problem
         @bind()
         @queueing()
         @renderProgressState()
+        callback?()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -251,10 +252,10 @@ class @Problem
       @questionTitle.focus()
 
   ###
-  # 'submit_fd' uses FormData to allow file submissions in the 'problem_submit' dispatch,
+  # 'submit_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
   #      in addition to simple querystring-based answers
   #
-  # NOTE: The dispatch 'problem_submit' is being singled out for the use of FormData;
+  # NOTE: The dispatch 'problem_check' is being singled out for the use of FormData;
   #       maybe preferable to consolidate all dispatches to use FormData
   ###
   submit_fd: =>
@@ -338,15 +339,15 @@ class @Problem
             @gentle_alert response.success
         Logger.log 'problem_graded', [@answers, response.contents], @id
 
-    $.ajaxWithPrefix("#{@url}/problem_submit", settings)
+    $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   submit: =>
     if not @submit_save_waitfor(@submit_internal)
       @disableAllButtonsWhileRunning @submit_internal, true
 
   submit_internal: =>
-    Logger.log 'problem_submit', @answers
-    $.postWithPrefix "#{@url}/problem_submit", @answers, (response) =>
+    Logger.log 'problem_check', @answers
+    $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))

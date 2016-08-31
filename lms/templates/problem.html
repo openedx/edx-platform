@@ -42,7 +42,7 @@ from openedx.core.djangolib.markup import HTML
     </span>
     % endif
     </div>
-    <button type="button" class="submit ${ submit_button } btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+    <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
         <span class="submit-label">${ submit_button }</span><span class="sr"> ${_("your answer")}</span>
     </button>
     <div class="submission_feedback" aria-live="polite" id="submission_feedback_${short_id}">

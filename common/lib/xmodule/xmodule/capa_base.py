@@ -620,7 +620,7 @@ class CapaMixin(CapaFields):
         html = self.remove_tags_from_html(html)
 
         # The convention is to pass the name of the submit button if we want
-        # to show a submit button, and False otherwise This works because
+        # to enable a submit button, and False otherwise This works because
         # non-empty strings evaluate to True.  We use the same convention
         # for the "submitting" state text.
         submit_button = self.submit_button_name()
@@ -1022,7 +1022,7 @@ class CapaMixin(CapaFields):
         answers_without_files = convert_files_to_filenames(answers)
         event_info['answers'] = answers_without_files
 
-        metric_name = u'capa.submit_problem.{}'.format
+        metric_name = u'capa.check_problem.{}'.format
         # Can override current time
         current_time = datetime.datetime.now(UTC())
         if override_time is not False:
@@ -1033,7 +1033,7 @@ class CapaMixin(CapaFields):
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
-            self.track_function_unmask('problem_submit_fail', event_info)
+            self.track_function_unmask('problem_check_fail', event_info)
             if dog_stats_api:
                 dog_stats_api.increment(metric_name('checks'), tags=[u'result:failed', u'failure:closed'])
             raise NotFoundError(_("Problem is closed."))
@@ -1079,7 +1079,7 @@ class CapaMixin(CapaFields):
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             if self.runtime.DEBUG:
                 log.warning(
-                    "StudentInputError in capa_module:problem_submit",
+                    "StudentInputError in capa_module:problem_check",
                     exc_info=True
                 )
 
@@ -1105,7 +1105,7 @@ class CapaMixin(CapaFields):
             self.set_state_from_lcp()
 
             if self.runtime.DEBUG:
-                msg = u"Error submitting problem: {}".format(err.message)
+                msg = u"Error checking problem: {}".format(err.message)
                 msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
                 return {'success': msg}
             raise
@@ -1126,7 +1126,7 @@ class CapaMixin(CapaFields):
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         event_info['submission'] = self.get_submission_metadata_safe(answers_without_files, correct_map)
-        self.track_function_unmask('problem_submit', event_info)
+        self.track_function_unmask('problem_check', event_info)
 
         if dog_stats_api:
             dog_stats_api.increment(metric_name('checks'), tags=[u'result:success'])
@@ -1358,7 +1358,7 @@ class CapaMixin(CapaFields):
             event_info['failure'] = 'unexpected'
             self.track_function_unmask('problem_rescore_fail', event_info)
             if self.runtime.DEBUG:
-                msg = u"Error submitting problem: {0}".format(err.message)
+                msg = u"Error checking problem: {0}".format(err.message)
                 msg += u'\nTraceback:\n' + traceback.format_exc()
                 return {'success': msg}
             raise
