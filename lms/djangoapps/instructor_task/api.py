@@ -33,7 +33,7 @@ from lms.djangoapps.instructor_task.tasks import (
     export_ora2_data,
 )
 
-from certificates.models import CertificateGenerationHistory
+from certificates.models import CertificateGenerationHistory, CertificateStatuses
 
 from lms.djangoapps.instructor_task.api_helper import (
     check_arguments_for_rescoring,
@@ -506,6 +506,11 @@ def regenerate_certificates(request, course_key, statuses_to_regenerate):
     """
     task_type = 'regenerate_certificates_all_student'
     task_input = {}
+
+    # Update task_input for verified users with audit passing and not passing certificate statuses.
+    if 'verified_users_with_audit_certs' in statuses_to_regenerate:
+        task_input.update({"student_set": 'verified_users_with_audit_certs'})
+        statuses_to_regenerate = [CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing]
 
     task_input.update({"statuses_to_regenerate": statuses_to_regenerate})
     task_class = generate_certificates

@@ -343,6 +343,11 @@ def _section_certificates(course):
         for certificate in GeneratedCertificate.get_unique_statuses(course_key=course.id)
     }
 
+    # Get the count of all course verified users with audit passing and audit not passing statuses.
+    verified_users_with_audit_certs = CourseEnrollment.objects.users_enrolled_in(course.id, mode='verified').filter(
+        generatedcertificate__status__in=[CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing]
+    ).count()
+
     return {
         'section_key': 'certificates',
         'section_display_name': _('Certificates'),
@@ -354,6 +359,7 @@ def _section_certificates(course):
         'html_cert_enabled': html_cert_enabled,
         'active_certificate': certs_api.get_active_web_certificate(course),
         'certificate_statuses_with_count': certificate_statuses_with_count,
+        'verified_users_with_audit_certs': verified_users_with_audit_certs,
         'status': CertificateStatuses,
         'certificate_generation_history':
             CertificateGenerationHistory.objects.filter(course_id=course.id).order_by("-created"),

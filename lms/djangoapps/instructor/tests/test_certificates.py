@@ -3,12 +3,19 @@ import contextlib
 import ddt
 import mock
 import json
+import pytz
+
+from datetime import datetime, timedelta
 
 from nose.plugins.attrib import attr
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.test.utils import override_settings
 from django.conf import settings
+
+from mock import patch, PropertyMock
+
+from course_modes.models import CourseMode
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
@@ -343,6 +350,70 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
             u'Certificate regeneration task has been started. You can view the status of the generation task in '
             u'the "Pending Tasks" section.'
         )
+
+    @patch(
+        'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75})
+    )
+    @override_settings(AUDIT_CERT_CUTOFF_DATE=datetime.now(pytz.UTC) - timedelta(days=1))
+    @ddt.data(
+        ('verified', 'ID Verified', True),
+        ('unverified', 'Not ID Verified', False)
+    )
+    @ddt.unpack
+    def test_verified_users_with_audit_certs(self, expected_cert_status, verification_output, user_verified):
+        """
+        Test that `verified_users_with_audit_certs` option regenerates certificate for verified users with audit
+        certificates get certificate.
+
+        Scenario:
+            User enrolled in course as audit,
+            User passed the course as audit so they have `audit_passing` certificate status,
+            User switched to verified mode and is ID verified,
+            Regenerate certificates for `verified_users_with_audit_certs` is run,
+            Modified certificate status is `verified` if user is ID verified otherwise `unverified`.
+        """
+        # Check that user is enrolled in audit mode.
+        enrollment = CourseEnrollment.get_enrollment(self.user, self.course.id)
+        self.assertEqual(enrollment.mode, CourseMode.AUDIT)
+
+        # Generate certificate for user and check that user has a audit passing certificate.
+        with patch('student.models.CourseEnrollment.refund_cutoff_date') as cutoff_date:
+            cutoff_date.return_value = datetime.now(pytz.UTC) - timedelta(minutes=5)
+            cert_status = certs_api.generate_user_certificates(student=self.user, course_key=self.course.id, course=self.course)
+            self.assertEqual(cert_status, CertificateStatuses.audit_passing)
+
+        # Update user enrollment mode to verified mode.
+        enrollment.update_enrollment(mode='verified')
+        self.assertEqual(enrollment.mode, CourseMode.VERIFIED)
+
+        with patch(
+            'lms.djangoapps.verify_student.models.SoftwareSecurePhotoVerification.user_is_verified'
+        ) as user_verify:
+            user_verify.return_value = user_verified
+
+            # Login the client and access the url with 'certificate_statuses'
+            self.client.login(username=self.global_staff.username, password='test')
+            url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+            response = self.client.post(url, data={'certificate_statuses': ['verified_users_with_audit_certs']})
+
+            # Assert 200 status code in response
+            self.assertEqual(response.status_code, 200)
+            res_json = json.loads(response.content)
+
+            # Assert request is successful
+            self.assertTrue(res_json['success'])
+
+            # Assert success message
+            self.assertEqual(
+                res_json['message'],
+                u'Certificate regeneration task has been started. You can view the status of the generation task in '
+                u'the "Pending Tasks" section.'
+            )
+            # Check user has a not audit passing certificate now.
+            cert = certs_api.get_certificate_for_user(self.user.username, self.course.id)
+            self.assertNotEqual(cert['status'], CertificateStatuses.audit_passing)
+            self.assertEqual(cert['status'], expected_cert_status)
 
     def test_certificate_regeneration_error(self):
         """
