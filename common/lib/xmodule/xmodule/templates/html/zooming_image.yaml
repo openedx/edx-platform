@@ -2,28 +2,26 @@
 metadata:
     display_name: Zooming Image Tool
 data: |
-      <h3 class="hd hd-2">Zooming Image Tool</h3>
+      <h3 class="hd hd-3">Zooming Image Tool</h3>
       <p>Use the Zooming Image Tool to enable learners to see details of large, complex images.</p>
       <p>With the Zooming Image Tool, the learner can move the mouse pointer over a part of the image to enlarge it and see more detail.</p>
       <p>To use the Zooming Image Tool, you must first add the <a href="http://files.edx.org/image-zoom-tool.js" target="_blank">image-zoom-tool.js JavaScript file</a> to your course.</p>
       <p>You must also add both the regular and magnified image files to your course.</p>
       <p>The following HTML code shows the format required to use the Zooming Image tool. For the example in this template, you must replace the values in <i>italics</i>.</p>
+      <p>Your small and large image should have the same aspect ratio.</p>
         <pre>
         &lt;div class="zooming-image-place" style="position: relative;"&gt;
           &lt;a class="edx-zoom" href="<i>path to the magnified version of the image</i>"&gt;
             &lt;img alt="<i>Text for screen readers</i>"
               src="<i>path to the image you want to display in the unit</i>" /&gt;
+              &lt;span class="indicator icon fa fa-search-plus" aria-hidden="true"&gt;&lt;/span&gt;
           &lt;/a>
           &lt;div class="script_placeholder"
             data-src="<i>path to the image-zoom-tool.js JavaScript file in your course</i>"/&gt;
         &lt;/div&gt;
         &lt;script type="text/javascript"&gt;// &gt;![CDATA[
         JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
-          $('.loupe').edxImageZoomTool({
-            width: 350,
-            height: 350,
-            lightbox: false
-          });
+          $('.edx-zoom').edxImageZoomTool();
         });
         // ]]&gt;&lt;/script&gt;
         &lt;div id="ap_listener_added"&gt;&lt;/div&gt;
@@ -48,11 +46,7 @@ data: |
       </div>
       <script type="text/javascript">// <![CDATA[
       JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
-        $('.edx-zoom').edxImageZoomTool({
-          width: 350,
-          height: 350,
-          lightbox: false
-        });
+        $('.edx-zoom').edxImageZoomTool();
       });
       // ]]></script>
       <div id="ap_listener_added"></div>
