@@ -590,3 +590,13 @@ COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 
 LMS_ROOT_URL = "http://localhost:8000"
+
+# Test configuration for neo4j
+NEO4J_CONFIG = {
+    'bolt': True,
+    'password': 'password',
+    'user': 'neo4j',
+    'https_port': 7473,
+    'host': 'localhost',
+    'secure': True,
+}
