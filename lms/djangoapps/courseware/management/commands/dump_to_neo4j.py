@@ -13,6 +13,7 @@ from py2neo import Graph, Node, Relationship, authenticate
 from py2neo.compat import integer, string, unicode as neo4j_unicode
 from request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
+from opaque_keys.edx.keys import CourseKey
 
 log = logging.getLogger(__name__)
 
@@ -30,8 +31,20 @@ class ModuleStoreSerializer(object):
     Class with functionality to serialize a modulestore into subgraphs,
     one graph per course.
     """
-    def __init__(self):
-        self.all_courses = modulestore().get_course_summaries()
+    def load_course_keys(self, courses=None):
+        """
+        Sets the object's course_keys attribute from the `courses` parameter.
+        If that parameter isn't furnished, loads all course_keys from the
+        modulestore.
+        :param courses: string serialization of course keys
+        """
+        if courses:
+            course_keys = [CourseKey.from_string(course.strip()) for course in courses]
+        else:
+            course_keys = [
+                course.id for course in modulestore().get_course_summaries()
+            ]
+        self.course_keys = course_keys
 
     @staticmethod
     def serialize_item(item):
@@ -136,6 +149,79 @@ class ModuleStoreSerializer(object):
         return coerced_value
 
 
+    @staticmethod
+    def add_to_transaction(neo4j_entities, transaction):
+        """
+        Args:
+            neo4j_entities: a list of Nodes or Relationships
+            transaction: a neo4j transaction
+        """
+        for entity in neo4j_entities:
+            transaction.create(entity)
+
+
+    def dump_courses_to_neo4j(self, graph):
+        """
+        Parameters
+        ----------
+        graph: py2neo graph object
+
+        Returns two lists: one of the courses that were successfully written
+          to neo4j, and one of courses that were not.
+        -------
+        """
+        total_number_of_courses = len(self.course_keys)
+
+        successful_courses = []
+        unsuccessful_courses = []
+
+        for index, course_key in enumerate(self.course_keys):
+            # first, clear the request cache to prevent memory leaks
+            RequestCache.clear_request_cache()
+
+            log.info(
+                "Now exporting %s to neo4j: course %d of %d total courses",
+                course_key,
+                index + 1,
+                total_number_of_courses,
+            )
+            nodes, relationships = self.serialize_course(course_key)
+            log.info(
+                "%d nodes and %d relationships in %s",
+                len(nodes),
+                len(relationships),
+                course_key,
+            )
+
+            transaction = graph.begin()
+            course_string = six.text_type(course_key)
+            try:
+                # first, delete existing course
+                transaction.run(
+                    "MATCH (n:item) WHERE n.course_key='{}' DETACH DELETE n".format(
+                        course_string
+                    )
+                )
+
+                # now, re-add it
+                self.add_to_transaction(nodes, transaction)
+                self.add_to_transaction(relationships, transaction)
+                transaction.commit()
+
+            except Exception:  # pylint: disable=broad-except
+                log.exception(
+                    "Error trying to dump course %s to neo4j, rolling back",
+                    course_string
+                )
+                transaction.rollback()
+                unsuccessful_courses.append(course_string)
+
+            else:
+                successful_courses.append(course_string)
+
+        return successful_courses, unsuccessful_courses
+
+
 class Command(BaseCommand):
     """
     Command to dump modulestore data to neo4j
@@ -155,16 +241,7 @@ class Command(BaseCommand):
         parser.add_argument('--port', type=int)
         parser.add_argument('--user', type=unicode)
         parser.add_argument('--password', type=unicode)
-
-    @staticmethod
-    def add_to_transaction(neo4j_entities, transaction):
-        """
-        Args:
-            neo4j_entities: a list of Nodes or Relationships
-            transaction: a neo4j transaction
-        """
-        for entity in neo4j_entities:
-            transaction.create(entity)
+        parser.add_argument('--courses', type=unicode, nargs='*')
 
     def handle(self, *args, **options):  # pylint: disable=unused-argument
         """
@@ -192,44 +269,22 @@ class Command(BaseCommand):
         )
 
         mss = ModuleStoreSerializer()
+        mss.load_course_keys(options['courses'])
 
-        total_number_of_courses = len(mss.all_courses)
+        successful_courses, unsuccessful_courses = mss.dump_courses_to_neo4j(graph)
 
-        for index, course in enumerate(mss.all_courses):
-            # first, clear the request cache to prevent memory leaks
-            RequestCache.clear_request_cache()
-
-            log.info(
-                "Now exporting %s to neo4j: course %d of %d total courses",
-                course.id,
-                index + 1,
-                total_number_of_courses
+        if successful_courses:
+            print(
+                "These courses exported to neo4j successfully:\n\t" +
+                 "\n\t".join(successful_courses)
             )
-            nodes, relationships = mss.serialize_course(course.id)
-            log.info(
-                "%d nodes and %d relationships in %s",
-                len(nodes),
-                len(relationships),
-                course.id
+        else:
+            print("No courses exported to neo4j successfully.")
+
+        if unsuccessful_courses:
+            print(
+                "These courses did not export to neo4j successfully:\n\t" +
+                "\n\t".join(unsuccessful_courses)
             )
-
-            transaction = graph.begin()
-            try:
-                # first, delete existing course
-                transaction.run(
-                    "MATCH (n:item) WHERE n.course_key='{}' DETACH DELETE n".format(
-                        six.text_type(course.id)
-                    )
-                )
-
-                # now, re-add it
-                self.add_to_transaction(nodes, transaction)
-                self.add_to_transaction(relationships, transaction)
-                transaction.commit()
-
-            except Exception:  # pylint: disable=broad-except
-                log.exception(
-                    "Error trying to dump course %s to neo4j, rolling back",
-                    six.text_type(course.id)
-                )
-                transaction.rollback()
+        else:
+            print("All courses exported to neo4j successfully.")

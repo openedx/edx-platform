@@ -35,18 +35,46 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
 
         cls.course2 = CourseFactory.create()
 
+        cls.course_strings = [six.text_type(cls.course.id), six.text_type(cls.course2.id)]
+
 
 @ddt.ddt
 class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
     """
     Tests for the dump to neo4j management command
     """
+
     @mock.patch('courseware.management.commands.dump_to_neo4j.Graph')
-    def test_dump_to_neo4j(self, mock_graph_class):
+    @ddt.data(1, 2)
+    def test_dump_specific_courses(self, number_of_courses, mock_graph_class):
         """
-        Tests the dump_to_neo4j management command works against a mock
-        py2neo Graph
+        Test that you can specify which courses you want to dump.
         """
+
+        mock_graph = mock_graph_class.return_value
+        mock_transaction = mock.Mock()
+        mock_graph.begin.return_value = mock_transaction
+
+        call_command(
+            'dump_to_neo4j',
+            courses=self.course_strings[:number_of_courses],
+            host='mock_host',
+            port=7473,
+            user='mock_user',
+            password='mock_password',
+        )
+
+        self.assertEqual(mock_graph.begin.call_count, number_of_courses)
+        self.assertEqual(mock_transaction.commit.call_count, number_of_courses)
+        self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
+
+    @mock.patch('courseware.management.commands.dump_to_neo4j.Graph')
+    def test_dump_all_courses(self, mock_graph_class):
+        """
+        Test if you don't specify which courses to dump, then you'll dump
+        all of them.
+        """
+
         mock_graph = mock_graph_class.return_value
         mock_transaction = mock.Mock()
         mock_graph.begin.return_value = mock_transaction
@@ -61,35 +89,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
 
         self.assertEqual(mock_graph.begin.call_count, 2)
         self.assertEqual(mock_transaction.commit.call_count, 2)
-        self.assertEqual(mock_transaction.rollback.call_count, 0)
-
-        # 7 nodes + 9 relationships from the first course
-        # 2 nodes and no relationships from the second
-        self.assertEqual(mock_transaction.create.call_count, 18)
-        self.assertEqual(mock_transaction.run.call_count, 2)
-
-    @mock.patch('courseware.management.commands.dump_to_neo4j.Graph')
-    def test_dump_to_neo4j_rollback(self, mock_graph_class):
-        """
-        Tests that the management command handles the case where there's
-        an exception trying to write to the neo4j database.
-        """
-        mock_graph = mock_graph_class.return_value
-        mock_transaction = mock.Mock()
-        mock_graph.begin.return_value = mock_transaction
-        mock_transaction.run.side_effect = ValueError('Something went wrong!')
-
-        call_command(
-            'dump_to_neo4j',
-            host='mock_host',
-            port=7473,
-            user='mock_user',
-            password='mock_password',
-        )
-
-        self.assertEqual(mock_graph.begin.call_count, 2)
-        self.assertEqual(mock_transaction.commit.call_count, 0)
-        self.assertEqual(mock_transaction.rollback.call_count, 2)
+        self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
 
 
 @ddt.ddt
@@ -97,15 +97,13 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
     """
     Tests for the ModuleStoreSerializer
     """
-    def setUp(self):
-        super(TestModuleStoreSerializer, self).setUp()
-        self.modulestore_serializer = ModuleStoreSerializer()
-
     def test_serialize_item(self):
         """
         Tests the serialize_item method.
         """
-        fields, label = self.modulestore_serializer.serialize_item(self.course)
+        mss = ModuleStoreSerializer()
+        mss.load_course_keys()
+        fields, label = mss.serialize_item(self.course)
         self.assertEqual(label, "course")
         self.assertIn("edited_on", fields.keys())
         self.assertIn("display_name", fields.keys())
@@ -119,7 +117,9 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests the serialize_course method.
         """
-        nodes, relationships = self.modulestore_serializer.serialize_course(
+        mss = ModuleStoreSerializer()
+        mss.load_course_keys()
+        nodes, relationships = mss.serialize_course(
             self.course.id
         )
         self.assertEqual(len(nodes), 9)
@@ -135,7 +135,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         # each element in the iterable is not unicode:
         self.assertFalse(any(isinstance(tab, six.text_type) for tab in example_iterable))
         # but after they are coerced, they are:
-        coerced = self.modulestore_serializer.coerce_types(example_iterable)
+        coerced = ModuleStoreSerializer().coerce_types(example_iterable)
         self.assertTrue(all(isinstance(tab, six.text_type) for tab in coerced))
         # finally, make sure we haven't changed the type:
         self.assertEqual(type(coerced), iterable_type)
@@ -154,5 +154,52 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests the coerce_types helper for the neo4j base types
         """
-        coerced_value = self.modulestore_serializer.coerce_types(original_value)
+        coerced_value = ModuleStoreSerializer().coerce_types(original_value)
         self.assertEqual(coerced_value, coerced_expected)
+
+    def test_dump_to_neo4j(self):
+        """
+        Tests the dump_to_neo4j method works against a mock
+        py2neo Graph
+        """
+        mock_graph = mock.Mock()
+        mock_transaction = mock.Mock()
+        mock_graph.begin.return_value = mock_transaction
+
+        mss = ModuleStoreSerializer()
+        mss.load_course_keys()
+
+        successful, unsuccessful = mss.dump_courses_to_neo4j(mock_graph)
+
+        self.assertEqual(mock_graph.begin.call_count, 2)
+        self.assertEqual(mock_transaction.commit.call_count, 2)
+        self.assertEqual(mock_transaction.rollback.call_count, 0)
+
+        # 7 nodes + 9 relationships from the first course
+        # 2 nodes and no relationships from the second
+        self.assertEqual(mock_transaction.create.call_count, 18)
+        self.assertEqual(mock_transaction.run.call_count, 2)
+
+        self.assertEqual(len(unsuccessful), 0)
+        self.assertItemsEqual(successful, self.course_strings)
+
+    def test_dump_to_neo4j_rollback(self):
+        """
+        Tests that the the dump_to_neo4j method handles the case where there's
+        an exception trying to write to the neo4j database.
+        """
+        mock_graph = mock.Mock()
+        mock_transaction = mock.Mock()
+        mock_graph.begin.return_value = mock_transaction
+        mock_transaction.run.side_effect = ValueError('Something went wrong!')
+
+        mss = ModuleStoreSerializer()
+        mss.load_course_keys()
+        successful, unsuccessful = mss.dump_courses_to_neo4j(mock_graph)
+
+        self.assertEqual(mock_graph.begin.call_count, 2)
+        self.assertEqual(mock_transaction.commit.call_count, 0)
+        self.assertEqual(mock_transaction.rollback.call_count, 2)
+
+        self.assertEqual(len(successful), 0)
+        self.assertItemsEqual(unsuccessful, self.course_strings)
