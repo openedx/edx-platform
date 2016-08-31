@@ -661,8 +661,8 @@ class CapaMixin(CapaFields):
             point_msg = ''
             if progress is not None:
                 point_msg = ungettext(
-                    "{progress} point earned",
-                    "{progress} points earned",
+                    "({progress} point earned)",
+                    "({progress} points earned)",
                     progress.frac()[1]
                 ).format(progress=str(progress))
 

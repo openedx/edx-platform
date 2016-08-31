@@ -158,6 +158,7 @@ class ProblemTypeTestMixin(object):
         self.problem_page.click_submit()
         self.wait_for_status('correct')
         self.problem_page.wait_success_notification_visible()
+        self.assertTrue(self.problem_page.is_focus_on_submit_notification())
 
         # Check for corresponding tracking event
         expected_events = [
@@ -195,6 +196,7 @@ class ProblemTypeTestMixin(object):
         self.problem_page.click_submit()
         self.wait_for_status('incorrect')
         self.problem_page.wait_incorrect_notification_visible()
+        self.assertTrue(self.problem_page.is_focus_on_submit_notification())
 
     @attr(shard=7)
     def test_submit_blank_answer(self):
@@ -212,7 +214,7 @@ class ProblemTypeTestMixin(object):
             lambda: self.problem_page.problem_name == self.problem_name,
             "Make sure the correct problem is on the page"
         )
-        # Leave the problem unchanged and click check.
+        # Leave the problem unchanged and click submit.
         self.assertTrue(self.problem_page.q(css='.problem .submit').attrs('disabled'))
         self.problem_page.click_submit()
         self.wait_for_status('incorrect')

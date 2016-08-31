@@ -146,6 +146,12 @@ class ProblemPage(PageObject):
         """
         return self.q(css='.problem-header').focused
 
+    def is_focus_on_submit_notification(self):
+        """
+        Check for focus submit notification.
+        """
+        return self.q(css='.notification-response').focused
+
     def wait_for_status_icon(self):
         """
         wait for status icon
