@@ -109,7 +109,7 @@ class OLIAnalyticsBackend(BaseBackend):
             'payload': {
                 'course_id': course_id,
                 'resource_id': problem_id,
-                'student_id': anonymous_id_for_user(user, None),
+                'user_id': user_id,
                 'grade': grade,
                 'max_grade': max_grade,
                 'timestamp': timestamp.isoformat(),
