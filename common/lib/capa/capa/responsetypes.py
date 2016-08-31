@@ -367,7 +367,6 @@ class LoncapaResponse(object):
             event_info.update(log_extra)
         self.capa_module.runtime.track_function('edx.problem.hint.feedback_displayed', event_info)
 
-
         # Form the div-wrapped hint texts
         hints_wrap = HTML(''.join(
             [HTML('<div class="{question_hint_text_style}">{hint_content}</div>').format(
