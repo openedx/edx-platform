@@ -75,6 +75,9 @@ from lms.envs.common import (
     # constants for redirects app
     REDIRECT_CACHE_TIMEOUT,
     REDIRECT_CACHE_KEY_PREFIX,
+
+    # django-debug-toolbar
+    DEBUG_TOOLBAR_PATCH_SETTINGS,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -707,15 +710,6 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # require.environments.Environment and defines some "args" function that
 # returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
-
-
-########################## DJANGO DEBUG TOOLBAR ###############################
-
-# We don't enable Django Debug Toolbar universally, but whenever we do, we want
-# to avoid patching settings.  Patched settings can cause circular import
-# problems: http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
-
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 ################################# CELERY ######################################
 
