@@ -106,7 +106,7 @@
     <input type="hidden" name="contribution" value="<%- minPrice %>" />
     <input type="hidden" name="sku" value="<%- sku %>" />
     <div class="purchase">
-      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
+      <p class="product-info"><span class="product-name"></span> <%- gettext( "price" ) %>: <span class="price"><% currencySymbol %><%- minPrice %> <%- currencyCode.toUpperCase() %></span></p>
     </div>
     <div class="pay-options">
       <%

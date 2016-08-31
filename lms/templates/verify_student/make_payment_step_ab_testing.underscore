@@ -37,7 +37,7 @@
 
         <div class="certificate <%- courseModeSlug %>_icon">
             <div class="purchase">
-              <p class="product-info"><span class="product-name"></span> <%- gettext( "Total" ) %>: <span class="price">$<%- minPrice %> USD</span></p>
+              <p class="product-info"><span class="product-name"></span> <%- gettext( "Total" ) %>: <span class="price"><% currencySymbol %><%- minPrice %> <%- currencyCode.toUpperCase() %></span></p>
             </div>
             <p>
                 <% if ( courseModeSlug === 'no-id-professional' || courseModeSlug === 'professional') { %>
