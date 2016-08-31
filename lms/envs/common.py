@@ -1710,6 +1710,15 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'edxicons': 'edx-pattern-library/js/edx-icons.js',
     'draggabilly': 'js/vendor/draggabilly.js'
 }
+
+########################## DJANGO DEBUG TOOLBAR ###############################
+
+# We don't enable Django Debug Toolbar universally, but whenever we do, we want
+# to avoid patching settings.  Patched settings can cause circular import
+# problems: http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
 ################################# CELERY ######################################
 
 # Celery's task autodiscovery won't find tasks nested in a tasks package.
