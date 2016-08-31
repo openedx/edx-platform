@@ -28,6 +28,8 @@ var edx = edx || {};
                 minPrice: 0,
                 sku: '',
                 currency: 'usd',
+                currencyCode: 'usd',
+                currencySymbol: '$',
                 upgrade: false,
                 verificationDeadline: '',
                 courseName: '',
