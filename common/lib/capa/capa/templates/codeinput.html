@@ -1,4 +1,7 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
 <section id="textbox_${id}" class="capa_inputtype textbox cminput">
   <textarea rows="${rows}" cols="${cols}" name="input_${id}" 
             aria-label="${_("{programming_language} editor").format(programming_language=mode)}" 
@@ -36,6 +39,6 @@
   <span id="answer_${id}"></span>
 
   <div class="external-grader-message" aria-live="polite">
-    ${msg|n}
+    ${HTML(msg)}
   </div>
 </section>

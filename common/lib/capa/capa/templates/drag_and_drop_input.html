@@ -24,7 +24,7 @@
     <p id="answer_${id}" class="answer"></p>
 
     % if msg:
-        <span class="message" aria-describedby="answer_input_${id}" tabindex="-1">${HTML(msg)}</span>
+        <span class="message" aria-describedby="answer_input_${id}" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
     % endif
 
     % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:

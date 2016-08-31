@@ -57,7 +57,7 @@
 % endif
 
   % if msg:
-      <span class="message" aria-describedby="answer_input_${id}" tabindex="-1">${HTML(msg)}</span>
+      <span class="message" aria-describedby="answer_input_${id}" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
   % endif
 
 </div>
