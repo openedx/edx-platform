@@ -108,6 +108,12 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Returns true if the add response button is visible, false otherwise"""
         return self.is_element_visible(".add-response-btn")
 
+    def has_discussion_reply_editor(self):
+        """
+        Returns true if the discussion reply editor is is visible
+        """
+        return self.is_element_visible(".discussion-reply-new")
+
     def click_add_response_button(self):
         """
         Clicks the add response button and ensures that the response text
@@ -151,6 +157,13 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Returns true if the edit response button is present, false otherwise"""
         with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
             return self.is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
+
+    def is_response_deletable(self, response_id):
+        """
+        Returns true if the delete response button is present, false otherwise
+        """
+        with self.secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+            return self.is_element_visible(".response_{} .discussion-response .action-delete".format(response_id))
 
     def get_response_body(self, response_id):
         return self._get_element_text(".response_{} .response-body".format(response_id))

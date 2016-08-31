@@ -93,6 +93,9 @@ FEATURES['LICENSING'] = True
 FEATURES['ENABLE_MOBILE_REST_API'] = True  # Enable video bumper in Studio
 FEATURES['ENABLE_VIDEO_BUMPER'] = True  # Enable video bumper in Studio settings
 
+# Enable persistent subsection grades, so that feature can be tested.
+FEATURES['ENABLE_SUBSECTION_GRADES_SAVED'] = True
+
 # Enable partner support link in Studio footer
 PARTNER_SUPPORT_EMAIL = 'partner-support@example.com'
 

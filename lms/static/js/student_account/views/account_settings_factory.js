@@ -265,9 +265,6 @@
                     visibility: null,
                     user_id: accountUserId
                 });
-
-                // Render the fields
-                accountSettingsView.renderFields();
             };
 
             showLoadingError = function() {

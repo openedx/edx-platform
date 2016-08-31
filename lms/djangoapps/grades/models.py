@@ -12,7 +12,7 @@ import json
 import logging
 from operator import attrgetter
 
-from django.db import models
+from django.db import models, transaction
 from django.db.utils import IntegrityError
 from model_utils.models import TimeStampedModel
 
@@ -45,9 +45,12 @@ class BlockRecordSet(frozenset):
         """
         if self._json is None:
             sorted_blocks = sorted(self, key=attrgetter('locator'))
+            list_of_block_dicts = [block._asdict() for block in sorted_blocks]
+            for block_dict in list_of_block_dicts:
+                block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
             # Remove spaces from separators for more compact representation
             self._json = json.dumps(
-                [block._asdict() for block in sorted_blocks],
+                list_of_block_dicts,
                 separators=(',', ':'),
                 sort_keys=True,
             )
@@ -104,7 +107,8 @@ class VisibleBlocksQuerySet(models.QuerySet):
             blocks = BlockRecordSet(blocks)
 
         try:
-            model = self.create_from_blockrecords(blocks)
+            with transaction.atomic():
+                model = self.create_from_blockrecords(blocks)
         except IntegrityError:
             # If an integrity error occurs, the VisibleBlocks model we want to
             # create already exists.  The hash is still the correct value.
@@ -119,7 +123,7 @@ class VisibleBlocks(models.Model):
     A django model used to track the state of a set of visible blocks under a
     given subsection at the time they are used for grade calculation.
 
-    This state is represented using an array of serialized BlockRecords, stored
+    This state is represented using an array of BlockRecord, stored
     in the blocks_json field. A hash of this json array is used for lookup
     purposes.
     """
@@ -156,7 +160,7 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
             user_id (int)
             usage_key (serialized UsageKey)
             course_version (str)
-            subtree_edited_date (datetime)
+            subtree_edited_timestamp (datetime)
             earned_all (float)
             possible_all (float)
             earned_graded (float)
@@ -164,16 +168,15 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
             visible_blocks (iterable of BlockRecord)
         """
         visible_blocks = kwargs.pop('visible_blocks')
+        kwargs['course_version'] = kwargs.get('course_version', None) or ""
+        if not kwargs.get('course_id', None):
+            kwargs['course_id'] = kwargs['usage_key'].course_key
 
         visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
-        grade = self.model(
-            course_id=kwargs['usage_key'].course_key,
+        return super(PersistentSubsectionGradeQuerySet, self).create(
             visible_blocks_id=visible_blocks_hash,
             **kwargs
         )
-        grade.full_clean()
-        grade.save()
-        return grade
 
 
 class PersistentSubsectionGrade(TimeStampedModel):
@@ -198,7 +201,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     usage_key = UsageKeyField(blank=False, max_length=255)
 
     # Information relating to the state of content when grade was calculated
-    subtree_edited_date = models.DateTimeField('last content edit timestamp', blank=False)
+    subtree_edited_timestamp = models.DateTimeField('last content edit timestamp', blank=False)
     course_version = models.CharField('guid of latest course version', blank=True, max_length=255)
 
     # earned/possible refers to the number of points achieved and available to achieve.
@@ -239,11 +242,18 @@ class PersistentSubsectionGrade(TimeStampedModel):
         user_id = kwargs.pop('user_id')
         usage_key = kwargs.pop('usage_key')
         try:
-            grade, is_created = cls.objects.get_or_create(user_id=user_id, usage_key=usage_key, defaults=kwargs)
+            with transaction.atomic():
+                grade, is_created = cls.objects.get_or_create(
+                    user_id=user_id,
+                    course_id=usage_key.course_key,
+                    usage_key=usage_key,
+                    defaults=kwargs,
+                )
         except IntegrityError:
-            is_created = False
-        if not is_created:
-            grade.update(**kwargs)
+            cls.update_grade(user_id=user_id, usage_key=usage_key, **kwargs)
+        else:
+            if not is_created:
+                grade.update(**kwargs)
 
     @classmethod
     def read_grade(cls, user_id, usage_key):
@@ -268,7 +278,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
             user_id,
             usage_key,
             course_version,
-            subtree_edited_date,
+            subtree_edited_timestamp,
             earned_all,
             possible_all,
             earned_graded,
@@ -294,7 +304,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         grade.update(
             course_version=course_version,
-            subtree_edited_date=subtree_edited_date,
+            subtree_edited_timestamp=subtree_edited_timestamp,
             earned_all=earned_all,
             possible_all=possible_all,
             earned_graded=earned_graded,
@@ -305,7 +315,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
     def update(
             self,
             course_version,
-            subtree_edited_date,
+            subtree_edited_timestamp,
             earned_all,
             possible_all,
             earned_graded,
@@ -318,8 +328,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
 
-        self.course_version = course_version
-        self.subtree_edited_date = subtree_edited_date
+        self.course_version = course_version or ""
+        self.subtree_edited_timestamp = subtree_edited_timestamp
         self.earned_all = earned_all
         self.possible_all = possible_all
         self.earned_graded = earned_graded

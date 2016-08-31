@@ -756,7 +756,7 @@ class TestCourseExportImport(LibraryTestCase):
 
         return self.get_lib_content_block_children(self.store.get_item(block_location).children[0])
 
-    def assert_problem_display_names(self, source_course_location, dest_course_location):
+    def assert_problem_display_names(self, source_course_location, dest_course_location, is_published):
         """
         Asserts that problems' display names in both source and destination courses are same.
         """
@@ -766,9 +766,22 @@ class TestCourseExportImport(LibraryTestCase):
         self.assertEquals(len(source_course_lib_children), len(dest_course_lib_children))
 
         for source_child_location, dest_child_location in zip(source_course_lib_children, dest_course_lib_children):
-            source_child = self.store.get_item(source_child_location)
-            dest_child = self.store.get_item(dest_child_location)
-            self.assertEquals(source_child.display_name, dest_child.display_name)
+            # Assert problem names on draft branch.
+            with self.store.branch_setting(branch_setting=ModuleStoreEnum.Branch.draft_preferred):
+                self.assert_names(source_child_location, dest_child_location)
+
+            if is_published:
+                # Assert problem names on publish branch.
+                with self.store.branch_setting(branch_setting=ModuleStoreEnum.Branch.published_only):
+                    self.assert_names(source_child_location, dest_child_location)
+
+    def assert_names(self, source_child_location, dest_child_location):
+        """
+        Check if blocks have same display_name.
+        """
+        source_child = self.store.get_item(source_child_location)
+        dest_child = self.store.get_item(dest_child_location)
+        self.assertEquals(source_child.display_name, dest_child.display_name)
 
     @ddt.data(True, False)
     def test_library_content_on_course_export_import(self, publish_item):
@@ -805,5 +818,6 @@ class TestCourseExportImport(LibraryTestCase):
 
         self.assert_problem_display_names(
             self.source_course.location,
-            dest_course.location
+            dest_course.location,
+            publish_item
         )

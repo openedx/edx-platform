@@ -47,7 +47,7 @@
 
 # Third-party:
 git+https://github.com/cyberdelia/django-pipeline.git@1.5.3#egg=django-pipeline==1.5.3
-git+https://github.com/edx/django-wiki.git@v0.0.8#egg=django-wiki==0.0.8
+git+https://github.com/edx/django-wiki.git@v0.0.9#egg=django-wiki==0.0.9
 git+https://github.com/edx/django-openid-auth.git@0.8#egg=django-openid-auth==0.8
 git+https://github.com/edx/MongoDBProxy.git@25b99097615bda06bd7cdfe5669ed80dc2a7fed0#egg=MongoDBProxy==0.1.0
 git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
@@ -69,7 +69,7 @@ git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
 
 # Used for testing
 git+https://github.com/edx/lettuce.git@0.2.20.002#egg=lettuce==0.2.20.002
-git+https://github.com/edx/pa11ycrawler.git@1.1.3#egg=pa11ycrawler==1.1.3
+git+https://github.com/edx/pa11ycrawler.git@1.2.0#egg=pa11ycrawler==1.2.0
 
 # Our libraries:
 git+https://github.com/edx/XBlock.git@xblock-0.4.12#egg=XBlock==0.4.12
@@ -77,7 +77,7 @@ git+https://github.com/edx/XBlock.git@xblock-0.4.12#egg=XBlock==0.4.12
 -e git+https://github.com/edx/event-tracking.git@0.2.1#egg=event-tracking==0.2.1
 -e git+https://github.com/edx/django-splash.git@v0.2#egg=django-splash==0.2
 -e git+https://github.com/edx/acid-block.git@e46f9cda8a03e121a00c7e347084d142d22ebfb7#egg=acid-xblock
-git+https://github.com/edx/edx-ora2.git@1.1.7#egg=ora2==1.1.7
+git+https://github.com/edx/edx-ora2.git@1.1.8#egg=ora2==1.1.8
 -e git+https://github.com/edx/edx-submissions.git@1.1.1#egg=edx-submissions==1.1.1
 git+https://github.com/edx/ease.git@release-2015-07-14#egg=ease==0.1.3
 git+https://github.com/edx/i18n-tools.git@v0.3.2#egg=i18n-tools==v0.3.2
