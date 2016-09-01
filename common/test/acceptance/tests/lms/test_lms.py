@@ -337,7 +337,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Verify that the expected errors are displayed.
         errors = self.register_page.wait_for_errors()
         self.assertIn(u'Please enter your Public username.', errors)
-        self.assertIn(u'You must agree to the edX Terms of Service and Honor Code.', errors)
+        self.assertIn(u'You must agree to the edX Terms of Service and Honor Code', errors)
         self.assertIn(u'Please select your Country.', errors)
         self.assertIn(u'Please tell us your favorite movie.', errors)
 
