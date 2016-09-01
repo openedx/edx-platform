@@ -3,8 +3,7 @@ metadata:
     display_name: Dropdown with Hints and Feedback
     markdown: |
         You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown with hints and feedback problems. Edit this component to replace this template with your own assessment.
-        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt
-        like this. <<
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this. <<
         [[
         an incorrect answer {{You can specify optional feedback like this, which appears after this answer is submitted.}}
         (the correct answer)
@@ -20,8 +19,7 @@ data:   |
             <optionresponse>
                 <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for dropdown with hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
                 <label>Add the question text, or prompt, here. This text is required.</label>
-                <description>You can add an optional tip or note related to the prompt
-                like this. </description>
+                <description>You can add an optional tip or note related to the prompt like this. </description>
                 <optioninput>
                     <option correct="False">an incorrect answer <optionhint>You can specify optional feedback like this, which appears after this answer is submitted.</optionhint></option>
                     <option correct="True">the correct answer</option>
