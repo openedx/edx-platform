@@ -16,7 +16,10 @@
     <div style="display:none;" name="${hidden}" inputid="input_${id}" />
 % endif
 
-<label class="problem-group-label" for="input_${id}">${response_data['label']}</label>
+% if response_data['label']:
+    <label class="problem-group-label" for="input_${id}">${response_data['label']}</label>
+% endif
+
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
