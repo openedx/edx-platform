@@ -8,6 +8,7 @@
 # Anatoli F. Peña Castillo <anatoli1993@yahoo.com>, 2016
 # Antonio Pardo <apardo@alabs.org>, 2013
 # Antonio Pardo <apardo@alabs.org>, 2013
+# Carlos Arias Fernandez <cararias@gmail.com>, 2016
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
 # David Salazar <imdjsg@gmail.com>, 2014
 # dzepeda <davitzepeda@hotmail.com>, 2014
@@ -184,7 +185,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-18 18:02+0000\n"
+"POT-Creation-Date: 2016-08-25 15:05+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -389,6 +390,7 @@ msgstr "Usted está inscrito como estudiante de código de honor"
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -1597,7 +1599,7 @@ msgstr "debe tener {0} caracteres o más"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must be {0} characters or fewer"
-msgstr ""
+msgstr "debe tener {0} caracteres o menos"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Must be more complex ({0})"
@@ -2092,7 +2094,6 @@ msgstr "Datos XML para la anotación"
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-#: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Display name for this module"
 msgstr "Mostrar el nombre para este módulo"
 
@@ -4767,13 +4768,36 @@ msgid "Poster URL"
 msgstr "URL de imagen"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "The label for this word cloud on the course page."
+msgstr "Etiqueta para esta nube de palabras en la página del curso"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: lms/templates/annotatable.html lms/templates/imageannotation.html
+#: lms/templates/textannotation.html lms/templates/videoannotation.html
+#: lms/templates/peer_grading/peer_grading.html
+msgid "Instructions"
+msgstr "Instrucciones"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid ""
+"Add instructions to help learners understand how to use the word cloud. "
+"Clear instructions are important, especially for learners who have "
+"accessibility requirements."
+msgstr ""
+"Añada las instrucciones que le permitan a los estudiantes saber como usar la"
+" nube de palabras.  Es importante que las instrucciones sean claras, "
+"especialmente para estudiantes que tengan requerimientos especiales de "
+"accesibilidad."
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Inputs"
 msgstr "Entradas"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Number of text boxes available for students to input words/sentences."
+msgid ""
+"The number of text boxes available for learners to add words and sentences."
 msgstr ""
-"Número de cuadros de texto disponibles para que los estudiantes ingresen "
+"Número de cuadros de texto disponibles para que los estudiantes añadan "
 "palabras o frases."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -4781,7 +4805,7 @@ msgid "Maximum Words"
 msgstr "Máximo de palabras"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Maximum number of words to be displayed in generated word cloud."
+msgid "The maximum number of words displayed in the generated word cloud."
 msgstr ""
 "Máximo número de palabras que se mostrarán en la nube de palabras generada."
 
@@ -4796,7 +4820,7 @@ msgstr ""
 "palabra."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Whether this student has posted words to the cloud."
+msgid "Whether this learner has posted words to the cloud."
 msgstr "Si este estudiante ha publicado palabras en la nube."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -4804,7 +4828,7 @@ msgid "Student answer."
 msgstr "Respuesta de estudiante"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "All possible words from all students."
+msgid "All possible words from all learners."
 msgstr "Todas las posibles palabras, de todos los estudiantes."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
@@ -4954,6 +4978,7 @@ msgstr "Términos del servicio y código de honor"
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -4969,6 +4994,7 @@ msgstr "Políticas de Accesibilidad"
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: themes/example/lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5489,7 +5515,7 @@ msgstr ""
 
 #: lms/djangoapps/commerce/models.py
 msgid "Path to order receipt page."
-msgstr ""
+msgstr "Ruta para la página de recibo de la orden."
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -6126,60 +6152,72 @@ msgstr "Notas"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "API key for accessing Sailthru. "
-msgstr ""
+msgstr "API key para acceder a Sailthru"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "API secret for accessing Sailthru. "
-msgstr ""
+msgstr "API secret para acceder a Sailthru"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru list name to add new users to. "
-msgstr ""
+msgstr "Nombre la lista en Sailthru para añadir nuevos usuarios"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru connection retry interval (secs)."
-msgstr ""
+msgstr "Intervalo de reintento de conexión en Sailthru (en segundos)."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru maximum retries."
-msgstr ""
+msgstr "Máximo número de reintentos en Sailthru"
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on activation send. "
-msgstr ""
+msgstr "Plantilla de Sailthru para ser usada en los envíos de activación."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru template to use on abandoned cart reminder. Deprecated."
 msgstr ""
+"Plantilla de Sailthru para ser usada en el recordatorio de carrito de "
+"compras abandonado. Deprecada."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
 "Sailthru minutes to wait before sending abandoned cart message. Deprecated."
 msgstr ""
+"Minutos que se espera antes de enviar el mensaje de carrito abandonado. "
+"Deprecado."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on enrolling for audit. "
 msgstr ""
+"Plantilla de Sailthru para ser usada en la inscripción a cursos modo "
+"asistente."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on upgrading a course. Deprecated "
 msgstr ""
+"Plantilla de Sailthru para ser usada en el upgrade de un curso. Deprecado."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Sailthru send template to use on purchasing a course seat. Deprecated "
 msgstr ""
+"Plantilla de Sailthru para ser usada en la compra de silla para un curso. "
+"Deprecado."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Use the Sailthru content API to fetch course tags."
 msgstr ""
+"Use la API de contenidos de Sailthru para recuperar etiquetas del curso."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Number of seconds to cache course content retrieved from Sailthru."
 msgstr ""
+"Número de segundos para tener en cache el contenido del curso obtenido desde"
+" Sailthru."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid "Cost in cents to report to Sailthru for enrolls."
-msgstr ""
+msgstr "Costo en centavos de reportar a Sailthru las inscripciones."
 
 #: lms/djangoapps/email_marketing/models.py
 msgid ""
@@ -6223,7 +6261,7 @@ msgstr "Error de integridad de datos"
 
 #: lms/djangoapps/instructor/services.py
 msgid "Proctored Exam Review: {review_status}"
-msgstr ""
+msgstr "Revisión de examen supervisado: {review_status}"
 
 #: lms/djangoapps/instructor/services.py
 msgid ""
@@ -6446,6 +6484,9 @@ msgid ""
 "The enrolled learner profile report is being created. To view the status of "
 "the report, see Pending Tasks below."
 msgstr ""
+"El reporte con el perfil de los estudiantes inscritos está siendo generado. "
+"Puede ver el estado de la tarea de generación en la sección de Tareas "
+"Pendientes de Instructor en la parte de abajo de la página."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6453,6 +6494,10 @@ msgid ""
 " report, see Pending Tasks below. You will be able to download the report "
 "when it is complete."
 msgstr ""
+"El reporte de inscripciones está siendo generado. Puede ver el estado de la "
+"tarea de generación en la sección de Tareas Pendientes de Instructor en la "
+"parte de abajo de la página. Podrá descargar el reporte una vez esté "
+"completado."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6460,6 +6505,10 @@ msgid ""
 "about learners who can enroll in the course. To view the status of the "
 "report, see Pending Tasks below."
 msgstr ""
+"El reporte de inscripciones está siendo generado. Este reporte contiene "
+"información de los estudiantes que pueden inscribirse al curso. Puede ver el"
+" estado de la tarea de generación en la sección de Tareas Pendientes de "
+"Instructor en la parte de abajo de la página."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
@@ -6533,6 +6582,9 @@ msgid ""
 "report, see Pending Tasks below. You will be able to download the report "
 "when it is complete."
 msgstr ""
+"El reporte de inscripciones detallado está siendo generado. Puede ver el "
+"estado de la tarea de generación en la sección de Tareas Pendientes de "
+"Instructor. Podrá descargar el reporte una vez esté completado."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -6652,6 +6704,10 @@ msgid ""
 "'Pending Tasks' table for the status of the task. When completed, the report"
 " will be available for download in the table below."
 msgstr ""
+"Una tarea de reporte de datos de ORA ya está en progreso. Verifique la tabla"
+" de 'Tareas pendientes de instructor' para ver el estado de esta tarea. "
+"Cuando se haya completado, el reporte estará disponible para ser descargado "
+"en la tabla a continuación."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -8955,11 +9011,11 @@ msgstr "Kosovo"
 
 #: lms/templates/logout.html
 msgid "Signed Out"
-msgstr ""
+msgstr "Sesión cerrada"
 
 #: lms/templates/logout.html
 msgid "You have signed out."
-msgstr ""
+msgstr "Ha cerrado su sesión."
 
 #: lms/templates/logout.html
 #, python-format
@@ -9452,6 +9508,8 @@ msgid ""
 "Once you have approved this request, go to {catalog_admin_url} to set up a "
 "catalog for this user."
 msgstr ""
+"Una vez haya aprobado esta solicitud, visite {catalog_admin_url} para "
+"configurar un catálogo para este usuario."
 
 #: openedx/core/djangoapps/api_admin/forms.py
 msgid "Company Address"
@@ -9564,6 +9622,8 @@ msgid ""
 "API root to be used for server-to-server requests (e.g., https://catalog-"
 "internal.example.com/api/v1/)."
 msgstr ""
+"API root para ser usada en peticiones de servidor a servidor. (Ej: https"
+"://catalog-internal.example.com/api/v1/)."
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid ""
@@ -10088,7 +10148,7 @@ msgstr "Hito de apertura para {usage_key}"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Display name for this component"
-msgstr ""
+msgstr "Nombre para mostrar de este componente"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
@@ -10117,21 +10177,6 @@ msgid ""
 msgstr ""
 "Nombre de subcategoría para la discusión. Este nombre aparece en el panel "
 "izquierdo de la pantalla de foros de discusión para el curso."
-
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option requires an argument"
-msgstr "%s requiere un argumento"
-
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option requires %d arguments"
-msgstr "%s requiere %d argumentos"
-
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option does not take a value"
-msgstr "%s no requiere argumentos"
 
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
@@ -10708,6 +10753,7 @@ msgstr "Número de curso:"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "Cursos"
@@ -10844,6 +10890,7 @@ msgid "Choose Language"
 msgstr "Seleccionar idioma"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 msgid "Account"
 msgstr "Cuenta"
 
@@ -10904,6 +10951,7 @@ msgstr "Enviar un correo electrónico a {email}"
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/example/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "Contáctenos"
@@ -10917,6 +10965,7 @@ msgid "Usermenu dropdown"
 msgstr "Menú desplegable de usuario"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Cerrar sesión"
@@ -11012,12 +11061,6 @@ msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
-#: lms/templates/peer_grading/peer_grading.html
-msgid "Instructions"
-msgstr "Instrucciones"
-
-#: lms/templates/annotatable.html lms/templates/imageannotation.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
 msgid "Collapse Instructions"
 msgstr "Minimizar Instrucciones"
 
@@ -11041,11 +11084,11 @@ msgstr "Haga clic para añadir"
 msgid "Bookmark"
 msgstr "Marcador"
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
 msgstr "Aprender más"
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "Starts"
 msgstr "Empieza"
 
@@ -11055,6 +11098,7 @@ msgstr "Ver todos los cursos"
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/example/lms/templates/header.html
 msgid "Dashboard"
 msgstr "Panel de control"
 
@@ -11152,6 +11196,7 @@ msgstr "Debe registrarse antes de intentar acceder a la unidad"
 #: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "Enroll"
 msgstr "Inscribirse"
 
@@ -11302,10 +11347,11 @@ msgid "Tell us the details"
 msgstr "Indíquenos los detalles"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
-"Incluya los mensajes de error, los pasos realizados que llevaron al "
-"inconveniente, etc."
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -11337,13 +11383,8 @@ msgid "Brief description of the problem"
 msgstr "Breve descripción del problema"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
-msgstr ""
-"Detalles sobre el problema que estás "
-"experimentando{asterisk}{begin_span}Incluye mensajes de error, pasos para "
-"reproducir el problema, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
+msgstr "Detalles del problema que está encontrando{asterisk}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -11673,7 +11714,8 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Datos planos:"
 
-#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/example/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Global"
 
@@ -11713,6 +11755,7 @@ msgid "Register"
 msgstr "Registrarse"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "Iniciar sesión"
@@ -12377,7 +12420,7 @@ msgstr ""
 msgid "Dashboard for:"
 msgstr "Panel de Control para:"
 
-#: lms/templates/user_dropdown.html
+#: lms/templates/user_dropdown.html themes/example/lms/templates/header.html
 msgid "Profile"
 msgstr "Perfil"
 
@@ -12447,12 +12490,12 @@ msgid "Download Handout"
 msgstr "Descargar documento"
 
 #: lms/templates/word_cloud.html
-msgid "Your words:"
-msgstr "Tus palabras:"
+msgid "{num} of {total}"
+msgstr "{num} de {total}"
 
 #: lms/templates/word_cloud.html
-msgid "Total number of words:"
-msgstr "Número total de palabras:"
+msgid "Your words were:"
+msgstr "Sus palabras fueron:"
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
@@ -13756,10 +13799,12 @@ msgid "This content is graded"
 msgstr "Este contenido es calificable"
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "Ocurrió un error. Por favor intente nuevamente más tarde."
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -13839,6 +13884,7 @@ msgid "Additional Resources"
 msgstr "Recursos Adicionales"
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "Inscribirse"
 
@@ -18616,6 +18662,85 @@ msgstr ""
 "lucro, se apoya en los Certificados Verificados para costear la educación "
 "gratuita para cualquier persona a nivel global."
 
+#: themes/example/lms/templates/header.html
+msgid "Create Account"
+msgstr "Crear cuenta"
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Want to purchase this course for a group?"
+msgstr "¿Desea comprar este curso para un grupo?"
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"You can purchase enrollment codes for this course to distribute to your team"
+msgstr ""
+"Puede comprar códigos de inscripción para este curso para distribuirlos en "
+"su equipo."
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Purchase for a Group"
+msgstr "Comprar para un grupo"
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"Bulk discounts may apply for groups larger than 10. Contact "
+"{link_start}harvardxplus@harvard.edu{link_end} for more information."
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Email Us"
+msgstr "Escríbanos"
+
+#: themes/example/lms/templates/courseware/courses.html
+msgid "Lorem ipsum dolor sit amet."
+msgstr "Lorem ipsum dolor sit amet."
+
+#: themes/example/lms/templates/static_templates/about.html
+msgid "About Us"
+msgstr "Acerca de"
+
+#: themes/example/lms/templates/static_templates/contact.html
+msgid "Thank you for your inquiry"
+msgstr "Gracias por su solicitud"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "FAQ's"
+msgstr "Preguntas Frequentes"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "General FAQs"
+msgstr "Preguntas generales"
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Lorem ipsum dolor sit amet"
+msgstr "Lorem ipsum dolor sit amet"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Academic Planning"
+msgstr "Planeación académica"
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Back to top"
+msgstr "Volver arriba"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Registration"
+msgstr "Registro"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Finances"
+msgstr "Finanzas"
+
+#: themes/example/lms/templates/student_account/login_and_register.html
+msgid "Sign in or Create Account"
+msgstr "Iniciar sesión o crear una cuenta"
+
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
 #: themes/red-theme/lms/templates/footer.html
@@ -19307,6 +19432,11 @@ msgid ""
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
 msgstr ""
+"Ningún contenido está actualmente visible para el curso y no hay estudiantes"
+" inscritos. Asegúrese de revisar y reiniciar las fechas, incluyendo la fecha"
+" de inicio y fin del curso, definir el equipo del curso, revisar las "
+"actualizaciones del curso y otros recursos con fecha, así como de crear y "
+"comenzar las discusiones y la wiki."
 
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
@@ -20034,6 +20164,9 @@ msgid ""
 "{studio_name} uses a simple hierarchy of {strong_start}sections{strong_end} "
 "and {strong_start}subsections{strong_end} to organize your content."
 msgstr ""
+"{studio_name} utiliza una sencilla jerarquía de "
+"{strong_start}secciones{strong_end} y {strong_start}subsecciones{strong_end}"
+" para organizar e contenido."
 
 #: cms/templates/howitworks.html
 msgid "Change Your Mind Anytime"
@@ -20056,6 +20189,9 @@ msgid ""
 "Build and release {strong_start}sections{strong_end} to your students "
 "incrementally. You don't have to have it all done at once."
 msgstr ""
+"Construya y libere las {strong_start}secciones{strong_end} para sus "
+"estudiantes de forma incremental. No tiene que tener todo terminado de una "
+"sola vez."
 
 #: cms/templates/howitworks.html
 msgid "Learning is More than Just Lectures"
@@ -20153,6 +20289,9 @@ msgid ""
 " it to go live and {studio_name} takes care of the rest. Build your course "
 "incrementally."
 msgstr ""
+"Cuando haya terminado una {strong_start}sección{strong_end}, elija cuando "
+"desea que esta sea visible para los estudiantes y {studio_name} se encargará"
+" del resto. Construya su curso de manera incremental."
 
 #: cms/templates/howitworks.html
 msgid "Work in Teams"
@@ -20172,7 +20311,7 @@ msgstr "¡Regístrese en {studio_name} hoy!"
 
 #: cms/templates/howitworks.html
 msgid "Sign Up & Start Making Your {platform_name} Course"
-msgstr ""
+msgstr "Regístrese y comience a elaborar su curso en {platform_name} "
 
 #: cms/templates/howitworks.html
 msgid "Already have a {studio_name} Account? Sign In"
@@ -21819,6 +21958,9 @@ msgid ""
 " you use double quotation marks (\") around the string. Do not use single "
 "quotation marks (')."
 msgstr ""
+"{em_start}Nota:{em_end} Cuando ingrese cadenas de texto como valores de las "
+"políticas, asegúrese de usar comillas dobles (\") a los lados de la cadena "
+"de texto. No utilice comillas sencillas (')."
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
