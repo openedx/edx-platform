@@ -80,6 +80,7 @@ from lms.envs.common import (
 
     # django-debug-toolbar
     DEBUG_TOOLBAR_PATCH_SETTINGS,
+    BLOCK_STRUCTURES_SETTINGS,
 )
 from path import Path as path
 from warnings import simplefilter
