@@ -67,7 +67,7 @@ networkx==1.7
 nose-xunitmp==0.3.2
 oauthlib==1.0.3
 paramiko==1.9.0
-path.py==7.2
+path.py==8.2.1
 piexif==1.0.2
 Pillow==3.1.1
 polib==1.0.3
