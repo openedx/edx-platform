@@ -1190,3 +1190,7 @@ PARTNER_SUPPORT_EMAIL = ''
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'affiliate_id'
+
+############## Settings for Studio Context Sensitive Help ##############
+
+DOC_LINK_BASE_URL = None

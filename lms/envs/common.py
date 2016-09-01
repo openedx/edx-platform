@@ -2965,3 +2965,7 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 
 # This should be set in configuration
 NEO4J_CONFIG = None
+
+############## Settings for LMS Context Sensitive Help ##############
+
+DOC_LINK_BASE_URL = None

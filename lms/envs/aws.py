@@ -865,4 +865,9 @@ APP_UPGRADE_CACHE_TIMEOUT = ENV_TOKENS.get('APP_UPGRADE_CACHE_TIMEOUT', APP_UPGR
 AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE_NAME)
 
 ############## Settings for Neo4j ############################
+
 NEO4J_CONFIG = AUTH_TOKENS.get('NEO4J_CONFIG')
+
+############## Settings for LMS Context Sensitive Help ##############
+
+DOC_LINK_BASE_URL = ENV_TOKENS.get('DOC_LINK_BASE_URL', DOC_LINK_BASE_URL)
