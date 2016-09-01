@@ -358,7 +358,7 @@ class InputTypeBase(object):
 
         context = self._get_render_context()
 
-        html = self.capa_system.render_template(self.template, context)
+        html = self.capa_system.render_template(self.template, context).strip()
 
         try:
             output = etree.XML(html)
