@@ -647,9 +647,14 @@ class CcxListTest(CcxRestApiTest):
             list_staff_ccx_course = list_with_level(course_ccx, 'staff')
             list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
 
-        self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
-        for course_user, ccx_user in izip(sorted(list_staff_master_course), sorted(list_staff_ccx_course)):
-            self.assertEqual(course_user, ccx_user)
+        # The "Coach" in the parent course becomes "Staff" on the CCX, so the CCX should have 1 "Staff"
+        # user more than the parent course
+        self.assertEqual(len(list_staff_master_course) + 1, len(list_staff_ccx_course))
+        # Make sure all of the existing course staff are passed to the CCX
+        for course_user in list_staff_master_course:
+            self.assertIn(course_user, list_staff_ccx_course)
+        # Make sure the "Coach" on the parent course is "Staff" on the CCX
+        self.assertIn(self.coach, list_staff_ccx_course)
         self.assertEqual(len(list_instructor_master_course), len(list_instructor_ccx_course))
         for course_user, ccx_user in izip(sorted(list_instructor_master_course), sorted(list_instructor_ccx_course)):
             self.assertEqual(course_user, ccx_user)

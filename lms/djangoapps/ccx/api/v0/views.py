@@ -766,8 +766,8 @@ class CCXDetailView(GenericAPIView):
                     email_students=True,
                     email_params=email_params,
                 )
-                # enroll the coach to the newly created ccx
-                assign_coach_role_to_ccx(ccx_course_key, coach, master_course_object.id)
+                # make the new coach staff on the CCX
+                assign_staff_role_to_ccx(ccx_course_key, coach, master_course_object.id)
 
         # using CCX object as sender here.
         responses = SignalHandler.course_published.send(
