@@ -32,6 +32,14 @@ describe 'MarkdownEditingDescriptor', ->
       expect(@descriptor.confirmConversionToXml).toHaveBeenCalled()
       expect($('.editor-bar').length).toEqual(0)
 
+  describe 'formatted xml', ->
+    it 'renders pre formatted xml', ->
+      expectedXml = '<div>\n  <h3>heading</h3>\n  <p>some text</p>\n</div>'
+      loadFixtures 'problem-with-markdown.html'
+      @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
+      @descriptor.createXMLEditor('<div><h3>heading</h3><p>some text</p></div>')
+      expect(@descriptor.xml_editor.getValue()).toEqual(expectedXml)
+
   describe 'insertMultipleChoice', ->
     it 'inserts the template if selection is empty', ->
       revisedSelection = MarkdownEditingDescriptor.insertMultipleChoice('')
