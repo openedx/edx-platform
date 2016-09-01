@@ -185,6 +185,14 @@ class ProblemPage(PageObject):
         self.wait_for_element_visibility('.notification.error', msg)
         self.wait_for_element_visibility('.fa-close', "Waiting for incorrect notification icon")
 
+    def wait_partial_notification_visible(self):
+        """
+        Check for visibility of the partially visible notification and icon.
+        """
+        msg = "Wait for {} notification to be visible".format('error')
+        self.wait_for_element_visibility('.notification.success', msg)
+        self.wait_for_element_visibility('.fa-asterisk', "Waiting for incorrect notification icon")
+
     def click_hint(self):
         """
         Click the Hint button.
