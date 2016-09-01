@@ -252,7 +252,7 @@ class @Problem
   focus_on_submit_notification: =>
     @submitNotification = @$('.notification-response')
     if @submitNotification.length > 0
-      @notification.focus()
+      @submitNotification.focus()
 
   ###
   # 'submit_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
@@ -798,9 +798,10 @@ class @Problem
     #   'enable' is a boolean to determine enabling/disabling of submit button.
     #   'changeText' is a boolean to determine if there is need to change the
     #    text of submit button as well.
-    if enable
-      @submitButton.removeAttr 'disabled'
-      @submitButton.removeClass 'is-disabled'
+    attempts_remaining = @submitButton.data('attempts-remaining')
+    if enable && attempts_remaining != 0
+        @submitButton.removeAttr 'disabled'
+        @submitButton.removeClass 'is-disabled'
       if changeText
         @submitButtonLabel.text(@submitButtonSubmitText)
     else
