@@ -626,4 +626,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
     # make all responsetypes descendants of a single problem element
     ## safe-lint: disable=javascript-concat-html
-    return '<problem>\n' + responseTypesXML.join('\n\n') + demandHints + '\n</problem>'
+    # format and return xml
+    finalXml = '<problem>' + responseTypesXML.join('\n\n') + demandHints + '</problem>'
+    return PrettyPrint.xml(finalXml);
