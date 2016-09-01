@@ -28,7 +28,6 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action button').click @refreshAnswers
-    @notification = @$('.notification-response')
     @reviewButton = @$('.action .review-btn')
     @reviewButton.click @scroll_to_problem_meta
     @submitButton = @$('.action .submit')
@@ -178,7 +177,7 @@ class @Problem
     $.postWithPrefix "#{url}/input_ajax", data, callback
 
 
-  render: (content, callback) ->
+  render: (content) ->
     if content
       @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
@@ -187,7 +186,6 @@ class @Problem
         @bind()
         @queueing()
         @renderProgressState()
-        callback?()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -250,6 +248,11 @@ class @Problem
         scrollTop: @questionTitle.offset().top
       }, 500);
       @questionTitle.focus()
+
+  focus_on_submit_notification: =>
+    @submitNotification = @$('.notification-response')
+    if @submitNotification.length > 0
+      @notification.focus()
 
   ###
   # 'submit_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
@@ -356,7 +359,7 @@ class @Problem
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
-          @notification.focus()
+          @focus_on_submit_notification()
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
