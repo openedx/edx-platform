@@ -78,7 +78,12 @@ DEBUG_TOOLBAR_PANELS = (
 )
 
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar'
+    # Profile panel is incompatible with wrapped views
+    # See https://github.com/jazzband/django-debug-toolbar/issues/792
+    'DISABLE_PANELS': (
+        'debug_toolbar.panels.profiling.ProfilingPanel',
+    ),
+    'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar',
 }
 
 
