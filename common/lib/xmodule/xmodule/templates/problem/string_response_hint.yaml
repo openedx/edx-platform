@@ -3,12 +3,9 @@ metadata:
     display_name: Text Input with Hints and Feedback
     markdown: |
 
-        You can use this template as a guide to the simple editor markdown and OLX markup to use for text
-        input with hints and feedback problems. Edit this component to replace this template with your
-        own assessment.
+        You can use this template as a guide to the simple editor markdown and OLX markup to use for text input with hints and feedback problems. Edit this component to replace this template with your own assessment.
 
-        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or
-        note related to the prompt like this. <<
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this. <<
 
         = the correct answer {{You can specify optional feedback like this, which appears after this answer is submitted.}}
         or= optional acceptable variant of the correct answer
@@ -21,8 +18,7 @@ hinted: true
 data:   |
         <problem>
             <stringresponse answer="the correct answer" type="ci">
-                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for text input with</p>
-                <p>hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for text input with hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
                 <label>Add the question text, or prompt, here. This text is required.</label>
                 <description>You can add an optional tip or note related to the prompt like this.</description>
                 <correcthint>You can specify optional feedback like this, which appears after this answer is submitted.</correcthint>
