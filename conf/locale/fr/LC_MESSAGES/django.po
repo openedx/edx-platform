@@ -1017,9 +1017,9 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
-msgstr ""
+msgstr "Trop de tentatives de connexion échouées. Réessayez plus tard."
 
-#: lms/templates/provider_login.html
+#: common/djangoapps/student/views.py lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "Adresse mail ou mot de passe incorrect."
 
@@ -1028,14 +1028,16 @@ msgid ""
 "Before you sign in, you need to activate your account. We have sent you an "
 "email message with instructions for activating your account."
 msgstr ""
+"Avant de vous identifier, vous devez activer votre compte. Un email "
+"contenant les instructions pour activer votre compte vous a été envoyé."
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
-msgstr ""
+msgstr "Veuillez saisir votre nom d'utilisateur"
 
 #: common/djangoapps/student/views.py
 msgid "Please choose an option"
-msgstr ""
+msgstr "Veuillez choisir une option, s'il vous plaît"
 
 #: common/djangoapps/student/views.py
 msgid "User with username {} does not exist"
@@ -1043,15 +1045,15 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Successfully disabled {}'s account"
-msgstr ""
+msgstr "Désactivation du compte {} réussie"
 
 #: common/djangoapps/student/views.py
 msgid "Successfully reenabled {}'s account"
-msgstr ""
+msgstr "Réactivation du compte {} réussie"
 
 #: common/djangoapps/student/views.py
 msgid "Unexpected account status"
-msgstr ""
+msgstr "Statut du compte inattendu"
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
@@ -1059,7 +1061,7 @@ msgstr "Un compte avec le même nom d'utilisateur '{username}' existe déjà."
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr ""
+msgstr "Un compte avec l'adresse email '{email}' existe déjà."
 
 #: common/djangoapps/student/views.py
 msgid "An access_token is required when passing value ({}) for provider."
@@ -1067,15 +1069,17 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "The provided access_token is already associated with another user."
-msgstr ""
+msgstr "L'access_token fourni est déjà associé à un autre utilisateur."
 
 #: common/djangoapps/student/views.py
 msgid "The provided access_token is not valid."
-msgstr ""
+msgstr "L'access_token fourni n'est pas valide."
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
 msgstr ""
+"Erreur inconnue. Merci de nous envoyer un email pour nous indiquer les "
+"circonstances du problème rencontré."
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -1099,19 +1103,19 @@ msgstr[1] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "La réinitialisation du mot de passe a échoué."
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
-msgstr ""
+msgstr "Pas d'utilisateur inactif avec cette adresse email"
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send reactivation email"
-msgstr ""
+msgstr "Impossible d'envoyer le mail de réactivation"
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
-msgstr ""
+msgstr "Une adresse courriel valide est requise."
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
@@ -1143,6 +1147,10 @@ msgid ""
 "(name, email, etc.) during the registration process. Only select this option"
 " for trusted providers that are known to provide accurate user information."
 msgstr ""
+"Si cette option est activée, les utilisateurs n'auront pas à confirmer leurs"
+" informations (nom, email, etc.) lors de l'inscription. Sélectionner cette "
+"option uniquement pour des fournisseurs de confiance connus pour fournir des"
+" informations utilisateur exactes."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1153,9 +1161,10 @@ msgstr ""
 "leur adresse mail, et leur compte sera activé immédiatement après "
 "inscription."
 
+#: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
 msgid "Please wait"
-msgstr "Veuillez patienter"
+msgstr "Veuillez patienter s'il vous plaît"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -1549,7 +1558,7 @@ msgstr "Doit être plus complexe ({0})"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more uppercase characters"
-msgstr ""
+msgstr "doit contenir {0} ou plus de lettres majuscules"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more lowercase characters"
@@ -1623,6 +1632,8 @@ msgstr ""
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
+"Ne peut pas recalculer les scores des questions avec d'éventuelles "
+"soumissions de fichier"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
@@ -4617,7 +4628,7 @@ msgstr ""
 
 #: lms/djangoapps/certificates/models.py
 msgid "Description of the asset."
-msgstr ""
+msgstr "Description de la ressource."
 
 #: lms/djangoapps/certificates/models.py
 msgid "Asset file. It could be an image or css file."
@@ -4647,15 +4658,15 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "User {username} does not exist"
-msgstr ""
+msgstr "L'utilisateur {username} n'existe pas"
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "{course_key} is not a valid course key"
-msgstr ""
+msgstr "{course_key} n'est pas une clé de cours valide"
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "The course {course_key} does not exist"
-msgstr ""
+msgstr "Le cours {course_key} n'existe pas"
 
 #: lms/djangoapps/certificates/views/support.py
 msgid "User {username} is not enrolled in the course {course_key}"
@@ -4736,7 +4747,7 @@ msgstr ""
 #. protect published content
 #: lms/djangoapps/certificates/views/webview.py
 msgid "All rights reserved"
-msgstr ""
+msgstr "Tous droits réservés"
 
 #. Translators:  This text is bound to the HTML 'title' element of the page
 #. and appears
@@ -4768,7 +4779,7 @@ msgstr ""
 #. for the certificate
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Issued On:"
-msgstr ""
+msgstr "Publié le :"
 
 #. Translators:  The Certificate ID Number is an alphanumeric value unique to
 #. each individual certificate
@@ -4806,23 +4817,23 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "About {platform_name}"
-msgstr ""
+msgstr "A propos de {platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Learn more about {platform_name}"
-msgstr ""
+msgstr "En savoir plus sur {platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Learn with {platform_name}"
-msgstr ""
+msgstr "Apprendre avec {platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Work at {platform_name}"
-msgstr ""
+msgstr "Travailler à {platform_name}"
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "Contact {platform_name}"
-msgstr ""
+msgstr "Contacter {platform_name}"
 
 #. Translators:  This text appears near the top of the certficate and
 #. describes the guarantee provided by edX
@@ -4844,7 +4855,7 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "I completed the {course_title} course on {platform_name}."
-msgstr ""
+msgstr "J'ai terminé le cours {course_title} sur {platform_name}."
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
@@ -4853,7 +4864,7 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "More Information About {user_name}'s Certificate:"
-msgstr ""
+msgstr "Plus d'informations sur le certificat de {user_name} :"
 
 #. Translators: This line is displayed to a user who has completed a course
 #. and achieved a certification
@@ -4875,27 +4886,33 @@ msgstr ""
 msgid "More about {fullname}'s accomplishment"
 msgstr "En savoir plus sur les résultats de {fullname}"
 
+#: lms/djangoapps/class_dashboard/dashboard_data.py
+#: lms/djangoapps/instructor/views/api.py
+#: lms/djangoapps/instructor/views/tools.py
+#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/api_admin/catalogs/search.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
+#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Grade"
 msgstr "Note"
 
+#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Percent"
 msgstr "Pourcentage"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Opened by this number of students"
-msgstr ""
+msgstr "Ouvert par ce nombre d'étudiants"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "subsections"
-msgstr ""
+msgstr "sous-sections"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Count of Students"
@@ -4903,15 +4920,15 @@ msgstr ""
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Percent of Students"
-msgstr ""
+msgstr "Pourcentage des étudiants"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Score"
-msgstr ""
+msgstr "Note"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "problems"
-msgstr ""
+msgstr "exercices"
 
 #: lms/djangoapps/commerce/api/v1/serializers.py
 msgid "{course_id} is not a valid course key."
@@ -4957,19 +4974,20 @@ msgstr ""
 
 #: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
-msgstr ""
+msgstr "[Remboursement] Demande de remboursement de l'utilisateur"
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
-msgstr ""
+msgstr "Reçu"
 
 #: lms/djangoapps/commerce/views.py
 msgid "Payment Failed"
-msgstr ""
+msgstr "Le paiement a échoué"
 
 #: lms/djangoapps/commerce/views.py
 msgid "There was a problem with this transaction. You have not been charged."
 msgstr ""
+"Il y a eu un problème avec cette transaction. Le montant n'a pas été débité."
 
 #: lms/djangoapps/commerce/views.py
 msgid ""
@@ -4985,15 +5003,15 @@ msgstr ""
 
 #: lms/djangoapps/commerce/views.py
 msgid "Please wait a few minutes and then try again."
-msgstr ""
+msgstr "Veuillez attendre quelques minutes s'il vous plaît et réessayez."
 
 #: lms/djangoapps/commerce/views.py
 msgid "For help, contact {payment_support_link}."
-msgstr ""
+msgstr "Pour obtenir de l'aide, contactez {payment_support_link}."
 
 #: lms/djangoapps/commerce/views.py
 msgid "An error occurred while creating your receipt."
-msgstr ""
+msgstr "Une erreur est survenue lors de la création de votre reçu."
 
 #: lms/djangoapps/commerce/views.py
 msgid ""
@@ -5010,7 +5028,7 @@ msgstr "Wiki"
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
-msgstr ""
+msgstr "Ceci est le wiki pour _{course_name}_ de **{organization}**."
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Course page automatically created."
@@ -5018,19 +5036,19 @@ msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Welcome to the {platform_name} Wiki"
-msgstr ""
+msgstr "Bienvenue sur le wiki de {platform_name}"
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
-msgstr ""
+msgstr "Visitez le wiki d'un cours pour ajouter un article."
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "Course has not started"
-msgstr ""
+msgstr "Le cours n'a pas démarré"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "Course does not start until {}"
-msgstr ""
+msgstr "Le cours ne commence pas avant le {}"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You have unfulfilled milestones"
@@ -5038,11 +5056,11 @@ msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You do not have access to this course"
-msgstr ""
+msgstr "Vous n'avez pas accès à ce cours"
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You do not have access to this course on a mobile device"
-msgstr ""
+msgstr "Vous n'avez pas accès à ce cours sur un appareil mobile"
 
 #. Translators: 'absolute' is a date such as "Jan 01,
 #. 2020". 'relative' is a fuzzy description of the time until
@@ -5067,7 +5085,7 @@ msgstr "Début du cours"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course End"
-msgstr ""
+msgstr "Fin du Cours"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid ""
@@ -5098,6 +5116,7 @@ msgstr ""
 msgid "Upgrade to Verified Certificate"
 msgstr ""
 
+#: lms/djangoapps/courseware/date_summary.py
 #: cms/templates/group_configurations.html
 msgid "Learn More"
 msgstr "En savoir plus"
@@ -5142,6 +5161,7 @@ msgstr ""
 msgid "Syllabus"
 msgstr "Syllabus"
 
+#: lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Progress"
 msgstr "Progression"
@@ -5169,11 +5189,11 @@ msgstr ""
 #. course costs nothing so it is free.
 #: lms/djangoapps/courseware/views/views.py
 msgid "Free"
-msgstr ""
+msgstr "Gratuit"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
-msgstr ""
+msgstr "Localisation invalide."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "User {username} has never accessed problem {location}"
@@ -5185,7 +5205,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Course is not valid"
-msgstr ""
+msgstr "Le cours n'est pas valide"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate will be available when you pass the course."
@@ -5259,29 +5279,31 @@ msgid ""
 "Non usable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
 msgstr ""
+"Aucune adresse URL git fournie. Une adresse comme celle ci : "
+"git@github.com:mitocw/edx4edx_lite.git est attendue"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to get git log"
-msgstr ""
+msgstr "Impossible d'obtenir le log git"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "git clone or pull failed!"
-msgstr ""
+msgstr "Echec de git clone ou pull !"
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to run import command."
-msgstr ""
+msgstr "Impossible d'exécuter la commande d'importation."
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The underlying module store does not support import."
-msgstr ""
+msgstr "Le module de stockage sous-jacent ne supporte pas l'importation."
 
 #. Translators: This is an error message when they ask for a
 #. particular version of a git repository and that version isn't
 #. available from the remote source they specified
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The specified remote branch is not available."
-msgstr ""
+msgstr "La branche distante spécifiée n'est pas disponible."
 
 #. Translators: Error message shown when they have asked for a git
 #. repository branch, a specific version within a repository, that
@@ -5304,7 +5326,7 @@ msgstr ""
 #. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {username}, error {error}\n"
-msgstr ""
+msgstr "Échec de l'authentification de {username}, erreur {error}\n"
 
 #. Translators: This message means that the user could not be authenticated
 #. (that is, we could
@@ -5312,7 +5334,7 @@ msgstr ""
 #. their password was wrong)
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed in authenticating {username}\n"
-msgstr ""
+msgstr "Échec de l'authentification de {username}\n"
 
 #. Translators: this means that the password has been corrected (sometimes the
 #. database needs to be resynchronized)
@@ -5325,11 +5347,11 @@ msgstr ""
 #. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "All ok!"
-msgstr ""
+msgstr "Tout est ok !"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Must provide username"
-msgstr ""
+msgstr "Vous devez fournir un nom d'utilisateur"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Must provide full name"
@@ -5338,11 +5360,11 @@ msgstr "Vous devez fournir un nom complet"
 #. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Email address must end in {domain}"
-msgstr ""
+msgstr "L'adresse e-mail doit se terminer par {domain}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed - email {email_addr} already exists as {external_id}"
-msgstr ""
+msgstr "Échec - l'adresse e-mail {email_addr} existe déjà pour {external_id}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
@@ -5350,15 +5372,15 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email address required (not username)"
-msgstr ""
+msgstr "adresse email requise (pas de nom d'utilisateur)"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Oops, failed to create user {user}, {error}"
-msgstr ""
+msgstr "Oups, impossible de créer l'utilisateur {user}, {error}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "User {user} created successfully!"
-msgstr ""
+msgstr "Utilisateur {user} créé avec succès !"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Cannot find user with email address {email_addr}"
@@ -5367,22 +5389,24 @@ msgstr ""
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Cannot find user with username {username} - {error}"
 msgstr ""
+"Impossible de trouver l’utilisateur avec le nom d’utilisateur {username} - "
+"{error}"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted user {username}"
-msgstr ""
+msgstr "L'utilisateur {username} a été effacé"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
-msgstr ""
+msgstr "Statistique"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Value"
-msgstr ""
+msgstr "Valeur"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Site statistics"
-msgstr ""
+msgstr "Statistiques du site"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Total number of users"
@@ -5390,7 +5414,7 @@ msgstr "Nombre total d'utilisateurs"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Courses loaded in the modulestore"
-msgstr ""
+msgstr "Cours chargés dans le modulestore"
 
 #: lms/djangoapps/dashboard/sysadmin.py lms/templates/tracking_log.html
 msgid "username"
@@ -5398,11 +5422,11 @@ msgstr "nom d'utilisateur"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email"
-msgstr ""
+msgstr "email"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Repair Results"
-msgstr ""
+msgstr "Réparer les résultats"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
@@ -5410,15 +5434,16 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Delete User Results"
-msgstr ""
+msgstr "Supprimer les résultats de l'utilisateur"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "The git repo location should end with '.git', and be a valid url"
 msgstr ""
+"L’adresse du dépôt git devrait se terminer par '.git' et être une URL valide"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
-msgstr ""
+msgstr "Cours ajouté"
 
 #: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
 #: cms/templates/index.html lms/templates/shoppingcart/receipt.html
@@ -5433,15 +5458,15 @@ msgstr ""
 #. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
-msgstr ""
+msgstr "Git Commit"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Last Change"
-msgstr ""
+msgstr "Dernière modification"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Last Editor"
-msgstr ""
+msgstr "Dernier éditeur"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Information about all courses"
@@ -5450,6 +5475,8 @@ msgstr "Informations sur tous les cours"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr ""
+"Erreur - impossible de trouver le cours avec l'identifiant "
+"{0}<br/><pre>{1}</pre>"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted"
@@ -5457,11 +5484,11 @@ msgstr "Supprimé"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "course_id"
-msgstr ""
+msgstr "course_id"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "# enrolled"
-msgstr ""
+msgstr "# inscrit"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "# staff"
@@ -5485,7 +5512,7 @@ msgstr "nom complet"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr ""
+msgstr "Le titre ne peut pas être vide"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
@@ -5493,11 +5520,11 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"
-msgstr ""
+msgstr "Le sujet n'existe pas"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Comment level too deep"
-msgstr ""
+msgstr "Niveau de commentaire trop profond"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
@@ -5599,6 +5626,7 @@ msgstr ""
 msgid "Course Staff"
 msgstr "Équipe pédagogique"
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Staff"
@@ -5618,7 +5646,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Manually Enrolled"
-msgstr ""
+msgstr "Inscrit manuellement"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Data Integrity Error"
@@ -5637,7 +5665,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
-msgstr ""
+msgstr "L'utilisateur n'existe pas."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
@@ -5648,10 +5676,12 @@ msgid ""
 "Make sure that the file you upload is in CSV format with no extraneous "
 "characters or rows."
 msgstr ""
+"Vérifier que le fichier importé est au format CSV et sans lignes ou "
+"caractères supplémentaires."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Could not read uploaded file."
-msgstr ""
+msgstr "Impossible de lire le fichier envoyé."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5671,11 +5701,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "File is not attached."
-msgstr ""
+msgstr "Le fichier n'est pas inclus en pièce jointe."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Username {user} already exists."
-msgstr ""
+msgstr "Le nom d'utilisateur {user} existe déjà."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5707,7 +5737,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The sale associated with this invoice has already been invalidated."
-msgstr ""
+msgstr "La vente associée à cette facture a déjà été invalidée."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invoice number {0} has been invalidated."
@@ -9960,7 +9990,7 @@ msgstr "Discussion - {course_number}"
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
-msgstr ""
+msgstr "Ajouter une discussion"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
@@ -10409,7 +10439,11 @@ msgid_plural ""
 "student will be assigned {max_count} components drawn randomly from this "
 "list."
 msgstr[0] ""
+"Tous les éléments pouvant être ajoutés à {display_name}. Chaque étudiant "
+"sera affecté à {max_count} composant pris au hasard depuis cette liste."
 msgstr[1] ""
+"Tous les éléments pouvant être ajoutés à {display_name}. Chaque étudiant "
+"sera affecté à {max_count} composants pris au hasard depuis cette liste."
 
 #: lms/templates/login-sidebar.html
 msgid "Helpful Information"
@@ -10443,6 +10477,7 @@ msgstr "Besoin d'aide ?"
 #: lms/templates/login-sidebar.html
 msgid "Looking for help signing in or with your {platform_name} account?"
 msgstr ""
+"Besoin d'aide pour vous connecter ou pour votre compte {platform_name} ?"
 
 #: lms/templates/login-sidebar.html
 msgid "View our help section for answers to commonly asked questions."
@@ -13848,6 +13883,8 @@ msgid ""
 "To enroll in {course_names} we have provided a registration URL for you.  "
 "Please follow the instructions below to claim your access."
 msgstr ""
+"Pour vous inscrire à {course_names} utilisez l'URL d'inscription. Suivez les"
+" instructions ci-dessous pour demander vos accès. "
 
 #. Translators: please translate the text inside [[ ]]. This is meant as a
 #. template for course teams to use.
@@ -13889,6 +13926,8 @@ msgstr ""
 msgid ""
 "(5) Course materials will not be available until the course start date."
 msgstr ""
+"(5) Les supports de cours ne sont disponibles qu'après la date de démarrage "
+"du cours."
 
 #. Translators: please translate the text inside [[ ]]. This is meant as a
 #. template for course teams to use. Please also keep the <p> and </p> HTML
@@ -14164,7 +14203,7 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "Payment Instructions"
-msgstr ""
+msgstr "Instructions de paiement "
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid ""
@@ -14176,7 +14215,7 @@ msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "For payment questions, contact {contact_email}"
-msgstr ""
+msgstr "Pour vos questions sur le paiement, contactez {contact_email}"
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
@@ -14229,6 +14268,8 @@ msgstr ""
 #: lms/templates/emails/reverification_processed.txt
 msgid "To try to verify your identity again, select the following link:"
 msgstr ""
+"Pour tenter de vérifier votre identité une nouvelle fois, sélectionnez le "
+"lien suivant :"
 
 #: lms/templates/emails/reverification_processed.txt
 msgid ""
@@ -14433,7 +14474,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Refresh Status"
-msgstr ""
+msgstr "Rafraîchir le statut"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Student-Generated Certificates"
@@ -14548,7 +14589,7 @@ msgstr "Nombre d'inscrits (admins, staff, and students) par mode"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Professional"
-msgstr ""
+msgstr "Professionnel"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Basic Course Information"
@@ -14674,7 +14715,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Download a CSV of learners who can enroll"
-msgstr ""
+msgstr "Télécharger un CSV des apprenants pouvant s'inscrire"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid ""
@@ -14744,7 +14785,7 @@ msgstr "Générer le rapport de notes"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate Problem Grade Report"
-msgstr ""
+msgstr "Générer le rapport de notes des exercices"
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Generate ORA Data Report"
@@ -14815,7 +14856,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download All Enrollment Codes"
-msgstr ""
+msgstr "Télécharger tous les codes d'inscription"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download a .csv file of all unused enrollment codes for this course."
@@ -14823,7 +14864,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download Unused Enrollment Codes"
-msgstr ""
+msgstr "Télécharger les codes d'inscriptions inutilisés"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download a .csv file of all used enrollment codes for this course."
@@ -14831,7 +14872,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download Used Enrollment Codes"
-msgstr ""
+msgstr "Télécharger les codes d'inscription utilisés"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
@@ -14844,7 +14885,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Edit Price"
-msgstr ""
+msgstr "Éditer le prix"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Course Seat Purchases"
@@ -14852,7 +14893,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Total Credit Card Purchases: "
-msgstr ""
+msgstr "Total des paiements par carte bancaire :"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid ""
@@ -14862,11 +14903,11 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download All Invoices"
-msgstr ""
+msgstr "Télécharger toutes les factures"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Download All Credit Card Purchases"
-msgstr ""
+msgstr "Télécharger tous les paiements par carte bancaire"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "To cancel or resubmit an invoice, enter the invoice number below."
@@ -18230,7 +18271,7 @@ msgstr "Outils"
 
 #: cms/templates/export.html
 msgid "About Exporting Libraries"
-msgstr ""
+msgstr "A propos de l'export des bibliothèques"
 
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
@@ -18287,6 +18328,8 @@ msgstr "Données {em_start}exportées avec{em_end} votre cours :"
 msgid ""
 "Values from Advanced Settings, including MATLAB API keys and LTI passports"
 msgstr ""
+"Valeurs des paramètres avancés, y compris les clés d'API MATLAB et les "
+"passports LTI"
 
 #: cms/templates/export.html
 msgid "Course Content (all Sections, Sub-sections, and Units)"
