@@ -181,7 +181,6 @@ class TemplateTestCase(unittest.TestCase):
         ]
 
         for context_status, div_class in cases:
-            # from nose.tools import set_trace; set_trace()
             self.context['status'] = Status(context_status)
             xml = self.render_to_xml(self.context)
 
