@@ -356,6 +356,11 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
+
+    # Display the 'Analytics' tab in the instructor dashboard for CCX courses.
+    # Note: This has no effect unless ANALYTICS_DASHBOARD_URL is already set,
+    #       because without that setting, the tab does not show up for any courses.
+    'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
 }
 
 # Ignore static asset files on import which match this pattern
