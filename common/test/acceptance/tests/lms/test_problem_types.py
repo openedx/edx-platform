@@ -769,6 +769,13 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         # (configured in the problem XML above)
         pass
 
+    def test_answer_correctly(self):
+        """
+        Overridden for script test because the testing grader always responds
+        with "correct"
+        """
+        pass
+
     def test_answer_incorrectly(self):
         """
         Overridden for script test because the testing grader always responds
