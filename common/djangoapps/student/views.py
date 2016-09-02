@@ -2274,16 +2274,15 @@ def reactivation_email_for_user(user):
     subject = render_to_string('emails/activation_email_subject.txt', context)
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', context)
+    from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
     try:
-        user.email_user(subject, message, configuration_helpers.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL,
-        ))
+        user.email_user(subject, message, from_address)
     except Exception:  # pylint: disable=broad-except
         log.error(
-            u'Unable to send reactivation email from "%s"',
-            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+            u'Unable to send reactivation email from "%s" to "%s"',
+            from_address,
+            user.email,
             exc_info=True
         )
         return JsonResponse({

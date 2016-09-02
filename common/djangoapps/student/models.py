@@ -545,6 +545,7 @@ class Registration(models.Model):
         self.user.is_active = True
         self._track_activation()
         self.user.save()
+        log.info(u'User %s (%s) account is successfully activated.', self.user.username, self.user.email)
 
     def _track_activation(self):
         """ Update the isActive flag in mailchimp for activated users."""
