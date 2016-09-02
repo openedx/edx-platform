@@ -328,7 +328,10 @@
                                 numResponses: responseLimit
                             }, true);
                         }
-                        $loadMoreButton = $('<button>').addClass('load-response-button').text(buttonText);
+                        $loadMoreButton = $('<button>')
+                            .addClass('btn-neutral')
+                            .addClass('load-response-button')
+                            .text(buttonText);
                         $loadMoreButton.click(function() {
                             return self.loadResponses(responseLimit, $loadMoreButton);
                         });

@@ -18,13 +18,11 @@ body.discussion {
     }
 
     .post-cancel {
-      @include white-button;
       @include float(left);
       margin: ($baseline/2) 0 0 ($baseline*0.75);
     }
 
     .post-update {
-      @include blue-button;
       @include float(left);
       margin-top: ($baseline/2);
       padding-bottom: ($baseline/10);
@@ -285,7 +283,6 @@ body.discussion {
   }
 
   .discussion-submit-post {
-    @include blue-button;
     @include float(left);
   }
 }
@@ -311,7 +308,6 @@ body.discussion {
   .new-post-btn {
     @include float(right);
     @include margin-right(4px);
-    @include blue-button;
   }
 
   div.add-response.post-extended-content {
@@ -382,13 +378,11 @@ section.discussion {
   }
 
   .post-cancel {
-    @include white-button;
     @include float(left);
     @include margin($baseline/2, 0, 0, $baseline*0.75);
   }
 
   .post-update {
-    @include blue-button;
     @include float(left);
     height: 37px;
     margin-top: ($baseline/2);
@@ -431,9 +425,6 @@ section.discussion-pagination {
         list-style: none;
         display: inline-block;
         padding-right: 0.5em;
-        a {
-          @include white-button;
-        }
         &.current-page span {
           display: inline-block;
           height: 35px;
@@ -471,14 +462,9 @@ section.discussion-pagination {
   }
 
   .load-response-button {
-    @include white-button;
-    @include linear-gradient(top, $white 35%, $gray-l4);
     position: relative;
     margin: ($baseline/2) 0;
-    border: 1px solid $forum-color-border;
     width: 100%;
-    box-shadow: 0 1px 1px $shadow-l1;
     text-align: left;
-    font-weight: normal;
   }
 }

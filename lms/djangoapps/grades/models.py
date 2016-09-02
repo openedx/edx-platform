@@ -17,6 +17,7 @@ from django.db.utils import IntegrityError
 from model_utils.models import TimeStampedModel
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
+from opaque_keys.edx.locator import BlockUsageLocator
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
 
@@ -62,7 +63,14 @@ class BlockRecordSet(frozenset):
         Return a BlockRecordSet from a json list.
         """
         block_dicts = json.loads(blockrecord_json)
-        record_generator = (BlockRecord(**block) for block in block_dicts)
+        record_generator = (
+            BlockRecord(
+                locator=BlockUsageLocator.from_string(block["locator"]),
+                weight=block["weight"],
+                max_score=block["max_score"],
+            )
+            for block in block_dicts
+        )
         return cls(record_generator)
 
     def to_hash(self):
