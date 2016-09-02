@@ -7,6 +7,7 @@ from django.conf import settings
 from lazy import lazy
 from logging import getLogger
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from xmodule import block_metadata_utils
 
@@ -228,7 +229,7 @@ class CourseGradeFactory(object):
         """
         Returns the saved grade for the given course and student.
         """
-        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+        if PersistentGradesEnabledFlag.feature_enabled(course.id):
             # TODO LATER Retrieve the saved grade for the course, if it exists.
             _pretend_to_save_course_grades()
 
