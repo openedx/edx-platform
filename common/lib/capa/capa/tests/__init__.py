@@ -1,6 +1,7 @@
 """Tools for helping with testing capa."""
 
 import gettext
+from path import path  # pylint: disable=no-name-in-module
 import os
 import os.path
 
@@ -9,10 +10,27 @@ import fs.osfs
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.inputtypes import Status
 from mock import Mock, MagicMock
+from mako.lookup import TemplateLookup
 
 import xml.sax.saxutils as saxutils
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
+
+
+def get_template(template_name):
+    """
+    Return template for a capa inputtype.
+    """
+    return TemplateLookup(
+        directories=[path(__file__).dirname().dirname() / 'templates']
+    ).get_template(template_name)
+
+
+def capa_render_template(template, context):
+    """
+    Render template for a capa inputtype.
+    """
+    return get_template(template).render_unicode(**context)
 
 
 def tst_render_template(template, context):
@@ -30,7 +48,7 @@ xqueue_interface = MagicMock()
 xqueue_interface.send_to_queue.return_value = (0, 'Success!')
 
 
-def test_capa_system():
+def test_capa_system(render_template=None):
     """
     Construct a mock LoncapaSystem instance.
 
@@ -46,7 +64,7 @@ def test_capa_system():
         filestore=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
         i18n=gettext.NullTranslations(),
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-        render_template=tst_render_template,
+        render_template=render_template or tst_render_template,
         seed=0,
         STATIC_URL='/dummy-static/',
         STATUS_CLASS=Status,
@@ -66,9 +84,10 @@ def mock_capa_module():
     return capa_module
 
 
-def new_loncapa_problem(xml, capa_system=None, seed=723):
+def new_loncapa_problem(xml, capa_system=None, seed=723, use_capa_render_template=False):
     """Construct a `LoncapaProblem` suitable for unit tests."""
-    return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system(),
+    render_template = capa_render_template if use_capa_render_template else None
+    return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system(render_template),
                           capa_module=mock_capa_module())
 
 
