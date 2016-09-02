@@ -37,18 +37,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   text: optional argument to override the text passed in via the HTML template
   ###
   createXMLEditor: (text) ->
-    xmlBox = $('.xml-box', @element)
-    xmlBox.text PrettyPrint.xml(xmlBox.text())
-    @xml_editor = CodeMirror.fromTextArea(xmlBox[0],
-      mode: 'xml'
-      lineNumbers: true
-      lineWrapping: true)
-
+    @xml_editor = CodeMirror.fromTextArea($(".xml-box", @element)[0], {
+    mode: "xml"
+    lineNumbers: true
+    lineWrapping: true
+    })
     if text
-      # format xml before displaying
-      text = PrettyPrint.xml(text)
-      @xml_editor.setValue text
-
+      @xml_editor.setValue(text)
     @setCurrentEditor(@xml_editor)
     $(@xml_editor.getWrapperElement()).toggleClass("CodeMirror-advanced");
     # Need to refresh to get line numbers to display properly.
@@ -536,7 +531,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
-          var selectString = '<pre><code>\n' + p1 + '</code></pre>';
+          var selectString = '<pre><code>' + p1 + '</code></pre>';
 
           return selectString;
       });
@@ -631,4 +626,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
     # make all responsetypes descendants of a single problem element
     ## safe-lint: disable=javascript-concat-html
-    return '<problem>\n' + responseTypesXML.join('\n\n') + demandHints + '\n</problem>'
+    # format and return xml
+    finalXml = '<problem>' + responseTypesXML.join('\n\n') + demandHints + '</problem>'
+    return PrettyPrint.xml(finalXml);
