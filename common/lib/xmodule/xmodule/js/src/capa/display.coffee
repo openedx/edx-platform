@@ -800,8 +800,8 @@ class @Problem
     #    text of submit button as well.
     attempts_remaining = @submitButton.data('attempts-remaining')
     if enable && attempts_remaining != 0
-        @submitButton.removeAttr 'disabled'
-        @submitButton.removeClass 'is-disabled'
+      @submitButton.removeAttr 'disabled'
+      @submitButton.removeClass 'is-disabled'
       if changeText
         @submitButtonLabel.text(@submitButtonSubmitText)
     else
