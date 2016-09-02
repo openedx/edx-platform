@@ -662,6 +662,8 @@ if FEATURES.get('ENABLE_COURSEWARE_SEARCH') or \
     # Use ElasticSearch as the search engine herein
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = ENV_TOKENS.get('SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING', False)
+
 ELASTIC_SEARCH_CONFIG = ENV_TOKENS.get('ELASTIC_SEARCH_CONFIG', [{}])
 
 # Facebook app
