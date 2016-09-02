@@ -642,37 +642,49 @@ class CapaMixin(CapaFields):
         answer_notification_type = None
         progress = self.get_progress()
 
-        if progress is not None:
-            key_list = self.correct_map.keys()
-            if len(key_list) == 1:
-                # Only one answer available or a missing progress and 1 or more answers.
-                answer_notification_type = self.correct_map.get(key_list[0]).get('correctness', None)
-            elif len(key_list) > 1:
-                # Look at the progress as we only want to show one notification for the problem. In this case there
-                # can be more that one correctness state in the correct_map.
-                if 0.0 < progress.percent() < 100.0:
+        key_list = self.correct_map.keys()
+        if len(key_list) == 1:
+            # Only one answer available or a missing progress and 1 or more answers.
+            answer_notification_type = self.correct_map.get(key_list[0]).get('correctness', None)
+        elif len(key_list) > 1:
+            answer_notification_type = self.correct_map.get(key_list[0]).get('correctness', None)
+            for key in key_list[1:]:
+                if self.correct_map.get(key).get('correctness', None) != answer_notification_type:
+                    # There is at least 1 of the following combinations of correctness states
+                    # Correct and incorrect, Correct and partially correct, or Incorrect and partially correct
+                    # which all should have a message type of Partially Correct
                     answer_notification_type = 'partially-correct'
-                elif progress.percent() == 100.0:
-                    answer_notification_type = 'correct'
-                else:
-                    answer_notification_type = 'incorrect'
+                    break
 
-            ungettext = self.runtime.service(self, "i18n").ungettext
-            point_msg = ''
+        # Build the notification message based on the notification type and translate it.
+        ungettext = self.runtime.service(self, "i18n").ungettext
+        if answer_notification_type == 'incorrect':
             if progress is not None:
-                point_msg = ungettext(
-                    "({progress} point earned)",
-                    "({progress} points earned)",
+                answer_notification_message = ungettext(
+                    "Incorrect ({progress} point earned)",
+                    "Incorrect ({progress} points earned)",
                     progress.frac()[1]
                 ).format(progress=str(progress))
-
-            # Build the notification message based on the notification type.
-            if answer_notification_type == 'incorrect':
-                answer_notification_message = 'Incorrect %s' % point_msg
-            elif answer_notification_type == 'correct':
-                answer_notification_message = 'Correct %s' % point_msg
-            elif answer_notification_type == 'partially-correct':
-                answer_notification_message = 'Partially correct %s' % point_msg
+            else:
+                answer_notification_message = _('Incorrect')
+        elif answer_notification_type == 'correct':
+            if progress is not None:
+                answer_notification_message = ungettext(
+                    "Correct ({progress} point earned)",
+                    "Correct ({progress} points earned)",
+                    progress.frac()[1]
+                ).format(progress=str(progress))
+            else:
+                answer_notification_message = _('Correct')
+        elif answer_notification_type == 'partially-correct':
+            if progress is not None:
+                answer_notification_message = ungettext(
+                    "Partially correct ({progress} point earned)",
+                    "Partially correct ({progress} points earned)",
+                    progress.frac()[1]
+                ).format(progress=str(progress))
+            else:
+                answer_notification_message = _('Partially Correct')
 
         context = {
             'problem': content,
