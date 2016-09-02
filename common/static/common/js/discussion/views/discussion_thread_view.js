@@ -210,7 +210,10 @@
             };
 
             DiscussionThreadView.prototype.cleanup = function() {
-                if (this.responsesRequest) {
+                // jQuery.ajax after 1.5 returns a jqXHR which doesn't implement .abort
+                // but I don't feel confident enough about what's going on here to remove this code
+                // so just check to make sure we can abort before we try to
+                if (this.responsesRequest && this.responsesRequest.abort) {
                     return this.responsesRequest.abort();
                 }
             };
