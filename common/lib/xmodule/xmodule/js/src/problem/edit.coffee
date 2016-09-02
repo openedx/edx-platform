@@ -531,7 +531,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
-          var selectString = '<pre><code>\n' + p1 + '</code></pre>';
+          var selectString = '<pre><code>' + p1 + '</code></pre>';
 
           return selectString;
       });

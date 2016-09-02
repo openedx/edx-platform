@@ -5,7 +5,7 @@ describe 'MarkdownEditingDescriptor', ->
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
       saveResult = @descriptor.save()
       expect(saveResult.metadata.markdown).toEqual('markdown')
-      expect(saveResult.data).toEqual('<problem>\n<p>markdown</p>\n</problem>')
+      expect(saveResult.data).toEqual('<problem>\n  <p>markdown</p>\n</problem>')
     it 'clears markdown when xml editor is selected', ->
       loadFixtures 'problem-with-markdown.html'
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
@@ -31,14 +31,6 @@ describe 'MarkdownEditingDescriptor', ->
       expect(e.preventDefault).toHaveBeenCalled()
       expect(@descriptor.confirmConversionToXml).toHaveBeenCalled()
       expect($('.editor-bar').length).toEqual(0)
-
-  describe 'formatted xml', ->
-    it 'renders pre formatted xml', ->
-      expectedXml = '<div>\n  <h3>heading</h3>\n  <p>some text</p>\n</div>'
-      loadFixtures 'problem-with-markdown.html'
-      @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
-      @descriptor.createXMLEditor('<div><h3>heading</h3><p>some text</p></div>')
-      expect(@descriptor.xml_editor.getValue()).toEqual(expectedXml)
 
   describe 'insertMultipleChoice', ->
     it 'inserts the template if selection is empty', ->
@@ -109,7 +101,7 @@ describe 'MarkdownEditingDescriptor', ->
   describe 'markdownToXml', ->
     it 'converts raw text to paragraph', ->
       data = MarkdownEditingDescriptor.markdownToXml('foo')
-      expect(data).toEqual('<problem>\n<p>foo</p>\n</problem>')
+      expect(data).toEqual('<problem>\n  <p>foo</p>\n</problem>')
     # test default templates
     it 'converts numerical response to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.
@@ -142,55 +134,44 @@ describe 'MarkdownEditingDescriptor', ->
         [Explanation]
         """)
       expect(data).toEqual("""<problem>
-        <p>A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.</p>
-
-        <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
-
-        <p>Enter the numerical value of Pi:</p>
-        <numericalresponse answer="3.14159">
-          <responseparam type="tolerance" default=".02" />
-          <formulaequationinput />
-        </numericalresponse>
-
-        <p>Enter the approximate value of 502*9:</p>
-        <numericalresponse answer="502*9">
-          <responseparam type="tolerance" default="15%" />
-          <formulaequationinput />
-        </numericalresponse>
-
-        <p>Enter the number of fingers on a human hand:</p>
-        <numericalresponse answer="5">
-          <formulaequationinput />
-        </numericalresponse>
-
-        <p>Range tolerance case</p>
-        <numericalresponse answer="[6, 7]">
-          <formulaequationinput />
-        </numericalresponse>
-        <numericalresponse answer="(1, 2)">
-          <formulaequationinput />
-        </numericalresponse>
-
-        <p>If first and last symbols are not brackets, or they are not closed, stringresponse will appear.</p>
-        <stringresponse answer="(7), 7" type="ci" >
-          <textline size="20"/>
-        </stringresponse>
-        <stringresponse answer="(1+2" type="ci" >
-          <textline size="20"/>
-        </stringresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
-
-        <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
-
-        <p>If you look at your hand, you can count that you have five fingers.</p>
-
-        </div>
-        </solution>
+          <p>A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.</p>
+          <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
+          <p>Enter the numerical value of Pi:</p>
+          <numericalresponse answer="3.14159">
+            <responseparam type="tolerance" default=".02" />
+            <formulaequationinput />
+          </numericalresponse>
+          <p>Enter the approximate value of 502*9:</p>
+          <numericalresponse answer="502*9">
+            <responseparam type="tolerance" default="15%" />
+            <formulaequationinput />
+          </numericalresponse>
+          <p>Enter the number of fingers on a human hand:</p>
+          <numericalresponse answer="5">
+            <formulaequationinput />
+          </numericalresponse>
+          <p>Range tolerance case</p>
+          <numericalresponse answer="[6, 7]">
+            <formulaequationinput />
+          </numericalresponse>
+          <numericalresponse answer="(1, 2)">
+            <formulaequationinput />
+          </numericalresponse>
+          <p>If first and last symbols are not brackets, or they are not closed, stringresponse will appear.</p>
+          <stringresponse answer="(7), 7" type="ci" >
+            <textline size="20"/>
+          </stringresponse>
+          <stringresponse answer="(1+2" type="ci" >
+            <textline size="20"/>
+          </stringresponse>
+          <solution>
+            <div class="detailed-solution">
+              <p>Explanation</p>
+              <p>Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.</p>
+              <p>Although you can get an exact value by typing 502*9 into a calculator, the result will be close to 500*10, or 5,000. The grader accepts any response within 15% of the true value, 4518, so that you can use any estimation technique that you like.</p>
+              <p>If you look at your hand, you can count that you have five fingers.</p>
+            </div>
+          </solution>
         </problem>""")
     it 'will convert 0 as a numerical response (instead of string response)', ->
       data =  MarkdownEditingDescriptor.markdownToXml("""
@@ -316,42 +297,38 @@ describe 'MarkdownEditingDescriptor', ->
         When the student is ready, the explanation appears.
         [Explanation]
         """)
-      expect(data).toEqual("""<problem>
-        <p>bleh</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice" shuffle="true">
-            <choice correct="true">a</choice>
-            <choice correct="false">b</choice>
-            <choice correct="false">c</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-
-        <p>yatta</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice">
-            <choice correct="false">x</choice>
-            <choice correct="false">y</choice>
-            <choice correct="true">z</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-
-        <p>testa</p>
-        <multiplechoiceresponse>
-          <choicegroup type="MultipleChoice" shuffle="true">
-            <choice correct="false">i</choice>
-            <choice correct="false">ii</choice>
-            <choice correct="true">iii</choice>
-          </choicegroup>
-        </multiplechoiceresponse>
-
-        <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>When the student is ready, the explanation appears.</p>
-
-        </div>
-        </solution>
+      expect(data).toEqual("""
+        <problem>
+          <p>bleh</p>
+          <multiplechoiceresponse>
+            <choicegroup type="MultipleChoice" shuffle="true">
+              <choice correct="true">a</choice>
+              <choice correct="false">b</choice>
+              <choice correct="false">c</choice>
+            </choicegroup>
+          </multiplechoiceresponse>
+          <p>yatta</p>
+          <multiplechoiceresponse>
+            <choicegroup type="MultipleChoice">
+              <choice correct="false">x</choice>
+              <choice correct="false">y</choice>
+              <choice correct="true">z</choice>
+            </choicegroup>
+          </multiplechoiceresponse>
+          <p>testa</p>
+          <multiplechoiceresponse>
+            <choicegroup type="MultipleChoice" shuffle="true">
+              <choice correct="false">i</choice>
+              <choice correct="false">ii</choice>
+              <choice correct="true">iii</choice>
+            </choicegroup>
+          </multiplechoiceresponse>
+          <solution>
+            <div class="detailed-solution">
+              <p>Explanation</p>
+              <p>When the student is ready, the explanation appears.</p>
+            </div>
+          </solution>
         </problem>""")
 
     it 'converts OptionResponse to xml', ->
@@ -644,10 +621,10 @@ describe 'MarkdownEditingDescriptor', ->
         Code should be nicely monospaced.
         [/code]
         """)
-      expect(data).toEqual("""<problem>
+      expect(data).toEqual("""
+      <problem>
         <p>Not a header</p>
         <h3 class="hd hd-2 problem-header">A header</h3>
-
         <p>Multiple choice w/ parentheticals</p>
         <multiplechoiceresponse>
           <choicegroup type="MultipleChoice">
@@ -657,7 +634,6 @@ describe 'MarkdownEditingDescriptor', ->
             <choice correct="false">no space b4 close paren</choice>
           </choicegroup>
         </multiplechoiceresponse>
-
         <p>Choice checks</p>
         <choiceresponse>
           <checkboxgroup>
@@ -668,54 +644,42 @@ describe 'MarkdownEditingDescriptor', ->
             <choice correct="false">no space</choice>
           </checkboxgroup>
         </choiceresponse>
-
         <p>Option with multiple correct ones</p>
-
         <optionresponse>
           <optioninput options="('one option','correct one','should not be correct')" correct="correct one"></optioninput>
         </optionresponse>
-
         <p>Option with embedded parens</p>
-
         <optionresponse>
           <optioninput options="('My (heart)','another','correct')" correct="correct"></optioninput>
         </optionresponse>
-
         <p>What happens w/ empty correct options?</p>
-
         <optionresponse>
           <optioninput options="('')" correct=""></optioninput>
         </optionresponse>
-
         <solution>
-        <div class="detailed-solution">
-        <p>Explanation</p>
-
-        <p>see</p>
-        </div>
+          <div class="detailed-solution">
+            <p>Explanation</p>
+            <p>see</p>
+          </div>
         </solution>
-
         <p>[explanation]</p>
         <p>orphaned start</p>
-
         <p>No p tags in the below</p>
         <script type='javascript'>
-           var two = 2;
+         var two = 2;
 
-           console.log(two * 2);
-        </script>
-
+         console.log(two * 2);
+      </script>
         <p>But in this there should be</p>
         <div>
-        <p>Great ideas require offsetting.</p>
-
-        <p>bad tests require drivel</p>
+          <p>Great ideas require offsetting.</p>
+          <p>bad tests require drivel</p>
         </div>
-
-        <pre><code>
-        Code should be nicely monospaced.
-        </code></pre>
-        </problem>""")
+        <pre>
+          <code>Code should be nicely monospaced.
+      </code>
+        </pre>
+      </problem>""")
 
     it 'can separate responsetypes based on ---', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
