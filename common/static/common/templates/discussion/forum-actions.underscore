@@ -3,10 +3,10 @@
         <% _.each(primaryActions, function(action) { print(_.template($('#forum-action-' + action).html())({})) }) %>
         <li class="actions-item is-visible">
             <div class="more-wrapper">
-                <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-<%= contentId %>">
-                    <span class="action-label"><%- gettext("More") %></span>
+                <button class="btn-link action-button action-more" aria-label="<%- gettext('More') %>" aria-haspopup="true" aria-controls="action-menu-<%= contentType %>">
+                    <span class="action-label"><%- gettext('More') %></span>
                     <span class="action-icon"><span class="icon fa fa-ellipsis-h" aria-hidden="true"></span></span>
-                </a>
+                </button>
                 <div class="actions-dropdown" id="action-menu-<%= contentType %>" aria-expanded="false">
                   <ul class="actions-dropdown-list">
                     <% _.each(secondaryActions, function(action) { print(_.template($('#forum-action-' + action).html())({})) }) %>

@@ -6,13 +6,13 @@
   border: 1px solid;
   border-radius: $forum-border-radius;
   height: 35px;
+  background-image: none;
   color: $white;
   line-height: 35px;
   font-size: $forum-base-font-size;
   white-space: nowrap;  // Prevent word-break in Arabic in Google Chrome
   text-shadow: none;
   padding: 0 ($baseline*0.75);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 }
 
 @mixin white-button {

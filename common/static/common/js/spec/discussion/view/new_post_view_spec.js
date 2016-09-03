@@ -82,9 +82,9 @@
             it('only enables the cohort selector when applicable', function() {
                 DiscussionSpecHelper.makeModerator();
                 checkVisibility(this.view, true, false, true);
-                $('.topic-title:contains(General)').click();
+                $('.topic-menu-entry:contains(General)').click();
                 checkVisibility(this.view, true, true, false);
-                $('.topic-title:contains(Topic)').click();
+                $('.topic-menu-entry:contains(Topic)').click();
                 return checkVisibility(this.view, true, false, false);
             });
             it('allows the user to make a cohort selection', function() {
