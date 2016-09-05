@@ -157,7 +157,7 @@ class ChooseModeView(View):
                 if x.strip()
             ]
 
-            default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY or ['usd', '$'];
+            default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY or ['usd', '$']
             context["currency_code"] = default_currency[0].upper()
             context["currency_symbol"] = default_currency[1]
 
