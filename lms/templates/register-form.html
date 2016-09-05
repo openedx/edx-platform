@@ -104,6 +104,12 @@ from student.models import UserProfile
       <label for="password">${_('Password')}</label>
       <input id="password" type="password" name="password" value="" required aria-required="true" />
     </li>
+    % if settings.REGISTRATION_EXTRA_FIELDS['password_copy'] == 'required':
+    <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['password_copy']} text" id="field-password_copy">
+      <label for="city">${_('Confirm password')}</label>
+      <input id="password_copy" type="password" name="password_copy" value="" required aria-required="true" />
+    </li>
+    % endif
 
     % endif
   </ol>
