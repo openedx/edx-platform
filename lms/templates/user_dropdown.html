@@ -20,7 +20,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             <img class="menu-image" src="${profile_image_url}" alt="">
             ${username}
         </a>
-        <div role="group" aria-label="User menu">
+        <div role="group" aria-label="User menu" class="user-menu">
             <button type="button" class="menu-button button-more has-dropdown js-dropdown-button" aria-expanded="false" aria-controls="${_("Usermenu")}">
                   <span class="icon fa fa-caret-down" aria-hidden="true"></span>
                   <span class="sr-only">${_("Usermenu dropdown")}</span>
@@ -49,7 +49,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             </a>
         </li>
         <li class="primary">
-            <div role="group" aria-label="User menu">
+            <div role="group" aria-label="User menu" class="user-menu">
                 <button class="dropdown" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><span class="fa fa-sort-desc" aria-hidden="true"></span></button>
                 <ul class="dropdown-menu" aria-label="More Options" role="menu">
                     ${navigation_dropdown_menu_links()}
