@@ -18,6 +18,8 @@ from common.test.acceptance.tests.helpers import (
     element_has_text,
 )
 
+import logging
+log = logging.getLogger('SettingsPage')
 
 @attr(shard=4)
 class StudioSettingsDetailsTest(StudioCourseTest):
@@ -49,7 +51,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
-    @skip("Too flaky for the flaky decorator  SOL-1811")  # SOL-1811
+    @flaky(max_runs=30, min_passes=30)  # SOL-1811
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
@@ -90,6 +92,41 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
 
         # Refresh the page again and confirm the prerequisite course selection is properly reflected
         self.settings_detail.refresh_page()
+
+        #Preselected course id
+        logging.debug("\n\n\nPre selected course id '{}'\n\n\n".format(
+            pre_requisite_course_id
+        ))
+
+        #license div
+        logging.debug("\n\n\nHTML of wrapper-license '{}'\n\n\n".format(
+            self.settings_detail.q(css='.wrapper-license').html
+        ))
+
+        # Course org
+        logging.debug("\n\n\nCourse org '{}'\n\n\n".format(
+            self.settings_detail.q(css='#course-organization').attrs('value')[0]
+        ))
+
+        # Course DropDown logs
+        logging.debug("\n\n\nHTML of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course').html
+        ))
+        logging.debug("\n\n\nOptions of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course option').html
+        ))
+        logging.debug("\n\n\noptions Selected of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course option').selected
+        ))
+
+        #single options logs
+        logging.debug("\n\n\nValue of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course').attrs('val')
+        ))
+        logging.debug("\n\n\nselected of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course').attrs('selected')
+        ))
+
         self.settings_detail.wait_for_prerequisite_course_options()
         self.assertTrue(is_option_value_selected(
             browser_query=self.settings_detail.pre_requisite_course_options,
