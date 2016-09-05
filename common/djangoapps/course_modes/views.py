@@ -9,6 +9,7 @@ from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
@@ -155,6 +156,11 @@ class ChooseModeView(View):
                 for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
+
+            default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY or ['usd', '$'];
+            context["currency_code"] = default_currency[0].upper()
+            context["currency_symbol"] = default_currency[1]
+
             context["currency"] = verified_mode.currency.upper()
             context["min_price"] = verified_mode.min_price
             context["verified_name"] = verified_mode.name
