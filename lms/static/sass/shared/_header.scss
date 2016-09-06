@@ -10,6 +10,30 @@
   width: 100%;
   height: 76px;
 
+  .doc-link {
+    position: relative;
+    @include float(right);
+    @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+    padding: 0;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0;
+    color: $base-font-color;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: $base-font-color;
+    }
+
+    &:visited {
+      text-decoration: none;
+      color: $base-font-color;
+    }
+  }
+
   .wrapper-header {
     @include clearfix();
     height: 40px;

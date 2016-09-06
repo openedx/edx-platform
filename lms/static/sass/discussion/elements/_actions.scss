@@ -141,18 +141,15 @@
 
     .action-label {
       @extend %t-copy-sub2;
-      display: inline-block;
+      display: none;
       vertical-align: middle;
       padding: 2px 8px;
-      color: $gray-l1;
-      opacity: 0;
     }
-
 
     &:hover, &:focus {
 
       .action-label {
-        opacity: 1;
+        display: inline-block;
       }
 
       .action-icon {
@@ -276,10 +273,11 @@
     // UI: secondary action
     .action-list-item {
       @extend %t-copy-sub2;
+      @include text-align(right);
       display: block;
+      width: 100%;
       padding: ($baseline/10) 0;
       white-space: nowrap;
-      @include text-align(right);
       color: $gray-l1;
 
       &:hover, &:focus {

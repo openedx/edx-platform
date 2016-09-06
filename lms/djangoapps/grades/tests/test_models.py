@@ -8,11 +8,16 @@ from hashlib import sha1
 import json
 from mock import patch
 
-from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
-from lms.djangoapps.grades.models import BlockRecord, BlockRecordSet, PersistentSubsectionGrade, VisibleBlocks
+from lms.djangoapps.grades.models import (
+    BlockRecord,
+    BlockRecordSet,
+    PersistentSubsectionGrade,
+    VisibleBlocks
+)
 
 
 class GradesModelTestCase(TestCase):
@@ -36,8 +41,8 @@ class GradesModelTestCase(TestCase):
             block_type='problem',
             block_id='block_id_b'
         )
-        self.record_a = BlockRecord(unicode(self.locator_a), 1, 10)
-        self.record_b = BlockRecord(unicode(self.locator_b), 1, 10)
+        self.record_a = BlockRecord(self.locator_a, 1, 10)
+        self.record_b = BlockRecord(self.locator_b, 1, 10)
 
 
 @ddt.ddt
@@ -89,7 +94,10 @@ class VisibleBlocksTest(GradesModelTestCase):
         Happy path test to ensure basic create functionality works as expected.
         """
         vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
-        expected_json = json.dumps([self.record_a._asdict()], separators=(',', ':'), sort_keys=True)
+        list_of_block_dicts = [self.record_a._asdict()]
+        for block_dict in list_of_block_dicts:
+            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
+        expected_json = json.dumps(list_of_block_dicts, separators=(',', ':'), sort_keys=True)
         expected_hash = b64encode(sha1(expected_json).digest())
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
@@ -156,7 +164,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             usage_key=self.params["usage_key"],
         )
         self.assertEqual(created_grade, read_grade)
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(IntegrityError):
             created_grade = PersistentSubsectionGrade.objects.create(**self.params)
 
     def test_create_bad_params(self):
@@ -164,7 +172,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         Confirms create will fail if params are missing.
         """
         del self.params["earned_graded"]
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(IntegrityError):
             PersistentSubsectionGrade.objects.create(**self.params)
 
     def test_course_version_is_optional(self):

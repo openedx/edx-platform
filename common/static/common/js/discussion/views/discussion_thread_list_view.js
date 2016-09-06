@@ -136,7 +136,7 @@
                         'css_class': searchAlert.attributes.css_class
                     });
                     edx.HtmlUtils.append(self.$('.search-alerts'), content);
-                    return self.$('#search-alert-' + searchAlert.cid + ' a.dismiss')
+                    return self.$('#search-alert-' + searchAlert.cid + ' .dismiss')
                         .bind('click', searchAlert, function(event) {
                             return self.removeSearchAlert(event.data.cid);
                         });
@@ -374,7 +374,8 @@
                     neverRead = !thread.get('read') && threadUnreadCommentCount === threadCommentCount,
                     context = _.extend(
                         {
-                            neverRead: neverRead
+                            neverRead: neverRead,
+                            threadUrl: thread.urlFor('retrieve')
                         },
                         thread.toJSON()
                     );

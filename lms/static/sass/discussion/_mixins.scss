@@ -6,46 +6,23 @@
   border: 1px solid;
   border-radius: $forum-border-radius;
   height: 35px;
+  background-image: none;
   color: $white;
   line-height: 35px;
   font-size: $forum-base-font-size;
   white-space: nowrap;  // Prevent word-break in Arabic in Google Chrome
   text-shadow: none;
   padding: 0 ($baseline*0.75);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
-}
-
-@mixin blue-button {
-  @include discussion-button();
-  @include linear-gradient(top, #6dccf1, #38a8e5);
-  border-color: #2d81ad;
-  color: $white;
-
-  &:hover, &:focus {
-    @include linear-gradient(top, #4fbbe4, #2090d0);
-    border-color: #297095;
-  }
 }
 
 @mixin white-button {
   @include discussion-button();
-  @include linear-gradient(top, $white, $gray-l5);
   border-color: #aaa;
+  background-color: $white;
   color: $dark-gray;
 
   &:hover, &:focus {
-    @include linear-gradient(top, $white, $gray-l6);
-  }
-}
-
-@mixin dark-grey-button {
-  @include discussion-button();
-  @include linear-gradient(top, #777, #555);
-  border-color: #222;
-  color: $white;
-
-  &:hover, &:focus {
-    background: -webkit-linear-gradient(top, #888, #666);
+    background-color: $white;
   }
 }
 

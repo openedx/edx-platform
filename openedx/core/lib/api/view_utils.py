@@ -32,11 +32,14 @@ class DeveloperErrorViewMixin(object):
     (auth failure, method not allowed, etc.) by generating an error response
     conforming to our API conventions with a developer message.
     """
-    def make_error_response(self, status_code, developer_message):
+    def make_error_response(self, status_code, developer_message, error_code=None):
         """
         Build an error response with the given status code and developer_message
         """
-        return Response({"developer_message": developer_message}, status=status_code)
+        error_data = {"developer_message": developer_message}
+        if error_code is not None:
+            error_data['error_code'] = error_code
+        return Response(error_data, status=status_code)
 
     def make_validation_error_response(self, validation_error):
         """

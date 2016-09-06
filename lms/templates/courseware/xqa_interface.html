@@ -5,11 +5,19 @@
 <script type="text/javascript">
 
 function setup_debug(element_id, edit_link, staff_context){
-    $('#' + element_id + '_trig').leanModal();
-    $('#' + element_id + '_xqa_log').leanModal();
+    var staffDebugTrigger = $('#' + element_id + '_trig'),
+        xqaLogTrigger = $('#' + element_id + '_xqa_log'),
+        historyTrigger = $("#" + element_id + "_history_trig"),
+        debugModalSelector = '#' + element_id + '_debug',
+        historyModalSelector = '#' + element_id + '_history',
+        xqaModalSelector = '#' + element_id + '_xqa-modal',
+        leanOverlaySelector = $('#lean_overlay');
+
+    staffDebugTrigger.leanModal();
+    xqaLogTrigger.leanModal();
     $('#' + element_id + '_xqa_form').submit(function () {sendlog(element_id, edit_link, staff_context);});
 
-    $("#" + element_id + "_history_trig").leanModal();
+    historyTrigger.leanModal();
 
     $('#' + element_id + '_history_form').submit(
         function () {
@@ -21,6 +29,31 @@ function setup_debug(element_id, edit_link, staff_context){
             return false;
         }
     );
+
+    DialogTabControls.setKeydownListner($(debugModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListner($(historyModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListner($(xqaModalSelector), leanOverlaySelector);
+
+    staffDebugTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(debugModalSelector);
+        $(debugModalSelector).attr("aria-hidden", "false");
+    });
+
+    historyTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(historyModalSelector);
+        $(historyModalSelector).attr("aria-hidden", "false");
+    });
+
+    xqaLogTrigger.on('click', function() {
+        DialogTabControls.initializeTabKeyValues(xqaModalSelector);
+        $(xqaModalSelector).attr("aria-hidden", "false");
+    });
+
+    leanOverlaySelector.click(function () {
+        $(xqaModalSelector).attr("aria-hidden", "true");
+        $(historyModalSelector).attr("aria-hidden", "true");
+        $(debugModalSelector).attr("aria-hidden", "true");
+      })
 }
 
 function sendlog(element_id, edit_link, staff_context){

@@ -10,6 +10,7 @@ from course_blocks.api import get_course_blocks
 from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.scores import get_score, possibly_scored
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
+from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from student.models import anonymous_id_for_user, User
 from submissions import api as submissions_api
 from xmodule import block_metadata_utils, graders
@@ -44,11 +45,15 @@ class SubsectionGrade(object):
         """
         Compute the grade of this subsection for the given student and course.
         """
-        for descendant_key in course_structure.post_order_traversal(
-                filter_func=possibly_scored,
-                start_node=self.location,
-        ):
-            self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
+        try:
+            for descendant_key in course_structure.post_order_traversal(
+                    filter_func=possibly_scored,
+                    start_node=self.location,
+            ):
+                self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
+        finally:
+            # self.scores may hold outdated data, force it to refresh on next access
+            lazy.invalidate(self, 'scores')
 
         self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
 
@@ -127,7 +132,7 @@ class SubsectionGrade(object):
 
             # There's a chance that the value of weight is not the same value used when the problem was scored,
             # since we can get the value from either block_structure or CSM/submissions.
-            weight = block.weight
+            weight = getattr(block, 'weight', 1.0)
             if persisted_values:
                 possible = persisted_values.get('possible', possible)
                 weight = persisted_values.get('weight', weight)
@@ -176,7 +181,7 @@ class SubsectionGradeFactory(object):
         from courseware.courses import get_course_by_id  # avoids circular import with courseware.py
         course = get_course_by_id(course_key, depth=0)
         # save ourselves the extra queries if the course does not use subsection grades
-        if not course.enable_subsection_grades_saved:
+        if not PersistentGradesEnabledFlag.feature_enabled(course.id):
             return
 
         course_structure = get_course_blocks(self.student, usage_key)
@@ -197,7 +202,7 @@ class SubsectionGradeFactory(object):
         """
         Returns the saved grade for the student and subsection.
         """
-        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+        if PersistentGradesEnabledFlag.feature_enabled(course.id):
             try:
                 model = PersistentSubsectionGrade.read_grade(
                     user_id=self.student.id,
@@ -213,7 +218,7 @@ class SubsectionGradeFactory(object):
         """
         Updates the saved grade for the student and subsection.
         """
-        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+        if PersistentGradesEnabledFlag.feature_enabled(course.id):
             subsection_grade.save(self.student, subsection, course)
 
     def _prefetch_scores(self, course_structure, course):

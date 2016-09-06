@@ -7,6 +7,7 @@ from django.conf import settings
 from lazy import lazy
 from logging import getLogger
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from xmodule import block_metadata_utils
 
@@ -52,6 +53,18 @@ class CourseGrade(object):
                 locations_to_weighted_scores.update(subsection_grade.locations_to_weighted_scores)
         return locations_to_weighted_scores
 
+    @lazy
+    def grade_value(self):
+        """
+        Helper function to extract the grade value as calculated by the course's grader.
+        """
+        # Grading policy might be overriden by a CCX, need to reset it
+        self.course.set_grading_policy(self.course.grading_policy)
+        return self.course.grader.grade(
+            self.subsection_grade_totals_by_format,
+            generate_random_scores=settings.GENERATE_PROFILE_SCORES
+        )
+
     @property
     def has_access_to_course(self):
         """
@@ -60,22 +73,41 @@ class CourseGrade(object):
         """
         return len(self.course_structure) > 0
 
-    @lazy
+    @property
+    def percent(self):
+        """
+        Returns a rounded percent from the overall grade.
+        """
+        return round(self.grade_value['percent'] * 100 + 0.05) / 100
+
+    @property
+    def letter_grade(self):
+        """
+        Returns a letter representing the grade.
+        """
+        return self._compute_letter_grade(self.percent)
+
+    @property
+    def passed(self):
+        """
+        Check user's course passing status. Return True if passed.
+        """
+        nonzero_cutoffs = [cutoff for cutoff in self.course.grade_cutoffs.values() if cutoff > 0]
+        success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
+        return success_cutoff and self.percent >= success_cutoff
+
+    @property
     def summary(self):
         """
         Returns the grade summary as calculated by the course's grader.
         """
-        # Grading policy might be overriden by a CCX, need to reset it
-        self.course.set_grading_policy(self.course.grading_policy)
-        grade_summary = self.course.grader.grade(
-            self.subsection_grade_totals_by_format,
-            generate_random_scores=settings.GENERATE_PROFILE_SCORES
-        )
+        grade_summary = self.grade_value
 
         # We round the grade here, to make sure that the grade is a whole percentage and
         # doesn't get displayed differently than it gets grades
-        grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
-        grade_summary['grade'] = self._compute_letter_grade(grade_summary['percent'])
+        grade_summary['percent'] = self.percent
+        grade_summary['grade'] = self.letter_grade
+
         grade_summary['totaled_scores'] = self.subsection_grade_totals_by_format
         grade_summary['raw_scores'] = list(self.locations_to_weighted_scores.itervalues())
 
@@ -197,7 +229,7 @@ class CourseGradeFactory(object):
         """
         Returns the saved grade for the given course and student.
         """
-        if settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED') and course.enable_subsection_grades_saved:
+        if PersistentGradesEnabledFlag.feature_enabled(course.id):
             # TODO LATER Retrieve the saved grade for the course, if it exists.
             _pretend_to_save_course_grades()
 

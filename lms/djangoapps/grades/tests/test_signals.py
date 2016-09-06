@@ -5,6 +5,7 @@ Tests for the score change signals defined in the courseware models module.
 import ddt
 from unittest import skip
 from django.test import TestCase
+from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag, CoursePersistentGradesFlag
 from mock import patch, MagicMock
 from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory
@@ -171,6 +172,7 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     def setUp(self):
         super(ScoreChangedUpdatesSubsectionGradeTest, self).setUp()
         self.user = UserFactory()
+        PersistentGradesEnabledFlag.objects.create(enabled=True)
 
     def set_up_course(self, enable_subsection_grades=True):
         """
@@ -181,7 +183,8 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
             org='edx',
             name='course',
             run='run',
-            metadata={'enable_subsection_grades_saved': enable_subsection_grades})
+        )
+        CoursePersistentGradesFlag.objects.create(course_id=self.course.id, enabled=enable_subsection_grades)
 
         self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
         self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
@@ -203,7 +206,7 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     def test_subsection_grade_updated_on_signal(self, default_store):
         with self.store.default_store(default_store):
             self.set_up_course()
-            with check_mongo_calls(2) and self.assertNumQueries(13):
+            with check_mongo_calls(2) and self.assertNumQueries(19):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -212,14 +215,14 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
             self.set_up_course()
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(13):
+            with check_mongo_calls(2) and self.assertNumQueries(19):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_subsection_grades_not_enabled_on_course(self, default_store):
         with self.store.default_store(default_store):
             self.set_up_course(enable_subsection_grades=False)
-            with check_mongo_calls(2) and self.assertNumQueries(0):
+            with check_mongo_calls(2) and self.assertNumQueries(2):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @skip("Pending completion of TNL-5089")
@@ -231,18 +234,18 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_score_changed_sent_with_feature_flag(self, default_store, feature_flag):
-        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_SUBSECTION_GRADES_SAVED': feature_flag}):
-            with self.store.default_store(default_store):
-                self.set_up_course()
-                with check_mongo_calls(0) and self.assertNumQueries(19 if feature_flag else 1):
-                    SCORE_CHANGED.send(sender=None, **self.score_changed_kwargs)
+        PersistentGradesEnabledFlag.objects.create(enabled=feature_flag)
+        with self.store.default_store(default_store):
+            self.set_up_course()
+            with check_mongo_calls(0) and self.assertNumQueries(19 if feature_flag else 1):
+                SCORE_CHANGED.send(sender=None, **self.score_changed_kwargs)
 
     @ddt.data(
-        ('points_possible', 2, 13),
-        ('points_earned', 2, 13),
-        ('user', 0, 0),
+        ('points_possible', 2, 19),
+        ('points_earned', 2, 19),
+        ('user', 0, 3),
         ('course_id', 0, 0),
-        ('usage_id', 0, 0),
+        ('usage_id', 0, 2),
     )
     @ddt.unpack
     def test_missing_kwargs(self, kwarg, expected_mongo_calls, expected_sql_calls):

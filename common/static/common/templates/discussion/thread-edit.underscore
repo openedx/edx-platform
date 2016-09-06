@@ -8,5 +8,5 @@
 <div class="form-row">
   <div class="edit-post-body" name="body"><%- body %></div>
 </div>
-<input type="submit" id="edit-post-submit" class="post-update" value="<%- gettext("Update post") %>">
-<a href="#" class="post-cancel"><%- gettext("Cancel") %></a>
+<button type="submit" id="edit-post-submit" class="btn-brand submit post-update"><%- gettext("Update post") %></button>
+<button class="btn post-cancel"><%- gettext("Cancel") %></button>
