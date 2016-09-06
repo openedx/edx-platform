@@ -6,6 +6,7 @@ from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
 from uuid import uuid4
 
+from common.test.acceptance.fixtures.catalog import CatalogFixture, CatalogConfigMixin
 from common.test.acceptance.fixtures.programs import ProgramsFixture, ProgramsConfigMixin
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.library import LibraryEditPage
@@ -68,17 +69,29 @@ class CreateLibraryTest(WebAppTest):
         self.assertTrue(self.dashboard_page.has_library(name=name, org=org, number=number))
 
 
-class DashboardProgramsTabTest(ProgramsConfigMixin, WebAppTest):
+class DashboardProgramsTabTest(ProgramsConfigMixin, CatalogConfigMixin, WebAppTest):
     """
     Test the programs tab on the studio home page.
     """
 
     def setUp(self):
         super(DashboardProgramsTabTest, self).setUp()
-        ProgramsFixture().install_programs([])
+        self.stub_programs_api()
+        self.stub_catalog_api()
+
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPageWithPrograms(self.browser)
         self.auth_page.visit()
+
+    def stub_programs_api(self):
+        """Stub out the programs API with fake data."""
+        self.set_programs_api_configuration(is_enabled=True)
+        ProgramsFixture().install_programs([])
+
+    def stub_catalog_api(self):
+        """Stub out the catalog API's program endpoint."""
+        self.set_catalog_configuration(is_enabled=True)
+        CatalogFixture().install_programs([])
 
     def test_tab_is_disabled(self):
         """
@@ -96,7 +109,6 @@ class DashboardProgramsTabTest(ProgramsConfigMixin, WebAppTest):
         via config.  When the programs list is empty, a button should appear
         that allows creating a new program.
         """
-        self.set_programs_api_configuration(True)
         self.dashboard_page.visit()
         self.assertTrue(self.dashboard_page.is_programs_tab_present())
         self.assertTrue(self.dashboard_page.is_new_program_button_present())
@@ -129,8 +141,6 @@ class DashboardProgramsTabTest(ProgramsConfigMixin, WebAppTest):
 
         ProgramsFixture().install_programs(programs)
 
-        self.set_programs_api_configuration(True)
-
         self.dashboard_page.visit()
 
         self.assertTrue(self.dashboard_page.is_programs_tab_present())
@@ -145,7 +155,6 @@ class DashboardProgramsTabTest(ProgramsConfigMixin, WebAppTest):
         The programs tab and "new program" button will not be available, even
         when enabled via config, if the user is not global staff.
         """
-        self.set_programs_api_configuration(True)
         AutoAuthPage(self.browser, staff=False).visit()
         self.dashboard_page.visit()
         self.assertFalse(self.dashboard_page.is_programs_tab_present())
