@@ -9,6 +9,7 @@ import unittest
 from . import new_loncapa_problem
 
 
+@ddt.ddt
 class CAPAProblemTest(unittest.TestCase):
     """ CAPA problem related tests"""
 
@@ -66,14 +67,14 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2_1':
                 {
-                    'label': '',
+                    'label': question,
                     'descriptions': {}
                 }
             }
         )
         self.assertEqual(
             len(problem.tree.xpath("//*[normalize-space(text())='{}']".format(question))),
-            1
+            0
         )
 
     def test_neither_label_tag_nor_attribute(self):
@@ -176,7 +177,7 @@ class CAPAProblemTest(unittest.TestCase):
             {
                 '1_2_1':
                 {
-                    'label': '',
+                    'label': question,
                     'descriptions': {}
                 }
             }
@@ -360,6 +361,68 @@ class CAPAProblemTest(unittest.TestCase):
         # verify that question is rendered only once
         question = problem_html.xpath("//*[normalize-space(text())='{}']".format(question))
         self.assertEqual(len(question), 1)
+
+    def assert_question_tag(self, question1, question2, tag, label_attr=False):
+        """
+        Verify question tag correctness.
+        """
+        question1_tag = '<{tag}>{}</{tag}>'.format(question1, tag=tag) if question1 else ''
+        question2_tag = '<{tag}>{}</{tag}>'.format(question2, tag=tag) if question2 else ''
+        question1_label_attr = 'label="{}"'.format(question1) if label_attr else ''
+        question2_label_attr = 'label="{}"'.format(question2) if label_attr else ''
+        xml = """
+        <problem>
+            {question1_tag}
+            <choiceresponse>
+                <checkboxgroup {question1_label_attr}>
+                    <choice correct="true">choice1</choice>
+                    <choice correct="false">choice2</choice>
+                </checkboxgroup>
+            </choiceresponse>
+            {question2_tag}
+            <multiplechoiceresponse>
+                <choicegroup type="MultipleChoice" {question2_label_attr}>
+                    <choice correct="false">choice1</choice>
+                    <choice correct="true">choice2</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """.format(
+            question1_tag=question1_tag,
+            question2_tag=question2_tag,
+            question1_label_attr=question1_label_attr,
+            question2_label_attr=question2_label_attr,
+        )
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2_1':
+                {
+                    'label': question1,
+                    'descriptions': {}
+                },
+                '1_3_1':
+                {
+                    'label': question2,
+                    'descriptions': {}
+                }
+            }
+        )
+        self.assertEqual(len(problem.tree.xpath('//{}'.format(tag))), 0)
+
+    @ddt.unpack
+    @ddt.data(
+        {'question1': 'question 1 label', 'question2': 'question 2 label'},
+        {'question1': '', 'question2': 'question 2 label'},
+        {'question1': 'question 1 label', 'question2': ''}
+    )
+    def test_correct_question_tag_is_picked(self, question1, question2):
+        """
+        For a problem with multiple questions verify that correct question tag is picked.
+        """
+        self.assert_question_tag(question1, question2, tag='label', label_attr=False)
+        self.assert_question_tag(question1, question2, tag='p', label_attr=True)
 
 
 @ddt.ddt

@@ -942,11 +942,21 @@ class LoncapaProblem(object):
                 # store <label> tag containing question text to delete
                 # it later otherwise question will be rendered twice
                 element_to_be_deleted = responsetype_label_tag
-            elif 'label' not in inputfields[0].attrib:
+            elif 'label' in inputfields[0].attrib:
+                # in this case we have old problems with label attribute and p tag having question in it
+                # we will pick the first sibling of responsetype if its a p tag and match the text with
+                # the label attribute text. if they are equal then we will use this text as question.
+                # Get first <p> tag before responsetype, this <p> may contains the question text.
+                p_tag = response.xpath('preceding-sibling::*[1][self::p]')
+
+                if p_tag and p_tag[0].text == inputfields[0].attrib['label']:
+                    label = p_tag[0].text
+                    element_to_be_deleted = p_tag[0]
+            else:
                 # In this case the problems don't have tag or label attribute inside the responsetype
                 # so we will get the first preceding label tag w.r.t to this responsetype.
                 # This will take care of those multi-question problems that are not using --- in their markdown.
-                label_tag = response.xpath('preceding-sibling::label[1]')
+                label_tag = response.xpath('preceding-sibling::*[1][self::label]')
                 if label_tag:
                     label = label_tag[0].text
                     element_to_be_deleted = label_tag[0]
