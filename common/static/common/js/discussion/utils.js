@@ -309,7 +309,7 @@
             var appended_id, editor, elem, id, imageUploadUrl, placeholder, _processor;
             elem = $local('.' + cls_identifier);
             placeholder = elem.data('placeholder');
-            id = elem.attr('data-id');
+            id = elem.data('id');
             appended_id = '-' + cls_identifier + '-' + id;
             imageUploadUrl = this.urlFor('upload');
             _processor = function(self) {
