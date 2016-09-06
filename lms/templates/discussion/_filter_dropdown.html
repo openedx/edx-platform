@@ -1,14 +1,16 @@
+<%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
-import json
+
+from openedx.core.djangolib.markup import HTML
 %>
 
 <%def name="render_dropdown(map)">
     % for child in map["children"]:
         % if child in map["entries"]:
-            ${render_entry(map["entries"], child)}
+            ${HTML(render_entry(map["entries"], child))}
         %else:
-            ${render_category(map["subcategories"], child)}
+            ${HTML(render_category(map["subcategories"], child))}
         %endif
     %endfor
 </%def>
@@ -19,15 +21,15 @@ import json
         data-discussion-id='${entries[entry]["id"]}'
         data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
     >
-        <a href="#" class="forum-nav-browse-title">${entry}</a>
+        <button type="button" class="forum-nav-browse-title">${entry}</button>
     </li>
 </%def>
 
 <%def name="render_category(categories, category)">
     <li class="forum-nav-browse-menu-item">
-        <a href="#" class="forum-nav-browse-title">${category}</a>
+        <button type="button" class="forum-nav-browse-title">${category}</button>
         <ul class="forum-nav-browse-submenu">
-            ${render_dropdown(categories[category])}
+            ${HTML(render_dropdown(categories[category]))}
         </ul>
     </li>
 </%def>
@@ -37,16 +39,19 @@ import json
         <label>
             <span class="sr">${_("Filter Topics")}</span>
             <input type="text" class="forum-nav-browse-filter-input" placeholder="${_("filter topics")}">
-            <i class="icon fa fa-filter"></i>
+            <span class="icon fa fa-filter" aria-hidden="true"></span>
         </label>
     </form>
     <ul class="forum-nav-browse-menu">
         <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
-            <a href="#" class="forum-nav-browse-title">${_("All Discussions")}</a>
+            <button type="button" class="forum-nav-browse-title">${_("All Discussions")}</button>
         </li>
         <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
-            <a href="#" class="forum-nav-browse-title"><i class="icon fa fa-star"></i>${_("Posts I'm Following")}</a>
+            <button type="button" class="forum-nav-browse-title">
+                <span class="icon fa fa-star" aria-hidden="true"></span>
+                ${_("Posts I'm Following")}
+            </button>
         </li>
-        ${render_dropdown(category_map)}
+        ${HTML(render_dropdown(category_map))}
     </ul>
 </div>

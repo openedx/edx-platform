@@ -2,6 +2,7 @@
 Tests for ProctoredExamTransformer.
 """
 from mock import patch
+from nose.plugins.attrib import attr
 
 import ddt
 from edx_proctoring.api import (
@@ -12,19 +13,22 @@ from edx_proctoring.api import (
 from edx_proctoring.models import ProctoredExamStudentAttemptStatus
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCreditService
-from lms.djangoapps.course_blocks.transformers.tests.test_helpers import CourseStructureTestCase
+from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from student.tests.factories import CourseEnrollmentFactory
 
 from ..proctored_exam import ProctoredExamTransformer
 from ...api import get_course_blocks
 
 
+@attr('shard_3')
 @ddt.ddt
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PROCTORED_EXAMS': True})
 class ProctoredExamTransformerTestCase(CourseStructureTestCase):
     """
     Test behavior of ProctoredExamTransformer
     """
+    TRANSFORMER_CLASS_TO_TEST = ProctoredExamTransformer
+
     def setUp(self):
         """
         Setup course structure and create user for split test transformer test.
@@ -40,8 +44,6 @@ class ProctoredExamTransformerTestCase(CourseStructureTestCase):
 
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
-
-        self.transformer = ProctoredExamTransformer()
 
     def setup_proctored_exam(self, block, attempt_status, user_id):
         """
@@ -123,7 +125,7 @@ class ProctoredExamTransformerTestCase(CourseStructureTestCase):
         block_structure = get_course_blocks(
             self.user,
             self.course.location,
-            transformers={self.transformer},
+            self.transformers,
         )
         self.assertEqual(
             set(block_structure.get_block_keys()),
@@ -163,7 +165,7 @@ class ProctoredExamTransformerTestCase(CourseStructureTestCase):
         block_structure = get_course_blocks(
             self.user,
             self.course.location,
-            transformers={self.transformer},
+            self.transformers,
         )
         self.assertEqual(
             set(block_structure.get_block_keys()),

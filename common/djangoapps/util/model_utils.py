@@ -9,11 +9,14 @@ from eventtracking import tracker
 from django.conf import settings
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
+from django.dispatch import Signal
 
 from django_countries.fields import Country
 
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
 USER_SETTINGS_CHANGED_EVENT_NAME = u'edx.user.settings.changed'
+# Used to signal a field value change
+USER_FIELD_CHANGED = Signal(providing_args=["user", "table", "setting", "old_value", "new_value"])
 
 
 def get_changed_fields_dict(instance, model_class):
@@ -151,6 +154,10 @@ def emit_setting_changed_event(user, db_table, setting_name, old_value, new_valu
         USER_SETTINGS_CHANGED_EVENT_NAME,
         truncated_fields
     )
+
+    # Announce field change
+    USER_FIELD_CHANGED.send(sender=None, user=user, table=db_table, setting=setting_name,
+                            old_value=old_value, new_value=new_value)
 
 
 def _get_truncated_setting_value(value, max_length=None):

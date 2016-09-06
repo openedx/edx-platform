@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%!
 from django.utils.translation import ugettext as _
 %>
@@ -18,7 +19,6 @@ from django.utils.translation import ugettext as _
     % endfor
 </%block>
 <%block name="js_extra">
-  <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
   <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='incourse_reverify'/>
 </%block>

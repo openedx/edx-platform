@@ -1,4 +1,6 @@
+<%page expression_filter="h"/>
 <%namespace name='static' file='/static_content.html'/>
+<%! from openedx.core.djangolib.js_utils import js_escaped_string %>
 <html>
 <head><title>Fake Software Secure Form</title>
 </head>
@@ -19,7 +21,7 @@
 
 </body>
 </html>
-<script type="text/javascript" src="${static.url('js/vendor/jquery.min.js')}"></script>
+<script type="text/javascript" src="${static.url('common/js/vendor/jquery.js')}"></script>
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -45,7 +47,7 @@ $(document).ready(function() {
     function ajax_post(status, reason){
 
         var data = {
-            "EdX-ID": '${receipt_id}',
+            "EdX-ID": '${receipt_id | n, js_escaped_string}',
             "Result": status,
             "Reason": reason,
             "MessageType": ""
@@ -56,9 +58,9 @@ $(document).ready(function() {
 
         $.ajax({
             type: "POST",
-            url: '${results_callback}',
+            url: '${results_callback | n, js_escaped_string}',
             headers: {
-            "Authorization": "${authorization_code}"
+            "Authorization": "${authorization_code | n, js_escaped_string}"
             },
             data: JSON.stringify(data),
             contentType: "application/json;",

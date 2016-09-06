@@ -356,6 +356,10 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
                     return (group.name, group.id)
         return (None, None)
 
+    @property
+    def tooltip_title(self):
+        return getattr(self.child, 'tooltip_title', '')
+
     def validate(self):
         """
         Message for either error or warning validation message/s.
@@ -371,6 +375,8 @@ class SplitTestModule(SplitTestFields, XModule, StudioEditableModule):
 class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDescriptor):
     # the editing interface can be the same as for sequences -- just a container
     module_class = SplitTestModule
+
+    resources_dir = 'assets/split_test'
 
     filename_extension = "xml"
 
@@ -695,3 +701,5 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
         )
         self.children.append(dest_usage_key)  # pylint: disable=no-member
         self.group_id_to_child[unicode(group.id)] = dest_usage_key
+
+    tooltip_title = module_attr('tooltip_title')

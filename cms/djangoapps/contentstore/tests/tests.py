@@ -89,8 +89,11 @@ class ContentStoreTestCase(ModuleStoreTestCase):
 class AuthTestCase(ContentStoreTestCase):
     """Check that various permissions-related things work"""
 
+    CREATE_USER = False
+    ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
     def setUp(self):
-        super(AuthTestCase, self).setUp(create_user=False)
+        super(AuthTestCase, self).setUp()
 
         self.email = 'a@b.com'
         self.pw = 'xyz'
@@ -232,7 +235,7 @@ class AuthTestCase(ContentStoreTestCase):
 
         # check the the HTML has links to the right login page. Note that this is merely a content
         # check and thus could be fragile should the wording change on this page
-        expected = 'You can now <a href="' + reverse('login') + '">login</a>.'
+        expected = 'You can now <a href="' + reverse('login') + '">sign in</a>.'
         self.assertIn(expected, resp.content)
 
     def test_private_pages_auth(self):

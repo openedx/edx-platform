@@ -2,10 +2,10 @@ define([
     'jquery',
     'backbone',
     'underscore',
-    'common/js/spec_helpers/ajax_helpers',
-    'common/js/components/views/paginated_view',
-    'common/js/components/collections/paging_collection'
-], function ($, Backbone, _, AjaxHelpers, PaginatedView, PagingCollection) {
+    'edx-ui-toolkit/js/pagination/paging-collection',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/components/views/paginated_view'
+], function ($, Backbone, _, PagingCollection, AjaxHelpers, PaginatedView) {
     'use strict';
     describe('PaginatedView', function () {
         var TestItemView = Backbone.View.extend({
@@ -36,11 +36,18 @@ define([
         beforeEach(function () {
             setFixtures('<div class="test-container"></div>');
             initialItems = generateItems(5);
-            testCollection = new PagingCollection({
+            var TestPagingCollection = PagingCollection.extend({
+                state: {
+                    pageSize: 5
+                }
+            });
+
+            testCollection = new TestPagingCollection();
+            testCollection.url = '/dummy/url';
+            testCollection.set({
                 count: 6,
                 num_pages: 2,
-                current_page: 1,
-                start: 0,
+                page: 1,
                 results: initialItems
             }, {parse: true});
             testView = new TestPaginatedView({el: '.test-container', collection: testCollection}).render();
@@ -76,7 +83,7 @@ define([
         function expectFooter(options) {
             var footerEl = testView.$('.test-paging-footer');
             expect(footerEl.text())
-                .toMatch(new RegExp(options.currentPage + '\\s+out of\\s+\/\\s+' + testCollection.totalPages));
+                .toMatch(new RegExp(options.currentPage + '\\s+out of\\s+\/\\s+' + options.totalPages));
             expect(footerEl.hasClass('hidden')).toBe(options.isHidden);
         }
 
@@ -90,11 +97,11 @@ define([
             initialItems = generateItems(1);
             testCollection.set(
                 {
-                    "count": 1,
-                    "num_pages": 1,
-                    "current_page": 1,
-                    "start": 0,
-                    "results": initialItems
+                    count: 1,
+                    num_pages: 1,
+                    page: 1,
+                    start: 0,
+                    results: initialItems
                 },
                 {parse: true}
             );
@@ -112,11 +119,10 @@ define([
             AjaxHelpers.expectNoRequests(requests);
             testView.$(nextPageButtonCss).click();
             AjaxHelpers.respondWithJson(requests, {
-                "count": 6,
-                "num_pages": 2,
-                "current_page": 2,
-                "start": 5,
-                "results": newItems
+                count: 6,
+                num_pages: 2,
+                page: 2,
+                results: newItems
             });
             expectHeader('Showing 6-6 out of 6 total');
             expectItems(newItems);
@@ -129,11 +135,10 @@ define([
             initialItems = generateItems(1);
             testCollection.set(
                 {
-                    "count": 6,
-                    "num_pages": 2,
-                    "current_page": 2,
-                    "start": 5,
-                    "results": initialItems
+                    count: 6,
+                    num_pages: 2,
+                    page: 2,
+                    results: initialItems
                 },
                 {parse: true}
             );
@@ -143,11 +148,10 @@ define([
             testView.$(previousPageButtonCss).click();
             previousPageItems = generateItems(5);
             AjaxHelpers.respondWithJson(requests, {
-                "count": 6,
-                "num_pages": 2,
-                "current_page": 1,
-                "start": 0,
-                "results": previousPageItems
+                count: 6,
+                num_pages: 2,
+                page: 1,
+                results: previousPageItems
             });
             expectHeader('Showing 1-5 out of 6 total');
             expectItems(previousPageItems);
@@ -159,11 +163,10 @@ define([
             spyOn($.fn, 'focus');
             testView.$(nextPageButtonCss).click();
             AjaxHelpers.respondWithJson(requests, {
-                "count": 6,
-                "num_pages": 2,
-                "current_page": 2,
-                "start": 5,
-                "results": generateItems(1)
+                count: 6,
+                num_pages: 2,
+                page: 2,
+                results: generateItems(1)
             });
             expect(testView.$('.sr-is-focusable').focus).toHaveBeenCalled();
         });

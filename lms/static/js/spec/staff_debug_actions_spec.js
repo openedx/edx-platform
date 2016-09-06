@@ -2,9 +2,11 @@ define([
     'backbone', 
     'jquery', 
     'js/staff_debug_actions', 
-    'common/js/spec_helpers/ajax_helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
     ],
     function (Backbone, $, tmp, AjaxHelpers) {
+        'use strict';
+        var StaffDebug = window.StaffDebug;
 
         describe('StaffDebugActions', function () {
             var location = 'i4x://edX/Open_DemoX/edx_demo_course/problem/test_loc';
@@ -20,8 +22,10 @@ define([
 
             describe('get_url ', function () {
                 it('defines url to courseware ajax entry point', function () {
-                    spyOn(StaffDebug, "get_current_url").andReturn("/courses/edX/Open_DemoX/edx_demo_course/courseware/stuff");
-                    expect(StaffDebug.get_url('rescore_problem')).toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor/api/rescore_problem');
+                    spyOn(StaffDebug, "get_current_url")
+                      .and.returnValue("/courses/edX/Open_DemoX/edx_demo_course/courseware/stuff");
+                    expect(StaffDebug.get_url('rescore_problem'))
+                      .toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor/api/rescore_problem');
                 });
             });
 
@@ -87,13 +91,13 @@ define([
                     spyOn($, 'ajax');
                     StaffDebug.reset(locationName, location);
 
-                    expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
-                    expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
+                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
+                    expect($.ajax.calls.mostRecent().args[0].data).toEqual({
                         'problem_to_reset': location,
                         'unique_student_identifier': 'userman',
                         'delete_module': false
                     });
-                    expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
+                    expect($.ajax.calls.mostRecent().args[0].url).toEqual(
                         '/instructor/api/reset_student_attempts'
                     );
                     $('#' + fixture_id).remove();
@@ -106,13 +110,13 @@ define([
                     spyOn($, 'ajax');
                     StaffDebug.sdelete(locationName, location);
 
-                    expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
-                    expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
+                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
+                    expect($.ajax.calls.mostRecent().args[0].data).toEqual({
                         'problem_to_reset': location,
                         'unique_student_identifier': 'userman',
                         'delete_module': true
                     });
-                    expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
+                    expect($.ajax.calls.mostRecent().args[0].url).toEqual(
                         '/instructor/api/reset_student_attempts'
                     );
 
@@ -126,13 +130,13 @@ define([
                     spyOn($, 'ajax');
                     StaffDebug.rescore(locationName, location);
 
-                    expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
-                    expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
+                    expect($.ajax.calls.mostRecent().args[0].type).toEqual('POST');
+                    expect($.ajax.calls.mostRecent().args[0].data).toEqual({
                         'problem_to_reset': location,
                         'unique_student_identifier': 'userman',
                         'delete_module': false
                     });
-                    expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
+                    expect($.ajax.calls.mostRecent().args[0].url).toEqual(
                         '/instructor/api/rescore_problem'
                     );
                     $('#' + fixture_id).remove();

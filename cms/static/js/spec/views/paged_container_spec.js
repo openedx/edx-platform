@@ -1,4 +1,4 @@
-define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "js/models/xblock_info",
+define(["jquery", "underscore", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "URI", "js/models/xblock_info",
         "js/views/paged_container", "js/views/paging_header",
         "common/js/components/views/paging_footer", "js/views/xblock"],
     function ($, _, AjaxHelpers, URI, XBlockInfo, PagedContainer, PagingHeader, PagingFooter, XBlockView) {
@@ -74,11 +74,14 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
             var pagingContainer;
 
             beforeEach(function () {
-                pagingContainer = new MockPagingView({page_size: PAGE_SIZE});
+                pagingContainer = new MockPagingView({
+                    page_size: PAGE_SIZE,
+                    page: jasmine.createSpyObj('page', ['updatePreviewButton', 'renderAddXBlockComponents'])
+                });
             });
 
             describe("Container", function () {
-                describe("rendering", function(){
+                describe("rendering", function() {
 
                     it('should set show_previews', function() {
                        var requests = AjaxHelpers.requests(this);
@@ -546,7 +549,7 @@ define(["jquery", "underscore", "common/js/spec_helpers/ajax_helpers", "URI", "j
                         mockXBlockView.model.id = 'mock-location';
                         pagingContainer.refresh(mockXBlockView, true);
                         expect(pagingContainer.render).toHaveBeenCalled();
-                        expect(pagingContainer.render.mostRecentCall.args[0].force_render).toEqual('mock-location');
+                        expect(pagingContainer.render.calls.mostRecent().args[0].force_render).toEqual('mock-location');
                     });
                 });
             });

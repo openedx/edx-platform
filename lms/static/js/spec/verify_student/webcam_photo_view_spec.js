@@ -2,7 +2,7 @@ define([
         'jquery',
         'backbone',
         'common/js/spec_helpers/template_helpers',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/verify_student/views/webcam_photo_view',
         'js/verify_student/models/verification_model'
     ],
@@ -94,7 +94,7 @@ define([
                 var view = createView( new StubBackend( "html5" ) );
 
                 // Spy on the backend
-                spyOn( view.backend, 'snapshot' ).andCallThrough();
+                spyOn( view.backend, 'snapshot' ).and.callThrough();
 
                 // Initially, only the snapshot button is shown
                 expectButtonShown({
@@ -125,7 +125,7 @@ define([
                 var view = createView( new StubBackend( "html5" ) );
 
                 // Spy on the backend
-                spyOn( view.backend, 'reset' ).andCallThrough();
+                spyOn( view.backend, 'reset' ).and.callThrough();
 
                 // Take the snapshot, then reset
                 takeSnapshot();

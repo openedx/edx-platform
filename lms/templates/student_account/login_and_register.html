@@ -1,7 +1,7 @@
 <%!
     import json
     from django.utils.translation import ugettext as _
-    from openedx.core.lib.js_utils import escape_json_dumps
+    from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 <%namespace name='static' file='/static_content.html'/>
 
@@ -11,8 +11,16 @@
 
 <%block name="js_extra">
     <%static:require_module module_name="js/student_account/logistration_factory" class_name="LogistrationFactory">
-        var options = ${ escape_json_dumps(data) | n };
+        var options = ${data | n, dump_js_escaped_json};
         LogistrationFactory(options);
+        if ('newrelic' in window) {
+            newrelic.finished();
+            // Because of a New Relic bug, the finished() event doesn't show up
+            // in Insights, so we have to make a new PageAction that is basically
+            // the same thing. We still want newrelic.finished() for session
+            // traces though.
+            newrelic.addPageAction('xfinished');
+        }
     </%static:require_module>
 </%block>
 
@@ -25,5 +33,7 @@
 </%block>
 
 <div class="section-bkg-wrapper">
-    <div id="login-and-registration-container" class="login-register" />
+    <main id="main" aria-label="Content" tabindex="-1">
+        <div id="login-and-registration-container" class="login-register" />
+    </main>
 </div>

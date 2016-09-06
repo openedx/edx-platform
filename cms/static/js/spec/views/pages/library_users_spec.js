@@ -1,15 +1,15 @@
 define([
-    "jquery", "common/js/spec_helpers/ajax_helpers", "common/js/spec_helpers/view_helpers",
+    "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "common/js/spec_helpers/view_helpers",
     "js/factories/manage_users_lib", "common/js/components/utils/view_utils"
 ],
 function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
     "use strict";
     describe("Library Instructor Access Page", function () {
-        const changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
+        var changeRoleUrl = "dummy_change_role_url/@@EMAIL@@";
         var team_member_fixture = readFixtures("team-member.underscore");
 
         function setRole(email, role){
-            var user_li = $("li.user-item[data-email="+ email + "]");
+            var user_li = $('li.user-item[data-email="'+ email + '"]');
             var role_action = $("li.action-role a.make-"+role, user_li);
             expect(role_action).toBeVisible();
             role_action.click();
@@ -22,7 +22,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         describe("read-write access", function() {
             var mockHTML = readFixtures('mock/mock-manage-users-lib.underscore');
 
-            beforeEach(function () {
+            beforeEach(function (done) {
                 ViewHelpers.installMockAnalytics();
                 setFixtures(mockHTML);
                 appendSetFixtures($("<script>", { id: "team-member-tpl", type: "text/template"}).text(team_member_fixture));
@@ -37,9 +37,10 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
                     10000,
                     true
                 );
-                waitsFor(function(){
-                   return $(".ui-loading").length === 0;
-                }, "Waiting for backbone render to happen", 1000);
+
+                jasmine.waitUntil(function() {
+                    return ($(".ui-loading").length === 0);
+                }).then(done);
             });
 
             afterEach(function () {
@@ -47,7 +48,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can give a user permission to use the library", function () {
-                const email = 'other@example.com';
+                var email = 'other@example.com';
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 $('.create-user-button').click();
@@ -60,7 +61,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             });
 
             it("can promote user", function() {
-                const email = "staff@example.com";
+                var email = "staff@example.com";
                 var requests = AjaxHelpers.requests(this);
                 var reloadSpy = spyOn(ViewUtils, 'reload');
                 setRole("staff@example.com", 'staff');

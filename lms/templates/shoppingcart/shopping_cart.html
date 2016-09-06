@@ -66,7 +66,7 @@ from openedx.core.lib.courses import course_image_url
         <div class="clearfix">
         <div class="image">
           <img class="item-image" src="${course_image_url(course)}"
-              alt="${course.display_number_with_default | h} ${course.display_name_with_default} ${_('Cover Image')}" />
+              alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} ${_('Cover Image')}" />
         </div>
         <div class="data-input">
           ## Translators: "Registration for:" is followed by a course name
@@ -101,28 +101,30 @@ from openedx.core.lib.courses import course_image_url
                   % endif
               </div>
               <div class="col-2">
+                % if enable_bulk_purchase:
                 <div class="numbers-row" aria-live="polite">
                   <label for="field_${item.id}">${_('Students:')}</label>
                   <div class="counter">
                       <input maxlength="3" class="spin-counter" title="${_('Input quantity and press enter.')}" max="999" type="text" name="students" value="${item.qty}" id="field_${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}" data-item-id="${item.id}" aria-describedby="students-${item.id}">
                   </div>
                   <button class="inc button" data-operation="inc">
-                    <i class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></i>
-                    <span class="sr">Increase</span>
+                    <span class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></span>
+                    <span class="sr">${_('Increase')}</span>
                   </button>
                   <button class="dec button" data-operation="dec">
-                    <i class="icon fa fa-caret-down"></i>
-                    <span class="sr">Decrease</span>
+                    <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+                    <span class="sr">${_('Decrease')}</span>
                   </button>
                       <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                   <span class="error-text hidden" id="students-${item.id}"></span>
-              </div>
                 </div>
+                % endif
+              </div>
 
               <div class="col-3">
                  <button href="#" class="btn-remove" data-item-id="${item.id}">
-                  <i class="icon fa fa-times-circle" aria-hidden="true"></i>
-                  <span class="sr">Remove</span>
+                  <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+                  <span class="sr">${_('Remove')}</span>
                 </button>
               </div>
           </div>
@@ -136,14 +138,14 @@ from openedx.core.lib.courses import course_image_url
             <div class="code-text">
             % if not discount_applied:
               <div class="code-input" aria-live="polite">
-                <label for="input_code" class="sr">Discount or activation code</label>
+                <label for="input_code" class="sr">${_('Discount or activation code')}</label>
                 <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
                 <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
                 <span class="error-text hidden" id="code"></span>
               </div>
             % else:
               <div class="code-applied">
-                <span class="green"><i class="icon fa fa-check-square-o" aria-hidden="true"></i>${_('code has been applied')}</span>
+                <span class="green"><span class="icon fa fa-check-square-o" aria-hidden="true"></span>${_('code has been applied')}</span>
                 <button type="submit" class="blue-border" id="submit-reset-redemption">${_('Reset')}</button>
               </div>
             % endif
@@ -163,7 +165,7 @@ from openedx.core.lib.courses import course_image_url
                   <div name="billing">
                       <button type="submit" name="billing-details" aria-describedby="billing_business_helper_text">
                         ${_('Billing Details')}
-                        <i class="icon fa fa-caret-right" aria-hidden="true"></i>
+                        <span class="icon fa fa-caret-right" aria-hidden="true"></span>
                       </button>
                       <p id="billing_business_helper_text">
                           ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
@@ -187,7 +189,7 @@ from openedx.core.lib.courses import course_image_url
                   <div name="billing" class="hidden">
                       <button type="submit" name="billing-details" aria-describedby="billing_helper_text">
                         ${_('Billing Details')}
-                        <i class="icon fa fa-caret-right" aria-hidden="true"></i>
+                        <span class="icon fa fa-caret-right" aria-hidden="true"></span>
                       </button>
                       <p id="billing_helper_text">
                           ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
@@ -372,14 +374,14 @@ from openedx.core.lib.courses import course_image_url
       var newQty    = parseInt(newQty);
       var unit_cost = parseFloat(unit_cost);
 
-      return (( newQty - prevQty ) * unit_cost + prevTotal)
+      return (( newQty - prevQty ) * unit_cost + parseFloat(prevTotal));
   }
 
   function update_user_cart(ItemId, newQty, prevQty, unit_cost, wasbusinessType, isbusinessType){
 
       var post_url = "${reverse('shoppingcart.views.update_user_cart')}";
       var typeChanged = false;
-      var prevTotal = $('#total-amount').data('amount')
+      var prevTotal = $('#total-amount').data('amount');
       var newTotal = getNewTotal(prevQty, newQty, unit_cost, prevTotal);
       $('#total-amount').html('$'+newTotal.toFixed(2)+' USD');
       $('#total-amount').data('amount', newTotal);

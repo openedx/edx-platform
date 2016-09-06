@@ -10,7 +10,9 @@ else:
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
-  from openedx.core.lib.js_utils import escape_json_dumps
+  from openedx.core.djangolib.js_utils import (
+      dump_js_escaped_json, js_escaped_string
+  )
 %>
 <%block name="title">
 %if library:
@@ -67,7 +69,7 @@ else:
         <p class="error-block"></p>
 
         <a href="#" class="action action-choose-file choose-file-button">
-          <i class="icon fa fa-upload"></i>
+          <span class="icon fa fa-upload" aria-hidden="true"></span>
           <span class="copy">${_("Choose a File to Import")}</span>
         </a>
 
@@ -100,8 +102,8 @@ else:
           <ol class="status-progress list-progress">
             <li class="item-progresspoint item-progresspoint-upload is-complete">
               <span class="deco status-visual">
-                <i class="icon fa fa-cog"></i>
-                <i class="icon fa fa-warning"></i>
+                <span class="icon fa fa-cog" aria-hidden="true"></span>
+                <span class="icon fa fa-warning" aria-hidden="true"></span>
               </span>
 
               <div class="status-detail">
@@ -115,8 +117,8 @@ else:
 
             <li class="item-progresspoint item-progresspoint-unpack is-started">
               <span class="deco status-visual">
-                <i class="icon fa fa-cog"></i>
-                <i class="icon fa fa-warning"></i>
+                <span class="icon fa fa-cog" aria-hidden="true"></span>
+                <span class="icon fa fa-warning" aria-hidden="true"v></span>
               </span>
 
               <div class="status-detail">
@@ -128,8 +130,8 @@ else:
 
             <li class="item-progresspoint item-progresspoint-verify is-not-started">
               <span class="deco status-visual">
-                <i class="icon fa fa-cog"></i>
-                <i class="icon fa fa-warning"></i>
+                <span class="icon fa fa-cog" aria-hidden="true"></span>
+                <span class="icon fa fa-warning" aria-hidden="true"></span>
               </span>
 
               <div class="status-detail">
@@ -140,8 +142,8 @@ else:
 
             <li class="item-progresspoint item-progresspoint-import is-not-started">
               <span class="deco status-visual">
-                <i class="icon fa fa-cog"></i>
-                <i class="icon fa fa-warning"></i>
+                <span class="icon fa fa-cog" aria-hidden="true"></span>
+                <span class="icon fa fa-warning" aria-hidden="true"></span>
               </span>
 
               <div class="status-detail">
@@ -163,7 +165,7 @@ else:
             </li>
             <li class="item-progresspoint item-progresspoint-success has-actions is-not-started">
               <span class="deco status-visual">
-                <i class="icon fa fa-square-o"></i>
+                <span class="icon fa fa-square-o" aria-hidden="true"></span>
               </span>
 
               <div class="status-detail">
@@ -239,6 +241,9 @@ else:
 
 <%block name="requirejs">
   require(["js/factories/import"], function(ImportFactory) {
-      ImportFactory("${import_status_url}", ${escape_json_dumps(library) | n});
+      ImportFactory(
+          "${import_status_url | n, js_escaped_string}",
+          ${library | n, dump_js_escaped_json}
+      );
   });
 </%block>

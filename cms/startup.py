@@ -9,10 +9,17 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from openedx.core.lib.django_startup import autostartup
 import django
-from monkey_patch import third_party_auth
+from monkey_patch import (
+    third_party_auth,
+    django_db_models_options
+)
+from openedx.core.lib.xblock_utils import xblock_local_resource_url
 
 import xmodule.x_module
 import cms.lib.xblock.runtime
+
+from openedx.core.djangoapps.theming.core import enable_theming
+from openedx.core.djangoapps.theming.helpers import is_comprehensive_theming_enabled
 
 
 def run():
@@ -20,6 +27,12 @@ def run():
     Executed during django startup
     """
     third_party_auth.patch()
+    django_db_models_options.patch()
+
+    # Comprehensive theming needs to be set up before django startup,
+    # because modifying django template paths after startup has no effect.
+    if is_comprehensive_theming_enabled():
+        enable_theming()
 
     django.setup()
 
@@ -35,7 +48,7 @@ def run():
     # TODO: Remove this code when Runtimes are no longer created by modulestores
     # https://openedx.atlassian.net/wiki/display/PLAT/Convert+from+Storage-centric+runtimes+to+Application-centric+runtimes
     xmodule.x_module.descriptor_global_handler_url = cms.lib.xblock.runtime.handler_url
-    xmodule.x_module.descriptor_global_local_resource_url = cms.lib.xblock.runtime.local_resource_url
+    xmodule.x_module.descriptor_global_local_resource_url = xblock_local_resource_url
 
 
 def add_mimetypes():

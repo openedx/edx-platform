@@ -28,13 +28,10 @@ function() {
 
     SkipControl.prototype = {
         template: [
-            '<button class="control video_control skip skip-control" aria-disabled="false">',
-                '<span class="icon-fallback-img">',
-                    '<span class="icon fa fa-step-forward" aria-hidden="true"></span>',
-                    '<span class="text control-text">',
-                        gettext('Do not show again'),
-                    '</span>',
-                '</span>',
+            '<button class="control video_control skip skip-control" aria-disabled="false" title="',
+                gettext('Do not show again'),
+            '">',
+                '<span class="icon fa fa-step-forward" aria-hidden="true"></span>',
             '</button>'
         ].join(''),
 

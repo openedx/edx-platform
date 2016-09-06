@@ -2,7 +2,6 @@
 A tiny app that checks for a status message.
 """
 
-from django.conf import settings
 import logging
 
 from .models import GlobalStatusMessage

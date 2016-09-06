@@ -24,7 +24,7 @@
         },
 
         render: function() {
-            var renderedHtml = _.template( $( this.template ).html(), {} );
+            var renderedHtml = _.template( $( this.template ).html())({});
             $( this.el ).html( renderedHtml );
 
             // Set the submit button to disabled by default

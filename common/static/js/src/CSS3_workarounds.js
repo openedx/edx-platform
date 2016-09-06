@@ -2,7 +2,7 @@
 // supported in older browsers
 
 var pointerEventsNone = function (selector, supportedStyles) {
-	// Check to see if the brower supports 'pointer-events' css rule.
+	// Check to see if the browser supports 'pointer-events' css rule.
 	// If it doesn't, use javascript to stop the link from working
 	// when clicked.
 	$(selector).click(function (event) {

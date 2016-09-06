@@ -3,7 +3,7 @@
  */
 var edx = edx || {};
 
-(function ($, _, _s, Backbone) {
+(function ($, _, Backbone) {
     'use strict';
 
     edx.commerce = edx.commerce || {};
@@ -19,11 +19,6 @@ var edx = edx || {};
             this.useEcommerceApi = this.ecommerceBasketId || this.ecommerceOrderNumber;
             _.bindAll(this, 'renderReceipt', 'renderError', 'getProviderData', 'renderProvider', 'getCourseData');
 
-            /* Mix non-conflicting functions from underscore.string (all but include, contains, and reverse) into
-             * the Underscore namespace.
-             */
-            _.mixin(_s.exports());
-
             this.render();
         },
 
@@ -31,7 +26,8 @@ var edx = edx || {};
             var templateHtml = $("#receipt-tpl").html(),
                 context = {
                     platformName: this.$el.data('platform-name'),
-                    verified: this.$el.data('verified').toLowerCase() === 'true'
+                    verified: this.$el.data('verified').toLowerCase() === 'true',
+                    is_request_in_themed_site: this.$el.data('is-request-in-themed-site').toLowerCase() === 'true'
                 },
                 providerId;
 
@@ -43,11 +39,15 @@ var edx = edx || {};
                 courseKey: this.courseKey
             });
 
-            this.$el.html(_.template(templateHtml, context));
+            this.$el.html(_.template(templateHtml)(context));
 
             this.trackLinks();
 
+            this.trackPurchase(data);
+
             this.renderCourseNamePlaceholder(this.courseKey);
+
+            this.renderUserFullNamePlaceholder(this.username);
 
             providerId = this.getCreditProviderId(data);
             if (providerId) {
@@ -63,18 +63,38 @@ var edx = edx || {};
                 $courseNamePlaceholder.text(responseData.name);
             });
         },
+        renderUserFullNamePlaceholder: function (username) {
+            var userModel = Backbone.Model.extend({
+              urlRoot: '/api/user/v1/accounts/',
+                url: function() {
+                    return this.urlRoot + this.id;
+                }
+            });
+            this.user = new userModel({id:username});
+            this.user.fetch({success: function(userData) {
+                $(".full_name_placeholder").text(userData.get('name'));
+            }});
+        },
         renderProvider: function (context) {
             var templateHtml = $("#provider-tpl").html(),
                 providerDiv = this.$el.find("#receipt-provider");
             context.course_key = this.courseKey;
             context.username = this.username;
             context.platformName = this.$el.data('platform-name');
-            providerDiv.html(_.template(templateHtml, context)).removeClass('hidden');
+            providerDiv.html(_.template(templateHtml)(context)).removeClass('hidden');
         },
 
         renderError: function () {
             // Display an error
             $('#error-container').removeClass('hidden');
+        },
+
+        trackPurchase: function (order) {
+            window.analytics.track("Completed Order", {
+                orderId: order.number,
+                total: order.total_excl_tax,
+                currency: order.currency
+            });
         },
 
         render: function () {
@@ -114,17 +134,16 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getReceiptData: function (orderId) {
-            var urlFormat = '/shoppingcart/receipt/%s/';
+            var urlFormat = '/shoppingcart/receipt/{orderId}/';
 
             if (this.ecommerceOrderNumber) {
-                urlFormat = '/api/commerce/v1/orders/%s/';
+                urlFormat = '/api/commerce/v1/orders/{orderId}/';
             } else if (this.ecommerceBasketId){
-                urlFormat = '/api/commerce/v0/baskets/%s/order/';
+                urlFormat = '/api/commerce/v0/baskets/{orderId}/order/';
             }
 
-
             return $.ajax({
-                url: _.sprintf(urlFormat, orderId),
+                url: edx.StringUtils.interpolate(urlFormat, {orderId: orderId}),
                 type: 'GET',
                 dataType: 'json'
             }).retry({times: 5, timeout: 2000, statusCodes: [404]});
@@ -135,10 +154,10 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getProviderData: function (providerId) {
-            var providerUrl = '/api/credit/v1/providers/%s/';
+            var providerUrl = '/api/credit/v1/providers/{providerId}/';
 
             return $.ajax({
-                url: _.sprintf(providerUrl, providerId),
+                url: edx.StringUtils.interpolate(providerUrl, {providerId: providerId}),
                 type: 'GET',
                 dataType: 'json',
                 contentType: 'application/json',
@@ -153,9 +172,9 @@ var edx = edx || {};
          * @return {object} JQuery Promise.
          */
         getCourseData: function (courseId) {
-            var courseDetailUrl = '/api/course_structure/v0/courses/%s/';
+            var courseDetailUrl = '/api/courses/v1/courses/{courseId}/';
             return $.ajax({
-                url: _.sprintf(courseDetailUrl, courseId),
+                url: edx.StringUtils.interpolate(courseDetailUrl, {courseId: courseId}),
                 type: 'GET',
                 dataType: 'json'
             });
@@ -242,7 +261,13 @@ var edx = edx || {};
                 for (var i = 0; i < length; i++) {
                     var line = order.lines[i],
                         attributeValues = _.find(line.product.attribute_values, function (attribute) {
-                            return attribute.name === 'course_key'
+                            // If the attribute has a 'code' property, compare its value, otherwise compare 'name'
+                            var value_to_match = 'course_key';
+                            if (attribute.code) {
+                                return attribute.code === value_to_match;
+                            } else {
+                                return attribute.name === value_to_match;
+                            }
                         });
 
                     // This method assumes that all items in the order are related to a single course.
@@ -295,7 +320,7 @@ var edx = edx || {};
         el: $('#receipt-container')
     });
 
-})(jQuery, _, _.str, Backbone);
+})(jQuery, _, Backbone);     // jshint ignore:line
 
 function completeOrder(event) {     // jshint ignore:line
     var courseKey = $(event).data("course-key"),

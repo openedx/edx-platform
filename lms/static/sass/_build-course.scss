@@ -4,13 +4,16 @@
 // About: Sass compile for the LMS Courseware Elements that are shared between LTR and RTL UI. Configuration and vendor specific imports happen before this shared set of imports are compiled in the lms-course-*.scss files.
 
 @import 'base/base';
+@import 'base/headings';
 @import 'base/extends';
 @import 'base/animations';
+@import 'shared/alerts_pattern_library_shim';
 @import 'shared/tooltips';
 
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/pagination';
 @import 'elements/navigation'; // all archetypes of navigation
 
 // course - base
@@ -49,7 +52,6 @@
 @import "views/teams";
 
 // course - instructor-only views
-@import "course/instructor/instructor";
 @import "course/instructor/instructor_2";
 @import "course/instructor/email";
 @import "xmodule/descriptors/css/module-styles.scss";
@@ -59,6 +61,7 @@
 
 // discussion
 @import "course/discussion/form-wmd-toolbar";
+@import "course/discussion/form";
 
 // search
 @import 'search/_search';

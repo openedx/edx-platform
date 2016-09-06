@@ -107,7 +107,7 @@ def path(block, child_to_parent, start_block):
         if block is not start_block:
             block_path.append({
                 # to be consistent with other edx-platform clients, return the defaulted display name
-                'name': block.display_name_with_default,
+                'name': block.display_name_with_default_escaped,
                 'category': block.category,
                 'id': unicode(block.location)
             })

@@ -17,7 +17,7 @@
               <li class="help-item"><%- gettext( "Make sure your face is well-lit" ) %></li>
               <li class="help-item"><%- gettext( "Be sure your entire face is inside the frame" ) %></li>
               <li class="help-item">
-                <%=  _.sprintf( gettext( "Once in position, use the camera button %(icon)s to capture your photo" ), { icon: '<span class="example">(<i class="icon fa fa-camera" aria-hidden="true"></i>)</span>' } ) %>
+                <%=  HtmlUtils.interpolateHtml( gettext( "Once in position, use the camera button {icon} to capture your photo" ), { icon: HtmlUtils.HTML('<span class="example">(<span class="icon fa fa-camera" aria-hidden="true"></span>)</span>') } ) %>
               </li>
               <li class="help-item"><%- gettext( "Can we match the photo you took with the one on your ID?" ) %></li>
               <li class="help-item"><%- gettext( "Use the retake photo button if you are not pleased with your photo" ) %></li>
@@ -44,7 +44,7 @@
     </div>
 
     <div>
-      <button class="action action-primary" id="submit"><%= gettext("Submit") %></button>
+      <button class="action action-primary" id="submit"><%- gettext("Submit") %></button>
     </div>
 
   </div>

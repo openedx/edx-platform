@@ -49,6 +49,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
             mutable=True,
         )
         self.cleaned_data = {
+            'all_blocks': None,
             'block_counts': set(),
             'depth': 0,
             'nav_depth': None,
@@ -58,6 +59,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
             'usage_key': usage_key,
             'username': self.student.username,
             'user': self.student,
+            'block_types_filter': set(),
         }
 
     def assert_raises_permission_denied(self):
@@ -100,8 +102,31 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
 
     #-- user
 
-    def test_no_user_param(self):
+    @ddt.data("True", "true", True)
+    def test_no_user_all_blocks_true(self, all_blocks_value):
+        self.initial = {'requesting_user': self.staff}
+
         self.form_data.pop('username')
+        self.form_data['all_blocks'] = all_blocks_value
+        self.get_form(expected_valid=True)
+
+    @ddt.data("False", "false", False)
+    def test_no_user_all_blocks_false(self, all_blocks_value):
+        self.initial = {'requesting_user': self.staff}
+
+        self.form_data.pop('username')
+        self.form_data['all_blocks'] = all_blocks_value
+        self.assert_error('username', "This field is required unless all_blocks is requested.")
+
+    def test_no_user_all_blocks_none(self):
+        self.initial = {'requesting_user': self.staff}
+
+        self.form_data.pop('username')
+        self.assert_error('username', "This field is required unless all_blocks is requested.")
+
+    def test_no_user_non_staff(self):
+        self.form_data.pop('username')
+        self.form_data['all_blocks'] = True
         self.assert_raises_permission_denied()
 
     def test_nonexistent_user_by_student(self):
@@ -134,7 +159,7 @@ class TestBlockListGetForm(FormTestMixin, SharedModuleStoreTestCase):
     def test_unenrolled_student_by_staff(self):
         CourseEnrollment.unenroll(self.student, self.course.id)
         self.initial = {'requesting_user': self.staff}
-        self.assert_raises_permission_denied()
+        self.get_form(expected_valid=True)
 
     #-- depth
 

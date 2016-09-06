@@ -6,13 +6,17 @@ from nose.plugins.attrib import attr
 from django.test.utils import override_settings
 from mock import patch
 
+from course_modes.models import CourseMode
 from opaque_keys.edx.locator import CourseLocator
-from certificates.tests.factories import BadgeAssertionFactory
+
+from badges.events.course_complete import get_completion_badge
+from badges.models import BadgeAssertion
+from badges.tests.factories import BadgeAssertionFactory, CourseCompleteImageConfigurationFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from certificates.management.commands import resubmit_error_certificates, regenerate_user, ungenerated_certs
-from certificates.models import GeneratedCertificate, CertificateStatuses, BadgeAssertion
+from certificates.models import GeneratedCertificate, CertificateStatuses
 
 
 class CertificateManagementTest(ModuleStoreTestCase):
@@ -29,17 +33,22 @@ class CertificateManagementTest(ModuleStoreTestCase):
             CourseFactory.create()
             for __ in range(3)
         ]
+        for course in self.courses:
+            chapter = ItemFactory.create(parent_location=course.location)
+            ItemFactory.create(parent_location=chapter.location, category='sequential', graded=True)
+        CourseCompleteImageConfigurationFactory.create()
 
-    def _create_cert(self, course_key, user, status):
+    def _create_cert(self, course_key, user, status, mode=CourseMode.HONOR):
         """Create a certificate entry. """
         # Enroll the user in the course
         CourseEnrollmentFactory.create(
             user=user,
-            course_id=course_key
+            course_id=course_key,
+            mode=mode
         )
 
         # Create the certificate
-        GeneratedCertificate.objects.create(
+        GeneratedCertificate.eligible_certificates.create(
             user=user,
             course_id=course_key,
             status=status
@@ -52,7 +61,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
 
     def _assert_cert_status(self, course_key, user, expected_status):
         """Check the status of a certificate. """
-        cert = GeneratedCertificate.objects.get(user=user, course_id=course_key)
+        cert = GeneratedCertificate.eligible_certificates.get(user=user, course_id=course_key)
         self.assertEqual(cert.status, expected_status)
 
 
@@ -61,9 +70,10 @@ class CertificateManagementTest(ModuleStoreTestCase):
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
 
-    def test_resubmit_error_certificate(self):
+    @ddt.data(CourseMode.HONOR, CourseMode.VERIFIED)
+    def test_resubmit_error_certificate(self, mode):
         # Create a certificate with status 'error'
-        self._create_cert(self.courses[0].id, self.user, CertificateStatuses.error)
+        self._create_cert(self.courses[0].id, self.user, CertificateStatuses.error, mode)
 
         # Re-submit all certificates with status 'error'
         with check_mongo_calls(1):
@@ -96,7 +106,6 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         CertificateStatuses.downloadable,
         CertificateStatuses.generating,
         CertificateStatuses.notpassing,
-        CertificateStatuses.regenerating,
         CertificateStatuses.restricted,
         CertificateStatuses.unavailable,
     )
@@ -143,6 +152,7 @@ class ResubmitErrorCertificatesTest(CertificateManagementTest):
         self._assert_cert_status(phantom_course, self.user, CertificateStatuses.error)
 
 
+@ddt.ddt
 @attr('shard_1')
 class RegenerateCertificatesTest(CertificateManagementTest):
     """
@@ -157,19 +167,23 @@ class RegenerateCertificatesTest(CertificateManagementTest):
         super(RegenerateCertificatesTest, self).setUp()
         self.course = self.courses[0]
 
+    @ddt.data(True, False)
     @override_settings(CERT_QUEUE='test-queue')
     @patch('certificates.api.XQueueCertInterface', spec=True)
-    def test_clear_badge(self, xqueue):
+    def test_clear_badge(self, issue_badges, xqueue):
         """
         Given that I have a user with a badge
         If I run regeneration for a user
         Then certificate generation will be requested
-        And the badge will be deleted
+        And the badge will be deleted if badge issuing is enabled
         """
         key = self.course.location.course_key
-        BadgeAssertionFactory(user=self.user, course_id=key, data={})
         self._create_cert(key, self.user, CertificateStatuses.downloadable)
-        self.assertTrue(BadgeAssertion.objects.filter(user=self.user, course_id=key))
+        badge_class = get_completion_badge(key, self.user)
+        BadgeAssertionFactory(badge_class=badge_class, user=self.user)
+        self.assertTrue(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class))
+        self.course.issue_badges = issue_badges
+        self.store.update_item(self.course, None)
         self._run_command(
             username=self.user.email, course=unicode(key), noop=False, insecure=False, template_file=None,
             grade_value=None
@@ -182,7 +196,9 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             template_file=None,
             generate_pdf=True
         )
-        self.assertFalse(BadgeAssertion.objects.filter(user=self.user, course_id=key))
+        self.assertEquals(
+            bool(BadgeAssertion.objects.filter(user=self.user, badge_class=badge_class)), not issue_badges
+        )
 
     @override_settings(CERT_QUEUE='test-queue')
     @patch('capa.xqueue_interface.XQueueInterface.send_to_queue', spec=True)
@@ -198,7 +214,7 @@ class RegenerateCertificatesTest(CertificateManagementTest):
             username=self.user.email, course=unicode(key), noop=False, insecure=True, template_file=None,
             grade_value=None
         )
-        certificate = GeneratedCertificate.objects.get(
+        certificate = GeneratedCertificate.eligible_certificates.get(
             user=self.user,
             course_id=key
         )
@@ -236,7 +252,7 @@ class UngenerateCertificatesTest(CertificateManagementTest):
                 course=unicode(key), noop=False, insecure=True, force=False
             )
         self.assertTrue(mock_send_to_queue.called)
-        certificate = GeneratedCertificate.objects.get(
+        certificate = GeneratedCertificate.eligible_certificates.get(
             user=self.user,
             course_id=key
         )

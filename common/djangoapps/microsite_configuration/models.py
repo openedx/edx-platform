@@ -127,7 +127,7 @@ class MicrositeHistory(TimeStampedModel):
     This is an archive table for Microsites model, so that we can maintain a history of changes. Note that the
     key field is no longer unique
     """
-    site = models.OneToOneField(Site, related_name='microsite_history')
+    site = models.ForeignKey(Site, related_name='microsite_history')
     key = models.CharField(max_length=63, db_index=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
 

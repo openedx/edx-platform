@@ -2,13 +2,14 @@
     'use strict';
     define([
         'gettext', 'jquery', 'underscore', 'backbone', 
+        'edx-ui-toolkit/js/utils/html-utils',
         'text!templates/fields/field_readonly.underscore',
         'text!templates/fields/field_dropdown.underscore',
         'text!templates/fields/field_link.underscore',
         'text!templates/fields/field_text.underscore',
         'text!templates/fields/field_textarea.underscore',
         'backbone-super'
-    ], function (gettext, $, _, Backbone,
+    ], function (gettext, $, _, Backbone, HtmlUtils,
                  field_readonly_template,
                  field_dropdown_template,
                  field_link_template,
@@ -30,12 +31,36 @@
             tagName: 'div',
 
             indicators: {
-                'canEdit': '<i class="icon fa fa-pencil message-can-edit" aria-hidden="true"></i><span class="sr">' + gettext("Editable") + '</span>',
-                'error': '<i class="fa fa-exclamation-triangle message-error" aria-hidden="true"></i><span class="sr">' + gettext("Error") + '</span>',
-                'validationError': '<i class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></i><span class="sr">' + gettext("Validation Error") + '</span>',
-                'inProgress': '<i class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></i><span class="sr">' + gettext("In Progress") + '</span>',
-                'success': '<i class="fa fa-check message-success" aria-hidden="true"></i><span class="sr">' + gettext("Success") + '</span>',
-                'plus': '<i class="fa fa-plus placeholder" aria-hidden="true"></i><span class="sr">' + gettext("Placeholder")+ '</span>'
+                'canEdit': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="icon fa fa-pencil message-can-edit" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Editable"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'error': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Error"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'validationError': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-exclamation-triangle message-validation-error" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Validation Error"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'inProgress': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-spinner fa-pulse message-in-progress" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("In Progress"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'success': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-check message-success" aria-hidden="true"></span><span class="sr">'), // jshint ignore:line
+                    gettext("Success"),
+                    HtmlUtils.HTML('</span>')
+                ),
+                'plus': HtmlUtils.joinHtml(
+                    HtmlUtils.HTML('<span class="fa fa-plus placeholder" aria-hidden="true"></span><span class="sr">'),
+                    gettext("Placeholder"),
+                    HtmlUtils.HTML('</span>')
+                ),
             },
 
             messages: {
@@ -46,12 +71,18 @@
                 'success': gettext('Your changes have been saved.')
             },
 
+            constructor: function(options) {
+                this.options = _.extend({}, options);
+                Backbone.View.apply(this, arguments);
+            },
+
             initialize: function () {
 
                 this.template = _.template(this.fieldTemplate || '');
 
                 this.helpMessage = this.options.helpMessage || '';
                 this.showMessages = _.isUndefined(this.options.showMessages) ? true : this.options.showMessages;
+                this.enabled = _.isUndefined(this.options.enabled) ? true: this.options.enabled;
 
                 _.bindAll(this, 'modelValue', 'modelValueIsSet', 'showNotificationMessage','getNotificationMessage',
                     'getMessage', 'title', 'showHelpMessage', 'showInProgressMessage', 'showSuccessMessage',
@@ -67,15 +98,15 @@
                 return (this.modelValue() === true);
             },
 
-            title: function (text) {
-                return this.$('.u-field-title').html(text);
+            title: function (title) {
+                return HtmlUtils.setHtml(this.$('.u-field-title'), title);
             },
 
             getMessage: function(message_status) {
                 if ((message_status + 'Message') in this) {
                     return this[message_status + 'Message'].call(this);
                 } else if (this.showMessages) {
-                    return this.indicators[message_status] + this.messages[message_status];
+                    return HtmlUtils.joinHtml(this.indicators[message_status], this.messages[message_status]);
                 }
                 return this.indicators[message_status];
             },
@@ -85,16 +116,16 @@
                     message = this.helpMessage;
                 }
                 this.$('.u-field-message-notification').html('');
-                this.$('.u-field-message-help').html(message);
+                HtmlUtils.setHtml(this.$('.u-field-message-help'), message);
             },
 
             getNotificationMessage: function() {
-                return this.$('.u-field-message-notification').html();
+                return HtmlUtils.HTML(this.$('.u-field-message-notification').html());
             },
 
             showNotificationMessage: function(message) {
                 this.$('.u-field-message-help').html('');
-                this.$('.u-field-message-notification').html(message);
+                HtmlUtils.setHtml(this.$('.u-field-message-notification'), message);
             },
 
             showCanEditMessage: function(show) {
@@ -114,7 +145,7 @@
                 this.showNotificationMessage(successMessage);
 
                 if (this.options.refreshPageOnSave) {
-                    document.location.reload();
+                    location.reload(true);
                 }
 
                 var view = this;
@@ -123,7 +154,8 @@
                 this.lastSuccessMessageContext = context;
 
                 setTimeout(function () {
-                    if ((context === view.lastSuccessMessageContext) && (view.getNotificationMessage() === successMessage)) {
+                    if ((context === view.lastSuccessMessageContext) &&
+                        (view.getNotificationMessage().toString() === successMessage.toString())) {
                         if (view.editable === 'toggle') {
                             view.showCanEditMessage(true);
                         } else {
@@ -137,10 +169,8 @@
                 if (xhr.status === 400) {
                     try {
                         var errors = JSON.parse(xhr.responseText),
-                            validationErrorMessage = _.escape(
-                                errors.field_errors[this.options.valueAttribute].user_message
-                            ),
-                            message = this.indicators.validationError + validationErrorMessage;
+                            validationErrorMessage = errors.field_errors[this.options.valueAttribute].user_message,
+                            message = HtmlUtils.joinHtml(this.indicators.validationError, validationErrorMessage);
                         this.showNotificationMessage(message);
                     } catch (error) {
                         this.showNotificationMessage(this.getMessage('error'));
@@ -225,8 +255,15 @@
             },
 
             finishEditing: function() {
+                var modelValue;
                 if (this.persistChanges === false || this.mode !== 'edit') {return;}
-                if (this.fieldValue() !== this.modelValue()) {
+
+                modelValue = this.modelValue();
+                if (!(_.isUndefined(modelValue) || _.isNull(modelValue))) {
+                    modelValue = modelValue.toString();
+                }
+
+                if (this.fieldValue() !== modelValue) {
                     this.saveValue();
                 } else {
                     if (this.editable === 'always') {
@@ -259,7 +296,7 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
@@ -275,7 +312,7 @@
             },
 
             updateValueInField: function () {
-                this.$('.u-field-value ').html(_.escape(this.modelValue()));
+                this.$('.u-field-value ').text(this.modelValue());
             }
         });
 
@@ -296,7 +333,7 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     value: this.modelValue(),
@@ -312,7 +349,7 @@
 
             updateValueInField: function () {
                 var value = (_.isUndefined(this.modelValue()) || _.isNull(this.modelValue())) ? '' : this.modelValue();
-                this.$('.u-field-value input').val(_.escape(value));
+                this.$('.u-field-value input').val(value);
             },
 
             saveValue: function () {
@@ -342,7 +379,7 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     mode: this.mode,
                     editable: this.editable,
@@ -406,7 +443,7 @@
                     value = this.options.placeholderValue || '';
                 }
                 this.$('.u-field-value').attr('aria-label', this.options.title);
-                this.$('.u-field-value-readonly').html(_.escape(value));
+                this.$('.u-field-value-readonly').text(value);
 
                 if (this.mode === 'display') {
                     this.updateDisplayModeClass();
@@ -480,7 +517,7 @@
                 if (this.mode === 'display') {
                     value = value || this.options.placeholderValue;
                 }
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,
                     mode: this.mode,
@@ -491,7 +528,8 @@
                     placeholderValue: this.options.placeholderValue
                 }));
                 this.delegateEvents();
-                this.title((this.modelValue() || this.mode === 'edit') ? this.options.title : this.indicators['plus'] + this.options.title);
+                this.title((this.modelValue() || this.mode === 'edit') ?
+                    this.options.title : HtmlUtils.joinHtml(this.indicators.plus, this.options.title));
 
                 if (this.editable === 'toggle') {
                     this.showCanEditMessage(this.mode === 'display');
@@ -575,7 +613,7 @@
             },
 
             render: function () {
-                this.$el.html(this.template({
+                HtmlUtils.setHtml(this.$el, HtmlUtils.template(this.fieldTemplate)({
                     id: this.options.valueAttribute,
                     title: this.options.title,
                     screenReaderTitle: this.options.screenReaderTitle || this.options.title,

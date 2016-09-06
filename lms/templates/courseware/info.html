@@ -1,10 +1,14 @@
+<%page expression_filter="h"/>
 <%inherit file="../main.html" />
+<%def name="online_help_token()"><% return "courseinfo" %></%def>
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
+
 from courseware.courses import get_course_info_section, get_course_date_summary
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangolib.markup import HTML, Text
 %>
 
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
@@ -14,70 +18,95 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 <%static:css group='style-course'/>
 </%block>
 
-
 % if show_enroll_banner:
-  <div class="wrapper-msg urgency-low" id="failed-verification-banner">
-    <div class="msg msg-reverify is-dismissable">
-      <div class="msg-content">
-        <h2 class="title">${_("You are not enrolled yet")}</h2>
-        <div class="copy">
-          <p class='enroll-message'>
-            ${_(u"You are not currently enrolled in this course. {link_start}Sign up now!{link_end}").format(
-            link_start=u"<a href={}>".format(url_to_enroll),
-            link_end=u"</a>"
-            )}
-          </p>
-        </div>
+<div class="wrapper-msg urgency-low" id="failed-verification-banner">
+  <div class="msg msg-reverify is-dismissable">
+    <div class="msg-content">
+      <h2 class="title">${_("You are not enrolled yet")}</h2>
+      <div class="copy">
+        <p class='enroll-message'>
+          ${Text(_("You are not currently enrolled in this course. {link_start}Sign up now!{link_end}")).format(
+                link_start=HTML("<a href={}>").format(url_to_enroll),
+                link_end=HTML("</a>")
+          )}
+        </p>
       </div>
     </div>
   </div>
+</div>
 % endif
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
+<%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+        ToggleElementVisibility();
+</%static:require_module_async>
+<%static:require_module_async module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+        CourseHomeEvents();
+</%static:require_module_async>
+
 <%block name="js_extra">
-  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
-  <script type="text/javascript" charset="utf-8">
-$(document).ready(function(){
-    $(".handouts").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
-    });
-  </script>
+  ## CourseTalk widget js script
+  % if show_coursetalk_widget:
+      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-write-reviews.js"></script>
+  % endif
 </%block>
 
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
-<section class="container">
-  <div class="info-wrapper">
-    % if user.is_authenticated():
-    <section class="updates">
-      % if studio_url is not None and masquerade and masquerade.role == 'staff':
-        <div class="wrap-instructor-info studio-view">
-          <a class="instructor-info-action" href="${studio_url}">
-            ${_("View Updates in Studio")}
-          </a>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+      <div class="home">
+        <div class="page-header-main">
+            <h1 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}</h1>
+            <h2 class="page-subtitle">${course.display_name_with_default}</h2>
         </div>
-      % endif
+        % if last_accessed_courseware_url:
+          <div class="page-header-secondary">
+              <a href="${last_accessed_courseware_url}" class="last-accessed-link">${_("Resume Course")}</a>
+          </div>
+        % endif
+      </div>
+      <div class="info-wrapper">
+        % if user.is_authenticated():
+        <section class="updates">
+          % if studio_url is not None and masquerade and masquerade.role == 'staff':
+          <div class="wrap-instructor-info studio-view">
+            <a class="instructor-info-action" href="${studio_url}">
+              ${_("View Updates in Studio")}
+            </a>
+          </div>
+          % endif
 
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'updates')}
-    </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      % if False:
-        <h1>${_("Important Course Dates")}</h1>
-        ${get_course_date_summary(course, user)}
-      % endif
+          <h1>${_("Course Updates and News")}</h1>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
 
-      <h1>${_(course.info_sidebar_name)}</h1>
-      ${get_course_info_section(request, course, 'handouts')}
-    </section>
-    % else:
-    <section class="updates">
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'guest_updates')}
-    </section>
-    <section aria-label="${_('Handout Navigation')}" class="handouts">
-      <h1>${_("Course Handouts")}</h1>
-      ${get_course_info_section(request, course, 'guest_handouts')}
-    </section>
-    % endif
+          ## CourseTalk widget
+          % if show_coursetalk_widget:
+          <div class="coursetalk-write-reviews">
+            <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
+          </div>
+          % endif
+        </section>
+        <section aria-label="${_('Handout Navigation')}" class="handouts">
+          % if SelfPacedConfiguration.current().enable_course_home_improvements:
+            <h1 class="handouts-header">${_("Important Course Dates")}</h1>
+            ${HTML(get_course_date_summary(course, user))}
+          % endif
+
+          <h1 class="handouts-header">${_(course.info_sidebar_name)}</h1>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
+        </section>
+        % else:
+        <section class="updates">
+          <h1 class="handouts-header">${_("Course Updates and News")}</h1>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_updates'))}
+        </section>
+        <section aria-label="${_('Handout Navigation')}" class="handouts">
+          <h1 class="handouts-header">${_("Course Handouts")}</h1>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_handouts'))}
+        </section>
+        % endif
+      </div>
   </div>
-</section>
+</main>

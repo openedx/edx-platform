@@ -1,4 +1,5 @@
-define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "common/js/spec_helpers/ajax_helpers"],
+define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", 
+        "js/collections/course_update", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers"],
 (CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, AjaxHelpers) ->
 
     describe "Course Updates and Handouts", ->
@@ -47,16 +48,16 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     # Edit button is not in the template under test (it is in parent HTML).
                     # Therefore call onNew directly.
                     @courseInfoEdit.onNew(@event)
-                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn(text)
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').and.returnValue(text)
                     @courseInfoEdit.$el.find('.save-button').click()
 
                 @cancelNewCourseInfo = (useCancelButton) ->
                     @courseInfoEdit.onNew(@event)
-                    spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+                    spyOn(@courseInfoEdit.$modalCover, 'hide').and.callThrough()
 
-                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('unsaved changes')
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').and.returnValue('unsaved changes')
                     model = @collection.at(0)
-                    spyOn(model, "save").andCallThrough()
+                    spyOn(model, "save").and.callThrough()
 
                     cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
 
@@ -67,11 +68,11 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
                 @doNotCloseNewCourseInfo = () ->
                     @courseInfoEdit.onNew(@event)
-                    spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+                    spyOn(@courseInfoEdit.$modalCover, 'hide').and.callThrough()
 
-                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('unsaved changes')
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').and.returnValue('unsaved changes')
                     model = @collection.at(0)
-                    spyOn(model, "save").andCallThrough()
+                    spyOn(model, "save").and.callThrough()
 
                     cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, false)
 
@@ -81,11 +82,11 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 @cancelExistingCourseInfo = (useCancelButton) ->
                     @createNewUpdate('existing update')
                     @courseInfoEdit.$el.find('.edit-button').click()
-                    spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+                    spyOn(@courseInfoEdit.$modalCover, 'hide').and.callThrough()
 
-                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('modification')
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').and.returnValue('modification')
                     model = @collection.at(0)
-                    spyOn(model, "save").andCallThrough()
+                    spyOn(model, "save").and.callThrough()
                     model.id = "saved_to_server"
                     cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
 
@@ -93,6 +94,14 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     expect(model.save).not.toHaveBeenCalled()
                     previewContents = @courseInfoEdit.$el.find('.update-contents').html()
                     expect(previewContents).toEqual('existing update')
+
+                @testInvalidDateValue = (value) ->
+                    @courseInfoEdit.onNew(@event)
+                    expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
+                    @courseInfoEdit.$el.find('input.date').val(value).trigger("change")
+                    expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(true)
+                    @courseInfoEdit.$el.find('input.date').val("01/01/16").trigger("change")
+                    expect(@courseInfoEdit.$el.find('.save-button').hasClass("is-disabled")).toEqual(false)
 
                 cancelEditingUpdate = (update, modalCover, useCancelButton) ->
                     if useCancelButton
@@ -109,8 +118,8 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 @courseInfoEdit.onNew(@event)
                 expect(@collection.length).toEqual(1)
                 model = @collection.at(0)
-                spyOn(model, "save").andCallThrough()
-                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
+                spyOn(model, "save").and.callThrough()
+                spyOn(@courseInfoEdit.$codeMirror, 'getValue').and.returnValue('/static/image.jpg')
 
                 # Click the "Save button."
                 @courseInfoEdit.$el.find('.save-button').click()
@@ -122,6 +131,9 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
 
                 # Verify the link is not rewritten when saved.
                 expect(requestSent.content).toEqual('/static/image.jpg')
+
+                # Verify that analytics are sent
+                expect(window.analytics.track).toHaveBeenCalled()
 
             it "does rewrite links for preview", ->
                 # Create a new update.
@@ -150,6 +162,13 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             it "does not remove existing course info on click outside modal", ->
                 @cancelExistingCourseInfo(false)
 
+            it "does not allow updates to be saved with an invalid date", ->
+                @testInvalidDateValue("Marchtober 40, 2048")
+
+            it "does not allow updates to be saved with a blank date", ->
+                @testInvalidDateValue("")
+
+
         describe "Course Updates WITH Push notification", ->
             courseInfoTemplate = readFixtures('course_info_update.underscore')
 
@@ -177,14 +196,21 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 requestSent = JSON.parse(requests[requests.length - 1].requestBody)
                 expect(requestSent.push_notification_selected).toEqual(true)
 
+		# Check that analytics send push_notification info
+                analytics_payload = window.analytics.track.calls.first().args[1]
+                expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': true}))
+
             it "sends correct value for push_notification_selected when it is unselected", ->
                 requests = AjaxHelpers.requests(this);
                 # unselect push notification
                 @courseInfoEdit.$el.find('.toggle-checkbox').attr('checked', false);
-
                 @courseInfoEdit.$el.find('.save-button').click()
                 requestSent = JSON.parse(requests[requests.length - 1].requestBody)
                 expect(requestSent.push_notification_selected).toEqual(false)
+
+		# Check that analytics send push_notification info
+                analytics_payload = window.analytics.track.calls.first().args[1]
+                expect(analytics_payload).toEqual(jasmine.objectContaining({'push_notification_selected': false}))
 
         describe "Course Handouts", ->
             handoutsTemplate = readFixtures('course_info_handouts.underscore')
@@ -212,8 +238,8 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                 # Enter something in the handouts section, verifying that the model is saved
                 # when "Save" is clicked.
                 @handoutsEdit.$el.find('.edit-button').click()
-                spyOn(@handoutsEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
-                spyOn(@model, "save").andCallThrough()
+                spyOn(@handoutsEdit.$codeMirror, 'getValue').and.returnValue('/static/image.jpg')
+                spyOn(@model, "save").and.callThrough()
                 @handoutsEdit.$el.find('.save-button').click()
                 expect(@model.save).toHaveBeenCalled()
 
@@ -226,7 +252,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             it "does rewrite links after edit", ->
                 # Edit handouts and save.
                 @handoutsEdit.$el.find('.edit-button').click()
-                spyOn(@handoutsEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
+                spyOn(@handoutsEdit.$codeMirror, 'getValue').and.returnValue('/static/image.jpg')
                 @handoutsEdit.$el.find('.save-button').click()
 
                 # Verify preview text.

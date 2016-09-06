@@ -34,21 +34,19 @@ class AcceptanceTest(TestSuite):
     def cmd(self):
 
         report_file = self.report_dir / "{}.xml".format(self.system)
-        report_args = "--with-xunit --xunit-file {}".format(report_file)
-
-        cmd = (
-            "DEFAULT_STORE={default_store} ./manage.py {system} --settings acceptance harvest --traceback "
-            "--debug-mode --verbosity {verbosity} {pdb}{report_args} {extra_args}".format(
-                default_store=self.default_store,
-                system=self.system,
-                verbosity=self.verbosity,
-                pdb="--pdb " if self.pdb else "",
-                report_args=report_args,
-                extra_args=self.extra_args,
-            )
-        )
-
-        return cmd
+        report_args = ["--xunit-file {}".format(report_file)]
+        return [
+            "DEFAULT_STORE={}".format(self.default_store),
+            "./manage.py",
+            self.system,
+            "--settings=acceptance",
+            "harvest",
+            "--traceback",
+            "--debug-mode",
+            "--verbosity={}".format(self.verbosity),
+        ] + report_args + [
+            self.extra_args
+        ] + self.passthrough_options
 
     def _update_assets(self):
         """
@@ -69,8 +67,14 @@ class AcceptanceTestSuite(TestSuite):
     def __init__(self, *args, **kwargs):
         super(AcceptanceTestSuite, self).__init__(*args, **kwargs)
         self.root = 'acceptance'
-        self.db = Env.REPO_ROOT / 'test_root/db/test_edx.db'
-        self.db_cache = Env.REPO_ROOT / 'common/test/db_cache/lettuce.db'
+        self.dbs = {
+            'default': Env.REPO_ROOT / 'test_root/db/test_edx.db',
+            'student_module_history': Env.REPO_ROOT / 'test_root/db/test_student_module_history.db'
+        }
+        self.db_caches = {
+            'default': Env.REPO_ROOT / 'common/test/db_cache/lettuce.db',
+            'student_module_history': Env.REPO_ROOT / 'common/test/db_cache/lettuce_student_module_history.db'
+        }
         self.fasttest = kwargs.get('fasttest', False)
 
         if kwargs.get('system'):
@@ -114,24 +118,30 @@ class AcceptanceTestSuite(TestSuite):
         definitions to sync and migrate.
         """
 
-        if self.db.isfile():
-            # Since we are using SQLLite, we can reset the database by deleting it on disk.
-            self.db.remove()
+        for db in self.dbs.keys():
+            if self.dbs[db].isfile():
+                # Since we are using SQLLite, we can reset the database by deleting it on disk.
+                self.dbs[db].remove()
 
-        if self.db_cache.isfile():
+        if all(self.db_caches[cache].isfile() for cache in self.db_caches.keys()):
             # To speed up migrations, we check for a cached database file and start from that.
             # The cached database file should be checked into the repo
 
             # Copy the cached database to the test root directory
-            sh("cp {db_cache} {db}".format(db_cache=self.db_cache, db=self.db))
+            for db_alias in self.dbs.keys():
+                sh("cp {db_cache} {db}".format(db_cache=self.db_caches[db_alias], db=self.dbs[db_alias]))
 
             # Run migrations to update the db, starting from its cached state
-            sh("./manage.py lms --settings acceptance migrate --traceback --noinput --fake-initial")
-            sh("./manage.py cms --settings acceptance migrate --traceback --noinput --fake-initial")
+            for db_alias in sorted(self.dbs.keys()):
+                # pylint: disable=line-too-long
+                sh("./manage.py lms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
+                sh("./manage.py cms --settings acceptance migrate --traceback --noinput --fake-initial --database {}".format(db_alias))
         else:
             # If no cached database exists, syncdb before migrating, then create the cache
-            sh("./manage.py lms --settings acceptance migrate --traceback --noinput")
-            sh("./manage.py cms --settings acceptance migrate --traceback --noinput")
+            for db_alias in sorted(self.dbs.keys()):
+                sh("./manage.py lms --settings acceptance migrate --traceback --noinput --database {}".format(db_alias))
+                sh("./manage.py cms --settings acceptance migrate --traceback --noinput --database {}".format(db_alias))
 
             # Create the cache if it doesn't already exist
-            sh("cp {db} {db_cache}".format(db_cache=self.db_cache, db=self.db))
+            for db_alias in self.dbs.keys():
+                sh("cp {db} {db_cache}".format(db_cache=self.db_caches[db_alias], db=self.dbs[db_alias]))

@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 ${_("You have been invited to a beta test for {course_name}").format(
-		course_name=course.display_name_with_default
+		course_name=course.display_name_with_default_escaped
 	)}

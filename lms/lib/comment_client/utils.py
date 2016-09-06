@@ -1,3 +1,4 @@
+"""" Common utilities for comment client wrapper """
 from contextlib import contextmanager
 import dogstats_wrapper as dog_stats_api
 import logging
@@ -52,6 +53,8 @@ def request_timer(request_id, method, url, tags=None):
 
 def perform_request(method, url, data_or_params=None, raw=False,
                     metric_action=None, metric_tags=None, paged_results=False):
+    # To avoid dependency conflict
+    from django_comment_common.models import ForumsConfig
 
     if metric_tags is None:
         metric_tags = []
@@ -76,13 +79,14 @@ def perform_request(method, url, data_or_params=None, raw=False,
         data = None
         params = merge_dict(data_or_params, request_id_dict)
     with request_timer(request_id, method, url, metric_tags):
+        config = ForumsConfig.current()
         response = requests.request(
             method,
             url,
             data=data,
             params=params,
             headers=headers,
-            timeout=5
+            timeout=config.connection_timeout
         )
 
     metric_tags.append(u'status_code:{}'.format(response.status_code))
@@ -141,9 +145,9 @@ class CommentClientError(Exception):
 
 
 class CommentClientRequestError(CommentClientError):
-    def __init__(self, msg, status_code=400):
+    def __init__(self, msg, status_codes=400):
         super(CommentClientRequestError, self).__init__(msg)
-        self.status_code = status_code
+        self.status_code = status_codes
 
 
 class CommentClient500Error(CommentClientError):
@@ -152,3 +156,14 @@ class CommentClient500Error(CommentClientError):
 
 class CommentClientMaintenanceError(CommentClientError):
     pass
+
+
+class CommentClientPaginatedResult(object):
+    """ class for paginated results returned from comment services"""
+
+    def __init__(self, collection, page, num_pages, thread_count=0, corrected_text=None):
+        self.collection = collection
+        self.page = page
+        self.num_pages = num_pages
+        self.thread_count = thread_count
+        self.corrected_text = corrected_text

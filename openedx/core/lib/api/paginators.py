@@ -15,6 +15,7 @@ class DefaultPagination(pagination.PageNumberPagination):
     by any subclass of Django Rest Framework's generic API views.
     """
     page_size_query_param = "page_size"
+    max_page_size = 100
 
     def get_paginated_response(self, data):
         """
@@ -25,6 +26,8 @@ class DefaultPagination(pagination.PageNumberPagination):
             'previous': self.get_previous_link(),
             'count': self.page.paginator.count,
             'num_pages': self.page.paginator.num_pages,
+            'current_page': self.page.number,
+            'start': (self.page.number - 1) * self.get_page_size(self.request),
             'results': data
         })
 
@@ -39,6 +42,18 @@ class NamespacedPageNumberPagination(pagination.PageNumberPagination):
 
     page_size_query_param = "page_size"
 
+    def get_result_count(self):
+        """
+        Returns total number of results
+        """
+        return self.page.paginator.count
+
+    def get_num_pages(self):
+        """
+        Returns total number of pages the results are divided into
+        """
+        return self.page.paginator.num_pages
+
     def get_paginated_response(self, data):
         """
         Annotate the response with pagination information
@@ -46,8 +61,8 @@ class NamespacedPageNumberPagination(pagination.PageNumberPagination):
         metadata = {
             'next': self.get_next_link(),
             'previous': self.get_previous_link(),
-            'count': self.page.paginator.count,
-            'num_pages': self.page.paginator.num_pages,
+            'count': self.get_result_count(),
+            'num_pages': self.get_num_pages(),
         }
         if isinstance(data, dict):
             if 'results' not in data:

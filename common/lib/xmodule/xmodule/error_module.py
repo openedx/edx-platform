@@ -75,6 +75,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     Module that provides a raw editing view of broken xml.
     """
     module_class = ErrorModule
+    resources_dir = None
 
     def get_html(self):
         return u''

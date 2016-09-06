@@ -51,6 +51,7 @@ setup(
             "visibility = lms.djangoapps.course_blocks.transformers.visibility:VisibilityTransformer",
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
             "proctored_exam = lms.djangoapps.course_api.blocks.transformers.proctored_exam:ProctoredExamTransformer",
+            "grades = lms.djangoapps.courseware.transformers.grades:GradesTransformer",
         ],
     }
 )

@@ -2,10 +2,10 @@ define([
     'jquery',
     'URI',
     'underscore',
-    'common/js/spec_helpers/ajax_helpers',
-    'common/js/components/views/paging_footer',
-    'common/js/components/collections/paging_collection'
-], function ($, URI, _, AjaxHelpers, PagingFooter, PagingCollection) {
+    'edx-ui-toolkit/js/pagination/paging-collection',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+    'common/js/components/views/paging_footer'
+], function ($, URI, _, PagingCollection, AjaxHelpers, PagingFooter) {
     'use strict';
     describe("PagingFooter", function () {
         var pagingFooter,
@@ -15,10 +15,10 @@ define([
                 }
                 return {
                     count: null,
-                    current_page: currentPage,
+                    page: currentPage,
                     num_pages: numPages,
-                    start: null,
-                    results: _.map(_.range(collectionLength), function() { return {}; }) // need to have non-empty collection to render
+                    // need to have non-empty collection to render
+                    results: _.map(_.range(collectionLength), function() { return {}; })
                 };
             },
             nextPageCss = '.next-page-link',
@@ -29,9 +29,12 @@ define([
 
         beforeEach(function () {
             setFixtures('<div class="paging-footer"></div>');
+            var collection = new PagingCollection(mockPage(1, 2), {parse: true});
+            collection.url = '/test/url/';
+
             pagingFooter = new PagingFooter({
                 el: $('.paging-footer'),
-                collection: new PagingCollection(mockPage(1, 2), {parse: true})
+                collection: collection
             }).render();
         });
 
@@ -75,7 +78,7 @@ define([
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.$(nextPageCss).click();
                 AjaxHelpers.respondWithJson(requests, mockPage(2, 2));
-                expect(pagingFooter.collection.currentPage).toBe(2);
+                expect(pagingFooter.collection.getPageNumber()).toBe(2);
             });
 
             it('should be enabled when there is at least one more page', function () {
@@ -91,7 +94,7 @@ define([
             });
         });
 
-        describe("Previous page button", function () {
+        describe('Previous page button', function () {
             it('does not move back if a server error occurs', function () {
                 var requests = AjaxHelpers.requests(this);
                 pagingFooter.collection.reset(mockPage(2, 2), {parse: true});

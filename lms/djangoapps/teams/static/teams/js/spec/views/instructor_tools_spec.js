@@ -6,7 +6,7 @@ define([
     'teams/js/views/instructor_tools',
     'teams/js/views/team_utils',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers'
 ], function ($, Backbone, _, Team, InstructorToolsView, TeamUtils, TeamSpecHelpers, AjaxHelpers, PageHelpers) {
     'use strict';

@@ -6,10 +6,10 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from mock import patch, MagicMock
+from nose.plugins.attrib import attr
 
 from courseware.testutils import RenderXBlockTestMixin
 from lti_provider import views, models
-from lti_provider.signature_validator import SignatureValidator
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -65,7 +65,11 @@ class LtiTestMixin(object):
     def setUp(self):
         super(LtiTestMixin, self).setUp()
         # Always accept the OAuth signature
-        SignatureValidator.verify = MagicMock(return_value=True)
+        self.mock_verify = MagicMock(return_value=True)
+        patcher = patch('lti_provider.signature_validator.SignatureValidator.verify', self.mock_verify)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
         self.consumer = models.LtiConsumer(
             consumer_name='consumer',
             consumer_key=LTI_DEFAULT_PARAMS['oauth_consumer_key'],
@@ -138,7 +142,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         Verifies that the view returns Forbidden if the LTI OAuth signature is
         incorrect.
         """
-        SignatureValidator.verify = MagicMock(return_value=False)
+        self.mock_verify.return_value = False
+
         request = build_launch_request()
         response = views.lti_launch(request, None, None)
         self.assertEqual(response.status_code, 403)
@@ -146,7 +151,8 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
 
     @patch('lti_provider.views.render_courseware')
     def test_lti_consumer_record_supplemented_with_guid(self, _render):
-        SignatureValidator.verify = MagicMock(return_value=False)
+        self.mock_verify.return_value = False
+
         request = build_launch_request()
         request.POST.update(LTI_OPTIONAL_PARAMS)
         with self.assertNumQueries(3):
@@ -157,6 +163,7 @@ class LtiLaunchTest(LtiTestMixin, TestCase):
         self.assertEqual(consumer.instance_guid, u'consumer instance guid')
 
 
+@attr('shard_3')
 class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the rendering returned by lti_launch view.
@@ -176,7 +183,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         )
         if url_encoded_params:
             lti_launch_url += '?' + url_encoded_params
-        SignatureValidator.verify = MagicMock(return_value=True)
+
         return self.client.post(lti_launch_url, data=LTI_DEFAULT_PARAMS)
 
     # The following test methods override the base tests for verifying access

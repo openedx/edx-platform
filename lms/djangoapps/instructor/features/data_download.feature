@@ -35,21 +35,3 @@ Feature: LMS.Instructor Dash Data Download
        | Role          |
        | instructor    |
        | staff         |
-
-    Scenario: Generate & download a grade report
-       Given I am "<Role>" for a course
-       When I click "Generate Grade Report"
-       Then I see a grade report csv file in the reports table
-       Examples:
-       | Role          |
-       | instructor    |
-       | staff         |
-
-    Scenario: Generate & download a student profile report
-       Given I am "<Role>" for a course
-       When I click "Download profile information as a CSV"
-       Then I see a student profile csv file in the reports table
-       Examples:
-       | Role          |
-       | instructor    |
-       | staff         |

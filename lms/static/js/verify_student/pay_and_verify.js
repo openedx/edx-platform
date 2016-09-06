@@ -49,6 +49,7 @@ var edx = edx || {};
                 requirements: el.data('requirements'),
                 courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
+                userEmail: el.data('user-email'),
                 hasVisibleReqs: _.some(
                     el.data('requirements'),
                     function( isVisible ) { return isVisible; }

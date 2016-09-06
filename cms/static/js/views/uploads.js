@@ -1,10 +1,10 @@
 define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery.form"],
     function($, _, gettext, BaseModal) {
         var UploadDialog = BaseModal.extend({
-            events: {
+            events: _.extend({}, BaseModal.prototype.events, {
                 "change input[type=file]": "selectFile",
                 "click .action-upload": "upload"
-            },
+            }),
 
             options: $.extend({}, BaseModal.prototype.options, {
                 modalName: 'assetupload',
@@ -15,7 +15,6 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "jquery
 
             initialize: function() {
                 BaseModal.prototype.initialize.call(this);
-                this.events = _.extend({}, BaseModal.prototype.events, this.events);
                 this.template = this.loadTemplate("upload-dialog");
                 this.listenTo(this.model, "change", this.renderContents);
                 this.options.title = this.model.get('title');

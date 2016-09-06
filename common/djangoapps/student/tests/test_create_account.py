@@ -16,9 +16,10 @@ import mock
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
-from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 import student
+from student.models import UserAttribute
+from student.views import REGISTRATION_AFFILIATE_ID
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -118,6 +119,7 @@ class TestCreateAccount(TestCase):
     @mock.patch('student.views.analytics.identify')
     def test_segment_tracking(self, mock_segment_identify, _):
         year = datetime.now().year
+        year_of_birth = year - 14
         self.params.update({
             "level_of_education": "a",
             "gender": "o",
@@ -125,7 +127,7 @@ class TestCreateAccount(TestCase):
             "city": "Exampleton",
             "country": "US",
             "goals": "To test this feature",
-            "year_of_birth": str(year),
+            "year_of_birth": str(year_of_birth),
             "extra1": "extra_value1",
             "extra2": "extra_value2",
         })
@@ -134,7 +136,8 @@ class TestCreateAccount(TestCase):
             'email': self.params['email'],
             'username': self.params['username'],
             'name': self.params['name'],
-            'age': 0,
+            'age': 13,
+            'yearOfBirth': year_of_birth,
             'education': 'Associate degree',
             'address': self.params['mailing_address'],
             'gender': 'Other/Prefer Not to Say',
@@ -227,9 +230,9 @@ class TestCreateAccount(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        mako_middleware_process_request(request)
-        with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
-            student.views.create_account(request)
+        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+            with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
+                student.views.create_account(request)
 
         # check that send_mail is called
         if bypass_activation_email:
@@ -275,6 +278,24 @@ class TestCreateAccount(TestCase):
                 self.assertIsNotNone(preference)
             else:
                 self.assertIsNone(preference)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_referral_attribution(self):
+        """
+        Verify that a referral attribution is recorded if an affiliate
+        cookie is present upon a new user's registration.
+        """
+        affiliate_id = 'test-partner'
+        self.client.cookies[settings.AFFILIATE_COOKIE_NAME] = affiliate_id
+        user = self.create_account_and_fetch_profile().user
+        self.assertEqual(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID), affiliate_id)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_no_referral(self):
+        """Verify that no referral is recorded when a cookie is not present."""
+        self.assertIsNone(self.client.cookies.get(settings.AFFILIATE_COOKIE_NAME))  # pylint: disable=no-member
+        user = self.create_account_and_fetch_profile().user
+        self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_AFFILIATE_ID))
 
 
 @ddt.ddt
@@ -366,12 +387,53 @@ class TestCreateAccountValidation(TestCase):
             assert_email_error("A properly formatted e-mail is required")
 
         # Too long
-        params["email"] = "this_email_address_has_76_characters_in_it_so_it_is_unacceptable@example.com"
-        assert_email_error("Email cannot be more than 75 characters long")
+        params["email"] = '{email}@example.com'.format(
+            email='this_email_address_has_254_characters_in_it_so_it_is_unacceptable' * 4
+        )
+
+        # Assert that we get error when email has more than 254 characters.
+        self.assertGreater(len(params['email']), 254)
+        assert_email_error("Email cannot be more than 254 characters long")
+
+        # Valid Email
+        params["email"] = "student@edx.com"
+        # Assert success on valid email
+        self.assertLess(len(params["email"]), 254)
+        self.assert_success(params)
 
         # Invalid
         params["email"] = "not_an_email_address"
         assert_email_error("A properly formatted e-mail is required")
+
+    @override_settings(
+        REGISTRATION_EMAIL_PATTERNS_ALLOWED=[
+            r'.*@edx.org',  # Naive regex omitting '^', '$' and '\.' should still work.
+            r'^.*@(.*\.)?example\.com$',
+            r'^(^\w+\.\w+)@school.tld$',
+        ]
+    )
+    @ddt.data(
+        ('bob@we-are.bad', False),
+        ('bob@edx.org.we-are.bad', False),
+        ('staff@edx.org', True),
+        ('student@example.com', True),
+        ('student@sub.example.com', True),
+        ('mr.teacher@school.tld', True),
+        ('student1234@school.tld', False),
+    )
+    @ddt.unpack
+    def test_email_pattern_requirements(self, email, expect_success):
+        """
+        Test the REGISTRATION_EMAIL_PATTERNS_ALLOWED setting, a feature which
+        can be used to only allow people register if their email matches a
+        against a whitelist of regexs.
+        """
+        params = dict(self.minimal_params)
+        params["email"] = email
+        if expect_success:
+            self.assert_success(params)
+        else:
+            self.assert_error(params, "email", "Unauthorized email address.")
 
     def test_password(self):
         params = dict(self.minimal_params)

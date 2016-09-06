@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+"""Tests for tracking middleware."""
+import ddt
 from mock import patch
 from mock import sentinel
 
@@ -11,7 +14,9 @@ from eventtracking import tracker
 from track.middleware import TrackMiddleware
 
 
+@ddt.ddt
 class TrackMiddlewareTestCase(TestCase):
+    """  Class for checking tracking requests """
 
     def setUp(self):
         super(TrackMiddlewareTestCase, self).setUp()
@@ -26,6 +31,26 @@ class TrackMiddlewareTestCase(TestCase):
         request = self.request_factory.get('/somewhere')
         self.track_middleware.process_request(request)
         self.assertTrue(self.mock_server_track.called)
+
+    @ddt.unpack
+    @ddt.data(
+        ('HTTP_USER_AGENT', 'agent'),
+        ('PATH_INFO', 'path'),
+        ('HTTP_REFERER', 'referer'),
+        ('HTTP_ACCEPT_LANGUAGE', 'accept_language'),
+    )
+    def test_request_with_latin1_characters(self, meta_key, context_key):
+        """
+        When HTTP headers contains latin1 characters.
+        """
+        request = self.request_factory.get('/somewhere')
+        # pylint: disable=no-member
+        request.META[meta_key] = 'test latin1 \xd3 \xe9 \xf1'  # pylint: disable=no-member
+
+        context = self.get_context_for_request(request)
+        # The bytes in the string on the right are utf8 encoded in the source file, so we decode them to construct
+        # a valid unicode string.
+        self.assertEqual(context[context_key], 'test latin1 Ó é ñ'.decode('utf8'))
 
     def test_default_filters_do_not_render_view(self):
         for url in ['/event', '/event/1', '/login', '/heartbeat']:

@@ -1,5 +1,13 @@
-define(["js/views/baseview", "underscore", "jquery", "gettext", "common/js/components/views/feedback_notification", "common/js/components/views/feedback_alert", "js/views/baseview", "jquery.smoothScroll"],
-    function(BaseView, _, $, gettext, NotificationView, AlertView) {
+define(["edx-ui-toolkit/js/utils/html-utils",
+        "js/views/baseview",
+        "underscore",
+        "jquery",
+        "gettext",
+        "common/js/components/views/feedback_notification",
+        "common/js/components/views/feedback_alert",
+        "js/views/baseview",
+        "jquery.smoothScroll"],
+    function(HtmlUtils, BaseView, _, $, gettext, NotificationView, AlertView) {
 
 var ValidatingView = BaseView.extend({
     // Intended as an abstract class which catches validation errors on the model and
@@ -10,7 +18,7 @@ var ValidatingView = BaseView.extend({
         this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
 
-    errorTemplate : _.template('<span class="message-error"><%= message %></span>'),
+    errorTemplate : HtmlUtils.template('<span class="message-error"><%- message %></span>'),
 
     save_title: gettext("You've made some changes"),
     save_message: gettext("Your changes will not take effect until you save your progress."),
@@ -34,7 +42,7 @@ var ValidatingView = BaseView.extend({
             var ele = this.$el.find('#' + this.fieldToSelectorMap[field]);
             this._cacheValidationErrors.push(ele);
             this.getInputElements(ele).addClass('error');
-            $(ele).parent().append(this.errorTemplate({message : error[field]}));
+            HtmlUtils.append($(ele).parent(), this.errorTemplate({message : error[field]}));
         }
         $('.wrapper-notification-warning').addClass('wrapper-notification-warning-w-errors');
         $('.action-save').addClass('is-disabled');
@@ -60,7 +68,7 @@ var ValidatingView = BaseView.extend({
         // Set model field and return the new value.
         this.clearValidationErrors();
         var field = this.selectorToField[event.currentTarget.id];
-        var newVal = ''
+        var newVal = '';
         if(event.currentTarget.type == 'checkbox'){
             newVal = $(event.currentTarget).is(":checked").toString();
         }else{

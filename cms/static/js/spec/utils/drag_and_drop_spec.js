@@ -1,4 +1,5 @@
-define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notification", "common/js/spec_helpers/ajax_helpers", "jquery", "underscore"],
+define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notification", 
+        "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "jquery", "underscore"],
     function (ContentDragger, Notification, AjaxHelpers, $, _) {
         describe("Overview drag and drop functionality", function () {
             beforeEach(function () {
@@ -40,7 +41,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#unit-2'));
+                    expect(destination.ele).toEqual($('#unit-2'));
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drag and drop across section boundaries, with special handling for single sibling", function () {
@@ -52,17 +53,17 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($unit4);
+                    expect(destination.ele).toEqual($unit4);
                     expect(destination.attachMethod).toBe('after');
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($unit4);
+                    expect(destination.ele).toEqual($unit4);
                     expect(destination.attachMethod).toBe('before');
                     $ele.offset({
                         top: $unit4.offset().top + $unit4.height() + 1,
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 0);
-                    expect(destination.ele).toBe($unit4);
+                    expect(destination.ele).toEqual($unit4);
                     expect(destination.attachMethod).toBe('after');
                     $unit0 = $('#unit-0');
                     $ele.offset({
@@ -70,7 +71,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 0);
-                    expect(destination.ele).toBe($unit0);
+                    expect(destination.ele).toEqual($unit0);
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drop before the first element, even if element being dragged is\nslightly before the first element", function () {
@@ -81,7 +82,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($('#subsection-0'));
+                    expect(destination.ele).toEqual($('#subsection-0'));
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drag and drop across section boundaries, with special handling for last element", function () {
@@ -92,14 +93,14 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($('#unit-3'));
+                    expect(destination.ele).toEqual($('#unit-3'));
                     expect(destination.attachMethod).toBe('after');
                     $ele.offset({
                         top: $('#unit-3').offset().top + 4,
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, -1);
-                    expect(destination.ele).toBe($('#unit-3'));
+                    expect(destination.ele).toEqual($('#unit-3'));
                     expect(destination.attachMethod).toBe('before');
                 });
                 it("can drop past the last element, even if element being dragged is\nslightly before/taller then the last element", function () {
@@ -110,7 +111,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#subsection-4'));
+                    expect(destination.ele).toEqual($('#subsection-4'));
                     expect(destination.attachMethod).toBe('after');
                 });
                 it("can drag into an empty list", function () {
@@ -121,7 +122,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#subsection-list-3'));
+                    expect(destination.ele).toEqual($('#subsection-list-3'));
                     expect(destination.attachMethod).toBe('prepend');
                 });
                 it("reports a null destination on a failed drag", function () {
@@ -146,8 +147,8 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                         left: $ele.offset().left
                     });
                     destination = ContentDragger.findDestination($ele, 1);
-                    expect(destination.ele).toBe($('#subsection-list-2'));
-                    expect(destination.parentList).toBe($('#subsection-2'));
+                    expect(destination.ele).toEqual($('#subsection-list-2'));
+                    expect(destination.parentList).toEqual($('#subsection-2'));
                     expect(destination.attachMethod).toBe('prepend');
                 });
             });
@@ -176,7 +177,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
             });
             describe("onDragMove", function () {
                 beforeEach(function () {
-                    this.redirectSpy = spyOn(window, 'scrollBy').andCallThrough();
+                    this.redirectSpy = spyOn(window, 'scrollBy').and.callThrough();
                 });
                 it("adds the correct CSS class to the drop destination", function () {
                     var $ele, dragX, dragY;
@@ -239,7 +240,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     this.reorderSpy = spyOn(ContentDragger, 'handleReorder');
                 });
                 afterEach(function () {
-                    this.reorderSpy.reset();
+                    this.reorderSpy.calls.reset();
                 });
                 it("calls handleReorder on a successful drag", function () {
                     ContentDragger.dragState.dropDestination = $('#unit-2');
@@ -279,7 +280,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     expect($('#subsection-1')).not.toHaveClass('expand-on-drop');
                 });
                 it("expands a collapsed element when something is dropped in it", function () {
-                    expandElementSpy = spyOn(ContentDragger, 'expandElement').andCallThrough();
+                    var expandElementSpy = spyOn(ContentDragger, 'expandElement').and.callThrough();
                     expect(expandElementSpy).not.toHaveBeenCalled();
                     expect($('#subsection-2').data('ensureChildrenRendered')).not.toHaveBeenCalled();
 
@@ -301,8 +302,8 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
             });
             describe("AJAX", function () {
                 beforeEach(function () {
-                    this.savingSpies = spyOnConstructor(Notification, "Mini", ["show", "hide"]);
-                    this.savingSpies.show.andReturn(this.savingSpies);
+                    this.savingSpies = jasmine.stealth.spyOnConstructor(Notification, "Mini", ["show", "hide"]);
+                    this.savingSpies.show.and.returnValue(this.savingSpies);
                     this.clock = sinon.useFakeTimers();
                 });
                 afterEach(function () {
@@ -327,11 +328,11 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     expect(this.savingSpies.constructor).toHaveBeenCalled();
                     expect(this.savingSpies.show).toHaveBeenCalled();
                     expect(this.savingSpies.hide).not.toHaveBeenCalled();
-                    savingOptions = this.savingSpies.constructor.mostRecentCall.args[0];
+                    savingOptions = this.savingSpies.constructor.calls.mostRecent().args[0];
                     expect(savingOptions.title).toMatch(/Saving/);
                     expect($('#unit-1')).toHaveClass('was-dropped');
                     expect(request.requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}');
-                    request.respond(200);
+                    request.respond(204);
                     expect(this.savingSpies.hide).toHaveBeenCalled();
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');
@@ -360,7 +361,7 @@ define(["js/utils/drag_and_drop", "common/js/components/views/feedback_notificat
                     expect(request.requestBody).toEqual(
                         '{"children":["second-unit-id","first-unit-id","third-unit-id"]}'
                     );
-                    request.respond(200);
+                    request.respond(204);
                     this.clock.tick(1001);
                     expect($('#unit-1')).not.toHaveClass('was-dropped');
                     // parent

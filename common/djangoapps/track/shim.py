@@ -1,13 +1,9 @@
 """Map new event context values to old top-level field values. Ensures events can be parsed by legacy parsers."""
 
 import json
-import logging
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import UsageKey
+from .transformers import EventTransformerRegistry
 
-
-log = logging.getLogger(__name__)
 
 CONTEXT_FIELDS_TO_INCLUDE = [
     'username',
@@ -63,6 +59,9 @@ class LegacyFieldMappingProcessor(object):
 
 
 def remove_shim_context(event):
+    """
+    Remove obsolete fields from event context.
+    """
     if 'context' in event:
         context = event['context']
         # These fields are present elsewhere in the event at this point
@@ -74,100 +73,6 @@ def remove_shim_context(event):
                 del context[field]
 
 
-NAME_TO_EVENT_TYPE_MAP = {
-    'edx.video.played': 'play_video',
-    'edx.video.paused': 'pause_video',
-    'edx.video.stopped': 'stop_video',
-    'edx.video.loaded': 'load_video',
-    'edx.video.position.changed': 'seek_video',
-    'edx.video.seeked': 'seek_video',
-    'edx.video.transcript.shown': 'show_transcript',
-    'edx.video.transcript.hidden': 'hide_transcript',
-}
-
-
-class VideoEventProcessor(object):
-    """
-    Converts new format video events into the legacy video event format.
-
-    Mobile devices cannot actually emit events that exactly match their counterparts emitted by the LMS javascript
-    video player. Instead of attempting to get them to do that, we instead insert a shim here that converts the events
-    they *can* easily emit and converts them into the legacy format.
-
-    TODO: Remove this shim and perform the conversion as part of some batch canonicalization process.
-
-    """
-
-    def __call__(self, event):
-        name = event.get('name')
-        if not name:
-            return
-
-        if name not in NAME_TO_EVENT_TYPE_MAP:
-            return
-
-        # Convert edx.video.seeked to edx.video.position.changed because edx.video.seeked was not intended to actually
-        # ever be emitted.
-        if name == "edx.video.seeked":
-            event['name'] = "edx.video.position.changed"
-
-        event['event_type'] = NAME_TO_EVENT_TYPE_MAP[name]
-
-        if 'event' not in event:
-            return
-        payload = event['event']
-
-        if 'module_id' in payload:
-            module_id = payload['module_id']
-            try:
-                usage_key = UsageKey.from_string(module_id)
-            except InvalidKeyError:
-                log.warning('Unable to parse module_id "%s"', module_id, exc_info=True)
-            else:
-                payload['id'] = usage_key.html_id()
-
-            del payload['module_id']
-
-        if 'current_time' in payload:
-            payload['currentTime'] = payload.pop('current_time')
-
-        if 'context' in event:
-            context = event['context']
-
-            # Converts seek_type to seek and skip|slide to onSlideSeek|onSkipSeek
-            if 'seek_type' in payload:
-                seek_type = payload['seek_type']
-                if seek_type == 'slide':
-                    payload['type'] = "onSlideSeek"
-                elif seek_type == 'skip':
-                    payload['type'] = "onSkipSeek"
-                del payload['seek_type']
-
-            # For the iOS build that is returning a +30 for back skip 30
-            if (
-                context['application']['version'] == "1.0.02" and
-                context['application']['name'] == "edx.mobileapp.iOS"
-            ):
-                if 'requested_skip_interval' in payload and 'type' in payload:
-                    if (
-                        payload['requested_skip_interval'] == 30 and
-                        payload['type'] == "onSkipSeek"
-                    ):
-                        payload['requested_skip_interval'] = -30
-
-            # For the Android build that isn't distinguishing between skip/seek
-            if 'requested_skip_interval' in payload:
-                if abs(payload['requested_skip_interval']) != 30:
-                    if 'type' in payload:
-                        payload['type'] = 'onSlideSeek'
-
-            if 'open_in_browser_url' in context:
-                page, _sep, _tail = context.pop('open_in_browser_url').rpartition('/')
-                event['page'] = page
-
-        event['event'] = json.dumps(payload)
-
-
 class GoogleAnalyticsProcessor(object):
     """Adds course_id as label, and sets nonInteraction property"""
 
@@ -177,7 +82,29 @@ class GoogleAnalyticsProcessor(object):
         context = event.get('context', {})
         course_id = context.get('course_id')
 
+        copied_event = event.copy()
         if course_id is not None:
-            event['label'] = course_id
+            copied_event['label'] = course_id
 
-        event['nonInteraction'] = 1
+        copied_event['nonInteraction'] = 1
+
+        return copied_event
+
+
+class PrefixedEventProcessor(object):
+    """
+    Process any events whose name or prefix (ending with a '.') is registered
+    as an EventTransformer.
+    """
+
+    def __call__(self, event):
+        """
+        If the event is registered with the EventTransformerRegistry, transform
+        it.  Otherwise do nothing to it, and continue processing.
+        """
+        try:
+            event = EventTransformerRegistry.create_transformer(event)
+        except KeyError:
+            return
+        event.transform()
+        return event
