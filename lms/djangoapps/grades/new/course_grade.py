@@ -40,6 +40,10 @@ class CourseGrade(object):
                     graded_total = subsection_grade.graded_total
                     if graded_total.possible > 0:
                         subsections_by_format[subsection_grade.format].append(graded_total)
+        log.info(u"Persistent Grades: Calculated subsections_by_format. course id: {0}, user: {1}".format(
+            self.course.location,
+            self.student.id
+        ))
         return subsections_by_format
 
     @lazy
@@ -51,6 +55,10 @@ class CourseGrade(object):
         for chapter in self.chapter_grades:
             for subsection_grade in chapter['sections']:
                 locations_to_weighted_scores.update(subsection_grade.locations_to_weighted_scores)
+        log.info(u"Persistent Grades: Calculated locations_to_weighted_scores. course id: {0}, user: {1}".format(
+            self.course.id,
+            self.student.id
+        ))
         return locations_to_weighted_scores
 
     @lazy
@@ -60,10 +68,15 @@ class CourseGrade(object):
         """
         # Grading policy might be overriden by a CCX, need to reset it
         self.course.set_grading_policy(self.course.grading_policy)
-        return self.course.grader.grade(
+        grade_value = self.course.grader.grade(
             self.subsection_grade_totals_by_format,
             generate_random_scores=settings.GENERATE_PROFILE_SCORES
         )
+        log.info(u"Persistent Grades: Calculated grade_value. course id: {0}, user: {1}".format(
+            self.course.location,
+            self.student.id
+        ))
+        return grade_value
 
     @property
     def has_access_to_course(self):
@@ -107,7 +120,6 @@ class CourseGrade(object):
         # doesn't get displayed differently than it gets grades
         grade_summary['percent'] = self.percent
         grade_summary['grade'] = self.letter_grade
-
         grade_summary['totaled_scores'] = self.subsection_grade_totals_by_format
         grade_summary['raw_scores'] = list(self.locations_to_weighted_scores.itervalues())
 
