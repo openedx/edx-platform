@@ -103,7 +103,7 @@ class CapaFields(object):
         display_name=_("Maximum Attempts"),
         help=_("Defines the number of times a student can try to answer this problem. "
                "If the value is not set, infinite attempts are allowed."),
-        scope=Scope.settings
+        values={"min": 0}, scope=Scope.settings
     )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     graceperiod = Timedelta(
