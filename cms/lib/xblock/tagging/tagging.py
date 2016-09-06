@@ -93,9 +93,9 @@ class StructuredTagsAside(XBlockAside):
 
     def get_event_context(self, event_type, event):  # pylint: disable=unused-argument
         """
-        This method return data that should be associated with the "submit_problem" event
+        This method return data that should be associated with the "check_problem" event
         """
-        if self.saved_tags and event_type == "problem_submit":
+        if self.saved_tags and event_type == "problem_check":
             return {'saved_tags': self.saved_tags}
         else:
             return None
