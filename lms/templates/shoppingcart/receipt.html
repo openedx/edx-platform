@@ -1,10 +1,11 @@
+<%namespace name='static' file='/static_content.html'/>
+
 <%inherit file="shopping_cart_flow.html" />
 <%!
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from markupsafe import escape
-from microsite_configuration import microsite
 from openedx.core.lib.courses import course_image_url
 %>
 
@@ -31,7 +32,7 @@ from openedx.core.lib.courses import course_image_url
            ## in case of multiple courses in single self purchase scenario,
            ## we will show the button View Dashboard
           <% dashboard_url = reverse('dashboard') %>
-          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon fa fa-caret-right"></i></a>
+          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <span class="icon fa fa-caret-right" aria-hidden="true"></span></a>
           <span class="mt-7">
             ${_(u"You have successfully been enrolled for {course_names}. "
                 u"The following receipt has been emailed to {receipient_emails}").format(
@@ -98,7 +99,7 @@ from openedx.core.lib.courses import course_image_url
     %endif
     <div class="bordered-bar">
       <h2>${_('Invoice')} #${order.id}<span>${_('Date of purchase')}: ${order_purchase_date} </span><span
-          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon fa fa-print"></i> ${_('Print Receipt')}</a></span>
+          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><span class="icon fa fa-print" aria-hidden="true"></span> ${_('Print Receipt')}</a></span>
       </h2>
     </div>
     % if order.total_cost > 0:
@@ -292,7 +293,7 @@ from openedx.core.lib.courses import course_image_url
         <div class="clearfix">
           <div class="image">
             <img class="item-image" src="${course_image_url(course)}"
-                 alt="${course.display_number_with_default | h} ${course.display_name_with_default} Image"/>
+                 alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} Image"/>
           </div>
           <div class="data-input">
 
@@ -377,8 +378,8 @@ from openedx.core.lib.courses import course_image_url
         <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>
       </div>
     </div>
-    ## Allow for a microsite to be able to insert additional text at the bottom of the page
-    <%include file="${microsite.get_template_path('receipt_custom_pane.html')}" />
+    ## Allow for a theming to be able to insert additional text at the bottom of the page
+    <%include file="${static.get_template_path('receipt_custom_pane.html')}" />
   </section>
 </div>
 </%block>

@@ -84,7 +84,12 @@ define('video/09_save_state_plugin.js', [], function() {
         },
 
         onYoutubeAvailability: function (event, youtubeIsAvailable) {
-            this.saveState(true, {youtube_is_available: youtubeIsAvailable});
+            // Compare what the client-side code has determined Youtube
+            // availability to be (true/false) vs. what the LMS recorded for
+            // this user. The LMS will assume YouTube is available by default.
+            if (youtubeIsAvailable !== this.state.config.recordedYoutubeIsAvailable) {
+                this.saveState(true, {youtube_is_available: youtubeIsAvailable});
+            }
         },
 
         saveState: function (async, data) {

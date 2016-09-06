@@ -1,4 +1,9 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/pagination/paging-collection',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/spec/student_profile/helpers',
         'js/views/fields',
@@ -6,12 +11,13 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
         'js/student_account/models/user_preferences_model',
         'js/student_profile/views/learner_profile_fields',
         'js/student_profile/views/learner_profile_view',
+        'js/student_profile/views/badge_list_container',
         'js/student_account/views/account_settings_fields',
         'js/views/message_banner'
-       ],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers, FieldViews,
-              UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
-              AccountSettingsFieldViews, MessageBannerView) {
+    ],
+    function (Backbone, $, _, PagingCollection, AjaxHelpers, TemplateHelpers, Helpers, LearnerProfileHelpers,
+              FieldViews, UserAccountModel, AccountPreferencesModel, LearnerProfileFields, LearnerProfileView,
+              BadgeListContainer, AccountSettingsFieldViews, MessageBannerView) {
         'use strict';
 
         describe("edx.user.LearnerProfileView", function () {
@@ -106,6 +112,15 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                     })
                 ];
 
+                var badgeCollection = new PagingCollection();
+                badgeCollection.url = Helpers.BADGES_API_URL;
+
+                var badgeListContainer = new BadgeListContainer({
+                    'attributes': {'class': 'badge-set-display'},
+                    'collection': badgeCollection,
+                    'find_courses_url': Helpers.FIND_COURSES_URL
+                });
+
                 return new LearnerProfileView(
                     {
                         el: $('.wrapper-profile'),
@@ -117,12 +132,17 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                         usernameFieldView: usernameFieldView,
                         profileImageFieldView: profileImageFieldView,
                         sectionOneFieldViews: sectionOneFieldViews,
-                        sectionTwoFieldViews: sectionTwoFieldViews
+                        sectionTwoFieldViews: sectionTwoFieldViews,
+                        badgeListContainer: badgeListContainer
                     });
             };
 
             beforeEach(function () {
                 loadFixtures('js/fixtures/student_profile/student_profile.html');
+            });
+
+            afterEach(function () {
+                Backbone.history.stop();
             });
 
             it("shows loading error correctly", function() {
@@ -188,6 +208,17 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
                 Helpers.expectLoadingErrorIsVisible(learnerProfileView, false);
                 LearnerProfileHelpers.expectLimitedProfileSectionsAndFieldsToBeRendered(learnerProfileView, true);
+            });
+
+            it("renders an error if the badges can't be fetched", function () {
+                var learnerProfileView = createLearnerProfileView(false, 'all_users', true);
+                learnerProfileView.options.accountSettingsModel.set({'accomplishments_shared': true});
+                var requests = AjaxHelpers.requests(this);
+
+                learnerProfileView.render();
+                
+                LearnerProfileHelpers.breakBadgeLoading(learnerProfileView, requests);
+                LearnerProfileHelpers.expectBadgeLoadingErrorIsRendered(learnerProfileView);
             });
         });
     });

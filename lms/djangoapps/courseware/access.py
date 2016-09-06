@@ -28,7 +28,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT,
 )
 from xmodule.error_module import ErrorDescriptor
-from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
+from xmodule.x_module import XModule
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
@@ -39,6 +39,7 @@ from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
     CourseBetaTesterRole,
+    CourseCcxCoachRole,
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
@@ -53,16 +54,49 @@ from util.milestones_helpers import (
 )
 from ccx_keys.locator import CCXLocator
 
-import dogstats_wrapper as dog_stats_api
-
 from courseware.access_response import (
     MilestoneError,
     MobileAvailabilityError,
     VisibilityError,
 )
-from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
+from courseware.access_utils import (
+    adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED,
+    in_preview_mode
+)
+
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
 
 log = logging.getLogger(__name__)
+
+
+def has_ccx_coach_role(user, course_key):
+    """
+    Check if user is a coach on this ccx.
+
+    Arguments:
+        user (User): the user whose descriptor access we are checking.
+        course_key (CCXLocator): Key to CCX.
+
+    Returns:
+        bool: whether user is a coach on this ccx or not.
+    """
+    if hasattr(course_key, 'ccx'):
+        ccx_id = course_key.ccx
+        role = CourseCcxCoachRole(course_key)
+
+        if role.has_user(user):
+            list_ccx = CustomCourseForEdX.objects.filter(
+                course_id=course_key.to_course_locator(),
+                coach=user
+            )
+            if list_ccx.exists():
+                coach_ccx = list_ccx[0]
+                return str(coach_ccx.id) == ccx_id
+    else:
+        raise CCXLocatorValidationException("Invalid CCX key. To verify that "
+                                            "user is a coach on CCX, you must provide key to CCX")
+    return False
 
 
 def has_access(user, action, obj, course_key=None):
@@ -99,8 +133,9 @@ def has_access(user, action, obj, course_key=None):
     if not user:
         user = AnonymousUser()
 
-    if isinstance(course_key, CCXLocator):
-        course_key = course_key.to_course_locator()
+    if in_preview_mode():
+        if not bool(has_staff_access_to_preview_mode(user=user, obj=obj, course_key=course_key)):
+            return ACCESS_DENIED
 
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
@@ -139,6 +174,52 @@ def has_access(user, action, obj, course_key=None):
 
 
 # ================ Implementation helpers ================================
+
+def has_staff_access_to_preview_mode(user, obj, course_key=None):
+    """
+    Returns whether user has staff access to specified modules or not.
+
+    Arguments:
+
+        user: a Django user object.
+
+        obj: The object to check access for.
+
+        course_key: A course_key specifying which course this access is for.
+
+    Returns an AccessResponse object.
+    """
+    if course_key is None:
+        if isinstance(obj, CourseDescriptor) or isinstance(obj, CourseOverview):
+            course_key = obj.id
+
+        elif isinstance(obj, ErrorDescriptor):
+            course_key = obj.location.course_key
+
+        elif isinstance(obj, XModule):
+            course_key = obj.descriptor.course_key
+
+        elif isinstance(obj, XBlock):
+            course_key = obj.location.course_key
+
+        elif isinstance(obj, CCXLocator):
+            course_key = obj.to_course_locator()
+
+        elif isinstance(obj, CourseKey):
+            course_key = obj
+
+        elif isinstance(obj, UsageKey):
+            course_key = obj.course_key
+
+    if course_key is None:
+        if GlobalStaff().has_user(user):
+            return ACCESS_GRANTED
+        else:
+            return ACCESS_DENIED
+
+    return _has_access_to_course(user, 'staff', course_key=course_key)
+
+
 def _can_access_descriptor_with_start_date(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     Checks if a user has access to a descriptor based on its start date.
@@ -318,7 +399,7 @@ def _has_access_course(user, action, courselike):
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
         it's past the enrollment period, they should still see it.
         """
-        return ACCESS_GRANTED if (can_enroll() or can_load()) else ACCESS_DENIED
+        return ACCESS_GRANTED if (can_load() or can_enroll()) else ACCESS_DENIED
 
     def can_see_in_catalog():
         """
@@ -659,7 +740,7 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return ACCESS_DENIED
 
-    if is_masquerading_as_student(user, course_key):
+    if not in_preview_mode() and is_masquerading_as_student(user, course_key):
         return ACCESS_DENIED
 
     if GlobalStaff().has_user(user):

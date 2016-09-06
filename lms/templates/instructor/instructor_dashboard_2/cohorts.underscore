@@ -18,7 +18,7 @@
         </form>
 
         <button class="button action-primary action-create">
-            <i class="icon fa fa-plus" aria-hidden="true"></i>
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
             <%- gettext('Add Cohort') %>
         </button>
     </div>
@@ -39,12 +39,14 @@
 
         <div class="cohort-management-supplemental">
             <p class="">
-                <i class="icon fa fa-info-circle" aria-hidden="true"></i>
-                <%= interpolate(
-                gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on %(link_start)s the Data Download page. %(link_end)s'),
-                    {link_start: '<a href="" class="link-cross-reference" data-section="data_download">', link_end: '</a>'},
-                    true
-                ) %>
+                <span class="icon fa fa-info-circle" aria-hidden="true"></span>
+                <%= HtmlUtils.interpolateHtml(
+                    gettext('To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on {link_start} the Data Download page. {link_end}'),
+                    {
+                        link_start: HtmlUtils.HTML('<a href="" class="link-cross-reference" data-section="data_download">'),
+                        link_end: HtmlUtils.HTML('</a>')
+                    })
+                %>
             </p>
         </div>
 

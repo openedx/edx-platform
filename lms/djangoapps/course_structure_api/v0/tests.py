@@ -1,27 +1,23 @@
 """
 Run these tests @ Devstack:
-    paver test_system -s lms --fasttest --verbose --test_id=lms/djangoapps/course_structure_api
+    paver test_system -s lms --fasttest --verbose --test-id=lms/djangoapps/course_structure_api
 """
 # pylint: disable=missing-docstring,invalid-name,maybe-no-member,attribute-defined-outside-init
-from abc import ABCMeta
 from datetime import datetime
 from mock import patch, Mock
-from itertools import product
 
 from django.core.urlresolvers import reverse
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests import get_test_system
 
-from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.factories import GlobalStaffFactory, StaffFactory
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
@@ -457,232 +453,3 @@ class CourseGradingPolicyMissingFieldsTests(CourseDetailTestMixin, CourseViewTes
             }
         ]
         self.assertListEqual(response.data, expected)
-
-
-#####################################################################################
-#
-# The following Mixins/Classes collectively test the CourseBlocksAndNavigation view.
-#
-# The class hierarchy is:
-#
-#      ----------------->  CourseBlocksOrNavigationTestMixin  <--------------
-#      |                                   ^                                |
-#      |                                   |                                |
-#      |        CourseNavigationTestMixin  |   CourseBlocksTestMixin        |
-#      |          ^                  ^     |    ^               ^           |
-#      |          |                  |     |    |               |           |
-#      |          |                  |     |    |               |           |
-#   CourseNavigationTests   CourseBlocksAndNavigationTests   CourseBlocksTests
-#
-#
-# Each Test Mixin is an abstract class that implements tests specific to its
-# corresponding functionality.
-#
-# The concrete Test classes are expected to define the following class fields:
-#
-#   block_navigation_view_type - The view's name as it should be passed to the django
-#       reverse method.
-#   container_fields - A list of fields that are expected to be included in the view's
-#       response for all container block types.
-#   block_fields - A list of fields that are expected to be included in the view's
-#       response for all block types.
-#
-######################################################################################
-
-
-class CourseBlocksOrNavigationTestMixin(CourseDetailTestMixin, CourseViewTestsMixin):
-    """
-    A Mixin class for testing all views related to Course blocks and/or navigation.
-    """
-    __metaclass__ = ABCMeta
-
-    view_supports_debug_mode = False
-
-    def setUp(self):
-        """
-        Override the base `setUp` method to enroll the user in the course, since these views
-        require enrollment for non-staff users.
-        """
-        super(CourseBlocksOrNavigationTestMixin, self).setUp()
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
-
-    def create_user(self):
-        """
-        Override the base `create_user` method to test with non-staff users for these views.
-        """
-        self.user = UserFactory.create()
-
-    @property
-    def view(self):
-        """
-        Returns the name of the view for testing to use in the django `reverse` call.
-        """
-        return 'course_structure_api:v0:' + self.block_navigation_view_type
-
-    def test_get(self):
-        with check_mongo_calls(3):
-            response = super(CourseBlocksOrNavigationTestMixin, self).test_get()
-
-        # verify root element
-        self.assertIn('root', response.data)
-        root_string = unicode(self.course.location)
-        self.assertEquals(response.data['root'], root_string)
-
-        # verify ~blocks element
-        self.assertTrue(self.block_navigation_view_type in response.data)
-        blocks = response.data[self.block_navigation_view_type]
-
-        # verify number of blocks
-        self.assertEquals(len(blocks), 5)
-
-        # verify fields in blocks
-        for field, block in product(self.block_fields, blocks.values()):
-            self.assertIn(field, block)
-
-        # verify container fields in container blocks
-        for field in self.container_fields:
-            self.assertIn(field, blocks[root_string])
-
-    def test_parse_error(self):
-        """
-        Verifies the view returns a 400 when a query parameter is incorrectly formatted.
-        """
-        response = self.http_get_for_course(data={'block_json': 'incorrect'})
-        self.assertEqual(response.status_code, 400)
-
-    @SharedModuleStoreTestCase.modifies_courseware
-    def test_no_access_to_block(self):
-        """
-        Verifies the view returns only the top-level course block, excluding the sequential block
-        and its descendants when the user does not have access to the sequential.
-        """
-        self.sequential.visible_to_staff_only = True
-        modulestore().update_item(self.sequential, self.user.id)
-
-        response = super(CourseBlocksOrNavigationTestMixin, self).test_get()
-        self.assertEquals(len(response.data[self.block_navigation_view_type]), 1)
-
-
-class CourseBlocksTestMixin(object):
-    """
-    A Mixin class for testing all views related to Course blocks.
-    """
-    __metaclass__ = ABCMeta
-
-    view_supports_debug_mode = False
-    block_fields = ['id', 'type', 'display_name', 'web_url', 'block_url', 'graded', 'format']
-
-    def test_block_json(self):
-        """
-        Verifies the view's response when the block_json data is requested.
-        """
-        response = self.http_get_for_course(
-            data={'block_json': '{"video":{"profiles":["mobile_low"]}}'}
-        )
-        self.assertEquals(response.status_code, 200)
-        video_block = response.data[self.block_navigation_view_type][unicode(self.video.location)]
-        self.assertIn('block_json', video_block)
-
-    def test_block_count(self):
-        """
-        Verifies the view's response when the block_count data is requested.
-        """
-        response = self.http_get_for_course(
-            data={'block_count': 'problem'}
-        )
-        self.assertEquals(response.status_code, 200)
-        root_block = response.data[self.block_navigation_view_type][unicode(self.course.location)]
-        self.assertIn('block_count', root_block)
-        self.assertIn('problem', root_block['block_count'])
-        self.assertEquals(root_block['block_count']['problem'], 1)
-
-    def test_multi_device_support(self):
-        """
-        Verifies the view's response when multi_device support is requested.
-        """
-        response = self.http_get_for_course(
-            data={'fields': 'multi_device'}
-        )
-        self.assertEquals(response.status_code, 200)
-
-        for block, expected_multi_device_support in (
-                (self.problem, True),
-                (self.html, True),
-                (self.video, False)
-        ):
-            block_response = response.data[self.block_navigation_view_type][unicode(block.location)]
-            self.assertEquals(block_response['multi_device'], expected_multi_device_support)
-
-
-class CourseNavigationTestMixin(object):
-    """
-    A Mixin class for testing all views related to Course navigation.
-    """
-    __metaclass__ = ABCMeta
-
-    def test_depth_zero(self):
-        """
-        Tests that all descendants are bundled into the root block when the navigation_depth is set to 0.
-        """
-        response = self.http_get_for_course(
-            data={'navigation_depth': '0'}
-        )
-        root_block = response.data[self.block_navigation_view_type][unicode(self.course.location)]
-        self.assertIn('descendants', root_block)
-        self.assertEquals(len(root_block['descendants']), 4)
-
-    def test_depth(self):
-        """
-        Tests that all container blocks have descendants listed in their data.
-        """
-        response = self.http_get_for_course()
-
-        container_descendants = (
-            (self.course.location, 1),
-            (self.sequential.location, 3),
-        )
-        for container_location, expected_num_descendants in container_descendants:
-            block = response.data[self.block_navigation_view_type][unicode(container_location)]
-            self.assertIn('descendants', block)
-            self.assertEquals(len(block['descendants']), expected_num_descendants)
-
-
-class CourseBlocksTests(CourseBlocksOrNavigationTestMixin, CourseBlocksTestMixin, SharedModuleStoreTestCase):
-    """
-    A Test class for testing the Course 'blocks' view.
-    """
-    block_navigation_view_type = 'blocks'
-    container_fields = ['children']
-
-    @classmethod
-    def setUpClass(cls):
-        super(CourseBlocksTests, cls).setUpClass()
-        cls.create_course_data()
-
-
-class CourseNavigationTests(CourseBlocksOrNavigationTestMixin, CourseNavigationTestMixin, SharedModuleStoreTestCase):
-    """
-    A Test class for testing the Course 'navigation' view.
-    """
-    block_navigation_view_type = 'navigation'
-    container_fields = ['descendants']
-    block_fields = []
-
-    @classmethod
-    def setUpClass(cls):
-        super(CourseNavigationTests, cls).setUpClass()
-        cls.create_course_data()
-
-
-class CourseBlocksAndNavigationTests(CourseBlocksOrNavigationTestMixin, CourseBlocksTestMixin,
-                                     CourseNavigationTestMixin, SharedModuleStoreTestCase):
-    """
-    A Test class for testing the Course 'blocks+navigation' view.
-    """
-    block_navigation_view_type = 'blocks+navigation'
-    container_fields = ['children', 'descendants']
-
-    @classmethod
-    def setUpClass(cls):
-        super(CourseBlocksAndNavigationTests, cls).setUpClass()
-        cls.create_course_data()

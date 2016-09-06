@@ -10,9 +10,9 @@ from instructor.access import allow_access
 from instructor.services import InstructorService
 from instructor.tests.test_tools import msk_from_problem_urlname
 from nose.plugins.attrib import attr
-
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
+import mock
 
 
 @attr('shard_1')
@@ -67,7 +67,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         self.service.delete_student_attempt(
             self.student.username,
             unicode(self.course.id),
-            self.problem_urlname
+            self.problem_urlname,
+            requesting_user=self.student,
         )
 
         # make sure the module has been deleted
@@ -88,7 +89,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         result = self.service.delete_student_attempt(
             self.student.username,
             unicode(self.course.id),
-            'foo/bar/baz'
+            'foo/bar/baz',
+            requesting_user=self.student,
         )
         self.assertIsNone(result)
 
@@ -100,7 +102,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         result = self.service.delete_student_attempt(
             'bad_student',
             unicode(self.course.id),
-            'foo/bar/baz'
+            'foo/bar/baz',
+            requesting_user=self.student,
         )
         self.assertIsNone(result)
 
@@ -112,13 +115,14 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         result = self.service.delete_student_attempt(
             self.student.username,
             unicode(self.course.id),
-            self.other_problem_urlname
+            self.other_problem_urlname,
+            requesting_user=self.student,
         )
         self.assertIsNone(result)
 
     def test_is_user_staff(self):
         """
-        Test to assert that the usrr is staff or not
+        Test to assert that the user is staff or not
         """
         result = self.service.is_course_staff(
             self.student,
@@ -133,3 +137,28 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             unicode(self.course.id)
         )
         self.assertTrue(result)
+
+    def test_report_suspicious_attempt(self):
+        """
+        Test to verify that the create_zendesk_ticket() is called
+        """
+        requester_name = "edx-proctoring"
+        email = "edx-proctoring@edx.org"
+        subject = "Proctored Exam Review: {review_status}".format(review_status="Suspicious")
+        body = "A proctored exam attempt for {exam_name} in {course_name} by username: {student_username} was " \
+               "reviewed as {review_status} by the proctored exam review provider."
+        body = body.format(
+            exam_name="test_exam", course_name=self.course.display_name, student_username="test_student",
+            review_status="Suspicious"
+        )
+        tags = ["proctoring"]
+
+        with mock.patch("instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
+            self.service.send_support_notification(
+                course_id=unicode(self.course.id),
+                exam_name="test_exam",
+                student_username="test_student",
+                review_status="Suspicious"
+            )
+
+        mock_create_zendesk_ticket.assert_called_with(requester_name, email, subject, body, tags)

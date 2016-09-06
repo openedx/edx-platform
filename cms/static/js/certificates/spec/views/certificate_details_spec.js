@@ -8,7 +8,7 @@ define([ // jshint ignore:line
     'js/certificates/views/certificate_details',
     'js/certificates/views/certificate_preview',
     'common/js/components/views/feedback_notification',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/template_helpers',
     'common/js/spec_helpers/view_helpers',
     'js/spec_helpers/validation_helpers',
@@ -47,27 +47,6 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         ViewHelpers.verifyPromptHidden(promptSpy);
     };
 
-    beforeEach(function() {
-        window.course = new Course({
-            id: '5',
-            name: 'Course Name',
-            url_name: 'course_name',
-            org: 'course_org',
-            num: 'course_num',
-            revision: 'course_rev'
-        });
-        window.certWebPreview = new CertificatePreview({
-            course_modes: ['honor', 'test'],
-            certificate_web_view_url: '/users/1/courses/orgX/009/2016'
-        });
-        window.CMS.User = {isGlobalStaff: true};
-    });
-
-    afterEach(function() {
-        delete window.course;
-        delete window.CMS.User;
-    });
-
     describe('Certificate Details Spec:', function() {
         var setValuesToInputs = function (view, values) {
             _.each(values, function (value, selector) {
@@ -79,7 +58,35 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
         };
 
         beforeEach(function() {
+            window.course = new Course({
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
+            });
+            window.certWebPreview = new CertificatePreview({
+                course_modes: ['honor', 'test'],
+                certificate_web_view_url: '/users/1/courses/orgX/009/2016'
+            });
+            window.CMS.User = {isGlobalStaff: true};
+
             TemplateHelpers.installTemplates(['certificate-details', 'signatory-details', 'signatory-editor', 'signatory-actions'], true);
+
+            window.course = new Course({
+                id: '5',
+                name: 'Course Name',
+                url_name: 'course_name',
+                org: 'course_org',
+                num: 'course_num',
+                revision: 'course_rev'
+            });
+            window.certWebPreview = new CertificatePreview({
+                course_modes: ['honor', 'test'],
+                certificate_web_view_url: '/users/1/courses/orgX/009/2016'
+            });
+            window.CMS.User = {isGlobalStaff: true};
 
             this.newModelOptions = {add: true};
             this.model = new CertificateModel({
@@ -97,8 +104,20 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 model: this.model
             });
             appendSetFixtures(this.view.render().el);
-            CustomMatchers(this); // jshint ignore:line
+            CustomMatchers(); // jshint ignore:line
         });
+
+        afterEach(function() {
+            delete window.course;
+            delete window.certWebPreview;
+            delete window.CMS.User;
+        });
+
+        afterEach(function() {
+            delete window.course;
+            delete window.CMS.User;
+        });
+
 
         describe('The Certificate Details view', function() {
 
@@ -235,7 +254,7 @@ function(_, Course, CertificatesCollection, CertificateModel, CertificateDetails
                 this.view.$(SELECTORS.signatory_panel_save).click();
 
                 ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-                requests[0].respond(200);
+                requests[0].respond(204);
                 ViewHelpers.verifyNotificationHidden(notificationSpy);
 
                 expect(this.view.$(SELECTORS.signatory_name_value)).toContainText('New Signatory Test Name');

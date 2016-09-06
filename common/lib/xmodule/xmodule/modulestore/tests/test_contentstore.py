@@ -16,7 +16,6 @@ from xmodule.contentstore.mongo import MongoContentStore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 import ddt
-from __builtin__ import delattr
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 
 log = logging.getLogger(__name__)

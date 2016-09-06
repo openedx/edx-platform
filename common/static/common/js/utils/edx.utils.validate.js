@@ -15,9 +15,6 @@
          * by the access view, but doing it here helps keep the
          * utility self-contained.
          */
-        if (_.isUndefined(_s)) {
-            _s = _.str;
-        }
         _.mixin( _s.exports() );
 
         utils = (function(){

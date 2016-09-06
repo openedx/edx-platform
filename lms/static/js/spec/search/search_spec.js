@@ -2,7 +2,7 @@ define([
     'jquery',
     'backbone',
     'logger',
-    'common/js/spec_helpers/ajax_helpers',
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
     'common/js/spec_helpers/page_helpers',
     'common/js/spec_helpers/template_helpers',
     'js/search/base/models/search_result',
@@ -77,14 +77,14 @@ define([
                 var collection = new SearchCollection([]);
                 spyOn($, 'ajax');
                 collection.performSearch('search string');
-                expect($.ajax.mostRecentCall.args[0].url).toEqual('/search/');
+                expect($.ajax.calls.mostRecent().args[0].url).toEqual('/search/');
             });
 
             it('sends a request with course ID', function () {
                 var collection = new SearchCollection([], { courseId: 'edx101' });
                 spyOn($, 'ajax');
                 collection.performSearch('search string');
-                expect($.ajax.mostRecentCall.args[0].url).toEqual('/search/edx101');
+                expect($.ajax.calls.mostRecent().args[0].url).toEqual('/search/edx101');
             });
 
             it('sends a request and parses the json result', function () {
@@ -139,10 +139,10 @@ define([
                 AjaxHelpers.respondWithJson(requests, response);
                 spyOn($, 'ajax');
                 this.collection.loadNextPage();
-                expect($.ajax.mostRecentCall.args[0].url).toEqual(this.collection.url);
-                expect($.ajax.mostRecentCall.args[0].data.search_string).toEqual(searchString);
-                expect($.ajax.mostRecentCall.args[0].data.page_size).toEqual(this.collection.pageSize);
-                expect($.ajax.mostRecentCall.args[0].data.page_index).toEqual(2);
+                expect($.ajax.calls.mostRecent().args[0].url).toEqual(this.collection.url);
+                expect($.ajax.calls.mostRecent().args[0].data.search_string).toEqual(searchString);
+                expect($.ajax.calls.mostRecent().args[0].data.page_size).toEqual(this.collection.pageSize);
+                expect($.ajax.calls.mostRecent().args[0].data.page_index).toEqual(2);
             });
 
             it('has next page', function () {
@@ -164,18 +164,18 @@ define([
                 this.collection.performSearch('new search');
                 AjaxHelpers.skipResetRequest(requests);
                 AjaxHelpers.respondWithJson(requests, response);
-                expect(this.onSearch.calls.length).toEqual(1);
+                expect(this.onSearch.calls.count()).toEqual(1);
 
                 this.collection.performSearch('old search');
                 this.collection.cancelSearch();
                 AjaxHelpers.skipResetRequest(requests);
-                expect(this.onSearch.calls.length).toEqual(1);
+                expect(this.onSearch.calls.count()).toEqual(1);
 
                 this.collection.loadNextPage();
                 this.collection.loadNextPage();
                 AjaxHelpers.skipResetRequest(requests);
                 AjaxHelpers.respondWithJson(requests, response);
-                expect(this.onNext.calls.length).toEqual(1);
+                expect(this.onNext.calls.count()).toEqual(1);
             });
 
             describe('reset state', function () {
@@ -261,7 +261,7 @@ define([
             function rendersItem() {
                 expect(this.item.$el).toHaveAttr('role', 'region');
                 expect(this.item.$el).toHaveAttr('aria-label', 'search result');
-                expect(this.item.$el).toContain('a[href="' + this.model.get('url') + '"]');
+                expect(this.item.$el).toContainElement('a[href="' + this.model.get('url') + '"]');
                 expect(this.item.$el.find('.result-type')).toContainHtml(this.model.get('content_type'));
                 expect(this.item.$el.find('.result-excerpt')).toContainHtml(this.model.get('excerpt'));
                 expect(this.item.$el.find('.result-location')).toContainHtml('section ▸ subsection ▸ unit');
@@ -270,7 +270,7 @@ define([
             function rendersSequentialItem() {
                 expect(this.seqItem.$el).toHaveAttr('role', 'region');
                 expect(this.seqItem.$el).toHaveAttr('aria-label', 'search result');
-                expect(this.seqItem.$el).toContain('a[href="' + this.seqModel.get('url') + '"]');
+                expect(this.seqItem.$el).toContainElement('a[href="' + this.seqModel.get('url') + '"]');
                 expect(this.seqItem.$el.find('.result-type')).toBeEmpty();
                 expect(this.seqItem.$el.find('.result-excerpt')).toBeEmpty();
                 expect(this.seqItem.$el.find('.result-location')).toContainHtml('section ▸ subsection');
@@ -280,8 +280,8 @@ define([
                 this.model.collection = new SearchCollection([this.model], { course_id: 'edx101' });
                 this.item.render();
                 // Mock the redirect call
-                spyOn(this.item, 'redirect').andCallFake( function() {} );
-                spyOn(Logger, 'log').andReturn($.Deferred().resolve());
+                spyOn(this.item, 'redirect').and.callFake( function() {} );
+                spyOn(Logger, 'log').and.returnValue($.Deferred().resolve());
                 this.item.$el.find('a').trigger('click');
                 expect(this.item.redirect).toHaveBeenCalled();
                 this.item.$el.trigger('click');
@@ -414,7 +414,7 @@ define([
 
             function returnsToContent () {
                 this.resultsView.clear();
-                expect(this.resultsView.$contentElement).toBeVisible();
+                expect(this.resultsView.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
                 expect(this.resultsView.$el).toBeHidden();
                 expect(this.resultsView.$el).toBeEmpty();
             }
@@ -487,10 +487,10 @@ define([
 
             function beforeEachHelper(SearchResultsView) {
                 appendSetFixtures(
-                    '<section id="courseware-search-results"></section>' +
+                    '<div class="courseware-results"></div>' +
                     '<section id="course-content"></section>' +
                     '<section id="dashboard-search-results"></section>' +
-                    '<section id="my-courses"></section>'
+                    '<section id="my-courses" tabindex="-1"></section>'
                 );
 
                 TemplateHelpers.installTemplates([
@@ -498,7 +498,6 @@ define([
                     'templates/search/dashboard_search_item',
                     'templates/search/course_search_results',
                     'templates/search/dashboard_search_results',
-                    'templates/search/search_list',
                     'templates/search/search_loading',
                     'templates/search/search_error'
                 ]);
@@ -518,6 +517,7 @@ define([
             describe('CourseSearchResultsView', function () {
                 beforeEach(function() {
                     beforeEachHelper.call(this, CourseSearchResultsView);
+                    this.contentElementDisplayValue = 'table-cell';
                 });
                 it('shows loading message', showsLoadingMessage);
                 it('shows error message', showsErrorMessage);
@@ -532,6 +532,7 @@ define([
             describe('DashSearchResultsView', function () {
                 beforeEach(function() {
                     beforeEachHelper.call(this, DashSearchResultsView);
+                    this.contentElementDisplayValue = 'block';
                 });
                 it('shows loading message', showsLoadingMessage);
                 it('shows error message', showsErrorMessage);
@@ -599,9 +600,9 @@ define([
             function updatesNavigationHistory () {
                 $('.search-field').val('edx');
                 $('.search-button').trigger('click');
-                expect(Backbone.history.navigate.calls[0].args).toContain('search/edx');
+                expect(Backbone.history.navigate.calls.mostRecent().args[0]).toContain('search/edx');
                 $('.cancel-button').trigger('click');
-                expect(Backbone.history.navigate.calls[1].args).toContain('');
+                expect(Backbone.history.navigate.calls.argsFor(1)[0]).toBe('');
             }
 
             function cancelsSearchRequest () {
@@ -613,13 +614,13 @@ define([
                 $('.cancel-button').trigger('click');
                 AjaxHelpers.skipResetRequest(requests);
                 // there should be no results
-                expect(this.$contentElement).toBeVisible();
+                expect(this.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
             function clearsResults () {
                 $('.cancel-button').trigger('click');
-                expect(this.$contentElement).toBeVisible();
+                expect(this.$contentElement).toHaveCss({'display': this.contentElementDisplayValue});
                 expect(this.$searchResults).toBeHidden();
             }
 
@@ -653,6 +654,7 @@ define([
 
             function navigatesToSearch () {
                 var requests = AjaxHelpers.requests(this);
+                Backbone.history.start();
                 Backbone.history.loadUrl('search/query');
                 expect(requests[0].requestBody).toContain('search_string=query');
             }
@@ -673,7 +675,7 @@ define([
                 beforeEach(function () {
                     loadFixtures('js/fixtures/search/course_search_form.html');
                     appendSetFixtures(
-                        '<section id="courseware-search-results"></section>' +
+                        '<div class="courseware-results"></div>' +
                         '<section id="course-content"></section>'
                     );
                     loadTemplates.call(this);
@@ -682,7 +684,12 @@ define([
                     CourseSearchFactory(courseId);
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#course-content');
-                    this.$searchResults = $('#courseware-search-results');
+                    this.contentElementDisplayValue = 'table-cell';
+                    this.$searchResults = $('.courseware-results');
+                });
+
+                afterEach(function (){
+                    Backbone.history.stop();
                 });
 
                 it('shows loading message on search', showsLoadingMessage);
@@ -702,14 +709,19 @@ define([
                     loadFixtures('js/fixtures/search/dashboard_search_form.html');
                     appendSetFixtures(
                         '<section id="dashboard-search-results"></section>' +
-                        '<section id="my-courses"></section>'
+                        '<section id="my-courses" tabindex="-1"></section>'
                     );
                     loadTemplates.call(this);
                     DashboardSearchFactory();
 
                     spyOn(Backbone.history, 'navigate');
                     this.$contentElement = $('#my-courses');
+                    this.contentElementDisplayValue = 'block';
                     this.$searchResults = $('#dashboard-search-results');
+                });
+
+                afterEach(function (){
+                    Backbone.history.stop();
                 });
 
                 it('shows loading message on search', showsLoadingMessage);

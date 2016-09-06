@@ -19,8 +19,6 @@ log = logging.getLogger(__name__)
 
 
 ERROR_UNAUTHORIZED = 'Unauthorized'
-WARNING_IGNORED_SOURCE = 'Source ignored'
-WARNING_IGNORED_TYPE = 'Type ignored'
 ERROR_MISSING_USER_ID = 'Required user_id missing from context'
 ERROR_USER_NOT_EXIST = 'Specified user does not exist'
 ERROR_INVALID_USER_ID = 'Unable to parse userId as an integer'
@@ -67,7 +65,7 @@ def segmentio_event(request):
     try:
         track_segmentio_event(request)
     except EventValidationError as err:
-        log.warning(
+        log.debug(
             'Unable to process event received from Segment: message="%s" event="%s"',
             str(err),
             request.body
@@ -133,29 +131,30 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     source_map = getattr(settings, 'TRACKING_SEGMENTIO_SOURCE_MAP', {})
     event_source = source_map.get(library_name)
     if not event_source:
-        raise EventValidationError(WARNING_IGNORED_SOURCE)
+        return
     else:
         context['event_source'] = event_source
+
+    # Ignore event types that are unsupported
+    segment_event_type = full_segment_event.get('type')
+    allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
+    if not segment_event_type or (segment_event_type.lower() not in allowed_types):
+        return
 
     if 'name' not in segment_properties:
         raise EventValidationError(ERROR_MISSING_NAME)
 
-    if 'data' not in segment_properties:
-        raise EventValidationError(ERROR_MISSING_DATA)
-
-    # Ignore event types and names that are unsupported
-    segment_event_type = full_segment_event.get('type')
+    # Ignore event names that are unsupported
     segment_event_name = segment_properties['name']
-    allowed_types = [a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_ALLOWED_TYPES', [])]
     disallowed_substring_names = [
         a.lower() for a in getattr(settings, 'TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES', [])
     ]
-    if (
-        not segment_event_type or
-        (segment_event_type.lower() not in allowed_types) or
-        any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names)
-    ):
-        raise EventValidationError(WARNING_IGNORED_TYPE)
+
+    if any(disallowed_subs_name in segment_event_name.lower() for disallowed_subs_name in disallowed_substring_names):
+        return
+
+    if 'data' not in segment_properties:
+        raise EventValidationError(ERROR_MISSING_DATA)
 
     # create and populate application field if it doesn't exist
     app_context = segment_properties.get('context', {})

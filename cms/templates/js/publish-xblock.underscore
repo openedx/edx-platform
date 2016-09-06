@@ -19,43 +19,43 @@ if (visibilityState === 'live') {
 
 var visibleToStaffOnly = visibilityState === 'staff_only';
 %>
-<div class="bit-publishing <%= visibilityClass %> <% if (releaseDate) { %>is-scheduled<% } %>">
-    <h3 class="bar-mod-title pub-status"><span class="sr"><%= gettext("Publishing Status") %></span>
-        <%= title %>
+<div class="bit-publishing <%- visibilityClass %> <% if (releaseDate) { %>is-scheduled<% } %>">
+    <h3 class="bar-mod-title pub-status"><span class="sr"><%- gettext("Publishing Status") %></span>
+        <%- title %>
     </h3>
 
     <div class="wrapper-last-draft bar-mod-content">
         <p class="copy meta">
             <% if (hasChanges && editedOn && editedBy) {
                 var message = gettext("Draft saved on %(last_saved_date)s by %(edit_username)s") %>
-                <%= interpolate(message, {
-                    last_saved_date: '<span class="date">' + editedOn + '</span>',
-                    edit_username: '<span class="user">' + editedBy + '</span>' }, true) %>
+                <%= interpolate(_.escape(message), {
+                    last_saved_date: '<span class="date">' + _.escape(editedOn) + '</span>',
+                    edit_username: '<span class="user">' + _.escape(editedBy) + '</span>' }, true) %>
             <% } else if (publishedOn && publishedBy) {
                 var message = gettext("Last published %(last_published_date)s by %(publish_username)s"); %>
-                <%= interpolate(message, {
-                    last_published_date: '<span class="date">' + publishedOn + '</span>',
-                    publish_username: '<span class="user">' + publishedBy + '</span>' }, true) %>
+                <%= interpolate(_.escape(message), {
+                    last_published_date: '<span class="date">' + _.escape(publishedOn) + '</span>',
+                    publish_username: '<span class="user">' + _.escape(publishedBy) + '</span>' }, true) %>
             <% } else { %>
-                <%= gettext("Previously published") %>
+                <%- gettext("Previously published") %>
             <% } %>
         </p>
     </div>
 
     <% if (!course.get('self_paced')) { %>
         <div class="wrapper-release bar-mod-content">
-            <h5 class="title"><%= releaseLabel %></h5>
+            <h5 class="title"><%- releaseLabel %></h5>
             <p class="copy">
                 <% if (releaseDate) { %>
-                    <span class="release-date"><%= releaseDate %></span>
+                    <span class="release-date"><%- releaseDate %></span>
                     <span class="release-with">
-                        <%= interpolate(
+                        <%- interpolate(
                             gettext('with %(release_date_from)s'), { release_date_from: releaseDateFrom }, true
                         ) %>
                     </span>
 
                 <% } else { %>
-                    <%= gettext("Unscheduled") %>
+                    <%- gettext("Unscheduled") %>
                 <% } %>
             </p>
         </div>
@@ -64,40 +64,40 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
     <div class="wrapper-visibility bar-mod-content">
         <h5 class="title">
             <% if (released && published && !hasChanges) { %>
-                <%= gettext("Is Visible To:") %>
+                <%- gettext("Is Visible To:") %>
             <% } else { %>
-                <%= gettext("Will Be Visible To:") %>
+                <%- gettext("Will Be Visible To:") %>
             <% } %>
         </h5>
         <% if (visibleToStaffOnly) { %>
             <p class="visbility-copy copy">
-                <%= gettext("Staff Only") %>
+                <%- gettext("Staff Only") %>
                 <% if (!hasExplicitStaffLock) { %>
                     <span class="inherited-from">
-                        <%= interpolate(
+                        <%- interpolate(
                             gettext("with %(section_or_subsection)s"),{ section_or_subsection: staffLockFrom }, true
                         ) %>
                     </span>
                 <% } %>
             </p>
         <% } else { %>
-            <p class="visbility-copy copy"><%= gettext("Staff and Students") %></p>
+            <p class="visbility-copy copy"><%- gettext("Staff and Students") %></p>
         <% } %>
             <% if (hasContentGroupComponents) { %>
                 <p class="note-visibility">
-                    <i class="icon fa fa-eye" aria-hidden="true"></i>
-                    <span class="note-copy"><%= gettext("Some content in this unit is visible only to particular content groups") %></span>
+                    <span class="icon fa fa-eye" aria-hidden="true"></span>
+                    <span class="note-copy"><%- gettext("Some content in this unit is visible only to particular content groups") %></span>
                 </p>
             <% } %>
         <ul class="actions-inline">
             <li class="action-inline">
-                <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">
+                <a href="" class="action-staff-lock" role="button" aria-pressed="<%- hasExplicitStaffLock %>">
                 <% if (hasExplicitStaffLock) { %>
-                    <i class="icon fa fa-check-square-o" aria-hidden="true"></i>
+                    <span class="icon fa fa-check-square-o" aria-hidden="true"></span>
                 <% } else { %>
-                    <i class="icon fa fa-square-o" aria-hidden="true"></i>
+                    <span class="icon fa fa-square-o" aria-hidden="true"></span>
                 <% } %>
-                <%= gettext('Hide from students') %>
+                <%- gettext('Hide from students') %>
             </a>
             </li>
         </ul>
@@ -107,12 +107,12 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <ul class="action-list">
             <li class="action-item">
                 <a class="action-publish action-primary <% if (published && !hasChanges) { %>is-disabled<% } %>"
-                   href="" aria-disabled="<% if (published && !hasChanges) { %>true<% } else { %>false<% } %>" ><%= gettext("Publish") %>
+                   href="" aria-disabled="<% if (published && !hasChanges) { %>true<% } else { %>false<% } %>" ><%- gettext("Publish") %>
                 </a>
             </li>
             <li class="action-item">
                 <a class="action-discard action-secondary <% if (!published || !hasChanges) { %>is-disabled<% } %>"
-                   href="" aria-disabled="<% if (!published || !hasChanges) { %>true<% } else { %>false<% } %>"><%= gettext("Discard Changes") %>
+                   href="" aria-disabled="<% if (!published || !hasChanges) { %>true<% } else { %>false<% } %>"><%- gettext("Discard Changes") %>
                 </a>
             </li>
         </ul>

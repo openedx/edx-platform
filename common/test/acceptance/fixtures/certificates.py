@@ -4,8 +4,8 @@ Tools for creating certificates config fixture data.
 
 import json
 
-from . import STUDIO_BASE_URL
-from .base import StudioApiFixture
+from common.test.acceptance.fixtures import STUDIO_BASE_URL
+from common.test.acceptance.fixtures.base import StudioApiFixture
 
 
 class CertificateConfigFixtureError(Exception):

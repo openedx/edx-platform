@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 
 from edxmako.shortcuts import render_to_response
 from support.decorators import require_support_permission
+import urllib
 
 
 class CertificatesSupportView(View):
@@ -30,6 +31,7 @@ class CertificatesSupportView(View):
     def get(self, request):
         """Render the certificates support view. """
         context = {
-            "user_query": request.GET.get("query", "")
+            "user_filter": urllib.unquote(urllib.quote_plus(request.GET.get("user", ""))),
+            "course_filter": request.GET.get("course_id", "")
         }
         return render_to_response("support/certificates.html", context)

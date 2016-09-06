@@ -2,12 +2,17 @@
 // These styles are included on admin pages used by the support team.
 // ===================================================================
 
-.certificates-search {
-    margin: 40px 0;
+.certificates-search, .enrollment-search {
+  
+  margin: 40px 0;
+  input[name="query"] {
+    width: 350px;
+  }
 
-    input[name="query"] {
-        width: 476px;
-    }
+  .certificates-form {
+    max-width: 850px;
+    margin: 0 auto;
+  }
 }
 
 
@@ -29,4 +34,101 @@
 
 .btn-cert-regenerate {
     font-size: 12px;
+}
+
+.btn-cert-generate {
+    font-size: 12px;
+}
+
+.enrollment-modal-wrapper.is-shown {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+
+  .enrollment-modal {
+    width: 600px;
+    position: relative;
+    margin: 10% auto;
+    padding: $baseline;
+    border: 4px solid $gray;
+    border-radius: 4px;
+    background-color: $white;
+
+    .enrollment-change-title {
+      @extend %t-title6;
+      @extend %t-strong;
+      @include text-align(left);
+      margin-bottom: 0;
+      text-transform: none;
+    }
+
+    .enrollment-change-field {
+      margin: 0;
+      padding: ($baseline/4) 0;
+      border-bottom: 1px solid $gray-l1;
+
+      p, label, select, input {
+        @extend %t-copy-sub1;
+        display: inline;
+        font-style: normal;
+      }
+    }
+
+    .enrollment-change-errors {
+      @extend %t-copy-sub1;
+      @extend %t-light;
+      color: $red;
+    }
+
+    .enrollment-info {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .enrollment-change-submit, .enrollment-change-cancel {
+      @extend %t-action4;
+      margin: ($baseline/4) auto;
+      text-transform: none;
+      background-image: none;
+      border: none;
+      box-shadow: none;
+      text-shadow: none;
+    }
+
+    .enrollment-change-cancel {
+      background-color: $gray-l3;
+    }
+  }
+}
+
+.enrollment-modal-wrapper.is-hidden {
+  display: none;
+}
+
+.enrollment-results {
+  @extend %t-copy-sub2;
+
+  .enrollment-table {
+    display: inline-block;
+  }
+
+  th {
+    @extend %t-title7;
+  }
+
+  .change-enrollment-btn, .change-enrollment-btn:hover {
+    @extend %t-action4;
+    margin: ($baseline/4) auto;
+    padding: ($baseline/4) 1px;
+    letter-spacing: normal;
+    text-transform: none;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+  }
 }

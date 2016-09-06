@@ -1,7 +1,8 @@
 ;(function (define) {
     'use strict';
-    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/views/cohort_discussions'],
-            function ($, _, Backbone, gettext, CohortDiscussionConfigurationView) {
+    define(['jquery', 'underscore', 'backbone', 'gettext', 'js/groups/views/cohort_discussions',
+        'edx-ui-toolkit/js/utils/html-utils'],
+            function ($, _, Backbone, gettext, CohortDiscussionConfigurationView, HtmlUtils) {
                 var CourseWideDiscussionsView = CohortDiscussionConfigurationView.extend({
                     events: {
                         'change .check-discussion-subcategory-course-wide': 'discussionCategoryStateChanged',
@@ -9,13 +10,13 @@
                     },
 
                     initialize: function (options) {
-                        this.template = _.template($('#cohort-discussions-course-wide-tpl').text());
+                        this.template = HtmlUtils.template($('#cohort-discussions-course-wide-tpl').text());
                         this.cohortSettings = options.cohortSettings;
                     },
 
                     render: function () {
-                        this.$('.cohort-course-wide-discussions-nav').html(this.template({
-                            courseWideTopics: this.getCourseWideDiscussionsHtml(
+                        HtmlUtils.setHtml(this.$('.cohort-course-wide-discussions-nav'), this.template({
+                            courseWideTopicsHtml: this.getCourseWideDiscussionsHtml(
                                 this.model.get('course_wide_discussions')
                             )
                         }));
@@ -25,14 +26,14 @@
                     /**
                      * Returns the html list for course-wide discussion topics.
                      * @param {object} courseWideDiscussions - course-wide discussions object from server.
-                     * @returns {Array} - HTML list for course-wide discussion topics.
+                     * @returns {HtmlSnippet} - HTML list for course-wide discussion topics.
                      */
                     getCourseWideDiscussionsHtml: function (courseWideDiscussions) {
-                        var subCategoryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
+                        var subCategoryTemplate = HtmlUtils.template($('#cohort-discussions-subcategory-tpl').html()),
                             entries = courseWideDiscussions.entries,
                             children = courseWideDiscussions.children;
 
-                        return _.map(children, function (name) {
+                        return HtmlUtils.joinHtml.apply(this, _.map(children, function (name) {
                             var entry = entries[name];
                             return subCategoryTemplate({
                                 name: name,
@@ -40,7 +41,7 @@
                                 is_cohorted: entry.is_cohorted,
                                 type: 'course-wide'
                             });
-                        }).join('');
+                        }));
                     },
 
                     /**

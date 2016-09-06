@@ -1,4 +1,4 @@
 <div class="is-collapsible">
-    <a href="#" class="expand-collapse collapse"><i class="ui-toggle-expansion">Expand/Collapse</i></a>
+    <a href="#" class="expand-collapse collapse"><span class="ui-toggle-expansion" aria-hidden="true"></span>Expand/Collapse</a>
     <div class="content">Mock Content</div>
 </div>

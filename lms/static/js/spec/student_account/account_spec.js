@@ -104,7 +104,7 @@ define(['js/student_account/account'],
 
             var assertAjax = function(url, method, data) {
                 expect($.ajax).toHaveBeenCalled();
-                var ajaxArgs = $.ajax.mostRecentCall.args[0];
+                var ajaxArgs = $.ajax.calls.mostRecent().args[0];
                 expect(ajaxArgs.url).toEqual(url);
                 expect(ajaxArgs.type).toEqual(method);
                 expect(ajaxArgs.data).toEqual(data);
@@ -127,7 +127,7 @@ define(['js/student_account/account'],
                 view = new edx.student.account.AccountView().render();
 
                 // Stub Ajax calls to return success/failure
-                spyOn($, "ajax").andCallFake(function() {
+                spyOn($, "ajax").and.callFake(function() {
                     return $.Deferred(function(defer) {
                         if (ajaxSuccess) {
                             defer.resolve();

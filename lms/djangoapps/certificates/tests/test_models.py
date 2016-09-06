@@ -1,20 +1,34 @@
 """Tests for certificate Django models. """
+import ddt
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files.images import ImageFile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
+import json
+from mock import Mock
 from path import Path as path
 
-from opaque_keys.edx.locator import CourseLocator
 from certificates.models import (
     ExampleCertificate,
     ExampleCertificateSet,
     CertificateHtmlViewConfiguration,
     CertificateTemplateAsset,
-    BadgeImageConfiguration)
+    CertificateInvalidation,
+    GeneratedCertificate,
+    CertificateStatuses,
+    CertificateGenerationHistory,
+)
+from certificates.tests.factories import (
+    CertificateInvalidationFactory,
+    GeneratedCertificateFactory
+)
+from instructor_task.tests.factories import InstructorTaskFactory
+from opaque_keys.edx.locator import CourseLocator
+from student.tests.factories import AdminFactory, UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
@@ -160,55 +174,6 @@ class CertificateHtmlViewConfigurationTest(TestCase):
 
 
 @attr('shard_1')
-class BadgeImageConfigurationTest(TestCase):
-    """
-    Test the validation features of BadgeImageConfiguration.
-    """
-    def get_image(self, name):
-        """
-        Get one of the test images from the test data directory.
-        """
-        return ImageFile(open(TEST_DATA_ROOT / 'badges' / name + '.png'))
-
-    def create_clean(self, file_obj):
-        """
-        Shortcut to create a BadgeImageConfiguration with a specific file.
-        """
-        BadgeImageConfiguration(mode='honor', icon=file_obj).full_clean()
-
-    def test_good_image(self):
-        """
-        Verify that saving a valid badge image is no problem.
-        """
-        good = self.get_image('good')
-        BadgeImageConfiguration(mode='honor', icon=good).full_clean()
-
-    def test_unbalanced_image(self):
-        """
-        Verify that setting an image with an uneven width and height raises an error.
-        """
-        unbalanced = ImageFile(self.get_image('unbalanced'))
-        self.assertRaises(ValidationError, self.create_clean, unbalanced)
-
-    def test_large_image(self):
-        """
-        Verify that setting an image that is too big raises an error.
-        """
-        large = self.get_image('large')
-        self.assertRaises(ValidationError, self.create_clean, large)
-
-    def test_no_double_default(self):
-        """
-        Verify that creating two configurations as default is not permitted.
-        """
-        BadgeImageConfiguration(mode='test', icon=self.get_image('good'), default=True).save()
-        self.assertRaises(
-            ValidationError,
-            BadgeImageConfiguration(mode='test2', icon=self.get_image('good'), default=True).full_clean
-        )
-
-
-@attr('shard_1')
 class CertificateTemplateAssetTest(TestCase):
     """
     Test Assets are uploading/saving successfully for CertificateTemplateAsset.
@@ -234,3 +199,155 @@ class CertificateTemplateAssetTest(TestCase):
 
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture2.jpg')
+
+
+@attr('shard_1')
+class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
+    """
+    Test the GeneratedCertificate model's object manager for filtering
+    out ineligible certs.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(EligibleCertificateManagerTest, cls).setUpClass()
+        cls.courses = (CourseFactory(), CourseFactory())
+
+    def setUp(self):
+        super(EligibleCertificateManagerTest, self).setUp()
+        self.user = UserFactory()
+        self.eligible_cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.courses[0].id  # pylint: disable=no-member
+        )
+        self.ineligible_cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.audit_passing,
+            user=self.user,
+            course_id=self.courses[1].id  # pylint: disable=no-member
+        )
+
+    def test_filter_ineligible_certificates(self):
+        """
+        Verify that the EligibleCertificateManager filters out
+        certificates marked as ineligible, and that the default object
+        manager for GeneratedCertificate does not filter them out.
+        """
+        self.assertEqual(list(GeneratedCertificate.eligible_certificates.filter(user=self.user)), [self.eligible_cert])
+        self.assertEqual(
+            list(GeneratedCertificate.objects.filter(user=self.user)),  # pylint: disable=no-member
+            [self.eligible_cert, self.ineligible_cert]
+        )
+
+
+@attr('shard_1')
+@ddt.ddt
+class TestCertificateGenerationHistory(TestCase):
+    """
+    Test the CertificateGenerationHistory model's methods
+    """
+    @ddt.data(
+        ({"student_set": "whitelisted_not_generated"}, "For exceptions", True),
+        ({"student_set": "whitelisted_not_generated"}, "For exceptions", False),
+        # check "students" key for backwards compatibility
+        ({"students": [1, 2, 3]}, "For exceptions", True),
+        ({"students": [1, 2, 3]}, "For exceptions", False),
+        ({}, "All learners", True),
+        ({}, "All learners", False),
+        # test single status to regenerate returns correctly
+        ({"statuses_to_regenerate": ['downloadable']}, 'already received', True),
+        ({"statuses_to_regenerate": ['downloadable']}, 'already received', False),
+        # test that list of > 1 statuses render correctly
+        ({"statuses_to_regenerate": ['downloadable', 'error']}, 'already received, error states', True),
+        ({"statuses_to_regenerate": ['downloadable', 'error']}, 'already received, error states', False),
+        # test that only "readable" statuses are returned
+        ({"statuses_to_regenerate": ['downloadable', 'not_readable']}, 'already received', True),
+        ({"statuses_to_regenerate": ['downloadable', 'not_readable']}, 'already received', False),
+    )
+    @ddt.unpack
+    def test_get_certificate_generation_candidates(self, task_input, expected, is_regeneration):
+        staff = AdminFactory.create()
+        instructor_task = InstructorTaskFactory.create(
+            task_input=json.dumps(task_input),
+            requester=staff,
+            task_key=Mock(),
+            task_id=Mock(),
+        )
+        certificate_generation_history = CertificateGenerationHistory(
+            course_id=instructor_task.course_id,
+            generated_by=staff,
+            instructor_task=instructor_task,
+            is_regeneration=is_regeneration,
+        )
+        self.assertEqual(
+            certificate_generation_history.get_certificate_generation_candidates(),
+            expected
+        )
+
+    @ddt.data((True, "regenerated"), (False, "generated"))
+    @ddt.unpack
+    def test_get_task_name(self, is_regeneration, expected):
+        staff = AdminFactory.create()
+        instructor_task = InstructorTaskFactory.create(
+            task_input=json.dumps({}),
+            requester=staff,
+            task_key=Mock(),
+            task_id=Mock(),
+        )
+        certificate_generation_history = CertificateGenerationHistory(
+            course_id=instructor_task.course_id,
+            generated_by=staff,
+            instructor_task=instructor_task,
+            is_regeneration=is_regeneration,
+        )
+        self.assertEqual(
+            certificate_generation_history.get_task_name(),
+            expected
+        )
+
+
+@attr('shard_1')
+class CertificateInvalidationTest(SharedModuleStoreTestCase):
+    """
+    Test for the Certificate Invalidation model.
+    """
+
+    def setUp(self):
+        super(CertificateInvalidationTest, self).setUp()
+        self.course = CourseFactory()
+        self.user = UserFactory()
+        self.course_id = self.course.id  # pylint: disable=no-member
+        self.certificate = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.course_id
+        )
+
+    def test_is_certificate_invalid_method(self):
+        """ Verify that method return false if certificate is valid. """
+
+        self.assertFalse(
+            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
+        )
+
+    def test_is_certificate_invalid_with_invalid_cert(self):
+        """ Verify that method return true if certificate is invalid. """
+
+        invalid_cert = CertificateInvalidationFactory.create(
+            generated_certificate=self.certificate,
+            invalidated_by=self.user
+        )
+        # Invalidate user certificate
+        self.certificate.invalidate()
+        self.assertTrue(
+            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
+        )
+
+        # mark the entry as in-active.
+        invalid_cert.active = False
+        invalid_cert.save()
+
+        # After making the certificate valid method will return false.
+        self.assertFalse(
+            CertificateInvalidation.has_certificate_invalidation(self.user, self.course_id)
+        )

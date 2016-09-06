@@ -21,6 +21,7 @@ from social.backends.saml import SAMLAuth, SAMLIdentityProvider
 from .lti import LTIAuthBackend, LTI_PARAMS_KEY
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
@@ -70,10 +71,23 @@ class ProviderConfig(ConfigurationModel):
     Abstract Base Class for configuring a third_party_auth provider
     """
     icon_class = models.CharField(
-        max_length=50, default='fa-sign-in',
+        max_length=50,
+        blank=True,
+        default='fa-sign-in',
         help_text=(
             'The Font Awesome (or custom) icon class to use on the login button for this provider. '
             'Examples: fa-google-plus, fa-facebook, fa-linkedin, fa-sign-in, fa-university'
+        ),
+    )
+    # We use a FileField instead of an ImageField here because ImageField
+    # doesn't support SVG. This means we don't get any image validation, but
+    # that should be fine because only trusted users should be uploading these
+    # anyway.
+    icon_image = models.FileField(
+        blank=True,
+        help_text=(
+            'If there is no Font Awesome icon available for this provider, upload a custom image. '
+            'SVG images are recommended as they can scale to any size.'
         ),
     )
     name = models.CharField(max_length=50, blank=False, help_text="Name of this provider (shown to users)")
@@ -108,6 +122,12 @@ class ProviderConfig(ConfigurationModel):
     class Meta(object):
         app_label = "third_party_auth"
         abstract = True
+
+    def clean(self):
+        """ Ensure that either `icon_class` or `icon_image` is set """
+        super(ProviderConfig, self).clean()
+        if bool(self.icon_class) == bool(self.icon_image):
+            raise ValidationError('Either an icon class or an icon image must be given (but not both)')
 
     @property
     def provider_id(self):
@@ -193,7 +213,7 @@ class OAuth2ProviderConfig(ProviderConfig):
     prefix = 'oa2'
     KEY_FIELDS = ('backend_name', )  # Backend name is unique
     backend_name = models.CharField(
-        max_length=50, choices=[(name, name) for name in _PSA_OAUTH2_BACKENDS], blank=False, db_index=True,
+        max_length=50, blank=False, db_index=True,
         help_text=(
             "Which python-social-auth OAuth2 provider backend to use. "
             "The list of backend choices is determined by the THIRD_PARTY_AUTH_BACKENDS setting."
@@ -246,7 +266,7 @@ class SAMLProviderConfig(ProviderConfig):
     prefix = 'saml'
     KEY_FIELDS = ('idp_slug', )
     backend_name = models.CharField(
-        max_length=50, default='tpa-saml', choices=[(name, name) for name in _PSA_SAML_BACKENDS], blank=False,
+        max_length=50, default='tpa-saml', blank=False,
         help_text="Which python-social-auth provider backend to use. 'tpa-saml' is the standard edX SAML backend.")
     idp_slug = models.SlugField(
         max_length=30, db_index=True,
@@ -434,7 +454,9 @@ class SAMLConfiguration(ConfigurationModel):
         other_config = json.loads(self.other_config_str)
         if name in ("TECHNICAL_CONTACT", "SUPPORT_CONTACT"):
             contact = {
-                "givenName": "{} Support".format(settings.PLATFORM_NAME),
+                "givenName": "{} Support".format(
+                    configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+                ),
                 "emailAddress": settings.TECH_SUPPORT_EMAIL
             }
             contact.update(other_config.get(name, {}))
@@ -500,9 +522,15 @@ class LTIProviderConfig(ProviderConfig):
     """
     prefix = 'lti'
     backend_name = 'lti'
-    icon_class = None  # This provider is not visible to users
-    secondary = False  # This provider is not visible to users
-    accepts_logins = False  # LTI login cannot be initiated by the tool provider
+
+    # This provider is not visible to users
+    icon_class = None
+    icon_image = None
+    secondary = False
+
+    # LTI login cannot be initiated by the tool provider
+    accepts_logins = False
+
     KEY_FIELDS = ('lti_consumer_key', )
 
     lti_consumer_key = models.CharField(

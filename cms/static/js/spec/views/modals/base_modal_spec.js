@@ -31,14 +31,13 @@ define(["jquery", "underscore", "js/views/modals/base_modal", "js/spec_helpers/m
                     expect(ModelHelpers.isShowingModal(modal)).toBeTruthy();
                 });
 
-                it('sends focus to the modal window after show is called', function() {
+                it('sends focus to the modal window after show is called', function(done) {
                     showMockModal();
-                    waitsFor(function () {
-                        // This is the implementation of "toBeFocused". However, simply calling that method
-                        // with no wait seems to be flaky.
+
+                    jasmine.waitUntil(function() {
                         var modalWindow = ModelHelpers.getModalWindow(modal);
-                        return $(modalWindow)[0] === $(modalWindow)[0].ownerDocument.activeElement;
-                    }, 'Modal Window did not get focus', 5000);
+                        return ($(modalWindow)[0] === $(modalWindow)[0].ownerDocument.activeElement);
+                    }).then(done);
                 });
 
                 it('is removed after hide is called', function () {

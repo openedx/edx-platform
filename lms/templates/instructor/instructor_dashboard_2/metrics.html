@@ -20,14 +20,14 @@ from django.template.defaultfilters import escapejs
   </div>
   <div class="metrics-header-container">
   	<div class="metrics-left-header">
-       <h2>${_("Subsection Data")}</h2>
+       <h3 class="hd hd-3">${_("Subsection Data")}</h3>
        <p>${_("Each bar shows the number of students that opened the subsection.")}</p>
        <p>${_("You can click on any of the bars to list the students that opened the subsection.")}</p>
        <p>${_("You can also download this data as a CSV file.")}</p>
        <p><input type="button" id="download_subsection_data" value="${_("Download Subsection Data for all Subsections as a CSV")}" /></p>
      </div>
      <div class="metrics-right-header">
-       <h2>${_("Grade Distribution Data")}</h2>
+       <h3 class="hd hd-3">${_("Grade Distribution Data")}</h3>
        <p>${_("Each bar shows the grade distribution for that problem.")}</p>
        <p>${_("You can click on any of the bars to list the students that attempted the problem, along with the grades they received.")}</p>
        <p>${_("You can also download this data as a CSV file.")}</p>
@@ -57,7 +57,7 @@ from django.template.defaultfilters import escapejs
           </div>
           <input class="download-csv metrics-student-opened" type="button" name="dump_student_opened" value="${_("Download Student Opened as a CSV")}" data-endpoint="${section_data['get_students_opened_subsection_url']}" data-csv="true">
           <input class="download-csv metrics-student-grades" type="button" name="dump_student_grades" value="${_("Download Student Grades as a CSV")}" data-endpoint="${section_data['get_students_problem_grades_url']}" data-csv="true">
-          <a class="close-button" href="#"><i class="icon fa fa-remove"></i><span class="sr">${_("Close")}</span></a>
+          <a class="close-button" href="#"><span class="icon fa fa-remove" aria-hidden="true"></span><span class="sr">${_("Close")}</span></a>
       </div>
       </div>
     </div>
@@ -91,7 +91,7 @@ from django.template.defaultfilters import escapejs
             $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
 
             $.each(response.results, function(index, value ){
-              overlay_content = '<tr><td>' + value['name'] + "</td><td>" + value['username'] + '</td></tr>';
+              overlay_content = '<tr><td>' + _.escape(value['name']) + "</td><td>" + _.escape(value['username']) + '</td></tr>';
               $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
             });
             // If student list too long, append message to screen.
@@ -131,7 +131,7 @@ from django.template.defaultfilters import escapejs
             $('.metrics-overlay-content thead', metrics_overlay).append(overlay_content);
 
             $.each(response.results, function(index, value ){
-              overlay_content = '<tr><td>' + value['name'] + "</td><td>" + value['username'] + "</td><td>" + value['grade'] + "</td><td>" + value['percent'] + '</td></tr>';
+              overlay_content = '<tr><td>' + _.escape(value['name']) + "</td><td>" + _.escape(value['username']) + "</td><td>" + _.escape(value['grade']) + "</td><td>" + _.escape(value['percent']) + '</td></tr>';
               $('.metrics-overlay-content tbody', metrics_overlay).append(overlay_content);
             });
             // If student list too long, append message to screen.
@@ -154,7 +154,7 @@ from django.template.defaultfilters import escapejs
         var nothingText = "${_('There are no problems in this section.')}";
         var loadingText = "${_('Loading')}";
         var nothingP = '<p class="nothing">' + nothingText  + '</p>';
-        var loading = '<p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>' + loadingText + '</p>';
+        var loading = '<p class="loading"><span class="icon fa fa-spinner fa-spin fa-large" aria-hidden="true"></span>' + loadingText + '</p>';
 
         // Display spinners or "There are no problems in this section" message
         $('.metrics-left').each(function() {

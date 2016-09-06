@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-{% load sekizai_tags i18n microsite pipeline optional_include %}
+{% load sekizai_tags i18n configuration theme_pipeline optional_include staticfiles %}
 {% load url from future %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
   <meta charset="UTF-8">
-  {% block title %}<title>{% platform_name %}</title>{% endblock %}
+  <title>{% block title %}{{ platform_name }}{% endblock %}</title>
 
- <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
+  <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
+
+  {% with "js/i18n/"|add:LANGUAGE_CODE|add:"/djangojs.js" as i18njs_path %}
+    <script type="text/javascript" src="{% static i18njs_path %}"></script>
+  {% endwith %}
 
   {% stylesheet 'style-vendor' %}
-  {% stylesheet 'style-main' %}
-  {% stylesheet 'style-course-vendor' %}
-  {% stylesheet 'style-course' %}
+  {% stylesheet 'style-main-v1' %}
 
   {% block main_vendor_js %}
   {% javascript 'main_vendor' %}
@@ -19,29 +21,28 @@
   {% block headextra %}{% endblock %}
   {% render_block "css" %}
 
-  {% optional_include "head-extra.html" %}
+  {% optional_include "head-extra.html"|microsite_template_path %}
 
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
 
 <body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
-  <div class="window-wrap" dir="${static.dir_rtl()}">
-    <a class="nav-skip" href="{% block nav_skip %}#content{% endblock %}">{% trans "Skip to main content" %}</a>
+  <div class="window-wrap" dir="{{LANGUAGE_BIDI|yesno:'rtl,ltr'}}">
+    <a class="nav-skip" href="#main">{% trans "Skip to main content" %}</a>
     {% with course=request.course %}
-      {% include "header.html" %}
+      {% include "header.html"|microsite_template_path with online_help_token=online_help_token  %}
     {% endwith %}
     <div class="content-wrapper" id="content">
       {% block body %}{% endblock %}
       {% block bodyextra %}{% endblock %}
     </div>
     {% with course=request.course %}
-      {% include "footer.html" %}
+      {% include "footer.html"|microsite_template_path %}
     {% endwith %}
 
   </div>
 
-    {% javascript 'application' %}
-    {% javascript 'module-js' %}
+    {% javascript 'base_application' %}
 
     {% render_block "js" %}
 </body>

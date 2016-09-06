@@ -22,40 +22,82 @@
 #
 ############################################################################
 
+# Fail fast
+set -e
+
 DB_CACHE_DIR="common/test/db_cache"
 
-# Ensure the test database exists.
-echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
+declare -A databases
+declare -a database_order
+databases=(["default"]="edxtest" ["student_module_history"]="student_module_history_test")
+database_order=("default" "student_module_history")
 
-# Clear out the test database
-./manage.py lms --settings bok_choy reset_db --traceback --noinput
+# Ensure the test database exists.
+for db in "${database_order[@]}"; do
+    echo "CREATE DATABASE IF NOT EXISTS ${databases[$db]};" | mysql -u root
+
+    # Clear out the test database
+    #
+    # We are using the django-extensions's reset_db command which uses "DROP DATABASE" and
+    # "CREATE DATABASE" in case the tests are being run in an environment (e.g. devstack
+    # or a jenkins worker environment) that already ran tests on another commit that had
+    # different migrations that created, dropped, or altered tables.
+    echo "Issuing a reset_db command to the $db bok_choy MySQL database."
+    ./manage.py lms --settings bok_choy reset_db --traceback --noinput --router $db
+
+    # If there are cached database schemas/data, load them
+    if [[ ! -f $DB_CACHE_DIR/bok_choy_schema_$db.sql || ! -f $DB_CACHE_DIR/bok_choy_data_$db.json || ! -f $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql ]]; then
+        echo "Missing $DB_CACHE_DIR/bok_choy_schema_$db.sql or $DB_CACHE_DIR/bok_choy_data_$db.json, or $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql rebuilding cache"
+        REBUILD_CACHE=true
+    fi
+
+done
 
 # If there are cached database schemas/data, load them
-if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_migrations_data.sql && -f $DB_CACHE_DIR/bok_choy_data.json ]]; then
+if [[ -z $REBUILD_CACHE ]]; then
 
-    # Load the schema, then the data (including the migration history)
-    mysql -u root edxtest < $DB_CACHE_DIR/bok_choy_schema.sql
-    mysql -u root edxtest < $DB_CACHE_DIR/bok_choy_migrations_data.sql
-    ./manage.py lms --settings bok_choy loaddata $DB_CACHE_DIR/bok_choy_data.json
+    echo "Found the bok_choy DB cache files. Loading them into the database..."
 
-    # Re-run migrations to ensure we are up-to-date
-    ./manage.py lms --settings bok_choy migrate --traceback --noinput
-    ./manage.py cms --settings bok_choy migrate --traceback --noinput
+    for db in "${database_order[@]}"; do
+        # Load the schema, then the data (including the migration history)
+        echo "Loading the schema from the filesystem into the $db MySQL DB."
+        mysql -u root "${databases["$db"]}" < $DB_CACHE_DIR/bok_choy_schema_$db.sql
+        echo "Loading the fixture data from the filesystem into the $db MySQL DB."
+        ./manage.py lms --settings bok_choy loaddata --database $db $DB_CACHE_DIR/bok_choy_data_$db.json
+
+        # Migrations are stored in the default database
+        echo "Loading the migration data from the filesystem into the $db MySQL DB."
+        mysql -u root "${databases["$db"]}" < $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
+
+        # Re-run migrations to ensure we are up-to-date
+        echo "Running the lms migrations on the $db bok_choy DB."
+        ./manage.py lms --settings bok_choy migrate --database $db --traceback --noinput
+        echo "Running the cms migrations on the $db bok_choy DB."
+        ./manage.py cms --settings bok_choy migrate --database $db --traceback --noinput
+
+    done
 
 # Otherwise, update the test database and update the cache
 else
-
+    echo "Did not find a bok_choy DB cache. Creating a new one from scratch."
     # Clean the cache directory
-    rm -rf $DB_CACHE_DIR && mkdir -p $DB_CACHE_DIR
+    mkdir -p $DB_CACHE_DIR && rm -f $DB_CACHE_DIR/bok_choy*
 
-    # Re-run migrations on the test database
-    ./manage.py lms --settings bok_choy migrate --traceback --noinput
-    ./manage.py cms --settings bok_choy migrate --traceback --noinput
+    for db in "${database_order[@]}"; do
+        # Re-run migrations on the test database
+        echo "Issuing a migrate command to the $db bok_choy MySQL database for the lms django apps."
+        ./manage.py lms --settings bok_choy migrate --database $db --traceback --noinput
+        echo "Issuing a migrate command to the $db bok_choy MySQL database for the cms django apps."
+        ./manage.py cms --settings bok_choy migrate --database $db --traceback --noinput
 
-    # Dump the schema and data to the cache
-    ./manage.py lms --settings bok_choy dumpdata > $DB_CACHE_DIR/bok_choy_data.json
-    # dump_data does not dump the django_migrations table so we do it separately.
-    mysqldump -u root --no-create-info edxtest django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data.sql
-    mysqldump -u root --no-data --skip-comments --skip-dump-date edxtest > $DB_CACHE_DIR/bok_choy_schema.sql
+        # Dump the schema and data to the cache
+        echo "Using the dumpdata command to save the $db fixture data to the filesystem."
+        ./manage.py lms --settings bok_choy dumpdata --database $db > $DB_CACHE_DIR/bok_choy_data_$db.json --exclude=api_admin.Catalog
+        echo "Saving the schema of the $db bok_choy DB to the filesystem."
+        mysqldump -u root --no-data --skip-comments --skip-dump-date "${databases[$db]}" > $DB_CACHE_DIR/bok_choy_schema_$db.sql
+
+        # dump_data does not dump the django_migrations table so we do it separately.
+        echo "Saving the django_migrations table of the $db bok_choy DB to the filesystem."
+        mysqldump -u root --no-create-info "${databases["$db"]}" django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data_$db.sql
+    done
 fi
-

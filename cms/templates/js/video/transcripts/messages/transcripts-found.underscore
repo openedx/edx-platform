@@ -1,4 +1,4 @@
-<div class="transcripts-message-status"><i class="icon fa fa-check"></i><%= gettext("Timed Transcript Found") %></div>
+<div class="transcripts-message-status"><span class="icon fa fa-check" aria-hidden="true"></span><%= gettext("Timed Transcript Found") %></div>
 <p class="transcripts-message">
 <%= gettext("EdX has a timed transcript for this video. If you want to edit this transcript, you can download, edit, and re-upload the existing transcript. If you want to replace this transcript, upload a new .srt transcript file.") %>
 </p>

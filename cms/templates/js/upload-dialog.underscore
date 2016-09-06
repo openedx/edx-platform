@@ -1,5 +1,5 @@
-<form class="upload-dialog" method="POST" action="<%= url %>" enctype="multipart/form-data">
-        <p id="dialog-assetupload-description" class="message"><%= message %></p>
+<form class="upload-dialog" method="POST" action="<%- url %>" enctype="multipart/form-data">
+        <p id="dialog-assetupload-description" class="message"><%- message %></p>
         <input type="file" name="file" <% if(error && error.attributes && error.attributes.selectedFile) {%>class="error"<% } %> />
 
         <div class="status-upload">
@@ -7,7 +7,7 @@
             <% if(uploading) { %>
             <div class="wrapper-progress">
                 <% if (uploadedBytes && totalBytes) { %>
-                <progress value="<%= uploadedBytes %>" max="<%= totalBytes %>"><%= uploadedBytes/totalBytes*100 %>%</progress>
+                <progress value="<%- uploadedBytes %>" max="<%- totalBytes %>"><%- uploadedBytes/totalBytes*100 %>%</progress>
                 <% } else { %>
                 <progress></progress>
                 <% } %>
@@ -16,13 +16,13 @@
 
             <% if(error) {%>
             <div id="upload_error" class="message message-status error is-shown" name="upload_error">
-                <p><%= error.message %></p>
+                <p><%- error.message %></p>
             </div>
             <% } %>
 
             <% if(finished) { %>
             <div id="upload_confirm" class="message message-status confirm success is-shown" name="upload_confirm">
-                <p><%= gettext("File upload succeeded") %></p>
+                <p><%- gettext("File upload succeeded") %></p>
             </div>
             <% } %>
 

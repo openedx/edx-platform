@@ -76,11 +76,11 @@ def instructor_task_status(request):
 
     """
     output = {}
-    if 'task_id' in request.REQUEST:
-        task_id = request.REQUEST['task_id']
+    task_id = request.GET.get('task_id') or request.POST.get('task_id')
+    tasks = request.GET.get('task_ids[]') or request.POST.get('task_ids[]')
+    if task_id:
         output = _get_instructor_task_status(task_id)
-    elif 'task_ids[]' in request.REQUEST:
-        tasks = request.REQUEST.getlist('task_ids[]')
+    elif tasks:
         for task_id in tasks:
             task_output = _get_instructor_task_status(task_id)
             if task_output is not None:

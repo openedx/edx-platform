@@ -20,27 +20,3 @@ urlpatterns = patterns(
         name='grading_policy'
     ),
 )
-
-if settings.FEATURES.get('ENABLE_COURSE_BLOCKS_NAVIGATION_API'):
-    # TODO (MA-789) This endpoint still needs to be approved by the arch council.
-    # TODO (MA-704) This endpoint still needs to be made performant.
-    urlpatterns += (
-        url(
-            r'^courses/{}/blocks/$'.format(COURSE_ID_PATTERN),
-            views.CourseBlocksAndNavigation.as_view(),
-            {'return_blocks': True, 'return_nav': False},
-            name='blocks'
-        ),
-        url(
-            r'^courses/{}/navigation/$'.format(COURSE_ID_PATTERN),
-            views.CourseBlocksAndNavigation.as_view(),
-            {'return_blocks': False, 'return_nav': True},
-            name='navigation'
-        ),
-        url(
-            r'^courses/{}/blocks\+navigation/$'.format(COURSE_ID_PATTERN),
-            views.CourseBlocksAndNavigation.as_view(),
-            {'return_blocks': True, 'return_nav': True},
-            name='blocks+navigation'
-        ),
-    )

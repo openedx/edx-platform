@@ -2,7 +2,8 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
         "common/js/components/views/feedback_notification", "js/views/paging_header", "common/js/components/views/paging_footer"],
     function ($, _, ViewUtils, ContainerView, ModuleUtils, gettext, NotificationView, PagingHeader, PagingFooter) {
         var PagedContainerView = ContainerView.extend({
-            initialize: function(options){
+
+            initialize: function(options) {
                 var self = this;
                 ContainerView.prototype.initialize.call(this);
                 this.page_size = this.options.page_size;
@@ -52,6 +53,22 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
 
                     hasNextPage: function () {
                         return self.collection.currentPage < self.collection.totalPages - 1;
+                    },
+
+                    getTotalPages: function () {
+                        return this.totalPages;
+                    },
+
+                    getPageNumber: function () {
+                        return this.getPage();
+                    },
+
+                    getTotalRecords: function () {
+                        return this.totalCount;
+                    },
+
+                    getPageSize: function () {
+                        return self.page_size;
                     }
                 };
             },
@@ -66,11 +83,12 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 return this.renderPage(options);
             },
 
-            renderPage: function(options){
+            renderPage: function(options) {
                 var self = this,
                     view = this.view,
                     xblockInfo = this.model,
                     xblockUrl = xblockInfo.url();
+
                 return $.ajax({
                     url: decodeURIComponent(xblockUrl) + "/" + view,
                     type: 'GET',
@@ -101,8 +119,10 @@ define(["jquery", "underscore", "common/js/components/utils/view_utils", "js/vie
                 };
             },
 
-            getPageCount: function(total_count){
-                if (total_count===0) return 1;
+            getPageCount: function(total_count) {
+                if (total_count === 0) {
+                    return 1;
+                }
                 return Math.ceil(total_count / this.page_size);
             },
 

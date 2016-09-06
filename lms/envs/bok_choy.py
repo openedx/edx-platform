@@ -61,13 +61,12 @@ STATIC_URL = "/static/"
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
 )
-STATICFILES_DIRS = (
+STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "lms").abspath(),
-)
+]
 
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
-MEDIA_URL = "/static/uploads/"
 
 # Don't use compression during tests
 PIPELINE_JS_COMPRESSOR = None
@@ -91,6 +90,8 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
+NOTES_DISABLED_TABS = []
+
 # Silence noisy logs
 import logging
 LOG_OVERRIDES = [
@@ -104,6 +105,9 @@ for log_name, log_level in LOG_OVERRIDES:
 
 # Enable milestones app
 FEATURES['MILESTONES_APP'] = True
+
+# Enable oauth authentication, which we test.
+FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 
 # Enable pre-requisite course
 FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
@@ -157,6 +161,12 @@ FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Enable dashboard search for tests
 FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 
+# Enable support for OpenBadges accomplishments
+FEATURES['ENABLE_OPENBADGES'] = True
+
+# Enable time zone field in account settings. Will be removed in Ticket #TNL-4750.
+FEATURES['ENABLE_TIME_ZONE_PREFERENCE'] = True
+
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 # Path at which to store the mock index
@@ -164,9 +174,8 @@ MOCK_SEARCH_BACKING_FILE = (
     TEST_ROOT / "index_file.dat"
 ).abspath()
 
-# Generate a random UUID so that different runs of acceptance tests don't break each other
-import uuid
-SECRET_KEY = uuid.uuid4().hex
+# this secret key should be the same as cms/envs/bok_choy.py's
+SECRET_KEY = "very_secret_bok_choy_key"
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {
@@ -176,6 +185,17 @@ PROFILE_IMAGE_BACKEND = {
         'base_url': os.path.join(MEDIA_URL, 'profile-images/'),
     },
 }
+
+# Make sure we test with the extended history table
+FEATURES['ENABLE_CSMH_EXTENDED'] = True
+INSTALLED_APPS += ('coursewarehistoryextended',)
+
+BADGING_BACKEND = 'lms.djangoapps.badges.backends.tests.dummy_backend.DummyBackend'
+
+# Configure the LMS to use our stub eCommerce implementation
+ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
+ECOMMERCE_API_SIGNING_KEY = 'ecommerce-key'
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

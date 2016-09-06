@@ -1,0 +1,172 @@
+// lms alerts
+// This file contains "I want alerts that look like the pattern library" sass
+// and should be replaced when moving to the patter library proper
+// https://github.com/edx/ux-pattern-library/blob/master/pattern-library/sass/patterns/_alerts.scss
+
+// ------------------------------
+// edX Pattern Library: Utilities - Alerts
+//
+// About: Contains base styling for alerts.
+// ----------------------------
+
+// #CONFIG
+// #UTILITIES
+// #GENERAL
+// #INDIVIDUAL CASES
+
+
+// ----------------------------
+// #CONFIG
+// ----------------------------
+
+// alert colors
+$alert-information-color: #6fa0ba;
+$alert-warning-color: #fdbc56;
+$alert-error-color: #b20610;
+$alert-success-color: #25b85a;
+$alert-background-color: #fcfcfc;
+$alert-icon-color: #fcfcfc;
+$alert-border-grey: #cdd7db;
+$alert-shadow-grey: #eef1f2;
+
+// alert borders
+$alert-border-radius: 0.3125rem;
+$alert-border: 0.0625rem solid $alert-border-grey;
+
+// ----------------------------
+// #UTILITIES
+// ----------------------------
+@mixin alert($alert-color) {
+    border-top:  rem(2) solid $alert-color;
+
+    .alert-icon {
+        color: $alert-icon-color;
+        background-color: $alert-color;
+    }
+}
+
+@mixin alert-message($width) {
+    @include float(left);
+    width: $width;
+    padding: 1.25rem;
+    padding-top: 0;
+    padding-bottom: 0;
+
+    :last-child {
+        // keeps the message compact
+        margin-bottom: 0;
+    }
+}
+
+// everything below here gets added specificity pattern-library-shim
+.pattern-library-shim {
+
+    // ----------------------------
+    // #GENERAL
+    // ----------------------------
+
+    &.alert {
+        background-color: $alert-background-color;
+        border: $alert-border;
+        border-radius: $alert-border-radius;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        padding: 1.25rem;
+        overflow: auto;
+        box-shadow: 0 rem(2) rem(2) 0 $alert-shadow-grey;
+    }
+
+    &.alert-icon {
+        @include float(left);
+        display: block;
+
+        // create a circle around the icon
+        border-radius: 50%;
+
+        // create room around the icon for the circle
+        padding: 0.625rem;
+    }
+
+    &.alert-message-with-action {
+        // provide room for the action to be displayed next to the alert message
+        @include alert-message(70%);
+    }
+
+    &.alert-message {
+        @include alert-message(90%);
+    }
+
+    &.alert-title {
+        @extend %hd-5;
+        @extend %headings-emphasized;
+
+        // shift the section up to make the alert more compact
+        margin-top: -0.625rem;
+
+    }
+
+    &.alert-copy {
+        @extend %copy-base;
+
+        // shift the message down to be in line with the icon
+        margin-top: 0.3125rem;
+    }
+
+    &.alert-copy-with-title {
+        @extend %copy-base;
+    }
+
+    &.alert-action {
+        @include float(right);
+        width: inherit;
+    }
+
+    // ----------------------------
+    // #INDIVIDUAL CASES
+    // ----------------------------
+
+    // information-based alert
+    &.alert-information {
+        @include alert($alert-information-color);
+    }
+
+    // warning-based alert
+    &.alert-warning {
+        @include alert($alert-warning-color);
+    }
+
+    // error-based alert
+    &.alert-error {
+        @include alert($alert-error-color);
+    }
+
+    // success-based alert
+    &.alert-success {
+        @include alert($alert-success-color);
+    }
+
+    // added from _icons.scss
+    &.icon {
+        display: inline-block;
+        height: auto;
+        width: auto;
+        font-family: FontAwesome;
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    &.icon-bullhorn:before {
+        content: "\f0a1";
+    }
+
+    // handles negative margin on navigation bar
+    &.subsection-header {
+        margin-top: -4px;
+        margin-bottom: 14px;
+    }
+}

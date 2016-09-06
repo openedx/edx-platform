@@ -1,4 +1,4 @@
-define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+define(['backbone', 'URI', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'teams/js/spec_helpers/team_spec_helpers'],
     function (Backbone, URI, _, AjaxHelpers, TeamSpecHelpers) {
         'use strict';
@@ -20,8 +20,9 @@ define(['backbone', 'URI', 'underscore', 'common/js/spec_helpers/ajax_helpers',
                 expect(params[param]).toBe(value);
             };
 
-            it('sets its perPage based on initial page size', function () {
-                expect(topicCollection.perPage).toBe(5);
+            it('sets its page size based on initial page size', function () {
+                expect(topicCollection.getPageSize()).toBe(5);
+                expect(topicCollection.getTotalPages()).toBe(2);
             });
 
             it('sorts by name', function () {

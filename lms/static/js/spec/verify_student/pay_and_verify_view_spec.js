@@ -68,6 +68,7 @@ define(['jquery', 'common/js/spec_helpers/template_helpers', 'js/verify_student/
 
             beforeEach(function() {
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
+                navigator.getUserMedia = jasmine.createSpy();
 
                 setFixtures('<div id="pay-and-verify-container"></div>');
                 $.each( TEMPLATES, function( index, templateName ) {

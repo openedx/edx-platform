@@ -1,5 +1,5 @@
 $sequence--border-color: #C8C8C8;
-
+$link-color: rgb(26, 161, 222) !default;
 // repeated extends - needed since LMS styling was referenced
 .block-link {
   border-left: 1px solid lighten($sequence--border-color, 10%);
@@ -30,13 +30,30 @@ $sequence--border-color: #C8C8C8;
   }
 }
 
+%ui-clear-button  {
+  background-color: rgba(0,0,0,0);
+  background-image: none;
+  background-position: center 14px;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 0;
+
+  background-clip: border-box;
+  box-shadow: none;
+  box-sizing: content-box;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+
 // ====================
 
 .sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  margin: -4px 0 ($baseline*1.5);
+  margin: -4px 0 $baseline;
   position: relative;
   border-bottom: none;
   z-index: 0;
@@ -90,7 +107,7 @@ $sequence--border-color: #C8C8C8;
     padding: 0 ($baseline/2);
     width: 100%;
 
-    a {
+    button {
       @extend .block-link;
     }
 
@@ -98,15 +115,14 @@ $sequence--border-color: #C8C8C8;
       display: table-cell;
       min-width: 20px;
 
-      a {
+      button {
         @extend %ui-fake-link;
+        @extend %ui-clear-button;
         @include transition(none);
         width: 100%;
         height: 42px;
         margin: 0;
-        background-position: center 14px;
-        background-repeat: no-repeat;
-        border: 1px solid transparent;
+
         display: block;
         padding: 0;
         position: relative;
@@ -117,6 +133,10 @@ $sequence--border-color: #C8C8C8;
           font-size: 90%;  // The icons at 100% are just a tad too big.
           color: rgb(90, 90, 90);
           -webkit-font-smoothing: antialiased; // Clear up the lines on the icons
+        }
+
+        i.fa-bookmark {
+          color: $link-color;
         }
 
         &.inactive {
@@ -141,6 +161,10 @@ $sequence--border-color: #C8C8C8;
 
             .icon {
               color: rgb(10, 10, 10);
+            }
+
+            i.fa-bookmark {
+              color: $link-color;
             }
           }
         }
@@ -187,21 +211,20 @@ $sequence--border-color: #C8C8C8;
           }
         }
 
-        p {
+        .sequence-tooltip {
           @extend %ui-depth2;
+          margin-top: ($baseline/5);
           background: #333;
           color: $white;
           font-family: $sans-serif;
           line-height: lh();
           right: 0;
-          opacity: 0.0;
           padding: 6px;
           position: absolute;
           top: 48px;
           text-shadow: 0 -1px 0 $black;
-          @include transition(all .1s $ease-in-out-quart 0s);
+          @include text-align(left);
           white-space: pre;
-          visibility: hidden;
           pointer-events: none;
 
           &:empty {
@@ -224,20 +247,11 @@ $sequence--border-color: #C8C8C8;
             width: 10px;
           }
         }
-
-        &:hover, &:focus {
-          p {
-            display: block;
-            margin-top: ($baseline/5);
-            opacity: 1.0;
-            visibility: visible;
-          }
-        }
       }
     }
   }
 
-  body.touch-based-device & ol li a:hover p {
+  body.touch-based-device & ol li button:hover p {
     display: none;
   }
 }
@@ -295,3 +309,4 @@ nav.sequence-bottom {
     outline: none;
   }
 }
+

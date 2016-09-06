@@ -6,69 +6,115 @@
     ],
     function($) {
 
-        describe("edx.dashboard.TrackEvents", function() {
-
+        describe('edx.dashboard.trackEvents', function() {
             beforeEach(function() {
                 // Stub the analytics event tracker
                 window.analytics = jasmine.createSpyObj('analytics', ['track', 'page', 'trackLink']);
                 loadFixtures('js/fixtures/dashboard/dashboard.html');
-                window.edx.dashboard.TrackEvents();
             });
 
-            it("sends an analytics event when the user clicks course title link", function() {
-                // Verify that analytics events fire when the "course title link" is clicked.
+            it('sends an analytics event when the user clicks course title link', function() {
+                var $courseTitle = $('.course-title > a');
+                window.edx.dashboard.trackCourseTitleClicked(
+                    $courseTitle,
+                    window.edx.dashboard.generateTrackProperties);
+                // Verify that analytics events fire when the 'course title link' is clicked.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
-                    $(".course-title > a"),
-                    "edx.bi.dashboard.course_title.clicked",
+                    $courseTitle,
+                    'edx.bi.dashboard.course_title.clicked',
                      window.edx.dashboard.generateTrackProperties
                 );
             });
 
-            it("sends an analytics event when the user clicks course image link", function() {
-                // Verify that analytics events fire when the "course image link" is clicked.
+            it('sends an analytics event when the user clicks course image link', function() {
+                var $courseImage = $('.cover');
+                window.edx.dashboard.trackCourseImageLinkClicked(
+                    $courseImage,
+                    window.edx.dashboard.generateTrackProperties);
+                // Verify that analytics events fire when the 'course image link' is clicked.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
-                    $(".cover"),
-                    "edx.bi.dashboard.course_image.clicked",
+                    $courseImage,
+                    'edx.bi.dashboard.course_image.clicked',
                     window.edx.dashboard.generateTrackProperties
                 );
             });
 
 
-            it("sends an analytics event when the user clicks enter course link", function() {
-                // Verify that analytics events fire when the "enter course link" is clicked.
+            it('sends an analytics event when the user clicks enter course link', function() {
+                var $enterCourse = $('.enter-course');
+                window.edx.dashboard.trackEnterCourseLinkClicked(
+                    $enterCourse,
+                    window.edx.dashboard.generateTrackProperties);
+                // Verify that analytics events fire when the 'enter course link' is clicked.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
-                    $(".enter-course"),
-                    "edx.bi.dashboard.enter_course.clicked",
+                    $enterCourse,
+                    'edx.bi.dashboard.enter_course.clicked',
                     window.edx.dashboard.generateTrackProperties
                 );
             });
 
-            it("sends an analytics event when the user clicks enter course link", function() {
+            it('sends an analytics event when the user clicks enter course link', function() {
+                var $dropDown = $('.wrapper-action-more');
+                window.edx.dashboard.trackCourseOptionDropdownClicked(
+                    $dropDown,
+                    window.edx.dashboard.generateTrackProperties);
                 // Verify that analytics events fire when the options dropdown is engaged.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
-                    $(".wrapper-action-more"),
-                    "edx.bi.dashboard.course_options_dropdown.clicked",
+                    $dropDown,
+                    'edx.bi.dashboard.course_options_dropdown.clicked',
                     window.edx.dashboard.generateTrackProperties
                 );
             });
 
-            it("sends an analytics event when the user clicks the learned about verified track link", function() {
-                //Verify that analytics events fire when the "Learned about verified track" link is clicked.
+            it('sends an analytics event when the user clicks the learned about verified track link', function() {
+                var $learnVerified = $('.verified-info');
+                window.edx.dashboard.trackLearnVerifiedLinkClicked(
+                    $learnVerified,
+                    window.edx.dashboard.generateTrackProperties);
+                //Verify that analytics events fire when the 'Learned about verified track' link is clicked.
                 expect(window.analytics.trackLink).toHaveBeenCalledWith(
-                    $(".verified-info"),
-                    "edx.bi.dashboard.verified_info_link.clicked",
+                    $learnVerified,
+                    'edx.bi.dashboard.verified_info_link.clicked',
                     window.edx.dashboard.generateTrackProperties
                 );
             });
 
-            it("sends an analytics event when the user clicks find courses button", function() {
-                // Verify that analytics events fire when the "user clicks find the course" button.
-                expect(window.analytics.trackLink).toHaveBeenCalledWith(
-                    $(".btn-find-courses"),
-                    "edx.bi.dashboard.find_courses_button.clicked",
-                    {
-                        category: "dashboard",
+            it('sends an analytics event when the user clicks find courses button', function() {
+                var $findCourse = $('.btn-find-courses'),
+                    property = {
+                        category: 'dashboard',
                         label: null
+                    };
+                window.edx.dashboard.trackFindCourseBtnClicked($findCourse, property);
+                // Verify that analytics events fire when the 'user clicks find the course' button.
+                expect(window.analytics.trackLink).toHaveBeenCalledWith(
+                    $findCourse,
+                    'edx.bi.dashboard.find_courses_button.clicked',
+                    property
+                );
+            });
+
+            it('sends an analytics event when the user clicks the \'View XSeries Details\' button', function() {
+                var $xseries = $('.xseries-action .btn');
+                window.edx.dashboard.trackXseriesBtnClicked(
+                    $xseries,
+                    window.edx.dashboard.generateProgramProperties);
+
+                expect(window.analytics.trackLink).toHaveBeenCalledWith(
+                    $xseries,
+                    'edx.bi.dashboard.xseries_cta_message.clicked',
+                    window.edx.dashboard.generateProgramProperties
+                );
+            });
+
+            it('sends an analytics event when xseries messages are present in the DOM on page load', function() {
+                window.edx.dashboard.xseriesTrackMessages();
+                expect(window.analytics.track).toHaveBeenCalledWith(
+                    'edx.bi.dashboard.xseries_cta_message.viewed',
+                    {
+                        category: 'dashboard',
+                        course_id: 'CTB3365DWx',
+                        program_id: 'xseries007'
                     }
                 );
             });

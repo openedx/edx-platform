@@ -3,20 +3,29 @@
 
 import json
 import ddt
-import mock
 from uuid import uuid4
 from nose.plugins.attrib import attr
 from mock import patch
+from urllib import urlencode
+from collections import OrderedDict
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
 
+from course_modes.models import CourseMode
+from lms.djangoapps.badges.events.course_complete import get_completion_badge
+from lms.djangoapps.badges.tests.factories import (
+    BadgeAssertionFactory,
+    CourseCompleteImageConfigurationFactory,
+    BadgeClassFactory,
+)
 from openedx.core.lib.tests.assertions.events import assert_event_matches
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
 from track.tests import EventTrackingTestCase
+from util import organizations_helpers as organizations_api
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -26,21 +35,20 @@ from certificates.models import (
     CertificateStatuses,
     CertificateSocialNetworks,
     CertificateTemplate,
-    CertificateHtmlViewConfiguration
+    CertificateHtmlViewConfiguration,
+    CertificateTemplateAsset,
 )
 
 from certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     LinkedInAddToProfileConfigurationFactory,
-    BadgeAssertionFactory,
     GeneratedCertificateFactory,
 )
-from util import organizations_helpers as organizations_api
-from django.test.client import RequestFactory
-import urllib
 
 FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
+FEATURES_WITH_BADGES_ENABLED = FEATURES_WITH_CERTS_ENABLED.copy()
+FEATURES_WITH_BADGES_ENABLED['ENABLE_OPENBADGES'] = True
 
 FEATURES_WITH_CERTS_DISABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_DISABLED['CERTIFICATES_HTML_VIEW'] = False
@@ -58,14 +66,12 @@ def _fake_is_request_in_microsite():
     return True
 
 
-@attr('shard_1')
-@ddt.ddt
-class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
+class CommonCertificatesTestCase(ModuleStoreTestCase):
     """
-    Tests for the certificates web/html views
+    Common setUp and utility methods for Certificate tests
     """
     def setUp(self):
-        super(CertificatesViewsTests, self).setUp()
+        super(CommonCertificatesTestCase, self).setUp()
         self.client = Client()
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='refundable course'
@@ -80,6 +86,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
         self.request = RequestFactory().request()
+        self.linkedin_url = 'http://www.linkedin.com/profile/add?{params}'
 
         self.cert = GeneratedCertificateFactory.create(
             user=self.user,
@@ -95,10 +102,12 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         CourseEnrollmentFactory.create(
             user=self.user,
-            course_id=self.course_id
+            course_id=self.course_id,
+            mode=CourseMode.HONOR,
         )
         CertificateHtmlViewConfigurationFactory.create()
         LinkedInAddToProfileConfigurationFactory.create()
+        CourseCompleteImageConfigurationFactory.create()
 
     def _add_course_certificates(self, count=1, signatory_count=0, is_active=True):
         """
@@ -138,6 +147,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         Creates a custom certificate template entry in DB.
         """
         template_html = """
+            <%namespace name='static' file='static_content.html'/>
             <html>
             <body>
                 lang: ${LANGUAGE_CODE}
@@ -145,6 +155,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 mode: ${course_mode}
                 ${accomplishment_copy_course_description}
                 ${twitter_url}
+                <img class="custom-logo" src="${static.certificate_asset_url('custom-logo')}" />
             </body>
             </html>
         """
@@ -158,6 +169,14 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         template.save()
 
+
+@attr('shard_1')
+@ddt.ddt
+class CertificatesViewsTests(CommonCertificatesTestCase):
+    """
+    Tests for the certificates web/html views
+    """
+
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_linkedin_share_url(self):
         """
@@ -167,20 +186,129 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         test_url = get_certificate_url(course_id=self.course.id, uuid=self.cert.verify_uuid)
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(urllib.quote_plus(self.request.build_absolute_uri(test_url)), response.content)
+        params = OrderedDict([
+            ('_ed', '0_0dPSPyS070e0HsE9HNz_13_d11_',),
+            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
+                platform_name=settings.PLATFORM_NAME,
+                course_name=self.course.display_name,
+            ),),
+            ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),
+        ])
+        self.assertIn(
+            self.linkedin_url.format(params=urlencode(params)),
+            response.content
+        )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    @mock.patch("microsite_configuration.microsite.is_request_in_microsite", _fake_is_request_in_microsite)
     def test_linkedin_share_microsites(self):
         """
-        Test: LinkedIn share URL should not be visible when called from within a microsite (for now)
+        Test: LinkedIn share URL should be visible when called from within a microsite.
         """
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
         test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
-        response = self.client.get(test_url)
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertEqual(response.status_code, 200)
-        # the URL should not be present
-        self.assertNotIn(urllib.quote_plus(self.request.build_absolute_uri(test_url)), response.content)
+        # the linkedIn share URL with appropriate parameters should be present
+        params = OrderedDict([
+            ('_ed', settings.MICROSITE_CONFIGURATION['test_site']['LINKEDIN_COMPANY_ID'],),
+            ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
+                platform_name=settings.MICROSITE_CONFIGURATION['test_site']['platform_name'],
+                course_name=self.course.display_name,
+            ),),
+            ('pfCertificationUrl', 'http://' + settings.MICROSITE_TEST_HOSTNAME + test_url,),
+        ])
+        self.assertIn(
+            self.linkedin_url.format(params=urlencode(params)),
+            response.content
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {"CERTIFICATE_FACEBOOK": True})
+    def test_facebook_share_microsites(self):
+        """
+        Test: Facebook share URL should be visible when web cert called from within a white label
+        site and it should use white label site's FACEBOOK_APP_ID.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Post on Facebook", response.content)
+        self.assertIn(settings.MICROSITE_CONFIGURATION['test_site']['FACEBOOK_APP_ID'], response.content)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @ddt.data(
+        (False, False, False),
+        (False, False, True),
+        (False, True, True),
+        (True, True, True),
+        (True, True, False),
+    )
+    @ddt.unpack
+    def test_social_sharing_availablity_microsites(self, facebook_sharing, twitter_sharing, linkedin_sharing):
+        """
+        Test: Facebook, Twitter and LinkedIn sharing availability for microsites.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        social_sharing_settings = dict(
+            CERTIFICATE_FACEBOOK=facebook_sharing,
+            CERTIFICATE_TWITTER=twitter_sharing,
+            CERTIFICATE_LINKEDIN=linkedin_sharing,
+        )
+        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
+            "test_site": dict(
+                settings.MICROSITE_CONFIGURATION['test_site'],
+                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
+            )
+        }):
+            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual("Post on Facebook" in response.content, facebook_sharing)
+            self.assertEqual("Share on Twitter" in response.content, twitter_sharing)
+            self.assertEqual("Add to LinkedIn Profile" in response.content, linkedin_sharing)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_facebook_default_text_microsites(self):
+        """
+        Test: Facebook sharing default text for microsites.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        facebook_text = "Facebook text on Test Site"
+        social_sharing_settings = dict(
+            CERTIFICATE_FACEBOOK=True,
+            CERTIFICATE_FACEBOOK_TEXT=facebook_text,
+        )
+        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
+            "test_site": dict(
+                settings.MICROSITE_CONFIGURATION['test_site'],
+                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
+            )
+        }):
+            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertContains(response, facebook_text)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_twitter_default_text_microsites(self):
+        """
+        Test: Twitter sharing default text for microsites.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        twitter_text = "Twitter text on Test Site"
+        social_sharing_settings = dict(
+            CERTIFICATE_TWITTER=True,
+            CERTIFICATE_TWITTER_TEXT=twitter_text,
+        )
+        with patch("django.conf.settings.MICROSITE_CONFIGURATION", {
+            "test_site": dict(
+                settings.MICROSITE_CONFIGURATION['test_site'],
+                SOCIAL_SHARING_SETTINGS=social_sharing_settings,
+            )
+        }):
+            response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+            self.assertContains(response, twitter_text)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_rendering_course_organization_data(self):
@@ -216,10 +344,45 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         self.assertIn('logo_test1.png', response.content)
 
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @ddt.data(True, False)
+    @patch('certificates.views.webview.get_completion_badge')
+    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
+    def test_fetch_badge_info(self, issue_badges, mock_get_completion_badge):
+        """
+        Test: Fetch badge class info if badges are enabled.
+        """
+        badge_class = BadgeClassFactory(course_id=self.course_id, mode=self.cert.mode)
+        mock_get_completion_badge.return_value = badge_class
+
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        test_url = get_certificate_url(course_id=self.cert.course_id, uuid=self.cert.verify_uuid)
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+
+        if issue_badges:
+            mock_get_completion_badge.assertCalled()
+        else:
+            mock_get_completion_badge.assertNotCalled()
+
+    @override_settings(FEATURES=FEATURES_WITH_BADGES_ENABLED)
     @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
         "CERTIFICATE_TWITTER": True,
         "CERTIFICATE_FACEBOOK": True,
+    })
+    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
+        "test_site": dict(
+            settings.MICROSITE_CONFIGURATION['test_site'],
+            urls=dict(
+                ABOUT=None,
+                PRIVACY=None,
+                TOS_AND_HONOR=None,
+            ),
+        )
+    })
+    @patch.dict("django.conf.settings.MKTG_URL_LINK_MAP", {
+        'ABOUT': None,
+        'PRIVACY': None,
+        'TOS_AND_HONOR': None,
     })
     def test_rendering_maximum_data(self):
         """
@@ -238,8 +401,9 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         test_org = organizations_api.add_organization(organization_data=test_organization_data)
         organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
         self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        badge_class = get_completion_badge(course_id=self.course_id, user=self.user)
         BadgeAssertionFactory.create(
-            user=self.user, course_id=self.course_id,
+            user=self.user, badge_class=badge_class,
         )
         self.course.cert_html_view_overrides = {
             "logo_src": "/static/certificates/images/course_override_logo.png"
@@ -265,7 +429,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         # Test an item from html cert configuration
         self.assertIn(
-            '<a class="logo" href="http://www.edx.org/honor_logo.png">',
+            '<a class="logo" href="http://test_site.localhost">',
             response.content
         )
         # Test an item from course info
@@ -275,7 +439,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         # Test an item from user info
         self.assertIn(
-            "{fullname}, you've earned a certificate!".format(fullname=self.user.profile.name),
+            "{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
             response.content
         )
         # Test an item from social info
@@ -290,11 +454,10 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         # Test an item from certificate/org info
         self.assertIn(
             "a course of study offered by {partner_short_name}, "
-            "an online learning initiative of {partner_long_name} "
-            "through {platform_name}.".format(
+            "an online learning initiative of "
+            "{partner_long_name}.".format(
                 partner_short_name=short_org_name,
                 partner_long_name=long_org_name,
-                platform_name='Test Microsite'
             ),
             response.content
         )
@@ -305,7 +468,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         # Test item from microsite info
         self.assertIn(
-            "http://www.testmicrosite.org/about-us",
+            "http://www.test-site.org/about-us",
             response.content
         )
         # Test course overrides
@@ -359,6 +522,38 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertIn("Invalid Certificate", response.content)
         self.assertIn("Cannot Find Certificate", response.content)
         self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+
+    @ddt.data(
+        (CertificateStatuses.downloadable, True),
+        (CertificateStatuses.audit_passing, False),
+        (CertificateStatuses.audit_notpassing, False),
+    )
+    @ddt.unpack
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_audit_certificate_display(self, status, eligible_for_certificate):
+        """
+        Ensure that audit-mode certs are only shown in the web view if they
+        are eligible for a certificate.
+        """
+        # Convert the cert to audit, with the specified eligibility
+        self.cert.mode = 'audit'
+        self.cert.status = status
+        self.cert.save()
+
+        self._add_course_certificates(count=1, signatory_count=2)
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+
+        if eligible_for_certificate:
+            self.assertIn(str(self.cert.verify_uuid), response.content)
+        else:
+            self.assertIn("Invalid Certificate", response.content)
+            self.assertIn("Cannot Find Certificate", response.content)
+            self.assertIn("We cannot find a certificate with this URL or ID number.", response.content)
+            self.assertNotIn(str(self.cert.verify_uuid), response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_html_view_for_invalid_certificate(self):
@@ -508,6 +703,16 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertIn('invalid', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_render_html_view_non_int_user(self):
+        self._add_course_certificates(count=1, signatory_count=0)
+        test_url = get_certificate_url(
+            user_id="Good tests make good neighbors",
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 404)
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_invalid_user_certificate(self):
         self._add_course_certificates(count=1, signatory_count=0)
         test_url = get_certificate_url(
@@ -515,7 +720,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             course_id=unicode(self.course.id)
         )
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
+        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
 
         response = self.client.get(test_url)
         self.assertIn('invalid', response.content)
@@ -538,7 +743,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         preview mode. Either the certificate is marked active or not.
         """
         self.cert.delete()
-        self.assertEqual(len(GeneratedCertificate.objects.all()), 0)
+        self.assertEqual(len(GeneratedCertificate.eligible_certificates.all()), 0)
         self._add_course_certificates(count=1, signatory_count=2)
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -612,62 +817,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         # Verify that Exception is raised when certificate is not in the preview mode
         with self.assertRaises(Exception):
             self.client.get(test_url)
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_certificate_evidence_event_emitted(self):
-        self.client.logout()
-        self._add_course_certificates(count=1, signatory_count=2)
-        self.recreate_tracker()
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 200)
-        actual_event = self.get_event()
-        self.assertEqual(actual_event['name'], 'edx.certificate.evidence_visited')
-        assert_event_matches(
-            {
-                'user_id': self.user.id,
-                'certificate_id': unicode(self.cert.verify_uuid),
-                'enrollment_mode': self.cert.mode,
-                'certificate_url': test_url,
-                'course_id': unicode(self.course.id),
-                'social_network': CertificateSocialNetworks.linkedin
-            },
-            actual_event['data']
-        )
-
-    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
-    def test_evidence_event_sent(self):
-        self._add_course_certificates(count=1, signatory_count=2)
-
-        cert_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=self.course_id
-        )
-        test_url = '{}?evidence_visit=1'.format(cert_url)
-        self.recreate_tracker()
-        assertion = BadgeAssertionFactory.create(
-            user=self.user, course_id=self.course_id,
-        )
-        response = self.client.get(test_url)
-        self.assertEqual(response.status_code, 200)
-        assert_event_matches(
-            {
-                'name': 'edx.badge.assertion.evidence_visited',
-                'data': {
-                    'course_id': 'testorg/run1/refundable_course',
-                    'assertion_id': assertion.id,
-                    'assertion_json_url': 'http://www.example.com/assertion.json',
-                    'assertion_image_url': 'http://www.example.com/image.png',
-                    'user_id': self.user.id,
-                    'issuer': 'http://www.example.com/issuer.json',
-                    'enrollment_mode': 'honor',
-                },
-            },
-            self.get_event()
-        )
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_DISABLED)
     def test_request_certificate_without_passing(self):
@@ -824,3 +973,246 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                         else:
                             self.assertContains(response, "Tweet this Accomplishment")
                         self.assertContains(response, 'https://twitter.com/intent/tweet')
+
+    @override_settings(FEATURES=FEATURES_WITH_CUSTOM_CERTS_ENABLED)
+    def test_certificate_asset_by_slug(self):
+        """
+        Tests certificate template asset display by slug using static.certificate_asset_url method.
+        """
+        self._add_course_certificates(count=1, signatory_count=2)
+        self._create_custom_template(mode='honor')
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+
+        # render certificate without template asset
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.return_value = []
+            response = self.client.get(test_url)
+            self.assertContains(response, '<img class="custom-logo" src="" />')
+
+        template_asset = CertificateTemplateAsset(
+            description='custom logo',
+            asset='certificate_template_assets/32/test_logo.png',
+            asset_slug='custom-logo',
+        )
+        template_asset.save()
+
+        # render certificate with template asset
+        with patch('certificates.api.get_course_organizations') as mock_get_orgs:
+            mock_get_orgs.return_value = []
+            response = self.client.get(test_url)
+            self.assertContains(
+                response, '<img class="custom-logo" src="{}certificate_template_assets/32/test_logo.png" />'.format(
+                    settings.MEDIA_URL
+                )
+            )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_certificate_branding(self):
+        """
+        Test that link urls in certificate web view are customized according to site branding and
+        microsite configuration.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        # logo_image_url Tis present in MICROSITE_CONFIGURATION['test_site']["urls"],
+        #  so web certificate will use that.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_site']['logo_image_url'],
+        )
+        # ABOUT is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['ABOUT'],
+        )
+        # PRIVACY is present in MICROSITE_CONFIGURATION['test_site']["urls"] so web certificate will use that url.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['PRIVACY'],
+        )
+        # TOS_AND_HONOR is present in MICROSITE_CONFIGURATION['test_site']["urls"],
+        #  so web certificate will use that url.
+        self.assertContains(
+            response,
+            settings.MICROSITE_CONFIGURATION['test_site']["urls"]['TOS_AND_HONOR'],
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
+        "test_site": dict(
+            settings.MICROSITE_CONFIGURATION['test_site'],
+            urls=dict(
+                ABOUT=None,
+                PRIVACY=None,
+                TOS_AND_HONOR=None,
+            ),
+        )
+    })
+    def test_certificate_branding_without_microsite_urls(self):
+        """
+        Test that links from MKTG_URL_LINK_MAP setting are used if corresponding microsite urls are not present.
+        microsite configuration.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        configuration = CertificateHtmlViewConfiguration.get_config()
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+        # ABOUT is not present in MICROSITE_CONFIGURATION['test_site']["urls"],
+        #  so web certificate will use MKTG_URL_LINK_MAP['ABOUT'] url.
+        self.assertContains(
+            response,
+            settings.MKTG_URL_LINK_MAP['ABOUT'],
+        )
+        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_site']["urls"],
+        # so web certificate will use MKTG_URL_LINK_MAP['PRIVACY'] url.
+        self.assertContains(
+            response,
+            settings.MKTG_URL_LINK_MAP['PRIVACY'],
+        )
+        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
+        # so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['test-site']['company_tos_url'],
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict("django.conf.settings.MICROSITE_CONFIGURATION", {
+        "test_site": dict(
+            settings.MICROSITE_CONFIGURATION['test_site'],
+            urls=dict(
+                ABOUT=None,
+                PRIVACY=None,
+                TOS_AND_HONOR=None,
+            ),
+        )
+    })
+    @patch.dict("django.conf.settings.MKTG_URL_LINK_MAP", {
+        'ABOUT': None,
+        'PRIVACY': None,
+        'TOS_AND_HONOR': None,
+    })
+    def test_certificate_without_branding_urls(self):
+        """
+        Test that links from CertificateHtmlViewConfiguration are used if
+        corresponding microsite or marketing urls are not present.
+        """
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+        configuration = CertificateHtmlViewConfiguration.get_config()
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+
+        # ABOUT is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
+        #  so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['test-site']['company_about_url'],
+        )
+        # PRIVACY is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
+        # so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['test-site']['company_privacy_url'],
+        )
+        # TOS_AND_HONOR is not present in MICROSITE_CONFIGURATION['test_site']["urls"] or MKTG_URL_LINK_MAP,
+        # so web certificate will use CertificateHtmlViewConfiguration url.
+        self.assertContains(
+            response,
+            configuration['microsites']['test-site']['company_tos_url'],
+        )
+
+
+@attr('shard_1')
+class CertificateEventTests(CommonCertificatesTestCase, EventTrackingTestCase):
+    """
+    Test events emitted by certificate handling.
+    """
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_certificate_evidence_event_emitted(self):
+        self.client.logout()
+        self._add_course_certificates(count=1, signatory_count=2)
+        self.recreate_tracker()
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        actual_event = self.get_event()
+        self.assertEqual(actual_event['name'], 'edx.certificate.evidence_visited')
+        assert_event_matches(
+            {
+                'user_id': self.user.id,
+                'certificate_id': unicode(self.cert.verify_uuid),
+                'enrollment_mode': self.cert.mode,
+                'certificate_url': test_url,
+                'course_id': unicode(self.course.id),
+                'social_network': CertificateSocialNetworks.linkedin
+            },
+            actual_event['data']
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    def test_evidence_event_sent(self):
+        self._add_course_certificates(count=1, signatory_count=2)
+
+        cert_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=self.course_id
+        )
+        test_url = '{}?evidence_visit=1'.format(cert_url)
+        self.recreate_tracker()
+        badge_class = get_completion_badge(self.course_id, self.user)
+        assertion = BadgeAssertionFactory.create(
+            user=self.user, badge_class=badge_class,
+            backend='DummyBackend',
+            image_url='http://www.example.com/image.png',
+            assertion_url='http://www.example.com/assertion.json',
+            data={
+                'issuer': 'http://www.example.com/issuer.json',
+            }
+        )
+        response = self.client.get(test_url)
+        self.assertEqual(response.status_code, 200)
+        assert_event_matches(
+            {
+                'name': 'edx.badge.assertion.evidence_visited',
+                'data': {
+                    'course_id': 'testorg/run1/refundable_course',
+                    'assertion_id': assertion.id,
+                    'badge_generator': u'DummyBackend',
+                    'badge_name': u'refundable course',
+                    'issuing_component': u'',
+                    'badge_slug': u'testorgrun1refundable_course_honor_432f164',
+                    'assertion_json_url': 'http://www.example.com/assertion.json',
+                    'assertion_image_url': 'http://www.example.com/image.png',
+                    'user_id': self.user.id,
+                    'issuer': 'http://www.example.com/issuer.json',
+                    'enrollment_mode': 'honor',
+                },
+            },
+            self.get_event()
+        )

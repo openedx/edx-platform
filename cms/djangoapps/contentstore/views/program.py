@@ -1,4 +1,5 @@
 """Programs views for use with Studio."""
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import Http404, JsonResponse
@@ -27,6 +28,7 @@ class ProgramAuthoringView(View):
             return render_to_response('program_authoring.html', {
                 'show_programs_header': programs_config.is_studio_tab_enabled,
                 'authoring_app_config': programs_config.authoring_app_config,
+                'lms_base_url': '//{}/'.format(settings.LMS_BASE),
                 'programs_api_url': programs_config.public_api_url,
                 'programs_token_url': reverse('programs_id_token'),
                 'studio_home_url': reverse('home'),

@@ -1,0 +1,174 @@
+// Rules for placing bookmarks and search button side by side
+.wrapper-course-modes {
+  border-bottom: 1px solid $gray-l3;
+  padding: ($baseline/4);
+
+  > div {
+    @include box-sizing(border-box);
+    display: inline-block;
+  }
+}
+
+
+// Rules for Bookmarks Button
+.courseware-bookmarks-button {
+  width: flex-grid(5);
+  vertical-align: top;
+
+  .bookmarks-list-button {
+    @extend %ui-clear-button;
+
+    // set styles
+    @extend %btn-pl-default-base;
+    @include font-size(13);
+    width: 100%;
+    padding: ($baseline/4) ($baseline/2);
+
+    &:before {
+      content: "\f02e";
+      font-family: FontAwesome;
+    }
+
+    &.is-active {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
+    }
+  }
+}
+
+
+// Rules for Bookmarks Results Header
+.bookmarks-results-header {
+  @extend %t-title4;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-bottom: ($baseline/2);
+}
+
+// Rules for Bookmarks Results
+.bookmarks-results-list {
+  padding-top: ($baseline/2);
+
+  .bookmarks-results-list-item {
+    @include padding(0, $baseline, ($baseline/4), $baseline);
+    display: block;
+    border: 1px solid $gray-l4;
+    margin-bottom: $baseline;
+
+    &:hover {
+      border-color: $m-blue;
+
+      .list-item-breadcrumbtrail {
+        color: $blue;
+      }
+    }
+
+    .icon {
+      @extend %t-icon6;
+    }
+  }
+
+  .results-list-item-view {
+    @include float(right);
+    margin-top: $baseline;
+  }
+
+  .list-item-date {
+    @extend %t-copy-sub2;
+    margin-top: ($baseline/4);
+    color: $gray;
+  }
+
+  .bookmarks-results-list-item:before {
+    content: "\f02e";
+    position: relative;
+    top: -7px;
+    font-family: FontAwesome;
+    color: $m-blue;
+  }
+
+  .list-item-content {
+    overflow: hidden;
+  }
+
+  .list-item-left-section {
+    display: inline-block;
+    vertical-align: middle;
+    width: 90%;
+  }
+
+  .list-item-right-section {
+    display: inline-block;
+    vertical-align: middle;
+
+    .fa-arrow-right {
+
+      @include rtl {
+        @include transform(rotate(180deg));
+      }
+    }
+  }
+}
+
+
+// Rules for empty bookmarks list
+.bookmarks-empty {
+  margin-top: $baseline;
+  border: 1px solid $gray-l4;
+  padding: $baseline;
+  background-color: $gray-l6;
+}
+
+.bookmarks-empty-header {
+  @extend %t-title5;
+  margin-bottom: ($baseline/2);
+}
+
+.bookmarks-empty-detail {
+  @extend %t-copy-sub1;
+}
+
+
+// Rules for bookmark icon shown on each sequence nav item
+.course-content {
+
+   .bookmark-icon.bookmarked {
+    top: -3px;
+    position: absolute;
+    left: ($baseline/4);
+  }
+
+
+  // Rules for bookmark button's different styles
+  .bookmark-button-wrapper {
+    text-align: right;
+    margin-bottom: 10px;
+  }
+
+  .bookmark-button {
+    @extend %ui-clear-button;
+    @extend %btn-pl-default-base;
+    @include font-size(13);
+    padding: ($baseline/4) ($baseline/2);
+
+    &:before {
+      content: "\f02e";
+      font-family: FontAwesome;
+    }
+
+    &.is-active {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
+    }
+
+    &.bookmarked {
+      background-color: lighten($action-primary-bg,10%);
+      color: $white;
+
+      &:before {
+        content: "\f097";
+        font-family: FontAwesome;
+      }
+    }
+  }
+}

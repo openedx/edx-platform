@@ -1,27 +1,20 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
-<%namespace file="../main.html" import="stanford_theme_enabled" />
-## Again, ugly hack that needs to be changed
-## TODO: this probably needs better formatting to look nice in an
-##       email client (Mako leaves awkward whitespace)
-% if stanford_theme_enabled():
-  ${_("This is to confirm that you changed the e-mail associated with "
-      "{platform_name} from {old_email} to {new_email}. If you "
-      "did not make this request, please contact us at").format(platform_name=settings.PLATFORM_NAME, old_email=old_email, new_email=new_email)}
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
+${_("This is to confirm that you changed the e-mail associated with "
+  "{platform_name} from {old_email} to {new_email}. If you "
+  "did not make this request, please contact us immediately. Contact "
+  "information is listed at:").format(
+      platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
+      old_email=old_email,
+      new_email=new_email
+  )
+}
 
-  ${settings.CONTACT_EMAIL}
-% else:
-  ${_("This is to confirm that you changed the e-mail associated with "
-      "{platform_name} from {old_email} to {new_email}. If you "
-      "did not make this request, please contact us immediately. Contact "
-      "information is listed at:").format(platform_name=settings.PLATFORM_NAME, old_email=old_email, new_email=new_email)}
-
-  % if is_secure:
+% if is_secure:
     https://${ site }${reverse('contact')}
-  % else:
+% else:
     http://${ site }${reverse('contact')}
-  % endif
 % endif
 
-${_("We keep a log of old e-mails, so if this request was unintentional, we "
-    "can investigate.")}
+${_("We keep a log of old e-mails, so if this request was unintentional, we can investigate.")}

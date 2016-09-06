@@ -3,7 +3,6 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%block name="pagetitle">${_('{course_number} Textbook').format(course_number=course.display_number_with_default) | h}</%block>
-<%block name="nav_skip">#viewer-frame</%block>
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
@@ -27,10 +26,11 @@ $(function(){
 });
 </script>
 
-<div class="book-wrapper">
+<main id="main" aria-label="${_('Content')}" tabindex="-1">
+    <div class="book-wrapper">
     %if 'chapters' in textbook:
     <section class="book-sidebar" aria-label="${_('Textbook Navigation')}">
-        <ul id="booknav" tabindex="0">
+        <ul id="booknav">
           % for (index, entry) in enumerate(textbook['chapters']):
           <li>
             <a class="chapter" rel="${entry['url']}" href="#">${entry.get('title')}</a>
@@ -40,16 +40,15 @@ $(function(){
     </section>
     %endif
 
-<div class="book">
-<iframe
-  title="${current_chapter['title']|h}"
-  id="viewer-frame"
-  src="${request.path}?viewer=true${viewer_params}"
-  width="856"
-  height="1108"
-  frameborder="0"
-  seamless
-  tabindex="1"
-  aria-live="polite"></iframe>
-</div>
-</div>
+    <div class="book">
+    <iframe
+    title="${current_chapter['title']|h}"
+    id="viewer-frame"
+    src="${request.path}?viewer=true${viewer_params}"
+    width="856"
+    height="1108"
+    frameborder="0"
+    seamless></iframe>
+    </div>
+    </div>
+</main>

@@ -9,4 +9,4 @@
 # trying to compile lxml as a dependency causes setuptools to go into an
 # infinite loop and run out of memory. Because why would you trust a
 # dependency management tool to manage dependencies for you?
-python-saml==2.1.3
+python-saml==2.1.6

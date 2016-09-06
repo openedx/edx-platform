@@ -1,4 +1,5 @@
 ## mako
+<%page expression_filter="h"/>
 <%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
@@ -8,7 +9,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <div class="wrapper wrapper-footer">
-  <footer id="footer-openedx"
+  <footer id="footer-openedx" class="grid-container"
     ## When rendering the footer through the branding API,
     ## the direction may not be set on the parent element,
     ## so we set it here.

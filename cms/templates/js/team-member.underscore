@@ -40,7 +40,7 @@
         </li>
         <li class="action action-delete <%=!allow_delete ? "is-disabled" : "" %> aria-disabled="<%=!allow_delete%>">
             <a href="#" class="delete remove-user action-icon" data-id="<%= user.email %>">
-                <i class="icon fa fa-trash-o"></i>
+                <span class="icon fa fa-trash-o" aria-hidden="true"></span>
                 <span class="sr"><%= viewHelpers.format(gettext("Delete the user, {username}"), {username:user.username}) %></span>
             </a>
         </li>

@@ -22,6 +22,7 @@ Mode = namedtuple('Mode',
                       'expiration_datetime',
                       'description',
                       'sku',
+                      'bulk_sku',
                   ])
 
 
@@ -30,6 +31,9 @@ class CourseMode(models.Model):
     We would like to offer a course in a variety of modes.
 
     """
+    class Meta(object):
+        app_label = "course_modes"
+
     # the course that this mode is attached to
     course_id = CourseKeyField(max_length=255, db_index=True, verbose_name=_("Course"))
 
@@ -93,6 +97,18 @@ class CourseMode(models.Model):
         )
     )
 
+    # Optional bulk order SKU for integration with the ecommerce service
+    bulk_sku = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,  # Need this in order to set DEFAULT NULL on the database column
+        verbose_name="Bulk SKU",
+        help_text=_(
+            u"This is the bulk SKU (stock keeping unit) of this mode in the external ecommerce service."
+        )
+    )
+
     HONOR = 'honor'
     PROFESSIONAL = 'professional'
     VERIFIED = "verified"
@@ -100,7 +116,7 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None)
+    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
 
     # Modes that allow a student to pursue a verified certificate
@@ -120,7 +136,7 @@ class CourseMode(models.Model):
     # "honor" to "audit", we still need to have the shoppingcart
     # use "honor"
     DEFAULT_SHOPPINGCART_MODE_SLUG = HONOR
-    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None)
+    DEFAULT_SHOPPINGCART_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None, None)
 
     class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
@@ -134,6 +150,8 @@ class CourseMode(models.Model):
             raise ValidationError(
                 _(u"Professional education modes are not allowed to have expiration_datetime set.")
             )
+        if self.is_verified_slug(self.mode_slug) and self.min_price <= 0:
+            raise ValidationError(_(u"Verified modes cannot be free."))
 
     def save(self, force_insert=False, force_update=False, using=None):
         # Ensure currency is always lowercase.
@@ -159,7 +177,9 @@ class CourseMode(models.Model):
     @expiration_datetime.setter
     def expiration_datetime(self, new_datetime):
         """ Saves datetime to _expiration_datetime and sets the explicit flag. """
-        self.expiration_datetime_is_explicit = True
+        # Only set explicit flag if we are setting an actual date.
+        if new_datetime is not None:
+            self.expiration_datetime_is_explicit = True
         self._expiration_datetime = new_datetime
 
     @classmethod
@@ -393,7 +413,7 @@ class CourseMode(models.Model):
 
     @classmethod
     def has_verified_mode(cls, course_mode_dict):
-        """Check whether the modes for a course allow a student to pursue a verfied certificate.
+        """Check whether the modes for a course allow a student to pursue a verified certificate.
 
         Args:
             course_mode_dict (dictionary mapping course mode slugs to Modes)
@@ -590,6 +610,18 @@ class CourseMode(models.Model):
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency.lower() == currency.lower())
 
+    @classmethod
+    def is_eligible_for_certificate(cls, mode_slug):
+        """
+        Returns whether or not the given mode_slug is eligible for a
+        certificate. Currently all modes other than 'audit' grant a
+        certificate. Note that audit enrollments which existed prior
+        to December 2015 *were* given certificates, so there will be
+        GeneratedCertificate records with mode='audit' which are
+        eligible.
+        """
+        return mode_slug != cls.AUDIT
+
     def to_tuple(self):
         """
         Takes a mode model and turns it into a model named tuple.
@@ -606,7 +638,8 @@ class CourseMode(models.Model):
             self.currency,
             self.expiration_datetime,
             self.description,
-            self.sku
+            self.sku,
+            self.bulk_sku
         )
 
     def __unicode__(self):
@@ -622,6 +655,9 @@ class CourseModesArchive(models.Model):
     field pair in CourseModes. Having a separate table allows us to have an audit trail of any changes
     such as course price changes
     """
+    class Meta(object):
+        app_label = "course_modes"
+
     # the course that this mode is attached to
     course_id = CourseKeyField(max_length=255, db_index=True)
 
@@ -651,6 +687,9 @@ class CourseModeExpirationConfig(ConfigurationModel):
     """
     Configuration for time period from end of course to auto-expire a course mode.
     """
+    class Meta(object):
+        app_label = "course_modes"
+
     verification_window = models.DurationField(
         default=timedelta(days=10),
         help_text=_(

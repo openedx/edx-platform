@@ -4,6 +4,7 @@ Tests for discussion API permission logic
 import itertools
 
 import ddt
+from nose.plugins.attrib import attr
 
 from discussion_api.permissions import (
     can_delete,
@@ -64,6 +65,7 @@ class GetInitializableFieldsTest(ModuleStoreTestCase):
         self.assertEqual(actual, expected)
 
 
+@attr('shard_3')
 @ddt.ddt
 class GetEditableFieldsTest(ModuleStoreTestCase):
     """Tests for get_editable_fields"""

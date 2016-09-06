@@ -5,6 +5,7 @@ class @Problem
     @id = @el.data('problem-id')
     @element_id = @el.attr('id')
     @url = @el.data('url')
+    @content = @el.data('content')
 
     # has_timed_out and has_response are used to ensure that are used to
     # ensure that we wait a minimum of ~ 1s before transitioning the check
@@ -12,7 +13,7 @@ class @Problem
     @has_timed_out = false
     @has_response = false
 
-    @render()
+    @render(@content)
 
   $: (selector) ->
     $(selector, @el)
@@ -32,11 +33,15 @@ class @Problem
     @checkButtonCheckText = @checkButtonLabel.text()
     @checkButtonCheckingText = @checkButton.data('checking')
     @checkButton.click @check_fd
+    @hintButton = @$('div.action button.hint-button')
+    @hintButton.click @hint_button
+    @resetButton = @$('div.action button.reset')
+    @resetButton.click @reset
+    @showButton = @$('div.action button.show')
+    @showButton.click @show
+    @saveButton = @$('div.action button.save')
+    @saveButton.click @save
 
-    @$('div.action button.hint-button').click @hint_button
-    @$('div.action button.reset').click @reset
-    @$('div.action button.show').click @show
-    @$('div.action button.save').click @save
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
       icon = $(ev.target).children "i"
@@ -45,6 +50,8 @@ class @Problem
       window.globalTooltipManager.hide()
 
     @bindResetCorrectness()
+    if @checkButton.length
+      @checkAnswersAndCheckButton true
 
     # Collapsibles
     Collapsible.setCollapsibles(@el)
@@ -154,6 +161,7 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
+        @renderProgressState()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -301,19 +309,15 @@ class @Problem
 
   check: =>
     if not @check_save_waitfor(@check_internal)
-      @check_internal()
+      @disableAllButtonsWhileRunning @check_internal, true
 
   check_internal: =>
-    @enableCheckButton false
-
-    timeout_id = @enableCheckButtonAfterTimeout()
-
     Logger.log 'problem_check', @answers
-
-    $.postWithPrefix("#{@url}/problem_check", @answers, (response) =>
+    $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
+          @el.trigger('contentChanged', [@id, response.contents])
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
@@ -322,11 +326,14 @@ class @Problem
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
-    ).always(@enableCheckButtonAfterResponse)
 
   reset: =>
+    @disableAllButtonsWhileRunning @reset_internal, false
+
+  reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
+        @el.trigger('contentChanged', [@id, response.html])
         @render(response.html)
         @updateProgress response
 
@@ -409,12 +416,14 @@ class @Problem
 
   save: =>
     if not @check_save_waitfor(@save_internal)
-      @save_internal()
+      @disableAllButtonsWhileRunning @save_internal, false
 
   save_internal: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
+      if response.success
+        @el.trigger('contentChanged', [@id, response.html])
       @gentle_alert saveMessage
       @updateProgress response
 
@@ -449,6 +458,58 @@ class @Problem
     @$(".CodeMirror").each (index, element) ->
       element.CodeMirror.save() if element.CodeMirror.save
     @answers = @inputs.serialize()
+
+  checkAnswersAndCheckButton: (bind=false) =>
+    # Used to check available answers and if something is checked (or the answer is set in some textbox)
+    # "Check"/"Final check" button becomes enabled. Otherwise it is disabled by default.
+    # params:
+    #   'bind' used on the first check to attach event handlers to input fields
+    #     to change "Check"/"Final check" enable status in case of some manipulations with answers
+    answered = true
+
+    at_least_one_text_input_found = false
+    one_text_input_filled = false
+    @el.find("input:text").each (i, text_field) =>
+      if $(text_field).is(':visible')
+        at_least_one_text_input_found = true
+        if $(text_field).val() isnt ''
+          one_text_input_filled = true
+        if bind
+          $(text_field).on 'input', (e) =>
+            @checkAnswersAndCheckButton()
+            return
+          return
+    if at_least_one_text_input_found and not one_text_input_filled
+      answered = false
+
+    @el.find(".choicegroup").each (i, choicegroup_block) =>
+      checked = false
+      $(choicegroup_block).find("input[type=checkbox], input[type=radio]").each (j, checkbox_or_radio) =>
+        if $(checkbox_or_radio).is(':checked')
+          checked = true
+        if bind
+          $(checkbox_or_radio).on 'click', (e) =>
+            @checkAnswersAndCheckButton()
+            return
+          return
+      if not checked
+        answered = false
+        return
+
+    @el.find("select").each (i, select_field) =>
+      selected_option = $(select_field).find("option:selected").text().trim()
+      if selected_option is ''
+        answered = false
+      if bind
+        $(select_field).on 'change', (e) =>
+          @checkAnswersAndCheckButton()
+          return
+        return
+
+    if answered
+      @enableCheckButton true
+    else
+      @enableCheckButton false, false
 
   bindResetCorrectness: ->
     # Loop through all input types
@@ -674,16 +735,56 @@ class @Problem
       element = $(element)
       element.find("section[id^='forinput']").removeClass('choicetextgroup_show_correct')
 
-  enableCheckButton: (enable) =>
+  disableAllButtonsWhileRunning: (operationCallback, isFromCheckOperation) =>
+    # Used to keep the buttons disabled while operationCallback is running.
+    # params:
+    #   'operationCallback' is an operation to be run.
+    #   'isFromCheckOperation' is a boolean to keep track if 'operationCallback' was
+    #    @check, if so then text of check button will be changed as well.
+    @enableAllButtons false, isFromCheckOperation
+    operationCallback().always =>
+      @enableAllButtons true, isFromCheckOperation
+
+  enableAllButtons: (enable, isFromCheckOperation) =>
+    # Used to enable/disable all buttons in problem.
+    # params:
+    #   'enable' is a boolean to determine enabling/disabling of buttons.
+    #   'isFromCheckOperation' is a boolean to keep track if operation was initiated
+    #    from @check so that text of check button will also be changed while disabling/enabling
+    #    the check button.
+    if enable
+      @resetButton
+        .add(@saveButton)
+        .add(@hintButton)
+        .add(@showButton)
+        .removeClass('is-disabled')
+        .attr({'aria-disabled': 'false'})
+    else
+      @resetButton
+        .add(@saveButton)
+        .add(@hintButton)
+        .add(@showButton)
+        .addClass('is-disabled')
+        .attr({'aria-disabled': 'true'})
+
+    @enableCheckButton enable, isFromCheckOperation
+
+  enableCheckButton: (enable, changeText = true) =>
     # Used to disable check button to reduce chance of accidental double-submissions.
+    # params:
+    #   'enable' is a boolean to determine enabling/disabling of check button.
+    #   'changeText' is a boolean to determine if there is need to change the
+    #    text of check button as well.
     if enable
       @checkButton.removeClass 'is-disabled'
       @checkButton.attr({'aria-disabled': 'false'})
-      @checkButtonLabel.text(@checkButtonCheckText)
+      if changeText
+        @checkButtonLabel.text(@checkButtonCheckText)
     else
       @checkButton.addClass 'is-disabled'
       @checkButton.attr({'aria-disabled': 'true'})
-      @checkButtonLabel.text(@checkButtonCheckingText)
+      if changeText
+        @checkButtonLabel.text(@checkButtonCheckingText)
 
   enableCheckButtonAfterResponse: =>
     @has_response = true

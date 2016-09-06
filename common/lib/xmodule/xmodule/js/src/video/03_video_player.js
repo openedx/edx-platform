@@ -70,7 +70,10 @@ function (HTML5Video, Resizer) {
     function _makeFunctionsPublic(state) {
         var debouncedF = _.debounce(
             function (params) {
-                return onSeek.call(this, params);
+                // Can't cancel a queued debounced function on destroy
+                if (state.videoPlayer) {
+                    return onSeek.call(this, params);
+                }
             }.bind(state),
             300
         );
@@ -139,7 +142,8 @@ function (HTML5Video, Resizer) {
             rel: 0,
             showinfo: 0,
             enablejsapi: 1,
-            modestbranding: 1
+            modestbranding: 1,
+            cc_load_policy: 0
         };
 
         if (!state.isFlashMode()) {

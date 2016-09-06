@@ -3,7 +3,7 @@ define([
     'teams/js/collections/my_teams',
     'teams/js/views/my_teams',
     'teams/js/spec_helpers/team_spec_helpers',
-    'common/js/spec_helpers/ajax_helpers'
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function (Backbone, MyTeamsCollection, MyTeamsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
     describe('My Teams View', function () {
@@ -43,7 +43,6 @@ define([
                 teams = TeamSpecHelpers.createMockTeams({
                     results: []
                 }, {
-                    per_page: 2,
                     url: TeamSpecHelpers.testContext.myTeamsUrl,
                     username: TeamSpecHelpers.testContext.userInfo.username
                 }, MyTeamsCollection),
@@ -60,7 +59,7 @@ define([
                     username : TeamSpecHelpers.testContext.userInfo.username,
                     course_id : TeamSpecHelpers.testContext.courseID,
                     page : '1',
-                    page_size : '2',
+                    page_size : '5',
                     text_search: '',
                     order_by: 'last_activity_at'
                 }

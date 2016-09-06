@@ -5,32 +5,16 @@ import datetime
 import logging
 
 from django.conf import settings
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 import pytz
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider, CreditEligibility, CreditRequest
 from openedx.core.djangoapps.credit.signature import get_shared_secret_key, signature
+from openedx.core.lib.api.serializers import CourseKeyField
 from util.date_utils import from_timestamp
 
 log = logging.getLogger(__name__)
-
-
-class CourseKeyField(serializers.Field):
-    """ Serializer field for a model CourseKey field. """
-
-    def to_representation(self, data):
-        """Convert a course key to unicode. """
-        return unicode(data)
-
-    def to_internal_value(self, data):
-        """Convert unicode to a course key. """
-        try:
-            return CourseKey.from_string(data)
-        except InvalidKeyError as ex:
-            raise serializers.ValidationError("Invalid course key: {msg}".format(msg=ex.msg))
 
 
 class CreditCourseSerializer(serializers.ModelSerializer):

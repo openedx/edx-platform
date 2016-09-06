@@ -1,15 +1,4 @@
 ## mako
+<%page expression_filter="h" args="online_help_token"/>
 <%namespace name='static' file='static_content.html'/>
-<%!
-from microsite_configuration import microsite
-%>
-<%
-theme_enabled = settings.FEATURES.get("USE_CUSTOM_THEME", False)
-is_microsite = microsite.is_request_in_microsite()
-%>
-
-% if theme_enabled and not is_microsite:
-  <%include file="theme-header.html" />
-% else:
-  <%include file="${microsite.get_template_path('navigation.html')}" />
-% endif
+<%include file="${static.get_themed_template_path(relative_path='theme-header.html', default_path='navigation.html')}"  args="online_help_token=online_help_token"  />

@@ -1,0 +1,70 @@
+## mako
+
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from provider.templatetags.scope import scopes
+from django.core.urlresolvers import reverse
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%inherit file="../main.html"/>
+
+<%block name="bodyclass">oauth2</%block>
+
+<%block name="body">
+<div class="authorization-confirmation">
+  % if not error:
+  <p>
+  ${Text(_("{start_strong}{application_name}{end_strong} would like to access your data with the following permissions:")).format(
+    start_strong=HTML("<strong>"),
+    application_name=client.name,
+    end_strong=HTML("</strong>")
+  )}
+  </p>
+  <ul>
+    % for permission in scopes(oauth_data['scope']):
+    <li>
+      % if permission == "openid":
+        ${_("Read your user ID")}
+      % elif permission == "profile":
+        ${_("Read your user profile")}
+      % elif permission == "email":
+        ${_("Read your email address")}
+      % elif permission == "course_staff":
+        ${_("Read the list of courses in which you are a staff member.")}
+      % elif permission == "course_instructor":
+        ${_("Read the list of courses in which you are an instructor.")}
+      % elif permission == "permissions":
+        ${_("To see if you are a global staff user")}
+      % else:
+        ${_("Manage your data: {permission}").format(permission=permission)}
+      % endif
+    </li>
+    % endfor
+  </ul>
+  <form method="post" action="${reverse('oauth2:authorize')}">
+    ${form.errors}
+    ${form.non_field_errors()}
+    <fieldset>
+      <div style="display: none;">
+        <select type="select" name="scope" multiple="multiple">
+          % for scope in scopes(oauth_data['scope']):
+          <option value="${scope}" selected="selected">${scope}</option>
+          % endfor
+        </select>
+      </div>
+      <input type="submit" class="btn login large danger" name="cancel" value="Cancel" />
+      <input type="submit" class="btn login large primary" name="authorize" value="Authorize" />
+    </fieldset>
+    <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}" />
+  </form>
+  % else:
+  <p class="error">
+    ${error}
+    ${error_description}
+  </p>
+  % endif
+</div>
+</%block>

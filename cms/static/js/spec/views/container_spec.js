@@ -1,4 +1,4 @@
-define([ "jquery", "common/js/spec_helpers/ajax_helpers", "js/spec_helpers/edit_helpers",
+define([ "jquery", "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers", "js/spec_helpers/edit_helpers",
     "js/views/container", "js/models/xblock_info", "jquery.simulate",
     "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
     function ($, AjaxHelpers, EditHelpers, ContainerView, XBlockInfo) {

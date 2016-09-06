@@ -1,0 +1,7 @@
+<section class="empty-programs-message">
+    <h2 class="hd-3"><%- gettext('You are not enrolled in any XSeries Programs yet.') %></h2>
+    <a class="btn-neutral find-xseries-programs" href="<%- xseriesUrl %>">
+        <span class="action-xseries-icon" aria-hidden="true"></span>
+        <span><%- gettext('Explore XSeries Programs') %></span>
+    </a>
+</section>

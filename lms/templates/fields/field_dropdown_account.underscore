@@ -1,0 +1,42 @@
+<div class="u-field-value field">
+    <% if (editable !== 'never') { %>
+        <% if (title && titleVisible) { %>
+            <label class="u-field-title field-label" for="u-field-select-<%- id %>">
+                <%- title %>
+            </label>
+        <% } else { %>
+            <label class="sr" for="u-field-select-<%- id %>">
+                <%- screenReaderTitle %>
+            </label>
+        <% } %>
+    <% } %>
+
+    <% if (iconName) { %>
+        <span class="u-field-icon icon fa <%- iconName %> fa-fw" aria-hidden="true"></span>
+    <% } %>
+
+    <% if (editable === 'never') { %>
+        <span class="sr"><%- screenReaderTitle %></span>
+        <span class="u-field-value-readonly"></span>
+    <% } else { %>
+        <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-help-message-<%- id %>">
+            <% if (showBlankOption) { %>
+                <option value=""></option>
+            <% } %>
+            <% _.each(selectOptions, function(selectOption) { %>
+                <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
+            <% }); %>
+        </select>
+        <span class="icon-caret-down" aria-hidden="true"></span>
+        <button class="u-field-value-display">
+            <span class="sr"><%- screenReaderTitle %> &nbsp;</span>
+            <span class="u-field-value-readonly"></span>
+            <span class="sr"><%- gettext('Click to edit') %></span>
+        </button>
+    <% } %>
+</div>
+
+<span class="u-field-message" id="u-field-message-<%- id %>">
+    <span class="u-field-message-notification" aria-live="polite"></span>
+    <span class="u-field-message-help" id="u-field-help-message-<%- id %>"><%- message %></span>
+</span>

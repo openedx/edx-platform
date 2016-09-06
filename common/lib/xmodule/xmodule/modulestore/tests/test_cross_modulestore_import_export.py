@@ -11,7 +11,7 @@ and then for each combination of modulestores, performing the sequence:
     4) Compare all modules in the source and destination modulestores to make sure that they line up
 
 """
-from contextlib import contextmanager, nested
+
 import itertools
 import os
 from path import Path as path
@@ -25,11 +25,8 @@ from mock import patch
 from xmodule.tests import CourseComparisonTest
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.xml_exporter import export_course_to_xml
-from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.utils import mock_tab_from_json
-from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.partitions.tests.test_partitions import PartitionTestCase
-from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.tests.utils import (
     MongoContentstoreBuilder, MODULESTORE_SETUPS, SPLIT_MODULESTORE_SETUP,
     CONTENTSTORE_SETUPS, TEST_DATA_DIR
@@ -124,6 +121,9 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                         self.exclude_field(None, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')
                         self.exclude_field(None, 'parent')
+                        # discussion_ids are auto-generated based on usage_id, so they should change across
+                        # modulestores - see TNL-5001
+                        self.exclude_field(None, 'discussion_id')
                         self.ignore_asset_key('_id')
                         self.ignore_asset_key('uploadDate')
                         self.ignore_asset_key('content_son')

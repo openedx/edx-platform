@@ -75,7 +75,7 @@ def update_certificate(request):
         try:
             course_key = SlashSeparatedCourseKey.from_deprecated_string(xqueue_body['course_id'])
 
-            cert = GeneratedCertificate.objects.get(
+            cert = GeneratedCertificate.eligible_certificates.get(
                 user__username=xqueue_body['username'],
                 course_id=course_key,
                 key=xqueue_header['lms_key'])
@@ -110,7 +110,7 @@ def update_certificate(request):
 
                 cert.error_reason = xqueue_body['error_reason']
         else:
-            if cert.status in [status.generating, status.regenerating]:
+            if cert.status == status.generating:
                 cert.download_uuid = xqueue_body['download_uuid']
                 cert.verify_uuid = xqueue_body['verify_uuid']
                 cert.download_url = xqueue_body['url']
