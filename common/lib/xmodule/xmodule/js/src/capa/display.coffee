@@ -426,7 +426,6 @@ class @Problem
 
         @el.addClass 'showed'
         @el.find('.show').attr('disabled', 'disabled')
-        @enableSubmitButton false, false
         @updateProgress response
         window.SR.readElts(answer_text)
         @scroll_to_problem_meta()
