@@ -3,7 +3,7 @@ SubsectionGrade Class
 """
 from collections import OrderedDict
 from lazy import lazy
-
+from logging import getLogger
 from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.scores import get_score, possibly_scored
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
@@ -12,6 +12,9 @@ from student.models import anonymous_id_for_user, User
 from submissions import api as submissions_api
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import Score
+
+
+log = getLogger(__name__)
 
 
 class SubsectionGrade(object):
@@ -36,22 +39,19 @@ class SubsectionGrade(object):
         """
         List of all problem scores in the subsection.
         """
+        log.info(u"Persistent Grades: calculated scores property for subsection {0}".format(self.location))
         return [score for score, _ in self.locations_to_weighted_scores.itervalues()]
 
     def compute(self, student, course_structure, scores_client, submissions_scores):
         """
         Compute the grade of this subsection for the given student and course.
         """
-        try:
-            for descendant_key in course_structure.post_order_traversal(
-                    filter_func=possibly_scored,
-                    start_node=self.location,
-            ):
-                self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
-        finally:
-            # self.scores may hold outdated data, force it to refresh on next access
-            lazy.invalidate(self, 'scores')
-
+        lazy.invalidate(self, 'scores')
+        for descendant_key in course_structure.post_order_traversal(
+                filter_func=possibly_scored,
+                start_node=self.location,
+        ):
+            self._compute_block_score(student, descendant_key, course_structure, scores_client, submissions_scores)
         self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
 
     def save(self, student, subsection, course):
@@ -103,6 +103,20 @@ class SubsectionGrade(object):
             graded=False,
             section=self.display_name,
             module_id=self.location,
+        )
+
+    def __unicode__(self):
+        """
+        Provides a unicode representation of the scoring
+        data for this subsection. Used for logging.
+        """
+        return u"SubsectionGrade|total: {0}/{1}|graded: {2}/{3}|location: {4}|display name: {5}".format(
+            self.all_total.earned,
+            self.all_total.possible,
+            self.graded_total.earned,
+            self.graded_total.possible,
+            self.location,
+            self.display_name
         )
 
     def _compute_block_score(
@@ -204,8 +218,28 @@ class SubsectionGradeFactory(object):
                 )
                 subsection_grade = SubsectionGrade(subsection)
                 subsection_grade.load_from_data(model, course_structure, self._scores_client, self._submissions_scores)
+                log.warning(
+                    u"Persistent Grades: Loaded grade for course id: {0}, version: {1}, subtree edited on: {2},"
+                    u" grade: {3}, user: {4}".format(
+                        course.id,
+                        getattr(course, 'course_version', None),
+                        course.subtree_edited_on,
+                        subsection_grade,
+                        self.student.id
+                    )
+                )
                 return subsection_grade
             except PersistentSubsectionGrade.DoesNotExist:
+                log.warning(
+                    u"Persistent Grades: Could not find grade for course id: {0}, version: {1}, subtree edited"
+                    u" on: {2}, subsection: {3}, user: {4}".format(
+                        course.id,
+                        getattr(course, 'course_version', None),
+                        course.subtree_edited_on,
+                        subsection.location,
+                        self.student.id
+                    )
+                )
                 return None
 
     def _save_grade(self, subsection_grade, subsection, course):  # pylint: disable=unused-argument
@@ -214,6 +248,15 @@ class SubsectionGradeFactory(object):
         """
         if PersistentGradesEnabledFlag.feature_enabled(course.id):
             subsection_grade.save(self.student, subsection, course)
+        log.warning(u"Persistent Grades: Saved grade for course id: {0}, version: {1}, subtree_edited_on: {2}, grade: "
+                    u"{3}, user: {4}"
+                    .format(
+                        course.id,
+                        getattr(course, 'course_version', None),
+                        course.subtree_edited_on,
+                        subsection_grade,
+                        self.student.id
+                    ))
 
     def _prefetch_scores(self, course_structure, course):
         """
