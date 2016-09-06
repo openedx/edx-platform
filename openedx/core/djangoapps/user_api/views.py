@@ -485,7 +485,7 @@ class RegistrationView(APIView):
             required=required
         )
 
-       def _add_password_copy_field(self, form_desc, required=True):
+    def _add_password_copy_field(self, form_desc, required=True):
         """Add a password copy field to a form description.
 
         Arguments:
