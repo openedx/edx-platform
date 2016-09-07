@@ -817,17 +817,6 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
-    enable_subsection_grades_saved = Boolean(
-        display_name=_("Enable Subsection Grades Saved"),
-        help=_(
-            "Enter true or false. If this value is true, the robust "
-            "grades feature of saving subsection grades is enabled "
-            "for this course."
-        ),
-        default=False,
-        scope=Scope.settings
-    )
-
     learning_info = List(
         display_name=_("Course Learning Information"),
         help=_("Specify what student can learn from the course."),

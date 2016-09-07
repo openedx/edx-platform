@@ -1,6 +1,6 @@
 <div class='modal' role='alertdialog' id='discussion-alert' aria-describedby='discussion-alert-message'>
     <div class='inner-wrapper discussion-alert-wrapper'>
-        <button class='close-modal dismiss' title='<%- gettext("Close") %>''>
+        <button class='btn close-modal dismiss' title='<%- gettext("Close") %>''>
             <span class='icon fa fa-times' aria-hidden='true'></span>
         </button>
         <header>
@@ -9,6 +9,6 @@
         </header>
         <p id='discussion-alert-message'></p>
         <hr/>
-        <button class='dismiss'><%- gettext("OK") %></button>
+        <button class='btn dismiss'><%- gettext("OK") %></button>
     </div>
 </div>

@@ -211,7 +211,6 @@ class DiscussionHomePageTest(UniqueCourseTest):
             "ignore": [
                 'section',  # TODO: AC-491
                 'color-contrast',  # TNL-4635
-                'link-href',  # TNL-4636
                 'icon-aria-hidden',  # TNL-4637
             ]
         })
@@ -459,7 +458,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4638
                 'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4641
             ]
         })
@@ -471,7 +469,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4638
                 'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4641
             ]
         })
@@ -535,7 +532,6 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4643
                 'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4645
             ]
         })
@@ -547,7 +543,6 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4643
                 'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4645
             ]
         })
@@ -836,7 +831,6 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4638
                 'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4645
                 'duplicate-id',  # TNL-4647
             ]
@@ -938,7 +932,6 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'aria-valid-attr-value',  # TNL-4643
                 'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4645
             ]
         })
@@ -1346,7 +1339,6 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
             'ignore': [
                 'section',  # TODO: AC-491
                 'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
                 'icon-aria-hidden',  # TNL-4641
             ]
         })

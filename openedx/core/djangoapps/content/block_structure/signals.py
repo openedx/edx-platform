@@ -1,6 +1,7 @@
 """
 Signal handlers for invalidating cached data.
 """
+from django.conf import settings
 from django.dispatch.dispatcher import receiver
 
 from xmodule.modulestore.django import SignalHandler
@@ -19,7 +20,10 @@ def _listen_for_course_publish(sender, course_key, **kwargs):  # pylint: disable
 
     # The countdown=0 kwarg ensures the call occurs after the signal emitter
     # has finished all operations.
-    update_course_in_cache.apply_async([unicode(course_key)], countdown=0)
+    update_course_in_cache.apply_async(
+        [unicode(course_key)],
+        countdown=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY'],
+    )
 
 
 @receiver(SignalHandler.course_deleted)

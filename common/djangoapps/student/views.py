@@ -106,7 +106,7 @@ from student.helpers import (
     auth_pipeline_urls, get_next_url_for_login_page,
     DISABLE_UNENROLL_CERT_STATES,
 )
-from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
+from student.cookies import set_logged_in_cookies, delete_logged_in_cookies, set_user_info_cookie
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
@@ -749,7 +749,9 @@ def dashboard(request):
             'ecommerce_payment_page': ecommerce_service.payment_page_url(),
         })
 
-    return render_to_response('dashboard.html', context)
+    response = render_to_response('dashboard.html', context)
+    set_user_info_cookie(response, request, user)
+    return response
 
 
 def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
@@ -2280,16 +2282,15 @@ def reactivation_email_for_user(user):
     subject = render_to_string('emails/activation_email_subject.txt', context)
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', context)
+    from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
     try:
-        user.email_user(subject, message, configuration_helpers.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL,
-        ))
+        user.email_user(subject, message, from_address)
     except Exception:  # pylint: disable=broad-except
         log.error(
-            u'Unable to send reactivation email from "%s"',
-            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+            u'Unable to send reactivation email from "%s" to "%s"',
+            from_address,
+            user.email,
             exc_info=True
         )
         return JsonResponse({

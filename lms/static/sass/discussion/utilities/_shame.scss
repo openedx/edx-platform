@@ -7,8 +7,12 @@
   .breadcrumbs {
     margin: 5px 0 0 0;
 
-    .all-topics .fa {
-      @include margin-right(10px);
+    .all-topics {
+      font-size: 14px;
+
+      .fa {
+        @include margin-right(10px);
+      }
     }
   }
 }

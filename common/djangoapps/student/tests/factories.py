@@ -4,7 +4,7 @@ import random
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment,
                             PendingEmailChange, UserStanding,
-                            CourseAccessRole)
+                            CourseAccessRole, OrganizationUser)
 from course_modes.models import CourseMode
 from django.contrib.auth.models import Group, AnonymousUser
 from datetime import datetime
@@ -15,7 +15,6 @@ from uuid import uuid4
 from pytz import UTC
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from organizations.models import Organization
-from student.models import OrganizationUser
 
 # Factories are self documenting
 # pylint: disable=missing-docstring
@@ -24,7 +23,7 @@ from student.models import OrganizationUser
 class GroupFactory(DjangoModelFactory):
     class Meta(object):
         model = Group
-        django_get_or_create = ('name', )
+        django_get_or_create = ('name',)
 
     name = factory.Sequence(u'group{0}'.format)
 
@@ -41,7 +40,7 @@ class UserStandingFactory(DjangoModelFactory):
 class UserProfileFactory(DjangoModelFactory):
     class Meta(object):
         model = UserProfile
-        django_get_or_create = ('user', )
+        django_get_or_create = ('user',)
 
     user = None
     name = factory.LazyAttribute(u'{0.user.first_name} {0.user.last_name}'.format)
@@ -178,6 +177,7 @@ class PendingEmailChangeFactory(DjangoModelFactory):
     new_email: sequence of new+email+{}@edx.org
     activation_key: sequence of integers, padded to 30 characters
     """
+
     class Meta(object):
         model = PendingEmailChange
 
