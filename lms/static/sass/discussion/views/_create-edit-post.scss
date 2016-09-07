@@ -257,7 +257,7 @@
     font-size: $forum-base-font-size;
   }
 
-  a.topic-title {
+  button.topic-title {
     @include transition(none);
 
     &:hover, &:focus {

@@ -177,7 +177,7 @@
                 DiscussionUtil.clearFormErrors(this.$('.post-errors'));
                 this.$('.wmd-preview p').html('');
                 if (this.isTabMode()) {
-                    return this.topicView.setTopic(this.$('.topic-title').first());
+                    return this.topicView.setTopic(this.$('button.topic-title').first());
                 }
             };
 

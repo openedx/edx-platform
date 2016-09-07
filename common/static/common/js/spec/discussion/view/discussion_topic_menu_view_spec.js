@@ -135,7 +135,7 @@
             var dropdownText;
             this.createTopicView();
             this.view.maxNameWidth = this.selectedOptionText.length + 100;
-            this.view.$el.find('.topic-title').first().click();
+            this.view.$el.find('button.topic-title').first().click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText.indexOf('/ span>')).toEqual(-1);
         });
@@ -150,6 +150,15 @@
             this.view.render();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(completeText).toEqual(dropdownText);
+        });
+
+        it("defaults to the first topic if you don't click one", function() {
+            this.createTopicView();
+            expect(
+                this.view.$el.find('.js-selected-topic').text()
+            ).toMatch(
+                this.view.$el.find('.topic-menu-entry')[0].innerHTML
+            );
         });
 
         it('click outside of the dropdown close it', function() {
