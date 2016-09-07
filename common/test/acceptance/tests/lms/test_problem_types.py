@@ -215,7 +215,7 @@ class ProblemTypeTestMixin(object):
             "Make sure the correct problem is on the page"
         )
         # Leave the problem unchanged and click submit.
-        self.assertTrue(self.problem_page.q(css='.problem .submit').attrs('disabled'))
+        self.assertFalse(self.problem_page.q(css='.problem .submit').attrs('disabled'))
         self.problem_page.click_submit()
         self.wait_for_status('incorrect')
 

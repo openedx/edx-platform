@@ -800,14 +800,18 @@ class @Problem
     attempts_remaining = @submitButton.data('attempts-remaining')
     if enable && attempts_remaining != 0
       @submitButton.removeAttr 'disabled'
+      # the is-disabled is needed for Lettuce test below
+      # lms/djangoapps/courseware/features/problems.py submit_problem(step)
       @submitButton.removeClass 'is-disabled'
       if changeText
         @submitButtonLabel.text(@submitButtonSubmitText)
     else
       @submitButton.attr({'disabled': 'disabled'})
+      # the is-disabled is needed for Lettuce test below
+      # lms/djangoapps/courseware/features/problems.py submit_problem(step)
       @submitButton.addClass 'is-disabled'
       if changeText
-        @submitButtonLabel.text(@submitButtonSubmittingText)
+        @submitButtonLabel.text(@submitButtonSubmitText)
 
   enableSubmitButtonAfterResponse: =>
     @has_response = true

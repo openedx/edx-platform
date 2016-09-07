@@ -619,10 +619,7 @@ class CapaMixin(CapaFields):
 
         html = self.remove_tags_from_html(html)
 
-        # The convention is to pass the name of the submit button if we want
-        # to enable a submit button, and False otherwise This works because
-        # non-empty strings evaluate to True.  We use the same convention
-        # for the "submitting" state text.
+        # Enable/Disable Submit button if should_enable_submit_button returns True/False.
         submit_button = self.submit_button_name()
         submit_button_submitting = self.submit_button_submitting_name()
         should_enable_submit_button = self.should_enable_submit_button()
@@ -1053,7 +1050,7 @@ class CapaMixin(CapaFields):
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
             event_info['failure'] = 'unreset'
-            self.track_function_unmask('problem_submit_fail', event_info)
+            self.track_function_unmask('problem_check_fail', event_info)
             if dog_stats_api:
                 dog_stats_api.increment(metric_name('checks'), tags=[u'result:failed', u'failure:unreset'])
             raise NotFoundError(_("Problem must be reset before it can be submitted again."))

@@ -42,15 +42,13 @@ from openedx.core.djangolib.markup import HTML
     </span>
     % endif
     </div>
-    % if attempts_allowed:
-    <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" ${attempts_allowed} data-attempts-remaining="${attempts_allowed - attempts_used}" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
+    <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}
+        % if attempts_allowed:
+            data-attempts-remaining="${attempts_allowed - attempts_used}"
+        % endif
+    >
         <span class="submit-label">${ submit_button }</span><span class="sr"> ${_("your answer")}</span>
     </button>
-    % else:
-    <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
-        <span class="submit-label">${ submit_button }</span><span class="sr"> ${_("your answer")}</span>
-    </button>
-    % endif
     <div class="submission_feedback" aria-live="polite" id="submission_feedback_${short_id}">
     % if attempts_allowed:
         ${_("You have used {num_used} of {num_total} attempts").format(num_used=attempts_used, num_total=attempts_allowed)}

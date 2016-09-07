@@ -1210,7 +1210,7 @@ class CapaModuleTest(unittest.TestCase):
         context = render_args[1]
         self.assertEqual(context['problem']['html'], "<div>Test Problem HTML</div>")
         ## comment out line below because submit button is always present but with enabled/disabled state
-        # self.assertEqual(bool(context['submit_button']), enable_submit_button)
+        self.assertEqual(bool(context['submit_button']), enable_submit_button)
         self.assertEqual(bool(context['reset_button']), show_reset_button)
         self.assertEqual(bool(context['save_button']), show_save_button)
 

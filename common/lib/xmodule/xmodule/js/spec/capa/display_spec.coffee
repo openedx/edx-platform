@@ -281,8 +281,8 @@ describe 'Problem', ->
   describe 'submit button on problems', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
-      @submitDisabled = (v) =>
-        if v
+      @submitDisabled = (disabled) =>
+        if disabled
           expect(@problem.submitButton).toHaveAttr('disabled')
         else
           expect(@problem.submitButton).not.toHaveAttr('disabled')

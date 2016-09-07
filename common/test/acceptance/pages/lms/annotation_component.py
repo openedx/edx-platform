@@ -73,7 +73,7 @@ class AnnotationComponentPage(PageObject):
         self.wait_for(lambda: 'selected' in self.q(css=answer_css).attrs('class')[0], description='answer selected')
         # Click the "Check" button.
         self.q(css=self.active_problem_selector('.submit')).click()
-        # This will trigger a POST to problem_submit so wait until the response is returned.
+        # This will trigger a POST to problem_check so wait until the response is returned.
         self.wait_for_ajax()
 
     def check_feedback(self):

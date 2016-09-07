@@ -58,7 +58,7 @@ class ProblemSubmissionTestMixin(TestCase):
         problem_location: location of the problem on which we want some action
 
         dispatch: the the action string that gets passed to the view as a kwarg
-            example: 'submit_problem' for having responses processed
+            example: 'check_problem' for having responses processed
         """
         return reverse(
             'xblock_handler',
