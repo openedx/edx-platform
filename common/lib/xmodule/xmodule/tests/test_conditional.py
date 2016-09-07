@@ -103,7 +103,7 @@ class ConditionalFactory(object):
         cond_location = Location("edX", "conditional_test", "test_run", "conditional", "SampleConditional", None)
         field_data = DictFieldData({
             'data': '<conditional/>',
-            'condional_attr': 'attempted',
+            'conditional_attr': 'attempted',
             'conditional_value': 'true',
             'xml_attributes': {'attempted': 'true'},
             'children': [child_descriptor.location],
@@ -322,7 +322,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         definition = ConditionalDescriptor.definition_from_xml(xml_object, Mock())[0]
         expected_definition = {
             'show_tag_list': [],
-            'condional_attr': 'attempted',
+            'conditional_attr': 'attempted',
             'conditional_value': 'false',
             'conditional_message': ''
         }
@@ -339,6 +339,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             'sources': ''
         }
         self.assertDictEqual(modules['cond_module'].xml_attributes, expected_xml_attributes)
+
 
 class ConditionalModuleStudioTest(XModuleXmlImportTest):
     """
