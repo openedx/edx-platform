@@ -155,11 +155,12 @@ class CapaHtmlRenderTest(unittest.TestCase):
         question_element = rendered_html.find("p")
         self.assertEqual(question_element.text, "Test question")
 
-        # Expect that the response has been turned into a <span>
-        response_element = rendered_html.find("span")
-        self.assertEqual(response_element.tag, "span")
+        # Expect that the response has been turned into a <section> with correct attributes
+        response_element = rendered_html.find("section")
+        self.assertEqual(response_element.tag, "section")
+        self.assertEqual(response_element.attrib["aria-label"], "Question 1")
 
-        # Expect that the response <span>
+        # Expect that the response <section>
         # that contains a <div> for the textline
         textline_element = response_element.find("div")
         self.assertEqual(textline_element.text, 'Input Template Render')
@@ -175,7 +176,6 @@ class CapaHtmlRenderTest(unittest.TestCase):
         expected_textline_context = {
             'STATIC_URL': '/dummy-static/',
             'status': the_system.STATUS_CLASS('unsubmitted'),
-            'label': '',
             'value': '',
             'preprocessor': None,
             'msg': '',
@@ -185,6 +185,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
             'id': '1_2_1',
             'trailing_text': '',
             'size': None,
+            'response_data': {'label': '', 'descriptions': {}},
+            'describedby': ''
         }
 
         expected_solution_context = {'id': '1_solution_1'}
@@ -200,6 +202,29 @@ class CapaHtmlRenderTest(unittest.TestCase):
             the_system.render_template.call_args_list,
             expected_calls
         )
+
+    def test_correct_aria_label(self):
+        xml = """
+                 <problem>
+                     <choiceresponse>
+                         <checkboxgroup>
+                             <choice correct="true">over-suspicious</choice>
+                             <choice correct="false">funny</choice>
+                         </checkboxgroup>
+                     </choiceresponse>
+                     <choiceresponse>
+                         <checkboxgroup>
+                             <choice correct="true">Urdu</choice>
+                             <choice correct="false">Finnish</choice>
+                         </checkboxgroup>
+                     </choiceresponse>
+                 </problem>
+                 """
+        problem = new_loncapa_problem(xml)
+        rendered_html = etree.XML(problem.get_html())
+        sections = rendered_html.findall('section')
+        self.assertEqual(sections[0].attrib['aria-label'], 'Question 1')
+        self.assertEqual(sections[1].attrib['aria-label'], 'Question 2')
 
     def test_render_response_with_overall_msg(self):
         # CustomResponse script that sets an overall_message
