@@ -151,7 +151,10 @@ class ProblemTypeTestMixin(object):
         And a "problem_check" browser event is emitted
         """
         # Make sure we're looking at the right problem
-        self.assertEqual(self.problem_page.problem_name, self.problem_name)
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
 
         # Answer the problem correctly
         self.answer_problem(correctness='correct')
@@ -214,8 +217,9 @@ class ProblemTypeTestMixin(object):
             lambda: self.problem_page.problem_name == self.problem_name,
             "Make sure the correct problem is on the page"
         )
-        # Leave the problem unchanged and click submit.
-        self.assertNotIn('is-disabled', self.problem_page.q(css='.problem .submit').attrs('class')[0])
+        # Leave the problem unchanged and assure submit is disabled.
+        self.wait_for_status('unanswered')
+        self.assertFalse(self.problem_page.is_submit_disabled())
         self.problem_page.click_submit()
         self.wait_for_status('incorrect')
 
@@ -233,7 +237,7 @@ class ProblemTypeTestMixin(object):
             lambda: self.problem_page.problem_name == self.problem_name,
             "Make sure the correct problem is on the page"
         )
-        self.assertIn('is-disabled', self.problem_page.q(css='.problem .submit').attrs('class')[0])
+        self.assertTrue(self.problem_page.is_submit_disabled())
 
     @attr(shard=7)
     def test_can_show_answer(self):

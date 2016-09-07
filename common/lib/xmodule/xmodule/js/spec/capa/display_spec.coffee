@@ -119,13 +119,13 @@ describe 'Problem', ->
     describe 'with any other valid status', ->
 
       it 'reports the current score', ->
-        testProgessData(@problem, 'foo', '1/1', "True", "1/1 point earned (graded)")
+        testProgessData(@problem, 'foo', '1/1', "True", "1/1 point (graded)")
 
       it 'shows current score when rendering happens with the content', ->
-        testProgessData(@problem, 'test status', '2/2', "True", "2/2 points earned (graded)")
+        testProgessData(@problem, 'test status', '2/2', "True", "2/2 points (graded)")
 
       it 'reports the current score even if problem is ungraded', ->
-        testProgessData(@problem, 'test status', '1/1', "False", "1/1 point earned (ungraded)")
+        testProgessData(@problem, 'test status', '1/1', "False", "1/1 point (ungraded)")
 
     describe 'with valid status and string containing an integer like "0" for detail', ->
       # These tests are to address a failure specific to Chrome 51 and 52 +

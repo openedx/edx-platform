@@ -146,11 +146,26 @@ class ProblemPage(PageObject):
         """
         return self.q(css='.problem-header').focused
 
+    def is_submit_disabled(self):
+        """
+        Checks if the submit button is disabled
+        """
+        return (self.q(css='.problem .submit').attrs('disabled') and
+                'is-disabled' in self.q(css='.problem .submit').attrs('class')[0])
+
     def is_focus_on_submit_notification(self):
         """
         Check for focus submit notification.
         """
-        return self.q(css='.notification-submit').focused
+
+        def focus_check():
+            """
+            Checks whether or not the focus is on the notification-submit
+            """
+            return self.q(css='.notification-submit').focused
+
+        self.wait_for(promise_check_func=focus_check, description='Waiting for the notification-response to gain focus')
+        return focus_check()
 
     def wait_for_status_icon(self):
         """
@@ -173,7 +188,7 @@ class ProblemPage(PageObject):
         """
         Check for visibility of the success notification and icon.
         """
-        msg = "Wait for {} notification to be visible".format('success')
+        msg = "Wait for success notification to be visible"
         self.wait_for_element_visibility('.notification.success', msg)
         self.wait_for_element_visibility('.fa-check', "Waiting for success icon")
 
@@ -181,7 +196,7 @@ class ProblemPage(PageObject):
         """
         Check for visibility of the incorrect notification and icon.
         """
-        msg = "Wait for {} notification to be visible".format('error')
+        msg = "Wait for error notification to be visible"
         self.wait_for_element_visibility('.notification.error', msg)
         self.wait_for_element_visibility('.fa-close', "Waiting for incorrect notification icon")
 
@@ -189,7 +204,7 @@ class ProblemPage(PageObject):
         """
         Check for visibility of the partially visible notification and icon.
         """
-        msg = "Wait for {} notification to be visible".format('error')
+        msg = "Wait for partial correct notification to be visible"
         self.wait_for_element_visibility('.notification.success', msg)
         self.wait_for_element_visibility('.fa-asterisk', "Waiting for incorrect notification icon")
 

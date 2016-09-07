@@ -84,11 +84,11 @@ class @Problem
         if graded == "True" and possible != 0
             # This comment needs to be on one line to be properly scraped for the translators. Sry for length.
             `// Translators: %(earned)s is the number of points earned. %(possible)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points)`
-            progress_template = ngettext('%(earned)s/%(possible)s point earned (graded)', '%(earned)s/%(possible)s points earned (graded)', possible)
+            progress_template = ngettext('%(earned)s/%(possible)s point (graded)', '%(earned)s/%(possible)s points (graded)', possible)
         else
             # This comment needs to be on one line to be properly scraped for the translators. Sry for length.
             `// Translators: %(earned)s is the number of points earned. %(possible)s is the total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of points will always be at least 1. We pluralize based on the total number of points (example: 0/1 point; 1/2 points)`
-            progress_template = ngettext('%(earned)s/%(possible)s point earned (ungraded)', '%(earned)s/%(possible)s points earned (ungraded)', possible)
+            progress_template = ngettext('%(earned)s/%(possible)s point (ungraded)', '%(earned)s/%(possible)s points (ungraded)', possible)
         progress = interpolate(progress_template, {'earned': earned, 'possible': possible}, true)
 
     # Render 'x point(s) possible' if student has not yet attempted question
@@ -123,22 +123,23 @@ class @Problem
     @el.trigger('progressChanged')
     @renderProgressState()
 
-  queueing: =>
+  queueing: (focus_callback) =>
     @queued_items = @$(".xqueue")
     @num_queued_items = @queued_items.length
     if @num_queued_items > 0
       if window.queuePollerID # Only one poller 'thread' per Problem
         window.clearTimeout(window.queuePollerID)
       window.queuePollerID = window.setTimeout(
-        => @poll(1000),
+        => @poll(1000, focus_callback),
         1000)
 
-  poll: (prev_timeout) =>
+  poll: (prev_timeout, focus_callback) =>
     $.postWithPrefix "#{@url}/problem_get", (response) =>
       # If queueing status changed, then render
       @new_queued_items = $(response.html).find(".xqueue")
       if @new_queued_items.length isnt @num_queued_items
-        @el.html(response.html)
+        @el.html(response.html).promise().done =>
+          focus_callback?()
         JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
           @bind()
@@ -155,7 +156,7 @@ class @Problem
           @gentle_alert gettext("The grading process is still running. Refresh the page to see updates.")
         else
           window.queuePollerID = window.setTimeout(
-            => @poll(new_timeout),
+            => @poll(new_timeout, focus_callback),
             new_timeout
           )
 
@@ -177,15 +178,16 @@ class @Problem
     $.postWithPrefix "#{url}/input_ajax", data, callback
 
 
-  render: (content) ->
+  render: (content, focus_callback) ->
     if content
       @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
       JavascriptLoader.executeModuleScripts @el, () =>
         @setupInputTypes()
         @bind()
-        @queueing()
+        @queueing(focus_callback)
         @renderProgressState()
+        focus_callback?()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -355,11 +357,10 @@ class @Problem
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
           @el.trigger('contentChanged', [@id, response.contents])
-          @render(response.contents)
+          @render(response.contents, @focus_on_submit_notification)
           @updateProgress response
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
-          @focus_on_submit_notification()
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
