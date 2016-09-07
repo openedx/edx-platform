@@ -250,7 +250,7 @@ class @Problem
       @questionTitle.focus()
 
   focus_on_submit_notification: =>
-    @submitNotification = @$('.notification-response')
+    @submitNotification = @$('.notification-submit')
     if @submitNotification.length > 0
       @submitNotification.focus()
 
@@ -798,7 +798,10 @@ class @Problem
     #   'changeText' is a boolean to determine if there is need to change the
     #    text of submit button as well.
     attempts_remaining = @submitButton.data('attempts-remaining')
-    if enable && attempts_remaining != 0
+    if enable && attempts_remaining == 0
+      if changeText
+        @submitButtonLabel.text(@submitButtonSubmitText)
+    else if enable && attempts_remaining != 0
       @submitButton.removeAttr 'disabled'
       # the is-disabled is needed for Lettuce test below
       # lms/djangoapps/courseware/features/problems.py submit_problem(step)
@@ -811,7 +814,7 @@ class @Problem
       # lms/djangoapps/courseware/features/problems.py submit_problem(step)
       @submitButton.addClass 'is-disabled'
       if changeText
-        @submitButtonLabel.text(@submitButtonSubmitText)
+        @submitButtonLabel.text(@submitButtonSubmittingText)
 
   enableSubmitButtonAfterResponse: =>
     @has_response = true

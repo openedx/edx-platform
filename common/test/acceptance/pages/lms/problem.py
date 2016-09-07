@@ -150,7 +150,7 @@ class ProblemPage(PageObject):
         """
         Check for focus submit notification.
         """
-        return self.q(css='.notification-response').focused
+        return self.q(css='.notification-submit').focused
 
     def wait_for_status_icon(self):
         """
