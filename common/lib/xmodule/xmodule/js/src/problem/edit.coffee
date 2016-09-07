@@ -192,11 +192,15 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-
   @markdownToXml: (markdown)->
+    # it will contain <hint>...</hint> tags
+    demandHintTags = [];
     toXml = `function (markdown) {
       var xml = markdown,
-          i, splits, scriptFlag;
+          i, splits, makeParagraph;
+      var responseTypes = [
+        'optionresponse', 'multiplechoiceresponse', 'stringresponse', 'numericalresponse', 'choiceresponse'
+      ];
 
       // fix DOS \r\n line endings to look like \n
       xml = xml.replace(/\r\n/g, '\n');
@@ -205,6 +209,20 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h3 class="hd hd-2 problem-header">$1</h3>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
+      // extract question and description(optional)
+      // >>question||description<< converts to
+      // <label>question</label> <description>description</description>
+      xml = xml.replace(/>>([^]+?)<</gm, function(match, questionText) {
+          var result = questionText.split('||'),
+              label = '<label>' + result[0] + '</label>' + '\n';
+
+          // don't add empty <description> tag
+          if (result.length === 1 || !result[1]) {
+              return label;
+          }
+          return label + '<description>' + result[1] + '</description>\n'
+      })
+
       // Pull out demand hints,  || a hint ||
       var demandhints = '';
       xml = xml.replace(/(^\s*\|\|.*?\|\|\s*$\n?)+/gm, function(match) {  // $\n
@@ -212,6 +230,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           for (i = 0; i < options.length; i += 1) {
               var inner = /\s*\|\|(.*?)\|\|/.exec(options[i]);
               if (inner) {
+                  //safe-lint: disable=javascript-concat-html
                   demandhints += '  <hint>' + inner[1].trim() + '</hint>\n';
               }
            }
@@ -510,56 +529,31 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return selectString;
       });
 
-      // replace labels
-      // looks for >>arbitrary text<< and inserts it into the label attribute of the input type directly below the text.
-      var split = xml.split('\n');
-      var new_xml = [];
-      var line, i, curlabel, prevlabel = '';
-      var didinput = false;
-      for (i = 0; i < split.length; i++) {
-        line = split[i];
-        if (match = line.match(/>>(.*)<</)) {
-          curlabel = match[1].replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&apos;');
-          line = line.replace(/>>|<</g, '');
-        } else if (line.match(/<\w+response/) && didinput && curlabel == prevlabel) {
-          // reset label to prevent gobbling up previous one (if multiple questions)
-          curlabel = '';
-          didinput = false;
-        } else if (line.match(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/) && curlabel != '' && curlabel != undefined) {
-          line = line.replace(/<(textline|optioninput|formulaequationinput|choicegroup|checkboxgroup)/, '<$1 label="' + curlabel + '"');
-          didinput = true;
-          prevlabel = curlabel;
-        }
-        new_xml.push(line);
-      }
-      xml = new_xml.join('\n');
-
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
-          var selectString = '<pre><code>\n' + p1 + '</code></pre>';
+          var selectString = '<pre><code>' + p1 + '</code></pre>';
 
           return selectString;
       });
 
       // split scripts and preformatted sections, and wrap paragraphs
-      splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
-      scriptFlag = false;
+      splits = xml.split(/(\<\/?(?:script|pre|label|description).*?\>)/g);
+
+      // Wrap a string by <p> tag when line is not already wrapped by another tag
+      // true when line is not already wrapped by another tag false otherwise
+      makeParagraph = true;
 
       for (i = 0; i < splits.length; i += 1) {
-          if(/\<(script|pre)/.test(splits[i])) {
-              scriptFlag = true;
+          if (/\<(script|pre|label|description)/.test(splits[i])) {
+              makeParagraph = false;
           }
 
-          if(!scriptFlag) {
+          if (makeParagraph) {
               splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
           }
 
-          if(/\<\/(script|pre)/.test(splits[i])) {
-              scriptFlag = false;
+          if (/\<\/(script|pre|label|description)/.test(splits[i])) {
+              makeParagraph = true;
           }
       }
 
@@ -570,12 +564,68 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // if we've come across demand hints, wrap in <demandhint> at the end
       if (demandhints) {
-          demandhints = '\n<demandhint>\n' + demandhints + '</demandhint>';
+          demandHintTags.push(demandhints);
       }
 
-      // make all elements descendants of a single problem element
-      xml = '<problem>\n' + xml + demandhints + '\n</problem>';
+      // make selector to search responsetypes in xml
+      var responseTypesSelector = responseTypes.join(', ');
 
+      // make temporary xml
+      // safe-lint: disable=javascript-concat-html
+      var $xml = $($.parseXML('<prob>' + xml + '</prob>'));
+      responseType = $xml.find(responseTypesSelector);
+
+      // convert if there is only one responsetype
+      if (responseType.length === 1) {
+        var inputtype = responseType[0].firstElementChild
+        // used to decide whether an element should be placed before or after an inputtype
+        var beforeInputtype = true;
+
+        _.each($xml.find('prob').children(), function(child, index){
+            // we don't want to add the responsetype again into new xml
+            if (responseType[0].nodeName === child.nodeName) {
+                beforeInputtype = false;
+                return;
+            }
+
+            if (beforeInputtype) {
+                // safe-lint: disable=javascript-jquery-insert-into-target
+                responseType[0].insertBefore(child, inputtype);
+            } else {
+                responseType[0].appendChild(child);
+            }
+        })
+        var serializer = new XMLSerializer();
+
+        xml = serializer.serializeToString(responseType[0]);
+
+        // remove xmlns attribute added by the serializer
+        xml = xml.replace(/\sxmlns=['"].*?['"]/gi, '');
+
+        // XMLSerializer messes the indentation of XML so add newline
+        // at the end of each ending tag to make the xml looks better
+        xml = xml.replace(/(\<\/.*?\>)(\<.*?\>)/gi, '$1\n$2');
+      }
+
+      // remove class attribute added on <p> tag for question title
+      xml = xml.replace(/\sclass=\'qtitle\'/gi, '');
       return xml;
     }`
-    return toXml markdown
+
+    responseTypesXML = []
+    responseTypesMarkdown = markdown.split(/\n\s*---\s*\n/g)
+    _.each responseTypesMarkdown, (responseTypeMarkdown, index) ->
+      if responseTypeMarkdown.trim().length > 0
+        responseTypesXML.push toXml(responseTypeMarkdown)
+
+    # combine demandhints
+    demandHints = ''
+    if demandHintTags.length
+        ## safe-lint: disable=javascript-concat-html
+        demandHints = '\n<demandhint>\n' + demandHintTags.join('') + '</demandhint>'
+
+    # make all responsetypes descendants of a single problem element
+    ## safe-lint: disable=javascript-concat-html
+    # format and return xml
+    finalXml = '<problem>' + responseTypesXML.join('\n\n') + demandHints + '</problem>'
+    return PrettyPrint.xml(finalXml);

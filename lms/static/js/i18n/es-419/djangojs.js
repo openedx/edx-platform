@@ -741,6 +741,7 @@
     "Group name is required": "Nombre de grupo requerido", 
     "Groups": "Grupos", 
     "H Align": "Alineaci\u00f3n H", 
+    "HTML preview of post": "previsiualizaci\u00f3n en HTML", 
     "HTML source code": "C\u00f3digo fuente HTML", 
     "Header": "Encabezado", 
     "Header 1": "Encabezado 1", 
@@ -1565,7 +1566,7 @@
     "To receive a certificate, you must also verify your identity before %(date)s.": "Para recibir un certificado, tambi\u00e9n debe verificar su identidad antes del %(date)s.", 
     "To receive a certificate, you must also verify your identity.": "Para recibir un certificado, tambi\u00e9n debe verificar su identidad.", 
     "To receive credit on a problem, you must click \"Check\" or \"Final Check\" on it before you select \"End My Exam\".": "Para recibir cr\u00e9ditos para un problema, debe hacer clic en el bot\u00f3n de \"Revisar\" o \"Env\u00edo Final\" de dicho problema antes de seleccionar \"Terminar el examen\".", 
-    "To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on {link_start} the Data Download page. {link_end}": "Para revisar las asignaciones de cohortes de estudiantes o ver los resultados de cargar un archivo CSV, descargue la informaci\u00f3n del perfil del curso o resultados de cohortes en {link_start} la p\u00e1gina para descarga de datos. {link_end}", 
+    "To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on the {link_start}Data Download{link_end} page.": "Para revisar las asignaciones de estudiantes a cohortes o ver los resultados de cargar un archivo CSV, descargue la informaci\u00f3n del perfil del curso o los resultados de cohortes en {link_start}la p\u00e1gina para descarga de datos{link_end}.", 
     "To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.": "Para compartir tu certificado en Mozilla Backpack, debes tener una cuenta de Backpack primero. Completa los siguientes pasos para agregar tu certificado a Backpack.", 
     "To take a successful photo, make sure that:": "Para tomar la foto correctamente, aseg\u00farese de: ", 
     "To use the current photo, select the camera button {icon}. To take another photo, select the retake button {icon}.": "Para usar la foto actual, selecciona el bot\u00f3n de c\u00e1mara {icon}. Para tomar una nueva foto, selecciona el bot\u00f3n de nueva toma {icon}.", 
@@ -1953,6 +1954,8 @@
     "strong text": "texto agrandado", 
     "subsection": "subsecci\u00f3n", 
     "team count": "Cantidad de equipos", 
+    "text_word_{uniqueId}": "text_word_{uniqueId}", 
+    "text_word_{uniqueId} title_word_{uniqueId}": "text_word_{uniqueId} title_word_{uniqueId}", 
     "there is currently %(numVotes)s vote": [
       "actualmente tiene %(numVotes)s voto", 
       "actualmente tiene %(numVotes)s votos"
@@ -1963,6 +1966,7 @@
     ], 
     "timed": "cronometrado", 
     "title": "T\u00edtulo", 
+    "title_word_{uniqueId}": "title_word_{uniqueId}", 
     "unanswered question": "pregunta sin responder", 
     "unit": "unidad", 
     "upload a PDF file or provide the path to a Studio asset file": "Suba un archivo PDF o ingrese la ruta de un recurso en Studio", 
@@ -2017,6 +2021,7 @@
     "{platform_name} learners can see my:": "Los usuarios de {platform_name} pueden ver mi:", 
     "{screen_reader_start}Warning:{screen_reader_end} No content groups exist.": "{screen_reader_start}Advertencia:{screen_reader_end} No existe ning\u00fan grupo de contenido.", 
     "{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.": "{screen_reader_start}Advertencia:{screen_reader_end} El grupo de contenido previamente seleccionado ha sido borrado. Seleccione otro grupo de contenido.", 
+    "{start_strong}{total}{end_strong} words submitted in total.": "{start_strong}{total}{end_strong} palabras enviadas en total.", 
     "{totalItems} total": "{totalItems} total", 
     "{unread_comments_count} new": "{unread_comments_count} nuevos", 
     "\u2026": "..."

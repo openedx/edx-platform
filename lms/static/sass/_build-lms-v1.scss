@@ -65,6 +65,7 @@
 @import "discussion/utilities/variables-v1";
 @import "discussion/mixins";
 @import 'discussion/discussion'; // Process old file after definitions but before everything else, partial is deprecated.
+@import 'discussion/discussion-v1'; // Non-Pattern Library styling
 @import "discussion/elements/actions";
 @import "discussion/elements/editor";
 @import "discussion/elements/labels";

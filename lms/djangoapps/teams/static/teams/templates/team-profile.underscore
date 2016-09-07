@@ -5,7 +5,7 @@
                 data-user-create-comment="<%- !readOnly %>"
                 data-user-create-subcomment="<%- !readOnly %>">
             <% if ( !readOnly) { %>
-                <button type="button" class="btn btn-small new-post-btn">
+                <button class="btn-brand btn-small new-post-btn">
                     <%- gettext("Add a Post") %>
                 </button>
             <% } %>

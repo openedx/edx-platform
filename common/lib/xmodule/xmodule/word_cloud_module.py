@@ -242,7 +242,6 @@ class WordCloudModule(WordCloudFields, XModule):
         context = {
             'ajax_url': self.system.ajax_url,
             'display_name': self.display_name,
-            'display_name_default': WordCloudFields.display_name.default,
             'instructions': self.instructions,
             'element_class': self.location.category,
             'element_id': self.location.html_id(),

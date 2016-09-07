@@ -1762,7 +1762,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>The following languages are in the Indo-European family:</p>
             <choiceresponse>
-              <checkboxgroup label="The following languages are in the Indo-European family:">
+              <checkboxgroup>
                 <choice correct="true">Urdu</choice>
                 <choice correct="false">Finnish</choice>
                 <choice correct="true">Marathi</choice>
@@ -1797,7 +1797,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
 
             <optionresponse>
-              <optioninput label="lbl" options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
+              <optioninput options="('India','Spain','China','Bermuda')" correct="India"></optioninput>
             </optionresponse>
 
              <solution>
@@ -1822,7 +1822,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>Which of the following countries has the largest population?</p>
             <multiplechoiceresponse>
-              <choicegroup label="Which of the following countries has the largest population?" type="MultipleChoice">
+              <choicegroup type="MultipleChoice">
                 <choice correct="false">Brazil
                     <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint>
                 </choice>
@@ -1866,14 +1866,13 @@ class CapaDescriptorTest(unittest.TestCase):
             <p>How many miles away from Earth is the sun? Use scientific notation to answer.</p>
 
             <numericalresponse answer="9.3*10^7">
-              <formulaequationinput label="How many miles away from Earth is the sun?
-              Use scientific notation to answer." />
+              <formulaequationinput/>
             </numericalresponse>
 
             <p>The square of what number is -100?</p>
 
             <numericalresponse answer="10*i">
-              <formulaequationinput label="The square of what number is -100?" />
+              <formulaequationinput/>
             </numericalresponse>
 
             <solution>
@@ -1906,8 +1905,7 @@ class CapaDescriptorTest(unittest.TestCase):
             <stringresponse answer="Nanjing Higher Normal Institute" type="ci" >
               <additional_answer answer="National Central University"></additional_answer>
               <additional_answer answer="Nanjing University"></additional_answer>
-              <textline label="What was the first post-secondary school in China to allow both male and female
-              students?" size="20"/>
+              <textline size="20"/>
             </stringresponse>
 
             <solution>
@@ -1939,7 +1937,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>Which of the following is a fruit? Check all that apply.</p>
             <choiceresponse>
-              <checkboxgroup label="Which of the following is a fruit? Check all that apply.">
+              <checkboxgroup>
                 <choice correct="true">apple
                   <choicehint selected="true">You are correct that an apple is a fruit because it is the fertilized
                   ovary that comes from an apple tree and contains seeds.</choicehint>
@@ -1987,7 +1985,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p> A/an ________ is a vegetable.</p>
             <optionresponse>
-              <optioninput label=" A/an ________ is a vegetable.">
+              <optioninput>
                 <option correct="False">apple <optionhint>An apple is the fertilized ovary that comes from an apple
                 tree and contains seeds, meaning it is a fruit.</optionhint></option>
                 <option correct="False">pumpkin <optionhint>A pumpkin is the fertilized ovary of a squash plant and
@@ -2019,7 +2017,7 @@ class CapaDescriptorTest(unittest.TestCase):
 
             <p>Which of the following is a vegetable?</p>
             <multiplechoiceresponse>
-              <choicegroup label="Which of the following is a vegetable?" type="MultipleChoice">
+              <choicegroup type="MultipleChoice">
                 <choice correct="false">apple <choicehint>An apple is the fertilized ovary that comes from an apple
                 tree and contains seeds, meaning it is a fruit.</choicehint></choice>
                 <choice correct="false">pumpkin <choicehint>A pumpkin is the fertilized ovary of a squash plant and
@@ -2056,8 +2054,7 @@ class CapaDescriptorTest(unittest.TestCase):
             <p>What is the arithmetic mean for the following set of numbers? (1, 5, 6, 3, 5)</p>
 
             <numericalresponse answer="4">
-              <formulaequationinput label="What is the arithmetic mean for the following set of numbers?
-              (1, 5, 6, 3, 5)" />
+              <formulaequationinput/>
               <correcthint>The mean for this set of numbers is 20 / 5, which equals 4.</correcthint>
             </numericalresponse>
             <solution>
@@ -2098,7 +2095,7 @@ class CapaDescriptorTest(unittest.TestCase):
               second largest, with 261,797 square miles.</stringequalhint>
               <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.
               </stringequalhint>
-              <textline label="Which U.S. state has the largest land area?" size="20"/>
+              <textline size="20"/>
             </stringresponse>
 
             <demandhint>
@@ -2175,7 +2172,7 @@ class CapaDescriptorTest(unittest.TestCase):
                   </choicegroup>
                 </multiplechoiceresponse>
                 <optionresponse>
-                    <optioninput label="Option" options="('1','2')" correct="2"></optioninput>
+                    <optioninput options="('1','2')" correct="2"></optioninput>
                 </optionresponse>
             </problem>
         """)
@@ -2557,12 +2554,13 @@ class TestProblemCheckTracking(unittest.TestCase):
     def test_choice_answer_text(self):
         xml = """\
             <problem display_name="Multiple Choice Questions">
-              <p>What color is the open ocean on a sunny day?</p>
               <optionresponse>
-                <optioninput options="('yellow','blue','green')" correct="blue" label="What color is the open ocean on a sunny day?"/>
+                <label>What color is the open ocean on a sunny day?</label>
+                <optioninput options="('yellow','blue','green')" correct="blue"/>
               </optionresponse>
-              <p>Which piece of furniture is built for sitting?</p>
+
               <multiplechoiceresponse>
+                <label>Which piece of furniture is built for sitting?</label>
                 <choicegroup type="MultipleChoice">
                   <choice correct="false"><text>a table</text></choice>
                   <choice correct="false"><text>a desk</text></choice>
@@ -2570,9 +2568,10 @@ class TestProblemCheckTracking(unittest.TestCase):
                   <choice correct="false"><text>a bookshelf</text></choice>
                 </choicegroup>
               </multiplechoiceresponse>
-              <p>Which of the following are musical instruments?</p>
+
               <choiceresponse>
-                <checkboxgroup label="Which of the following are musical instruments?">
+                <label>Which of the following are musical instruments?</label>
+                <checkboxgroup>
                   <choice correct="true">a piano</choice>
                   <choice correct="false">a tree</choice>
                   <choice correct="true">a guitar</choice>
@@ -2604,7 +2603,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(3): {
-                'question': '',
+                'question': 'Which piece of furniture is built for sitting?',
                 'answer': u'<text>a table</text>',
                 'response_type': 'multiplechoiceresponse',
                 'input_type': 'choicegroup',
@@ -2662,19 +2661,19 @@ class TestProblemCheckTracking(unittest.TestCase):
         })
 
     def test_multiple_inputs(self):
+        group_label = 'Choose the correct color'
+        input1_label = 'What color is the sky?'
+        input2_label = 'What color are pine needles?'
         factory = self.capa_factory_for_problem_xml("""\
             <problem display_name="Multiple Inputs">
-              <p>Choose the correct color</p>
               <optionresponse>
-                <p>What color is the sky?</p>
-                <optioninput options="('yellow','blue','green')" correct="blue"/>
-                <p>What color are pine needles?</p>
-                <optioninput options="('yellow','blue','green')" correct="green"/>
+                <label>{}</label>
+                <optioninput options="('yellow','blue','green')" correct="blue" label="{}"/>
+                <optioninput options="('yellow','blue','green')" correct="green" label="{}"/>
               </optionresponse>
             </problem>
-            """)
+            """.format(group_label, input1_label, input2_label))
         module = factory.create()
-
         answer_input_dict = {
             factory.input_key(2, 1): 'blue',
             factory.input_key(2, 2): 'yellow',
@@ -2683,7 +2682,8 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2, 1): {
-                'question': '',
+                'group_label': group_label,
+                'question': input1_label,
                 'answer': 'blue',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2691,7 +2691,8 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(2, 2): {
-                'question': '',
+                'group_label': group_label,
+                'question': input2_label,
                 'answer': 'yellow',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2702,11 +2703,14 @@ class TestProblemCheckTracking(unittest.TestCase):
 
     def test_optioninput_extended_xml(self):
         """Test the new XML form of writing with <option> tag instead of options= attribute."""
+        group_label = 'Are you the Gatekeeper?'
+        input1_label = 'input 1 label'
+        input2_label = 'input 2 label'
         factory = self.capa_factory_for_problem_xml("""\
             <problem display_name="Woo Hoo">
-              <p>Are you the Gatekeeper?</p>
                 <optionresponse>
-                   <optioninput>
+                   <label>{}</label>
+                   <optioninput label="{}">
                        <option correct="True" label="Good Job">
                            apple
                            <optionhint>
@@ -2721,7 +2725,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                        </option>
                    </optioninput>
 
-                   <optioninput>
+                   <optioninput label="{}">
                        <option correct="True">
                            apple
                            <optionhint>
@@ -2737,7 +2741,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                    </optioninput>
                  </optionresponse>
             </problem>
-            """)
+            """.format(group_label, input1_label, input2_label))
         module = factory.create()
 
         answer_input_dict = {
@@ -2748,7 +2752,8 @@ class TestProblemCheckTracking(unittest.TestCase):
         event = self.get_event_for_answers(module, answer_input_dict)
         self.assertEquals(event['submission'], {
             factory.answer_key(2, 1): {
-                'question': '',
+                'group_label': group_label,
+                'question': input1_label,
                 'answer': 'apple',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
@@ -2756,7 +2761,8 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'variant': '',
             },
             factory.answer_key(2, 2): {
-                'question': '',
+                'group_label': group_label,
+                'question': input2_label,
                 'answer': 'cucumber',
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',

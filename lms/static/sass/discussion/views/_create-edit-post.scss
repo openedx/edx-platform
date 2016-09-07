@@ -139,12 +139,12 @@
     padding: ($baseline/2);
 
     &:hover {
-      border-color: $gray-l3;
+      border-color: $forum-color-border;
     }
 
     &.is-enabled {
-      border-color: $blue;
-      color: $blue;
+      border-color: $forum-color-following;
+      color: $forum-color-following;
     }
 
     .post-option-input {
@@ -162,13 +162,11 @@
 // UI: actions
 .forum-new-post-form {
   .submit {
-    @include blue-button;
     @include margin-right($baseline/2);
     display: inline-block;
   }
 
   .cancel {
-    @include white-button;
     display: inline-block;
   }
 }

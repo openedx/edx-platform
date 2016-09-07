@@ -492,6 +492,7 @@ urlpatterns += (
         name='courseware_position',
     ),
 
+    # progress page
     url(
         r'^courses/{}/progress$'.format(
             settings.COURSE_ID_PATTERN,
@@ -499,6 +500,7 @@ urlpatterns += (
         'courseware.views.views.progress',
         name='progress',
     ),
+
     # Takes optional student_id for instructor use--shows profile as that student sees it.
     url(
         r'^courses/{}/progress/(?P<student_id>[^/]*)/$'.format(
@@ -507,6 +509,13 @@ urlpatterns += (
         'courseware.views.views.progress',
         name='student_progress',
     ),
+
+    # rest api for grades
+    url(
+        r'^api/grades/',
+        include('lms.djangoapps.grades.api.urls', namespace='grades_api')
+    ),
+
 
     # For the instructor
     url(

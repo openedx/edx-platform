@@ -1,8 +1,8 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb to check licensing
-#   * @edx/devops to check system requirements
+#   * @edx/ospr - to check licensing
+#   * @edx/devops - to check system requirements
 
 # Use a modern setuptools instead of distribute
 setuptools==18.0.1

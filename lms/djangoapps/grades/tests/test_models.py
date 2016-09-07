@@ -36,8 +36,8 @@ class GradesModelTestCase(TestCase):
             block_type='problem',
             block_id='block_id_b'
         )
-        self.record_a = BlockRecord(unicode(self.locator_a), 1, 10)
-        self.record_b = BlockRecord(unicode(self.locator_b), 1, 10)
+        self.record_a = BlockRecord(self.locator_a, 1, 10)
+        self.record_b = BlockRecord(self.locator_b, 1, 10)
 
 
 @ddt.ddt
@@ -89,7 +89,10 @@ class VisibleBlocksTest(GradesModelTestCase):
         Happy path test to ensure basic create functionality works as expected.
         """
         vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
-        expected_json = json.dumps([self.record_a._asdict()], separators=(',', ':'), sort_keys=True)
+        list_of_block_dicts = [self.record_a._asdict()]
+        for block_dict in list_of_block_dicts:
+            block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
+        expected_json = json.dumps(list_of_block_dicts, separators=(',', ':'), sort_keys=True)
         expected_hash = b64encode(sha1(expected_json).digest())
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)

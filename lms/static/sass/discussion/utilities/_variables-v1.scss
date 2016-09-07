@@ -3,8 +3,9 @@
 
 // color variables
 $forum-color-background: $white;
-$forum-color-active-thread: $white !default;
-$forum-color-active-text: $base-font-color !default;
+$forum-color-active-thread: $blue !default;
+$forum-color-hover: $action-primary-bg !default;
+$forum-color-active-text: $white !default;
 $forum-color-pinned: $pink !default;
 $forum-color-reported: $pink !default;
 $forum-color-closed: $black !default;

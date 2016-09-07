@@ -1,7 +1,7 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb - to check licensing
+#   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 
 # This needs to be installed *after* lxml, which is in base.txt.
