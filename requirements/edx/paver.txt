@@ -2,7 +2,7 @@
 Paver==1.2.4
 psutil==1.2.1
 lazy==1.1
-path.py==7.2
+path.py==7.6
 watchdog==0.7.1
 python-memcached
 libsass==0.10.0
