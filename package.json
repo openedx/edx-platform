@@ -17,6 +17,8 @@
     "underscore.string": "~3.3.4"
   },
   "devDependencies": {
+    "bootstrap": "3.3.7",
+    "bootstrap-table": "1.11.0",
     "edx-custom-a11y-rules": "0.1.2",
     "eslint": "^2.13.1",
     "eslint-config-edx": "^1.2.1",
@@ -32,8 +34,7 @@
     "karma-junit-reporter": "^0.4.1",
     "karma-requirejs": "^0.2.6",
     "karma-spec-reporter": "^0.0.20",
-    "pa11y": "3.6.0",
-    "pa11y-reporter-1.0-json": "1.0.2",
+    "pa11y": "4.0.1",
     "plato": "1.2.2"
   }
 }
