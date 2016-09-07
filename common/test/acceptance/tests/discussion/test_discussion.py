@@ -827,7 +827,6 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'color-contrast',  # TNL-4644
                 'icon-aria-hidden',  # TNL-4645
-                'duplicate-id',  # TNL-4647
             ]
         })
         page.visit()
