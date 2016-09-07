@@ -74,7 +74,7 @@
             templateNames = [
                 'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show',
                 'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
-                'discussion-home', 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry',
+                'discussion-home', 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-alert',
                 'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
                 'profile-thread', 'customwmd-prompt', 'nav-loading'
             ];
