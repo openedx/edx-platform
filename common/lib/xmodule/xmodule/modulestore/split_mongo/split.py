@@ -2517,7 +2517,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 del new_block_info.defaults['markdown']
             # </workaround>
 
-            new_block_info.fields = existing_block_info.fields  # Preserve any existing overrides
+            # Preserve any existing overrides
+            new_block_info.fields = existing_block_info.fields
+
             if 'children' in new_block_info.defaults:
                 del new_block_info.defaults['children']  # Will be set later
 
