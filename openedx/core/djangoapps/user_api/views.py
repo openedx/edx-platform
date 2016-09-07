@@ -910,16 +910,17 @@ class RegistrationView(APIView):
                                 field_name, default=field_overrides[field_name]
                             )
 
-                    # Hide the password field
-                    form_desc.override_field_properties(
-                        "password",
-                        default="",
-                        field_type="hidden",
-                        required=False,
-                        label="",
-                        instructions="",
-                        restrictions={}
-                    )
+                    # Hide the password & password_copy fields
+                    for name in ["password", "password_copy"]:
+                        form_desc.override_field_properties(
+                            name,
+                            default="",
+                            field_type="hidden",
+                            required=False,
+                            label="",
+                            instructions="",
+                            restrictions={}
+                        )
 
 
 class PasswordResetView(APIView):

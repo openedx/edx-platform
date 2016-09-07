@@ -1660,6 +1660,37 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
             }
         )
 
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"password_copy": "required"})
+    def test_confirm_password_success(self):
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "password_copy": self.PASSWORD,
+            "honor_code": "true",
+        })
+        self.assertHttpOK(response)
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"password_copy": "required"})
+    def test_confirm_password_failure(self):
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "password_copy": "doesn't match",
+            "honor_code": "true",
+        })
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "password_copy": [{"user_message": "The passwords must match."}],
+            }
+        )
+
     def _assert_reg_field(self, extra_fields_setting, expected_field):
         """Retrieve the registration form description from the server and
         verify that it contains the expected field.
@@ -1796,6 +1827,10 @@ class ThirdPartyRegistrationTestMixin(ThirdPartyOAuthTestMixin, CacheIsolationTe
         self.assertEqual(response.status_code, 200)
 
         self._verify_user_existence(user_exists=True, social_link_exists=True, user_is_active=False)
+
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"password_copy": "required"})
+    def test_success_with_required_password_confirmation(self):
+        self.test_success()
 
     def test_unlinked_active_user(self):
         user = UserFactory()

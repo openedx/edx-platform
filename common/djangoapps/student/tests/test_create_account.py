@@ -460,6 +460,28 @@ class TestCreateAccountValidation(TestCase):
         params["username"] = params["password"] = "test_username_and_password"
         assert_password_error("Username and password fields cannot match")
 
+    @override_settings(REGISTRATION_EXTRA_FIELDS={"password_copy": "required"})
+    def test_password_copy(self):
+        params = dict(self.minimal_params)
+
+        def assert_password_copy_error(expected_error):
+            """
+            Assert that requesting account creation results in the expected
+            error
+            """
+            self.assert_error(params, "password_copy", expected_error)
+
+        # Missing
+        assert_password_copy_error("Please confirm password.")
+
+        # Doesn't match password
+        params["password_copy"] = "test passwords don't match"
+        assert_password_copy_error("The passwords must match.")
+
+        # Success
+        params["password_copy"] = params["password"]
+        self.assert_success(params)
+
     def test_name(self):
         params = dict(self.minimal_params)
 
