@@ -96,9 +96,9 @@
   // CASE: banner - staff response
   .staff-banner {
     @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+    @include left(0);
     position: absolute;
     top: 0;
-    left: 0;
     width: 100%;
     height: 14px;
     padding: 1px ($baseline/4);
@@ -111,14 +111,14 @@
 
   // CASE: banner - community TA response
   .community-ta-banner{
+    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+    @include left(0);
     position: absolute;
     top: 0;
-    left: 0;
     width: 100%;
     height: 14px;
     padding: 1px ($baseline/4);
     box-sizing: border-box;
-    border-radius: $forum-border-radius $forum-border-radius 0 0;
     background: $forum-color-community-ta;
     font-size: $forum-small-font-size;
     font-weight: 700;
@@ -138,7 +138,7 @@
 // +comments styling
 .container .discussion-body .comments {
   @extend %ui-no-list;
-  border-radius: 0 0 $forum-border-radius $forum-border-radius;
+  @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
   background: $gray-l6;
   box-shadow: 0 1px 3px -1px $shadow inset;
 
