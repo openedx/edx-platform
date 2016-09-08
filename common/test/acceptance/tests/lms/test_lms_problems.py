@@ -102,7 +102,61 @@ class ProblemClarificationTest(ProblemsTest):
         self.assertNotIn('strong', tooltip_text)
 
 
-class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
+class ProblemHintTest(ProblemsTest, EventsTestMixin):
+    """
+    Base test class for problem hint tests.
+    """
+    def verify_check_hint(self, answer, answer_text, expected_events):
+        """
+        Verify clicking Check shows the extended hint in the problem message.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_text[0], u'question text')
+        problem_page.fill_answer(answer)
+        problem_page.click_submit()
+        self.assertEqual(problem_page.message_text, answer_text)
+        # Check for corresponding tracking event
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
+            number_of_matches=1
+        )
+        self.assert_events_match(expected_events, actual_events)
+
+    def verify_demand_hints(self, first_hint, second_hint, expected_events):
+        """
+        Test clicking through the demand hints and verify the events sent.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # The single visible Hint button should be enabled.
+        self.assertEqual([None], problem_page.get_hint_button_disabled_attr())
+
+        # The hint button rotates through multiple hints
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, first_hint)
+        # Now there are two "hint" buttons, as there is also one in the hint notification.
+        self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
+
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, second_hint)
+        # Now both "hint" buttons should be disabled, as there are no more hints.
+        self.assertEqual(['true', 'true'], problem_page.get_hint_button_disabled_attr())
+
+        # Check corresponding tracking events
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
+            number_of_matches=2
+        )
+        self.assert_events_match(expected_events, actual_events)
+
+    def get_problem(self):
+        """ Subclasses should override this to complete the fixture """
+        raise NotImplementedError()
+
+
+class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.
     """
@@ -130,54 +184,39 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
         """
         Test clicking Check shows the extended hint in the problem message.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_text[0], u'question text')
-        problem_page.fill_answer('B')
-        problem_page.click_submit()
-        self.assertEqual(problem_page.message_text, u'Answer\nIncorrect: hint')
-        # Check for corresponding tracking event
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
-            number_of_matches=1
+        self.verify_check_hint(
+            'B',
+            u'Answer\nIncorrect: hint',
+            [
+                {
+                    'event':
+                        {
+                            'hint_label': u'Incorrect:',
+                            'trigger_type': 'single',
+                            'student_answer': [u'B'],
+                            'correctness': False,
+                            'question_type': 'stringresponse',
+                            'hints': [{'text': 'hint'}]
+                        }
+                }
+            ]
         )
-        self.assert_events_match(
-            [{'event': {'hint_label': u'Incorrect:',
-                        'trigger_type': 'single',
-                        'student_answer': [u'B'],
-                        'correctness': False,
-                        'question_type': 'stringresponse',
-                        'hints': [{'text': 'hint'}]}}],
-            actual_events)
 
     def test_demand_hint(self):
         """
         Test clicking hint button shows the demand hint in its div.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        # The hint button rotates through multiple hints
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): demand-hint1')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (2 of 2): demand-hint2')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): demand-hint1')
-        # Check corresponding tracking events
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
-            number_of_matches=3
-        )
-        self.assert_events_match(
+        self.verify_demand_hints(
+            u'Hint (1 of 2): demand-hint1',
+            u'Hint (1 of 2): demand-hint1\nHint (2 of 2): demand-hint2',
             [
                 {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}},
-                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'demand-hint2'}},
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}}
-            ],
-            actual_events)
+                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'demand-hint2'}}
+            ]
+        )
 
 
-class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
+class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
     """
     Tests that hints containing html get rendered properly
     """
@@ -205,51 +244,36 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
         """
         Test clicking Check shows the extended hint in the problem message.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_text[0], u'question text')
-        problem_page.fill_answer('C')
-        problem_page.click_submit()
-        self.assertEqual(problem_page.message_text, u'Answer\nIncorrect: aa bb cc')
-        # Check for corresponding tracking event
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
-            number_of_matches=1
+        self.verify_check_hint(
+            'C',
+            u'Answer\nIncorrect: aa bb cc',
+            [
+                {
+                    'event':
+                        {
+                            'hint_label': u'Incorrect:',
+                            'trigger_type': 'single',
+                            'student_answer': [u'C'],
+                            'correctness': False,
+                            'question_type': 'stringresponse',
+                            'hints': [{'text': '<a href="#">aa bb</a> cc'}]
+                        }
+                }
+            ]
         )
-        self.assert_events_match(
-            [{'event': {'hint_label': u'Incorrect:',
-                        'trigger_type': 'single',
-                        'student_answer': [u'C'],
-                        'correctness': False,
-                        'question_type': 'stringresponse',
-                        'hints': [{'text': '<a href="#">aa bb</a> cc'}]}}],
-            actual_events)
 
     def test_demand_hint(self):
         """
-        Test clicking hint button shows the demand hint in its div.
+        Test clicking hint button shows the demand hints in a notification area.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        # The hint button rotates through multiple hints
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (2 of 2): dd ee ff')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
-        # Check corresponding tracking events
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
-            number_of_matches=3
-        )
-        self.assert_events_match(
+        self.verify_demand_hints(
+            u'Hint (1 of 2): aa bb cc',
+            u'Hint (1 of 2): aa bb cc\nHint (2 of 2): dd ee ff',
             [
                 {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}},
-                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'<a href="#">dd  ee</a> ff'}},
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}}
-            ],
-            actual_events)
+                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'<a href="#">dd  ee</a> ff'}}
+            ]
+        )
 
 
 class ProblemWithMathjax(ProblemsTest):
@@ -291,13 +315,23 @@ class ProblemWithMathjax(ProblemsTest):
 
         # The hint button rotates through multiple hints
         problem_page.click_hint()
-        self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.extract_hint_text_from_html)
+        self.assertEqual(
+            ["<strong>Hint (1 of 2): </strong>mathjax should work1"],
+            problem_page.extract_hint_text_from_html
+        )
         problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
         problem_page.click_hint()
 
-        self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.extract_hint_text_from_html)
+        self.assertEqual(
+            [
+                "<strong>Hint (1 of 2): </strong>mathjax should work1",
+                "<strong>Hint (2 of 2): </strong>mathjax should work2"
+            ],
+            problem_page.extract_hint_text_from_html
+        )
+
         problem_page.verify_mathjax_rendered_in_hint()
 
 

@@ -29,6 +29,8 @@ from django.utils.timezone import UTC
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from django.conf import settings
 
+from openedx.core.djangolib.markup import HTML, Text
+
 log = logging.getLogger("edx.courseware")
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -565,49 +567,63 @@ class CapaMixin(CapaFields):
 
     def get_demand_hint(self, hint_index):
         """
-        Return html for the problem.
+        Return html for the problem, including demand hints.
 
-        Adds submit, reset, save, and hint buttons as necessary based on the problem config
-        and state.
-        encapsulate: if True (the default) embed the html in a problem <div>
-        hint_index: (None is the default) if not None, this is the index of the next demand
-        hint to show.
+        hint_index (int): (None is the default) if not None, this is the index of the next demand
+            hint to show.
         """
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         hint_index = hint_index % len(demand_hints)
 
         _ = self.runtime.service(self, "i18n").ugettext
-        hint_element = demand_hints[hint_index]
-        hint_text = get_inner_html_from_xpath(hint_element)
-        if len(demand_hints) == 1:
-            prefix = _('Hint: ')
-        else:
-            # Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three hints.
-            prefix = _('Hint ({hint_num} of {hints_count}): ').format(hint_num=hint_index + 1,
-                                                                      hints_count=len(demand_hints))
 
-        # Log this demand-hint request
+        counter = 0
+        total_text = ''
+        while counter <= hint_index:
+            # Translators: {previous_hints} is the HTML of hints that have already been generated, {hint_number_prefix}
+            # is a header for this hint, and {hint_text} is the text of the hint itself.
+            # This string is being passed to translation only for possible reordering of the placeholders.
+            total_text = HTML(_('{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>')).format(
+                previous_hints=HTML(total_text),
+                # Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three hints.
+                # This text is shown in bold before the accompanying hint text.
+                hint_number_prefix=Text(_("Hint ({hint_num} of {hints_count}): ")).format(
+                    hint_num=counter + 1, hints_count=len(demand_hints)
+                ),
+                # Course-authored HTML demand hints are supported.
+                hint_text=HTML(get_inner_html_from_xpath(demand_hints[counter]))
+            )
+            counter += 1
+
+        total_text = HTML('<ol>{hints}</ol>').format(hints=total_text)
+
+        # Log this demand-hint request. Note that this only logs the last hint requested (although now
+        # all previously shown hints are still displayed).
         event_info = dict()
         event_info['module_id'] = self.location.to_deprecated_string()
         event_info['hint_index'] = hint_index
         event_info['hint_len'] = len(demand_hints)
-        event_info['hint_text'] = hint_text
+        event_info['hint_text'] = get_inner_html_from_xpath(demand_hints[hint_index])
         self.runtime.publish(self, 'edx.problem.hint.demandhint_displayed', event_info)
 
         # We report the index of this hint, the client works out what index to use to get the next hint
         return {
             'success': True,
-            'contents': prefix + hint_text,
-            'hint_index': hint_index
+            'hint_index': hint_index,
+            'html': self.get_problem_html(encapsulate=False, demand_hint_text=total_text, hint_index=hint_index)
         }
 
-    def get_problem_html(self, encapsulate=True, save_notification_message=None):
+    def get_problem_html(self, encapsulate=True, demand_hint_text=None, hint_index=0, save_notification_message=None):
         """
         Return html for the problem.
 
         Adds submit, reset, save, and hint buttons as necessary based on the problem config
         and state.
-        encapsulate: if True (the default) embed the html in a problem <div>
+
+        encapsulate (bool): if True (the default) embed the html in a problem <div>
+        demand_hint_text (str): the demand hint text (optional, default is None)
+        hint_index (int): the index of the last demand hint being shown (optional, default is 0)
+        save_notification_message (str): the save notification message to show (optional, default is None)
         """
         try:
             html = self.lcp.get_html()
@@ -633,8 +649,52 @@ class CapaMixin(CapaFields):
         # If demand hints are available, emit hint button and div.
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         demand_hint_possible = len(demand_hints) > 0
+        # hint_index is the index of the last hint that will be displayed in this rendering,
+        # so add 1 to check if others exist.
+        should_enable_next_hint = demand_hint_possible and hint_index + 1 < len(demand_hints)
 
-        # Get the current problem status and generate the answer notification and message.
+        answer_notification_type, answer_notification_message = self._get_answer_notification()
+
+        context = {
+            'problem': content,
+            'id': self.location.to_deprecated_string(),
+            'short_id': self.location.html_id(),
+            'submit_button': submit_button,
+            'submit_button_submitting': submit_button_submitting,
+            'should_enable_submit_button': should_enable_submit_button,
+            'reset_button': self.should_show_reset_button(),
+            'save_button': self.should_show_save_button(),
+            'answer_available': self.answer_available(),
+            'attempts_used': self.attempts,
+            'attempts_allowed': self.max_attempts,
+            'demand_hint_possible': demand_hint_possible,
+            'should_enable_next_hint': should_enable_next_hint,
+            'hint_notification_message': demand_hint_text,
+            'save_notification_message': save_notification_message,
+            'answer_notification_type': answer_notification_type,
+            'answer_notification_message': answer_notification_message,
+        }
+
+        html = self.runtime.render_template('problem.html', context)
+
+        if encapsulate:
+            html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
+                id=self.location.html_id(), ajax_url=self.runtime.ajax_url
+            ) + html + "</div>"
+
+        # Now do all the substitutions which the LMS module_render normally does, but
+        # we need to do here explicitly since we can get called for our HTML via AJAX
+        html = self.runtime.replace_urls(html)
+        if self.runtime.replace_course_urls:
+            html = self.runtime.replace_course_urls(html)
+
+        if self.runtime.replace_jump_to_id_urls:
+            html = self.runtime.replace_jump_to_id_urls(html)
+
+        return html
+
+    def _get_answer_notification(self):
+        """ Generate the answer notification type and message from the current problem status. """
         answer_notification_message = None
         answer_notification_type = None
 
@@ -684,41 +744,7 @@ class CapaMixin(CapaFields):
             else:
                 answer_notification_message = _('Partially Correct')
 
-        context = {
-            'problem': content,
-            'id': self.location.to_deprecated_string(),
-            'short_id': self.location.html_id(),
-            'submit_button': submit_button,
-            'submit_button_submitting': submit_button_submitting,
-            'should_enable_submit_button': should_enable_submit_button,
-            'reset_button': self.should_show_reset_button(),
-            'save_button': self.should_show_save_button(),
-            'answer_available': self.answer_available(),
-            'attempts_used': self.attempts,
-            'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible,
-            'save_notification_message': save_notification_message,
-            'answer_notification_type': answer_notification_type,
-            'answer_notification_message': answer_notification_message,
-        }
-
-        html = self.runtime.render_template('problem.html', context)
-
-        if encapsulate:
-            html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
-                id=self.location.html_id(), ajax_url=self.runtime.ajax_url
-            ) + html + "</div>"
-
-        # Now do all the substitutions which the LMS module_render normally does, but
-        # we need to do here explicitly since we can get called for our HTML via AJAX
-        html = self.runtime.replace_urls(html)
-        if self.runtime.replace_course_urls:
-            html = self.runtime.replace_course_urls(html)
-
-        if self.runtime.replace_jump_to_id_urls:
-            html = self.runtime.replace_jump_to_id_urls(html)
-
-        return html
+        return answer_notification_type, answer_notification_message
 
     def remove_tags_from_html(self, html):
         """
