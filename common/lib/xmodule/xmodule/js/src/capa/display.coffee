@@ -246,17 +246,26 @@ class @Problem
 
   # Scroll to problem metadata and next focus is problem input
   scroll_to_problem_meta: =>
-    @questionTitle = @$(".problem-header")
-    if @questionTitle.length > 0
+    questionTitle = @$(".problem-header")
+    if questionTitle.length > 0
       $('html, body').animate({
-        scrollTop: @questionTitle.offset().top
+        scrollTop: questionTitle.offset().top
       }, 500);
-      @questionTitle.focus()
+      questionTitle.focus()
+
+  focus_on_notification: (type) =>
+    notification = @$('.notification-'+type)
+    if notification.length > 0
+      notification.focus()
 
   focus_on_submit_notification: =>
-    @submitNotification = @$('.notification-submit')
-    if @submitNotification.length > 0
-      @submitNotification.focus()
+    @focus_on_notification('submit')
+
+  focus_on_hint_notification: =>
+    @focus_on_notification('hint')
+
+  focus_on_save_notification: =>
+    @focus_on_notification('save')
 
   ###
   # 'submit_fd' uses FormData to allow file submissions in the 'problem_check' dispatch,
@@ -444,10 +453,6 @@ class @Problem
   save: =>
     if not @submit_save_waitfor(@save_internal)
       @disableAllButtonsWhileRunning @save_internal, false
-
-  focus_on_save_notification: =>
-    if @saveNotification.length > 0
-      @saveNotification.focus()
 
   save_internal: =>
     Logger.log 'problem_save', @answers
@@ -850,18 +855,16 @@ class @Problem
   hint_button: =>
     # Store the index of the currently shown hint as an attribute.
     # Use that to compute the next hint number when the button is clicked.
-    hint_index = @$('.problem-hint').attr('hint_index')
+    hint_container = @.$('.problem-hint')
+    hint_index = hint_container.attr('hint_index')
     if hint_index == undefined
       next_index = 0
     else
       next_index = parseInt(hint_index) + 1
     $.postWithPrefix "#{@url}/hint_button", hint_index: next_index, input_id: @id, (response) =>
-      hint_container = @.$('.problem-hint')
-      hint_container.html(response.contents)
-      MathJax.Hub.Queue [
-        'Typeset'
-        MathJax.Hub
-        hint_container[0]
-      ]
-      hint_container.attr('hint_index', response.hint_index)
-      @$('.hint-button').focus()  # a11y focus on click, like the Submit button
+      if response.success
+        @render(response.html, @focus_on_hint_notification)
+        hint_container = @.$('.problem-hint')
+        hint_container.attr('hint_index', response.hint_index)
+      else
+        @gentle_alert response.msg

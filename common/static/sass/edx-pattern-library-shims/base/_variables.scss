@@ -133,12 +133,15 @@ $uxpl-blue-hover-active: darken($uxpl-blue-base, 7%); // wcag2a compliant
 $uxpl-green-base: rgba(0, 129, 0, 1); // wcag2a compliant
 $uxpl-green-hover-active: lighten($uxpl-green-base, 7%); // wcag2a compliant
 
+$uxpl-gray-dark: rgb(17, 17, 17);
+$uxpl-gray-base: rgb(65, 65, 65);
+$uxpl-gray-background: rgb(217, 217, 217);
+
 
 // Alert styles
 $error-color: rgb(203, 7, 18) !default;
 $success-color: rgb(0, 155, 0) !default;
 $warning-color: rgb(255, 192 ,31) !default;
-$info-color: rgb(0, 134, 206) !default;
 
 
 // BUTTONS
@@ -212,7 +215,7 @@ $btn-small-padding-horizontal: spacing-horizontal(small);
 @mixin notification-by-type($color) {
   border-top: 3px solid $color;
   .icon {
-    @include margin-right($baseline / 2);
+    @include margin-right(3 * $baseline/ 4);
     color: $color;
   }
 }
