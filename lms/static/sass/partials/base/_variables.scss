@@ -5,6 +5,7 @@
 // #UNITS:          Basic units of measurement
 // #GRID:           Grid and layout variables
 // #COLORS:         Base, palette and theme color definitions + application
+// #COLORS-EDX-SPECIFIC: edX specific colors not yet refactored to use updated color scheme
 // #TYPOGRAPHY:     Font definitions and scales
 // #DEPTH:          UI depth-based scale
 // #SPACING:        General UI spacing variables and scale
@@ -219,7 +220,13 @@ $alert-color: rgb(212, 64, 64) !default;
 $warning-color: rgb(237, 189, 60) !default;
 $success-color: rgb(37, 184, 90) !default;
 
-// newer color variables
+
+// ----------------------------
+// #COLORS- EDX-SPECIFIC
+// ----------------------------
+
+// old color variables
+// DEPRECATED: Do not continue to use these colors, instead use pattern libary and base colors above.
 $dark-gray1: rgb(74,74,74);
 $light-gray1: rgb(242,242,242);
 $light-gray2: rgb(171,171,171);
@@ -232,6 +239,7 @@ $green1: rgb(97,161,46);
 $red1: rgb(208,2,27);
 
 // edx-specific: marketing site variables
+// DEPRECATED: Do not continue to use these colors, instead use pattern libary and base colors above.
 $m-gray: rgb(138,140,143); //C8F
 $m-gray-l1: rgb(151,153,155);
 $m-gray-l2: rgb(164,166,168);

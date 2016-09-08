@@ -24,7 +24,6 @@
       @include clearfix();
       box-sizing: border-box;
       padding: $baseline;
-      background-color: $body-bg;
       border: 1px solid $border-color-l3;
       .advertise-message {
         @include font-size(12);
@@ -196,7 +195,6 @@
         @include clearfix();
         box-sizing: border-box;
         padding: $baseline;
-        background-color: $body-bg;
         border: 1px solid $border-color-l3;
 
         .list--nav {
@@ -275,11 +273,10 @@
 
       .course-item {
         margin-bottom: $baseline;
-        border-bottom: 4px solid $border-color-l4;
         padding-bottom: $baseline;
 
         .course-container {
-          border: 1px solid $border-color-l4;
+          border: 2px solid $border-color-l4;
           border-radius: 3px;
         }
 
@@ -600,8 +597,7 @@
         display: none;
         margin: $baseline 0 ($baseline/2) 0;
         padding: ($baseline/2) $baseline;
-        background: $gray-l5;
-        border: 1px solid $gray-l4;
+        border-top: 1px solid $gray-l4;
         color: $base-font-color; // Overrides the normal white color in this one case
 
         // STATE: shown
@@ -795,11 +791,6 @@
           .message-copy {
             @extend %t-copy-sub1;
             margin: 0;
-
-            .grade-value {
-              font-size: 1.2rem;
-              font-weight: bold;
-            }
           }
 
           .credit-action {
