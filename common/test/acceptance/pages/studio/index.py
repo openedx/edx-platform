@@ -31,7 +31,7 @@ class HeaderMixin(object):
         return next_page.wait_for_page()
 
 
-class IndexPage(PageObject, HeaderMixin):
+class IndexPage(PageObject, HeaderMixin, HelpMixin):
     """
     Home page for Studio when not logged in.
     """
@@ -322,3 +322,11 @@ class DashboardPageWithPrograms(DashboardPage):
             element.find_element_by_css_selector('.course-org .value').text,  # org key
         )
         return self.q(css='div.programs-tab li.course-item').map(div2info).results
+
+    def click_new_program_button(self):
+        """
+        Click on the new program button.
+        """
+        self.q(css='.button.new-button.new-program-button').click()
+        self.wait_for_ajax()
+        self.wait_for_element_visibility(".account-username", "New program page is open")

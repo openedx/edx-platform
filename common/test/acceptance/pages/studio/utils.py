@@ -12,7 +12,7 @@ from common.test.acceptance.pages.common.utils import click_css, wait_for_notifi
 NAV_HELP_NOT_SIGNED_IN_CSS = '.nav-item.nav-not-signedin-help a'
 NAV_HELP_CSS = '.nav-item.nav-account-help a'
 SIDE_BAR_HELP_AS_LIST_ITEM = '.bit li.action-item a'
-SIDE_BAR_HELP_CSS = '.bit.external-help a'
+SIDE_BAR_HELP_CSS = '.external-help a, .external-help-button'
 
 
 @js_defined('window.jQuery')
@@ -282,10 +282,10 @@ class HelpMixin(object):
         else:
             element_css = NAV_HELP_NOT_SIGNED_IN_CSS
 
-        self.q(css=element_css).click()
+        self.q(css=element_css).first.click()
         return self.q(css=element_css).results[0]
 
-    def get_side_bar_help_element_and_click_help(self, as_list_item=False):
+    def get_side_bar_help_element_and_click_help(self, as_list_item=False, index=-1):
         """
         Click on the help, and also get the DOM help element.
 
@@ -294,6 +294,8 @@ class HelpMixin(object):
         Arguments:
             as_list_item (bool): Indicates whether help element is
                                  enclosed in a 'li' DOM element.
+            index (int): The index of element in case there are more than
+                         one matching elements.
 
         Returns:
             WebElement: Help DOM element in the side bar.
@@ -304,5 +306,5 @@ class HelpMixin(object):
         else:
             element_css = SIDE_BAR_HELP_CSS
 
-        self.q(css=element_css).click()
-        return self.q(css=element_css).results[0]
+        self.q(css=element_css).results[index].click()
+        return self.q(css=element_css).results[index]
