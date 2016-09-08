@@ -294,6 +294,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     # the comments service.
     try:
         thread = cc.Thread.find(thread_id).retrieve(
+            with_responses=True,
             recursive=request.is_ajax(),
             user_id=request.user.id,
             response_skip=request.GET.get("resp_skip"),
