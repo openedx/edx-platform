@@ -9,7 +9,7 @@ FEATURES["ENABLE_SYSADMIN_DASHBOARD"] = True
 
 # needed to show only users and appsembler courses
 FEATURES["ENABLE_COURSE_DISCOVERY"] = True
-FEATURES["SHOW_ONLY_APPSEMBLER_AND_OWNED_COURSES"] = False
+FEATURES["ORGANIZATIONS_APP"] = True
 OAUTH_ENFORCE_SECURE = False
 
 # disable caching in dev environment
