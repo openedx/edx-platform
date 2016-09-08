@@ -17,8 +17,8 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogConfigMixin, UniqueCourseTest)
         super(ProgramPageBase, self).setUp()
 
         self.set_programs_api_configuration(is_enabled=True)
-        self.set_catalog_configuration(is_enabled=True)
 
+        self.programs = [catalog_factories.Program() for __ in range(3)]
         self.course_run = catalog_factories.CourseRun(key=self.course_id)
         self.stub_catalog_api()
 
@@ -51,7 +51,9 @@ class ProgramPageBase(ProgramsConfigMixin, CatalogConfigMixin, UniqueCourseTest)
         ProgramsFixture().install_programs(programs, is_list=is_list)
 
     def stub_catalog_api(self):
-        """Stub out the catalog API's course run endpoint."""
+        """Stub out the catalog API's program and course run endpoints."""
+        self.set_catalog_configuration(is_enabled=True)
+        CatalogFixture().install_programs(self.programs)
         CatalogFixture().install_course_run(self.course_run)
 
     def auth(self, enroll=True):
