@@ -96,6 +96,7 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
     """
     retrieve_kwargs = retrieve_kwargs or {}
     try:
+        retrieve_kwargs["with_responses"] = True
         if "mark_as_read" not in retrieve_kwargs:
             retrieve_kwargs["mark_as_read"] = False
         cc_thread = Thread(id=thread_id).retrieve(**retrieve_kwargs)

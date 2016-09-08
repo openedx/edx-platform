@@ -432,6 +432,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "page": ["1"],
             "per_page": ["10"],
             "recursive": ["False"],
+            "with_responses": ["True"],
         })
 
     @ddt.data("unread", "unanswered")
@@ -452,6 +453,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "sort_key": ["activity"],
             "sort_order": ["desc"],
             "recursive": ["False"],
+            "with_responses": ["True"],
             "page": ["1"],
             "per_page": ["10"],
             query: ["true"],
@@ -477,6 +479,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "page": ["18"],
             "per_page": ["4"],
             "recursive": ["False"],
+            "with_responses": ["True"],
         })
 
     def test_text_search(self):
@@ -504,6 +507,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "page": ["1"],
             "per_page": ["10"],
             "recursive": ["False"],
+            "with_responses": ["True"],
             "text": ["test search string"],
         })
 
@@ -598,6 +602,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "page": ["1"],
             "per_page": ["10"],
             "sort_key": [cc_query],
+            "with_responses": ["True"],
         })
 
     @ddt.data("asc", "desc")
@@ -620,6 +625,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "page": ["1"],
             "per_page": ["10"],
             "sort_order": [query],
+            "with_responses": ["True"],
         })
 
     def test_mutually_exclusive(self):
@@ -1130,6 +1136,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "resp_limit": ["10"],
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
+                "with_responses": ["True"],
             }
         )
 
@@ -1163,6 +1170,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
                 "resp_limit": ["4"],
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
+                "with_responses": ["True"],
             }
         )
 
