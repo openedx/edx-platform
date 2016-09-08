@@ -322,6 +322,7 @@
 .forum-nav-load-more-link {
     @extend %forum-nav-load-more-content;
     color: $link-color;
+    width: 100%;
 
     &:hover,
     &:focus {
