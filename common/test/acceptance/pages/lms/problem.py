@@ -50,14 +50,15 @@ class ProblemPage(PageObject):
         """
         Return the "hint" text of the problem from html
         """
-        return self.q(css="div.problem div.problem-hint").html[0].split(' <', 1)[0]
+        hints_html = self.q(css="div.problem .notification-hint .notification-message li").html
+        return [hint_html.split(' <span', 1)[0] for hint_html in hints_html]
 
     @property
     def hint_text(self):
         """
         Return the "hint" text of the problem from its div.
         """
-        return self.q(css="div.problem div.problem-hint").text[0]
+        return self.q(css="div.problem .notification-hint .notification-message").text[0]
 
     def verify_mathjax_rendered_in_problem(self):
         """
@@ -232,8 +233,21 @@ class ProblemPage(PageObject):
         """
         Click the Hint button.
         """
-        self.q(css='div.problem button.hint-button').click()
-        self.wait_for_ajax()
+        click_css(self, '.problem .hint-button', require_notification=False)
+        self.wait_for_focus_on_hint_notification()
+
+    def wait_for_focus_on_hint_notification(self):
+        """
+        Wait for focus to be on the hint notification.
+        """
+        self.wait_for(
+            lambda: self.q(css='.notification-hint').focused,
+            'Waiting for the focus to be on the hint notification'
+        )
+
+    def get_hint_button_disabled_attr(self):
+        """ Return the disabled attribute of all hint buttons (once hints are visible, there will be two). """
+        return self.q(css='.problem .hint-button').attrs('disabled')
 
     def click_choice(self, choice_value):
         """
