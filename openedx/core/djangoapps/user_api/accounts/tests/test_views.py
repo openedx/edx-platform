@@ -112,28 +112,6 @@ class UserAPITestCase(APITestCase):
         legacy_profile.language_proficiencies.add(LanguageProficiency(code='en'))
         legacy_profile.save()
 
-
-@ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
-@patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
-    {'full': 50, 'small': 10},
-    clear=True
-)
-@attr(shard=2)
-class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
-    """
-    Unit tests for the Account API.
-    """
-
-    ENABLED_CACHES = ['default']
-
-    def setUp(self):
-        super(TestAccountAPI, self).setUp()
-
-        self.url = reverse("accounts_api", kwargs={'username': self.user.username})
-
     def _verify_profile_image_data(self, data, has_profile_image):
         """
         Verify the profile image data in a GET response for self.user
@@ -159,6 +137,88 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
                 'image_url_small': template.format(size=10),
             }
         )
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    {'full': 50, 'small': 10},
+    clear=True
+)
+@attr(shard=2)
+class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
+    """
+    Unit tests for the Accounts API.
+    """
+
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(TestAccountAPI, self).setUp()
+
+        self.url = reverse("account_api")
+
+    def test_get_account_default(self):
+        """
+        Test that a client (logged in) can get her own account information (using default legacy profile information,
+        as created by the test UserFactory).
+        """
+        def verify_get_own_information(queries):
+            """
+            Internal helper to perform the actual assertions
+            """
+            with self.assertNumQueries(queries):
+                response = self.send_get(self.client)
+            data = response.data
+            self.assertEqual(17, len(data))
+            self.assertEqual(self.user.username, data["username"])
+            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
+            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
+                self.assertIsNone(data[empty_field])
+            self.assertIsNone(data["country"])
+            self.assertEqual("m", data["gender"])
+            self.assertEqual("Learn a lot", data["goals"])
+            self.assertEqual(self.user.email, data["email"])
+            self.assertIsNotNone(data["date_joined"])
+            self.assertEqual(self.user.is_active, data["is_active"])
+            self._verify_profile_image_data(data, False)
+            self.assertTrue(data["requires_parental_consent"])
+            self.assertEqual([], data["language_proficiencies"])
+            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
+            # Badges aren't on by default, so should not be present.
+            self.assertEqual(False, data["accomplishments_shared"])
+
+        self.client.login(username=self.user.username, password=self.test_password)
+        verify_get_own_information(17)
+
+        # Now make sure that the user can get the same information, even if not active
+        self.user.is_active = False
+        self.user.save()
+        verify_get_own_information(11)
+
+
+@ddt.ddt
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
+    {'full': 50, 'small': 10},
+    clear=True
+)
+@attr(shard=2)
+class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
+    """
+    Unit tests for the Accounts API.
+    """
+
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(TestAccountsAPI, self).setUp()
+
+        self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
     def _verify_full_shareable_account_response(self, response, account_privacy=None, badges_enabled=False):
         """
@@ -305,44 +365,6 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
         # Verify how the view parameter changes the fields that are returned.
         response = self.send_get(client, query_parameters='view=shared')
         verify_fields_visible_to_all_users(response)
-
-    def test_get_account_default(self):
-        """
-        Test that a client (logged in) can get her own account information (using default legacy profile information,
-        as created by the test UserFactory).
-        """
-        def verify_get_own_information(queries):
-            """
-            Internal helper to perform the actual assertions
-            """
-            with self.assertNumQueries(queries):
-                response = self.send_get(self.client)
-            data = response.data
-            self.assertEqual(17, len(data))
-            self.assertEqual(self.user.username, data["username"])
-            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
-                self.assertIsNone(data[empty_field])
-            self.assertIsNone(data["country"])
-            self.assertEqual("m", data["gender"])
-            self.assertEqual("Learn a lot", data["goals"])
-            self.assertEqual(self.user.email, data["email"])
-            self.assertIsNotNone(data["date_joined"])
-            self.assertEqual(self.user.is_active, data["is_active"])
-            self._verify_profile_image_data(data, False)
-            self.assertTrue(data["requires_parental_consent"])
-            self.assertEqual([], data["language_proficiencies"])
-            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
-            # Badges aren't on by default, so should not be present.
-            self.assertEqual(False, data["accomplishments_shared"])
-
-        self.client.login(username=self.user.username, password=self.test_password)
-        verify_get_own_information(17)
-
-        # Now make sure that the user can get the same information, even if not active
-        self.user.is_active = False
-        self.user.save()
-        verify_get_own_information(11)
 
     def test_get_account_empty_string(self):
         """

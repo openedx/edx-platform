@@ -29,6 +29,7 @@ class AccountViewSet(ViewSet):
 
         **Example Requests**
 
+            GET /api/user/v1/me[?view=shared]
             GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
@@ -146,6 +147,18 @@ class AccountViewSet(ViewSet):
     )
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
+
+    def get(self, request):
+        """
+        GET /api/user/v1/me
+        """
+        try:
+            account_settings = get_account_settings(
+                request, [request.user.username], view=request.query_params.get('view'))
+        except UserNotFound:
+            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
+
+        return Response(account_settings[0])
 
     def list(self, request):
         """
