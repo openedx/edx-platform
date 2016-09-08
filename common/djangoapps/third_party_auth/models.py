@@ -121,6 +121,14 @@ class ProviderConfig(ConfigurationModel):
             "email, and their account will be activated immediately upon registration."
         ),
     )
+    visible = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is not selected, users will not be presented with the provider "
+            "as an option to authenticate with on the login screen, but manual "
+            "authentication using the correct link is still possible."
+        ),
+    )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
@@ -211,6 +219,14 @@ class ProviderConfig(ConfigurationModel):
     def get_authentication_backend(self):
         """Gets associated Django settings.AUTHENTICATION_BACKEND string."""
         return '{}.{}'.format(self.backend_class.__module__, self.backend_class.__name__)
+
+    @property
+    def display_for_login(self):
+        """
+        Determines whether the provider ought to be shown as an option with
+        which to authenticate on the login screen, registration screen, and elsewhere.
+        """
+        return bool(self.enabled and self.accepts_logins and self.visible)
 
 
 class OAuth2ProviderConfig(ProviderConfig):
