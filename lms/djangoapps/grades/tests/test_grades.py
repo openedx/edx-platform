@@ -382,10 +382,12 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
 
+        self.course_structure = get_course_blocks(self.request.user, self.course.location)
+
         # warm up the score cache to allow accurate query counts, even if tests are run in random order
         get_module_score(self.request.user, self.course, self.seq1)
 
-    def test_get_module_score(self):
+    def test_subsection_scores(self):
         """
         Test test_get_module_score
         """
@@ -393,21 +395,30 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         # then stored in the request).
         with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
+        new_score = SubsectionGradeFactory(self.request.user).create(self.seq1, self.course_structure, self.course)
         self.assertEqual(score, 0)
+        self.assertEqual(new_score.all_total.earned, 0)
 
         answer_problem(self.course, self.request, self.problem1)
         answer_problem(self.course, self.request, self.problem2)
 
         with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
+        new_score = SubsectionGradeFactory(self.request.user).create(self.seq1, self.course_structure, self.course)
         self.assertEqual(score, 1.0)
+        self.assertEqual(new_score.all_total.earned, 2.0)
+        # These differ because get_module_score normalizes the subsection score
+        # to 1, which can cause incorrect aggregation behavior that will be
+        # fixed by TNL-5062.
 
         answer_problem(self.course, self.request, self.problem1)
         answer_problem(self.course, self.request, self.problem2, 0)
 
         with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
+        new_score = SubsectionGradeFactory(self.request.user).create(self.seq1, self.course_structure, self.course)
         self.assertEqual(score, .5)
+        self.assertEqual(new_score.all_total.earned, 1.0)
 
     def test_get_module_score_with_empty_score(self):
         """

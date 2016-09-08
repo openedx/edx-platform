@@ -1912,7 +1912,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
-    'lms.djangoapps.grades',
+    'lms.djangoapps.grades.apps.GradesConfig',
 
     # Student support tools
     'support',

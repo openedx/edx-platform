@@ -18,6 +18,43 @@ def get_field_on_block(block, field_name, default_value=None):
     return default_value
 
 
+def collect_unioned_set_field(block_structure, transformer, merged_field_name, filter_by):
+    """
+    Recursively union a set field on the block structure.
+
+    If a block matches filter_by, it will be added to the result set.
+    This (potentially empty) set is unioned with the sets contained in
+    merged_field_name for all parents of the block.
+
+    This set union operation takes place during a topological traversal
+    of the block_structure, so all sets are inherited by descendants.
+
+    Parameters:
+        block_structure: BlockStructure to traverse
+        transformer: transformer that will be used for get_ and
+            set_transformer_block_field
+        merged_field_name: name of the field to store
+        filter_by: a unary lambda that returns true if a given
+            block_key should be included in the result set
+    """
+    for block_key in block_structure.topological_traversal():
+        result_set = {block_key} if filter_by(block_key) else set()
+        for parent in block_structure.get_parents(block_key):
+            result_set |= block_structure.get_transformer_block_field(
+                parent,
+                transformer,
+                merged_field_name,
+                set(),
+            )
+
+        block_structure.set_transformer_block_field(
+            block_key,
+            transformer,
+            merged_field_name,
+            result_set,
+        )
+
+
 def collect_merged_boolean_field(
         block_structure,
         transformer,

@@ -45,7 +45,7 @@ from courseware.masquerade import (
     setup_masquerade,
 )
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
-from lms.djangoapps.grades.signals import SCORE_CHANGED
+from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
