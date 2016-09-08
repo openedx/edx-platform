@@ -152,6 +152,21 @@ div.problem {
       margin-top: $baseline;
     }
   }
+
+  .question-description {
+    @include margin(($baseline*0.75), 0);
+  }
+
+  form > label, .problem-group-label {
+    display: block;
+    margin-bottom: $baseline;
+    font: inherit;
+    color: inherit;
+  }
+
+  .wrapper-problem-response:not(:last-child) {
+    margin-bottom: $baseline;
+  }
 }
 
 // Choice Group - silent class

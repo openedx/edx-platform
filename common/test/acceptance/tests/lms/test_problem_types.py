@@ -324,7 +324,8 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'question_text': 'The correct answer is Choice 0 and Choice 2',
         'choice_type': 'checkbox',
         'choices': [True, False, True, False],
-        'choice_names': ['Choice 0', 'Choice 1', 'Choice 2', 'Choice 3']
+        'choice_names': ['Choice 0', 'Choice 1', 'Choice 2', 'Choice 3'],
+        'explanation_text': 'This is explanation text'
     }
 
     def setUp(self, *args, **kwargs):
@@ -332,15 +333,6 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for CheckboxProblemTypeTest
         """
         super(CheckboxProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'aria-allowed-attr',  # TODO: AC-251
-                'aria-valid-attr',  # TODO: AC-251
-                'aria-roles',  # TODO: AC-251
-                'checkboxgroup',  # TODO: AC-251
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -351,6 +343,30 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
             self.problem_page.click_choice("choice_2")
         else:
             self.problem_page.click_choice("choice_1")
+
+    @attr('shard_7')
+    def test_can_show_hide_answer(self):
+        """
+        Scenario: Verifies that show/hide answer button is working as expected.
+
+        Given that I am on courseware page
+        And I can see a CAPA problem with show answer button
+        When I click "Show Answer" button
+        Then I should see "Hide Answer" text on button
+        And I should see question's solution
+        And I should see correct choices highlighted
+        When I click "Hide Answer" button
+        Then I should see "Show Answer" text on button
+        And I should not see question's solution
+        And I should not see correct choices highlighted
+        """
+        self.problem_page.click_show_hide_button()
+        self.assertTrue(self.problem_page.is_solution_tag_present())
+        self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
+
+        self.problem_page.click_show_hide_button()
+        self.assertFalse(self.problem_page.is_solution_tag_present())
+        self.assertFalse(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -378,13 +394,6 @@ class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for MultipleChoiceProblemTypeTest
         """
         super(MultipleChoiceProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr',  # TODO: AC-251
-                'radiogroup',  # TODO: AC-251
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -422,13 +431,6 @@ class RadioProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for RadioProblemTypeTest
         """
         super(RadioProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'aria-valid-attr',  # TODO: AC-292
-                'radiogroup',  # TODO: AC-292
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -460,12 +462,6 @@ class DropDownProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for DropDownProblemTypeTest
         """
         super(DropDownProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-291
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -503,12 +499,6 @@ class StringProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for StringProblemTypeTest
         """
         super(StringProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-290
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -545,12 +535,6 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for NumericalProblemTypeTest
         """
         super(NumericalProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-289
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -589,12 +573,6 @@ class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for FormulaProblemTypeTest
         """
         super(FormulaProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-288
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -614,10 +592,10 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     factory = CustomResponseXMLFactory()
 
     factory_kwargs = {
-        'question_text': 'Enter two integers that sum to 10.',
         'cfn': 'test_add_to_ten',
         'expect': '10',
         'num_inputs': 2,
+        'group_label': 'Enter two integers that sum to 10.',
         'script': textwrap.dedent("""
             def test_add_to_ten(expect,ans):
                 try:
@@ -640,12 +618,6 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for ScriptProblemTypeTest
         """
         super(ScriptProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-287
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -798,13 +770,6 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         Additional setup for RadioTextProblemTypeTest
         """
         super(RadioTextProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-285
-                'radiogroup',  # TODO: AC-285
-            ]
-        })
 
 
 class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
@@ -831,13 +796,6 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
         Additional setup for CheckboxTextProblemTypeTest
         """
         super(CheckboxTextProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-284
-                'checkboxgroup',  # TODO: AC-284
-            ]
-        })
 
 
 class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -885,9 +843,9 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     }
 
     status_indicators = {
-        'correct': ['span div.correct'],
-        'incorrect': ['span div.incorrect'],
-        'unanswered': ['span div.unanswered'],
+        'correct': ['div.capa_inputtype div.correct'],
+        'incorrect': ['div.capa_inputtype div.incorrect'],
+        'unanswered': ['div.capa_inputtype div.unanswered'],
     }
 
     def setUp(self, *args, **kwargs):

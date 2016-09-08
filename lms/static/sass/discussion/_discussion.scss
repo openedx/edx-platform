@@ -8,6 +8,7 @@ body.discussion {
     @include clearfix();
     box-sizing: border-box;
     width: 100%;
+    padding-top: 0;
 
     h1 {
       font-size: $forum-x-large-font-size;
@@ -19,14 +20,12 @@ body.discussion {
 
     .post-cancel {
       @include float(left);
-      margin: ($baseline/2) 0 0 ($baseline*0.75);
+      @include margin($baseline/2, 0, 0, $baseline*0.75);
     }
 
     .post-update {
       @include float(left);
       margin-top: ($baseline/2);
-      padding-bottom: ($baseline/10);
-      height: 37px;
 
       &:hover, &:focus {
         border-color: #222;
@@ -350,7 +349,6 @@ section.discussion {
 
 .new-post-article {
   display: none;
-  margin-top: $baseline;
 
   .inner-wrapper {
     max-width: 1180px;

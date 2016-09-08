@@ -86,6 +86,15 @@
                         };
                     }
                 };
+            },
+            toXMLEqual: function() {
+                return {
+                    compare: function(actual, expected) {
+                        return {
+                            pass: actual.replace(/\s+/g, '') === expected.replace(/\s+/g, '')
+                        };
+                    }
+                };
             }
         });
     });

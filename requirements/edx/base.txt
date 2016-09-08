@@ -67,7 +67,7 @@ networkx==1.7
 nose-xunitmp==0.3.2
 oauthlib==1.0.3
 paramiko==1.9.0
-path.py==7.2
+path.py==8.2.1
 piexif==1.0.2
 Pillow==3.1.1
 polib==1.0.3
@@ -94,7 +94,6 @@ requests-oauthlib==0.4.1
 scipy==0.14.0
 Shapely==1.2.16
 singledispatch==3.4.0.2
-six>=1.10.0,<2.0.0
 sorl-thumbnail==12.3
 sortedcontainers==0.9.2
 stevedore==1.10.0

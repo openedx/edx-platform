@@ -252,33 +252,36 @@
         };
 
         DiscussionUtil.formErrorHandler = function(errorsField) {
-            return function(xhr, textStatus, error) {
-                var makeErrorElem, response, _i, _len, _ref, _results, $errorItem;
-                makeErrorElem = function(message) {
-                    return edx.HtmlUtils.setHtml(
-                        $('<li>').addClass('post-error'),
-                        message
+            return function(xhr) {
+                var makeErrorElem, response, i, $errorItem;
+                makeErrorElem = function(message, alertId) {
+                    return edx.HtmlUtils.joinHtml(
+                        edx.HtmlUtils.HTML('<li>'),
+                        edx.HtmlUtils.template(
+                            $('#new-post-alert-template').html()
+                        )({
+                            message: message,
+                            alertId: alertId
+                        }),
+                        edx.HtmlUtils.HTML('</li>')
                     );
                 };
                 errorsField.empty().show();
                 if (xhr.status === 400) {
                     response = JSON.parse(xhr.responseText);
                     if (response.errors) {
-                        _ref = response.errors;
-                        _results = [];
-                        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                            error = _ref[_i];
-                            $errorItem = makeErrorElem(error);
-                            _results.push(errorsField.append($errorItem));
+                        for (i = 0; i < response.errors.length; i++) {
+                            $errorItem = makeErrorElem(response.errors[i], i);
+                            edx.HtmlUtils.append(errorsField, $errorItem);
                         }
-                        return _results;
                     }
                 } else {
-                    $errorItem = makeErrorElem(
-                        gettext('We had some trouble processing your request. Please try again.')
-                    );
-                    return errorsField.append($errorItem);
+                    $errorItem = makeErrorElem('We had some trouble processing your request. Please try again.', 0);
+                    edx.HtmlUtils.append(errorsField, $errorItem);
                 }
+
+                // Set focus on the first error displayed
+                $('div[role="alert"]', errorsField).first().focus();
             };
         };
 
@@ -309,7 +312,7 @@
             var appended_id, editor, elem, id, imageUploadUrl, placeholder, _processor;
             elem = $local('.' + cls_identifier);
             placeholder = elem.data('placeholder');
-            id = elem.attr('data-id');
+            id = elem.data('id');
             appended_id = '-' + cls_identifier + '-' + id;
             imageUploadUrl = this.urlFor('upload');
             _processor = function(self) {
