@@ -216,7 +216,7 @@ def answer_problem(course, problem_type, correctness):
         world.css_fill(inputfield(course, 'string'), textvalue)
 
     elif problem_type == 'numerical':
-        textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
+        textvalue = "pi+1" if correctness == 'correct' else str(random.randint(-2, 2))
         world.css_fill(inputfield(course, 'numerical'), textvalue)
 
     elif problem_type == 'formula':
