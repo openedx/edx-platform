@@ -9,7 +9,7 @@ import microsite_configuration.utils
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('microsite_configuration', '0002_microsite_sass_variables'),
+        ('microsite_configuration', '0003_microsite_sass_variables'),
     ]
 
     operations = [

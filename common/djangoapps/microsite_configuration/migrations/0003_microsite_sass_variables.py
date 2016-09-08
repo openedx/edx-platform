@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('microsite_configuration', '0001_initial'),
+        ('microsite_configuration', '0002_auto_20160202_0228.py'),
     ]
 
     operations = [
