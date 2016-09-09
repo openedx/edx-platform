@@ -46,7 +46,7 @@
                         '[data-discussion-id="' + this.getCurrentTopicId() + '"]')
                     );
                 } else {
-                    this.setTopic(this.$('.topic-title').first());
+                    this.setTopic(this.$('button.topic-title').first());
                 }
                 return this.$el;
             },
