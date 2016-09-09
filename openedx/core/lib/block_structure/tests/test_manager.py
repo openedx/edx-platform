@@ -139,6 +139,24 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
         TestTransformer1.assert_collected(block_structure)
         TestTransformer1.assert_transformed(block_structure)
 
+    def test_get_transformed_with_collected(self):
+        with mock_registered_transformers(self.registered_transformers):
+            collected_block_structure = self.bs_manager.get_collected()
+
+        # using the same collected block structure,
+        # transform at different starting blocks
+        for (starting_block, expected_structure, expected_missing_blocks) in [
+            (0, [[1, 2], [3, 4], [], [], []], []),
+            (1, [[], [3, 4], [], [], []], [0, 2]),
+            (2, [[], [], [], [], []], [0, 1, 3, 4]),
+        ]:
+            block_structure = self.bs_manager.get_transformed(
+                self.transformers,
+                starting_block_usage_key=starting_block,
+                collected_block_structure=collected_block_structure,
+            )
+            self.assert_block_structure(block_structure, expected_structure, missing_blocks=expected_missing_blocks)
+
     def test_get_transformed_with_nonexistent_starting_block(self):
         with mock_registered_transformers(self.registered_transformers):
             with self.assertRaises(UsageKeyNotInBlockStructure):
