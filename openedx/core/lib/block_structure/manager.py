@@ -33,7 +33,7 @@ class BlockStructureManager(object):
         self.modulestore = modulestore
         self.block_structure_cache = BlockStructureCache(cache)
 
-    def get_transformed(self, transformers, starting_block_usage_key=None):
+    def get_transformed(self, transformers, starting_block_usage_key=None, collected_block_structure=None):
         """
         Returns the transformed Block Structure for the root_block_usage_key,
         starting at starting_block_usage_key, getting block data from the cache
@@ -50,11 +50,17 @@ class BlockStructureManager(object):
                 in the block structure that is to be transformed.
                 If None, root_block_usage_key is used.
 
+            collected_block_structure (BlockStructureBlockData) - A
+                block structure retrieved from a prior call to
+                get_collected.  Can be optionally provided if already available,
+                for optimization.
+
         Returns:
             BlockStructureBlockData - A transformed block structure,
                 starting at starting_block_usage_key.
         """
-        block_structure = self.get_collected()
+        block_structure = collected_block_structure.copy() if collected_block_structure else self.get_collected()
+
         if starting_block_usage_key:
             # Override the root_block_usage_key so traversals start at the
             # requested location.  The rest of the structure will be pruned

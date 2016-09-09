@@ -3,10 +3,11 @@ Tests for the score change signals defined in the courseware models module.
 """
 
 import ddt
-from unittest import skip
 from django.test import TestCase
-from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag, CoursePersistentGradesFlag
 from mock import patch, MagicMock
+from unittest import skip
+
+from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -177,7 +178,7 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     def setUp(self):
         super(ScoreChangedUpdatesSubsectionGradeTest, self).setUp()
         self.user = UserFactory()
-        PersistentGradesEnabledFlag.objects.create(enabled=True)
+        PersistentGradesEnabledFlag.objects.create(enabled_for_all_courses=True, enabled=True)
 
     def set_up_course(self, enable_subsection_grades=True):
         """
@@ -189,7 +190,8 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
             name='course',
             run='run',
         )
-        CoursePersistentGradesFlag.objects.create(course_id=self.course.id, enabled=enable_subsection_grades)
+        if not enable_subsection_grades:
+            PersistentGradesEnabledFlag.objects.create(enabled=False)
 
         self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
         self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
@@ -211,23 +213,36 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     def test_subsection_grade_updated_on_signal(self, default_store):
         with self.store.default_store(default_store):
             self.set_up_course()
-            with check_mongo_calls(2) and self.assertNumQueries(19):
+            self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
+            with check_mongo_calls(2) and self.assertNumQueries(15):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
+
+    def test_single_call_to_create_block_structure(self):
+        self.set_up_course()
+        self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
+        with patch(
+            'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_cache',
+            return_value=None,
+        ) as mock_block_structure_create:
+            recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
+            self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_query_count_does_not_change_with_more_problems(self, default_store):
         with self.store.default_store(default_store):
             self.set_up_course()
+            self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(19):
+            with check_mongo_calls(2) and self.assertNumQueries(15):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_subsection_grades_not_enabled_on_course(self, default_store):
         with self.store.default_store(default_store):
             self.set_up_course(enable_subsection_grades=False)
-            with check_mongo_calls(2) and self.assertNumQueries(2):
+            self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
+            with check_mongo_calls(2) and self.assertNumQueries(0):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @skip("Pending completion of TNL-5089")
@@ -242,21 +257,13 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
         PersistentGradesEnabledFlag.objects.create(enabled=feature_flag)
         with self.store.default_store(default_store):
             self.set_up_course()
-            with check_mongo_calls(0) and self.assertNumQueries(19 if feature_flag else 1):
+            with check_mongo_calls(0) and self.assertNumQueries(15 if feature_flag else 1):
                 SCORE_CHANGED.send(sender=None, **self.score_changed_kwargs)
 
-    @ddt.data(
-        ('points_possible', 2, 19),
-        ('points_earned', 2, 19),
-        ('user', 0, 0),
-        ('course_id', 0, 0),
-        ('usage_id', 0, 0),
-    )
-    @ddt.unpack
-    def test_missing_kwargs(self, kwarg, expected_mongo_calls, expected_sql_calls):
+    @ddt.data('user', 'course_id', 'usage_id')
+    def test_missing_kwargs(self, kwarg):
         self.set_up_course()
+        self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
         del self.score_changed_kwargs[kwarg]
-        with patch('lms.djangoapps.grades.signals.handlers.log') as log_mock:
-            with check_mongo_calls(expected_mongo_calls) and self.assertNumQueries(expected_sql_calls):
-                recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
-            self.assertEqual(log_mock.exception.called, kwarg not in ['points_possible', 'points_earned'])
+        with self.assertRaises(KeyError):
+            recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
