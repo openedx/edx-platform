@@ -371,15 +371,6 @@ class ProblemTypeTestMixin(object):
         self.problem_page.a11y_audit.config.set_scope(
             include=['div#seq_content'])
 
-        self.problem_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'checkboxgroup',  # TODO: AC-491
-                'radiogroup',  # TODO: AC-491
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-491
-            ]
-        })
-
         # Run the accessibility audit.
         self.problem_page.a11y_audit.check_for_accessibility_errors()
 
@@ -421,6 +412,12 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         Additional setup for AnnotationProblemTypeTest
         """
         super(AnnotationProblemTypeTest, self).setUp(*args, **kwargs)
+
+        self.problem_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'label',  # TODO: AC-491
+            ]
+        })
 
     def answer_problem(self, correctness):
         """
@@ -939,6 +936,14 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
         """
         super(RadioTextProblemTypeTest, self).setUp(*args, **kwargs)
 
+        self.problem_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'radiogroup',  # TODO: AC-491
+                'label',  # TODO: AC-491
+                'section',  # TODO: AC-491
+            ]
+        })
+
 
 class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMixin):
     """
@@ -965,6 +970,14 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
         Additional setup for CheckboxTextProblemTypeTest
         """
         super(CheckboxTextProblemTypeTest, self).setUp(*args, **kwargs)
+
+        self.problem_page.a11y_audit.config.set_rules({
+            "ignore": [
+                'checkboxgroup',  # TODO: AC-491
+                'label',  # TODO: AC-491
+                'section',  # TODO: AC-491
+            ]
+        })
 
 
 class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):

@@ -818,8 +818,17 @@ class CodeInput(InputTypeBase):
         self.setup_code_response_rendering()
 
     def _extra_context(self):
-        """Defined queue_len, add it """
-        return {'queue_len': self.queue_len, }
+        """
+        Define queue_len, arial_label and code mirror exit message context variables
+        """
+        _ = self.capa_system.i18n.ugettext
+        return {
+            'queue_len': self.queue_len,
+            'aria_label': _('{programming_language} editor').format(
+                programming_language=self.loaded_attributes.get('mode')
+            ),
+            'code_mirror_exit_message': _('Press ESC then TAB or click outside of the code editor to exit')
+        }
 
 
 #-----------------------------------------------------------------------------

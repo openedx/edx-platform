@@ -46,6 +46,7 @@ ACCESSIBLE_CAPA_INPUT_TYPES = [
     'optioninput',
     'textline',
     'formulaequationinput',
+    'textbox',
 ]
 
 # these get captured as student responses
