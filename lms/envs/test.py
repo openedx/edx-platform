@@ -298,6 +298,9 @@ OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
+########################### Grades #################################
+FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
+
 ###################### Payment ##############################3
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
