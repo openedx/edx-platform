@@ -286,9 +286,6 @@ class ProblemTypeTestMixin(object):
 
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
-                'aria-allowed-attr',  # TODO: AC-491
-                'aria-valid-attr',  # TODO: AC-491
-                'aria-roles',  # TODO: AC-491
                 'checkboxgroup',  # TODO: AC-491
                 'radiogroup',  # TODO: AC-491
                 'section',  # TODO: AC-491
@@ -625,7 +622,8 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'cfn': 'test_add_to_ten',
         'expect': '10',
         'num_inputs': 2,
-        'group_label': 'Enter two integers that sum to 10.',
+        'question_text': 'Enter two integers that sum to 10.',
+        'input_element_label': 'Enter an integer',
         'script': textwrap.dedent("""
             def test_add_to_ten(expect,ans):
                 try:
@@ -686,18 +684,6 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'incorrect': ['.grader-status .incorrect ~ .debug'],
         'unanswered': ['.grader-status .unanswered ~ .debug'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for CodeProblemTypeTest
-        """
-        super(CodeProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-286
-            ]
-        })
 
     def answer_problem(self, correct):
         """
@@ -876,6 +862,7 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
 
     factory_kwargs = {
         'expect': '2*x+3*y',
+        'question_text': 'Enter a value'
     }
 
     status_indicators = {
@@ -883,18 +870,6 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'incorrect': ['div.capa_inputtype div.incorrect'],
         'unanswered': ['div.capa_inputtype div.unanswered'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for SymbolicProblemTypeTest
-        """
-        super(SymbolicProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-294
-            ]
-        })
 
     def answer_problem(self, correct):
         """
