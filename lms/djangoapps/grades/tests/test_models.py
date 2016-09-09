@@ -20,6 +20,25 @@ from lms.djangoapps.grades.models import (
 )
 
 
+class BlockRecordSetTestCase(TestCase):
+    """
+    Verify the behavior of BlockRecordSets, particularly around edge cases
+    """
+    empty_json = '{"blocks":[],"course_key":null}'
+
+    def test_empty_block_record_set(self):
+        brs = BlockRecordSet()
+        self.assertFalse(brs)
+        self.assertEqual(
+            brs.to_json(),
+            self.empty_json
+        )
+        self.assertEqual(
+            BlockRecordSet.from_json(self.empty_json),
+            brs
+        )
+
+
 class GradesModelTestCase(TestCase):
     """
     Base class for common setup of grades model tests.
@@ -41,8 +60,8 @@ class GradesModelTestCase(TestCase):
             block_type='problem',
             block_id='block_id_b'
         )
-        self.record_a = BlockRecord(self.locator_a, 1, 10)
-        self.record_b = BlockRecord(self.locator_b, 1, 10)
+        self.record_a = BlockRecord(locator=self.locator_a, weight=1, max_score=10)
+        self.record_b = BlockRecord(locator=self.locator_b, weight=1, max_score=10)
 
 
 @ddt.ddt
@@ -97,8 +116,15 @@ class VisibleBlocksTest(GradesModelTestCase):
         list_of_block_dicts = [self.record_a._asdict()]
         for block_dict in list_of_block_dicts:
             block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
-        expected_json = json.dumps(list_of_block_dicts, separators=(',', ':'), sort_keys=True)
+        expected_data = {
+            'course_key': unicode(self.record_a.locator.course_key),
+            'blocks': [
+                {'locator': unicode(self.record_a.locator), 'max_score': 10, 'weight': 1},
+            ],
+        }
+        expected_json = json.dumps(expected_data, separators=(',', ':'), sort_keys=True)
         expected_hash = b64encode(sha1(expected_json).digest())
+        self.assertEqual(expected_data, json.loads(vblocks.blocks_json))
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
 
