@@ -84,6 +84,7 @@ h2 {
 
 %feedback-hint {
   margin-top: ($baseline / 4);
+
   .icon {
     @include margin-right($baseline / 4);
   }
@@ -1007,10 +1008,13 @@ div.problem {
     border: 1px solid $gray-l3;
   }
 
+  .message {
+    font-size: inherit;
+  }
+
   .detailed-solution {
     > p {
       margin: 0;
-      font-size: $medium-font-size;
 
       &:first-child {
         @extend %t-strong;
@@ -1024,7 +1028,6 @@ div.problem {
   .detailed-targeted-feedback-correct {
     > p {
         margin: 0;
-        font-size: $medium-font-size;
         font-weight: normal;
 
         &:first-child {
