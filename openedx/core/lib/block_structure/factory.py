@@ -1,7 +1,7 @@
 """
 Module for factory class for BlockStructure objects.
 """
-from .block_structure import BlockStructureModulestoreData
+from .block_structure import BlockStructureModulestoreData, BlockStructureBlockData
 
 
 class BlockStructureFactory(object):
@@ -82,3 +82,14 @@ class BlockStructureFactory(object):
             NoneType - If the root_block_usage_key is not found in the cache.
         """
         return block_structure_cache.get(root_block_usage_key)
+
+    @classmethod
+    def create_new(cls, root_block_usage_key, block_relations, transformer_data, block_data_map):
+        """
+        Returns a new block structure for given the arguments.
+        """
+        block_structure = BlockStructureBlockData(root_block_usage_key)
+        block_structure._block_relations = block_relations
+        block_structure.transformer_data = transformer_data
+        block_structure._block_data_map = block_data_map
+        return block_structure
