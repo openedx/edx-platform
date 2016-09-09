@@ -8,7 +8,7 @@ from django.dispatch import receiver
 import logging
 
 from lms.djangoapps.grades import progress
-from lms.djangoapps.grades.signals import SCORE_CHANGED
+from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
 from lms import CELERY_APP
 from lti_provider.models import GradedAssignment
 import lti_provider.outcomes as outcomes

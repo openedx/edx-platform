@@ -14,7 +14,11 @@ import pytz
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
 from lms.djangoapps.commerce.utils import EcommerceService
-from openedx.core.djangoapps.catalog.utils import get_run_marketing_url
+from openedx.core.djangoapps.catalog.utils import (
+    get_programs as get_catalog_programs,
+    munge_catalog_program,
+    get_run_marketing_url,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.lib.edx_api_utils import get_edx_api_data
@@ -31,6 +35,7 @@ DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=pytz.UTC)
 
 def get_programs(user, program_id=None):
     """Given a user, get programs from the Programs service.
+
     Returned value is cached depending on user permissions. Staff users making requests
     against Programs will receive unpublished programs, while regular users will only receive
     published programs.
@@ -43,6 +48,7 @@ def get_programs(user, program_id=None):
 
     Returns:
         list of dict, representing programs returned by the Programs service.
+        dict, if a specific program is requested.
     """
     programs_config = ProgramsApiConfig.current()
 
@@ -50,7 +56,15 @@ def get_programs(user, program_id=None):
     # to see them displayed immediately.
     cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
 
-    return get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
+    programs = get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
+
+    # Mix in munged MicroMasters data from the catalog.
+    if not program_id:
+        programs += [
+            munge_catalog_program(micromaster) for micromaster in get_catalog_programs(user, type='MicroMasters')
+        ]
+
+    return programs
 
 
 def get_programs_for_credentials(user, programs_credentials):

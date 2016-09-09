@@ -134,6 +134,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         fetch_metadata = kwargs.pop('fetch_metadata', True)
         kwargs.setdefault('name', self.PROVIDER_NAME)
         kwargs.setdefault('enabled', True)
+        kwargs.setdefault('visible', True)
         kwargs.setdefault('idp_slug', self.PROVIDER_IDP_SLUG)
         kwargs.setdefault('entity_id', TESTSHIB_ENTITY_ID)
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)

@@ -71,13 +71,6 @@ class TestCourseGradeFactory(GradeTestBase):
     Test that CourseGrades are calculated properly
     """
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestCourseGradeFactory, cls).setUpClass()
-
-    def setUp(self):
-        super(TestCourseGradeFactory, self).setUp()
-
     @ddt.data(
         (True, True),
         (True, False),
@@ -109,16 +102,6 @@ class SubsectionGradeFactoryTest(GradeTestBase):
     persistent grades are functioning as expected, and that the flag to
     enable saving subsection grades blocks/enables that feature as expected.
     """
-
-    @classmethod
-    def setUpClass(cls):
-        super(SubsectionGradeFactoryTest, cls).setUpClass()
-
-    def setUp(self):
-        """
-        Set up test course
-        """
-        super(SubsectionGradeFactoryTest, self).setUp()
 
     def test_create(self):
         """
@@ -189,13 +172,6 @@ class SubsectionGradeTest(GradeTestBase):
     """
     Tests SubsectionGrade functionality.
     """
-
-    @classmethod
-    def setUpClass(cls):
-        super(SubsectionGradeTest, cls).setUpClass()
-
-    def setUp(self):
-        super(SubsectionGradeTest, self).setUp()
 
     def test_compute(self):
         """

@@ -13,12 +13,12 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
-from ..signals import (
+from ..signals.handlers import (
     submissions_score_set_handler,
     submissions_score_reset_handler,
     recalculate_subsection_grade_handler,
-    SCORE_CHANGED
 )
+from ..signals.signals import SCORE_CHANGED
 
 
 SUBMISSION_SET_KWARGS = {
@@ -50,10 +50,13 @@ class SubmissionSignalRelayTest(TestCase):
         Configure mocks for all the dependencies of the render method
         """
         super(SubmissionSignalRelayTest, self).setUp()
-        self.signal_mock = self.setup_patch('lms.djangoapps.grades.signals.SCORE_CHANGED.send', None)
+        self.signal_mock = self.setup_patch('lms.djangoapps.grades.signals.signals.SCORE_CHANGED.send', None)
         self.user_mock = MagicMock()
         self.user_mock.id = 42
-        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', self.user_mock)
+        self.get_user_mock = self.setup_patch(
+            'lms.djangoapps.grades.signals.handlers.user_by_anonymous_id',
+            self.user_mock
+        )
 
     def setup_patch(self, function_name, return_value):
         """
@@ -100,7 +103,8 @@ class SubmissionSignalRelayTest(TestCase):
             kwargs = SUBMISSION_SET_KWARGS.copy()
             del kwargs[missing]
 
-            submissions_score_set_handler(None, **kwargs)
+            with self.assertRaises(KeyError):
+                submissions_score_set_handler(None, **kwargs)
             self.signal_mock.assert_not_called()
 
     def test_score_set_bad_user(self):
@@ -109,7 +113,7 @@ class SubmissionSignalRelayTest(TestCase):
         that has an invalid user ID, the courseware model does not generate a
         signal.
         """
-        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', None)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.user_by_anonymous_id', None)
         submissions_score_set_handler(None, **SUBMISSION_SET_KWARGS)
         self.signal_mock.assert_not_called()
 
@@ -149,7 +153,8 @@ class SubmissionSignalRelayTest(TestCase):
             kwargs = SUBMISSION_RESET_KWARGS.copy()
             del kwargs[missing]
 
-            submissions_score_reset_handler(None, **kwargs)
+            with self.assertRaises(KeyError):
+                submissions_score_reset_handler(None, **kwargs)
             self.signal_mock.assert_not_called()
 
     def test_score_reset_bad_user(self):
@@ -158,7 +163,7 @@ class SubmissionSignalRelayTest(TestCase):
         that has an invalid user ID, the courseware model does not generate a
         signal.
         """
-        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.user_by_anonymous_id', None)
+        self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.user_by_anonymous_id', None)
         submissions_score_reset_handler(None, **SUBMISSION_RESET_KWARGS)
         self.signal_mock.assert_not_called()
 
@@ -243,15 +248,15 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     @ddt.data(
         ('points_possible', 2, 19),
         ('points_earned', 2, 19),
-        ('user', 0, 3),
+        ('user', 0, 0),
         ('course_id', 0, 0),
-        ('usage_id', 0, 2),
+        ('usage_id', 0, 0),
     )
     @ddt.unpack
     def test_missing_kwargs(self, kwarg, expected_mongo_calls, expected_sql_calls):
         self.set_up_course()
         del self.score_changed_kwargs[kwarg]
-        with patch('lms.djangoapps.grades.signals.log') as log_mock:
+        with patch('lms.djangoapps.grades.signals.handlers.log') as log_mock:
             with check_mongo_calls(expected_mongo_calls) and self.assertNumQueries(expected_sql_calls):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
             self.assertEqual(log_mock.exception.called, kwarg not in ['points_possible', 'points_earned'])
