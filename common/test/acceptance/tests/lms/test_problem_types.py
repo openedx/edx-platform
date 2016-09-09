@@ -826,6 +826,18 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'unanswered': ['.grader-status .unanswered ~ .debug'],
     }
 
+    def setUp(self, *args, **kwargs):
+        """
+        Additional setup for CodeProblemTypeTest
+        """
+        super(CodeProblemTypeTest, self).setUp(*args, **kwargs)
+        self.problem_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'label',  # TODO: AC-286
+            ]
+        })
+
     def answer_problem(self, correctness):
         """
         Answer code problem.
@@ -1020,6 +1032,18 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'incorrect': ['div.capa_inputtype div.incorrect'],
         'unanswered': ['div.capa_inputtype div.unanswered'],
     }
+
+    def setUp(self, *args, **kwargs):
+        """
+        Additional setup for SymbolicProblemTypeTest
+        """
+        super(SymbolicProblemTypeTest, self).setUp(*args, **kwargs)
+        self.problem_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'label',  # TODO: AC-294
+            ]
+        })
 
     def answer_problem(self, correctness):
         """
