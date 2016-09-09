@@ -17,7 +17,7 @@ from django.db.utils import IntegrityError
 from model_utils.models import TimeStampedModel
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
-from opaque_keys.edx.locator import BlockUsageLocator
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
 
@@ -39,6 +39,17 @@ class BlockRecordSet(frozenset):
         self._json = None
         self._hash = None
 
+    def _get_course_key_string(self):
+        """
+        Get the course key as a string.  All blocks are from the same course,
+        so just grab one arbitrarily.  If no blocks are present, return None.
+        """
+        if self:
+            a_block = next(iter(self))
+            return unicode(a_block.locator.course_key)
+        else:
+            return None
+
     def to_json(self):
         """
         Return a JSON-serialized version of the list of block records, using a
@@ -47,12 +58,18 @@ class BlockRecordSet(frozenset):
         if self._json is None:
             sorted_blocks = sorted(self, key=attrgetter('locator'))
             list_of_block_dicts = [block._asdict() for block in sorted_blocks]
+            course_key_string = self._get_course_key_string()  # all blocks are from the same course
+
             for block_dict in list_of_block_dicts:
                 block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
-            # Remove spaces from separators for more compact representation
+            data = {
+                'course_key': course_key_string,
+                'blocks': list_of_block_dicts,
+            }
+
             self._json = json.dumps(
-                list_of_block_dicts,
-                separators=(',', ':'),
+                data,
+                separators=(',', ':'),  # Remove spaces from separators for more compact representation
                 sort_keys=True,
             )
         return self._json
@@ -62,10 +79,17 @@ class BlockRecordSet(frozenset):
         """
         Return a BlockRecordSet from a json list.
         """
-        block_dicts = json.loads(blockrecord_json)
+        data = json.loads(blockrecord_json)
+        course_key = data['course_key']
+        if course_key is not None:
+            course_key = CourseKey.from_string(course_key)
+        else:
+            # If there was no course key, there are no blocks.
+            assert len(data['blocks']) == 0
+        block_dicts = data['blocks']
         record_generator = (
             BlockRecord(
-                locator=BlockUsageLocator.from_string(block["locator"]),
+                locator=UsageKey.from_string(block["locator"]).replace(course_key=course_key),
                 weight=block["weight"],
                 max_score=block["max_score"],
             )
