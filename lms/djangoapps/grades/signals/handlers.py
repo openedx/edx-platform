@@ -5,6 +5,8 @@ from logging import getLogger
 
 from django.dispatch import receiver
 
+from lms.djangoapps.course_blocks.api import get_course_blocks
+from lms.djangoapps.courseware.courses import get_course_by_id
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
@@ -95,33 +97,25 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
        - course_id: Unicode string representing the course
        - usage_id: Unicode string indicating the courseware instance
     """
-    try:
-        course_id = kwargs['course_id']
-        usage_id = kwargs['usage_id']
-        student = kwargs['user']
-    except KeyError:
-        log.exception(
-            u"Failed to process SCORE_CHANGED signal, some arguments were missing."
-            "user: %s, course_id: %s, usage_id: %s.",
-            kwargs.get('user', None),
-            kwargs.get('course_id', None),
-            kwargs.get('usage_id', None),
-        )
-        return
-
-    course_key = CourseLocator.from_string(course_id)
+    student = kwargs['user']
+    course_key = CourseLocator.from_string(kwargs['course_id'])
     if not PersistentGradesEnabledFlag.feature_enabled(course_key):
         return
 
-    usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
-    block_structure = get_course_in_cache(course_key)
+    scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
+    collected_block_structure = get_course_in_cache(course_key)
+    course = get_course_by_id(course_key, depth=0)
 
-    subsections_to_update = block_structure.get_transformer_block_field(
-        usage_key,
+    subsections_to_update = collected_block_structure.get_transformer_block_field(
+        scored_block_usage_key,
         GradesTransformer,
         'subsections',
         set()
     )
-
-    for subsection in subsections_to_update:
-        SubsectionGradeFactory(student).update(subsection, course_key)
+    for subsection_usage_key in subsections_to_update:
+        transformed_subsection_structure = get_course_blocks(
+            student,
+            subsection_usage_key,
+            collected_block_structure=collected_block_structure,
+        )
+        SubsectionGradeFactory(student).update(subsection_usage_key, transformed_subsection_structure, course)
