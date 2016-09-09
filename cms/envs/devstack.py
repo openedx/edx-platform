@@ -9,7 +9,7 @@ from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
 MEDIA_ROOT = "/edx/var/edxapp/uploads"
-
+MAKO_MODULE_DIR = os.path.join(tempfile.gettempdir(), 'mako_dev_cms')
 DEBUG = True
 USE_I18N = True
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = DEBUG
