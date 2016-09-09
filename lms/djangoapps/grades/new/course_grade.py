@@ -125,7 +125,8 @@ class CourseGrade(object):
                 subsection_grades.append(
                     subsection_grade_factory.create(
                         self.course_structure[subsection_key],
-                        self.course_structure, self.course
+                        self.course_structure,
+                        self.course,
                     )
                 )
 
