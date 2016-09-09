@@ -253,23 +253,26 @@ class LoncapaResponse(object):
         """
         _ = self.capa_system.i18n.ugettext
 
-        # get responsetype index to make responsetype label
-        response_index = self.xml.attrib['id'].split('_')[-1]
+        # response_id = problem_id + response index
+        response_id = self.xml.attrib['id']
+
+        response_index = response_id.split('_')[-1]
         # Translators: index here could be 1,2,3 and so on
         response_label = _(u'Question {index}').format(index=response_index)
 
         # wrap the content inside a section
-        tree = etree.Element('section')
+        tree = etree.Element('div')
         tree.set('class', 'wrapper-problem-response')
         tree.set('tabindex', '-1')
         tree.set('aria-label', response_label)
+        tree.set('role', 'group')
 
         if self.xml.get('multiple_inputtypes'):
             # add <div> to wrap all inputtypes
             content = etree.SubElement(tree, 'div')
             content.set('class', 'multi-inputs-group')
             content.set('role', 'group')
-            content.set('aria-labelledby', self.xml.get('id'))
+            content.set('aria-labelledby', response_id)
         else:
             content = tree
 

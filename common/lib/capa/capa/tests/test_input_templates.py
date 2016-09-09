@@ -1181,3 +1181,43 @@ class SchematicInputTemplateTest(TemplateTestCase):
         Verify aria-label attribute rendering.
         """
         self.assert_label(aria_label=True)
+
+
+class CodeinputTemplateTest(TemplateTestCase):
+    """
+    Test mako template for `<textbox>` input
+    """
+
+    TEMPLATE_NAME = 'codeinput.html'
+
+    def setUp(self):
+        super(CodeinputTemplateTest, self).setUp()
+        self.context = {
+            'id': '1',
+            'status': Status('correct'),
+            'mode': 'parrot',
+            'linenumbers': 'false',
+            'rows': '37',
+            'cols': '11',
+            'tabsize': '7',
+            'hidden': '',
+            'msg': '',
+            'value': 'print "good evening"',
+            'aria_label': 'python editor',
+            'code_mirror_exit_message': 'Press ESC then TAB or click outside of the code editor to exit',
+            'response_data': self.RESPONSE_DATA,
+            'describedby': self.DESCRIBEDBY,
+        }
+
+    def test_label(self):
+        """
+        Verify question label is rendered correctly.
+        """
+        self.assert_label(xpath="//label[@class='problem-group-label']")
+
+    def test_editor_exit_message(self):
+        """
+        Verify that editor exit message is rendered.
+        """
+        xml = self.render_to_xml(self.context)
+        self.assert_has_text(xml, '//span[@id="cm-editor-exit-message-1"]', self.context['code_mirror_exit_message'])

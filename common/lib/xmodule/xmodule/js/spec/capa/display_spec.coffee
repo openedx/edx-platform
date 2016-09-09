@@ -834,3 +834,25 @@ describe 'Problem', ->
       expect(@problem.poll.calls.count()).toEqual(6)
 
       expect($('.notification-gentle-alert .notification-message').text()).toEqual("The grading process is still running. Refresh the page to see updates.")
+
+  describe 'codeinput problem', ->
+    codeinputProblemHtml = readFixtures('codeinput_problem.html')
+
+    beforeEach ->
+      spyOn($, 'postWithPrefix').and.callFake (url, callback) ->
+        callback html: codeinputProblemHtml
+      @problem = new Problem($('.xblock-student_view'))
+      @problem.render(codeinputProblemHtml)
+
+    it 'has rendered with correct a11y info', ->
+      CodeMirrorTextArea = $('textarea')[1]
+      CodeMirrorTextAreaId = 'cm-textarea-101'
+
+      # verify that question label has correct `for` attribute value
+      expect($('.problem-group-label').attr('for')).toEqual(CodeMirrorTextAreaId)
+
+      # verify that codemirror textarea has correct `id` attribute value
+      expect($(CodeMirrorTextArea).attr('id')).toEqual(CodeMirrorTextAreaId)
+
+      # verify that codemirror textarea has correct `aria-describedby` attribute value
+      expect($(CodeMirrorTextArea).attr('aria-describedby')).toEqual('cm-editor-exit-message-101 status_101')

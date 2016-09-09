@@ -1,3 +1,7 @@
+"""
+CAPA HTML rendering tests.
+"""
+import ddt
 import unittest
 from lxml import etree
 import os
@@ -9,7 +13,11 @@ from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFac
 from capa.tests.helpers import test_capa_system, new_loncapa_problem
 
 
+@ddt.ddt
 class CapaHtmlRenderTest(unittest.TestCase):
+    """
+    CAPA HTML rendering tests class.
+    """
 
     def setUp(self):
         super(CapaHtmlRenderTest, self).setUp()
@@ -142,28 +150,28 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Mock out the template renderer
         the_system = test_capa_system()
         the_system.render_template = mock.Mock()
-        the_system.render_template.return_value = "<div>Input Template Render</div>"
+        the_system.render_template.return_value = "<div class='input-template-render'>Input Template Render</div>"
 
         # Create the problem and render the HTML
         problem = new_loncapa_problem(xml_str, capa_system=the_system)
         rendered_html = etree.XML(problem.get_html())
-
         # Expect problem has been turned into a <div>
         self.assertEqual(rendered_html.tag, "div")
 
-        # Expect that the response has been turned into a <section> with correct attributes
-        response_element = rendered_html.find("section")
-        self.assertEqual(response_element.tag, "section")
+        # Expect that the response has been turned into a <div> with correct attributes
+        response_element = rendered_html.find('div')
+
+        self.assertEqual(response_element.tag, "div")
         self.assertEqual(response_element.attrib["aria-label"], "Question 1")
 
-        # Expect that the response <section>
+        # Expect that the response div.wrapper-problem-response
         # that contains a <div> for the textline
-        textline_element = response_element.find("div")
+        textline_element = response_element.find('div')
         self.assertEqual(textline_element.text, 'Input Template Render')
 
         # Expect a child <div> for the solution
         # with the rendered template
-        solution_element = rendered_html.find("div")
+        solution_element = rendered_html.xpath('//div[@class="input-template-render"]')[0]
         self.assertEqual(solution_element.text, 'Input Template Render')
 
         # Expect that the template renderer was called with the correct
@@ -218,9 +226,9 @@ class CapaHtmlRenderTest(unittest.TestCase):
                  """
         problem = new_loncapa_problem(xml)
         rendered_html = etree.XML(problem.get_html())
-        sections = rendered_html.findall('section')
-        self.assertEqual(sections[0].attrib['aria-label'], 'Question 1')
-        self.assertEqual(sections[1].attrib['aria-label'], 'Question 2')
+        response_elements = rendered_html.findall('div')
+        self.assertEqual(response_elements[0].attrib['aria-label'], 'Question 1')
+        self.assertEqual(response_elements[1].attrib['aria-label'], 'Question 2')
 
     def test_render_response_with_overall_msg(self):
         # CustomResponse script that sets an overall_message
