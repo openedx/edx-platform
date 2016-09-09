@@ -6,8 +6,8 @@
   <optionresponse>
     <optioninput options="('yellow','blue','green')" correct="blue"/>
   </optionresponse>
-  <p>Which piece of furniture is built for sitting?</p>
   <multiplechoiceresponse>
+    <label>Which piece of furniture is built for sitting?</label>
     <choicegroup type="MultipleChoice">
       <choice correct="false">a table</choice>
       <choice correct="false">a desk</choice>
@@ -15,8 +15,8 @@
       <choice correct="false">a bookshelf</choice>
     </choicegroup>
   </multiplechoiceresponse>
-  <p>Which of the following are musical instruments?</p>
   <choiceresponse>
+    <label>Which of the following are musical instruments?</label>
     <checkboxgroup>
       <choice correct="true">a piano</choice>
       <choice correct="false">a tree</choice>
