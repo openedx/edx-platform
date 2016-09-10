@@ -29,13 +29,16 @@ log = logging.getLogger(__name__)
 BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
 
 
-class BlockRecordSet(frozenset):
+class BlockRecordList(tuple):
     """
-    An immutable ordered collection of BlockRecord objects.
+    An immutable ordered list of BlockRecord objects.
     """
 
-    def __init__(self, *args, **kwargs):
-        super(BlockRecordSet, self).__init__(*args, **kwargs)
+    def __new__(cls, blocks):
+        return super(BlockRecordList, cls).__new__(cls, tuple(blocks))
+
+    def __init__(self, blocks):
+        super(BlockRecordList, self).__init__(blocks)
         self._json = None
         self._hash = None
 
@@ -56,8 +59,7 @@ class BlockRecordSet(frozenset):
         stable ordering.
         """
         if self._json is None:
-            sorted_blocks = sorted(self, key=attrgetter('locator'))
-            list_of_block_dicts = [block._asdict() for block in sorted_blocks]
+            list_of_block_dicts = [block._asdict() for block in self]
             course_key_string = self._get_course_key_string()  # all blocks are from the same course
 
             for block_dict in list_of_block_dicts:
@@ -77,7 +79,7 @@ class BlockRecordSet(frozenset):
     @classmethod
     def from_json(cls, blockrecord_json):
         """
-        Return a BlockRecordSet from a json list.
+        Return a BlockRecordList from a previously serialized json.
         """
         data = json.loads(blockrecord_json)
         course_key = data['course_key']
@@ -96,6 +98,13 @@ class BlockRecordSet(frozenset):
             for block in block_dicts
         )
         return cls(record_generator)
+
+    @classmethod
+    def from_list(cls, blocks):
+        """
+        Return a BlockRecordList from a list.
+        """
+        return cls(tuple(blocks))
 
     def to_hash(self):
         """
@@ -120,24 +129,18 @@ class VisibleBlocksQuerySet(models.QuerySet):
         """
         Creates a new VisibleBlocks model object.
 
-        Argument 'blocks' should be a BlockRecordSet.
+        Argument 'blocks' should be a BlockRecordList.
         """
-
-        if not isinstance(blocks, BlockRecordSet):
-            blocks = BlockRecordSet(blocks)
-
         model, _ = self.get_or_create(hashed=blocks.to_hash(), defaults={'blocks_json': blocks.to_json()})
         return model
 
     def hash_from_blockrecords(self, blocks):
         """
-        Return the hash for a given BlockRecordSet, serializing the records if
+        Return the hash for a given list of blocks, saving the records if
         possible, but returning the hash even if an IntegrityError occurs.
+
+        Argument 'blocks' should be a BlockRecordList.
         """
-
-        if not isinstance(blocks, BlockRecordSet):
-            blocks = BlockRecordSet(blocks)
-
         try:
             with transaction.atomic():
                 model = self.create_from_blockrecords(blocks)
@@ -176,7 +179,7 @@ class VisibleBlocks(models.Model):
         Returns the blocks_json data stored on this model as a list of
         BlockRecords in the order they were provided.
         """
-        return BlockRecordSet.from_json(self.blocks_json)
+        return BlockRecordList.from_json(self.blocks_json)
 
 
 class PersistentSubsectionGradeQuerySet(models.QuerySet):
@@ -204,7 +207,7 @@ class PersistentSubsectionGradeQuerySet(models.QuerySet):
         if not kwargs.get('course_id', None):
             kwargs['course_id'] = kwargs['usage_key'].course_key
 
-        visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
+        visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(BlockRecordList.from_list(visible_blocks))
         return super(PersistentSubsectionGradeQuerySet, self).create(
             visible_blocks_id=visible_blocks_hash,
             **kwargs
@@ -358,7 +361,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         Modify an existing PersistentSubsectionGrade object, saving the new
         version.
         """
-        visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(blocks=visible_blocks)
+        visible_blocks_hash = VisibleBlocks.objects.hash_from_blockrecords(BlockRecordList.from_list(visible_blocks))
 
         self.course_version = course_version or ""
         self.subtree_edited_timestamp = subtree_edited_timestamp

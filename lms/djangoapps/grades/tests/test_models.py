@@ -14,27 +14,27 @@ from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from lms.djangoapps.grades.models import (
     BlockRecord,
-    BlockRecordSet,
+    BlockRecordList,
     PersistentSubsectionGrade,
     VisibleBlocks
 )
 
 
-class BlockRecordSetTestCase(TestCase):
+class BlockRecordListTestCase(TestCase):
     """
-    Verify the behavior of BlockRecordSets, particularly around edge cases
+    Verify the behavior of BlockRecordList, particularly around edge cases
     """
     empty_json = '{"blocks":[],"course_key":null}'
 
     def test_empty_block_record_set(self):
-        brs = BlockRecordSet()
+        brs = BlockRecordList(())
         self.assertFalse(brs)
         self.assertEqual(
             brs.to_json(),
             self.empty_json
         )
         self.assertEqual(
-            BlockRecordSet.from_json(self.empty_json),
+            BlockRecordList.from_json(self.empty_json),
             brs
         )
 
@@ -108,11 +108,17 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
+    def _create_block_record_list(self, blocks):
+        """
+        Creates and returns a BlockRecordList for the given blocks.
+        """
+        return VisibleBlocks.objects.create_from_blockrecords(BlockRecordList.from_list(blocks))
+
     def test_creation(self):
         """
         Happy path test to ensure basic create functionality works as expected.
         """
-        vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
+        vblocks = self._create_block_record_list([self.record_a])
         list_of_block_dicts = [self.record_a._asdict()]
         for block_dict in list_of_block_dicts:
             block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
@@ -128,30 +134,34 @@ class VisibleBlocksTest(GradesModelTestCase):
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
 
-    def test_ordering_does_not_matter(self):
+    def test_ordering_matters(self):
         """
-        When creating new vblocks, a different ordering of blocks produces the
-        same record in the database.
+        When creating new vblocks, different ordering of blocks produces
+        different records in the database.
         """
-        stored_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
-        repeat_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b, self.record_a])
-        new_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b])
+        stored_vblocks = self._create_block_record_list([self.record_a, self.record_b])
+        repeat_vblocks = self._create_block_record_list([self.record_b, self.record_a])
+        same_order_vblocks = self._create_block_record_list([self.record_a, self.record_b])
+        new_vblocks = self._create_block_record_list([self.record_b])
 
-        self.assertEqual(stored_vblocks.pk, repeat_vblocks.pk)
-        self.assertEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
+        self.assertNotEqual(stored_vblocks.pk, repeat_vblocks.pk)
+        self.assertNotEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
+
+        self.assertEquals(stored_vblocks.pk, same_order_vblocks.pk)
+        self.assertEquals(stored_vblocks.hashed, same_order_vblocks.hashed)
 
         self.assertNotEqual(stored_vblocks.pk, new_vblocks.pk)
         self.assertNotEqual(stored_vblocks.hashed, new_vblocks.hashed)
 
     def test_blocks_property(self):
         """
-        Ensures that, given an array of BlockRecord, creating visible_blocks and accessing
-        visible_blocks.blocks yields a copy of the initial array. Also, trying to set the blocks property should raise
-        an exception.
+        Ensures that, given an array of BlockRecord, creating visible_blocks
+        and accessing visible_blocks.blocks yields a copy of the initial array.
+        Also, trying to set the blocks property should raise an exception.
         """
-        expected_blocks = [self.record_a, self.record_b]
-        visible_blocks = VisibleBlocks.objects.create_from_blockrecords(expected_blocks)
-        self.assertEqual(BlockRecordSet(expected_blocks), visible_blocks.blocks)
+        expected_blocks = (self.record_a, self.record_b)
+        visible_blocks = self._create_block_record_list(expected_blocks)
+        self.assertEqual(expected_blocks, visible_blocks.blocks)
         with self.assertRaises(AttributeError):
             visible_blocks.blocks = expected_blocks
 
