@@ -1345,6 +1345,8 @@ class ProgressPageTests(ModuleStoreTestCase):
         )
         self.assertContains(resp, u"Download Your Certificate")
 
+    # disable persistent grades until TNL-5458 (reduces query counts)
+    @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(
         *itertools.product(((39, 4, True), (39, 4, False)), (True, False))
     )

@@ -36,6 +36,7 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
     'django.conf.settings.FEATURES',
     {
         'ENABLE_XBLOCK_VIEW_ENDPOINT': True,
+        'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False  # disable persistent grades until TNL-5458 (reduces queries)
     }
 )
 @ddt.ddt
