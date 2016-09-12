@@ -123,14 +123,18 @@ body.discussion {
   }
 
   .wmd-spacer1 {
-    @include left(50px);
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+    left: 50px;
   }
+
   .wmd-spacer2 {
-    @include left(175px);
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+    left: 175px;
   }
 
   .wmd-spacer3 {
-    @include left(300px);
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+    left: 300px;
   }
 
   .wmd-prompt-background {
@@ -404,9 +408,10 @@ section.discussion-pagination {
 
     ol {
       li {
+        @include padding-right($baseline/2);
         list-style: none;
         display: inline-block;
-        padding-right: 0.5em;
+
         &.current-page span {
           display: inline-block;
           height: 35px;
@@ -444,9 +449,9 @@ section.discussion-pagination {
   }
 
   .load-response-button {
+    @include text-align(left);
     position: relative;
     margin: ($baseline/2) 0;
     width: 100%;
-    text-align: left;
   }
 }

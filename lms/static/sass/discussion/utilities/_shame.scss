@@ -47,7 +47,7 @@
 }
 
 .forum-nav-browse-menu {
-  padding-left: 0;
+  @include padding-left(0);
 }
 
 // --------------------------------
@@ -102,7 +102,7 @@ li[class*=forum-nav-thread-label-] {
 
   // Override global ul rules
   .topic-menu {
-    padding-left: 0;
+    @include padding-left(0);
   }
 
   .topic-menu, .topic-submenu {
@@ -129,7 +129,6 @@ li[class*=forum-nav-thread-label-] {
   // Override courseware
   .post-actions-list, .response-actions-list, .comment-actions-list {
     @extend %t-copy-sub2;
-    padding-left: 0 !important;
   }
 
   // Override global span

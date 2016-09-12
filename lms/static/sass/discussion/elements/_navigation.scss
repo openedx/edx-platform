@@ -44,11 +44,11 @@
 }
 
 .forum-nav-browse-filter .icon {
+    @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
     font-size: $forum-small-font-size;
     position: absolute;
     margin-top: -6px;
     top: 50%;
-    right: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
 }
 
 .forum-nav-browse-filter-input {
@@ -56,6 +56,7 @@
 }
 
 .forum-nav-browse-title {
+    @include text-align(left);
     display: block;
     width: 100%;
     border: 0;
@@ -66,7 +67,6 @@
     box-shadow: none;
     background-image: none;
     color: $link-color;
-    text-align: left;
 
     &:hover,
     &:focus {
@@ -95,7 +95,7 @@
     li {
 
         .forum-nav-browse-title {
-            padding-left: $baseline;
+            @include padding-left($baseline);
         }
     }
 }
@@ -105,13 +105,13 @@
 // -------------------
 .forum-nav-refine-bar {
     @include clearfix();
+    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+    @include text-align(right);
     font-size: $forum-small-font-size;
     border-bottom: 1px solid $forum-color-border;
     background-color: $gray-l5;
     padding: ($baseline/4) ($baseline/2);
     color: $black;
-    text-align: right;
-    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
 }
 
 .forum-nav-filter-main {
@@ -150,8 +150,8 @@
 // Thread list
 // -----------
 .forum-nav-thread-list {
+    @include padding-left(0);
     margin: 0;
-    padding-left: 0;
     overflow-y: scroll;
     list-style: none;
     border-radius: 0 0 3px 3px;
@@ -202,7 +202,7 @@
                 color: $base-font-color;
 
                 &:after {
-                    border-right-color: $forum-color-border;
+                    @include border-right-color($forum-color-border);
                 }
             }
 
@@ -262,9 +262,9 @@
 }
 
 .forum-nav-thread-title {
+    @include margin-left(0);
     font-size: $forum-base-font-size;
     display: block;
-    margin-left: 0;
 }
 
 %forum-nav-thread-wrapper-2-content {

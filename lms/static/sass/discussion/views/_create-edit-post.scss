@@ -204,11 +204,11 @@
   position: relative;
 
   .topic-menu-wrapper {
-    box-sizing: border-box;
     @extend %ui-depth4;
+    @include left(0);
+    box-sizing: border-box;
     position: absolute;
     top: 40px;
-    left: 0;
     width: 100%;
     background: $forum-color-background;
     box-shadow: 0 2px 1px $shadow;
@@ -231,15 +231,15 @@
   }
 
   .topic-menu {
+    @include margin-left($baseline/2);
     overflow-y: scroll;
     max-height: 400px;
     list-style: none;
-    margin-left: ($baseline/2);
   }
 
   .topic-submenu {
+    @include margin-left($baseline);
     list-style: none;
-    margin-left: $baseline;
   }
 
   .topic-title {
