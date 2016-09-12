@@ -1348,7 +1348,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     # disable persistent grades until TNL-5458 (reduces query counts)
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(
-        *itertools.product(((39, 4, True), (39, 4, False)), (True, False))
+        *itertools.product(((34, 4, True), (34, 4, False)), (True, False))
     )
     @ddt.unpack
     def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
