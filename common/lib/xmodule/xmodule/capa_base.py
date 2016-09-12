@@ -637,16 +637,17 @@ class CapaMixin(CapaFields):
         # Get the current problem status and generate the answer notification and message.
         answer_notification_message = None
         answer_notification_type = None
-        progress = self.get_progress()
 
-        key_list = self.correct_map.keys()
-        if len(key_list) == 1:
-            # Only one answer available or a missing progress and 1 or more answers.
-            answer_notification_type = self.correct_map.get(key_list[0]).get('correctness', None)
-        elif len(key_list) > 1:
-            answer_notification_type = self.correct_map.get(key_list[0]).get('correctness', None)
-            for key in key_list[1:]:
-                if self.correct_map.get(key).get('correctness', None) != answer_notification_type:
+        progress = self.get_progress()
+        id_list = self.lcp.correct_map.keys()
+        if len(id_list) == 1:
+            # Only one answer available
+            answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+        elif len(id_list) > 1:
+            # Check the multiple answers that are available
+            answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+            for answer_id in id_list[1:]:
+                if self.lcp.correct_map.get_correctness(answer_id) != answer_notification_type:
                     # There is at least 1 of the following combinations of correctness states
                     # Correct and incorrect, Correct and partially correct, or Incorrect and partially correct
                     # which all should have a message type of Partially Correct
