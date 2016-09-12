@@ -189,7 +189,7 @@ class ProblemPage(PageObject):
         Check for visibility of the success notification and icon.
         """
         msg = "Wait for success notification to be visible"
-        self.wait_for_element_visibility('.notification.success', msg)
+        self.wait_for_element_visibility('.notification-submit', msg)
         self.wait_for_element_visibility('.fa-check', "Waiting for success icon")
 
     def wait_incorrect_notification_visible(self):
@@ -197,7 +197,7 @@ class ProblemPage(PageObject):
         Check for visibility of the incorrect notification and icon.
         """
         msg = "Wait for error notification to be visible"
-        self.wait_for_element_visibility('.notification.error', msg)
+        self.wait_for_element_visibility('.notification-submit', msg)
         self.wait_for_element_visibility('.fa-close', "Waiting for incorrect notification icon")
 
     def wait_partial_notification_visible(self):
@@ -205,7 +205,7 @@ class ProblemPage(PageObject):
         Check for visibility of the partially visible notification and icon.
         """
         msg = "Wait for partial correct notification to be visible"
-        self.wait_for_element_visibility('.notification.success', msg)
+        self.wait_for_element_visibility('.notification-submit', msg)
         self.wait_for_element_visibility('.fa-asterisk', "Waiting for incorrect notification icon")
 
     def click_hint(self):

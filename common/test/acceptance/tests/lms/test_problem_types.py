@@ -739,7 +739,7 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'unanswered': ['.grader-status .unanswered ~ .debug'],
     }
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer code problem.
         """
@@ -930,7 +930,7 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'unanswered': ['div.capa_inputtype div.unanswered'],
     }
 
-    def answer_problem(self, correct):
+    def answer_problem(self, correctness):
         """
         Answer symbolic problem.
         """
