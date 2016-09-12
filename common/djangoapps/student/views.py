@@ -1463,6 +1463,7 @@ def change_setting(request):
 
 
 class AccountValidationError(Exception):
+
     def __init__(self, message, field):
         super(AccountValidationError, self).__init__(message)
         self.field = field
@@ -1639,7 +1640,7 @@ def create_account_with_params(request, params):
         not eamap.external_domain.startswith(
             external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
         )
-    )
+    ) and not settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION")
 
     form = AccountCreationForm(
         data=params,

@@ -12,6 +12,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.utils.importlib import import_module
 import mock
+from mock import patch
 
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
@@ -303,6 +304,7 @@ class TestCreateAccountValidation(TestCase):
     """
     Test validation of various parameters in the create_account view
     """
+
     def setUp(self):
         super(TestCreateAccountValidation, self).setUp()
         self.url = reverse("create_account")
@@ -511,6 +513,7 @@ class TestCreateAccountValidation(TestCase):
             params["email"] = "another_test_email@example.com"
             self.assert_success(params)
 
+    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def test_terms_of_service(self):
         params = dict(self.minimal_params)
 
@@ -532,6 +535,13 @@ class TestCreateAccountValidation(TestCase):
 
         # True
         params["terms_of_service"] = "tRUe"
+        self.assert_success(params)
+
+    # with "ENABLE_COMBINED_LOGIN_REGISTRATION" the "terms of service" checkbox is hidden
+    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": True})
+    def test_terms_of_service_with_combined_login_registration(self):
+        params = dict(self.minimal_params)
+        del params["terms_of_service"]
         self.assert_success(params)
 
     @ddt.data(
