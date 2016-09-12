@@ -19,38 +19,40 @@ from openedx.core.djangolib.markup import HTML
     <li
         class="forum-nav-browse-menu-item"
         data-discussion-id='${entries[entry]["id"]}'
+        id='${entries[entry]["id"]}'
         data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
+        role="option"
     >
-        <button type="button" class="forum-nav-browse-title">${entry}</button>
+        <span class="forum-nav-browse-title">${entry}</span>
     </li>
 </%def>
 
 <%def name="render_category(categories, category)">
-    <li class="forum-nav-browse-menu-item">
-        <button type="button" class="forum-nav-browse-title">${category}</button>
+    <li class="forum-nav-browse-menu-item"
+        id='${category | u}'
+    >
+        <span class="forum-nav-browse-title">${category}</span>
         <ul class="forum-nav-browse-submenu">
             ${HTML(render_dropdown(categories[category]))}
         </ul>
     </li>
 </%def>
 
-<div class="forum-nav-browse-menu-wrapper" style="display: none">
-    <form class="forum-nav-browse-filter">
+<div class="forum-nav-browse-menu-wrapper" style="display: none" aria-label="${_("Discussion topics list")}">
+    <form class="forum-nav-browse-filter" autocomplete="off">
         <label>
             <span class="sr">${_("Filter Topics")}</span>
-            <input type="text" class="forum-nav-browse-filter-input" placeholder="${_("filter topics")}">
+            <input type="text" id="forum-nav-browse-filter-input" role="combobox" aria-expanded="true" aria-owns="discussion_topics_listbox" aria-autocomplete="list" class="forum-nav-browse-filter-input" placeholder="${_("filter topics")}">
             <span class="icon fa fa-filter" aria-hidden="true"></span>
         </label>
     </form>
-    <ul class="forum-nav-browse-menu">
-        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all">
-            <button type="button" class="forum-nav-browse-title">${_("All Discussions")}</button>
+    <ul class="forum-nav-browse-menu" role="listbox" id="discussion_topics_listbox">
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all" role="option" id="all_discussions">
+            <span class="forum-nav-browse-title">${_("All Discussions")}</span>
         </li>
-        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
-            <button type="button" class="forum-nav-browse-title">
-                <span class="icon fa fa-star" aria-hidden="true"></span>
-                ${_("Posts I'm Following")}
-            </button>
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following" role="option" id="posts_following">
+            <span class="icon fa fa-star" aria-hidden="true"></span>
+            <span class="forum-nav-browse-title">${_("Posts I'm Following")}</span>
         </li>
         ${HTML(render_dropdown(category_map))}
     </ul>
