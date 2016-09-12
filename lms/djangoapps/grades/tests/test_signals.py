@@ -3,6 +3,7 @@ Tests for the score change signals defined in the courseware models module.
 """
 
 import ddt
+from django.conf import settings
 from django.test import TestCase
 from mock import patch, MagicMock
 from unittest import skip
@@ -169,6 +170,7 @@ class SubmissionSignalRelayTest(TestCase):
         self.signal_mock.assert_not_called()
 
 
+@patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
 @ddt.ddt
 class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
     """

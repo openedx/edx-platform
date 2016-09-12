@@ -43,8 +43,6 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     usage_id = kwargs['item_id']
     user = user_by_anonymous_id(kwargs['anonymous_user_id'])
 
-    # If any of the kwargs were missing, at least one of the following values
-    # will be None.
     SCORE_CHANGED.send(
         sender=None,
         points_possible=points_possible,
@@ -73,8 +71,6 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
     usage_id = kwargs['item_id']
     user = user_by_anonymous_id(kwargs['anonymous_user_id'])
 
-    # If any of the kwargs were missing, at least one of the following values
-    # will be None.
     SCORE_CHANGED.send(
         sender=None,
         points_possible=0,
