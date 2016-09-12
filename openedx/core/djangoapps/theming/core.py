@@ -1,6 +1,7 @@
 """
 Core logic for Comprehensive Theming.
 """
+import os
 from django.conf import settings
 
 from .helpers import get_themes
@@ -27,3 +28,7 @@ def enable_theming():
 
         if theme.themes_base_dir not in settings.MAKO_TEMPLATES['main']:
             settings.MAKO_TEMPLATES['main'].insert(0, theme.themes_base_dir)
+
+        customer_themes_dir = os.path.join(theme.themes_base_dir, 'customer_themes')
+        if os.path.isdir(customer_themes_dir):
+            settings.STATICFILES_DIRS.insert(0, ('customer_themes', customer_themes_dir))

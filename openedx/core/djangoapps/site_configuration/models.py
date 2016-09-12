@@ -3,6 +3,11 @@ Django models for site configurations.
 """
 import collections
 
+import os
+import sass
+from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save
@@ -11,6 +16,7 @@ from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
 
+from .utils import get_initial_sass_variables, get_initial_page_elements
 
 from logging import getLogger
 logger = getLogger(__name__)  # pylint: disable=invalid-name
@@ -32,12 +38,28 @@ class SiteConfiguration(models.Model):
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
+    sass_variables = models.TextField(blank=True, default=get_initial_sass_variables)
+    page_elements = JSONField(blank=True, default=get_initial_page_elements)
 
     def __unicode__(self):
         return u"<SiteConfiguration: {site} >".format(site=self.site)
 
     def __repr__(self):
         return self.__unicode__()
+
+    def save(self, **kwargs):
+        # When creating a new object, save default microsite values. Not implemented as a default method on the field
+        # because it depends on other fields that should be already filled.
+        if not self.id:
+            self.values = self._get_initial_microsite_values()
+
+        # fix for a bug with some pages requiring uppercase platform_name variable
+        self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
+
+        # recompile SASS on every save
+        self.compile_microsite_sass()
+        #self.collect_css_file()
+        return super(SiteConfiguration, self).save(**kwargs)
 
     def get_value(self, name, default=None):
         """
@@ -108,6 +130,48 @@ class SiteConfiguration(models.Model):
             True if given organization is present in site configurations otherwise False.
         """
         return org in cls.get_all_orgs()
+
+    def compile_microsite_sass(self):
+        theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME, 'lms', 'src', 'main.scss')
+        site_domain = self.site.domain
+        output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(site_domain))
+        collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(site_domain))
+        sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
+        with open(output_path, 'w') as f:
+            f.write(sass_output)
+        with open(collected_output_path, 'w') as f:
+            f.write(sass_output)
+
+    def collect_css_file(self):
+        path = self.values.get('css_overrides_file')
+        storage = staticfiles_storage
+        file_storage = FileSystemStorage(settings.MICROSITE_ROOT_DIR)
+        if getattr(file_storage, 'prefix', None):
+            prefixed_path = os.path.join(file_storage.prefix, path)
+        else:
+            prefixed_path = path
+        found_files = collections.OrderedDict()
+        found_files[prefixed_path] = (file_storage, path)
+
+        with file_storage.open(path) as source_file:
+            storage.save(prefixed_path, source_file)
+        if hasattr(storage, 'post_process'):
+            processor = storage.post_process(found_files)
+            for original_path, processed_path, processed in processor:
+                if isinstance(processed, Exception):
+                    raise processed
+
+    def _sass_var_override(self, path):
+        if 'branding-basics' in path:
+            return [(path, self.sass_variables)]
+        return None
+
+    def _get_initial_microsite_values(self):
+        return {
+            'platform_name': self.site.name,
+            'css_overrides_file': "customer_themes/{}.css".format(self.key),
+            'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
+        }
 
 
 class SiteConfigurationHistory(TimeStampedModel):
