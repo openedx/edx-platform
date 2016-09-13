@@ -424,6 +424,39 @@ class CAPAProblemTest(unittest.TestCase):
         self.assert_question_tag(question1, question2, tag='label', label_attr=False)
         self.assert_question_tag(question1, question2, tag='p', label_attr=True)
 
+    def test_question_tag_child_left(self):
+        """
+        If the "old" question tag has children, don't delete the children when
+        transforming to the new label tag.
+        """
+        xml = """
+            <problem>
+                <p>Question<img src='img/src'/></p>
+                <choiceresponse>
+                    <checkboxgroup label="Question">
+                        <choice correct="true">choice1</choice>
+                        <choice correct="false">choice2</choice>
+                    </checkboxgroup>
+                </choiceresponse>
+            </problem>
+            """
+
+        problem = new_loncapa_problem(xml)
+        self.assertEqual(
+            problem.problem_data,
+            {
+                '1_2_1':
+                    {
+                        'label': "Question",
+                        'descriptions': {}
+                    }
+            }
+        )
+        # img tag is still present within the paragraph, but p text has been deleted
+        self.assertEqual(len(problem.tree.xpath('//p')), 1)
+        self.assertEqual(problem.tree.xpath('//p')[0].text, '')
+        self.assertEqual(len(problem.tree.xpath('//p/img')), 1)
+
 
 @ddt.ddt
 class CAPAMultiInputProblemTest(unittest.TestCase):
