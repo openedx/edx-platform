@@ -4,6 +4,7 @@ Test saved subsection grade functionality.
 
 import ddt
 from django.conf import settings
+from django.db.utils import DatabaseError
 from mock import patch
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
@@ -117,7 +118,7 @@ class SubsectionGradeFactoryTest(GradeTestBase):
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_saved_grade',
                 wraps=self.subsection_grade_factory._get_saved_grade  # pylint: disable=protected-access
             ) as mock_get_saved_grade:
-                with self.assertNumQueries(12):
+                with self.assertNumQueries(14):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
                 self.assertTrue(mock_get_saved_grade.called)
                 self.assertTrue(mock_create_grade.called)
@@ -132,6 +133,30 @@ class SubsectionGradeFactoryTest(GradeTestBase):
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
         self.assertEqual(grade_a.all_total, grade_b.all_total)
+
+    @ddt.data(
+        (
+            'lms.djangoapps.grades.new.subsection_grade.SubsectionGrade.create_model',
+            lambda self: self.subsection_grade_factory.create(self.sequence)
+        ),
+        (
+            'lms.djangoapps.grades.new.subsection_grade.SubsectionGrade.bulk_create_models',
+            lambda self: self.subsection_grade_factory.bulk_create_unsaved()
+        ),
+    )
+    @ddt.unpack
+    def test_fallback_handling(self, underlying_method, method_to_test):
+        """
+        Tests that the persistent grades fallback handler functions as expected.
+        """
+        with patch('lms.djangoapps.grades.new.subsection_grade.log') as log_mock:
+            with patch(underlying_method) as underlying:
+                underlying.side_effect = DatabaseError("I'm afraid I can't do that")
+                method_to_test(self)
+                # By making it this far, we implicitly assert "the factory method swallowed the exception correctly"
+                self.assertTrue(
+                    log_mock.warning.call_args_list[0].startswith("Persistent Grades: Persistence Error, falling back.")
+                )
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(

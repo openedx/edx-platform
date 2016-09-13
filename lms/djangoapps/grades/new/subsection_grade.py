@@ -2,6 +2,9 @@
 SubsectionGrade Class
 """
 from collections import OrderedDict
+from contextlib import contextmanager
+from django.db import transaction
+from django.db.utils import DatabaseError
 from lazy import lazy
 from logging import getLogger
 from courseware.model_data import ScoresClient
@@ -10,11 +13,26 @@ from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from student.models import anonymous_id_for_user, User
 from submissions import api as submissions_api
+from traceback import format_exc
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import Score
 
 
 log = getLogger(__name__)
+
+
+@contextmanager
+def persistence_safe_fallback():
+    """
+    A context manager intended to be used to wrap robust grades database-specific code that can be ignored on failure.
+    """
+    try:
+        with transaction.atomic():
+            yield
+    except DatabaseError:
+        # Error deliberately logged, then swallowed. It's assumed that the wrapped code is not guaranteed to succeed.
+        # TODO: enqueue a celery task to finish the task asynchronously, see TNL-5471
+        log.warning("Persistent Grades: Persistence Error, falling back.\n{}".format(format_exc()))
 
 
 class SubsectionGrade(object):
@@ -254,8 +272,9 @@ class SubsectionGradeFactory(object):
                 if read_only:
                     self._unsaved_subsection_grades.append(subsection_grade)
                 else:
-                    grade_model = subsection_grade.create_model(self.student)
-                    self._update_saved_subsection_grade(subsection.location, grade_model)
+                    with persistence_safe_fallback():
+                        grade_model = subsection_grade.create_model(self.student)
+                        self._update_saved_subsection_grade(subsection.location, grade_model)
         return subsection_grade
 
     def bulk_create_unsaved(self):
@@ -264,8 +283,9 @@ class SubsectionGradeFactory(object):
         """
         self._log_event(log.warning, u"bulk_create_unsaved")
 
-        SubsectionGrade.bulk_create_models(self.student, self._unsaved_subsection_grades, self.course.id)
-        self._unsaved_subsection_grades = []
+        with persistence_safe_fallback():
+            SubsectionGrade.bulk_create_models(self.student, self._unsaved_subsection_grades, self.course.id)
+            self._unsaved_subsection_grades = []
 
     def update(self, subsection, block_structure=None):
         """
