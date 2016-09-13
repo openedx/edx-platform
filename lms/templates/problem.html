@@ -26,7 +26,11 @@ from openedx.core.djangolib.markup import HTML
     % endif
     % if save_button:
     <span class="problem-action-button-wrapper">
-        <button class="save problem-action-btn btn-default btn-small" data-value="${_('Save')}"><span class="icon fa fa-floppy-o" aria-hidden="true"></span><span aria-hidden="true">${_('Save')}</span><span class="sr">${_("Save your answer")}</span></button>
+        <button class="save problem-action-btn btn-default btn-small" data-value="${_('Save')}">
+            <span class="icon fa fa-floppy-o" aria-hidden="true"></span>
+            <span aria-hidden="true">${_('Save')}</span>
+            <span class="sr">${_("Save your answer")}</span>
+        </button>
     </span>
     % endif
     % if reset_button:
@@ -58,26 +62,34 @@ from openedx.core.djangolib.markup import HTML
             <%include file="problem_notifications.html" args="
                 notification_type='success',
                 notification_icon='check',
-                notification_message=answer_notification_message,
-                hint_notification=hint_notification"
+                notification_name='submit',
+                notification_message= answer_notification_message"
             />
         % endif
         % if 'incorrect' == answer_notification_type:
             <%include file="problem_notifications.html" args="
                 notification_type='error',
                 notification_icon='close',
-                notification_message=answer_notification_message,
-                hint_notification=hint_notification"
+                notification_name='submit',
+                notification_message= answer_notification_message"
             />
         % endif
         % if 'partially-correct' == answer_notification_type:
             <%include file="problem_notifications.html" args="
                 notification_type='success',
                 notification_icon='asterisk',
-                notification_message=answer_notification_message,
-                hint_notification=hint_notification"
+                notification_name='submit',
+                notification_message= answer_notification_message"
             />
         % endif
+    % endif
+    % if save_notification_message:
+      <%include file="problem_notifications.html" args="
+        notification_type='warning',
+        notification_icon='save',
+        notification_name='save',
+        notification_message=save_notification_message"
+      />
     % endif
 
   </div>
