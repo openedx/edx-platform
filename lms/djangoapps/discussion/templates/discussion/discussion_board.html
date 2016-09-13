@@ -58,8 +58,9 @@ DiscussionBoardFactory({
     <header class="page-header has-secondary">
         ## Breadcrumb navigation
         <div class="page-header-main">
-            <div class="sr-is-focusable" tabindex="-1"></div>
-            <div class="has-breadcrumbs"></div>
+            <nav aria-label="${_('Discussions')}" class="sr-is-focusable" tabindex="-1">
+                <div class="has-breadcrumbs"></div>
+            </nav>
         </div>
         <div class="page-header-secondary">
             ## Add Post button
