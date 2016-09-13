@@ -69,22 +69,21 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
     if something goes wrong, or ValueError if the group_id is invalid.
 
     Arguments:
-        request: The user request.
-        course: The course object.
-        user_info: The comment client User object as a dict.
-        discussion_id: Optional discussion id/commentable id for context.
-        per_page: Optional number of threads per page.
+        request (WSGIRequest): The user request.
+        course (CourseDescriptorWithMixins): The course object.
+        user_info (dict): The comment client User object as a dict.
+        discussion_id (unicode): Optional discussion id/commentable id for context.
+        per_page (int): Optional number of threads per page.
 
     Returns:
-        A tuple of the threads and the query parameters used for the search.
-    :return:
+        (tuple of list, dict): A tuple of the list of threads and a dict of the
+            query parameters used for the search.
 
     """
     default_query_params = {
         'page': 1,
         'per_page': per_page,
         'sort_key': 'activity',
-        'sort_order': 'desc',
         'text': '',
         'course_id': unicode(course.id),
         'user_id': request.user.id,
@@ -122,7 +121,6 @@ def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS
                 [
                     'page',
                     'sort_key',
-                    'sort_order',
                     'text',
                     'commentable_ids',
                     'flagged',
@@ -483,7 +481,6 @@ def followed_threads(request, course_key, user_id):
             'page': 1,
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
             'sort_key': 'date',
-            'sort_order': 'desc',
         }
 
         query_params = merge_dict(
@@ -494,7 +491,6 @@ def followed_threads(request, course_key, user_id):
                     [
                         'page',
                         'sort_key',
-                        'sort_order',
                         'flagged',
                         'unread',
                         'unanswered',
