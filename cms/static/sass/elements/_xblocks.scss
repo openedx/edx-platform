@@ -492,6 +492,15 @@
       }
     }
   }
+
+  .component-id-footer {
+    .component-id-container {
+      padding: 5px 20px;
+      background: #f9f9f9;
+      border-top: 1px solid #ddd;
+      text-align: right;
+    }
+  }
 }
 
 // +Editing - Xblocks
