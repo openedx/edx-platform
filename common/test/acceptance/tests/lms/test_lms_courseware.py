@@ -734,7 +734,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         # Update problem 1's content state by clicking save button.
         self.problem_page.click_choice('choice_choice_1')
         self.problem_page.click_save()
-        self.problem_page.wait_for_expected_status('div.capa_alert', 'saved')
+        self.problem_page.wait_for_save_notification()
 
         # Save problem 1's content state as we're about to switch units in the sequence.
         problem1_content_before_switch = self.problem_page.problem_content
