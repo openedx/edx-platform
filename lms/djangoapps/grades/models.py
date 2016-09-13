@@ -164,6 +164,7 @@ class VisibleBlocks(models.Model):
     """
     blocks_json = models.TextField()
     hashed = models.CharField(max_length=100, unique=True)
+    course_id = CourseKeyField(max_length=255, db_index=True, blank=False)
 
     objects = VisibleBlocksQuerySet.as_manager()
 
