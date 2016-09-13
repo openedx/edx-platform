@@ -35,7 +35,7 @@ def get_time_zone_abbr(date_time=None, *args):
     return _format_time_zone_string(time_zone, date_time, '%Z')
 
 
-def get_time_zone_offset(date_time=None *args):
+def get_time_zone_offset(date_time=None, *args):
     """
     Returns the time zone offset (e.g. -0800) of the time zone for given datetime
     """
