@@ -1183,6 +1183,12 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
+            if settings.FEATURES.get('ENABLE_LOGIN_BY_EMAIL_OR_USERNAME', False):
+                try:
+                    user = User.objects.get(username=email)
+                except User.DoesNotExist:
+                    pass
+        if not user:
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
                 AUDIT_LOG.warning(u"Login failed - Unknown user email")
             else:

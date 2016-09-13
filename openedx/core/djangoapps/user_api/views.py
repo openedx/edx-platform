@@ -65,10 +65,13 @@ class LoginSessionView(APIView):
 
         """
         form_desc = FormDescription("post", reverse("user_api_login_session"))
+        email_or_username = settings.FEATURES.get('ENABLE_LOGIN_BY_EMAIL_OR_USERNAME', False)
 
         # Translators: This label appears above a field on the login form
         # meant to hold the user's email address.
         email_label = _(u"Email")
+        if email_or_username:
+            email_label += _(u" or username")
 
         # Translators: This example email address is used as a placeholder in
         # a field on the login form meant to hold the user's email address.
@@ -76,13 +79,16 @@ class LoginSessionView(APIView):
 
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
-        email_instructions = _("The email address you used to register with {platform_name}").format(
+        email_instructions = _("The email address")
+        if email_or_username:
+            email_instructions += _(" or username")
+        email_instructions += _(" you used to register with {platform_name}").format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
             "email",
-            field_type="email",
+            field_type="text" if email_or_username else "email",
             label=email_label,
             placeholder=email_placeholder,
             instructions=email_instructions,
