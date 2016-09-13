@@ -89,7 +89,9 @@ class LoginTest(CacheIsolationTestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_LOGIN_BY_EMAIL_OR_USERNAME': True})
     def test_login_success_by_username(self):
-        response, mock_audit_log = self._login_response('test', 'test_password', patched_audit_log='student.models.AUDIT_LOG')
+        response, mock_audit_log = \
+            self._login_response('test', 'test_password',
+                                 patched_audit_log='student.models.AUDIT_LOG')
         self._assert_response(response, success=True)
         self._assert_audit_log(mock_audit_log, 'info', [u'Login success', u'test@edx.org'])
 
