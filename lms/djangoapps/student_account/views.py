@@ -347,7 +347,7 @@ def get_user_orders(user):
                                     'order_date': strftime_localized(
                                         date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
                                     ),
-                                    'receipt_url': commerce_configuration.receipt_page + order['number']
+                                    'receipt_url': commerce_configuration.get_receipt_page_url(order['number'])
                                 }
                                 user_orders.append(order_data)
                             except KeyError:

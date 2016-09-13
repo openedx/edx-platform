@@ -102,7 +102,7 @@ class IntegrationTestMixin(object):
         self._test_return_login(user_is_activated=True)
 
     def test_login(self):
-        user = UserFactory.create()
+        self.user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
         # The user goes to the login page, and sees a button to login with this provider:
         provider_login_url = self._check_login_page()
         # The user clicks on the provider's button:
@@ -122,7 +122,7 @@ class IntegrationTestMixin(object):
         # The AJAX on the page will log them in:
         ajax_login_response = self.client.post(
             reverse('user_api_login_session'),
-            {'email': user.email, 'password': 'test'}
+            {'email': self.user.email, 'password': 'test'}
         )
         self.assertEqual(ajax_login_response.status_code, 200)
         # Then the AJAX will finish the third party auth:

@@ -1,10 +1,13 @@
 """
 Third_party_auth integration tests using a mock version of the TestShib provider
 """
+import ddt
 import unittest
 import httpretty
 from mock import patch
+from social.apps.django_app.default.models import UserSocialAuth
 
+from third_party_auth.saml import log as saml_log
 from third_party_auth.tasks import fetch_saml_metadata
 from third_party_auth.tests import testutil
 
@@ -16,6 +19,7 @@ TESTSHIB_METADATA_URL = 'https://mock.testshib.org/metadata/testshib-providers.x
 TESTSHIB_SSO_URL = 'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO'
 
 
+@ddt.ddt
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
 class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
     """
@@ -24,6 +28,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
     PROVIDER_ID = "saml-testshib"
     PROVIDER_NAME = "TestShib"
     PROVIDER_BACKEND = "tpa-saml"
+    PROVIDER_IDP_SLUG = "testshib"
 
     USER_EMAIL = "myself@testshib.org"
     USER_NAME = "Me Myself And I"
@@ -77,6 +82,47 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self._configure_testshib_provider()
         super(TestShibIntegrationTest, self).test_register()
 
+    def test_login_records_attributes(self):
+        """
+        Test that attributes sent by a SAML provider are stored in the UserSocialAuth table.
+        """
+        self.test_login()
+        record = UserSocialAuth.objects.get(
+            user=self.user, provider=self.PROVIDER_BACKEND, uid__startswith=self.PROVIDER_IDP_SLUG
+        )
+        attributes = record.extra_data["attributes"]
+        self.assertEqual(
+            attributes.get("urn:oid:1.3.6.1.4.1.5923.1.1.1.9"), ["Member@testshib.org", "Staff@testshib.org"]
+        )
+        self.assertEqual(attributes.get("urn:oid:2.5.4.3"), ["Me Myself And I"])
+        self.assertEqual(attributes.get("urn:oid:0.9.2342.19200300.100.1.1"), ["myself"])
+        self.assertEqual(attributes.get("urn:oid:2.5.4.20"), ["555-5555"])  # Phone number
+
+    @ddt.data(True, False)
+    def test_debug_mode_login(self, debug_mode_enabled):
+        """ Test SAML login logs with debug mode enabled or not """
+        self._configure_testshib_provider(debug_mode=debug_mode_enabled)
+        with patch.object(saml_log, 'info') as mock_log:
+            super(TestShibIntegrationTest, self).test_login()
+        if debug_mode_enabled:
+            # We expect that test_login() does two full logins, and each attempt generates two
+            # logs - one for the request and one for the response
+            self.assertEqual(mock_log.call_count, 4)
+
+            (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[0]
+            self.assertTrue(msg.startswith("SAML login %s"))
+            self.assertEqual(action_type, "request")
+            self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            self.assertIn('<samlp:AuthnRequest', xml)
+
+            (msg, action_type, idp_name, xml), _kwargs = mock_log.call_args_list[1]
+            self.assertTrue(msg.startswith("SAML login %s"))
+            self.assertEqual(action_type, "response")
+            self.assertEqual(idp_name, self.PROVIDER_IDP_SLUG)
+            self.assertIn('<saml2p:Response', xml)
+        else:
+            self.assertFalse(mock_log.called)
+
     def _freeze_time(self, timestamp):
         """ Mock the current time for SAML, so we can replay canned requests/responses """
         now_patch = patch('onelogin.saml2.utils.OneLogin_Saml2_Utils.now', return_value=timestamp)
@@ -86,9 +132,9 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
     def _configure_testshib_provider(self, **kwargs):
         """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
         fetch_metadata = kwargs.pop('fetch_metadata', True)
-        kwargs.setdefault('name', 'TestShib')
+        kwargs.setdefault('name', self.PROVIDER_NAME)
         kwargs.setdefault('enabled', True)
-        kwargs.setdefault('idp_slug', 'testshib')
+        kwargs.setdefault('idp_slug', self.PROVIDER_IDP_SLUG)
         kwargs.setdefault('entity_id', TESTSHIB_ENTITY_ID)
         kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL)
         kwargs.setdefault('icon_class', 'fa-university')

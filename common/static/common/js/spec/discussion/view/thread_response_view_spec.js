@@ -1,4 +1,4 @@
-/* globals DiscussionSpecHelper, ResponseCommentView, Thread, ThreadResponseView, ThreadResponseShowView */
+/* globals DiscussionSpecHelper, ResponseCommentView, Thread, ThreadResponseView, ThreadResponseShowView, _ */
 (function() {
     'use strict';
     describe('ThreadResponseView', function() {
@@ -89,6 +89,25 @@
                     return expect(this.view.$('.action-show-comments')).not.toBeVisible();
                 }
             );
+            it('calls renderTemplate with a temporary id if the model lacks one', function() {
+                this.view = new ThreadResponseView({
+                    model: this.response,
+                    el: $('#fixture-element'),
+                    collapseComments: true
+                });
+                spyOn(_, 'extend').and.callThrough();
+                spyOn(window, 'Date').and.callFake(function() {
+                    return {
+                        getTime: function() {
+                            return 1;
+                        }
+                    };
+                });
+                this.view.render();
+                expect(_.extend).toHaveBeenCalledWith(jasmine.any(Object), jasmine.objectContaining({
+                    wmdId: 1
+                }));
+            });
             it('populates commentViews and binds events', function() {
                 this.view.createEditView();
                 spyOn(this.view, 'cancelEdit');
