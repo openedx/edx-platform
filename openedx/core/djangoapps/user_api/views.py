@@ -174,6 +174,7 @@ class RegistrationView(APIView):
         "goals",
         "honor_code",
         "terms_of_service",
+        "password_copy",
     ]
 
     # This end-point is available to anonymous users,
