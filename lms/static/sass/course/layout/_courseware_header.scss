@@ -43,19 +43,10 @@
         text-decoration: none;
 
         &:hover,
-        &:focus {
+        &:focus,
+        &.active {
           color: $uxpl-blue-hover-active;
           border-bottom: 4px solid $uxpl-blue-hover-active;
-        }
-
-        &.active {
-          border-bottom: 4px solid $uxpl-blue-base;
-          color: $uxpl-blue-base;
-
-          &:hover,
-          &:focus {
-            color: $uxpl-blue-base;
-          }
         }
       }
     }
