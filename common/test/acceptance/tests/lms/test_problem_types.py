@@ -137,6 +137,7 @@ class ProblemTypeTestMixin(object):
     Test cases shared amongst problem types.
     """
     can_submit_blank = False
+    can_update_save_notification = True
 
     @attr(shard=7)
     def test_answer_correctly(self):
@@ -252,6 +253,35 @@ class ProblemTypeTestMixin(object):
         self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
     @attr(shard=7)
+    def test_save_reaction(self):
+        """
+        Scenario: Verify that the save button performs as expected with problem types
+
+        Given that I am on a problem page
+        And I can see a CAPA problem with the Save button present
+        When I select and answer and click the "Save" button
+        Then I should see the Save notification
+        And the Save button should not be disabled
+        And if I change the answer selected
+        And the Save notification should be removed
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+        self.problem_page.wait_for_page()
+        self.answer_problem(correctness='correct')
+        self.assertTrue(self.problem_page.is_save_button_enabled())
+        self.problem_page.click_save()
+        # Ensure "Save" button is enabled after save is complete.
+        self.assertTrue(self.problem_page.is_save_button_enabled())
+        self.problem_page.wait_for_save_notification()
+        self.answer_problem(correctness='incorrect')
+        if self.can_update_save_notification:
+            # Not all problems will detect the change and remove the save notification
+            self.assertFalse(self.problem_page.is_save_notification_visible())
+
+    @attr(shard=7)
     def test_reset_clears_answer_and_focus(self):
         """
         Scenario: Reset will clear answers and focus on problem meta
@@ -337,6 +367,7 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     partially_correct = True
 
     can_submit_blank = True
+    can_update_save_notification = False
     factory_kwargs = {
         'title': 'Annotation Problem',
         'text': 'The text being annotated',
@@ -722,7 +753,7 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     problem_name = 'CODE TEST PROBLEM'
     problem_type = 'code'
     partially_correct = False
-
+    can_update_save_notification = False
     factory = CodeResponseXMLFactory()
 
     factory_kwargs = {
@@ -787,6 +818,7 @@ class ChoiceTextProbelmTypeTestBase(ProblemTypeTestBase):
     """
     choice_type = None
     partially_correct = False
+    can_update_save_notification = False
 
     def _select_choice(self, input_num):
         """
@@ -824,6 +856,7 @@ class RadioTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTestMix
     problem_type = 'radio_text'
     choice_type = 'radio'
     partially_correct = False
+    can_update_save_notification = False
 
     factory = ChoiceTextResponseXMLFactory()
 
@@ -858,6 +891,7 @@ class CheckboxTextProblemTypeTest(ChoiceTextProbelmTypeTestBase, ProblemTypeTest
     choice_type = 'checkbox'
     factory = ChoiceTextResponseXMLFactory()
     partially_correct = False
+    can_update_save_notification = False
 
     factory_kwargs = {
         'question_text': 'The correct answer is Choice 0 and input 8',
@@ -886,6 +920,7 @@ class ImageProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     factory = ImageResponseXMLFactory()
 
     can_submit_blank = True
+    can_update_save_notification = False
 
     factory_kwargs = {
         'src': '/static/images/placeholder-image.png',
