@@ -96,7 +96,7 @@ def course_start_date_is_default(start, advertised_start):
     return advertised_start is None and start == DEFAULT_START_DATE
 
 
-def _datetime_to_string(date_time, format_string, time_zone, strftime_localized):
+def _datetime_to_string(date_time, format_string, strftime_localized, *args):
     """
     Formats the given datetime with the given function and format string.
 
@@ -117,7 +117,7 @@ def _datetime_to_string(date_time, format_string, time_zone, strftime_localized)
     )
 
 
-def course_start_datetime_text(start_date, advertised_start, format_string, time_zone, ugettext, strftime_localized):
+def course_start_datetime_text(start_date, advertised_start, format_string, ugettext, strftime_localized, *args):
     """
     Calculates text to be shown to user regarding a course's start
     datetime in specified time zone.
@@ -154,7 +154,7 @@ def course_start_datetime_text(start_date, advertised_start, format_string, time
         return _('TBD')
 
 
-def course_end_datetime_text(end_date, format_string, time_zone, strftime_localized):
+def course_end_datetime_text(end_date, format_string, strftime_localized, *args):
     """
     Returns a formatted string for a course's end date or datetime.
 

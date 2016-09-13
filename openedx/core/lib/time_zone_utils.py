@@ -15,7 +15,7 @@ def get_user_time_zone(user):
     return timezone(time_zone)
 
 
-def _format_time_zone_string(time_zone, date_time, format_string):
+def _format_time_zone_string(date_time, format_string, *args):
     """
     Returns a string, specified by format string, of the current date/time of the time zone.
 
@@ -27,7 +27,7 @@ def _format_time_zone_string(time_zone, date_time, format_string):
     return date_time.astimezone(time_zone).strftime(format_string)
 
 
-def get_time_zone_abbr(time_zone, date_time=None):
+def get_time_zone_abbr(date_time=None, *args):
     """
     Returns the time zone abbreviation (e.g. EST) of the time zone for given datetime
     """
@@ -35,7 +35,7 @@ def get_time_zone_abbr(time_zone, date_time=None):
     return _format_time_zone_string(time_zone, date_time, '%Z')
 
 
-def get_time_zone_offset(time_zone, date_time=None):
+def get_time_zone_offset(date_time=None *args):
     """
     Returns the time zone offset (e.g. -0800) of the time zone for given datetime
     """
