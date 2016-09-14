@@ -1144,11 +1144,11 @@ def notify_enrollment_by_email(course, user, request):
         try:
             # Check if the course has already started and set subject & message accordingly
             if course.has_started():
-                subject = get_course_about_section(course, 'post_enrollment_email_subject')
-                message = get_course_about_section(course, 'post_enrollment_email')
+                subject = get_course_about_section(request, course, 'post_enrollment_email_subject')
+                message = get_course_about_section(request, course, 'post_enrollment_email')
             else:
-                subject = get_course_about_section(course, 'pre_enrollment_email_subject')
-                message = get_course_about_section(course, 'pre_enrollment_email')
+                subject = get_course_about_section(request, course, 'pre_enrollment_email_subject')
+                message = get_course_about_section(request, course, 'pre_enrollment_email')
 
             subject = ''.join(subject.splitlines())
             context = {
