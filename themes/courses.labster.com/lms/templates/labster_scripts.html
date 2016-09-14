@@ -1,0 +1,45 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<div id="uvTab" class="uv-tab uv-slide-left ">
+    <a id="uvTabLabel" href="javascript:void(0)" data-uv-lightbox="classic_widget" data-uv-mode="full"
+       data-uv-primary-color="#1d354d" data-uv-link-color="#007dbf" data-uv-default-mode="support"
+       data-uv-forum-id="215077">${_("Help")}</a>
+</div>
+
+<%block name="js_extra">
+<!-- begin script live chat -->
+<script type="text/javascript">
+  var __lc = {};
+  __lc.license = 4609071;
+  __lc.group = 0;
+  (function() {
+    var lc = document.createElement('script'); lc.type = 'text/javascript'; lc.async = true;
+    lc.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'cdn.livechatinc.com/tracking.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(lc, s);
+  })();
+</script>
+<!-- end script live chat -->
+
+<!-- UserVoice JavaScript SDK (only needed once on a page) -->
+<script>(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/eOpNRSGPvZMDdQLbzNQTKg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})()</script>
+<!-- end script uservoice -->
+
+<!-- crazy egg script -->
+<script type="text/javascript">
+setTimeout(function(){var a=document.createElement("script");
+var b=document.getElementsByTagName("script")[0];
+a.src=document.location.protocol+"//dnn506yrbagrg.cloudfront.net/pages/scripts/0028/1359.js?"+Math.floor(new Date().getTime()/3600000);
+a.async=true;a.type="text/javascript";b.parentNode.insertBefore(a,b)}, 1);
+</script>
+<!-- end of crazy egg script -->
+
+<!-- show user voice button only if user has logged in -->
+<script>
+  var isUserLoggedIn = "${user.is_authenticated()}";
+  if (isUserLoggedIn == "False") {
+    $('#uvTab').hide();
+  }
+</script>
+</%block>
