@@ -36,7 +36,6 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
     'django.conf.settings.FEATURES',
     {
         'ENABLE_XBLOCK_VIEW_ENDPOINT': True,
-        'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False  # disable persistent grades until TNL-5458 (reduces queries)
     }
 )
 @ddt.ddt
@@ -230,18 +229,18 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
         #     # of sql queries to default,
         #     # of mongo queries,
         # )
-        ('no_overrides', 1, True, False): (17, 6),
-        ('no_overrides', 2, True, False): (17, 6),
-        ('no_overrides', 3, True, False): (17, 6),
-        ('ccx', 1, True, False): (17, 6),
-        ('ccx', 2, True, False): (17, 6),
-        ('ccx', 3, True, False): (17, 6),
-        ('no_overrides', 1, False, False): (17, 6),
-        ('no_overrides', 2, False, False): (17, 6),
-        ('no_overrides', 3, False, False): (17, 6),
-        ('ccx', 1, False, False): (17, 6),
-        ('ccx', 2, False, False): (17, 6),
-        ('ccx', 3, False, False): (17, 6),
+        ('no_overrides', 1, True, False): (20, 6),
+        ('no_overrides', 2, True, False): (20, 6),
+        ('no_overrides', 3, True, False): (20, 6),
+        ('ccx', 1, True, False): (20, 6),
+        ('ccx', 2, True, False): (20, 6),
+        ('ccx', 3, True, False): (20, 6),
+        ('no_overrides', 1, False, False): (20, 6),
+        ('no_overrides', 2, False, False): (20, 6),
+        ('no_overrides', 3, False, False): (20, 6),
+        ('ccx', 1, False, False): (20, 6),
+        ('ccx', 2, False, False): (20, 6),
+        ('ccx', 3, False, False): (20, 6),
     }
 
 
@@ -253,19 +252,19 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (17, 3),
-        ('no_overrides', 2, True, False): (17, 3),
-        ('no_overrides', 3, True, False): (17, 3),
-        ('ccx', 1, True, False): (17, 3),
-        ('ccx', 2, True, False): (17, 3),
-        ('ccx', 3, True, False): (17, 3),
-        ('ccx', 1, True, True): (18, 3),
-        ('ccx', 2, True, True): (18, 3),
-        ('ccx', 3, True, True): (18, 3),
-        ('no_overrides', 1, False, False): (17, 3),
-        ('no_overrides', 2, False, False): (17, 3),
-        ('no_overrides', 3, False, False): (17, 3),
-        ('ccx', 1, False, False): (17, 3),
-        ('ccx', 2, False, False): (17, 3),
-        ('ccx', 3, False, False): (17, 3),
+        ('no_overrides', 1, True, False): (20, 3),
+        ('no_overrides', 2, True, False): (20, 3),
+        ('no_overrides', 3, True, False): (20, 3),
+        ('ccx', 1, True, False): (20, 3),
+        ('ccx', 2, True, False): (20, 3),
+        ('ccx', 3, True, False): (20, 3),
+        ('ccx', 1, True, True): (21, 3),
+        ('ccx', 2, True, True): (21, 3),
+        ('ccx', 3, True, True): (21, 3),
+        ('no_overrides', 1, False, False): (20, 3),
+        ('no_overrides', 2, False, False): (20, 3),
+        ('no_overrides', 3, False, False): (20, 3),
+        ('ccx', 1, False, False): (20, 3),
+        ('ccx', 2, False, False): (20, 3),
+        ('ccx', 3, False, False): (20, 3),
     }

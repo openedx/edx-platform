@@ -1641,8 +1641,6 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
         super(TestCertificateGeneration, self).setUp()
         self.initialize_course()
 
-    # disable persistent grades until TNL-5458 (reduces query counts)
-    @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     def test_certificate_generation_for_students(self):
         """
         Verify that certificates generated for all eligible students enrolled in a course.
@@ -1672,8 +1670,18 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
+        with self.assertNumQueries(175):
+            self.assertCertificatesGenerated(task_input, expected_results)
 
-        with self.assertNumQueries(151):
+        expected_results = {
+            'action_name': 'certificates generated',
+            'total': 10,
+            'attempted': 0,
+            'succeeded': 0,
+            'failed': 0,
+            'skipped': 10
+        }
+        with self.assertNumQueries(3):
             self.assertCertificatesGenerated(task_input, expected_results)
 
     @ddt.data(
