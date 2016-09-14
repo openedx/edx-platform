@@ -39,17 +39,19 @@ from django.utils.http import urlquote_plus
     <div class="container">
         <div class="profile-wrapper">
             <section class="course-info" id="course-info-progress">
-                <h2 class="hd hd-2 sr">${_('Course Progress')}</h2>
+                <h3 class="hd hd-3 progress-certificates-title">
+                    ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}
+                </h3>
                 % if staff_access and studio_url is not None:
                 <div class="wrap-instructor-info">
                     <a class="instructor-info-action studio-view" href="${studio_url | h}">${_("View Grading in studio")}</a>
                 </div>
                 % endif
-                <div class="progress-certificates">
-                    <h3 class="hd hd-3 progress-certificates-title">
+                <!-- <div class="progress-certificates">
+                    <h4 class="hd hd-3 progress-certificates-title">
                         ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}
-                    </h3>
-                </div>
+                    </h4>
+                </div> -->
                 %if certificate_data:
                 <div class="wrapper-msg wrapper-auto-cert">
                     <div id="errors-info" class="errors-info"></div>
@@ -82,12 +84,9 @@ from django.utils.http import urlquote_plus
                 %endif
 
                 % if credit_course_requirements:
-                <div class="credit-eligibility">
+                <section class="credit-eligibility">
+                    <h3 class="hd hd-4">${_("Requirements for Course Credit")}</h3>
                     <div class="credit-eligibility-container">
-                        <div class="eligibility-heading">
-                            <h4 class="hd hd-4">${_("Requirements for Course Credit")}</h4>
-                        </div>
-
                         %if credit_course_requirements['eligibility_status'] == 'not_eligible':
                         <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name) | h}</span>
                         %elif credit_course_requirements['eligibility_status'] == 'eligible':
@@ -141,12 +140,12 @@ from django.utils.http import urlquote_plus
                             <span class="requirement-detail">${_("Less")}</span>
                         </button>
                     </div>
-                </div>
+                </section>
                 %endif
 
                 %if courseware_summary:
                 <section class="chapters">
-                    <h3 class="hd hd-3 sr">${_('Details for each chapter')}</h3>
+                    <h3 class="hd hd-4 sr">${_('Details for each chapter')}</h3>
                     %for chapter in courseware_summary:
                         %if not chapter['display_name'] == "hidden":
                         <div>
