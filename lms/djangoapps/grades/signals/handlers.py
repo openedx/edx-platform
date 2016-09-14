@@ -108,10 +108,13 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
         'subsections',
         set()
     )
+    subsection_grade_factory = SubsectionGradeFactory(student, course, collected_block_structure)
     for subsection_usage_key in subsections_to_update:
         transformed_subsection_structure = get_course_blocks(
             student,
             subsection_usage_key,
             collected_block_structure=collected_block_structure,
         )
-        SubsectionGradeFactory(student).update(subsection_usage_key, transformed_subsection_structure, course)
+        subsection_grade_factory.update(
+            transformed_subsection_structure[subsection_usage_key], transformed_subsection_structure
+        )
