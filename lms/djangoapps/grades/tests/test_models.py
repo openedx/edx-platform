@@ -6,7 +6,6 @@ from collections import OrderedDict
 import ddt
 from hashlib import sha1
 import json
-from mock import patch
 
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -24,17 +23,25 @@ class BlockRecordListTestCase(TestCase):
     """
     Verify the behavior of BlockRecordList, particularly around edge cases
     """
-    empty_json = '{"blocks":[],"course_key":null}'
+    def setUp(self):
+        super(BlockRecordListTestCase, self).setUp()
+        self.course_key = CourseLocator(
+            org='some_org',
+            course='some_course',
+            run='some_run'
+        )
 
     def test_empty_block_record_set(self):
-        brs = BlockRecordList(())
+        empty_json = '{0}"blocks":[],"course_key":"{1}"{2}'.format('{', unicode(self.course_key), '}')
+
+        brs = BlockRecordList((), self.course_key)
         self.assertFalse(brs)
         self.assertEqual(
-            brs.to_json(),
-            self.empty_json
+            brs.json_value,
+            empty_json
         )
         self.assertEqual(
-            BlockRecordList.from_json(self.empty_json),
+            BlockRecordList.from_json(empty_json),
             brs
         )
 
@@ -112,7 +119,7 @@ class VisibleBlocksTest(GradesModelTestCase):
         """
         Creates and returns a BlockRecordList for the given blocks.
         """
-        return VisibleBlocks.objects.create_from_blockrecords(BlockRecordList.from_list(blocks))
+        return VisibleBlocks.objects.create_from_blockrecords(BlockRecordList.from_list(blocks, self.course_key))
 
     def test_creation(self):
         """
@@ -159,7 +166,7 @@ class VisibleBlocksTest(GradesModelTestCase):
         and accessing visible_blocks.blocks yields a copy of the initial array.
         Also, trying to set the blocks property should raise an exception.
         """
-        expected_blocks = (self.record_a, self.record_b)
+        expected_blocks = BlockRecordList.from_list([self.record_a, self.record_b], self.course_key)
         visible_blocks = self._create_block_record_list(expected_blocks)
         self.assertEqual(expected_blocks, visible_blocks.blocks)
         with self.assertRaises(AttributeError):
@@ -178,6 +185,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             block_type='subsection',
             block_id='subsection_12345',
         )
+        self.block_records = BlockRecordList([self.record_a, self.record_b], self.course_key)
         self.params = {
             "user_id": 12345,
             "usage_key": self.usage_key,
@@ -187,21 +195,23 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "possible_all": 12.0,
             "earned_graded": 6.0,
             "possible_graded": 8.0,
-            "visible_blocks": [self.record_a, self.record_b],
+            "visible_blocks": self.block_records,
         }
 
     def test_create(self):
         """
         Tests model creation, and confirms error when trying to recreate model.
         """
-        created_grade = PersistentSubsectionGrade.objects.create(**self.params)
-        read_grade = PersistentSubsectionGrade.read_grade(
-            user_id=self.params["user_id"],
-            usage_key=self.params["usage_key"],
-        )
-        self.assertEqual(created_grade, read_grade)
+        created_grade = PersistentSubsectionGrade.create_grade(**self.params)
+        with self.assertNumQueries(1):
+            read_grade = PersistentSubsectionGrade.read_grade(
+                user_id=self.params["user_id"],
+                usage_key=self.params["usage_key"],
+            )
+            self.assertEqual(created_grade, read_grade)
+            self.assertEquals(read_grade.visible_blocks.blocks, self.block_records)
         with self.assertRaises(IntegrityError):
-            created_grade = PersistentSubsectionGrade.objects.create(**self.params)
+            PersistentSubsectionGrade.create_grade(**self.params)
 
     def test_create_bad_params(self):
         """
@@ -209,56 +219,19 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         """
         del self.params["earned_graded"]
         with self.assertRaises(IntegrityError):
-            PersistentSubsectionGrade.objects.create(**self.params)
+            PersistentSubsectionGrade.create_grade(**self.params)
 
     def test_course_version_is_optional(self):
         del self.params["course_version"]
-        PersistentSubsectionGrade.objects.create(**self.params)
-
-    def test_update_grade(self):
-        """
-        Tests model update, and confirms error when updating a nonexistent model.
-        """
-        with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
-            PersistentSubsectionGrade.update_grade(**self.params)
-        PersistentSubsectionGrade.objects.create(**self.params)
-        self.params['earned_all'] = 12.0
-        self.params['earned_graded'] = 8.0
-
-        with patch('lms.djangoapps.grades.models.log') as log_mock:
-            PersistentSubsectionGrade.update_grade(**self.params)
-            read_grade = PersistentSubsectionGrade.read_grade(
-                user_id=self.params["user_id"],
-                usage_key=self.params["usage_key"],
-            )
-            log_mock.info.assert_called_with(
-                u"Persistent Grades: Grade model updated: {0}".format(read_grade)
-            )
-
-        self.assertEqual(read_grade.earned_all, 12.0)
-        self.assertEqual(read_grade.earned_graded, 8.0)
+        PersistentSubsectionGrade.create_grade(**self.params)
 
     @ddt.data(True, False)
-    def test_save(self, already_created):
-        if already_created:
-            PersistentSubsectionGrade.objects.create(**self.params)
-        module_prefix = "lms.djangoapps.grades.models.PersistentSubsectionGrade."
-        with patch(
-            module_prefix + "objects.get_or_create",
-            wraps=PersistentSubsectionGrade.objects.get_or_create
-        ) as mock_get_or_create:
-            with patch(module_prefix + "update") as mock_update:
-                PersistentSubsectionGrade.save_grade(**self.params)
-                self.assertTrue(mock_get_or_create.called)
-                self.assertEqual(mock_update.called, already_created)
+    def test_update_or_create_grade(self, already_created):
+        created_grade = PersistentSubsectionGrade.create_grade(**self.params) if already_created else None
 
-    def test_logging_for_save(self):
-        with patch('lms.djangoapps.grades.models.log') as log_mock:
-            PersistentSubsectionGrade.save_grade(**self.params)
-            read_grade = PersistentSubsectionGrade.read_grade(
-                user_id=self.params["user_id"],
-                usage_key=self.params["usage_key"],
-            )
-            log_mock.info.assert_called_with(
-                u"Persistent Grades: Grade model saved: {0}".format(read_grade)
-            )
+        self.params["earned_all"] = 7
+        updated_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.assertEquals(updated_grade.earned_all, 7)
+        if already_created:
+            self.assertEquals(created_grade.id, updated_grade.id)
+            self.assertEquals(created_grade.earned_all, 6)
