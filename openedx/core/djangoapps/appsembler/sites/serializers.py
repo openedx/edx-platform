@@ -1,6 +1,7 @@
+from django.contrib.sites.models import Site
 from rest_framework import serializers
-from .models import SiteConfiguration
-from .utils import sass_to_dict, dict_to_sass
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from .utils import sass_to_dict, dict_to_sass, create_site
 
 
 class SASSDictField(serializers.DictField):
@@ -26,3 +27,12 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
 class SiteConfigurationListSerializer(SiteConfigurationSerializer):
     class Meta(SiteConfigurationSerializer.Meta):
         fields = ('id', 'name', 'domain')
+
+
+class SiteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Site
+        fields = ('id', 'name', 'domain')
+
+    def save(self):
+        create_site(name=self.validated_data.get('name'), domain=self.validated_data.get('domain'))

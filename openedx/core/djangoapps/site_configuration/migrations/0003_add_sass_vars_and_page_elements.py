@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 import jsonfield.fields
-import openedx.core.djangoapps.site_configuration.utils
+import openedx.core.djangoapps.appsembler.sites.utils
 
 
 class Migration(migrations.Migration):
@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='siteconfiguration',
             name='page_elements',
-            field=jsonfield.fields.JSONField(default=openedx.core.djangoapps.site_configuration.utils.get_initial_page_elements, blank=True),
+            field=jsonfield.fields.JSONField(default=openedx.core.djangoapps.appsembler.sites.utils.get_initial_page_elements, blank=True),
         ),
         migrations.AddField(
             model_name='siteconfiguration',
             name='sass_variables',
-            field=models.TextField(default=openedx.core.djangoapps.site_configuration.utils.get_initial_sass_variables, blank=True),
+            field=models.TextField(default=openedx.core.djangoapps.appsembler.sites.utils.get_initial_sass_variables, blank=True),
         ),
     ]

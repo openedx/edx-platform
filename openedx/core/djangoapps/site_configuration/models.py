@@ -2,6 +2,7 @@
 Django models for site configurations.
 """
 import collections
+from urlparse import urlparse
 
 import os
 import sass
@@ -16,7 +17,7 @@ from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
 
-from .utils import get_initial_sass_variables, get_initial_page_elements
+from openedx.core.djangoapps.appsembler.sites.utils import get_initial_sass_variables, get_initial_page_elements
 
 from logging import getLogger
 logger = getLogger(__name__)  # pylint: disable=invalid-name
@@ -133,14 +134,15 @@ class SiteConfiguration(models.Model):
 
     def compile_microsite_sass(self):
         theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME, 'lms', 'src', 'main.scss')
-        site_domain = self.site.domain
-        output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(site_domain))
-        collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(site_domain))
+        domain_without_port_number = self.site.domain.split(':')[0]
+        output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(
+            domain_without_port_number))
+        # collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(site_domain))
         sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
         with open(output_path, 'w') as f:
             f.write(sass_output)
-        with open(collected_output_path, 'w') as f:
-            f.write(sass_output)
+        # with open(collected_output_path, 'w') as f:
+        #     f.write(sass_output)
 
     def collect_css_file(self):
         path = self.values.get('css_overrides_file')
@@ -167,9 +169,10 @@ class SiteConfiguration(models.Model):
         return None
 
     def _get_initial_microsite_values(self):
+        domain_without_port_number = self.site.domain.split(':')[0]
         return {
             'platform_name': self.site.name,
-            'css_overrides_file': "customer_themes/{}.css".format(self.key),
+            'css_overrides_file': "customer_themes/{}.css".format(domain_without_port_number),
             'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
         }
 

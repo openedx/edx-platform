@@ -3,21 +3,26 @@ from rest_framework import views, viewsets
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
-from .models import SiteConfiguration
-from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer
+from .utils import delete_site
 
 
 class SiteConfigurationViewSet(viewsets.ModelViewSet):
     queryset = SiteConfiguration.objects.all()
     serializer_class = SiteConfigurationSerializer
     list_serializer_class = SiteConfigurationListSerializer
+    create_serializer_class = SiteSerializer
 
     def get_serializer_class(self):
         if self.action == 'list':
-            if hasattr(self, 'list_serializer_class'):
-                return self.list_serializer_class
-
+            return self.list_serializer_class
+        if self.action == 'create':
+            return self.create_serializer_class
         return super(SiteConfigurationViewSet, self).get_serializer_class()
+
+    def perform_destroy(self, instance):
+        delete_site(instance)
 
 
 class FileUploadView(views.APIView):

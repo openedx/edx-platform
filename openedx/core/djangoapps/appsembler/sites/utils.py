@@ -1,9 +1,9 @@
 import json
-from collections import OrderedDict
-
 import os
 
 from django.conf import settings
+from django.contrib.sites.models import Site
+from openedx.core.djangoapps.theming.models import SiteTheme
 
 
 def get_initial_sass_variables():
@@ -63,3 +63,19 @@ def dict_to_sass(dict_input):
 def json_to_sass(json_input):
     sass_dict = json.loads(json_input)
     return dict_to_sass(sass_dict)
+
+
+def create_site(name, domain):
+    from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+    site = Site.objects.create(name=name, domain=domain)
+    # don't use create because we need to call save() to set some values automatically
+    site_config = SiteConfiguration(site=site, enabled=True)
+    site_config.save()
+    SiteTheme.objects.create(site=site, theme_dir_name=settings.THEME_NAME)
+
+
+def delete_site(site_id):
+    site = Site.objects.get(id=site_id)
+    site.configuration.delete()
+    site.themes.delete()
+    site.delete()

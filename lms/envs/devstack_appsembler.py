@@ -9,6 +9,7 @@ FEATURES["ENABLE_SYSADMIN_DASHBOARD"] = True
 
 # needed to show only users and appsembler courses
 FEATURES["ENABLE_COURSE_DISCOVERY"] = True
+FEATURES["ENABLE_COMPREHENSIVE_THEMING"] = True
 FEATURES["ORGANIZATIONS_APP"] = True
 OAUTH_ENFORCE_SECURE = False
 
@@ -20,7 +21,10 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
-INSTALLED_APPS += ('appsembler_lms',)
+INSTALLED_APPS += (
+    'appsembler_lms',
+    'openedx.core.djangoapps.appsembler.sites',
+)
 
 CORS_ORIGIN_ALLOW_ALL = True
 

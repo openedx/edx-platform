@@ -121,7 +121,7 @@ urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
     # appsembler management console endpoint for student enrollment
     url(r'^appsembler/', include('appsembler_lms.urls')),
-    url(r'^api/site_configuration/', include('openedx.core.djangoapps.site_configuration.urls')),
+    url(r'^appsembler/api/', include('openedx.core.djangoapps.appsembler.sites.urls')),
 )
 
 
