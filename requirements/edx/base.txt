@@ -144,7 +144,7 @@ django_debug_toolbar==1.5
 before_after==0.1.3
 bok-choy==0.5.3
 chrono==1.0.2
-coverage==4.0.2
+coverage==4.2
 ddt==0.8.0
 diff-cover==0.9.8
 django-crum==0.5
