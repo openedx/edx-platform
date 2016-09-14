@@ -47,21 +47,6 @@ from opaque_keys.edx.keys import UsageKey
 log = logging.getLogger(__name__)
 
 
-def get_request_for_thread():
-    """Walk up the stack, return the nearest first argument named "request"."""
-    frame = None
-    try:
-        for f in inspect.stack()[1:]:
-            frame = f[0]
-            code = frame.f_code
-            if code.co_varnames[:1] == ("request",):
-                return frame.f_locals["request"]
-            elif code.co_varnames[:2] == ("self", "request",):
-                return frame.f_locals["request"]
-    finally:
-        del frame
-
-
 def get_course(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
@@ -181,7 +166,7 @@ def get_course_university_about_section(course):  # pylint: disable=invalid-name
     return course.display_org_with_default
 
 
-def get_course_about_section(course, section_key):
+def get_course_about_section(request, course, section_key):
     """
     This returns the snippet of html to be rendered on the course about page,
     given the key for the section.
@@ -214,19 +199,35 @@ def get_course_about_section(course, section_key):
     # markup. This can change without effecting this interface when we find a
     # good format for defining so many snippets of text/html.
 
-    # TODO: Remove number, instructors from this list
-    if section_key in ['short_description', 'description', 'key_dates', 'video',
-                       'course_staff_short', 'course_staff_extended',
-                       'requirements', 'syllabus', 'textbook', 'faq', 'more_info',
-                       'number', 'instructors', 'overview', 'about_sidebar_html',
-                       'effort', 'end_date', 'prerequisites', 'ocw_links',
-                       'pre_enrollment_email', 'post_enrollment_email',
-                       'pre_enrollment_email_subject', 'post_enrollment_email_subject']:
+    # TODO: Remove number, instructors from this set
+    html_sections = {
+        'short_description',
+        'description',
+        'key_dates',
+        'video',
+        'course_staff_short',
+        'course_staff_extended',
+        'requirements',
+        'syllabus',
+        'textbook',
+        'faq',
+        'more_info',
+        'number',
+        'instructors',
+        'overview',
+        'effort',
+        'end_date',
+        'prerequisites',
+        'ocw_links',
+        'about_sidebar_html',
+        'pre_enrollment_email',
+        'post_enrollment_email',
+        'pre_enrollment_email_subject',
+        'post_enrollment_email_subject',
+    }
 
+    if section_key in html_sections:
         try:
-
-            request = get_request_for_thread()
-
             loc = course.location.replace(category='about', name=section_key)
 
             # Use an empty cache

@@ -92,6 +92,20 @@
     }
   }
 
+  .msg-success{
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+    color: $confirm-color;
+  }
+
+  .multi-select {
+    min-width: 150px;
+
+    option {
+        padding: ($baseline/5) $baseline ($baseline/10) ($baseline/4);
+    }
+  }
+
   // inline copy
   .copy-confirm {
     color: $confirm-color;
@@ -2431,12 +2445,6 @@ input[name="subject"] {
 }
 
 #certificate-white-list-editor{
-  .msg-success{
-    border-top: 2px solid $confirm-color;
-    background: tint($confirm-color,95%);
-    color: $confirm-color;
-  }
-
   .certificate-exception-inputs{
     .student-username-or-email{
       width: 300px;

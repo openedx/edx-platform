@@ -84,7 +84,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
             self.assertEqual(response.status_code, expected_response_code)
         return response
 
-    def reverse_url(self, reverse_args=None, **kwargs):  # pylint: disable=unused-argument
+    def reverse_url(self, reverse_args=None, **kwargs):
         """Base implementation that returns URL for endpoint that's being tested."""
         reverse_args = reverse_args or {}
         if 'course_id' in self.REVERSE_INFO['params']:

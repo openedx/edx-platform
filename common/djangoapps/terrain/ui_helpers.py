@@ -1,5 +1,4 @@
 # pylint: disable=missing-docstring
-# pylint: disable=redefined-outer-name
 
 from lettuce import world
 
@@ -22,7 +21,7 @@ from selenium.common.exceptions import (
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from nose.tools import assert_true  # pylint: disable=no-name-in-module
+from nose.tools import assert_true
 
 GLOBAL_WAIT_FOR_TIMEOUT = 60
 

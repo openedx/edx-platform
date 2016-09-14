@@ -24,10 +24,7 @@ class Command(BaseCommand):
         with the database already migrated to post-CohortMembership state, we will use the pre-CohortMembership
         table CourseUserGroup as the canonical source of truth. This way, changes made in the window are persisted.
         """
-        commit = False
-        if len(args) == 1:
-            commit = args[0] == 'commit'
-
+        commit = 'commit' in options
         memberships_to_delete = 0
         memberships_to_add = 0
 

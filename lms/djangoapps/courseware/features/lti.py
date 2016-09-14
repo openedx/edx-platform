@@ -181,10 +181,10 @@ def add_correct_lti_to_course(_step, fields):
         metadata=metadata,
     )
 
-    setattr(world.scenario_dict['LTI'], 'TEST_BASE_PATH', '{host}:{port}'.format(
+    world.scenario_dict['LTI'].TEST_BASE_PATH = '{host}:{port}'.format(
         host=world.browser.host,
         port=world.browser.port,
-    ))
+    )
 
     visit_scenario_item('LTI')
 

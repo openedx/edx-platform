@@ -58,7 +58,7 @@ See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
 
 import random
-import string  # pylint: disable=deprecated-module
+import string
 from collections import OrderedDict
 import urllib
 import analytics
@@ -149,19 +149,6 @@ class AuthEntryError(AuthException):
     invoked earlier than the login code, and it needs to know if the login flow
     was requested to dispatch correctly).
     """
-
-
-class NotActivatedException(AuthException):
-    """ Raised when a user tries to login to an unverified account """
-    def __init__(self, backend, email):
-        self.email = email
-        super(NotActivatedException, self).__init__(backend, email)
-
-    def __str__(self):
-        return (
-            _('This account has not yet been activated. An activation email has been re-sent to {email_address}.')
-            .format(email_address=self.email)
-        )
 
 
 class ProviderUserState(object):
@@ -514,26 +501,27 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             # This parameter is used by the auth_exchange app, which always allows users to
             # login, whether or not their account is validated.
             pass
-        # IF the user has just registered a new account as part of this pipeline, that is fine
-        # and we allow the login to continue this once, because if we pause again to force the
-        # user to activate their account via email, the pipeline may get lost (e.g. email takes
-        # too long to arrive, user opens the activation email on a different device, etc.).
-        # This is consistent with first party auth and ensures that the pipeline completes
-        # fully, which is critical.
-        # But if this is an existing account, we refuse to allow them to login again until they
-        # check their email and activate the account.
-        elif social is not None:
-            # This third party account is already linked to a user account. That means that the
-            # user's account existed before this pipeline originally began (since the creation
-            # of the 'social' link entry occurs in one of the following pipeline steps).
-            # Reject this login attempt and tell the user to validate their account first.
-
-            # Send them another activation email:
-            student.views.reactivation_email_for_user(user)
-
-            raise NotActivatedException(backend, user.email)
-        # else: The user must have just successfully registered their account, so we proceed.
-        # We know they did not just login, because the login process rejects unverified users.
+        elif social is None:
+            # The user has just registered a new account as part of this pipeline. Their account
+            # is inactive but we allow the login to continue, because if we pause again to force
+            # the user to activate their account via email, the pipeline may get lost (e.g.
+            # email takes too long to arrive, user opens the activation email on a different
+            # device, etc.). This is consistent with first party auth and ensures that the
+            # pipeline completes fully, which is critical.
+            pass
+        else:
+            # This is an existing account, linked to a third party provider but not activated.
+            # Double-check these criteria:
+            assert user is not None
+            assert social is not None
+            # We now also allow them to login again, because if they had entered their email
+            # incorrectly then there would be no way for them to recover the account, nor
+            # register anew via SSO. See SOL-1324 in JIRA.
+            # However, we will log a warning for this case:
+            logger.warning(
+                'User "%s" is using third_party_auth to login but has not yet activated their account. ',
+                user.username
+            )
 
 
 @partial.partial
@@ -601,7 +589,7 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
             {
                 'category': "conversion",
                 'label': None,
-                'provider': getattr(kwargs['backend'], 'name')
+                'provider': kwargs['backend'].name
             },
             context={
                 'ip': tracking_context.get('ip'),

@@ -73,22 +73,13 @@ class CohortMembership(models.Model):
     class Meta(object):
         unique_together = (('user', 'course_id'), )
 
-    # The sole purpose of overriding this method is to get the django 1.6 behavior of allowing 'validate_unique'
-    # For django 1.8 upgrade, just remove this method and allow the base method to be called instead.
-    # Reference: https://docs.djangoproject.com/en/1.6/ref/models/instances/, under "Validating Objects"
-    def full_clean(self, **kwargs):
-        self.clean_fields()
-        self.clean()
-        if 'validate_unique' not in kwargs or kwargs['validate_unique'] is True:
-            self.validate_unique()
-
     def clean_fields(self, *args, **kwargs):
         if self.course_id is None:
             self.course_id = self.course_user_group.course_id
         super(CohortMembership, self).clean_fields(*args, **kwargs)
 
     def clean(self):
-        if self.course_user_group.group_type != CourseUserGroup.COHORT:  # pylint: disable=E1101
+        if self.course_user_group.group_type != CourseUserGroup.COHORT:
             raise ValidationError("CohortMembership cannot be used with CourseGroup types other than COHORT")
         if self.course_user_group.course_id != self.course_id:
             raise ValidationError("Non-matching course_ids provided")
@@ -106,30 +97,26 @@ class CohortMembership(models.Model):
         max_retries = 2
         success = False
         for __ in range(max_retries):
-            # The following 2 "transaction" lines force a fresh read, they can be removed once we're on django 1.8
-            # http://stackoverflow.com/questions/3346124/how-do-i-force-django-to-ignore-any-caches-and-reload-data
-            with transaction.commit_manually():
-                transaction.commit()
 
-            with transaction.commit_on_success():
+            with transaction.atomic():
 
                 try:
-                    saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
-                        user__id=self.user.id,  # pylint: disable=E1101
-                        course_id=self.course_id,
-                        defaults={
-                            'course_user_group': self.course_user_group,
-                            'user': self.user
-                        }
-                    )
+                    with transaction.atomic():
+                        saved_membership, created = CohortMembership.objects.select_for_update().get_or_create(
+                            user__id=self.user.id,
+                            course_id=self.course_id,
+                            defaults={
+                                'course_user_group': self.course_user_group,
+                                'user': self.user
+                            }
+                        )
                 except IntegrityError:  # This can happen if simultaneous requests try to create a membership
-                    transaction.rollback()
                     continue
 
                 if not created:
                     if saved_membership.course_user_group == self.course_user_group:
                         raise ValueError("User {user_name} already present in cohort {cohort_name}".format(
-                            user_name=self.user.username,  # pylint: disable=E1101
+                            user_name=self.user.username,
                             cohort_name=self.course_user_group.name
                         ))
                     self.previous_cohort = saved_membership.course_user_group
@@ -138,10 +125,9 @@ class CohortMembership(models.Model):
                     self.previous_cohort.users.remove(self.user)
 
                 saved_membership.course_user_group = self.course_user_group
-                self.course_user_group.users.add(self.user)  # pylint: disable=E1101
+                self.course_user_group.users.add(self.user)
 
-                #note: in django 1.8, we can call save with updated_fields=['course_user_group']
-                super(CohortMembership, saved_membership).save()
+                super(CohortMembership, saved_membership).save(update_fields=['course_user_group'])
 
             success = True
             break

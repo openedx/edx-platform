@@ -91,7 +91,7 @@ from openedx.core.lib.js_utils import (
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
-                      display_course_number: "${_(context_course.display_coursenumber)}",
+                      display_course_number: "${_(context_course.display_number_with_default)}",
                       revision: "${context_course.location.revision | h}",
                       self_paced: ${escape_json_dumps(context_course.self_paced) | n}
                   });

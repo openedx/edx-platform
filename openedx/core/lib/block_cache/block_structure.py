@@ -8,7 +8,6 @@ The following internal data structures are implemented:
     _BlockRelations - Data structure for a single block's relations.
     _BlockData - Data structure for a single block's data.
 """
-# pylint: disable=protected-access
 from collections import defaultdict
 from logging import getLogger
 

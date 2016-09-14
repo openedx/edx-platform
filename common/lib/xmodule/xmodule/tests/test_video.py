@@ -654,7 +654,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         def mock_val_export(edx_video_id):
             """Mock edxval.api.export_to_xml"""
-            return etree.Element(  # pylint:disable=no-member
+            return etree.Element(
                 'video_asset',
                 attrib={'export_edx_video_id': edx_video_id}
             )

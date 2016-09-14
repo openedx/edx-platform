@@ -27,7 +27,7 @@ def register_access_role(cls):
 
     """
     try:
-        role_name = getattr(cls, 'ROLE')
+        role_name = cls.ROLE
         REGISTERED_ACCESS_ROLES[role_name] = cls
     except AttributeError:
         log.exception(u"Unable to register Access Role with attribute 'ROLE'.")
@@ -62,7 +62,7 @@ class AccessRole(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def has_user(self, user):  # pylint: disable=unused-argument
+    def has_user(self, user):
         """
         Return whether the supplied django user has access to this role.
         """

@@ -27,6 +27,9 @@ class GroupedQuery(models.Model):
     course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
+    class Meta(object):
+        app_label = 'instructor_email_widget'
+
     def __unicode__(self):
         return "[GroupedQuery] Query {} for Course {}, {}".format(
             self.id,  # pylint: disable=no-member
@@ -52,6 +55,9 @@ class SavedQuery(models.Model):
     filter_on = models.CharField(max_length=255)
     entity_name = models.CharField(max_length=255)
     query_type = models.CharField(max_length=255)
+
+    class Meta(object):
+        app_label = 'instructor_email_widget'
 
     def __unicode__(self):
         return "[QueriesSaved] Query {} for {}/{}, {} {}".format(
@@ -82,6 +88,9 @@ class TemporaryQuery(models.Model):
     origin = models.CharField(default=QUERYORIGIN_MAP[QueryOrigin.WIDGET], max_length=1, choices=ORIGIN)
     done = models.NullBooleanField()
 
+    class Meta(object):
+        app_label = 'instructor_email_widget'
+
     def __unicode__(self):
         return "[QueriesSaved] Query {} for {}/{}, {} {}".format(
             self.id,  # pylint: disable=no-member
@@ -102,6 +111,9 @@ class StudentsForQuery(models.Model):
     student = models.ForeignKey(User, db_index=True)
     inclusion = models.CharField(max_length=1, choices=INCLUSIONS)
 
+    class Meta(object):
+        app_label = 'instructor_email_widget'
+
     def __unicode__(self):
         return "[QueriesStudents] Query {} for {}, {}".format(
             self.query.id,  # pylint: disable=no-member
@@ -118,6 +130,9 @@ class GroupedTempQueryForSubquery(models.Model):
     grouped = models.ForeignKey('GroupedQuery')
     query = models.ForeignKey('TemporaryQuery')
 
+    class Meta(object):
+        app_label = 'instructor_email_widget'
+
     def __unicode__(self):
         return "[GroupedQueriesSubqueries] Group {} has Query {}".format(
             self.grouped.id,  # pylint: disable=no-member
@@ -132,6 +147,9 @@ class SubqueryForGroupedQuery(models.Model):
     """
     grouped = models.ForeignKey('GroupedQuery')
     query = models.ForeignKey('SavedQuery')
+
+    class Meta(object):
+        app_label = 'instructor_email_widget'
 
     def __unicode__(self):
         return "[GroupedQueriesSubqueries] Group {} has Query {}".format(

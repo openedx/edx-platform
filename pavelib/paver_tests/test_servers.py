@@ -156,7 +156,7 @@ class TestPaverServerTasks(PaverTestCase):
         """
         settings = options.get("settings", "devstack")
         call_task("pavelib.servers.update_db", options=options)
-        db_command = "python manage.py {server} --settings={settings} syncdb --migrate --traceback --pythonpath=."
+        db_command = "python manage.py {server} --settings={settings} migrate --traceback --pythonpath=."
         self.assertEquals(
             self.task_messages,
             [

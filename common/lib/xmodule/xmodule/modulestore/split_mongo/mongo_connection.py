@@ -15,7 +15,7 @@ from time import time
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 
 try:
-    from django.core.cache import get_cache, InvalidCacheBackendError
+    from django.core.cache import caches, InvalidCacheBackendError
     DJANGO_AVAILABLE = True
 except ImportError:
     DJANGO_AVAILABLE = False
@@ -30,6 +30,15 @@ from xmodule.modulestore.split_mongo import BlockKey
 
 
 new_contract('BlockData', BlockData)
+
+
+def get_cache(alias):
+    """
+    Return cache for an `alias`
+
+    Note: The primary purpose of this is to mock the cache in test_split_modulestore.py
+    """
+    return caches[alias]
 
 
 def round_power_2(value):

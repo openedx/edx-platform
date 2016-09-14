@@ -33,6 +33,7 @@ from shoppingcart.models import (
 from survey.models import SurveyAnswer
 
 from track.views import task_track
+from util.db import outer_atomic
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xblock.runtime import KvsFieldData
 from xmodule.modulestore.django import modulestore
@@ -41,7 +42,8 @@ from django.utils.translation import ugettext as _
 from certificates.models import (
     CertificateWhitelist,
     certificate_info_for_user,
-    CertificateStatuses
+    CertificateStatuses,
+    GeneratedCertificate
 )
 from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
@@ -66,8 +68,8 @@ from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from instructor.utils import collect_anonymous_ora2_data, collect_email_ora2_data, collect_course_forums_data, collect_student_forums_data
 from student.models import CourseEnrollment, CourseAccessRole
-from teams.models import CourseTeamMembership
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.teams.models import CourseTeamMembership
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -277,9 +279,10 @@ def run_main_task(entry_id, task_fcn, action_name):
 
     # Get the InstructorTask to be updated. If this fails then let the exception return to Celery.
     # There's no point in catching it here.
-    entry = InstructorTask.objects.get(pk=entry_id)
-    entry.task_state = PROGRESS
-    entry.save_now()
+    with outer_atomic():
+        entry = InstructorTask.objects.get(pk=entry_id)
+        entry.task_state = PROGRESS
+        entry.save_now()
 
     # Get inputs to use in this task from the entry
     task_id = entry.task_id
@@ -483,7 +486,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
     )
 
 
-@transaction.autocommit
+@outer_atomic
 def rescore_problem_module_state(xmodule_instance_args, module_descriptor, student_module):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
@@ -572,7 +575,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             return UPDATE_STATUS_SUCCEEDED
 
 
-@transaction.autocommit
+@outer_atomic
 def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Resets problem attempts to zero for specified `student_module`.
@@ -599,7 +602,7 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
     return update_status
 
 
-@transaction.autocommit
+@outer_atomic
 def delete_problem_module_state(xmodule_instance_args, _module_descriptor, student_module):
     """
     Delete the StudentModule entry.
@@ -1231,6 +1234,7 @@ def upload_enrollment_report(_xmodule_instance_args, _entry_id, course_id, _task
             'Enrollment Date': _('Enrollment Date'),
             'Currently Enrolled': _('Currently Enrolled'),
             'Enrollment Source': _('Enrollment Source'),
+            'Manual (Un)Enrollment Reason': _('Manual (Un)Enrollment Reason'),
             'Enrollment Role': _('Enrollment Role'),
             'List Price': _('List Price'),
             'Payment Amount': _('Payment Amount'),
@@ -1388,7 +1392,7 @@ def get_executive_report(course_id):
     }
 
 
-def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a html report containing information,
     which provides a snapshot of how the course is doing.
@@ -1451,7 +1455,7 @@ def upload_exec_summary_report(_xmodule_instance_args, _entry_id, course_id, _ta
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):  # pylint: disable=invalid-name
+def upload_course_survey_report(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     For a given `course_id`, generate a html report containing the survey results for a course.
     """
@@ -1541,7 +1545,7 @@ def upload_proctored_exam_results_report(_xmodule_instance_args, _entry_id, cour
 
 
 def generate_students_certificates(
-        _xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # pylint: disable=unused-argument
+        _xmodule_instance_args, _entry_id, course_id, task_input, action_name):
     """
     For a given `course_id`, generate certificates for only students present in 'students' key in task_input
     json column, otherwise generate certificates for all enrolled students.
@@ -1559,7 +1563,14 @@ def generate_students_certificates(
     current_step = {'step': 'Calculating students already have certificates'}
     task_progress.update_task_state(extra_meta=current_step)
 
-    students_require_certs = students_require_certificate(course_id, enrolled_students)
+    statuses_to_regenerate = task_input.get('statuses_to_regenerate', [])
+    students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
+
+    if statuses_to_regenerate:
+        # Mark existing generated certificates as 'unavailable' before regenerating
+        # We need to call this method after "students_require_certificate" otherwise "students_require_certificate"
+        # would return no results.
+        invalidate_generated_certificates(course_id, enrolled_students, statuses_to_regenerate)
 
     task_progress.skipped = task_progress.total - len(students_require_certs)
 
@@ -1637,7 +1648,8 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                 continue
 
             try:
-                add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
+                with outer_atomic():
+                    add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
                 cohorts_status[cohort_name]['Students Added'] += 1
                 task_progress.succeeded += 1
             except User.DoesNotExist:
@@ -1668,15 +1680,62 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def students_require_certificate(course_id, enrolled_students):
-    """ Returns list of students where certificates needs to be generated.
-    Removing those students who have their certificate already generated
-    from total enrolled students for given course.
+def students_require_certificate(course_id, enrolled_students, statuses_to_regenerate=None):
+    """
+    Returns list of students where certificates needs to be generated.
+    if 'statuses_to_regenerate' is given then return students that have Generated Certificates
+    and the generated certificate status lies in 'statuses_to_regenerate'
+
+    if 'statuses_to_regenerate' is not given then return all the enrolled student skipping the ones
+    whose certificates have already been generated.
+
     :param course_id:
     :param enrolled_students:
+    :param statuses_to_regenerate:
     """
-    # compute those students where certificates already generated
-    students_already_have_certs = User.objects.filter(
-        ~Q(generatedcertificate__status=CertificateStatuses.unavailable),
-        generatedcertificate__course_id=course_id)
-    return list(set(enrolled_students) - set(students_already_have_certs))
+    if statuses_to_regenerate:
+        # Return Students that have Generated Certificates and the generated certificate status
+        # lies in 'statuses_to_regenerate'
+        students_require_certificates = enrolled_students.filter(
+            generatedcertificate__course_id=course_id,
+            generatedcertificate__status__in=statuses_to_regenerate
+        )
+        # Fetch results otherwise subsequent operations on table cause wrong data fetch
+        return list(students_require_certificates)
+    else:
+        # compute those students whose certificates are already generated
+        students_already_have_certs = User.objects.filter(
+            ~Q(generatedcertificate__status=CertificateStatuses.unavailable),
+            generatedcertificate__course_id=course_id)
+
+        # Return all the enrolled student skipping the ones whose certificates have already been generated
+        return list(set(enrolled_students) - set(students_already_have_certs))
+
+
+def invalidate_generated_certificates(course_id, enrolled_students, certificate_statuses):  # pylint: disable=invalid-name
+    """
+    Invalidate generated certificates for all enrolled students in the given course having status in
+    'certificate_statuses'.
+
+    Generated Certificates are invalidated by marking its status 'unavailable' and updating verify_uuid, download_uuid,
+    download_url and grade with empty string.
+
+    :param course_id: Course Key for the course whose generated certificates need to be removed
+    :param enrolled_students: (queryset or list) students enrolled in the course
+    :param certificate_statuses: certificates statuses for whom to remove generated certificate
+    """
+    certificates = GeneratedCertificate.objects.filter(
+        user__in=enrolled_students,
+        course_id=course_id,
+        status__in=certificate_statuses,
+    )
+
+    # Mark generated certificates as 'unavailable' and update download_url, download_uui, verify_uuid and
+    # grade with empty string for each row
+    certificates.update(
+        status=CertificateStatuses.unavailable,
+        verify_uuid='',
+        download_uuid='',
+        download_url='',
+        grade='',
+    )

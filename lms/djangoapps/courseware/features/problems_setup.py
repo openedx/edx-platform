@@ -1,5 +1,4 @@
 # pylint: disable=missing-docstring
-# pylint: disable=redefined-outer-name
 
 # EVERY PROBLEM TYPE MUST HAVE THE FOLLOWING:
 # -Section in Dictionary containing:

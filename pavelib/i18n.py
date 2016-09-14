@@ -9,7 +9,7 @@ from paver.easy import task, cmdopts, needs, sh
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable=invalid-name
+    colorize = lambda color, text: text
 
 
 @task

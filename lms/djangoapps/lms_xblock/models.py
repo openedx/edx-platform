@@ -18,6 +18,9 @@ class XBlockAsidesConfig(ConfigurationModel):
     Configuration for XBlockAsides.
     """
 
+    class Meta(ConfigurationModel.Meta):
+        app_label = "lms_xblock"
+
     disabled_blocks = TextField(
         default="about course_info static_tab",
         help_text="Space-separated list of XBlocks on which XBlockAsides should never render."

@@ -773,6 +773,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('list_report_downloads', {}),
             ('list_financial_report_downloads', {}),
             ('calculate_grades_csv', {}),
+            ('get_student_responses', {}),
             ('get_student_forums_usage', {}),
             ('get_ora2_responses', {'include_email': False}),
             ('get_course_forums_usage', {}),

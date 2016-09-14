@@ -90,7 +90,6 @@ def _filter_entrance_exam_grader(graders):
     return graders
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
@@ -241,7 +240,6 @@ class StudioEditModuleRuntime(object):
         return None
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("GET"))
 @login_required
 @expect_json
@@ -307,7 +305,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
                         'page_size': int(request.REQUEST.get('page_size', 0)),
                     }
             except ValueError:
-                # pylint: disable=too-many-format-args
                 return HttpResponse(
                     content="Couldn't parse paging parameters: enable_paging: "
                             "{0}, page_number: {1}, page_size: {2}".format(
@@ -349,7 +346,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         hashed_resources = OrderedDict()
         for resource in fragment.resources:
-            hashed_resources[hash_resource(resource)] = resource
+            hashed_resources[hash_resource(resource)] = resource._asdict()
 
         return JsonResponse({
             'html': fragment.content,
@@ -360,7 +357,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
         return HttpResponse(status=406)
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("GET"))
 @login_required
 @expect_json
@@ -713,7 +709,6 @@ def _delete_item(usage_key, user):
         store.delete_item(usage_key, user.id)
 
 
-# pylint: disable=unused-argument
 @login_required
 @require_http_methods(("GET", "DELETE"))
 def orphan_handler(request, course_key_string):

@@ -202,7 +202,7 @@ class SplitTestTransformerTestCase(CourseStructureTestCase):
 
     def test_user_randomly_assigned(self):
         # user was randomly assigned to one of the groups
-        user_groups = _get_user_partition_groups(  # pylint: disable=protected-access
+        user_groups = _get_user_partition_groups(
             self.course.id, [self.split_test_user_partition], self.user
         )
         self.assertEquals(len(user_groups), 1)

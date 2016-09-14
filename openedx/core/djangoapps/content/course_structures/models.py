@@ -18,6 +18,10 @@ class CourseStructure(TimeStampedModel):
     """
     The CourseStructure model is an aggregated representation of the course content tree
     """
+
+    class Meta(object):
+        app_label = 'course_structures'
+
     course_id = CourseKeyField(max_length=255, db_index=True, unique=True, verbose_name='Course ID')
 
     # Right now the only thing we do with the structure doc is store it and

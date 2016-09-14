@@ -55,7 +55,7 @@ log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 
-CorrectMap = correctmap.CorrectMap  # pylint: disable=invalid-name
+CorrectMap = correctmap.CorrectMap
 CORRECTMAP_PY = None
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -2666,7 +2666,7 @@ class SymbolicResponse(CustomResponse):
 ## score:       Points to be assigned (numeric, can be float)
 ## msg:         Message from grader to display to student (string)
 
-ScoreMessage = namedtuple('ScoreMessage', ['valid', 'correct', 'points', 'msg'])  # pylint: disable=invalid-name
+ScoreMessage = namedtuple('ScoreMessage', ['valid', 'correct', 'points', 'msg'])
 
 
 @registry.register
@@ -3058,7 +3058,7 @@ class ExternalResponse(LoncapaResponse):
         cmap = CorrectMap()
         try:
             submission = [student_answers[k] for k in idset]
-        except Exception as err:  # pylint: disable=broad-except
+        except Exception as err:
             log.error(
                 'Error %s: cannot get student answer for %s; student_answers=%s',
                 err,

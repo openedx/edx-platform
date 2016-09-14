@@ -5,7 +5,7 @@ from django.conf import settings
 from optparse import make_option
 from textwrap import dedent
 
-from teams.models import CourseTeam
+from lms.djangoapps.teams.models import CourseTeam
 
 
 class Command(BaseCommand):
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         """
         # This is ugly, but there is a really strange circular dependency that doesn't
         # happen anywhere else that I can't figure out how to avoid it :(
-        from teams.search_indexes import CourseTeamIndexer
+        from ...search_indexes import CourseTeamIndexer
 
         if len(args) == 0 and not options.get('all', False):
             raise CommandError(u"reindex_course_team requires one or more arguments: <course_team_id>")

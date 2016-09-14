@@ -14,7 +14,7 @@ from pavelib.utils.test import utils as test_utils
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable=invalid-name
+    colorize = lambda color, text: text
 
 __test__ = False  # do not collect
 
@@ -55,6 +55,7 @@ class BokChoyTestSuite(TestSuite):
         self.num_processes = kwargs.get('num_processes', DEFAULT_NUM_PROCESSES)
         self.extra_args = kwargs.get('extra_args', '')
         self.har_dir = self.log_dir / 'hars'
+        self.a11y_file = Env.BOK_CHOY_A11Y_CUSTOM_RULES_FILE
         self.imports_dir = kwargs.get('imports_dir', None)
         self.coveragerc = kwargs.get('coveragerc', None)
 
@@ -65,7 +66,7 @@ class BokChoyTestSuite(TestSuite):
         self.log_dir.makedirs_p()
         self.har_dir.makedirs_p()
         self.report_dir.makedirs_p()
-        test_utils.clean_reports_dir()
+        test_utils.clean_reports_dir()      # pylint: disable=no-value-for-parameter
 
         if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
@@ -205,6 +206,7 @@ class BokChoyTestSuite(TestSuite):
             "DEFAULT_STORE={}".format(self.default_store),
             "SCREENSHOT_DIR='{}'".format(self.log_dir),
             "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
+            "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
             "nosetests",
             test_spec,

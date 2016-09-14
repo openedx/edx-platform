@@ -12,7 +12,8 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from config_models.models import cache
 from courseware.tests.factories import GlobalStaffFactory, InstructorFactory, UserFactory
-from certificates.models import CertificateGenerationConfiguration
+from certificates.tests.factories import GeneratedCertificateFactory
+from certificates.models import CertificateGenerationConfiguration, CertificateStatuses
 from certificates import api as certs_api
 
 
@@ -486,3 +487,78 @@ class CertificatesInstructorApiTest(SharedModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         res_json = json.loads(response.content)
         self.assertTrue(res_json['success'])
+
+    def test_certificate_regeneration_success(self):
+        """
+        Test certificate regeneration is successful when accessed with 'certificate_statuses'
+        present in GeneratedCertificate table.
+        """
+
+        # Create a generated Certificate of some user with status 'downloadable'
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='honor'
+        )
+
+        # Login the client and access the url with 'certificate_statuses'
+        self.client.login(username=self.global_staff.username, password='test')
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url, data={'certificate_statuses': [CertificateStatuses.downloadable]})
+
+        # Assert 200 status code in response
+        self.assertEqual(response.status_code, 200)
+        res_json = json.loads(response.content)
+
+        # Assert request is successful
+        self.assertTrue(res_json['success'])
+
+        # Assert success message
+        self.assertEqual(
+            res_json['message'],
+            u'Certificate regeneration task has been started. You can view the status of the generation task in '
+            u'the "Pending Tasks" section.'
+        )
+
+    def test_certificate_regeneration_error(self):
+        """
+        Test certificate regeneration errors out when accessed with either empty list of 'certificate_statuses' or
+        the 'certificate_statuses' that are not present in GeneratedCertificate table.
+        """
+        # Create a dummy course and GeneratedCertificate with the same status as the one we will use to access
+        # 'start_certificate_regeneration' but their error message should be displayed as GeneratedCertificate
+        # belongs to a different course
+        dummy_course = CourseFactory.create()
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=dummy_course.id,
+            status=CertificateStatuses.generating,
+            mode='honor'
+        )
+
+        # Login the client and access the url without 'certificate_statuses'
+        self.client.login(username=self.global_staff.username, password='test')
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url)
+
+        # Assert 400 status code in response
+        self.assertEqual(response.status_code, 400)
+        res_json = json.loads(response.content)
+
+        # Assert Error Message
+        self.assertEqual(
+            res_json['message'],
+            u'Please select one or more certificate statuses that require certificate regeneration.'
+        )
+
+        # Access the url passing 'certificate_statuses' that are not present in db
+        url = reverse('start_certificate_regeneration', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url, data={'certificate_statuses': [CertificateStatuses.generating]})
+
+        # Assert 400 status code in response
+        self.assertEqual(response.status_code, 400)
+        res_json = json.loads(response.content)
+
+        # Assert Error Message
+        self.assertEqual(res_json['message'], u'Please select certificate statuses from the list only.')

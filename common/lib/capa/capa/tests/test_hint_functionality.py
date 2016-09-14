@@ -13,7 +13,6 @@ from ddt import ddt, data, unpack
 # in the test code. Therefore:
 # pylint: disable=line-too-long
 # For out many ddt data cases, prefer a compact form of { .. }
-# pylint: disable=bad-continuation
 
 from . import new_loncapa_problem, load_fixture
 

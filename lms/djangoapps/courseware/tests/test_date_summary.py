@@ -21,8 +21,8 @@ from courseware.date_summary import (
 )
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
-from verify_student.models import VerificationDeadline
-from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
+from lms.djangoapps.verify_student.models import VerificationDeadline
+from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
@@ -146,11 +146,11 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         block = TodaysDate(self.course, self.user)
         self.assertTrue(block.is_enabled)
         self.assertEqual(block.date, datetime.now(pytz.UTC))
-        self.assertEqual(block.title, 'Today is Jan 02, 2015')
+        self.assertEqual(block.title, 'Today is Jan 02, 2015 (00:00 UTC)')
         self.assertNotIn('date-summary-date', block.render())
 
     @freezegun.freeze_time('2015-01-02')
-    def test_date_render(self):
+    def test_todays_date_render(self):
         self.setup_course_and_user()
         block = TodaysDate(self.course, self.user)
         self.assertIn('Jan 02, 2015', block.render())
@@ -161,6 +161,12 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.setup_course_and_user()
         block = CourseStartDate(self.course, self.user)
         self.assertEqual(block.date, self.course.start)
+
+    @freezegun.freeze_time('2015-01-02')
+    def test_start_date_render(self):
+        self.setup_course_and_user()
+        block = CourseStartDate(self.course, self.user)
+        self.assertIn('in 1 day - Jan 03, 2015', block.render())
 
     ## CourseEndDate
 

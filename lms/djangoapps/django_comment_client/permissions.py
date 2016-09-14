@@ -10,7 +10,7 @@ from lms.lib.comment_client import Thread
 from opaque_keys.edx.keys import CourseKey
 
 from django_comment_common.models import all_permissions_for_user_in_course
-from teams.models import CourseTeam
+from lms.djangoapps.teams.models import CourseTeam
 
 
 def has_permission(user, permission, course_id=None):

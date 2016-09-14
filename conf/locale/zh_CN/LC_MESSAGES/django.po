@@ -30,8 +30,10 @@
 # jsgang <jsgang9@gmail.com>, 2014-2015
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Michael Cao <ming.cao.ming@gmail.com>, 2015
+# Mingye Wang <arthur200126@gmail.com>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
+# Rui Xu <xurui6376@gmail.com>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # shuchuanchen <am15501@163.com>, 2014-2015
 # riceball <snowyu.lee@gmail.com>, 2014
@@ -143,6 +145,7 @@
 # Junjie, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # Lucas H. Xu <xuh@bu.edu>, 2015
+# Mingye Wang <arthur200126@gmail.com>, 2015
 # Wheathana <mr_wheat@sina.cn>, 2015
 # pku9104038 <pku9104038@hotmail.com>, 2014
 # ruiruillp <gaier1993@163.com>, 2015
@@ -266,9 +269,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-05 18:36+0000\n"
-"PO-Revision-Date: 2015-06-18 03:04+0000\n"
-"Last-Translator: louyihua <supermouselyh@hotmail.com>\n"
+"POT-Creation-Date: 2015-11-24 13:41+0000\n"
+"PO-Revision-Date: 2015-11-24 13:39+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -283,46 +286,37 @@ msgstr ""
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/django_comment_client/forum/views.py
 msgid "Discussion"
-msgstr "论坛"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "Problem"
-msgstr "问题"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Advanced"
-msgstr "高级"
+msgstr ""
 
-#: cms/djangoapps/contentstore/views/entrance_exam.py
-#: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
+#: cms/templates/settings.html
 msgid "Entrance Exam"
 msgstr "入学考试"
 
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/ccx/schedule.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr "章"
 
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/templates/ccx/schedule.html
 msgid "Subsection"
 msgstr "节"
 
-#: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/templates/seq_module.html lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "单元"
 
-#: cms/djangoapps/contentstore/views/videos.py
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
+#: lms/templates/help_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
@@ -334,11 +328,8 @@ msgstr "名称"
 #: cms/djangoapps/contentstore/views/videos.py
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Video ID"
-msgstr "视频 ID"
+msgstr ""
 
-#: cms/djangoapps/contentstore/views/videos.py
-#: common/djangoapps/config_models/admin.py
-#: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/open_ended_problems/open_ended_problems.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
@@ -366,11 +357,11 @@ msgstr ""
 
 #: common/djangoapps/config_models/admin.py
 msgid "Update"
-msgstr "更新"
+msgstr ""
 
 #: common/djangoapps/config_models/models.py
 msgid "Change date"
-msgstr "修改日期"
+msgstr ""
 
 #. Translators: this label indicates the name of the user who made this
 #. change:
@@ -407,9 +398,10 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/course_modes/models.py
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
+#: lms/templates/courseware/courseware.html
 msgid "Course"
-msgstr "课程"
+msgstr ""
 
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -440,7 +432,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
-msgstr "诚信准则证书"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid ""
@@ -458,7 +450,7 @@ msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "ID verification pending"
-msgstr "身份证件验证挂起"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're enrolled as a verified student"
@@ -470,14 +462,12 @@ msgstr "已认证"
 
 #: common/djangoapps/course_modes/models.py
 msgid "ID Verified Ribbon/Badge"
-msgstr "身份证件已验证时的色带／徽章"
+msgstr ""
 
 #: common/djangoapps/course_modes/models.py
 msgid "You're enrolled as an honor code student"
 msgstr ""
 
-#: common/djangoapps/course_modes/models.py lms/djangoapps/branding/api.py
-#: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
 msgid "Honor Code"
 msgstr "诚信准则"
@@ -500,45 +490,43 @@ msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment is closed"
-msgstr "选课已关闭"
+msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "Enrollment mode not supported"
-msgstr "不支持的选课模式"
+msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "Invalid amount selected."
-msgstr "选择的数量无效。"
+msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
-msgstr "未选择价格或选择的价格过低。"
+msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
-msgstr "管理员"
+msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Moderator"
-msgstr "版主"
+msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Community TA"
-msgstr "社区助教"
+msgstr ""
 
-#: common/djangoapps/django_comment_common/models.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr "学生"
 
 #: common/djangoapps/embargo/forms.py
 msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
-msgstr "课程未找到，请检查课程 ID 是否有效。"
+msgstr ""
 
 #: common/djangoapps/embargo/models.py
 msgid "The course key for the restricted course."
-msgstr "此受限课程的课程标识。"
+msgstr ""
 
 #: common/djangoapps/embargo/models.py
 msgid "The message to show when a user is blocked from enrollment."
@@ -589,20 +577,32 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/forms.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+
+#: common/djangoapps/student/forms.py
 msgid "Username must be minimum of two characters long"
-msgstr "用户名至少得两个字符串"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "A properly formatted e-mail is required"
-msgstr "需要正确的邮件格式"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "A valid password is required"
-msgstr "需要一个有效的密码"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "Your legal name must be a minimum of two characters long"
-msgstr "你的合法名字必须至少包含两个字符的长度"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid ""
@@ -622,39 +622,39 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "You must accept the terms of service."
-msgstr "您必须接受本服务条款。"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "A level of education is required"
-msgstr "需要以上学历"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "Your gender is required"
-msgstr "你的性别是必填项"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "Your year of birth is required"
-msgstr "你的出生年份是必填项"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "Your mailing address is required"
-msgstr "你的邮件地址是必填项"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "A description of your goals is required"
-msgstr "你的目标描述是必填项"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "A city is required"
-msgstr "城市是必填项"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "A country is required"
-msgstr "国家是必填项"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
-msgstr "您必须遵循诚信准则才能选修。"
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
@@ -666,7 +666,7 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py common/djangoapps/student/views.py
 msgid "Password: "
-msgstr "密码: "
+msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid ""
@@ -676,15 +676,15 @@ msgstr ""
 
 #: common/djangoapps/student/middleware.py
 msgid "Disabled Account"
-msgstr "已停用的账户"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Male"
-msgstr "男"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Female"
-msgstr "女"
+msgstr ""
 
 #. Translators: 'Other' refers to the student's gender
 #: common/djangoapps/student/models.py
@@ -693,15 +693,15 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Doctorate"
-msgstr "博士"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Master's or professional degree"
-msgstr "硕士"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Bachelor's degree"
-msgstr "学士"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Associate degree"
@@ -709,15 +709,15 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Secondary/high school"
-msgstr "高中"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Junior secondary/junior high/middle school"
-msgstr "初中"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Elementary/primary school"
-msgstr "小学"
+msgstr ""
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
@@ -786,7 +786,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
-msgstr "课程编号未指定"
+msgstr ""
 
 #: common/djangoapps/student/views.py lms/djangoapps/support/views/refund.py
 msgid "Invalid course id"
@@ -794,7 +794,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
-msgstr "课程编号无效"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Could not enroll"
@@ -802,7 +802,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
-msgstr "您还没有选修本课程"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Your certificate prevents you from unenrolling from this course"
@@ -810,13 +810,13 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Enrollment action is invalid"
-msgstr "选课操作无效"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
 "You've successfully logged into your {provider_name} account, but this "
 "account isn't linked with an {platform_name} account yet."
-msgstr "你已成功登录{provider_name}帐户，但该帐号尚未与{platform_name}帐户关联。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -824,7 +824,6 @@ msgid ""
 "below, and then link your {platform_name} account with {provider_name} from "
 "your dashboard."
 msgstr ""
-"用你的{platform_name}用户名和密码登陆{platform_name}，然后从课程面板页面关联{platform_name}账户和{provider_name}。"
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -834,13 +833,13 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "There was an error receiving your login information. Please email us."
-msgstr "接受您的登录信息时出现错误，请发电子邮件给我们。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has been temporarily locked due to excessive login failures. "
 "Try again later."
-msgstr "由于登录失败次数过多，该账户暂时被锁定，请稍后再试。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -851,9 +850,9 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Too many failed login attempts. Try again later."
-msgstr "失败次数超过限制，请稍后再试！"
+msgstr ""
 
-#: common/djangoapps/student/views.py lms/templates/provider_login.html
+#: lms/templates/provider_login.html
 msgid "Email or password is incorrect."
 msgstr "邮箱或密码错误。"
 
@@ -865,35 +864,35 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
-msgstr "请输入用户名"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Please choose an option"
-msgstr "请选择"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "User with username {} does not exist"
-msgstr "用户名 {} 不存在"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Successfully disabled {}'s account"
-msgstr "成功停用{}的账户"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Successfully reenabled {}'s account"
-msgstr "成功重新启用{}的账户"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Unexpected account status"
-msgstr "异常的账户状态"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Public Username '{username}' already exists."
-msgstr "公开用户名“{username}”对应的账户已存在。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr "电子邮件“{email}”对应的账户已存在。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An access_token is required when passing value ({}) for provider."
@@ -909,7 +908,7 @@ msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Unknown error. Please e-mail us to let us know how it happened."
-msgstr "未知错误。请给我们发电子邮件，告知错误是如何发生的。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid ""
@@ -931,27 +930,27 @@ msgstr[0] ""
 
 #: common/djangoapps/student/views.py
 msgid "Password reset unsuccessful"
-msgstr "重新设置密码不成功"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
-msgstr "本邮件地址不存在非激活用户。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send reactivation email"
-msgstr "无法发送重新激活的电子邮件"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Valid e-mail address required."
-msgstr "需要有效的电子邮件地址"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
-msgstr "新邮件地址与旧邮件地址相同。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "An account with this e-mail already exists."
-msgstr "已经存在与该邮箱地址对应的账户。"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
@@ -980,19 +979,13 @@ msgid ""
 "email, and their account will be activated immediately upon registration."
 msgstr ""
 
-#: common/djangoapps/third_party_auth/pipeline.py
-msgid ""
-"This account has not yet been activated. An activation email has been re-"
-"sent to {email_address}."
-msgstr ""
-
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
 #. American English form is "%A, %B %d %Y".
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "LONG_DATE_FORMAT"
-msgstr "%Y年%m月%d日"
+msgstr ""
 
 #. Translators: the translation for "DATE_TIME_FORMAT" must be a format
 #. string for formatting dates with times.  For example, the American
@@ -1000,7 +993,7 @@ msgstr "%Y年%m月%d日"
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "DATE_TIME_FORMAT"
-msgstr "%Y年%m月%d日 %H:%M"
+msgstr ""
 
 #. Translators: the translation for "SHORT_DATE_FORMAT" must be a
 #. format string for formatting dates in a brief form.  For example,
@@ -1008,14 +1001,14 @@ msgstr "%Y年%m月%d日 %H:%M"
 #. See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "SHORT_DATE_FORMAT"
-msgstr "%Y/%m/%d"
+msgstr ""
 
 #. Translators: the translation for "TIME_FORMAT" must be a format
 #. string for formatting times.  For example, the American English
 #. form is "%H:%M:%S". See http://strftime.org for details.
 #: common/djangoapps/util/date_utils.py
 msgid "TIME_FORMAT"
-msgstr "%H:%M:%S"
+msgstr ""
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -1023,7 +1016,7 @@ msgstr "%H:%M:%S"
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "AM"
-msgstr "上午"
+msgstr ""
 
 #. Translators: This is an AM/PM indicator for displaying times.  It is
 #. used for the %p directive in date-time formats. See http://strftime.org
@@ -1031,7 +1024,7 @@ msgstr "上午"
 #: common/djangoapps/util/date_utils.py
 msgctxt "am/pm indicator"
 msgid "PM"
-msgstr "下午"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Monday Februrary 10, 2014". It is used for the %A
@@ -1039,7 +1032,7 @@ msgstr "下午"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Monday"
-msgstr "星期一"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
@@ -1047,7 +1040,7 @@ msgstr "星期一"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Tuesday"
-msgstr "星期二"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
@@ -1055,7 +1048,7 @@ msgstr "星期二"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Wednesday"
-msgstr "星期三"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
@@ -1063,7 +1056,7 @@ msgstr "星期三"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Thursday"
-msgstr "星期四"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Friday Februrary 14, 2014". It is used for the %A
@@ -1071,7 +1064,7 @@ msgstr "星期四"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Friday"
-msgstr "星期五"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
@@ -1079,7 +1072,7 @@ msgstr "星期五"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Saturday"
-msgstr "星期六"
+msgstr ""
 
 #. Translators: this is a weekday name that will be used when displaying
 #. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
@@ -1087,7 +1080,7 @@ msgstr "星期六"
 #: common/djangoapps/util/date_utils.py
 msgctxt "weekday name"
 msgid "Sunday"
-msgstr "星期天"
+msgstr ""
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
@@ -1095,7 +1088,7 @@ msgstr "星期天"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Mon"
-msgstr "周一"
+msgstr ""
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
@@ -1103,7 +1096,7 @@ msgstr "周一"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Tue"
-msgstr "周二"
+msgstr ""
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
@@ -1111,7 +1104,7 @@ msgstr "周二"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Wed"
-msgstr "周三"
+msgstr ""
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
@@ -1119,7 +1112,7 @@ msgstr "周三"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Thu"
-msgstr "周四"
+msgstr ""
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
@@ -1127,7 +1120,7 @@ msgstr "周四"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Fri"
-msgstr "周五"
+msgstr ""
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
@@ -1135,7 +1128,7 @@ msgstr "周五"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sat"
-msgstr "周六"
+msgstr ""
 
 #. Translators: this is an abbreviated weekday name that will be used when
 #. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
@@ -1143,7 +1136,7 @@ msgstr "周六"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated weekday name"
 msgid "Sun"
-msgstr "周日"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jan 10, 2014". It is used for the %b
@@ -1151,7 +1144,7 @@ msgstr "周日"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jan"
-msgstr "一月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Feb 10, 2014". It is used for the %b
@@ -1159,7 +1152,7 @@ msgstr "一月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Feb"
-msgstr "二月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Mar 10, 2014". It is used for the %b
@@ -1167,7 +1160,7 @@ msgstr "二月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Mar"
-msgstr "三月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Apr 10, 2014". It is used for the %b
@@ -1175,7 +1168,7 @@ msgstr "三月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Apr"
-msgstr "四月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "May 10, 2014". It is used for the %b
@@ -1183,7 +1176,7 @@ msgstr "四月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "May"
-msgstr "五月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jun 10, 2014". It is used for the %b
@@ -1191,7 +1184,7 @@ msgstr "五月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jun"
-msgstr "六月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Jul 10, 2014". It is used for the %b
@@ -1199,7 +1192,7 @@ msgstr "六月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Jul"
-msgstr "七月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Aug 10, 2014". It is used for the %b
@@ -1207,7 +1200,7 @@ msgstr "七月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Aug"
-msgstr "八月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Sep 10, 2014". It is used for the %b
@@ -1215,7 +1208,7 @@ msgstr "八月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Sep"
-msgstr "九月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Oct 10, 2014". It is used for the %b
@@ -1223,7 +1216,7 @@ msgstr "九月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Oct"
-msgstr "十月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Nov 10, 2014". It is used for the %b
@@ -1231,7 +1224,7 @@ msgstr "十月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Nov"
-msgstr "十一月"
+msgstr ""
 
 #. Translators: this is an abbreviated month name that will be used when
 #. displaying dates, as in "Dec 10, 2014". It is used for the %b
@@ -1239,7 +1232,7 @@ msgstr "十一月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "abbreviated month name"
 msgid "Dec"
-msgstr "十二月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "January 10, 2014". It is used for the %B directive in
@@ -1247,7 +1240,7 @@ msgstr "十二月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "January"
-msgstr "一月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "February 10, 2014". It is used for the %B directive in
@@ -1255,7 +1248,7 @@ msgstr "一月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "February"
-msgstr "二月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "March 10, 2014". It is used for the %B directive in
@@ -1263,7 +1256,7 @@ msgstr "二月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "March"
-msgstr "三月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "April 10, 2014". It is used for the %B directive in
@@ -1271,7 +1264,7 @@ msgstr "三月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "April"
-msgstr "四月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "May 10, 2014". It is used for the %B directive in
@@ -1279,7 +1272,7 @@ msgstr "四月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "May"
-msgstr "五月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "June 10, 2014". It is used for the %B directive in
@@ -1287,7 +1280,7 @@ msgstr "五月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "June"
-msgstr "六月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "July 10, 2014". It is used for the %B directive in
@@ -1295,7 +1288,7 @@ msgstr "六月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "July"
-msgstr "七月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "August 10, 2014". It is used for the %B directive in
@@ -1303,7 +1296,7 @@ msgstr "七月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "August"
-msgstr "八月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "September 10, 2014". It is used for the %B directive in
@@ -1311,7 +1304,7 @@ msgstr "八月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "September"
-msgstr "九月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "October 10, 2014". It is used for the %B directive in
@@ -1319,7 +1312,7 @@ msgstr "九月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "October"
-msgstr "十月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "November 10, 2014". It is used for the %B directive in
@@ -1327,7 +1320,7 @@ msgstr "十月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "November"
-msgstr "十一月"
+msgstr ""
 
 #. Translators: this is a month name that will be used when displaying
 #. dates, as in "December 10, 2014". It is used for the %B directive in
@@ -1335,13 +1328,13 @@ msgstr "十一月"
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
-msgstr "十二月"
+msgstr ""
 
 #: common/djangoapps/util/file.py
 msgid "The file must end with the extension '{file_types}'."
 msgid_plural ""
 "The file must end with one of the following extensions: '{file_types}'."
-msgstr[0] "该文件必须以下列扩展名之一结尾：“{file_types}”。"
+msgstr[0] ""
 
 #: common/djangoapps/util/file.py
 msgid "Maximum upload file size is {file_size} bytes."
@@ -1357,47 +1350,47 @@ msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid Length ({0})"
-msgstr "无效长度 ({0})"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must be {0} characters or more"
-msgstr "须有 {0} 个字符或更多"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must be {0} characters or less"
-msgstr "须有 {0} 个字符或更少"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Must be more complex ({0})"
-msgstr "须更加复杂({0})"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more uppercase characters"
-msgstr "必须包含{0}个或者更多大写字母"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more lowercase characters"
-msgstr "必须包含{0}个或者更多小写字母"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more digits"
-msgstr "必须包含{0}个或者更多数字"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more punctuation characters"
-msgstr "必须包含{0}个或者更多标点符号"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more non ascii characters"
-msgstr "必须包含{0}个或更多非ASCII字符"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "must contain {0} or more unique words"
-msgstr "必须包含{0}个或更多不重复的单词"
+msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Too similar to a restricted dictionary word."
-msgstr "与受限词字典中的词语过于相似。"
+msgstr ""
 
 #: common/djangoapps/xblock_django/models.py
 msgid "Space-separated list of XBlocks which should not render."
@@ -1405,15 +1398,15 @@ msgstr ""
 
 #: common/lib/capa/capa/capa_problem.py
 msgid "Cannot rescore problems with possible file submissions"
-msgstr "无法对可能的文件提交重新评分"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
-msgstr "正确"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incorrect"
-msgstr "不正确"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "partially correct"
@@ -1421,15 +1414,15 @@ msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "incomplete"
-msgstr "不完整"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "unanswered"
-msgstr "未答复"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "processing"
-msgstr "处理中"
+msgstr ""
 
 #. Translators: these are tooltips that indicate the state of an assessment
 #. question
@@ -1478,17 +1471,17 @@ msgstr ""
 msgid ""
 "Your answer has been submitted. As soon as your submission is graded, this "
 "message will be replaced with the grader's feedback."
-msgstr "你的答案已经发布。当评定完成，此消息将被显示评定者的反馈所替代。"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Submitted. As soon as a response is returned, this message will be replaced "
 "by that feedback."
-msgstr "发布。当响应返回，该消息将被反馈信息所替代。"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "No response from Xqueue within {xqueue_timeout} seconds. Aborted."
-msgstr " Xqueue在 {xqueue_timeout} 秒内无响应，终止。"
+msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Error running code."
@@ -1535,15 +1528,15 @@ msgstr "不正确"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
-msgstr "在对提示函数 {hintfn} 求值时发生错误 {err}。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "(Source code line unavailable)"
-msgstr "(源代码不可用 )"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
-msgstr "参见 XML 源文件中的行{sourcenum}。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "JavaScript Input"
@@ -1564,24 +1557,24 @@ msgstr "多项选择"
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "unmask_name called on response that is not masked"
-msgstr "unmask_name被未掩蔽的响应调用"
+msgstr ""
 
 #. Translators: 'shuffle' and 'answer-pool' are attribute names and should not
 #. be translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "Do not use shuffle and answer-pool at the same time"
-msgstr "请勿同时使用拖拽和答案池"
+msgstr ""
 
 #. Translators: 'answer-pool' is an attribute name and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "answer-pool value should be an integer"
-msgstr "答案池的值必须是整数"
+msgstr ""
 
 #. Translators: 'Choicegroup' is an input type and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "Choicegroup must include at least 1 correct and 1 incorrect choice"
-msgstr "Choicegroup必须至少包含1个正确选项和1个错误选项"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "True/False Choice"
@@ -1597,27 +1590,27 @@ msgstr "数值输入"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "There was a problem with the staff answer to this problem."
-msgstr "工作人员对这个问题的答案有问题。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Could not interpret '{student_answer}' as a number."
-msgstr "无法将“{student_answer}”解释为一个数字。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use variables ({bad_variables}) in numerical problems."
-msgstr "你可能在数学问题中无法使用变量({bad_variables})。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
-msgstr "在阶乘函数的定义域之外对其求值：“{student_answer}”"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid math syntax: '{student_answer}'"
-msgstr "无效的数学表达式：“{student_answer}”"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "You may not use complex numbers in range tolerance problems"
-msgstr "范围公差类型的问题不可以使用复数"
+msgstr ""
 
 #. Translators: This is an error message for a math problem. If the instructor
 #. provided a boundary
@@ -1626,7 +1619,7 @@ msgstr "范围公差类型的问题不可以使用复数"
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: complex boundary."
-msgstr "工作人员对此问题的解答存在问题：复杂边界。"
+msgstr ""
 
 #. Translators: This is an error message for a math problem. If the instructor
 #. did not provide
@@ -1634,7 +1627,7 @@ msgstr "工作人员对此问题的解答存在问题：复杂边界。"
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
-msgstr "工作人员对此问题的解答存在问题：边界未设置。"
+msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Text Input"
@@ -1642,16 +1635,11 @@ msgstr "文本输入"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error"
-msgstr "错误"
+msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: Separator used in StringResponse to display multiple answers.
-#. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
-#. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
-#: common/lib/capa/capa/responsetypes.py
 #: common/templates/course_modes/choose.html lms/templates/login.html
 #: lms/templates/register.html
 msgid "or"
@@ -1667,11 +1655,11 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer entered!"
-msgstr "没有输入答案！"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "CustomResponse: check function returned an invalid dictionary!"
-msgstr "客户端响应：检查函数返回无效字典！"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Symbolic Math Input"
@@ -1689,7 +1677,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer provided."
-msgstr "未提供答案。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error: No grader has been set up for this problem."
@@ -1699,7 +1687,7 @@ msgstr ""
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
-msgstr "无法将您的提交发送给评分者 (原因：{error_msg})。 请稍后重试。"
+msgstr ""
 
 #. Translators: 'grader' refers to the edX automatic code grader.
 #. Translators: the `grader` refers to the grading service open response
@@ -1709,7 +1697,7 @@ msgstr "无法将您的提交发送给评分者 (原因：{error_msg})。 请稍
 #: common/lib/capa/capa/responsetypes.py
 #: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Invalid grader reply. Please contact the course staff."
-msgstr "无效评定回复。请联系课程工作人员。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "External Grader"
@@ -1721,21 +1709,21 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: {bad_input} not permitted in answer."
-msgstr "无效输入：{bad_input}不允许出现在回答中。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
-msgstr "该问题的答案中不允许使用阶乘函数。提交的回答是：{bad_input}"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
-msgstr "无效输入：无法将“{bad_input}”解析为公式。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
-msgstr "无效输入：无法将“{bad_input}”解析为一个公式"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Circuit Schematic Builder"
@@ -1745,7 +1733,7 @@ msgstr ""
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
-msgstr "评估SchematicResponse出错。错误为： {error_msg}"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Image Mapped Input"
@@ -1762,7 +1750,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Annotation Input"
-msgstr "批注输入"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Checkboxes With Text Input"
@@ -1774,18 +1762,18 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "The Staff answer could not be interpreted as a number."
-msgstr "工作人员的大幅无法被解析为一个数字。"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Could not interpret '{given_answer}' as a number."
-msgstr "无法将“{given_answer}”解析为一个数字。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "XML data for the annotation"
-msgstr "用于批注的XML数据"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/discussion_module.py
@@ -1801,7 +1789,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
-msgstr "批注"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1828,7 +1816,7 @@ msgstr ""
 msgid ""
 "Defines the number of times a student can try to answer this problem. If the"
 " value is not set, infinite attempts are allowed."
-msgstr "定义学生在回答这个问题时所允许的尝试次数。如果未设置，则允许无限次尝试。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
@@ -1905,7 +1893,7 @@ msgstr ""
 msgid ""
 "Defines when to randomize the variables specified in the associated Python "
 "script. For problems that do not randomize values, specify \"Never\". "
-msgstr "定义何时随机化Python脚本中的变量。如果不需要随机化的变量，请选择“从不”。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "On Reset"
@@ -2003,19 +1991,19 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Check"
-msgstr "检查答案"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Final Check"
-msgstr "最后一次检查答案"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Checking..."
-msgstr "正在检查……"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
-msgstr "警告：这个问题已经被重置为其初始状态！"
+msgstr ""
 
 #. Translators: Following this message, there will be a bulleted list of
 #. items.
@@ -2023,46 +2011,46 @@ msgstr "警告：这个问题已经被重置为其初始状态！"
 msgid ""
 "The problem's state was corrupted by an invalid submission. The submission "
 "consisted of:"
-msgstr "该问题的描述被一个无效的发布损坏。该发布包含："
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "If this error persists, please contact the course staff."
-msgstr "如果该问题依然存在，请联系课程工作人员。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint: "
-msgstr "提示："
+msgstr ""
 
 #. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
 #. hints.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
-msgstr "提示(第 {hint_num} 个，共 {hints_count} 个)："
+msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem is closed."
-msgstr "问题已结束。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be reset before it can be checked again."
-msgstr "在重新检查问题之前必须把它重置。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
-msgstr "在两次发布之间你至少需要等待{wait}秒。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
 "You must wait at least {wait_secs} between submissions. {remaining_secs} "
 "remaining."
-msgstr "在两次提交之间需要等待 {wait_secs} 秒。还需等待{remaining_secs}秒。"
+msgstr ""
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Error: {msg}"
-msgstr "错误: {msg}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "{num_hour} hour"
@@ -2083,19 +2071,19 @@ msgstr[0] ""
 #. solution so it can get a new score.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem's definition does not support rescoring."
-msgstr "问题定义不支持重新打分。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be answered before it can be graded again."
-msgstr "问题必须回答才能够重新评定。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem needs to be reset prior to save."
-msgstr "问题在保存之前需要重置。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Your answers have been saved."
-msgstr "你的答案已保存。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid ""
@@ -2107,19 +2095,19 @@ msgstr ""
 #. page before they can reset it.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Refresh the page and make an attempt before resetting."
-msgstr "在重置之前请刷新页面并做一次尝试回答。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "We're sorry, there was an error with processing your request. Please try "
 "reloading your page and trying again."
-msgstr "很抱歉，在处理你的请求时出现错误。请重新加载你的页面并再次尝试操作。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
-msgstr "该问题的描述在你加载本页面之后已经发生变化了。请刷新你的页面。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/combined_open_ended_module.py
 msgid "Open Response Assessment"
@@ -2254,7 +2242,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_metadata_utils.py
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "TBD"
-msgstr "待定"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
@@ -2264,7 +2252,7 @@ msgstr ""
 msgid ""
 "Enter the passports for course LTI tools in the following format: "
 "\"id:client_key:client_secret\"."
-msgstr "以下列格式输入课程 LTI 工具的通行证：“id:client_key:client_secret”。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "List of pairs of (title, url) for textbooks used in this course"
@@ -2318,7 +2306,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Course key if this course has a pre-requisite course"
-msgstr "如果本课程有先修课程，则指定先修课程的课程标识"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Grading policy definition for this class"
@@ -2337,7 +2325,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the name of the course as it should appear in the edX.org course list."
-msgstr "输入应当出现在 edX.org 课程列表中的课程名称。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Display Name"
@@ -2351,7 +2339,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the method by which this course is edited (\"XML\" or \"Studio\")."
-msgstr "输入这门课程的编辑方式(“XML”或者“Studio”)。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Survey URL"
@@ -2379,10 +2367,6 @@ msgid ""
 "brackets: [[\"2015-09-15\", \"2015-09-21\"], [\"2015-10-01\", "
 "\"2015-10-08\"]] "
 msgstr ""
-"输入一对日期，在此期间内不允许学生往在讨论区上发帖。请在所提供的括号之内输入日期，每一对日期应由一组方括号包围，其格式为 [\"YYYY-MM-"
-"DD\", \"YYYY-MM-DD\"]。如果还需要指定时间，请使用格式 [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-"
-"DDTHH:MM\"]，请确保在日期和时间的中间一定要有“T”。例如，一项定义了两段禁用时期的项应该是如下列格式所示（包括了最外层的一对方括号）：[[\"2015-09-15\","
-" \"2015-09-21\"], [\"2015-10-01\", \"2015-10-08\"]]"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Discussion Topic Mapping"
@@ -2418,14 +2402,14 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Cohort Configuration"
-msgstr "群组配置"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter policy keys and values to enable the cohort feature, define automated "
 "student assignment to groups, or identify any course-wide discussion topics "
 "as private to cohort members."
-msgstr "请输入策略键和值以启用群组功能、定义如何自动将学生分配到群组中、或者将任何全课程范围内的讨论主题标识为对群组成员私有的主题。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Is New"
@@ -2436,7 +2420,6 @@ msgid ""
 "Enter true or false. If true, the course appears in the list of new courses "
 "on edx.org, and a New! badge temporarily appears next to the course image."
 msgstr ""
-"输入true或者false。如果输入true，课程会出现在edx.org的新课程列表中，并且在课程图片旁边会出现一个New!样式的临时图标。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Mobile Course Available"
@@ -2450,7 +2433,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Video Upload Credentials"
-msgstr "视频上传凭据"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2461,11 +2444,11 @@ msgstr ""
 msgid ""
 "Enter the URL for the official course Facebook group. If you provide a URL, "
 "the mobile app includes a button that students can tap to access the group."
-msgstr "输入课程团队官方 Facebook 小组的 URL。如果你提供了 URL，移动 APP 将包含一个按钮，学生可以点击该按钮访问小组。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Facebook URL"
-msgstr "Facebook 的 URL"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Not Graded"
@@ -2556,6 +2539,10 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Enter the names of the advanced components to use in your course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Checklist to Follow When Developing a Course"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2774,7 +2761,7 @@ msgstr ""
 msgid ""
 "Let students know what knowledge and/or skills they should have before they "
 "enroll in your course."
-msgstr "让学生们知道他们在选修这门课程之前需要先掌握哪些知识（技能）。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Info Sidebar Name"
@@ -2791,7 +2778,7 @@ msgstr ""
 msgid ""
 "True if timezones should be shown on dates in the courseware. Deprecated in "
 "favor of due_date_display_format."
-msgstr "如果希望时区信息也在课件的日期信息中显示，请设为 True。由于 due_date_display_format 的出现，该选项已过时。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2803,9 +2790,6 @@ msgid ""
 "\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
 "YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 msgstr ""
-"输入截止日期的格式，默认的格式是 Mon DD, YYYY。要使用 MM-DD-YYYY 格式，请输入“%m-%d-%Y”；要使用 DD-MM-"
-"YYYY，请输入“%d-%m-%Y”；要使用 YYYY-MM-DD 格式，请输入“%Y-%m-%d”；要使用 YYYY-DD-MM "
-"格式，请输入“%Y-%d-%m”。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "External Login Domain"
@@ -2840,7 +2824,6 @@ msgid ""
 "early_with_info. To display only the links to passing students as soon as "
 "certificates are generated, enter early_no_info."
 msgstr ""
-"输入“end”、“early_with_info”或“early_no_info”。在证书生成后，所有通过考核的学生们会在他们的课程面板上看到证书的链接，而没有通过的学生则会看到关于成绩配置的信息。默认值是“end”，即在课程结束日期之后向所有学生显示证书信息。如果希望在证书生成后尽快让所有学生看到证书信息，请输入“early_with_info”。而如果只是希望在证书生成后尽快向已经通过的学生显示链接，请输入“early_no_info”。"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
@@ -2947,7 +2930,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Organization Display String"
-msgstr "课程所属机构的显示名称"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -2955,7 +2938,7 @@ msgid ""
 "This setting overrides the organization that you entered when you created "
 "the course. To use the organization that you entered when you created the "
 "course, enter null."
-msgstr "输入你想在课件中显示的课程所属机构，该设置将覆盖你在创建课程时输入的机构名称。要使用你在创建课程时输入的机构名称，请输入“null”。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Number Display String"
@@ -2971,13 +2954,13 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Maximum Student Enrollment"
-msgstr "最大选课学生人数"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter the maximum number of students that can enroll in the course. To allow"
 " an unlimited number of students, enter null."
-msgstr "输入该课程的最大选课学生人数；如无限制，输入null。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Allow Public Wiki Access"
@@ -3037,7 +3020,7 @@ msgstr ""
 msgid "About"
 msgstr "关于我们"
 
-#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#: cms/templates/settings.html
 msgid "None"
 msgstr "无"
 
@@ -3145,7 +3128,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
-msgstr "一般"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/discussion_module.py
 msgid "Discussion Id"
@@ -3217,7 +3200,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 msgid "Image Annotation"
-msgstr "图片批注"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3235,32 +3218,32 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Location of Annotation backend"
-msgstr "批注后端的位置"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Url for Annotation Storage"
-msgstr "用于批注存储的 URL"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Secret string for annotation storage"
-msgstr "用于批注存储的秘密字符串"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Secret Token String for Annotation"
-msgstr "用于批注存储的秘密令牌串"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Default Annotations Tab"
-msgstr "默认的批注标签"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3268,13 +3251,13 @@ msgstr "默认的批注标签"
 msgid ""
 "Select which tab will be the default in the annotations table: myNotes, "
 "Instructor, or Public."
-msgstr "选择默认的批注标签：“myNotes”，“Instructor”或“Public”。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Email for 'Instructor' Annotations"
-msgstr "“教师”批注的电子邮件地址"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3282,13 +3265,13 @@ msgstr "“教师”批注的电子邮件地址"
 msgid ""
 "Email of the user that will be attached to all annotations that will be "
 "found in 'Instructor' tab."
-msgstr "将被附加到“教师”标签中所有批注上的用户的电子邮件地址。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Mode for Annotation Tool"
-msgstr "批注工具模式"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
@@ -3301,7 +3284,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "No email address found."
-msgstr "未找到邮箱地址。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Any Type"
@@ -3343,12 +3326,12 @@ msgstr ""
 msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
-msgstr "选择一个要从知识库中获取的问题类型，如果选择了“任意类型”，则不应用任何筛选。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "Scored"
-msgstr "可评分"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid ""
@@ -3498,7 +3481,7 @@ msgstr ""
 msgid ""
 "Enter the number of points possible for this component.  The default value "
 "is 1.0.  This setting is only used when Scored is set to True."
-msgstr "输入该组件可能的分数，默认值为 1.0。该设置仅在“可评分”设置为true的时候才有用。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -3564,19 +3547,19 @@ msgstr ""
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Select True to allow third party systems to post grades past the deadline."
-msgstr "请选择“True”以同意第三方系统在截止日期之后发布成绩。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
-msgstr "无法解析自定义参数：{custom_parameter}。参数格式必须类似于“x=y”。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Could not parse LTI passport: {lti_passport}. Should be \"id:key:secret\" "
 "string."
-msgstr "无法解析LTI通行证：{lti_passport}，这应当是一个由“id:key:secret”构成的字符串。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/mixin.py
 msgid "License"
@@ -3585,6 +3568,389 @@ msgstr ""
 #: common/lib/xmodule/xmodule/mixin.py
 msgid ""
 "A license defines how the contents of this block can be shared and reused."
+msgstr ""
+
+#: lms/templates/ccx/schedule.html
+msgid "Due Date"
+msgstr "截止日期"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the default date by which problems are due."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid "If true, can be seen only by course staff, regardless of start date."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "GIT URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the URL for the course data GIT repository."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "XQA Key"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "This setting is not currently supported."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the location of the annotation storage server. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "URL for Annotation Storage"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the secret string for annotation storage. The textannotation, "
+"videoannotation, and imageannotation advanced modules require this string."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the ids for the content groups this problem belongs to."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify when the Show Answer button appears for each problem. Valid values "
+"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
+"\"past_due\", \"correct_or_past_due\", and \"never\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Specify the default for how often variable values in a problem are "
+"randomized. This setting should be set to \"never\" unless you plan to "
+"provide a Python script to identify and randomize values in most of the "
+"problems in your course. Valid values are \"always\", \"onreset\", "
+"\"never\", and \"per_student\"."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Days Early for Beta Users"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the number of days before the start date that beta users can access "
+"the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Static Asset Path"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the path to use for files on the Files & Uploads page. This value "
+"overrides the Studio default, c4x://."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Text Customization"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter string customization substitutions for particular locations."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable LaTeX Compiler"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, you can use the LaTeX templates for HTML "
+"components and advanced Problem components."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the maximum number of times a student can try to answer problems. By "
+"default, Maximum Attempts is set to null, meaning that students have an "
+"unlimited number of attempts for problems. You can override this course-wide"
+" setting for individual problems. However, if the course-wide setting is a "
+"specific number, you cannot set the Maximum Attempts for individual problems"
+" to unlimited."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
+"Service. This key is granted for exclusive use in this course for the "
+"specified duration. Do not share the API key with other courses. Notify "
+"MathWorks immediately if you believe the key is exposed or compromised. To "
+"obtain a key for your course, or to report an issue, please contact "
+"moocsupport@mathworks.com"
+msgstr ""
+
+#: cms/templates/certificates.html cms/templates/group_configurations.html
+#: cms/templates/settings.html cms/templates/settings_advanced.html
+#: cms/templates/settings_graders.html cms/templates/widgets/header.html
+msgid "Group Configurations"
+msgstr "组配置"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter the configurations that govern how students are grouped together."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable video caching system"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, video caching will be used for HTML5 videos."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Video Pre-Roll"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Identify a video, 5-10 seconds in length, to play before course videos. "
+"Enter the video ID from the Video Uploads page and one or more transcript "
+"files in the following format: {\"video_id\": \"ID\", \"transcripts\": "
+"{\"language\": \"/static/filename.srt\"}}. For example, an entry for a video"
+" with two transcripts looks like this: {\"video_id\": \"77cef264-d6f5-4cf2"
+"-ad9d-0178ab8c77be\", \"transcripts\": {\"en\": \"/static/DemoX-D01_1.srt\","
+" \"uk\": \"/static/DemoX-D01_1_uk.srt\"}}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Show Reset Button for Problems"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, problems in the course default to always "
+"displaying a 'Reset' button. You can override this in each problem's "
+"settings. All existing problems are affected when this course-wide setting "
+"is changed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enable Student Notes"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, students can use the Student Notes feature."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Indicates whether Student Notes are visible in the course. Students can also"
+" show or hide their notes in the courseware."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Tag this module as part of an Entrance Exam section"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid ""
+"Enter true or false. If true, answer submissions for problem modules will be"
+" considered in the Entrance Exam scoring/gating algorithm."
+msgstr ""
+
+#. Translators: "Self" is used to denote an openended response that is self-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Self"
+msgstr ""
+
+#. Translators: "AI" is used to denote an openended response that is machine-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "AI"
+msgstr ""
+
+#. Translators: "Peer" is used to denote an openended response that is peer-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Peer"
+msgstr ""
+
+#. Translators: "Not started" is used to communicate to a student that their
+#. response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Not started."
+msgstr ""
+
+#. Translators: "Being scored." is used to communicate to a student that their
+#. response
+#. are in the process of being scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Being scored."
+msgstr ""
+
+#. Translators: "Scoring finished" is used to communicate to a student that
+#. their response
+#. have been scored, but the full scoring process is not yet complete
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scoring finished."
+msgstr ""
+
+#. Translators: "Complete" is used to communicate to a student that their
+#. openended response has been fully scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Complete."
+msgstr ""
+
+#. Translators: "Scored rubric" appears to a user as part of a longer
+#. string that looks something like: "Scored rubric from grader 1".
+#. "Scored" is an adjective that modifies the noun "rubric".
+#. That longer string appears when a user is viewing a graded rubric
+#. returned from one of the graders of their openended response problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scored rubric"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid ""
+"You have attempted this question {number_of_student_attempts} times. You are"
+" only allowed to attempt it {max_number_of_attempts} times."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "The problem state got out-of-sync. Please try reloading the page."
+msgstr ""
+
+#. Translators: "Self-Assessment" refers to the self-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Self-Assessment"
+msgstr ""
+
+#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Peer-Assessment"
+msgstr ""
+
+#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
+#. of openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Instructor-Assessment"
+msgstr ""
+
+#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
+#. evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "AI-Assessment"
+msgstr ""
+
+#. Translators: 'tag' is one of 'feedback', 'submission_id',
+#. 'grader_id', or 'score'. They are categories that a student
+#. responds to when filling out a post-assessment survey
+#. of his or her grade from an openended problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Could not find needed tag {tag_name} in the survey responses. Please try "
+"submitting again."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "There was an error saving your feedback. Please contact course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Couldn't submit feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your feedback."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Unable to save your feedback. Please try again later."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your submission."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Unable to submit your submission to the grader. Please try again later."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error getting feedback from grader."
+msgstr ""
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "No feedback available from grader."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error handling action. Please try again."
+msgstr ""
+
+#. Translators: this string appears once an openended response
+#. is submitted but before it has been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+
+#. Translators: "Not started" communicates to a student that their response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Not started"
+msgstr ""
+
+#. Translators: "In progress" communicates to a student that their response
+#. is currently in the grading process
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "In progress"
+msgstr ""
+
+#. Translators: "Done" communicates to a student that their response
+#. has been fully graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Done"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We could not find a file in your submission. Please try choosing a file or "
+"pasting a URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We are having trouble saving your file. Please try another file or paste a "
+"URL to your file into the answer box."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py
+msgid "Error saving your score.  Please notify course staff."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
@@ -3612,7 +3978,7 @@ msgstr ""
 msgid ""
 "Defines whether the student gets credit for grading this problem. Only used "
 "when \"Show Single Problem\" is True."
-msgstr "定义在对这个问题进行评分时学生是否获得分数，当设置“显示单个问题”为 True 时才可用。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Due date that should be displayed."
@@ -3629,10 +3995,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/peer_grading_module.py
 msgid "Peer Grading Interface"
 msgstr ""
-
-#: lms/templates/ccx/schedule.html
-msgid "Due Date"
-msgstr "截止日期"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
@@ -3775,7 +4137,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Text Annotation"
-msgstr "文字批注"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Source/Citation"
@@ -3785,7 +4147,7 @@ msgstr ""
 msgid ""
 "Optional for citing source of any material used. Automatic citation can be "
 "done using <a href=\"http://easybib.com\">EasyBib</a>"
-msgstr "可选，任意使用的材料的引用源。自动引证可以通过<a href=\"http://easybib.com\">EasyBib</a>完成"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/textannotation_module.py
 msgid "Diacritic Marks"
@@ -3797,9 +4159,281 @@ msgid ""
 "i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid ""
+"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
+"{status_code}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "We support only SubRip (*.srt) transcripts format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid ""
+"Something wrong with SubRip transcripts file during parsing. Inner message "
+"is {error_message}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "Something wrong with SubRip transcripts file during parsing."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
+msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Basic"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid ""
+"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
+".ogg, or .webm video file hosted elsewhere on the Internet."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "Default Video URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"The name students see. This name appears in the course ribbon and as a "
+"header for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Component Display Name"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Current position in the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Optional, for older browsers: the YouTube ID for the normal speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "YouTube ID"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "YouTube ID for .75x speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Optional, for older browsers: the YouTube ID for the 1.25x speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "YouTube ID for 1.25x speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "YouTube ID for 1.5x speed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Time you want the video to start if you don't want the entire video to play."
+" Not supported in the native mobile app: the full video file will play. "
+"Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Video Start Time"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Time you want the video to stop if you don't want the entire video to play. "
+"Not supported in the native mobile app: the full video file will play. "
+"Formatted as HH:MM:SS. The maximum value is 23:59:59."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Video Stop Time"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "The external URL to download the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Download Video"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Allow students to download versions of this video in different formats if "
+"they cannot use the edX video player or do not have access to YouTube. You "
+"must add at least one non-YouTube URL in the Video File URLs field."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Video Download Allowed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"The URL or URLs where you've posted non-YouTube versions of the video. Each "
+"URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
+"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
+"Students will be able to view the first listed video that's compatible with "
+"the student's computer. To allow students to download these videos, set "
+"Video Download Allowed to True."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Video File URLs"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"By default, students can download an .srt or .txt transcript when you set "
+"Download Transcript Allowed to True. If you want to provide a downloadable "
+"transcript in a different format, we recommend that you upload a handout by "
+"using the Upload a Handout field. If this isn't possible, you can post a "
+"transcript file on the Files & Uploads page or on the Internet, and then add"
+" the URL for the transcript here. Students see a link to download that "
+"transcript below the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Downloadable Transcript URL"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Allow students to download the timed transcript. A link to download the file"
+" appears below the video. By default, the transcript is an .srt or .txt "
+"file. If you want to provide the transcript for download in a different "
+"format, upload a file by using the Upload Handout field."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Download Transcript Allowed"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"The default transcript for the video, from the Default Timed Transcript "
+"field on the Basic tab. This transcript should be in English. You don't have"
+" to change this setting."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Default Timed Transcript"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Specify whether the transcripts appear with the video by default."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Show Transcript"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Add transcripts in different languages. Click below to specify a language "
+"and upload an .srt transcript file for that language."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Transcript Languages"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Preferred language for transcript."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Preferred language for transcript"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Transcript file format to download by user."
+msgstr ""
+
+#. Translators: This is a type of file used for captioning in the video
+#. player.
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "SubRip (.srt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Text (.txt) file"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "The last speed that the user specified for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "The default speed for the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Specify whether YouTube is available for the user."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Upload a handout to accompany this video. Students can download the handout "
+"by clicking Download Handout under the video."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Upload Handout"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"Specify whether access to this video is limited to browsers only, or if it "
+"can be accessed from other applications including mobile apps."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Video Available on Web Only"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid ""
+"If you were assigned a Video ID by edX for the video to play in this "
+"component, enter the ID here. In this case, do not enter values in the "
+"Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
+"were not assigned a Video ID, enter values in those other fields and ignore "
+"this field."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Date of the last view of the bumper"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
+msgid "Do not show bumper again"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Video Annotation"
-msgstr "视频批注"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "The external source URL for the video."
@@ -3855,674 +4489,6 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the default date by which problems are due."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: lms/djangoapps/lms_xblock/mixin.py
-msgid "If true, can be seen only by course staff, regardless of start date."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "GIT URL"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the URL for the course data GIT repository."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "XQA Key"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "This setting is not currently supported."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the location of the annotation storage server. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this setting."
-msgstr ""
-"请输入批注存储服务器的位置，高级模块“textannotation”、“videoannotation”和“imageannotation "
-"”都需要此设置。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "URL for Annotation Storage"
-msgstr "用于批注存储的 URL"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the secret string for annotation storage. The textannotation, "
-"videoannotation, and imageannotation advanced modules require this string."
-msgstr ""
-"请输入用于批注存储的秘密字符串，高级模块“textannotation”、“videoannotation”和“imageannotation "
-"”都需要此设置。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter the ids for the content groups this problem belongs to."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Specify when the Show Answer button appears for each problem. Valid values "
-"are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", "
-"\"past_due\", \"correct_or_past_due\", and \"never\"."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Specify the default for how often variable values in a problem are "
-"randomized. This setting should be set to \"never\" unless you plan to "
-"provide a Python script to identify and randomize values in most of the "
-"problems in your course. Valid values are \"always\", \"onreset\", "
-"\"never\", and \"per_student\"."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Days Early for Beta Users"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the number of days before the start date that beta users can access "
-"the course."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Static Asset Path"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the path to use for files on the Files & Uploads page. This value "
-"overrides the Studio default, c4x://."
-msgstr "请输入要使用的文件＆上传页面中文件的路径。这将覆盖 Studio 的默认值（c4x:// 格式）。"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Text Customization"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter string customization substitutions for particular locations."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enable LaTeX Compiler"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, you can use the LaTeX templates for HTML "
-"components and advanced Problem components."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the maximum number of times a student can try to answer problems. By "
-"default, Maximum Attempts is set to null, meaning that students have an "
-"unlimited number of attempts for problems. You can override this course-wide"
-" setting for individual problems. However, if the course-wide setting is a "
-"specific number, you cannot set the Maximum Attempts for individual problems"
-" to unlimited."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the API key provided by MathWorks for accessing the MATLAB Hosted "
-"Service. This key is granted for exclusive use in this course for the "
-"specified duration. Do not share the API key with other courses. Notify "
-"MathWorks immediately if you believe the key is exposed or compromised. To "
-"obtain a key for your course, or to report an issue, please contact "
-"moocsupport@mathworks.com"
-msgstr ""
-"请输入由 MathWorks 提供的、用于访问 MATLAB 宿主服务的 API Key 。请保证该 API Key "
-"在指定的一段时间内由本课程独占使用，不要与其他课程共享该 API Key 。如果您确认 API Key 泄露或受损，请立刻通知 MathWorks "
-"。要为您的课程获取 API Key 或报告问题，请联系 moocsupport@mathworks.com"
-
-#: cms/templates/certificates.html cms/templates/group_configurations.html
-#: cms/templates/settings.html cms/templates/settings_advanced.html
-#: cms/templates/settings_graders.html cms/templates/widgets/header.html
-msgid "Group Configurations"
-msgstr "组配置"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter the configurations that govern how students are grouped together."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enable video caching system"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, video caching will be used for HTML5 videos."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Video Pre-Roll"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Identify a video, 5-10 seconds in length, to play before course videos. "
-"Enter the video ID from the Video Uploads page and one or more transcript "
-"files in the following format: {\"video_id\": \"ID\", \"transcripts\": "
-"{\"language\": \"/static/filename.srt\"}}. For example, an entry for a video"
-" with two transcripts looks like this: {\"video_id\": \"77cef264-d6f5-4cf2"
-"-ad9d-0178ab8c77be\", \"transcripts\": {\"en\": \"/static/DemoX-D01_1.srt\","
-" \"uk\": \"/static/DemoX-D01_1_uk.srt\"}}"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Show Reset Button for Problems"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, problems in the course default to always "
-"displaying a 'Reset' button. You can override this in each problem's "
-"settings. All existing problems are affected when this course-wide setting "
-"is changed."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enable Student Notes"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, students can use the Student Notes feature."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Indicates whether Student Notes are visible in the course. Students can also"
-" show or hide their notes in the courseware."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Tag this module as part of an Entrance Exam section"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid ""
-"Enter true or false. If true, answer submissions for problem modules will be"
-" considered in the Entrance Exam scoring/gating algorithm."
-msgstr ""
-
-#. Translators: "Self" is used to denote an openended response that is self-
-#. graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Self"
-msgstr "我"
-
-#. Translators: "AI" is used to denote an openended response that is machine-
-#. graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "AI"
-msgstr "系统"
-
-#. Translators: "Peer" is used to denote an openended response that is peer-
-#. graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Peer"
-msgstr "对方"
-
-#. Translators: "Not started" is used to communicate to a student that their
-#. response
-#. has not yet been graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Not started."
-msgstr "尚未开始。"
-
-#. Translators: "Being scored." is used to communicate to a student that their
-#. response
-#. are in the process of being scored
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Being scored."
-msgstr "正在被评分"
-
-#. Translators: "Scoring finished" is used to communicate to a student that
-#. their response
-#. have been scored, but the full scoring process is not yet complete
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Scoring finished."
-msgstr "评分已经完成"
-
-#. Translators: "Complete" is used to communicate to a student that their
-#. openended response has been fully scored
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Complete."
-msgstr "完成"
-
-#. Translators: "Scored rubric" appears to a user as part of a longer
-#. string that looks something like: "Scored rubric from grader 1".
-#. "Scored" is an adjective that modifies the noun "rubric".
-#. That longer string appears when a user is viewing a graded rubric
-#. returned from one of the graders of their openended response problem.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "Scored rubric"
-msgstr "已评分的题目"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid ""
-"You have attempted this question {number_of_student_attempts} times. You are"
-" only allowed to attempt it {max_number_of_attempts} times."
-msgstr ""
-"你已经尝试回答该问题{number_of_student_attempts}次。你总共可以尝试回答{max_number_of_attempts}次。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
-msgid "The problem state got out-of-sync. Please try reloading the page."
-msgstr "这个问题的状态已失同步，请重新加载本页面。"
-
-#. Translators: "Self-Assessment" refers to the self-assessed mode of
-#. openended evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "Self-Assessment"
-msgstr "自我评价"
-
-#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
-#. openended evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "Peer-Assessment"
-msgstr "同伴评价"
-
-#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
-#. of openended evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "Instructor-Assessment"
-msgstr "主讲教师-判分"
-
-#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
-#. evaluation
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
-msgid "AI-Assessment"
-msgstr "所有评价"
-
-#. Translators: 'tag' is one of 'feedback', 'submission_id',
-#. 'grader_id', or 'score'. They are categories that a student
-#. responds to when filling out a post-assessment survey
-#. of his or her grade from an openended problem.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid ""
-"Could not find needed tag {tag_name} in the survey responses. Please try "
-"submitting again."
-msgstr "调查结果中无法找到所需的标签 {tag_name}，请尝试重新提交。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "There was an error saving your feedback. Please contact course staff."
-msgstr "保存你的反馈出错。请联系课程工作人员。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Couldn't submit feedback."
-msgstr "无法提交反馈"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Successfully saved your feedback."
-msgstr "你的反馈已保存成功。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Unable to save your feedback. Please try again later."
-msgstr "无法保存你的反馈，请重试。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Successfully saved your submission."
-msgstr "成功保存你的提交"
-
-#. Translators: the `grader` refers to the grading service open response
-#. problems
-#. are sent to, either to be machine-graded, peer-graded, or instructor-
-#. graded.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid ""
-"Unable to submit your submission to the grader. Please try again later."
-msgstr "无法将你发布的内容提交给评定者，请稍晚再重新尝试。"
-
-#. Translators: the `grader` refers to the grading service open response
-#. problems
-#. are sent to, either to be machine-graded, peer-graded, or instructor-
-#. graded.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Error getting feedback from grader."
-msgstr "从评定者处获取反馈出错。"
-
-#. Translators: the `grader` refers to the grading service open response
-#. problems
-#. are sent to, either to be machine-graded, peer-graded, or instructor-
-#. graded.
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "No feedback available from grader."
-msgstr "尚无有效的评定者反馈。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid "Error handling action. Please try again."
-msgstr "操作失败。请重试。"
-
-#. Translators: this string appears once an openended response
-#. is submitted but before it has been graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
-msgid ""
-"Your response has been submitted. Please check back later for your grade."
-msgstr "您的"
-
-#. Translators: "Not started" communicates to a student that their response
-#. has not yet been graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid "Not started"
-msgstr "没有开始"
-
-#. Translators: "In progress" communicates to a student that their response
-#. is currently in the grading process
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid "In progress"
-msgstr "进度"
-
-#. Translators: "Done" communicates to a student that their response
-#. has been fully graded
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid "Done"
-msgstr "完成"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid ""
-"We could not find a file in your submission. Please try choosing a file or "
-"pasting a URL to your file into the answer box."
-msgstr "我们未能在你的提交中找到文件。请尝试选择一个文件，或者粘贴你的文件的 URL 到回答栏中。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
-msgid ""
-"We are having trouble saving your file. Please try another file or paste a "
-"URL to your file into the answer box."
-msgstr "在保存你的文件时遇到问题。请尝试选择一个文件，或者粘贴你的文件的 URL 到回答栏中。"
-
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py
-msgid "Error saving your score.  Please notify course staff."
-msgstr "保存你的分数时遇到错误，请通知课程工作人员。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid ""
-"Can't receive transcripts from Youtube for {youtube_id}. Status code: "
-"{status_code}."
-msgstr "不能从Youtube接受{youtube_id}的成绩单。状态码为：{status_code}。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "We support only SubRip (*.srt) transcripts format."
-msgstr "我们只支持SubRip (*.srt)格式的字幕。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid ""
-"Something wrong with SubRip transcripts file during parsing. Inner message "
-"is {error_message}"
-msgstr "解析SubRip字幕文件时出错。内部消息是{error_message}"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "Something wrong with SubRip transcripts file during parsing."
-msgstr "解析SubRip字幕文件时出错。"
-
-#: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
-msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
-msgstr "{exception_message}: 找不到上传的成绩单: {user_filename}"
-
-#: common/lib/xmodule/xmodule/video_module/video_handlers.py
-msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Basic"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid ""
-"The URL for your video. This can be a YouTube URL or a link to an .mp4, "
-".ogg, or .webm video file hosted elsewhere on the Internet."
-msgstr ""
-"该地址指向视频链接。这可能是一个YouTube的网址或者一个存储于其他互联网服务器的 .mp4, .ogg, 或者.webm 格式视频的链接地址。"
-
-#: common/lib/xmodule/xmodule/video_module/video_module.py
-msgid "Default Video URL"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Component Display Name"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Current position in the video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Optional, for older browsers: the YouTube ID for the normal speed video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Optional, for older browsers: the YouTube ID for the .75x speed video."
-msgstr "可选，针对较早的浏览器：0.75 倍速视频的 YouTube ID。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID for .75x speed"
-msgstr "YouTube ID（0.75 倍速）"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Optional, for older browsers: the YouTube ID for the 1.25x speed video."
-msgstr "可选，针对较早的浏览器：1.25 倍速视频的 YouTube ID。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID for 1.25x speed"
-msgstr "YouTube ID（1.25 倍速）"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Optional, for older browsers: the YouTube ID for the 1.5x speed video."
-msgstr "可选，针对较早的浏览器：1.5 倍速视频的 YouTube ID。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "YouTube ID for 1.5x speed"
-msgstr "YouTube ID（1.5 倍速）"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Time you want the video to start if you don't want the entire video to play."
-" Not supported in the native mobile app: the full video file will play. "
-"Formatted as HH:MM:SS. The maximum value is 23:59:59."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Start Time"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Time you want the video to stop if you don't want the entire video to play. "
-"Not supported in the native mobile app: the full video file will play. "
-"Formatted as HH:MM:SS. The maximum value is 23:59:59."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Stop Time"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The external URL to download the video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Video"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Allow students to download versions of this video in different formats if "
-"they cannot use the edX video player or do not have access to YouTube. You "
-"must add at least one non-YouTube URL in the Video File URLs field."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Download Allowed"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The URL or URLs where you've posted non-YouTube versions of the video. Each "
-"URL must end in .mpeg, .mp4, .ogg, or .webm and cannot be a YouTube URL. "
-"(For browser compatibility, we strongly recommend .mp4 and .webm format.) "
-"Students will be able to view the first listed video that's compatible with "
-"the student's computer. To allow students to download these videos, set "
-"Video Download Allowed to True."
-msgstr ""
-"非 YouTube 版本的视频 URL。每个 URL 应当以 .mpeg、.mp4、.ogg 或者 .webm 结尾，并且不得为 YouTube "
-"URL。(为了浏览器的兼容性考虑，我们强烈建议您使用 .mp4 和 .webm "
-"格式。)每个学生将看到列表中第一个与他自己的计算机兼容的视频。如果想让学生下载这些视频，请将“允许下载视频”设置为“True”。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video File URLs"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"By default, students can download an .srt or .txt transcript when you set "
-"Download Transcript Allowed to True. If you want to provide a downloadable "
-"transcript in a different format, we recommend that you upload a handout by "
-"using the Upload a Handout field. If this isn't possible, you can post a "
-"transcript file on the Files & Uploads page or on the Internet, and then add"
-" the URL for the transcript here. Students see a link to download that "
-"transcript below the video."
-msgstr ""
-"默认情况下，当“允许下载字幕”设置为“True”的时候，学生可以下载 .srt 或者 .txt "
-"格式的字幕。如果您需要提供不同文件格式的字幕供学生下载，我们建议您首先考虑使用“上传讲义”域上传您的讲义；其次您可以将字幕文件上传至“文件＆上传”页面或者"
-" Internet，并在这里添加下载字幕的 URL。学生们会在视频的下方看到一个下载字幕的链接。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Downloadable Transcript URL"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Allow students to download the timed transcript. A link to download the file"
-" appears below the video. By default, the transcript is an .srt or .txt "
-"file. If you want to provide the transcript for download in a different "
-"format, upload a file by using the Upload Handout field."
-msgstr ""
-"允许学生下载字幕。下载链接会出现在视频的下方。默认情况下，下载的字幕是一个 .srt 或者 .txt "
-"文件。如果您需要提供不同文件格式的字幕下载，使用“上传讲义”域上传该文件。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Download Transcript Allowed"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The default transcript for the video, from the Default Timed Transcript "
-"field on the Basic tab. This transcript should be in English. You don't have"
-" to change this setting."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Default Timed Transcript"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Specify whether the transcripts appear with the video by default."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Show Transcript"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Add transcripts in different languages. Click below to specify a language "
-"and upload an .srt transcript file for that language."
-msgstr "添加不同语言的字幕。单击下方以指定语言并上传该语言对应的 .srt 字幕文件。"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Transcript Languages"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Preferred language for transcript."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Preferred language for transcript"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Transcript file format to download by user."
-msgstr ""
-
-#. Translators: This is a type of file used for captioning in the video
-#. player.
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "SubRip (.srt) file"
-msgstr "字幕 (.srt) 文件"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Text (.txt) file"
-msgstr "文本 (.txt) 文件"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The last speed that the user specified for the video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "The default speed for the video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Specify whether YouTube is available for the user."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Upload a handout to accompany this video. Students can download the handout "
-"by clicking Download Handout under the video."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Upload Handout"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"Specify whether access to this video is limited to browsers only, or if it "
-"can be accessed from other applications including mobile apps."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Video Available on Web Only"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"If you were assigned a Video ID by edX for the video to play in this "
-"component, enter the ID here. In this case, do not enter values in the "
-"Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
-"were not assigned a Video ID, enter values in those other fields and ignore "
-"this field."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Date of the last view of the bumper"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid "Do not show bumper again"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
@@ -4616,14 +4582,6 @@ msgstr ""
 msgid ""
 "You cannot create a CCX from a course using a deprecated id. Please create a"
 " rerun of this course in the studio to allow this action."
-msgstr ""
-
-#: lms/djangoapps/ccx/views.py
-msgid "Could not find a user with name or email \"{email}\" "
-msgstr ""
-
-#: lms/djangoapps/ccx/views.py
-msgid "Please enter a valid username or email."
 msgstr ""
 
 #: lms/djangoapps/certificates/badge_handler.py
@@ -4790,39 +4748,77 @@ msgid ""
 "program of study, and includes verification of the student's identity."
 msgstr ""
 
-#: lms/djangoapps/certificates/views/webview.py
-msgid "I completed the {course_title} course on {platform_name}."
-msgstr ""
-
-#: lms/djangoapps/certificates/views/webview.py
-msgid ""
-"I completed a course on {platform_name}. Take a look at my certificate."
-msgstr ""
-
 #. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
 msgid "{month} {day}, {year}"
 msgstr ""
 
+#. Translators:  This text represents the verification of the certificate
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
-"a course of study offered by {partner_short_name}, an online learning "
-"initiative of {partner_long_name} through {platform_name}."
+"This is a valid {platform_name} certificate for {user_name}, who "
+"participated in {partner_short_name} {course_number}"
 msgstr ""
 
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears in the browser title bar
+#: lms/djangoapps/certificates/views/webview.py
+msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
+msgstr ""
+
+#. Translators:  This text fragment appears after the student's name
+#. (displayed in a large font) on the certificate
+#. screen.  The text describes the accomplishment represented by the
+#. certificate information displayed to the user
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
-"a course of study offered by {partner_short_name}, through {platform_name}."
+"successfully completed, received a passing grade, and was awarded a "
+"{platform_name} {certificate_type} Certificate of Completion in "
+msgstr ""
+
+#. Translators: This text describes the purpose (and therefore, value) of a
+#. course certificate
+#. 'verifying your identity' refers to the process for establishing the
+#. authenticity of the student
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"{platform_name} acknowledges achievements through certificates, which are "
+"awarded for various activities {platform_name} students complete under the "
+"<a href='{tos_url}'>{platform_name} Honor Code</a>.  Some certificates "
+"require completing additional steps, such as <a href='{verified_cert_url}'> "
+"verifying your identity</a>."
+msgstr ""
+
+#. Translators:  'All rights reserved' is a legal term used in copyrighting to
+#. protect published content
+#: lms/djangoapps/certificates/views/webview.py
+msgid "All rights reserved"
+msgstr ""
+
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears
+#. in the browser title bar when a requested certificate is not found or
+#. recognized
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Invalid Certificate"
+msgstr ""
+
+#. Translators: The &amp; characters represent an ampersand character and can
+#. be ignored
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Terms of Service &amp; Honor Code"
+msgstr ""
+
+#. Translators: This line appears as a byline to a header image and describes
+#. the purpose of the page
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Certificate Validation"
 msgstr ""
 
 #. Translators: Accomplishments describe the awards/certifications obtained by
 #. students on this platform
 #: lms/djangoapps/certificates/views/webview.py
 msgid "About {platform_name} Accomplishments"
-msgstr ""
-
-#: lms/djangoapps/certificates/views/webview.py
-msgid "More Information About {user_name}'s Certificate:"
 msgstr ""
 
 #. Translators:  This line appears on the page just before the generation date
@@ -4839,19 +4835,6 @@ msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "About {platform_name} Certificates"
-msgstr ""
-
-#. Translators: This text describes the purpose (and therefore, value) of a
-#. course certificate
-#. 'verifying your identity' refers to the process for establishing the
-#. authenticity of the student
-#: lms/djangoapps/certificates/views/webview.py
-msgid ""
-"{platform_name} acknowledges achievements through certificates, which are "
-"awarded for various activities {platform_name} students complete under the "
-"<a href='{tos_url}'>{platform_name} Honor Code</a>.  Some certificates "
-"require completing additional steps, such as <a href='{verified_cert_url}'> "
-"verifying your identity</a>."
 msgstr ""
 
 #: lms/djangoapps/certificates/views/webview.py
@@ -4908,27 +4891,30 @@ msgstr ""
 msgid "{platform_name} acknowledges the following student accomplishment"
 msgstr ""
 
-#. Translators:  This text represents the verification of the certificate
+#. Translators:  This text represents the description of course
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
-"This is a valid {platform_name} certificate for {user_name}, who "
-"participated in {partner_short_name} {course_number}"
+"a course of study offered by {partner_short_name}, an online learning "
+"initiative of {partner_long_name} through {platform_name}."
 msgstr ""
 
-#. Translators:  This text is bound to the HTML 'title' element of the page
-#. and appears in the browser title bar
-#: lms/djangoapps/certificates/views/webview.py
-msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
-msgstr ""
-
-#. Translators:  This text fragment appears after the student's name
-#. (displayed in a large font) on the certificate
-#. screen.  The text describes the accomplishment represented by the
-#. certificate information displayed to the user
+#. Translators:  This text represents the description of course
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
-"successfully completed, received a passing grade, and was awarded a "
-"{platform_name} {certificate_type} Certificate of Completion in "
+"a course of study offered by {partner_short_name}, through {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid "I completed the {course_title} course on {platform_name}."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"I completed a course on {platform_name}. Take a look at my certificate."
+msgstr ""
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid "More Information About {user_name}'s Certificate:"
 msgstr ""
 
 #. Translators: This line is displayed to a user who has completed a course
@@ -4952,37 +4938,6 @@ msgstr ""
 msgid "More about {fullname}'s accomplishment"
 msgstr ""
 
-#. Translators:  'All rights reserved' is a legal term used in copyrighting to
-#. protect published content
-#: lms/djangoapps/certificates/views/webview.py
-msgid "All rights reserved"
-msgstr ""
-
-#. Translators:  This text is bound to the HTML 'title' element of the page
-#. and appears
-#. in the browser title bar when a requested certificate is not found or
-#. recognized
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Invalid Certificate"
-msgstr ""
-
-#. Translators: The &amp; characters represent an ampersand character and can
-#. be ignored
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Terms of Service &amp; Honor Code"
-msgstr ""
-
-#. Translators: This line appears as a byline to a header image and describes
-#. the purpose of the page
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Certificate Validation"
-msgstr ""
-
-#: lms/djangoapps/class_dashboard/dashboard_data.py
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Username"
@@ -5020,6 +4975,14 @@ msgstr "得分"
 msgid "problems"
 msgstr ""
 
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5028,7 +4991,7 @@ msgstr ""
 
 #: lms/djangoapps/commerce/signals.py lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
-msgstr "[Refund] 用户申请退款"
+msgstr ""
 
 #: lms/djangoapps/commerce/views.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
@@ -5072,14 +5035,6 @@ msgid ""
 "{payment_support_link}."
 msgstr ""
 
-#: lms/djangoapps/commerce/api/v1/serializers.py
-msgid "{course_id} is not a valid course key."
-msgstr ""
-
-#: lms/djangoapps/commerce/api/v1/serializers.py
-msgid "Course {course_id} does not exist."
-msgstr ""
-
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -5089,11 +5044,11 @@ msgstr "维基"
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
-msgstr "这是**{organization}**_{course_name}_的wiki。"
+msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Course page automatically created."
-msgstr "课程网页已经自动创建"
+msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Welcome to the {platform_name} Wiki"
@@ -5101,7 +5056,7 @@ msgstr ""
 
 #: lms/djangoapps/course_wiki/views.py
 msgid "Visit a course wiki to add an article."
-msgstr "浏览课程维基添加课程标题"
+msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "Course has not started"
@@ -5121,6 +5076,14 @@ msgstr ""
 
 #: lms/djangoapps/courseware/access_response.py
 msgid "You do not have access to this course on a mobile device"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "in {relative_date} - {absolute_date}"
+msgstr ""
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "UTC"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -5198,7 +5161,6 @@ msgid ""
 "specific student."
 msgstr ""
 
-#: lms/djangoapps/courseware/tabs.py
 #: lms/templates/courseware/courseware-error.html
 msgid "Courseware"
 msgstr "课程页面"
@@ -5206,22 +5168,17 @@ msgstr "课程页面"
 #: lms/djangoapps/courseware/tabs.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
-msgstr "课程信息"
+msgstr ""
 
-#: lms/djangoapps/courseware/tabs.py lms/templates/courseware/syllabus.html
+#: lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "教学大纲"
 
-#: lms/djangoapps/courseware/tabs.py
 #: lms/templates/peer_grading/peer_grading.html
 msgid "Progress"
 msgstr "进度"
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: 'Textbooks' refers to the tab in the course that leads to the
-#. course' textbooks
-#: lms/djangoapps/courseware/tabs.py cms/templates/textbooks.html
-#: cms/templates/widgets/header.html
+#: cms/templates/textbooks.html cms/templates/widgets/header.html
 msgid "Textbooks"
 msgstr "教材"
 
@@ -5244,7 +5201,7 @@ msgstr ""
 #. course costs nothing so it is free.
 #: lms/djangoapps/courseware/views.py
 msgid "Free"
-msgstr "免费"
+msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "Invalid location."
@@ -5252,7 +5209,7 @@ msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "User {username} has never accessed problem {location}"
-msgstr "用户{username} 从来没有访问{location}问答"
+msgstr ""
 
 #: lms/djangoapps/courseware/views.py
 msgid "You must be signed in to {platform_name} to create a certificate."
@@ -5278,43 +5235,49 @@ msgstr ""
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
-msgstr "路径 {0} 不存在，请创建，或为GIT_REPO_DIR设置一个不同的路径。"
+msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid ""
 "Non usable git url provided. Expecting something like: "
 "git@github.com:mitocw/edx4edx_lite.git"
-msgstr "没有可写的Git地址。期待类似这样的地址：git@github.com:mitocw/edx4edx_lite.git"
+msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to get git log"
-msgstr "不能取得git 日志"
+msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "git clone or pull failed!"
-msgstr "git clone或pull失败！"
+msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to run import command."
-msgstr "不能执行导入命令。"
+msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The underlying module store does not support import."
-msgstr "底层模块存储不支持导入。"
+msgstr ""
 
 #. Translators: This is an error message when they ask for a
 #. particular version of a git repository and that version isn't
 #. available from the remote source they specified
 #: lms/djangoapps/dashboard/git_import.py
 msgid "The specified remote branch is not available."
-msgstr "指定的远程分支无效。"
+msgstr ""
 
 #. Translators: Error message shown when they have asked for a git
 #. repository branch, a specific version within a repository, that
 #. doesn't exist, or there is a problem changing to it.
 #: lms/djangoapps/dashboard/git_import.py
 msgid "Unable to switch to specified branch. Please check your branch name."
-msgstr "无法切换到指定的分支。请检查你的分支名。"
+msgstr ""
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
+msgstr ""
 
 #. Translators: This message means that the user could not be authenticated
 #. (that is, we could
@@ -5338,20 +5301,20 @@ msgstr ""
 #. corrected".
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "fixed password"
-msgstr "修改后的密码"
+msgstr ""
 
 #. Translators: this means everything happened successfully, yay!
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "All ok!"
-msgstr "一切正常！"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Must provide username"
-msgstr "请提供用户名"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Must provide full name"
-msgstr "请提供全名"
+msgstr ""
 
 #. Translators: Domain is an email domain, such as "@gmail.com"
 #: lms/djangoapps/dashboard/sysadmin.py
@@ -5364,11 +5327,11 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Password must be supplied if not using certificates"
-msgstr "没有使用认证时必须提供密码。"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email address required (not username)"
-msgstr "电子邮件地址必填(不是用户名)"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Oops, failed to create user {user}, {error}"
@@ -5392,51 +5355,51 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Statistic"
-msgstr "统计"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Value"
-msgstr "值"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Site statistics"
-msgstr "网站统计"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Total number of users"
-msgstr "用户总数"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Courses loaded in the modulestore"
-msgstr "已加载课程至模块仓库"
+msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py lms/templates/tracking_log.html
+#: lms/templates/tracking_log.html
 msgid "username"
 msgstr "用户名"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "email"
-msgstr "电子邮件"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Repair Results"
-msgstr "修复结果"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Create User Results"
-msgstr "创建用户结果"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Delete User Results"
-msgstr "删除用户结果"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "The git repo location should end with '.git', and be a valid url"
-msgstr "Git仓库应为以“.git”结尾的有效 URL"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Added Course"
-msgstr "添加课程"
+msgstr ""
 
 #. Translators: "GIT_IMPORT_WITH_XMLMODULESTORE" is a variable name.
 #. "XMLModuleStore" and "MongoDB" are database systems. You should not
@@ -5448,12 +5411,11 @@ msgid ""
 "We recommend you enable the MongoDB based module store instead, unless this "
 "is a development environment."
 msgstr ""
-"拒绝导入。GIT_IMPORT_WITH_XMLMODULESTORE未被设置为on，且以多线程方式导入到XMLModuleStore中通常存在不安全因素。在非开发环境中，推荐您采用基于MongoDB的模块仓库。"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
-msgstr "课程 {0} 已在数据目录中存在！(强制重新加载)"
+msgstr ""
 
 #. Translators: unable to download the course content from
 #. the source git repository. Clone occurs if this is brand
@@ -5462,7 +5424,7 @@ msgstr "课程 {0} 已在数据目录中存在！(强制重新加载)"
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid ""
 "Unable to clone or pull repository. Please check your url. Output was: {0!r}"
-msgstr "无法克隆或拉取代码仓库。请检查你的url。输出是：{0!r}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Failed to clone repository to {directory_name}"
@@ -5470,88 +5432,82 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Successfully switched to branch: {branch_name}"
-msgstr "成功切换到分支：{branch_name}"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Loaded course {course_name}<br/>Errors:"
 msgstr ""
 
-#: lms/djangoapps/dashboard/sysadmin.py cms/templates/course-create-rerun.html
-#: cms/templates/index.html lms/templates/shoppingcart/receipt.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Course Name"
 msgstr "课程名称"
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Directory/ID"
-msgstr "目录/ID"
+msgstr ""
 
 #. Translators: "Git Commit" is a computer command; see
 #. http://gitref.org/basic/#commit
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Git Commit"
-msgstr "Git提交"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Last Change"
-msgstr "最后一次修改"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Last Editor"
-msgstr "最后一次编辑者"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Information about all courses"
-msgstr "所有课程信息"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
-msgstr "错误，不能通过 ID {0}<br/><pre>{1}</pre> 取得课程"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Deleted"
-msgstr "已删除"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "course_id"
-msgstr "课程ID"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "# enrolled"
-msgstr "# 已选修"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "# staff"
-msgstr "# 员工"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "instructors"
-msgstr "主讲教师"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "Enrollment information for all courses"
-msgstr "所有课程的选课信息"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "role"
-msgstr "角色"
+msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 msgid "full_name"
-msgstr "全名"
-
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid ""
-"Import the specified git repository and optional branch into the modulestore"
-" and optionally specified directory."
-msgstr "倒入指定的git代码仓库和可选分支到模块库与可选的指定目录。"
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
-msgstr "标题不能为空"
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Body can't be empty"
-msgstr "内容不能为空"
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Topic doesn't exist"
@@ -5559,16 +5515,16 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Comment level too deep"
-msgstr "评论层级过深"
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid ""
 "Error uploading file. Please contact the site administrator. Thank you."
-msgstr "上传文件出错，请联系网站管理员，谢谢。"
+msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Good"
-msgstr "好"
+msgstr ""
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
@@ -5608,7 +5564,7 @@ msgid "Credit Card - Individual"
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "manually enrolled by {username} - reason: {reason}"
+msgid "manually enrolled by username: {username}"
 msgstr ""
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
@@ -5621,11 +5577,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
-msgstr "该用户不存在。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Task is already running."
-msgstr "任务已在运行中。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5719,16 +5675,6 @@ msgstr ""
 msgid "User ID"
 msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a field on the login form
-#. meant to hold the user's email address.
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's email address.
-#. Translators: This label appears above a field on the password reset
-#. form meant to hold the user's email address.
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-#: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Email"
@@ -5737,44 +5683,37 @@ msgstr "电子邮件"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py lms/envs/devstack.py
 msgid "Language"
-msgstr "语言"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Location"
-msgstr "所在地"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Birth Year"
-msgstr "出生年度"
+msgstr ""
 
-#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: This label appears above a dropdown menu on the registration
-#. form used to select the user's gender.
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-#: lms/templates/signup_modal.html
+#: lms/templates/register.html lms/templates/signup_modal.html
 msgid "Gender"
 msgstr "性别"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Level of Education"
-msgstr "教育水平"
+msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py
-#: lms/djangoapps/instructor_task/tasks_helper.py lms/templates/register.html
+#: lms/templates/register.html
 msgid "Mailing Address"
 msgstr "邮寄地址"
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Goals"
-msgstr "目标"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
-msgstr "群组"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Team"
@@ -5802,11 +5741,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'cohort' column containing cohort names."
-msgstr "该文件必须包含一个“群组”列，该列中包含了群组的名称。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "The file must contain a 'username' column, an 'email' column, or both."
-msgstr "该文件必须包含一个“username”列，或一个“email”列，或两者都包含。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
@@ -5823,8 +5762,6 @@ msgstr ""
 msgid "% Discount"
 msgstr ""
 
-#: lms/djangoapps/instructor/views/api.py lms/djangoapps/shoppingcart/pdf.py
-#: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
@@ -5921,11 +5858,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
-msgstr "模块不存在。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "An error occurred while deleting the score."
-msgstr "删除该分数时出错。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Course has no entrance exam section."
@@ -5983,7 +5920,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
-msgstr "成功修改了学生{0}的截止日期从{1}变为{2}"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -5992,7 +5929,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully reset due date for student {0} for {1} to {2}"
-msgstr "成功重置了学生{0}的截止日期从{1}变为{2}"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 #, python-format
@@ -6009,6 +5946,22 @@ msgid ""
 "Certificate generation task for all students of this course has been "
 "started. You can view the status of the generation task in the \"Pending "
 "Tasks\" section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Please select one or more certificate statuses that require certificate "
+"regeneration."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Please select certificate statuses from the list only."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate regeneration task has been started. You can view the status of "
+"the generation task in the \"Pending Tasks\" section."
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -6092,14 +6045,13 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Instructor"
-msgstr "主讲教师"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid ""
 "To gain insights into student enrollment and participation {link_start}visit"
 " {analytics_dashboard_name}, our new course analytics product{link_end}."
 msgstr ""
-"要深入了解学生的选课和参与信息，请{link_start}访问我们全新的课程分析产品{analytics_dashboard_name}{link_end}。"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "E-Commerce"
@@ -6128,30 +6080,28 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "No end date set"
-msgstr "未设置结束日期"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
-msgstr "选课数据现已可通过{dashboard_link}查看。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Membership"
-msgstr "会员资格"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Cohorts"
-msgstr "群组"
+msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/ccx/coach_dashboard.html
 msgid "Student Admin"
 msgstr "学生管理"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Extensions"
-msgstr "扩展"
+msgstr ""
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
 msgstr "数据下载"
@@ -6162,7 +6112,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Analytics"
-msgstr "分析"
+msgstr ""
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Metrics"
@@ -6185,119 +6135,118 @@ msgstr[0] ""
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Complete"
-msgstr "已完成"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
-msgstr "未完成"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
+#: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Course Statistics At A Glance"
-msgstr "课程统计信息概览"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "List of students enrolled in {course_key}"
-msgstr "选修课程 {course_key}的学生清单"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Raw Grades of students enrolled in {course_key}"
-msgstr "选修课程{course_key}的学生原始成绩"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Assignment Name"
-msgstr "作业名称"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Please enter an assignment name"
-msgstr "请输入作业名称"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Invalid assignment name '{name}'"
-msgstr "作业名称“{name}”无效"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "External email"
-msgstr "外部邮箱"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades for assignment \"{name}\""
-msgstr " 作业“{name}”的成绩"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Grades from {course_id}"
-msgstr "课程“{course_id}”的成绩"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "No remote gradebook defined in course metadata"
-msgstr "课程元数据中没有定义远程成绩簿"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "No remote gradebook url defined in settings.FEATURES"
-msgstr "在settings.FEATURES中没有定义远程成绩簿的链接地址"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "No gradebook name defined in course remote_gradebook metadata"
-msgstr "远程成绩簿元数据中没有定义成绩簿名称"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Failed to communicate with gradebook server at {url}"
-msgstr "同位于{url}的成绩簿服务器通讯失败"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Error: {err}"
-msgstr "错误：{err}"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Remote gradebook response for {action}"
-msgstr "远程成绩簿对{action}的应答"
+msgstr ""
 
 #. Translators: This label appears above a field on the registration form
 #. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/legacy.py
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
-msgstr "全名"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "{title} in course {course_key}"
-msgstr "课程 {course_key} 中的 {title}"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "ID"
-msgstr "ID"
+msgstr ""
 
-#: lms/djangoapps/instructor/views/legacy.py
-#: lms/djangoapps/instructor/views/tools.py
-#: lms/djangoapps/instructor_task/tasks_helper.py cms/templates/register.html
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/signup_modal.html lms/templates/sysadmin_dashboard.html
+#: cms/templates/register.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/signup_modal.html
+#: lms/templates/sysadmin_dashboard.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Full Name"
 msgstr "全名"
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "edX email"
-msgstr "edX邮箱"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Enrollment of students"
-msgstr "选课学生"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid "Un-enrollment of students"
-msgstr "弃选学生"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
 "Failed to find any background tasks for course \"{course}\", module "
 "\"{problem}\" and student \"{student}\"."
-msgstr "寻找针对课程“{course}”，模块“{problem}”及学生“{student}”的后台任务失败。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/legacy.py
 msgid ""
 "Failed to find any background tasks for course \"{course}\" and module "
 "\"{problem}\"."
-msgstr "寻找针对课程“{course}”，模块“{problem}”的后台任务失败。"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/registration_codes.py
 msgid ""
@@ -6326,11 +6275,11 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unable to parse date: "
-msgstr "不能解析日期"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Couldn't find module for url: {0}"
-msgstr "不能为url {0} 找到合适的模块"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit {0} has no due date to extend."
@@ -6346,15 +6295,15 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Extended Due Date"
-msgstr "扩展截止日期"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Users with due date extensions for {0}"
-msgstr "拥有到期扩展{0}的用户"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Due date extensions for {0} {1} ({2})"
-msgstr "到期扩展{0} {1} ({2})"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/api_helper.py
 msgid "Not all problems in entrance exam support re-scoring."
@@ -6364,13 +6313,13 @@ msgstr ""
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "rescored"
-msgstr "重新评分"
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "reset"
-msgstr "重置"
+msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
@@ -6384,7 +6333,7 @@ msgstr "已删除"
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "emailed"
-msgstr "已邮件通知"
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -6396,7 +6345,7 @@ msgstr ""
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "graded"
-msgstr "已评价"
+msgstr ""
 
 #. Translators: This is a past-tense phrase that is inserted into task
 #. progress messages as {action}.
@@ -6422,7 +6371,7 @@ msgstr ""
 #. {attempted} so far"
 #: lms/djangoapps/instructor_task/tasks.py
 msgid "cohorted"
-msgstr "群组化"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "First Name"
@@ -6470,6 +6419,10 @@ msgid "Enrollment Source"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Manual (Un)Enrollment Reason"
+msgstr ""
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Role"
 msgstr ""
 
@@ -6499,59 +6452,59 @@ msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No status information available"
-msgstr "尚无状态信息"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No task_output information found for instructor_task {0}"
-msgstr "无主讲教师任务 {0}的输出信息"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
-msgstr "未找到主讲教师任务{0}:{1} 的可解析的任务输出信息"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No parsable status information available"
-msgstr "尚无可解析的状态信息"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No message provided"
-msgstr "尚无消息"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
-msgstr "发现主讲教师任务{0}: {1}的无效的任务输出信息"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No progress status information available"
-msgstr "尚无进度状态信息"
+msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
-msgstr "未找到主讲教师任务{0}:{1} 的可解析的任务输入信息"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Progress: {action} {succeeded} of {attempted} so far"
-msgstr "进度: 目前 {attempted}的{action} {succeeded} "
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find submission to be {action} for student '{student}'"
-msgstr "无法找到学生“{student}”的要被{action}的提交"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem failed to be {action} for student '{student}'"
-msgstr "学生“{student}”的问题{action}失败"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem successfully {action} for student '{student}'"
-msgstr "学生“{student}”的问题{action}成功"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
@@ -6570,66 +6523,66 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find any students with submissions to be {action}"
-msgstr "无法找到任何为{action}提交的学生"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem failed to be {action} for any of {attempted} students"
-msgstr "对于{attempted}学生的问题{action}失败"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem successfully {action} for {attempted} students"
-msgstr "对于{attempted}学生的问题{action}成功"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Problem {action} for {succeeded} of {attempted} students"
-msgstr "对于{attempted} 学生的问题 {action}{succeeded}"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Unable to find any recipients to be {action}"
-msgstr "无法找到{action}的接受者"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Message failed to be {action} for any of {attempted} recipients "
-msgstr "对{attempted}接受者的消息{action}失败"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Message successfully {action} for {attempted} recipients"
-msgstr "对于{attempted}接受者的消息{action}成功"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Message {action} for {succeeded} of {attempted} recipients"
-msgstr "对于{attempted}接受者的消息{action}{succeeded}"
+msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
 msgid "Status: {action} {succeeded} of {attempted}"
-msgstr "状态: 对于{attempted}{action} {succeeded}  "
+msgstr ""
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
 msgid " (skipping {skipped})"
-msgstr "(忽略 {skipped})"
+msgstr ""
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
 msgid " (out of {total})"
-msgstr "( ／{total}  )"
+msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Whether to display this module in the table of contents"
@@ -6709,84 +6662,83 @@ msgstr "我的笔记"
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
-msgstr "无法联系上外部的评分服务器。请联系开发团队{email}。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
 "Cannot find any open response problems in this course. Have you submitted "
 "answers to any open response assessment questions? If not, please do so and "
 "return to this page."
-msgstr "没有发现该课程任何开放问题的应答，您是否已经提交过任何开放问题的答案？如果没，请提交并返回该页面。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "AI Assessment"
-msgstr "智能评估"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Peer Assessment"
-msgstr "互评"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Not yet available"
-msgstr "还未有效"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Automatic Checker"
-msgstr "自动检查器"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "Instructor Assessment"
-msgstr "主讲教师评分"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
 "Error occurred while contacting the grading service.  Please notify course "
 "staff."
-msgstr "连接评分服务出现错误，请通知课程员工。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid ""
 "Error occurred while contacting the grading service.  Please notify your edX"
 " point of contact."
-msgstr "连接评分服务时发生错误，请告知您的edX联系点。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
 msgid "for course {0} and student {1}."
-msgstr "于课程 {0} 与学生 {1}。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View all problems that require peer assessment in this particular course."
-msgstr "查看该课程中所有需要同行评议的问题。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View ungraded submissions submitted by students for the open ended problems "
 "in the course."
-msgstr "查看学生对该课程中开放性问题的更新。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
 "View open ended problems that you have previously submitted for grading."
-msgstr "查看您此前提交评分的开放性问题。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "View submissions that have been flagged by students as inappropriate."
-msgstr "查看提交内容中被学生标注为不妥的内容。"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "New submissions to grade"
-msgstr "供评分的新提交"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "New grades have been returned"
-msgstr "返回新的评分"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "Submissions have been flagged for review"
-msgstr "提交已被标记为审阅"
+msgstr ""
 
-#: lms/djangoapps/open_ended_grading/views.py
 #: lms/templates/instructor/staff_grading.html
 msgid "Staff grading"
 msgstr "教员评分"
@@ -6795,7 +6747,7 @@ msgstr "教员评分"
 #. students to view open-ended problems that require grading
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "Peer grading"
-msgstr "互评"
+msgstr ""
 
 #. Translators: "Open Ended Panel" appears on a tab that, when clicked, opens
 #. up a panel that
@@ -6803,7 +6755,7 @@ msgstr "互评"
 #. needs to grade
 #: lms/djangoapps/open_ended_grading/views.py
 msgid "Open Ended Panel"
-msgstr "开放问题面板"
+msgstr ""
 
 #: lms/djangoapps/open_ended_grading/views.py
 msgid ""
@@ -6813,15 +6765,10 @@ msgid ""
 "        Please check back later for this.\n"
 "        "
 msgstr ""
-"\n"
-"        初始化互评时出现错误。\n"
-"        该课件尚未创建一个允许您评价其他同学的模块。\n"
-"        请稍后再检查确认。\n"
-"        "
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Order Payment Confirmation"
-msgstr "订单付款确认"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -6831,7 +6778,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Trying to add a different currency into the cart"
-msgstr "尝试添加不同的货币到购物车"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Internal reference code for this invoice."
@@ -6873,12 +6820,12 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Registration for Course: {course_name}"
-msgstr "注册课程：{course_name}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
 "Please visit your {link_start}dashboard{link_end} to see your new course."
-msgstr "请前往你的{link_start}课程面板{link_end}查看新课程。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "Enrollment codes for Course: {course_name}"
@@ -6899,7 +6846,7 @@ msgstr ""
 msgid ""
 "If you haven't verified your identity yet, please start the verification "
 "process ({verification_url})."
-msgstr "如果你还没有验证你的身份，请立即开始验证过程吧({verification_url})。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
@@ -6952,7 +6899,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/reports.py
 msgid "Quantity"
-msgstr "数量"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid ""
@@ -6997,202 +6944,25 @@ msgstr ""
 msgid "TERMS AND CONDITIONS"
 msgstr ""
 
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order Number"
-msgstr "订单号"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Customer Name"
-msgstr "客户姓名"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Original Transaction"
-msgstr "原本事务的日期"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Refund"
-msgstr "偿还日期"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Amount of Refund"
-msgstr "偿还总数"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Service Fees (if any)"
-msgstr "服务费(如果有的话)"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Purchase Time"
-msgstr "购买时间"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order ID"
-msgstr "订单ID"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Unit Cost"
-msgstr "单位价格"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Cost"
-msgstr "总价格"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Currency"
-msgstr "货币"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Comments"
-msgstr "评论"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "University"
-msgstr "大学"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Announce Date"
-msgstr "课程发布日期"
-
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
-#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
-msgid "Course Start Date"
-msgstr "课程开始日期"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Close Date"
-msgstr "课程注册截止日期"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Period"
-msgstr "课程注册期"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Enrolled"
-msgstr "总计选修人数"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Audit Enrollment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Honor Code Enrollment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Verified Enrollment"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue"
-msgstr "总收入"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue over the Minimum"
-msgstr "总收入超过最低"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Verified Students Contributing More than the Minimum"
-msgstr "已验证的学生贡献数量超过最低"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Refunds"
-msgstr "偿还数量"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Dollars Refunded"
-msgstr "已偿还金额"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Transactions"
-msgstr "事务数量"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Payments Collected"
-msgstr "总的已收集支付"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Successful Refunds"
-msgstr "成功偿还的数量"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Amount of Refunds"
-msgstr "总偿还数量"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You must be logged-in to add to a shopping cart"
-msgstr "您必须登录才能添加到购物车"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "The course you requested does not exist."
-msgstr "您请求的课程不存在。"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "The course {course_id} is already in your cart."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You are already registered in course {course_id}."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Course added to cart."
-msgstr "课程添加到购物车。"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Discount does not exist against code '{code}'."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "This enrollment code ({enrollment_code}) is no longer valid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "This enrollment code ({enrollment_code}) is not valid."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid ""
-"Code '{registration_code}' is not valid for any course in the shopping cart."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid ""
-"Cart item quantity should not be greater than 1 when applying activation "
-"code"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Only one coupon redemption is allowed against an order"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "success"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You do not have permission to view this page."
-msgstr "你没有访问此页面的权限。"
-
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
-msgstr "付款处理器没有返回所需的参数：{0}"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
-msgstr "对于参数 {1} ，付款处理器返回一个错误类型值 {0} 。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The payment processor accepted an order whose number is not in our system."
-msgstr "付款处理器接受了一个号码不在我们系统中的订单。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
-msgstr "付款处理器收取的总金额 {0} {1} 与订单总金额 {2} {3} 不一致。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7232,17 +7002,17 @@ msgstr ""
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "Successful transaction."
-msgstr "交易成功。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The request is missing one or more required fields."
-msgstr "请求缺少了一个或多个必须的字段"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "One or more fields in the request contains invalid data."
-msgstr "请求中的一个或多个字段包含了无效数据。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7252,17 +7022,12 @@ msgid ""
 "            Possible fix: retry the payment after 15 minutes.\n"
 "            "
 msgstr ""
-"\n"
-"此次授权请求的merchantReferenceCode\n"
-"与您15分钟内所发起的另一个授权请求的merchantReferenceCode一致。\n"
-"解决方法：15分钟后再尝试支付。\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Error: General system failure. Possible fix: retry the payment after a few "
 "minutes."
-msgstr "错误：系统故障。可能的解决方法：几分钟后重试支付。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7272,11 +7037,6 @@ msgid ""
 "            Possible fix: retry the payment after some time.\n"
 "            "
 msgstr ""
-"\n"
-"错误: 请求已接受但服务器响应超时。\n"
-"此错误不包括客户端与服务器之间的超时。\n"
-"解决方法：稍后重试支付。\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7285,16 +7045,12 @@ msgid ""
 "            Possible fix: retry the payment after some time.\n"
 "            "
 msgstr ""
-"\n"
-"错误：请求已接受，但是服务未按时完成\n"
-"解决办法：稍后再尝试支付。\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The issuing bank has questions about the request. Possible fix: retry with "
 "another form of payment"
-msgstr "发卡银行对请求有问题。可能的解决方法：重试另一种付款方式。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7304,11 +7060,6 @@ msgid ""
 "            Possible fix: retry with another form of payment\n"
 "            "
 msgstr ""
-"\n"
-"信用卡已过期。也有可能是由于您所提供的有效期\n"
-"与银行提供的日期不一致。\n"
-"解决办法：尝试其他支付形式\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7317,25 +7068,21 @@ msgid ""
 "            Possible fix: retry with another form of payment\n"
 "            "
 msgstr ""
-"\n"
-"拒绝支付。发卡行未提供其他信息。\n"
-"解决办法：尝试其他支付形式\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Insufficient funds in the account. Possible fix: retry with another form of "
 "payment"
-msgstr "账户中的资金不足。可能的解决方法：重试另一种付款方式"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Unknown reason"
-msgstr "未知的原因"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Issuing bank unavailable. Possible fix: retry again after a few minutes"
-msgstr "发卡银行无响应。可能的解决方法：几分钟后重试"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7344,27 +7091,23 @@ msgid ""
 "            Possible fix: retry with another form of payment\n"
 "            "
 msgstr ""
-"\n"
-"未激活的卡或卡主未授权无卡交易。\n"
-"解决办法：尝试其他交易形式\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "The card has reached the credit limit. Possible fix: retry with another form"
 " of payment"
-msgstr "已超过该卡信用额度。可能的解决方法：重试另一种付款方式"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Invalid card verification number. Possible fix: retry with another form of "
 "payment"
-msgstr "无效的信用卡验证码。可能的解决方法：重试另一种付款方式"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "Invalid account number. Possible fix: retry with another form of payment"
-msgstr "无效的帐户号码。可能的解决方法：重试另一种付款方式"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7373,16 +7116,12 @@ msgid ""
 "            Possible fix: retry with another form of payment\n"
 "            "
 msgstr ""
-"\n"
-"支付系统不受理该信用卡类型。\n"
-"解决办法：尝试其他支付形式\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
 "General decline by the processor.  Possible fix: retry with another form of "
 "payment"
-msgstr "付款被拒绝。可能的解决方法：重试另一种付款方式"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7392,21 +7131,21 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The requested amount exceeds the originally authorized amount."
-msgstr "所要求的数额超过的原始授权的金额。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "Processor Failure.  Possible fix: retry the payment"
-msgstr "处理器故障。可能的解决方法：重试支付。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The authorization has already been captured"
-msgstr "预授权完成"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
 "The requested transaction amount must match the previous transaction amount."
-msgstr "要求的交易金额必须与先前的交易金额一致。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7415,15 +7154,11 @@ msgid ""
 "            Possible fix: retry with the same card or another form of payment\n"
 "            "
 msgstr ""
-"\n"
-"所发送的信用卡类型无效或者所关联的信用卡卡号错误。\n"
-"解决办法：以此卡重试或者尝试其他支付形式\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The request ID is invalid."
-msgstr "请求ID无效。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7431,14 +7166,11 @@ msgid ""
 "            You requested a capture through the API, but there is no corresponding, unused authorization record.\n"
 "            "
 msgstr ""
-"\n"
-"你通过API发起预授权请求，但是当前没有相关的、未使用的授权记录。\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid "The transaction has already been settled or reversed."
-msgstr "该交易已经得到处理或已被退回。"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7447,14 +7179,10 @@ msgid ""
 "            submitted to your processor. Or, you requested a void for a type of transaction that cannot be voided.\n"
 "            "
 msgstr ""
-"\n"
-"扣费／预授权申请信息已经提交到支付系统，不可撤销。\n"
-"或者，你所请求的交易类型是不可撤销的。\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "You requested a credit for a capture that was previously voided"
-msgstr "您请求确认扣款的预授权已经撤销"
+msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7463,10 +7191,6 @@ msgid ""
 "            Possible fix: retry the payment.\n"
 "            "
 msgstr ""
-"\n"
-"            错误：请求已收到，但是支付服务超时。\n"
-"            可能的解决办法：重试交易\n"
-"            "
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
@@ -7475,10 +7199,6 @@ msgid ""
 "            Possible fix: retry with a different form of payment.\n"
 "            "
 msgstr ""
-"\n"
-"授权请求已被发卡行通过但被CyberSouce拒绝。\n"
-"可能的解决办法：尝试其他支付方式。\n"
-"            "
 
 #. Translators: this text appears when an unfamiliar error code occurs during
 #. payment,
@@ -7776,6 +7496,183 @@ msgid ""
 "            "
 msgstr ""
 
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Order Number"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Customer Name"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Date of Original Transaction"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Date of Refund"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Amount of Refund"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Service Fees (if any)"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Purchase Time"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Order ID"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Unit Cost"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Cost"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Currency"
+msgstr "货币"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Comments"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "University"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Course Announce Date"
+msgstr ""
+
+#: cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Course Start Date"
+msgstr "课程开始日期"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Course Registration Close Date"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Course Registration Period"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Enrolled"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Audit Enrollment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Honor Code Enrollment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Verified Enrollment"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Gross Revenue"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Gross Revenue over the Minimum"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Verified Students Contributing More than the Minimum"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Refunds"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Dollars Refunded"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Transactions"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Payments Collected"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Successful Refunds"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Amount of Refunds"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "You must be logged-in to add to a shopping cart"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "The course you requested does not exist."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "The course {course_id} is already in your cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "You are already registered in course {course_id}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Course added to cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Discount does not exist against code '{code}'."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "This enrollment code ({enrollment_code}) is no longer valid."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "This enrollment code ({enrollment_code}) is not valid."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid ""
+"Code '{registration_code}' is not valid for any course in the shopping cart."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid ""
+"Cart item quantity should not be greater than 1 when applying activation "
+"code"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Only one coupon redemption is allowed against an order"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "success"
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "You do not have permission to view this page."
+msgstr ""
+
 #: lms/djangoapps/student_account/views.py
 msgid "No user with the provided email address exists."
 msgstr ""
@@ -7903,20 +7800,20 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "No photo ID was provided."
-msgstr "未提供带照片的身份证件。"
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "We couldn't read your name from your photo ID image."
-msgstr "我们无法从你身份证件的照片中获取你的姓名。"
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid ""
 "The name associated with your account and the name on your ID do not match."
-msgstr "你在账户中填写的姓名与你身份证件上的名字不相符。"
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The image of your face was not clear."
-msgstr "你面部的图像不够清晰。"
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "Your face was not visible in your self-photo."
@@ -7924,7 +7821,7 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
-msgstr "在验证你身份证件的照片时发生了一个错误。"
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "The course for which this deadline applies"
@@ -7966,7 +7863,7 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "Selected price is not valid number."
-msgstr "选择的价格不是有效数字。"
+msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "This course doesn't support paid certificates"
@@ -7974,7 +7871,7 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No selected price or selected price is below minimum."
-msgstr "未选择价格或选择的价格低于最低价。"
+msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid ""
@@ -8509,22 +8406,6 @@ msgstr "注意：请在操作完成后做一次人工检查。"
 msgid "Create new merged version"
 msgstr "创建新的合并版本"
 
-#: lms/templates/wiki/preview_inline.html
-msgid "Previewing revision:"
-msgstr "预览修改:"
-
-#: lms/templates/wiki/preview_inline.html
-msgid "Previewing a merge between two revisions:"
-msgstr "预览合并效果："
-
-#: lms/templates/wiki/preview_inline.html
-msgid "This revision has been deleted."
-msgstr "该修订已被删除。"
-
-#: lms/templates/wiki/preview_inline.html
-msgid "Restoring to this revision will mark the article as deleted."
-msgstr "恢复该修订将标记本文章为已删除状态。"
-
 #: lms/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
@@ -8681,7 +8562,8 @@ msgid ""
 msgstr "您可以从其他文章中重用一些文件。但是该文件的更新依赖于原始文章，请判断该引用关系是否恰当。"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/dashboard.html lms/templates/courseware/courses.html
+#: lms/templates/dashboard.html lms/templates/index.html
+#: lms/templates/courseware/courses.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -8737,18 +8619,34 @@ msgstr "修订版"
 msgid "There are no attachments for this article."
 msgstr "这篇文章没有附件"
 
+#: lms/templates/wiki/preview_inline.html
+msgid "Previewing revision:"
+msgstr "预览修改:"
+
+#: lms/templates/wiki/preview_inline.html
+msgid "Previewing a merge between two revisions:"
+msgstr "预览合并效果："
+
+#: lms/templates/wiki/preview_inline.html
+msgid "This revision has been deleted."
+msgstr "该修订已被删除。"
+
+#: lms/templates/wiki/preview_inline.html
+msgid "Restoring to this revision will mark the article as deleted."
+msgstr "恢复该修订将标记本文章为已删除状态。"
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
-msgstr "您无法创建两个具有相同名称的群组。"
+msgstr ""
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid ""
 "There must be one cohort to which students can automatically be assigned."
-msgstr "必须存在一个可以将学生自动分配进去的群组。"
+msgstr ""
 
 #: openedx/core/djangoapps/course_groups/views.py
 msgid "A cohort with the same name already exists."
-msgstr "具有相同名称的群组已存在。"
+msgstr ""
 
 #: openedx/core/djangoapps/credit/email_utils.py
 msgid "Course Credit Eligibility"
@@ -8855,8 +8753,48 @@ msgstr ""
 msgid "Enable Student Dashboard Displays"
 msgstr ""
 
+#: openedx/core/djangoapps/programs/models.py
+msgid "Cache Time To Live"
+msgstr ""
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"Specified in seconds. Enable caching by setting this to a value greater than"
+" 0."
+msgstr ""
+
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "The '{field_name}' field cannot be edited."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Delete failed for user preference '{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Preference '{preference_key}' cannot be set to an empty value."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Invalid user preference key '{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid ""
+"Value '{preference_value}' is not valid for user preference "
+"'{preference_key}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Save failed for user preference '{key}' with value '{value}'."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/preferences/views.py
+msgid "No data provided for user preference update"
 msgstr ""
 
 #. Translators: This example email address is used as a placeholder in
@@ -8950,7 +8888,7 @@ msgstr ""
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
-msgstr "服务条款和诚信准则"
+msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}."
@@ -8958,36 +8896,6 @@ msgstr ""
 
 #: openedx/core/djangoapps/user_api/views.py
 msgid "You must agree to the {platform_name} {terms_of_service}."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/accounts/api.py
-msgid "The '{field_name}' field cannot be edited."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Delete failed for user preference '{preference_key}'."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Preference '{preference_key}' cannot be set to an empty value."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Invalid user preference key '{preference_key}'."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid ""
-"Value '{preference_value}' is not valid for user preference "
-"'{preference_key}'."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Save failed for user preference '{key}' with value '{value}'."
-msgstr ""
-
-#: openedx/core/djangoapps/user_api/preferences/views.py
-msgid "No data provided for user preference update"
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -9087,10 +8995,6 @@ msgstr "提供了错误的课程地址"
 msgid "Missing branch on fresh clone"
 msgstr "在最近的复制中，丢失一些分支"
 
-#: cms/djangoapps/contentstore/utils.py
-msgid "Deleted group"
-msgstr ""
-
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -9098,6 +9002,10 @@ msgid ""
 msgstr ""
 "取得指定的课程然后尝试将其导出到一个Git源。\n"
 "课程目录必须已经是一个Git源。用法： git_export <course_loc> <git_url>"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Deleted group"
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid ""
@@ -10336,6 +10244,7 @@ msgid "There has been an error on the {platform_name} servers"
 msgstr "{platform_name} 平台的服务器发生了错误"
 
 #: lms/templates/module-error.html
+#: lms/templates/courseware/courseware-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -10816,7 +10725,7 @@ msgstr "{course_number} 教材"
 msgid "Textbook Navigation"
 msgstr "课本导航"
 
-#: lms/templates/staticbook.html
+#: lms/templates/staticbook.html lms/templates/courseware/gradebook.html
 msgid "Page"
 msgstr "页面"
 
@@ -11332,6 +11241,10 @@ msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 msgid "Enter username or email"
+msgstr ""
+
+#: lms/templates/ccx/enrollment.html
+msgid "Checking this box has no effect if 'Revoke' is clicked."
 msgstr ""
 
 #: lms/templates/ccx/grading_policy.html
@@ -11896,14 +11809,6 @@ msgstr "{course_number} 课程页面"
 msgid "Course Utilities"
 msgstr "课程工具"
 
-#: lms/templates/courseware/courseware-error.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {tech_support_email}' to "
-"report any problems or downtime."
-msgstr ""
-"非常抱歉，该模块暂时无法使用，我们的教员正在努力尽修复问题。要报告您发现的任何问题或遇到网站停摆，请向{tech_support_email}发送邮件"
-
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "搜索课程"
@@ -11942,6 +11847,18 @@ msgstr "成绩簿"
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
 msgstr "搜索学生"
+
+#: lms/templates/courseware/gradebook.html
+msgid "previous page"
+msgstr ""
+
+#: lms/templates/courseware/gradebook.html
+msgid "of"
+msgstr ""
+
+#: lms/templates/courseware/gradebook.html
+msgid "next page"
+msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
@@ -13793,6 +13710,12 @@ msgid "Generate Certificates"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Course certificate generation requires an activated web certificate "
+"configuration."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -13808,6 +13731,22 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "The status for any active tasks appears in a table below."
 msgstr "下表显示所有活动任务的状态。"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate Certificates"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Select one or more certificate statuses below using your mouse and ctrl or "
+"command key."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Select certificate statuses that need regeneration and click Regenerate "
+"Certificates button."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Certificate Exceptions"
@@ -19821,8 +19760,9 @@ msgstr "文档“%s”及其子链接已经被恢复。"
 
 #: wiki/views/article.py
 #, python-format
-msgid "The article %s is now set to display revision #%d"
-msgstr "文档%s当前被设置为显示修订版本#%d"
+msgid ""
+"The article %(title)s is now set to display revision #%(revision_number)d"
+msgstr ""
 
 #: wiki/views/article.py
 msgid "New title"

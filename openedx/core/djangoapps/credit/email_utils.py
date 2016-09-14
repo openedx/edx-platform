@@ -14,13 +14,12 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.staticfiles import finders
 from django.core.cache import cache
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, SafeMIMEText
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from eventtracking import tracker
 
 from edxmako.shortcuts import render_to_string
@@ -89,7 +88,7 @@ def send_credit_notifications(username, course_key):
 
     # add alternative plain text message
     email_body_plain = render_to_string('credit_notifications/credit_eligibility_email.txt', context)
-    msg_alternative.attach(MIMEText(email_body_plain, _subtype='plain', _charset='utf-8'))
+    msg_alternative.attach(SafeMIMEText(email_body_plain, _subtype='plain', _charset='utf-8'))
 
     # add alternative html message
     email_body_content = cache.get('credit.email.css-email-body')
@@ -109,7 +108,7 @@ def send_credit_notifications(username, course_key):
             email_body_content = ''
 
     email_body = Template(email_body_content).render([context])
-    msg_alternative.attach(MIMEText(email_body, _subtype='html', _charset='utf-8'))
+    msg_alternative.attach(SafeMIMEText(email_body, _subtype='html', _charset='utf-8'))
 
     # attach logo image
     if logo_image:

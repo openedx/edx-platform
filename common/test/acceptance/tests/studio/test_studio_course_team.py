@@ -32,9 +32,9 @@ class CourseTeamPageTest(StudioCourseTest):
         """
         super(CourseTeamPageTest, self).setUp(is_staff)
 
-        self.other_user = self._make_user('other')  # pylint:disable=attribute-defined-outside-init
-        self.dashboard_page = DashboardPage(self.browser)  # pylint:disable=attribute-defined-outside-init
-        self.page = CourseTeamPage(  # pylint:disable=attribute-defined-outside-init
+        self.other_user = self._make_user('other')
+        self.dashboard_page = DashboardPage(self.browser)
+        self.page = CourseTeamPage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
         self._go_to_course_team_page()

@@ -68,7 +68,7 @@ urlpatterns = patterns(
         'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
     url(r'^reset_student_attempts$',
         'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
-    url(  # pylint: disable=bad-continuation
+    url(
         r'^rescore_problem$',
         'instructor.views.api.rescore_problem',
         name="rescore_problem"
@@ -156,7 +156,10 @@ urlpatterns = patterns(
 
     # spoc gradebook
     url(r'^gradebook$',
-        'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+        'instructor.views.gradebook_api.spoc_gradebook', name='spoc_gradebook'),
+
+    url(r'^gradebook/(?P<offset>[0-9]+)$',
+        'instructor.views.gradebook_api.spoc_gradebook', name='spoc_gradebook'),
 
     # Blank LTI csv
     url(
@@ -208,6 +211,10 @@ urlpatterns = patterns(
     url(r'^start_certificate_generation',
         'instructor.views.api.start_certificate_generation',
         name='start_certificate_generation'),
+
+    url(r'^start_certificate_regeneration',
+        'instructor.views.api.start_certificate_regeneration',
+        name='start_certificate_regeneration'),
 
     url(r'^create_certificate_exception/(?P<white_list_student>[^/]*)',
         'instructor.views.api.create_certificate_exception',

@@ -156,8 +156,7 @@ class CommentListGetFormTest(FormTestMixin, PaginationTestMixin, TestCase):
                 "thread_id": "deadbeef",
                 "endorsed": False,
                 "page": 2,
-                "page_size": 13,
-                "mark_as_read": False
+                "page_size": 13
             }
         )
 

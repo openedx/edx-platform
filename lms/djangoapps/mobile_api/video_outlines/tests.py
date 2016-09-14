@@ -2,6 +2,7 @@
 """
 Tests for video outline API
 """
+
 import ddt
 import itertools
 from uuid import uuid4

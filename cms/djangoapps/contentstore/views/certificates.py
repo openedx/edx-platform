@@ -245,7 +245,7 @@ class CertificateManager(object):
         """
         for cert_index, cert in enumerate(course.certificates['certificates']):  # pylint: disable=unused-variable
             if int(cert['id']) == int(certificate_id):
-                for sig_index, signatory in enumerate(cert.get('signatories')):  # pylint: disable=unused-variable
+                for sig_index, signatory in enumerate(cert.get('signatories')):
                     if int(signatory_id) == int(signatory['id']):
                         _delete_asset(course.id, signatory['signature_image_path'])
                         del cert['signatories'][sig_index]

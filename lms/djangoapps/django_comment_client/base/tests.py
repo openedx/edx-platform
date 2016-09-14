@@ -5,15 +5,15 @@ import json
 import ddt
 
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.test.client import Client, RequestFactory
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from request_cache.middleware import RequestCache
 from mock import patch, ANY, Mock
-from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from nose.tools import assert_true, assert_equal
+from opaque_keys.edx.keys import CourseKey
 from lms.lib.comment_client import Thread
 
 from common.test.utils import MockSignalHandlerMixin, disable_signal
@@ -24,7 +24,7 @@ from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
 from student.tests.factories import CourseEnrollmentFactory, UserFactory, CourseAccessRoleFactory
-from teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory, CourseTeamMembershipFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -360,7 +360,7 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
     def clear_caches(self):
         """Clears caches so that query count numbers are accurate."""
         for cache in settings.CACHES:
-            get_cache(cache).clear()
+            caches[cache].clear()
         RequestCache.clear_request_cache()
 
     def count_queries(func):  # pylint: disable=no-self-argument
@@ -378,10 +378,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 23),
-        (ModuleStoreEnum.Type.mongo, 20, 4, 23),
-        (ModuleStoreEnum.Type.split, 3, 13, 23),
-        (ModuleStoreEnum.Type.split, 20, 13, 23),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 27),
+        (ModuleStoreEnum.Type.mongo, 20, 4, 27),
+        (ModuleStoreEnum.Type.split, 3, 13, 27),
+        (ModuleStoreEnum.Type.split, 20, 13, 27),
     )
     @ddt.unpack
     @count_queries
@@ -389,10 +389,10 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 17),
-        (ModuleStoreEnum.Type.mongo, 20, 3, 17),
-        (ModuleStoreEnum.Type.split, 3, 10, 17),
-        (ModuleStoreEnum.Type.split, 20, 10, 17),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 21),
+        (ModuleStoreEnum.Type.mongo, 20, 3, 21),
+        (ModuleStoreEnum.Type.split, 3, 10, 21),
+        (ModuleStoreEnum.Type.split, 20, 10, 21),
     )
     @ddt.unpack
     @count_queries
@@ -1641,6 +1641,40 @@ class ForumEventTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         self.assertEqual(name, event_name)
         self.assertEqual(event['team_id'], team.team_id)
 
+    @ddt.data(
+        ('vote_for_thread', 'thread_id', 'thread'),
+        ('undo_vote_for_thread', 'thread_id', 'thread'),
+        ('vote_for_comment', 'comment_id', 'response'),
+        ('undo_vote_for_comment', 'comment_id', 'response'),
+    )
+    @ddt.unpack
+    @patch('eventtracking.tracker.emit')
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def test_thread_voted_event(self, view_name, obj_id_name, obj_type, mock_request, mock_emit):
+        undo = view_name.startswith('undo')
+
+        self._set_mock_request_data(mock_request, {
+            'closed': False,
+            'commentable_id': 'test_commentable_id',
+            'username': 'gumprecht',
+        })
+        request = RequestFactory().post('dummy_url', {})
+        request.user = self.student
+        request.view_name = view_name
+        view_function = getattr(views, view_name)
+        kwargs = dict(course_id=unicode(self.course.id))
+        kwargs[obj_id_name] = obj_id_name
+        if not undo:
+            kwargs.update(value='up')
+        view_function(request, **kwargs)
+
+        self.assertTrue(mock_emit.called)
+        event_name, event = mock_emit.call_args[0]
+        self.assertEqual(event_name, 'edx.forum.{}.voted'.format(obj_type))
+        self.assertEqual(event['target_username'], 'gumprecht')
+        self.assertEqual(event['undo_vote'], undo)
+        self.assertEqual(event['vote_value'], 'up')
+
 
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 
@@ -1699,7 +1733,7 @@ class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         self.assertNotIn("users", content)
 
     def test_course_does_not_exist(self):
-        course_id = SlashSeparatedCourseKey.from_deprecated_string("does/not/exist")
+        course_id = CourseKey.from_string("does/not/exist")
         response = self.make_request(course_id=course_id, username="other")
 
         self.assertEqual(response.status_code, 404)

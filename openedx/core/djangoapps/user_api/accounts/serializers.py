@@ -70,7 +70,11 @@ class UserReadOnlySerializer(serializers.Serializer):
                 reverse('accounts_api', kwargs={'username': user.username})
             ),
             "email": user.email,
-            "date_joined": user.date_joined,
+            # For backwards compatibility: Tables created after the upgrade to Django 1.8 will save microseconds.
+            # However, mobile apps are not expecting microsecond in the serialized value. If we set it to zero the
+            # DRF JSONEncoder will not include it in the serialized value.
+            # https://docs.djangoproject.com/en/1.8/ref/databases/#fractional-seconds-support-for-time-and-datetime-fields
+            "date_joined": user.date_joined.replace(microsecond=0),
             "is_active": user.is_active,
             "bio": AccountLegacyProfileSerializer.convert_empty_to_None(profile.bio),
             "country": AccountLegacyProfileSerializer.convert_empty_to_None(profile.country.code),
@@ -91,7 +95,7 @@ class UserReadOnlySerializer(serializers.Serializer):
             "level_of_education": AccountLegacyProfileSerializer.convert_empty_to_None(profile.level_of_education),
             "mailing_address": profile.mailing_address,
             "requires_parental_consent": profile.requires_parental_consent(),
-            "account_privacy": UserPreference.get_value(user, 'account_privacy'),
+            "account_privacy": self._get_profile_visibility(profile, user),
         }
 
         return self._filter_fields(
@@ -185,19 +189,19 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer, Rea
             raise serializers.ValidationError("The language_proficiencies field must consist of unique languages")
         return value
 
-    def transform_gender(self, user_profile, value):
+    def transform_gender(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
-    def transform_country(self, user_profile, value):
+    def transform_country(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
-    def transform_level_of_education(self, user_profile, value):
+    def transform_level_of_education(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 
-    def transform_bio(self, user_profile, value):
+    def transform_bio(self, user_profile, value):  # pylint: disable=unused-argument
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
         return AccountLegacyProfileSerializer.convert_empty_to_None(value)
 

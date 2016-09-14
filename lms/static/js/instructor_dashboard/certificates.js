@@ -1,4 +1,5 @@
 var edx = edx || {};
+var onCertificatesReady = null;
 
 (function($, gettext, _) {
     'use strict';
@@ -6,7 +7,7 @@ var edx = edx || {};
     edx.instructor_dashboard = edx.instructor_dashboard || {};
     edx.instructor_dashboard.certificates = {};
 
-    $(function() {
+    onCertificatesReady = function() {
         /**
          * Show a confirmation message before letting staff members
          * enable/disable self-generated certificates for a course.
@@ -59,7 +60,52 @@ var edx = edx || {};
                 }
             });
         });
-    });
+
+        /**
+         * Start regenerating certificates for students.
+         */
+        $section.on('click', '#btn-start-regenerating-certificates', function(event) {
+            if ( !confirm( gettext('Start regenerating certificates for students in this course?') ) ) {
+                event.preventDefault();
+                return;
+            }
+
+            var $btn_regenerating_certs = $(this),
+                $certificate_regeneration_status = $('.certificate-regeneration-status'),
+                url = $btn_regenerating_certs.data('endpoint');
+
+            $.ajax({
+                type: "POST",
+                data: $("#certificate-regenerating-form").serializeArray(),
+                url: url,
+                success: function (data) {
+                    $btn_regenerating_certs.attr('disabled','disabled');
+                    if(data.success){
+                        $certificate_regeneration_status.text(data.message).
+                            removeClass('msg-error').addClass('msg-success');
+                    }
+                    else{
+                        $certificate_regeneration_status.text(data.message).
+                            removeClass('msg-success').addClass("msg-error");
+                    }
+                },
+                error: function(jqXHR) {
+                    try{
+                        var response = JSON.parse(jqXHR.responseText);
+                        $certificate_regeneration_status.text(gettext(response.message)).
+                            removeClass('msg-success').addClass("msg-error");
+                    }catch(error){
+                        $certificate_regeneration_status.
+                            text(gettext('Error while regenerating certificates. Please try again.')).
+                            removeClass('msg-success').addClass("msg-error");
+                    }
+                }
+            });
+        });
+    };
+
+    // Call onCertificatesReady on document.ready event
+    $(onCertificatesReady);
 
     var Certificates = (function() {
         function Certificates($section) {

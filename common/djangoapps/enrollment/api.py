@@ -3,7 +3,7 @@ Enrollment API for creating, updating, and deleting enrollments. Also provides a
 course level, such as available course modes.
 
 """
-from django.utils import importlib
+import importlib
 import logging
 from django.conf import settings
 from django.core.cache import cache

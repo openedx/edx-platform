@@ -84,7 +84,6 @@ def _load_mixed_class(category):
     return mixologist.mix(component_class)
 
 
-# pylint: disable=unused-argument
 @require_GET
 @login_required
 def container_handler(request, usage_key_string):

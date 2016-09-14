@@ -418,6 +418,7 @@ class CourseFields(object):
     )
     has_children = True
     checklists = List(
+        help=_("Checklist to Follow When Developing a Course"),
         scope=Scope.settings,
         default=[
             {
@@ -823,7 +824,8 @@ class CourseFields(object):
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),
-        scope=Scope.settings
+        scope=Scope.settings,
+        default=""
     )
 
     max_student_enrollments_allowed = Integer(
@@ -1011,7 +1013,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             # Then remove show_timezone so that if the user clears out the due_date_display_format,
             # they get the default date display.
             self.due_date_display_format = "DATE_TIME"
-            delattr(self, 'show_timezone')
+            del self.show_timezone
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)

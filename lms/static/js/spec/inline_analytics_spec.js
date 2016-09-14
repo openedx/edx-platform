@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/inline_analytics'],
+define(['backbone', 'jquery', 'common/js/spec_helpers/ajax_helpers', 'js/inline_analytics'],
     function(Backbone, $, AjaxHelpers, InlineAnalytics) {
 
         describe('InlineAnalyticsActions', function() {

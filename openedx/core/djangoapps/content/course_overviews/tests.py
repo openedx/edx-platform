@@ -367,13 +367,31 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             with mock.patch(
                 'openedx.core.djangoapps.content.course_overviews.models.CourseOverview._get_pk_val'
             ) as mock_get_pk_val:
-
                 mock_get_pk_val.return_value = None
+                # This method was not present in django 1.4. Django 1.8 calls this method if
+                # _get_pk_val returns None.  This method will return empty str if there is no
+                # default value present. So mock it to avoid returning the empty str as primary key
+                # value. Due to empty str, model.save will do an update instead of insert which is
+                # incorrect and get exception in
+                # common.djangoapps.xmodule_django.models.OpaqueKeyField.get_prep_value
+                with mock.patch('django.db.models.Field.get_pk_value_on_save') as mock_get_pk_value_on_save:
 
-                # verify the CourseOverview is loaded successfully both times,
-                # including after an IntegrityError exception the 2nd time
-                for _ in range(2):
-                    self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
+                    mock_get_pk_value_on_save.return_value = None
+
+                    # The CourseOverviewTab entries can't get properly created when the CourseOverview used as a
+                    # foreign key has a None 'id' - the bulk_create raises an IntegrityError. Mock out the
+                    # CourseOverviewTab creation, as those record creations aren't what is being tested in this test.
+                    # This mocking makes the first get_from_id() succeed with no IntegrityError - the 2nd one raises
+                    # an IntegrityError for the reason listed above.
+                    with mock.patch(
+                        'openedx.core.djangoapps.content.course_overviews.models.CourseOverviewTab.objects.bulk_create'
+                    ) as mock_bulk_create:
+                        mock_bulk_create.return_value = None
+
+                        # Verify the CourseOverview is loaded successfully both times,
+                        # including after an IntegrityError exception the 2nd time.
+                        for _ in range(2):
+                            self.assertIsInstance(CourseOverview.get_from_id(course.id), CourseOverview)
 
     def test_course_overview_version_update(self):
         """

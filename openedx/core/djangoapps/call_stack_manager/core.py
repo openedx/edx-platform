@@ -138,10 +138,10 @@ class CallStackMixin(object):
 
 class CallStackManager(Manager):
     """ Manager class which overrides the default Manager class for getting call stacks """
-    def get_query_set(self):
+    def get_queryset(self):
         """ Override the default queryset API method """
         capture_call_stack(self.model)
-        return super(CallStackManager, self).get_query_set()
+        return super(CallStackManager, self).get_queryset()
 
 
 def donottrack(*entities_not_to_be_tracked):

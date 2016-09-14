@@ -14,7 +14,7 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.core.mail import send_mail
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -201,7 +201,8 @@ def _do_cme_create_account(post_vars):
     # @todo: Rearrange so that if part of the process fails, the whole process fails.
     # Right now, we can have e.g. no registration e-mail sent out and a zombie account
     try:
-        user.save()
+        with transaction.atomic():
+            user.save()
     except IntegrityError:
         json_string = {'success': False}
         # Figure out the cause of the integrity error

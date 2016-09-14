@@ -24,6 +24,9 @@ class BrandingInfoConfig(ConfigurationModel):
             }
         }
     """
+    class Meta(ConfigurationModel.Meta):
+        app_label = "branding"
+
     configuration = TextField(
         help_text="JSON data of Configuration for Video Branding."
     )
@@ -54,4 +57,5 @@ class BrandingApiConfig(ConfigurationModel):
 
     When the flag is enabled, the api will returns the valid reponse.
     """
-    pass
+    class Meta(ConfigurationModel.Meta):
+        app_label = "branding"

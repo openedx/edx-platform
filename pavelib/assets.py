@@ -138,8 +138,8 @@ class SassWatcher(PatternMatchingEventHandler):
     def on_modified(self, event):
         print('\tCHANGED:', event.src_path)
         try:
-            compile_sass()
-        except Exception:  # pylint: disable=broad-except
+            compile_sass()      # pylint: disable=no-value-for-parameter
+        except Exception:       # pylint: disable=broad-except
             traceback.print_exc()
 
 

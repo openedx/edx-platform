@@ -294,6 +294,10 @@
                 exports: 'coffee/src/instructor_dashboard/student_admin',
                 deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
             },
+            'js/instructor_dashboard/certificates': {
+                exports: 'js/instructor_dashboard/certificates',
+                deps: ['jquery', 'gettext', 'underscore']
+            },
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
                 exports: 'js/student_account/account',
@@ -313,7 +317,7 @@
             },
             'js/ccx/schedule': {
                 exports: 'js/ccx/schedule',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext']
+                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
             },
             'js/inline_analytics': {
             	exports: 'js/inline_analytics',
@@ -650,6 +654,7 @@
         'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
         'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
         'lms/include/js/spec/instructor_dashboard/certificates_exception_spec.js',
+        'lms/include/js/spec/instructor_dashboard/certificates_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/logistration_factory_spec.js',

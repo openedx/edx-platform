@@ -162,7 +162,7 @@ class AccountView(APIView):
         else an error response with status code 415 will be returned.
         """
         try:
-            with transaction.commit_on_success():
+            with transaction.atomic():
                 update_account_settings(request.user, request.data, username=username)
                 account_settings = get_account_settings(request, username)
         except UserNotAuthorized:

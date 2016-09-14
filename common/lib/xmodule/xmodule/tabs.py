@@ -76,7 +76,7 @@ class CourseTab(object):
         self.is_hidden = tab_dict.get('is_hidden', False)
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         """Returns true if this course tab is enabled in the course.
 
         Args:
@@ -253,7 +253,7 @@ class StaticTab(CourseTab):
         super(StaticTab, self).__init__(tab_dict)
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         """
         Static tabs are viewable to everyone, even anonymous users.
         """
