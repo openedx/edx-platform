@@ -142,10 +142,11 @@ messages = xblock.validate().to_json()
         <article class="xblock-render">
         ${content}
         </article>
-        <footer class="component-id-footer">
-            <div class="component-id-container">
-                <label>${_('Component ID:')}
-                    <span>${ xblock.location.block_id }</span>
+        <footer class="location-footer">
+            <div class="location-container">
+                <label class="location-label">
+                    <span class="location-label-text">${_('Location:')}</span>
+                    <input class="location-value" type="text" value="${ xblock.location }" disabled />
                 </label>
             </div>
         </footer>
