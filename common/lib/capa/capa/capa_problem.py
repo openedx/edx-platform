@@ -951,7 +951,13 @@ class LoncapaProblem(object):
 
                 if p_tag and p_tag[0].text == inputfields[0].attrib['label']:
                     label = p_tag[0].text
-                    element_to_be_deleted = p_tag[0]
+
+                    p_tag_children = list(p_tag[0])
+                    if len(p_tag_children) == 0:
+                        element_to_be_deleted = p_tag[0]
+                    else:
+                        # Delete the text from the p-tag, but leave the children.
+                        p_tag[0].text = ''
             else:
                 # In this case the problems don't have tag or label attribute inside the responsetype
                 # so we will get the first preceding label tag w.r.t to this responsetype.
