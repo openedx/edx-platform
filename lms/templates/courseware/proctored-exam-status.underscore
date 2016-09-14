@@ -8,7 +8,7 @@
     %>
     <div class='exam-text'>
         <%= interpolate_text('You are taking "{exam_link}" as a {exam_type} exam. The timer on the right shows the time remaining in the exam.', {exam_link: "<a href='" + exam_url_path + "'>"+gtLtEscape(exam_display_name)+"</a>", exam_type: (!_.isUndefined(arguments[0].exam_type)) ? exam_type : gettext('timed')}) %>
-        <%- gettext('To receive credit on a problem, you must click "Check" or "Final Check" on it before you select "End My Exam".') %>
+        <%- gettext('To receive credit for problems, you must select "Submit" for each problem before you select "End My Exam".') %>
     </div>
     <div id="turn_in_exam_id" class="pull-right turn_in_exam">
         <span>
