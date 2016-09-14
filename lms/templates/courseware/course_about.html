@@ -24,8 +24,8 @@ from edxmako.shortcuts import marketing_link
 
   ## OG (Open Graph) title and description added below to give social media info to display
   ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
-  <meta property="og:title" content="${get_course_about_section(course, 'title')}" />
-  <meta property="og:description" content="${get_course_about_section(course, 'short_description')}" />
+  <meta property="og:title" content="${get_course_about_section(request, course, 'title')}" />
+  <meta property="og:description" content="${get_course_about_section(request, course, 'short_description')}" />
 </%block>
 
 <%block name="js_extra">
@@ -133,7 +133,7 @@ from edxmako.shortcuts import marketing_link
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="pagetitle">${get_course_about_section(course, "title")}</%block>
+<%block name="pagetitle">${get_course_about_section(request, course, "title")}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -142,9 +142,9 @@ from edxmako.shortcuts import marketing_link
       <section class="intro">
         <hgroup>
           <h1>
-            ${get_course_about_section(course, "title")}
+            ${get_course_about_section(request, course, "title")}
             % if not self.theme_enabled():
-              <a href="#">${get_course_about_section(course, "university")}</a>
+              <a href="#">${get_course_about_section(request, course, "university")}</a>
             % endif
           </h1>
         </hgroup>
@@ -206,7 +206,7 @@ from edxmako.shortcuts import marketing_link
         </div>
 
       </section>
-      % if get_course_about_section(course, "video"):
+      % if get_course_about_section(request, course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
           <img src="${course_image_url(course)}" alt="" />
@@ -242,7 +242,7 @@ from edxmako.shortcuts import marketing_link
       </nav>
 
       <div class="inner-wrapper">
-        ${get_course_about_section(course, "overview")}
+        ${get_course_about_section(request, course, "overview")}
       </div>
       % if sneakpeek_allowed and not regularly_registered:
         <section class="unauth-tos" id="unauth-tos">
@@ -274,7 +274,7 @@ from edxmako.shortcuts import marketing_link
                 ## Twitter account. {url} should appear at the end of the text.
                 tweet_text = _("I just enrolled in {number} {title} through {account}: {url}").format(
                     number=course.number,
-                    title=get_course_about_section(course, 'title'),
+                    title=get_course_about_section(request, course, 'title'),
                     account=microsite.get_value('course_about_twitter_account', settings.PLATFORM_TWITTER_ACCOUNT),
                     url=u"http://{domain}{path}".format(
                         domain=site_domain,
@@ -289,7 +289,7 @@ from edxmako.shortcuts import marketing_link
                     subject=_("Take a course with {platform} online").format(platform=platform_name),
                     body=_("I just enrolled in {number} {title} through {platform} {url}").format(
                         number=course.number,
-                        title=get_course_about_section(course, 'title'),
+                        title=get_course_about_section(request, course, 'title'),
                         platform=platform_name,
                         url=u"http://{domain}{path}".format(
                             domain=site_domain,
@@ -319,13 +319,13 @@ from edxmako.shortcuts import marketing_link
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
-            % if get_course_about_section(course, "end_date") or course.end:
+            % if get_course_about_section(request, course, "end_date") or course.end:
             <li class="important-dates-item">
                 <i class="icon fa fa-calendar"></i>
                 <p class="important-dates-item-title">${_("Classes End")}</p>
                 <span class="important-dates-item-text final-date">
-                    % if get_course_about_section(course, "end_date"):
-                        ${get_course_about_section(course, "end_date")}
+                    % if get_course_about_section(request, course, "end_date"):
+                        ${get_course_about_section(request, course, "end_date")}
                     % else:
                         ${course.end_datetime_text()}
                     % endif
@@ -333,8 +333,8 @@ from edxmako.shortcuts import marketing_link
             </li>
             % endif
 
-          % if get_course_about_section(course, "effort"):
-            <li class="important-dates-item"><i class="icon fa fa-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(course, "effort")}</span></li>
+          % if get_course_about_section(request, course, "effort"):
+            <li class="important-dates-item"><i class="icon fa fa-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(request, course, "effort")}</span></li>
           % endif
 
           ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
@@ -363,36 +363,36 @@ from edxmako.shortcuts import marketing_link
             </p>
           </li>
           % endif
-          % if get_course_about_section(course, "prerequisites"):
-            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
+          % if get_course_about_section(request, course, "prerequisites"):
+            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Requirements")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(request, course, "prerequisites")}</span></li>
           % endif
         </ol>
       % if self.course_about_sidebar_extra_file:
           <%include file="${self.course_about_sidebar_extra_file}" />
       % endif
       </section>
-  
-  
-        ## For now, ocw links are the only thing that goes in additional resources
-        % if get_course_about_section(course, "ocw_links"):
-          <section class="additional-resources">
-            <header>
-              <h1>${_("Additional Resources")}</h1>
-            </header>
-        
-            <section>
-              ## "MITOpenCourseware" should *not* be translated
-              <h2 class="opencourseware">MITOpenCourseware</h2>
-                 ${get_course_about_section(course, "ocw_links")}
-            </section>
+
+
+      ## For now, ocw links are the only thing that goes in additional resources
+      % if get_course_about_section(request, course, "ocw_links"):
+      <section class="additional-resources">
+        <header>
+          <h1>${_("Additional Resources")}</h1>
+        </header>
+
+        <section>
+          ## "MITOpenCourseware" should *not* be translated
+          <h2 class="opencourseware">MITOpenCourseware</h2>
+             ${get_course_about_section(request, course, "ocw_links")}
+        </section>
+      </section>
+      %endif
+
+      % if get_course_about_section(request, course, "about_sidebar_html"):
+          <section class="about-sidebar-html">
+              ${get_course_about_section(request, course, "about_sidebar_html")}
           </section>
-        %endif
-        
-        % if get_course_about_section(course, "about_sidebar_html"):
-            <section class="about-sidebar-html">
-                ${get_course_about_section(course, "about_sidebar_html")}
-            </section>
-        %endif
+      %endif
     </section>
   </section>
 </section>

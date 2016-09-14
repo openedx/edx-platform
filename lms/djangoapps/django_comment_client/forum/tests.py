@@ -18,6 +18,7 @@ from django_comment_client.tests.group_id import (
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.utils import strip_none
+from student.models import UserProfile
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
@@ -30,13 +31,12 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 
 from courseware.courses import UserNotEnrolled
-from nose.tools import assert_true  # pylint: disable=E0611
+from nose.tools import assert_true
 from mock import patch, Mock, ANY, call
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
-from teams.tests.factories import CourseTeamFactory
-from student.models import UserProfile
+from lms.djangoapps.teams.tests.factories import CourseTeamFactory
 
 log = logging.getLogger(__name__)
 
@@ -338,11 +338,11 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
 
     @ddt.data(
         # old mongo with cache
-        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 15, 8),
-        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 15, 8),
+        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 16, 8),
+        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 16, 8),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 15, 8),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 15, 8),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 16, 8),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 16, 8),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(

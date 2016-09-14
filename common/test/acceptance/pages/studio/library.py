@@ -9,6 +9,7 @@ from .component_editor import ComponentEditorView
 from .container import XBlockWrapper
 from ...pages.studio.users import UsersPageMixin
 from ...pages.studio.pagination import PaginatedMixin
+from selenium.webdriver.common.keys import Keys
 
 from ..common.utils import confirm_prompt, wait_for_notification
 
@@ -168,7 +169,8 @@ class StudioLibraryContentEditor(ComponentEditorView):
         Sets value of children count input
         """
         count_text = self.get_setting_element(self.COUNT_LABEL)
-        count_text.clear()
+        count_text.send_keys(Keys.CONTROL, "a")
+        count_text.send_keys(Keys.BACK_SPACE)
         count_text.send_keys(count)
         EmptyPromise(lambda: self.count == count, "count is updated in modal.").fulfill()
 

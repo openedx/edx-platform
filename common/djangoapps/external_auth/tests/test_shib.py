@@ -13,7 +13,7 @@ from django.test.client import RequestFactory, Client as DjangoTestClient
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
-from django.utils.importlib import import_module
+from importlib import import_module
 from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
 from external_auth.views import _safe_postlogin_redirect

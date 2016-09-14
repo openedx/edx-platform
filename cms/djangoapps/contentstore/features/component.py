@@ -6,7 +6,7 @@
 # pylint: disable=unused-argument
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_in, assert_equal
 
 DISPLAY_NAME = "Display Name"
 

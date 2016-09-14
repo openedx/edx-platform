@@ -29,6 +29,8 @@ class IntegrationTestLTI(testutil.TestCase):
 
     def setUp(self):
         super(IntegrationTestLTI, self).setUp()
+        self.client.defaults['SERVER_NAME'] = 'testserver'
+        self.url_prefix = 'http://testserver'
         self.configure_lti_provider(
             name='Other Tool Consumer 1', enabled=True,
             lti_consumer_key='other1',

@@ -1,7 +1,7 @@
 """
 Test the views served by third_party_auth.
 """
-# pylint: disable=no-member
+
 import ddt
 from lxml import etree
 from onelogin.saml2.errors import OneLogin_Saml2_Error

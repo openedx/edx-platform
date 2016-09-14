@@ -13,7 +13,8 @@ from search.search_engine_base import SearchEngine
 from request_cache import get_request_or_stub
 
 from .errors import ElasticSearchConnectionError
-from .serializers import CourseTeamSerializer, CourseTeam
+from lms.djangoapps.teams.models import CourseTeam
+from .serializers import CourseTeamSerializer
 
 
 def if_search_enabled(f):

@@ -1,6 +1,4 @@
-
 # -*- coding: utf-8 -*-
-# pylint: disable=abstract-method
 """Video is ungraded Xmodule for support video content.
 It's new improved video module, which support additional feature:
 - Can play non-YouTube video sources via in-browser HTML5 video player.
@@ -39,7 +37,7 @@ from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_fie
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 
-from .transcripts_utils import VideoTranscriptsMixin
+from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
 from .video_utils import create_youtube_string, get_video_from_cdn, get_poster
 from .bumper_utils import bumperize
 from .video_xfields import VideoFields
@@ -430,6 +428,23 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         This should be fixed too.
         """
         metadata_was_changed_by_user = old_metadata != own_metadata(self)
+
+        # There is an edge case when old_metadata and own_metadata are same and we are importing transcript from youtube
+        # then there is a syncing issue where html5_subs are not syncing with youtube sub, We can make sync better by
+        # checking if transcript is present for the video and if any html5_ids transcript is not present then trigger
+        # the manage_video_subtitles_save to create the missing transcript with particular html5_id.
+        if not metadata_was_changed_by_user and self.sub and hasattr(self, 'html5_sources'):
+            html5_ids = get_html5_ids(self.html5_sources)
+            for subs_id in html5_ids:
+                try:
+                    Transcript.asset(self.location, subs_id)
+                except NotFoundError:
+                    # If a transcript does not not exist with particular html5_id then there is no need to check other
+                    # html5_ids because we have to create a new transcript with this missing html5_id by turning on
+                    # metadata_was_changed_by_user flag.
+                    metadata_was_changed_by_user = True
+                    break
+
         if metadata_was_changed_by_user:
             manage_video_subtitles_save(
                 self,

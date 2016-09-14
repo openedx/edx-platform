@@ -9,11 +9,11 @@ from django.db import transaction, IntegrityError
 
 import request_cache
 
-from courseware.field_overrides import FieldOverrideProvider  # pylint: disable=import-error
+from courseware.field_overrides import FieldOverrideProvider
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 
-from .models import CcxFieldOverride, CustomCourseForEdX
+from lms.djangoapps.ccx.models import CcxFieldOverride, CustomCourseForEdX
 
 
 log = logging.getLogger(__name__)
@@ -125,7 +125,7 @@ def _get_overrides_for_ccx(ccx):
     return overrides_cache[ccx]
 
 
-@transaction.commit_on_success
+@transaction.atomic
 def override_field_for_ccx(ccx, block, name, value):
     """
     Overrides a field for the `ccx`.  `block` and `name` specify the block
@@ -142,18 +142,15 @@ def override_field_for_ccx(ccx, block, name, value):
         override_has_changes = serialized_value != override.value
 
     if not override:
-        try:
-            override = CcxFieldOverride.objects.create(
-                ccx=ccx,
-                location=block.location,
-                field=name,
-                value=serialized_value
-            )
+        override, created = CcxFieldOverride.objects.get_or_create(
+            ccx=ccx,
+            location=block.location,
+            field=name,
+            defaults={'value': serialized_value},
+        )
+        if created:
             _get_overrides_for_ccx(ccx).setdefault(block.location, {})[name + "_id"] = override.id
-        except IntegrityError:
-            transaction.commit()
-            kwargs = {'ccx': ccx, 'location': block.location, 'field': name}
-            override = CcxFieldOverride.objects.get(**kwargs)
+        else:
             override_has_changes = serialized_value != override.value
 
     if override_has_changes:

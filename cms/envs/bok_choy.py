@@ -13,11 +13,6 @@ from the same directory.
 import os
 from path import Path as path
 
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
-
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.

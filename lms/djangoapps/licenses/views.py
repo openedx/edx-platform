@@ -87,4 +87,4 @@ def user_software_license(request):
     else:
         response = {'error': 'No serial number found'}
 
-    return HttpResponse(json.dumps(response), mimetype='application/json')
+    return HttpResponse(json.dumps(response), content_type='application/json')

@@ -23,7 +23,6 @@ from django.utils.translation import ugettext
 __all__ = ['checklists_handler']
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie

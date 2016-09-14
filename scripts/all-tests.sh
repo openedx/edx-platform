@@ -11,8 +11,8 @@ set -e
 ###############################################################################
 
 # Violations thresholds for failing the build
-export PYLINT_THRESHOLD=5650
-export JSHINT_THRESHOLD=3700
+export PYLINT_THRESHOLD=5555
+export JSHINT_THRESHOLD=9080
 
 doCheckVars() {
     if [ -n "$CIRCLECI" ] ; then

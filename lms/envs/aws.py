@@ -44,7 +44,7 @@ CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
 ################################ ALWAYS THE SAME ##############################
 
 DEBUG = False
-TEMPLATE_DEBUG = False
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = False
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
@@ -73,11 +73,6 @@ BROKER_HEARTBEAT_CHECKRATE = 2
 
 # Each worker should only fetch one message at a time
 CELERYD_PREFETCH_MULTIPLIER = 1
-
-# Skip djcelery migrations, since we don't use the database as the broker
-SOUTH_MIGRATION_MODULES = {
-    'djcelery': 'ignore',
-}
 
 # Rename the exchange and queues for each variant
 
@@ -170,7 +165,18 @@ REGISTRATION_EXTRA_FIELDS = ENV_TOKENS.get('REGISTRATION_EXTRA_FIELDS', REGISTRA
 EDXMKTG_LOGGED_IN_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_LOGGED_IN_COOKIE_NAME', EDXMKTG_LOGGED_IN_COOKIE_NAME)
 EDXMKTG_USER_INFO_COOKIE_NAME = ENV_TOKENS.get('EDXMKTG_USER_INFO_COOKIE_NAME', EDXMKTG_USER_INFO_COOKIE_NAME)
 
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
+for feature, value in ENV_FEATURES.items():
+    FEATURES[feature] = value
+
 CMS_BASE = ENV_TOKENS.get('CMS_BASE', 'studio.edx.org')
+
+ALLOWED_HOSTS = [
+    # TODO: bbeggs remove this before prod, temp fix to get load testing running
+    "*",
+    ENV_TOKENS.get('LMS_BASE'),
+    FEATURES['PREVIEW_LMS_BASE'],
+]
 
 # allow for environments to specify what cookie name our login subsystem should use
 # this is to fix a bug regarding simultaneous logins between edx.org and edge.edx.org which can
@@ -259,10 +265,6 @@ USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 # Additional installed apps
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS += (app,)
-
-ENV_FEATURES = ENV_TOKENS.get('FEATURES', {})
-for feature, value in ENV_FEATURES.items():
-    FEATURES[feature] = value
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
@@ -441,6 +443,12 @@ FILE_UPLOAD_STORAGE_PREFIX = ENV_TOKENS.get('FILE_UPLOAD_STORAGE_PREFIX', FILE_U
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
 DATABASES = AUTH_TOKENS['DATABASES']
+
+# Enable automatic transaction management on all databases
+# https://docs.djangoproject.com/en/1.8/topics/db/transactions/#tying-transactions-to-http-requests
+# This needs to be true for all databases
+for database_name in DATABASES:
+    DATABASES[database_name]['ATOMIC_REQUESTS'] = True
 
 XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 
@@ -709,10 +717,11 @@ ECOMMERCE_API_TIMEOUT = ENV_TOKENS.get('ECOMMERCE_API_TIMEOUT', ECOMMERCE_API_TI
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ('ccx',)
+    INSTALLED_APPS += ('lms.djangoapps.ccx',)
     FIELD_OVERRIDE_PROVIDERS += (
-        'ccx.overrides.CustomCoursesForEdxOverrideProvider',
+        'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
+CCX_MAX_STUDENTS_ALLOWED = ENV_TOKENS.get('CCX_MAX_STUDENTS_ALLOWED', CCX_MAX_STUDENTS_ALLOWED)
 
 ##### Individual Due Date Extensions #####
 if FEATURES.get('INDIVIDUAL_DUE_DATES'):

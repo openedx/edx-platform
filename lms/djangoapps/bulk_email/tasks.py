@@ -286,7 +286,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
     return progress
 
 
-@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)  # pylint: disable=not-callable
+@task(default_retry_delay=settings.BULK_EMAIL_DEFAULT_RETRY_DELAY, max_retries=settings.BULK_EMAIL_MAX_RETRIES)
 def send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status_dict):
     """
     Sends an email to a list of recipients.

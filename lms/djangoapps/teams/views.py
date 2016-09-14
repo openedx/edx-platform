@@ -36,9 +36,9 @@ from courseware.courses import get_course_with_access, has_access
 from student.models import CourseEnrollment, CourseAccessRole
 from student.roles import CourseStaffRole
 from django_comment_client.utils import has_discussion_privileges
-from teams import is_feature_enabled
 from util.model_utils import truncate_fields
-from .models import CourseTeam, CourseTeamMembership
+from . import is_feature_enabled
+from lms.djangoapps.teams.models import CourseTeam, CourseTeamMembership
 from .serializers import (
     CourseTeamSerializer,
     CourseTeamCreationSerializer,
@@ -421,7 +421,6 @@ class TeamsListView(ExpandableFieldViewMixin, GenericAPIView):
         username = request.query_params.get('username', None)
         if username is not None:
             result_filter.update({'membership__user__username': username})
-
         topic_id = request.query_params.get('topic_id', None)
         if topic_id is not None:
             if topic_id not in [topic['id'] for topic in course_module.teams_configuration['topics']]:

@@ -12,7 +12,7 @@ from django.test import TestCase
 from django.test.client import Client
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
-from nose.tools import assert_true  # pylint: disable=no-name-in-module
+from nose.tools import assert_true
 
 from licenses.models import CourseSoftware, UserLicense
 

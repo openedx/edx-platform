@@ -75,7 +75,7 @@ class StaffGradingTab(EnrolledTab):
     view_name = "staff_grading"
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
             return False
         if user and not has_access(user, 'staff', course, course.id):
@@ -94,7 +94,7 @@ class PeerGradingTab(EnrolledTab):
     view_name = "peer_grading"
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
             return False
         if not super(PeerGradingTab, cls).is_enabled(course, user=user):
@@ -113,7 +113,7 @@ class OpenEndedGradingTab(EnrolledTab):
     view_name = "open_ended_notifications"
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         if XBlockDisableConfig.is_block_type_disabled('combinedopenended'):
             return False
         if not super(OpenEndedGradingTab, cls).is_enabled(course, user=user):
@@ -373,7 +373,7 @@ def take_action_on_flags(request, course_id):
                 'success': False,
                 'error': STAFF_ERROR_MESSAGE + error_message
             }
-            return HttpResponse(json.dumps(response), mimetype="application/json")
+            return HttpResponse(json.dumps(response), content_type="application/json")
 
     p = request.POST
     submission_id = p['submission_id']
@@ -387,7 +387,7 @@ def take_action_on_flags(request, course_id):
     controller_qs = create_controller_query_service()
     try:
         response = controller_qs.take_action_on_flags(course_key, student_id, submission_id, action_type)
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")
     except GradingServiceError:
         log.exception(
             u"Error taking action on flagged peer grading submissions, "
@@ -398,4 +398,4 @@ def take_action_on_flags(request, course_id):
             'success': False,
             'error': STAFF_ERROR_MESSAGE
         }
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")

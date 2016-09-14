@@ -74,20 +74,21 @@ class StudentModuleHistoryCleaner(object):
 
         batch_size = batch_size or self.BATCH_SIZE
 
-        transaction.enter_transaction_management()
-
         self.last_student_module_id = self.get_last_student_module_id()
         self.load_state()
 
         while self.next_student_module_id <= self.last_student_module_id:
-            for smid in self.module_ids_to_check(batch_size):
-                try:
-                    self.clean_one_student_module(smid)
-                except Exception:       # pylint: disable=broad-except
-                    trace = traceback.format_exc()
-                    self.say("Couldn't clean student_module_id {}:\n{}".format(smid, trace))
-            if not self.dry_run:
-                self.commit()
+            with transaction.atomic():
+                for smid in self.module_ids_to_check(batch_size):
+                    try:
+                        self.clean_one_student_module(smid)
+                    except Exception:       # pylint: disable=broad-except
+                        trace = traceback.format_exc()
+                        self.say("Couldn't clean student_module_id {}:\n{}".format(smid, trace))
+                if self.dry_run:
+                    transaction.set_rollback(True)
+                else:
+                    self.say("Committing")
             self.save_state()
             if sleep:
                 time.sleep(sleep)
@@ -100,13 +101,6 @@ class StudentModuleHistoryCleaner(object):
 
         """
         print message
-
-    def commit(self):
-        """
-        Commit the transaction.
-        """
-        self.say("Committing")
-        transaction.commit()
 
     def load_state(self):
         """

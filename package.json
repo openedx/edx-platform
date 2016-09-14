@@ -6,6 +6,7 @@
     "uglify-js": "2.4.24"
   },
   "devDependencies": {
-    "jshint": "^2.7.0"
+    "jshint": "^2.7.0",
+    "edx-custom-a11y-rules": "edx/edx-custom-a11y-rules"
   }
 }

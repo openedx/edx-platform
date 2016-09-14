@@ -12,11 +12,6 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
-
 from .common import *
 
 DEBUG = True
@@ -59,6 +54,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ENV_ROOT / "db" / "edx.db",
+        'ATOMIC_REQUESTS': True,
     }
 }
 
@@ -205,9 +201,6 @@ LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 FEATURES['AUTH_USE_OPENID'] = True
 FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
-
-INSTALLED_APPS += ('external_auth',)
-INSTALLED_APPS += ('django_openid_auth',)
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True

@@ -114,7 +114,7 @@ class SysadminDashboardView(TemplateView):
                 writer.writerow(row)
             csv_data = read_and_flush()
             yield csv_data
-        response = HttpResponse(csv_data(), mimetype='text/csv')
+        response = HttpResponse(csv_data(), content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(
             filename)
         return response
@@ -665,7 +665,7 @@ class Staffing(SysadminDashboardView):
             raise Http404
         data = []
 
-        for course in self.get_courses():  # pylint: disable=unused-variable
+        for course in self.get_courses():
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
@@ -699,7 +699,7 @@ class Staffing(SysadminDashboardView):
             data = []
             roles = [CourseInstructorRole, CourseStaffRole, ]
 
-            for course in self.get_courses():  # pylint: disable=unused-variable
+            for course in self.get_courses():
                 for role in roles:
                     for user in role(course.id).users_with_role():
                         datum = [course.id, role, user.username, user.email,
@@ -768,7 +768,7 @@ class GitLogs(TemplateView):
         else:
             try:
                 course = get_course_by_id(course_id)
-            except Exception:  # pylint: disable=broad-except
+            except Exception:
                 log.info('Cannot find course %s', course_id)
                 raise Http404
 

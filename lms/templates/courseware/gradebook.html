@@ -118,7 +118,23 @@ from django.core.urlresolvers import reverse
         </tbody>
       </table>
     </div>
+    <span class="grade-book-footer">
+        %if page["previous_offset"] is not None:
+          <a href="${page_url}?offset=${page['previous_offset']}"
+             class="sequence-nav-button button-previous">
+            <span class="icon fa fa-chevron-left" aria-hidden="true"></span><span class="sr">${_('previous page')}</span>
+          </a>
+        %endif
 
+        ${_('Page')} ${page["page_num"]} ${_('of')} ${page["total_pages"]}
+
+        %if page["next_offset"] is not None:
+          <a href="${page_url}?offset=${page['next_offset']}"
+             class="sequence-nav-button button-next">
+            <span class="icon fa fa-chevron-right" aria-hidden="true"></span><span class="sr">${_('next page')}</span>
+          </a>
+        %endif
+    </span>
     %endif
   </section>
 </div>

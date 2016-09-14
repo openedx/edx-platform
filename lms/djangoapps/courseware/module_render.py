@@ -48,6 +48,7 @@ from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.lib.inline_analytics_utils import add_inline_analytics
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
     replace_jump_to_id_urls,
@@ -78,8 +79,7 @@ from util.keyword_substitution import substitute_keywords_with_data
 from util.model_utils import slugify
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 from util import milestones_helpers
-from verify_student.services import ReverificationService
-from openedx.core.lib.inline_analytics_utils import add_inline_analytics
+from lms.djangoapps.verify_student.services import ReverificationService
 
 from edx_proctoring.services import ProctoringService
 from openedx.core.djangoapps.credit.services import CreditService
@@ -603,7 +603,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         )
 
         module.descriptor.scope_ids = (
-            module.descriptor.scope_ids._replace(user_id=real_user.id)  # pylint: disable=protected-access
+            module.descriptor.scope_ids._replace(user_id=real_user.id)
         )
         module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
@@ -783,7 +783,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
     system.set(u'user_is_staff', user_is_staff)
     system.set(u'user_is_admin', bool(has_access(user, u'staff', 'global')))
     system.set(u'user_is_beta_tester', CourseBetaTesterRole(course_id).has_user(user))
-    system.set(u'days_early_for_beta', getattr(descriptor, 'days_early_for_beta'))
+    system.set(u'days_early_for_beta', descriptor.days_early_for_beta)
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, u'staff', descriptor.location, course_id):
@@ -836,7 +836,7 @@ def get_module_for_descriptor_internal(user, descriptor, student_data, course_id
         ],
     )
 
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
 
     # Do not check access when it's a noauth request.
     # Not that the access check needs to happen after the descriptor is bound
@@ -1036,7 +1036,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
-        return JsonResponse(object={'success': error_msg}, status=413)
+        return JsonResponse({'success': error_msg}, status=413)
 
     # Make a CourseKey from the course_id, raising a 404 upon parse error.
     try:
@@ -1079,7 +1079,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, course
         except ProcessingError as err:
             log.warning("Module encountered an error while processing AJAX call",
                         exc_info=True)
-            return JsonResponse(object={'success': err.args[0]}, status=200)
+            return JsonResponse({'success': err.args[0]}, status=200)
 
         # If any other error occurred, re-raise it to trigger a 500 response
         except Exception:

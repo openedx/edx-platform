@@ -18,15 +18,16 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
-from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
 from django.shortcuts import redirect
-import string  # pylint: disable=deprecated-module
+from util.db import outer_atomic
+import string
 import random
 import unicodecsv
 import urllib
@@ -85,7 +86,6 @@ from instructor.enrollment import (
     unenroll_email,
 )
 from instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
-from instructor.offline_gradecalc import student_grades
 import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
@@ -97,7 +97,7 @@ from instructor.lti_grader import LTIGrader
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from certificates import api as certs_api
-from certificates.models import CertificateWhitelist
+from certificates.models import CertificateWhitelist, GeneratedCertificate
 
 from bulk_email.models import CourseEmail
 from student.models import get_user_by_username_or_email
@@ -453,11 +453,12 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                     password = generate_unique_password(generated_passwords)
 
                     try:
-                        enrollment_obj = create_and_enroll_user(email, username, name, country, password, course_id)
-                        reason = 'Enrolling via csv upload'
-                        ManualEnrollmentAudit.create_manual_enrollment_audit(
-                            request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
-                        )
+                        with transaction.atomic():
+                            enrollment_obj = create_and_enroll_user(email, username, name, country, password, course_id)
+                            reason = 'Enrolling via csv upload'
+                            ManualEnrollmentAudit.create_manual_enrollment_audit(
+                                request.user, email, UNENROLLED_TO_ENROLLED, reason, enrollment_obj
+                            )
                     except IntegrityError:
                         row_errors.append({
                             'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
@@ -642,6 +643,7 @@ def students_update_enrollment(request, course_id):
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_allowed = before.to_dict()['allowed']
+                enrollment_obj = CourseEnrollment.get_enrollment(user, course_id)
 
                 if before_enrollment:
                     state_transition = ENROLLED_TO_UNENROLLED
@@ -1343,6 +1345,7 @@ def save_group_name(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1364,7 +1367,7 @@ def get_problem_responses(request, course_id):
     try:
         problem_key = UsageKey.from_string(problem_location)
         # Are we dealing with an "old-style" problem location?
-        run = getattr(problem_key, 'run')
+        run = problem_key.run
         if not run:
             problem_key = course_key.make_usage_key_from_deprecated_string(problem_location)
         if problem_key.course_key != course_key:
@@ -1418,7 +1421,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     query_features = [
         'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
-        'total_amount', 'created_at', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
+        'total_amount', 'created', 'customer_reference_number', 'recipient_name', 'recipient_email', 'created_by',
         'internal_reference', 'invoice_number', 'codes', 'course_id'
     ]
 
@@ -1442,7 +1445,7 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument, redefined-outer-name
+def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument
     """
     return the summary of all sales records for a particular course
     """
@@ -1545,10 +1548,11 @@ def re_validate_invoice(obj_invoice):
     return JsonResponse({'message': message})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_issued_certificates(request, course_id):  # pylint: disable=invalid-name
+def get_issued_certificates(request, course_id):
     """
     Responds with JSON if CSV is not required. contains a list of issued certificates.
     Arguments:
@@ -1584,6 +1588,7 @@ def get_issued_certificates(request, course_id):  # pylint: disable=invalid-name
         return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1662,6 +1667,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
             return JsonResponse({"status": already_running_status})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1693,6 +1699,7 @@ def get_students_who_may_enroll(request, course_id):
         return JsonResponse({"status": already_running_status})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_POST
@@ -1767,6 +1774,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', csv_columns, data_rows)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1790,6 +1798,7 @@ def get_enrollment_report(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1814,6 +1823,7 @@ def get_exec_summary_report(request, course_id):
     })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1837,6 +1847,7 @@ def get_course_survey_results(request, course_id):
     })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1847,6 +1858,7 @@ def get_proctored_exam_results(request, course_id):
     query_features = [
         'user_email',
         'exam_name',
+        'attempt_code',
         'allowed_time_limit_mins',
         'is_sample_attempt',
         'started_at',
@@ -1906,7 +1918,8 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None,
         invoice_item=invoice_item
     )
     try:
-        course_registration.save()
+        with transaction.atomic():
+            course_registration.save()
         return course_registration
     except IntegrityError:
         return save_registration_code(
@@ -1946,7 +1959,7 @@ def random_code_generator():
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def get_registration_codes(request, course_id):  # pylint: disable=unused-argument
+def get_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Registration Codes.
     """
@@ -2062,7 +2075,7 @@ def generate_registration_codes(request, course_id):
     course_price = course_mode.min_price
 
     registration_codes = []
-    for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
+    for __ in range(course_code_number):
         generated_registration_code = save_registration_code(
             request.user, course_id, course_mode.slug, invoice=sale_invoice, order=None, invoice_item=invoice_item
         )
@@ -2149,7 +2162,7 @@ def generate_registration_codes(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def active_registration_codes(request, course_id):  # pylint: disable=unused-argument
+def active_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Active Registration Codes.
     """
@@ -2180,7 +2193,7 @@ def active_registration_codes(request, course_id):  # pylint: disable=unused-arg
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def spent_registration_codes(request, course_id):  # pylint: disable=unused-argument
+def spent_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Spent(used) Registration Codes.
     """
@@ -2221,7 +2234,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 
     def csv_response(filename, header, rows):
         """Returns a CSV http response for the given header and rows (excel/utf-8)."""
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(unicode(filename).encode('utf-8'))
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
         # In practice, there should not be non-ascii data in this query,
@@ -2270,6 +2283,7 @@ def get_student_progress_url(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2351,6 +2365,7 @@ def reset_student_attempts(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2416,6 +2431,7 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -2471,6 +2487,7 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
@@ -2677,6 +2694,7 @@ def list_financial_report_downloads(_request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2699,6 +2717,7 @@ def calculate_grades_csv(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2806,6 +2825,7 @@ def list_forum_members(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2971,7 +2991,7 @@ def send_email(request, course_id):
     )
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=no-member
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -3218,46 +3238,6 @@ def enable_certificate_generation(request, course_id=None):
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-#---- Gradebook (shown to small courses only) ----
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-def spoc_gradebook(request, course_id):
-    """
-    Show the gradebook for this course:
-    - Only shown for courses with enrollment < settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    - Only displayed to course staff
-    """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_with_access(request.user, 'staff', course_key, depth=None)
-
-    enrolled_students = User.objects.filter(
-        courseenrollment__course_id=course_key,
-        courseenrollment__is_active=1
-    ).order_by('username').select_related("profile")
-
-    # possible extension: implement pagination to show to large courses
-
-    student_info = [
-        {
-            'username': student.username,
-            'id': student.id,
-            'email': student.email,
-            'grade_summary': student_grades(student, request, course),
-            'realname': student.profile.name,
-        }
-        for student in enrolled_students
-    ]
-
-    return render_to_response('courseware/gradebook.html', {
-        'students': student_info,
-        'course': course,
-        'course_id': course_key,
-        # Checked above
-        'staff_access': True,
-        'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
-    })
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -3336,6 +3316,7 @@ def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
@@ -3355,6 +3336,45 @@ def start_certificate_generation(request, course_id):
     return JsonResponse(response_payload)
 
 
+@transaction.non_atomic_requests
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_global_staff
+@require_POST
+def start_certificate_regeneration(request, course_id):
+    """
+    Start regenerating certificates for students whose certificate statuses lie with in 'certificate_statuses'
+    entry in POST data.
+    """
+    course_key = CourseKey.from_string(course_id)
+    certificates_statuses = request.POST.getlist('certificate_statuses', [])
+    if not certificates_statuses:
+        return JsonResponse(
+            {'message': _('Please select one or more certificate statuses that require certificate regeneration.')},
+            status=400
+        )
+
+    # Check if the selected statuses are allowed
+    allowed_statuses = GeneratedCertificate.get_unique_statuses(course_key=course_key, flat=True)
+    if not set(certificates_statuses).issubset(allowed_statuses):
+        return JsonResponse(
+            {'message': _('Please select certificate statuses from the list only.')},
+            status=400
+        )
+    try:
+        instructor_task.api.regenerate_certificates(request, course_key, certificates_statuses)
+    except AlreadyRunningError as error:
+        return JsonResponse({'message': error.message}, status=400)
+
+    response_payload = {
+        'message': _('Certificate regeneration task has been started. '
+                     'You can view the status of the generation task in the "Pending Tasks" section.'),
+        'success': True
+    }
+    return JsonResponse(response_payload)
+
+
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
@@ -3372,13 +3392,15 @@ def create_certificate_exception(request, course_id, white_list_student=None):
             'success': False,
             'message': _('Invalid Json data')
         }, status=400)
-    try:
-        certificate_white_list, students = process_certificate_exceptions(certificate_white_list, course_key)
-    except ValueError as error:
-        return JsonResponse(
-            {'success': False, 'message': error.message, 'data': json.dumps(certificate_white_list)},
-            status=400
-        )
+
+    with outer_atomic():
+        try:
+            certificate_white_list, students = process_certificate_exceptions(certificate_white_list, course_key)
+        except ValueError as error:
+            return JsonResponse(
+                {'success': False, 'message': error.message, 'data': json.dumps(certificate_white_list)},
+                status=400
+            )
 
     if white_list_student == 'all':
         # Generate Certificates for all white listed students

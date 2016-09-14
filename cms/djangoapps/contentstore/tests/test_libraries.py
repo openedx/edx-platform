@@ -114,7 +114,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         if user not in self.session_data:
             self.session_data[user] = {}
         request = Mock(user=user, session=self.session_data[user])
-        _load_preview_module(request, descriptor)  # pylint: disable=protected-access
+        _load_preview_module(request, descriptor)
 
     def _update_item(self, usage_key, metadata):
         """

@@ -467,7 +467,7 @@ class ChoiceGroup(InputTypeBase):
             raise Exception(msg)
 
         self.choices = self.extract_choices(self.xml, i18n)
-        self._choices_map = dict(self.choices,)  # pylint: disable=attribute-defined-outside-init
+        self._choices_map = dict(self.choices,)
 
     @classmethod
     def get_attributes(cls):

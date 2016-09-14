@@ -20,7 +20,7 @@ from xmodule.validation import StudioValidationMessage, StudioValidation
 from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from .xml_module import XmlDescriptor
-from pkg_resources import resource_string  # pylint: disable=no-name-in-module
+from pkg_resources import resource_string
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
 #  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
@@ -618,7 +618,6 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     @classmethod
     def definition_from_xml(cls, xml_object, system):
         children = [
-            # pylint: disable=no-member
             system.process_xml(etree.tostring(child)).scope_ids.usage_id
             for child in xml_object.getchildren()
         ]
@@ -630,7 +629,6 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
     def definition_to_xml(self, resource_fs):
         """ Exports Library Content Module to XML """
-        # pylint: disable=no-member
         xml_object = etree.Element('library_content')
         for child in self.get_children():
             self.runtime.add_block_as_child_node(child, xml_object)

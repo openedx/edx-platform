@@ -250,7 +250,7 @@ def _get_user_and_profile(username):
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
-@transaction.commit_on_success
+@transaction.atomic
 def create_account(username, password, email):
     """Create a new user account.
 

@@ -327,10 +327,6 @@ def _has_access_course_desc(user, action, course):
         """
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
         it's past the enrollment period, they should still see it.
-
-        TODO (vshnayder): This means that courses with limited enrollment periods will not appear
-        to non-staff visitors after the enrollment period is over.  If this is not what we want, will
-        need to change this logic.
         """
         # VS[compat] -- this setting should go away once all courses have
         # properly configured enrollment_start times (if course should be
@@ -425,7 +421,7 @@ _COURSE_OVERVIEW_CHECKERS = {
     ),
     'view_courseware_with_prerequisites': _can_view_courseware_with_prerequisites
 }
-COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()  # pylint: disable=invalid-name
+COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()
 
 
 def _has_access_course_overview(user, action, course_overview):
@@ -742,7 +738,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint: disable=invalid-name,unused-argument
+def _adjust_start_date_for_beta_testers(user, descriptor, course_key):  # pylint: disable=invalid-name
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.

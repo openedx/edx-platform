@@ -3,7 +3,7 @@ import json
 import random
 import logging
 import lxml.html
-from lxml.etree import XMLSyntaxError, ParserError  # pylint:disable=no-name-in-module
+from lxml.etree import XMLSyntaxError, ParserError
 from uuid import uuid4
 
 from django.test.client import RequestFactory
@@ -17,7 +17,7 @@ from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey
 from course_modes.models import CourseMode
 from student.models import UserProfile, CourseEnrollment
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 from certificates.models import (
     GeneratedCertificate,

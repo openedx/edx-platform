@@ -31,10 +31,11 @@ echo "CREATE DATABASE IF NOT EXISTS edxtest;" | mysql -u root
 ./manage.py lms --settings bok_choy reset_db --traceback --noinput
 
 # If there are cached database schemas/data, load them
-if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_data.json ]]; then
+if [[ -f $DB_CACHE_DIR/bok_choy_schema.sql && -f $DB_CACHE_DIR/bok_choy_migrations_data.sql && -f $DB_CACHE_DIR/bok_choy_data.json ]]; then
 
     # Load the schema, then the data (including the migration history)
     mysql -u root edxtest < $DB_CACHE_DIR/bok_choy_schema.sql
+    mysql -u root edxtest < $DB_CACHE_DIR/bok_choy_migrations_data.sql
     ./manage.py lms --settings bok_choy loaddata $DB_CACHE_DIR/bok_choy_data.json
 
     # Re-run migrations to ensure we are up-to-date
@@ -48,13 +49,13 @@ else
     rm -rf $DB_CACHE_DIR && mkdir -p $DB_CACHE_DIR
 
     # Re-run migrations on the test database
-    ./manage.py lms --settings bok_choy syncdb --traceback --noinput
-    ./manage.py cms --settings bok_choy syncdb --traceback --noinput
     ./manage.py lms --settings bok_choy migrate --traceback --noinput
     ./manage.py cms --settings bok_choy migrate --traceback --noinput
 
     # Dump the schema and data to the cache
     ./manage.py lms --settings bok_choy dumpdata > $DB_CACHE_DIR/bok_choy_data.json
+    # dump_data does not dump the django_migrations table so we do it separately.
+    mysqldump -u root --no-create-info edxtest django_migrations > $DB_CACHE_DIR/bok_choy_migrations_data.sql
     mysqldump -u root --no-data --skip-comments --skip-dump-date edxtest > $DB_CACHE_DIR/bok_choy_schema.sql
 fi
 

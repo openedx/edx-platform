@@ -165,7 +165,7 @@ class ProfileImageViewGeneralTestCase(ProfileImageEndpointMixin, APITestCase):
         """
         self.assertEqual(405, self.client.get(self.url).status_code)
         self.assertEqual(405, self.client.put(self.url).status_code)
-        self.assertEqual(405, self.client.patch(self.url).status_code)  # pylint: disable=no-member
+        self.assertEqual(405, self.client.patch(self.url).status_code)
         self.assertFalse(mock_log.info.called)
         self.assert_no_events_were_emitted()
 

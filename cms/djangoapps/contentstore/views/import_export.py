@@ -59,7 +59,6 @@ log = logging.getLogger(__name__)
 CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11})")
 
 
-# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
@@ -359,7 +358,6 @@ def _save_request_status(request, key, status):
     request.session.save()
 
 
-# pylint: disable=unused-argument
 @require_GET
 @ensure_csrf_cookie
 @login_required
@@ -458,7 +456,6 @@ def send_tarball(tarball):
     return response
 
 
-# pylint: disable=unused-argument
 @ensure_csrf_cookie
 @login_required
 @require_http_methods(("GET",))

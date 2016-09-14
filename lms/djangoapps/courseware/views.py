@@ -18,6 +18,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.utils.timezone import UTC
 from django.http import HttpResponseNotFound, HttpResponseServerError
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
@@ -27,7 +28,6 @@ from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from django.db import transaction
 from markupsafe import escape
 
 from courseware import grades
@@ -67,6 +67,7 @@ from student.models import UserTestGroup, CourseEnrollment
 from student.views import is_course_blocked
 from util.cache import cache, cache_if_anonymous
 from util.date_utils import strftime_localized
+from util.db import outer_atomic
 from xblock.fragment import Fragment
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -86,8 +87,6 @@ from util.date_utils import get_time_display
 
 from analyticsclient.client import Client
 from analyticsclient.exceptions import NotFoundError, InvalidRequestError, TimeoutError
-
-from util.db import commit_on_success_with_read_committed
 
 import survey.utils
 import survey.views
@@ -291,11 +290,12 @@ def save_positions_recursively_up(user, request, field_data_cache, xmodule, cour
         current_module = parent
 
 
+@transaction.non_atomic_requests
 @login_required
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @ensure_valid_course_key
-@commit_on_success_with_read_committed
+@outer_atomic(read_committed=True)
 def index(request, course_id, chapter=None, section=None,
           position=None):
     """
@@ -909,21 +909,17 @@ def course_about(request, course_id):
         })
 
 
+@transaction.non_atomic_requests
 @login_required
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@transaction.commit_manually
 @ensure_valid_course_key
 def progress(request, course_id, student_id=None):
-    """
-    Wraps "_progress" with the manual_transaction context manager just in case
-    there are unanticipated errors.
-    """
+    """ Display the progress page. """
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     with modulestore().bulk_operations(course_key):
-        with grades.manual_transaction():
-            return _progress(request, course_key, student_id)
+        return _progress(request, course_key, student_id)
 
 
 def _progress(request, course_key, student_id):
@@ -962,9 +958,12 @@ def _progress(request, course_key, student_id):
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
+
+    with outer_atomic():
+        field_data_cache = grades.field_data_cache_for_grading(course, student)
+        scores_client = ScoresClient.from_field_data_cache(field_data_cache)
+
     courseware_summary = []
-    field_data_cache = grades.field_data_cache_for_grading(course, student)
-    scores_client = ScoresClient.from_field_data_cache(field_data_cache)
     if settings.FEATURES['ENABLE_PROGRESS_SUMMARY']:
         courseware_summary = grades.progress_summary(
             student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
@@ -1014,7 +1013,7 @@ def _progress(request, course_key, student_id):
                     'download_url': None
                 })
 
-    with grades.manual_transaction():
+    with outer_atomic():
         response = render_to_response('courseware/progress.html', context)
 
     return response
@@ -1513,6 +1512,8 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     return success_cutoff and grade_summary['percent'] >= success_cutoff
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @require_POST
 def generate_user_cert(request, course_id):
     """Start generating a new certificate for the user.

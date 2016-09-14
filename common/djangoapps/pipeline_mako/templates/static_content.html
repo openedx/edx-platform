@@ -51,8 +51,11 @@ except:
 %></%def>
 
 <%def name="include(path)"><%
-from django.template.loaders.filesystem import _loader
-source, template_path = _loader.load_template_source(path)
+from django.conf import settings
+from django.template.engine import Engine
+from django.template.loaders.filesystem import Loader
+engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+source, template_path = Loader(engine).load_template_source(path)
 %>${source}</%def>
 
 <%def name="require_module(module_name, class_name)">

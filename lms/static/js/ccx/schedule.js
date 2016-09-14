@@ -104,23 +104,41 @@ var edx = edx || {};
 	    // Add unit handler
 	    $('#add-unit-button').on('click', function(event) {
 	      event.preventDefault();
-	      var chapter = self.chapter_select.val(),
-		  sequential = self.sequential_select.val(),
-		  vertical = self.vertical_select.val(),
-		  units = self.find_lineage(self.schedule,
-		    chapter,
-		    sequential === 'all' ? null : sequential,
-		    vertical === 'all' ? null: vertical),
-		  start = self.get_datetime('start'),
-		  due = self.get_datetime('due');
-	      units.map(self.show);
-	      var unit = units[units.length - 1];
-	      if (unit !== undefined && start) { unit.start = start; }
-	      if (unit !== undefined && due) { unit.due = due; }
-	      self.schedule_apply([unit], self.show);
-	      self.schedule_collection.set(self.schedule);
-	      self.dirty = true;
-	      self.render();
+	      // Default value of time is 00:00.
+	      var start, chapter, sequential, vertical, units, due;
+	      start = self.get_datetime('start');
+	      chapter = self.chapter_select.val();
+	      sequential = self.sequential_select.val();
+	      vertical = self.vertical_select.val();
+	      units = self.find_lineage(
+	        self.schedule,
+	        chapter,
+	        sequential === 'all' ? null : sequential,
+	        vertical === 'all' ? null : vertical
+	      );
+	      due = self.get_datetime('due');
+	      var errorMessage = self.valid_dates(start, due);
+	      if (_.isUndefined(errorMessage)) {
+	        units.map(self.show);
+	        var unit = units[units.length - 1];
+	        if (!_.isUndefined(unit)) {
+	          if (!_.isNull(start)) {
+	            unit.start = start;
+	          }
+	          if (!_.isNull(due)) {
+	            unit.due = due;
+	          }
+	        }
+	        self.schedule_apply([unit], self.show);
+	        self.schedule_collection.set(self.schedule);
+	        self.dirty = true;
+	        self.render();
+	      } else {
+	        self.dirty = false;
+	        $('#ccx_schedule_error_message').text(errorMessage);
+	        $('#ajax-error').show().focus();
+	        $('#dirty-schedule').hide();
+	      }
 	    });
 
 	    // Handle save button
@@ -251,9 +269,27 @@ var edx = edx || {};
 	    }
 	},
 
+	valid_dates: function(start, due) {
+          var errorMessage;
+          // Start date is compulsory and due date is optional.
+          if (_.isEmpty(start) && !_.isEmpty(due)) {
+            errorMessage = gettext("Please enter valid start date and time.");
+          } else if (!_.isEmpty(start) && !_.isEmpty(due)) {
+            var requirejs = window.require || RequireJS.require;
+            var moment = requirejs("moment");
+            var parsedDueDate = moment(due, 'YYYY-MM-DD HH:mm');
+            var parsedStartDate = moment(start, 'YYYY-MM-DD HH:mm');
+            if (parsedDueDate.isBefore(parsedStartDate)) {
+              errorMessage = gettext("Due date cannot be before start date.");
+            }
+          }
+          return errorMessage;
+	},
+
 	get_datetime: function(which) {
 	    var date = $('form#add-unit input[name=' + which + '_date]').val();
 	    var time = $('form#add-unit input[name=' + which + '_time]').val();
+	    time = _.isEmpty(time) ? "00:00" : time;
 	    if (date && time) {
 	      return date + ' ' + time; }
 	    return null;

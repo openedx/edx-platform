@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 
 from lettuce import world, step
-from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_equal
 from selenium.common.exceptions import StaleElementReferenceException
 
 
