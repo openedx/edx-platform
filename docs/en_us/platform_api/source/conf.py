@@ -8,6 +8,7 @@ import os
 from path import Path as path
 import sys
 import mock
+import datetime
 
 MOCK_MODULES = [
     'lxml',
@@ -241,7 +242,7 @@ extensions = [
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
     'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
 
-project = u'Open edX Platform APIs'
-copyright = u'2016, edX Inc. and licensed under a Creative Commons Attribution-ShareAlike 4.0 International License unless otherwise specified'
+project = 'Open edX Platform APIs'
+copyright = '{year}, edX Inc. and licensed under a Creative Commons Attribution-ShareAlike 4.0 International License unless otherwise specified'.format(year=datetime.datetime.now().year)
 
 exclude_patterns = ['build', 'links.rst']
