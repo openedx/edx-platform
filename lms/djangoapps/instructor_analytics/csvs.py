@@ -15,7 +15,7 @@ def create_csv_response(filename, header, datarows):
     header   e.g. ['Name', 'Email']
     datarows e.g. [['Jim', 'jim@edy.org'], ['Jake', 'jake@edy.org'], ...]
     """
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename={0}'\
         .format(filename)
     csvwriter = csv.writer(

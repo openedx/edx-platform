@@ -23,7 +23,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from certificates.api import get_certificate_url
 from certificates.models import (
     GeneratedCertificate,
-    BadgeAssertion,
     CertificateStatuses,
     CertificateSocialNetworks,
     CertificateTemplate,
@@ -33,6 +32,7 @@ from certificates.models import (
 from certificates.tests.factories import (
     CertificateHtmlViewConfigurationFactory,
     LinkedInAddToProfileConfigurationFactory,
+    BadgeAssertionFactory,
 )
 from util import organizations_helpers as organizations_api
 from django.test.client import RequestFactory
@@ -222,6 +222,104 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         self.assertIn('logo_test1.png', response.content)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
+    @patch.dict("django.conf.settings.SOCIAL_SHARING_SETTINGS", {
+        "CERTIFICATE_TWITTER": True,
+        "CERTIFICATE_FACEBOOK": True,
+    })
+    def test_rendering_maximum_data(self):
+        """
+        Tests at least one data item from different context update methods to
+        make sure every context update method is invoked while rendering certificate template.
+        """
+        long_org_name = 'Long org name'
+        short_org_name = 'short_org_name'
+        test_organization_data = {
+            'name': long_org_name,
+            'short_name': short_org_name,
+            'description': 'Test Organization Description',
+            'active': True,
+            'logo': '/logo_test1.png'
+        }
+        test_org = organizations_api.add_organization(organization_data=test_organization_data)
+        organizations_api.add_organization_course(organization_data=test_org, course_id=unicode(self.course.id))
+        self._add_course_certificates(count=1, signatory_count=1, is_active=True)
+        BadgeAssertionFactory.create(
+            user=self.user, course_id=self.course_id,
+        )
+        self.course.cert_html_view_overrides = {
+            "logo_src": "/static/certificates/images/course_override_logo.png"
+        }
+
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
+
+        test_url = get_certificate_url(
+            user_id=self.user.id,
+            course_id=unicode(self.course.id)
+        )
+        response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
+
+        # Test an item from basic info
+        self.assertIn(
+            'Terms of Service &amp; Honor Code',
+            response.content
+        )
+        self.assertIn(
+            'Certificate ID Number',
+            response.content
+        )
+        # Test an item from html cert configuration
+        self.assertIn(
+            '<a class="logo" href="http://www.edx.org/honor_logo.png">',
+            response.content
+        )
+        # Test an item from course info
+        self.assertIn(
+            'course_title_0',
+            response.content
+        )
+        # Test an item from user info
+        self.assertIn(
+            "{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
+            response.content
+        )
+        # Test an item from social info
+        self.assertIn(
+            "Post on Facebook",
+            response.content
+        )
+        self.assertIn(
+            "Share on Twitter",
+            response.content
+        )
+        # Test an item from certificate/org info
+        self.assertIn(
+            "a course of study offered by {partner_short_name}, "
+            "an online learning initiative of "
+            "{partner_long_name}.".format(
+                partner_short_name=short_org_name,
+                partner_long_name=long_org_name,
+                platform_name='Test Microsite'
+            ),
+            response.content
+        )
+        # Test item from badge info
+        self.assertIn(
+            "Add to Mozilla Backpack",
+            response.content
+        )
+        # Test item from microsite info
+        self.assertIn(
+            "http://www.testmicrosite.org/about-us",
+            response.content
+        )
+        # Test course overrides
+        self.assertIn(
+            "/static/certificates/images/course_override_logo.png",
+            response.content
+        )
+
+    @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_render_html_view_valid_certificate(self):
         test_url = get_certificate_url(
             user_id=self.user.id,
@@ -398,7 +496,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             course_id=unicode(self.course.id)
         )
         response = self.client.get(test_url + '?preview=honor')
-        #accessing certificate web view in preview mode without
+        # accessing certificate web view in preview mode without
         # staff or instructor access should show invalid certificate
         self.assertIn('Cannot Find Certificate', response.content)
 
@@ -454,8 +552,12 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
             user_id=self.user.id,
             course_id=unicode(self.course.id)
         )
-        response = self.client.get(test_url)
+        response = self.client.get(test_url + "?preview=honor")
         self.assertIn("Invalid Certificate Configuration", response.content)
+
+        # Verify that Exception is raised when certificate is not in the preview mode
+        with self.assertRaises(Exception):
+            self.client.get(test_url)
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_certificate_evidence_event_emitted(self):
@@ -491,16 +593,9 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         test_url = '{}?evidence_visit=1'.format(cert_url)
         self._add_course_certificates(count=1, signatory_count=2)
         self.recreate_tracker()
-        assertion = BadgeAssertion(
-            user=self.user, course_id=self.course_id, mode='honor',
-            data={
-                'image': 'http://www.example.com/image.png',
-                'json': {'id': 'http://www.example.com/assertion.json'},
-                'issuer': 'http://www.example.com/issuer.json',
-
-            }
+        assertion = BadgeAssertionFactory.create(
+            user=self.user, course_id=self.course_id,
         )
-        assertion.save()
         response = self.client.get(test_url)
         self.assertEqual(response.status_code, 200)
         assert_event_matches(
@@ -508,7 +603,6 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
                 'name': 'edx.badge.assertion.evidence_visited',
                 'data': {
                     'course_id': 'testorg/run1/refundable_course',
-                    # pylint: disable=no-member
                     'assertion_id': assertion.id,
                     'assertion_json_url': 'http://www.example.com/assertion.json',
                     'assertion_image_url': 'http://www.example.com/image.png',

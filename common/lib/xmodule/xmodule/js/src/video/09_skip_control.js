@@ -28,10 +28,14 @@ function() {
 
     SkipControl.prototype = {
         template: [
-            '<a class="video_control skip skip-control" href="#" title="',
-                gettext('Do not show again'), '" role="button" aria-disabled="false">',
-                gettext('Do not show again'),
-            '</a>'
+            '<button class="control video_control skip skip-control" aria-disabled="false">',
+                '<span class="icon-fallback-img">',
+                    '<span class="icon fa fa-step-forward" aria-hidden="true"></span>',
+                    '<span class="text control-text">',
+                        gettext('Do not show again'),
+                    '</span>',
+                '</span>',
+            '</button>'
         ].join(''),
 
         destroy: function () {
@@ -51,7 +55,7 @@ function() {
          * initial configuration.
          */
         render: function() {
-            this.state.el.find('.vcr a').after(this.el);
+            this.state.el.find('.vcr .control').after(this.el);
         },
 
         /** Bind any necessary function callbacks to DOM events. */

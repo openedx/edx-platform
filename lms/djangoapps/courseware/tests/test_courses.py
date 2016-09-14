@@ -198,12 +198,10 @@ class CoursesRenderTest(ModuleStoreTestCase):
             course_info = get_course_info_section(self.request, self.course, 'handouts')
             self.assertIn("this module is temporarily unavailable", course_info)
 
-    @mock.patch('courseware.courses.get_request_for_thread')
-    def test_get_course_about_section_render(self, mock_get_request):
-        mock_get_request.return_value = self.request
+    def test_get_course_about_section_render(self):
 
         # Test render works okay
-        course_about = get_course_about_section(self.course, 'short_description')
+        course_about = get_course_about_section(self.request, self.course, 'short_description')
         self.assertEqual(course_about, "A course about toys.")
 
         # Test when render raises an exception
@@ -211,7 +209,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
             mock_module_render.return_value = mock.MagicMock(
                 render=mock.Mock(side_effect=Exception('Render failed!'))
             )
-            course_about = get_course_about_section(self.course, 'short_description')
+            course_about = get_course_about_section(self.request, self.course, 'short_description')
             self.assertIn("this module is temporarily unavailable", course_about)
 
 

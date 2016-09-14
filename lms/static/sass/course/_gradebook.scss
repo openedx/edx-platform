@@ -80,6 +80,16 @@ div.gradebook-wrapper {
 		}
 	}
 
+	.grade-book-footer {
+	    position: relative;
+	    top: 15px;
+		width: 100%;
+		border: 0;
+		box-shadow: 0;
+		text-align: center;
+	    display: inline-block;
+	}
+
 	.grades {
 		position: relative;
 		float: left;

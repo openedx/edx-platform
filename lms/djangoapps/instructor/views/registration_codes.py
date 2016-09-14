@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_GET
-def look_up_registration_code(request, course_id):  # pylint: disable=unused-argument
+def look_up_registration_code(request, course_id):
     """
     Look for the registration_code in the database.
     and check if it is still valid, allowed to redeem or not.

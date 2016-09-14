@@ -35,7 +35,7 @@ class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
             'course_id': 'A/B/C',
         }
         json_analytics_data = json.dumps(analytics_data)
-        self.data = {'data': json_analytics_data}
+        self.data = json_analytics_data
         self.zendesk_response = (
             'A problem has occurred retrieving the data, to report the problem click '
             '<a href="{ZENDESK_URL}/hc/en-us/requests/new">here</a>'
@@ -43,7 +43,7 @@ class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
 
     @override_settings(ZENDESK_URL=ZENDESK_URL)
     def test_no_url(self):
-        request = self.factory.post('', self.data)
+        request = self.factory.post('', self.data, content_type='application/json')
         request.user = self.instructor
 
         response = get_analytics_answer_dist(request)
@@ -51,7 +51,7 @@ class InlineAnalyticsAnswerDistribution(ModuleStoreTestCase):
 
     @override_settings(ZENDESK_URL=None)
     def test_no_url_no_zendesk(self):
-        request = self.factory.post('', self.data)
+        request = self.factory.post('', self.data, content_type='application/json')
         request.user = self.instructor
 
         response = get_analytics_answer_dist(request)
@@ -443,14 +443,14 @@ class InlineAnalyticsAnswerDistributionWithOverrides(ModuleStoreTestCase):
             'course_id': 'A/B/C',
         }
         json_analytics_data = json.dumps(analytics_data)
-        self.data = {'data': json_analytics_data}
+        self.data = json_analytics_data
         self.zendesk_response = (
             'A problem has occurred retrieving the data, to report the problem click '
             '<a href="{ZENDESK_URL}/hc/en-us/requests/new">here</a>'
         ).format(ZENDESK_URL=ZENDESK_URL)
 
     def test_regular_user(self):
-        request = self.factory.post('', self.data)
+        request = self.factory.post('', self.data, content_type='application/json')
         request.user = self.user
 
         response = get_analytics_answer_dist(request)
@@ -461,7 +461,7 @@ class InlineAnalyticsAnswerDistributionWithOverrides(ModuleStoreTestCase):
     def test_staff_and_url(self, mock_client, mock_process_analytics):
         mock_client.return_value.modules.return_value.answer_distribution.return_value = [{}]
         factory = self.factory
-        request = factory.post('', self.data)
+        request = factory.post('', self.data, content_type='application/json')
         request.user = self.staff
 
         mock_process_analytics.return_value = [{'dummy': 'dummy'}]
@@ -474,7 +474,7 @@ class InlineAnalyticsAnswerDistributionWithOverrides(ModuleStoreTestCase):
         mock_client.return_value.modules.return_value.answer_distribution.return_value = [{}]
 
         factory = self.factory
-        request = factory.post('', self.data)
+        request = factory.post('', self.data, content_type='application/json')
         request.user = self.instructor
 
         mock_process_analytics.return_value = [{'dummy': 'dummy'}]
@@ -486,7 +486,7 @@ class InlineAnalyticsAnswerDistributionWithOverrides(ModuleStoreTestCase):
         mock_client.return_value.modules.return_value.answer_distribution.side_effect = NotFoundError
 
         factory = self.factory
-        request = factory.post('', self.data)
+        request = factory.post('', self.data, content_type='application/json')
         request.user = self.instructor
 
         response = get_analytics_answer_dist(request)
@@ -498,7 +498,7 @@ class InlineAnalyticsAnswerDistributionWithOverrides(ModuleStoreTestCase):
         mock_client.return_value.modules.return_value.answer_distribution.side_effect = InvalidRequestError
 
         factory = self.factory
-        request = factory.post('', self.data)
+        request = factory.post('', self.data, content_type='application/json')
         request.user = self.instructor
 
         response = get_analytics_answer_dist(request)
@@ -510,7 +510,7 @@ class InlineAnalyticsAnswerDistributionWithOverrides(ModuleStoreTestCase):
         mock_client.return_value.modules.return_value.answer_distribution.side_effect = TimeoutError
 
         factory = self.factory
-        request = factory.post('', self.data)
+        request = factory.post('', self.data, content_type='application/json')
         request.user = self.instructor
 
         response = get_analytics_answer_dist(request)

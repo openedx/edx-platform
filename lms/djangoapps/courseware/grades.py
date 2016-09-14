@@ -8,7 +8,6 @@ import logging
 
 from contextlib import contextmanager
 from django.conf import settings
-from django.db import transaction
 from django.test.client import RequestFactory
 from django.core.cache import cache
 
@@ -18,6 +17,7 @@ from courseware import courses
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache, ScoresClient
 from student.models import anonymous_id_for_user
+from util.db import outer_atomic
 from util.module_utils import yield_dynamic_descriptor_descendants
 from xmodule import graders
 from xmodule.graders import Score
@@ -295,27 +295,25 @@ def answer_distributions(course_key):
     return answer_counts
 
 
-@transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False, field_data_cache=None, scores_client=None):
     """
-    Wraps "_grade" with the manual_transaction context manager just in case
-    there are unanticipated errors.
-    Send a signal to update the minimum grade requirement status.
+    Returns the grade of the student.
+
+    Also sends a signal to update the minimum grade requirement status.
     """
-    with manual_transaction():
-        grade_summary = _grade(student, request, course, keep_raw_scores, field_data_cache, scores_client)
-        responses = GRADES_UPDATED.send_robust(
-            sender=None,
-            username=student.username,
-            grade_summary=grade_summary,
-            course_key=course.id,
-            deadline=course.end
-        )
+    grade_summary = _grade(student, request, course, keep_raw_scores, field_data_cache, scores_client)
+    responses = GRADES_UPDATED.send_robust(
+        sender=None,
+        username=student.username,
+        grade_summary=grade_summary,
+        course_key=course.id,
+        deadline=course.end
+    )
 
-        for receiver, response in responses:
-            log.info('Signal fired when student grade is calculated. Receiver: %s. Response: %s', receiver, response)
+    for receiver, response in responses:
+        log.info('Signal fired when student grade is calculated. Receiver: %s. Response: %s', receiver, response)
 
-        return grade_summary
+    return grade_summary
 
 
 def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_client):
@@ -339,11 +337,11 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
 
     More information on the format is in the docstring for CourseGrader.
     """
-    if field_data_cache is None:
-        with manual_transaction():
+    with outer_atomic():
+        if field_data_cache is None:
             field_data_cache = field_data_cache_for_grading(course, student)
-    if scores_client is None:
-        scores_client = ScoresClient.from_field_data_cache(field_data_cache)
+        if scores_client is None:
+            scores_client = ScoresClient.from_field_data_cache(field_data_cache)
 
     # Dict of item_ids -> (earned, possible) point tuples. This *only* grabs
     # scores that were registered with the submissions API, which for the moment
@@ -352,14 +350,19 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
     # XBlock --> submissions --> Django Rest Framework error strings -->
     # Django translation --> ... --> courseware --> submissions
     from submissions import api as sub_api  # installed from the edx-submissions repository
-    submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
-    max_scores_cache = MaxScoresCache.create_for_course(course)
 
-    # For the moment, we have to get scorable_locations from field_data_cache
-    # and not from scores_client, because scores_client is ignorant of things
-    # in the submissions API. As a further refactoring step, submissions should
-    # be hidden behind the ScoresClient.
-    max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
+    with outer_atomic():
+        submissions_scores = sub_api.get_scores(
+            course.id.to_deprecated_string(),
+            anonymous_id_for_user(student, course.id)
+        )
+        max_scores_cache = MaxScoresCache.create_for_course(course)
+
+        # For the moment, we have to get scorable_locations from field_data_cache
+        # and not from scores_client, because scores_client is ignorant of things
+        # in the submissions API. As a further refactoring step, submissions should
+        # be hidden behind the ScoresClient.
+        max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
 
     grading_context = course.grading_context
     raw_scores = []
@@ -373,113 +376,120 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
             section_descriptor = section['section_descriptor']
             section_name = section_descriptor.display_name_with_default
 
-            # some problems have state that is updated independently of interaction
-            # with the LMS, so they need to always be scored. (E.g. foldit.,
-            # combinedopenended)
-            should_grade_section = any(
-                descriptor.always_recalculate_grades for descriptor in section['xmoduledescriptors']
-            )
-
-            # If there are no problems that always have to be regraded, check to
-            # see if any of our locations are in the scores from the submissions
-            # API. If scores exist, we have to calculate grades for this section.
-            if not should_grade_section:
+            with outer_atomic():
+                # some problems have state that is updated independently of interaction
+                # with the LMS, so they need to always be scored. (E.g. foldit.,
+                # combinedopenended)
+                # TODO This block is causing extra savepoints to be fired that are empty because no queries are executed
+                # during the loop. When refactoring this code please keep this outer_atomic call in mind and ensure we
+                # are not making unnecessary database queries.
                 should_grade_section = any(
-                    descriptor.location.to_deprecated_string() in submissions_scores
-                    for descriptor in section['xmoduledescriptors']
+                    descriptor.always_recalculate_grades for descriptor in section['xmoduledescriptors']
                 )
 
-            if not should_grade_section:
-                should_grade_section = any(
-                    descriptor.location in scores_client
-                    for descriptor in section['xmoduledescriptors']
-                )
-
-            # If we haven't seen a single problem in the section, we don't have
-            # to grade it at all! We can assume 0%
-            if should_grade_section:
-                scores = []
-
-                def create_module(descriptor):
-                    '''creates an XModule instance given a descriptor'''
-                    # TODO: We need the request to pass into here. If we could forego that, our arguments
-                    # would be simpler
-                    return get_module_for_descriptor(
-                        student, request, descriptor, field_data_cache, course.id, course=course
+                # If there are no problems that always have to be regraded, check to
+                # see if any of our locations are in the scores from the submissions
+                # API. If scores exist, we have to calculate grades for this section.
+                if not should_grade_section:
+                    should_grade_section = any(
+                        descriptor.location.to_deprecated_string() in submissions_scores
+                        for descriptor in section['xmoduledescriptors']
                     )
 
-                descendants = yield_dynamic_descriptor_descendants(section_descriptor, student.id, create_module)
-                for module_descriptor in descendants:
-                    user_access = has_access(student, 'load', module_descriptor, module_descriptor.location.course_key)
-                    if not user_access:
-                        continue
-
-                    (correct, total) = get_score(
-                        student,
-                        module_descriptor,
-                        create_module,
-                        scores_client,
-                        submissions_scores,
-                        max_scores_cache,
+                if not should_grade_section:
+                    should_grade_section = any(
+                        descriptor.location in scores_client
+                        for descriptor in section['xmoduledescriptors']
                     )
-                    if correct is None and total is None:
-                        continue
 
-                    if settings.GENERATE_PROFILE_SCORES:    # for debugging!
-                        if total > 1:
-                            correct = random.randrange(max(total - 2, 1), total + 1)
-                        else:
-                            correct = total
+                # If we haven't seen a single problem in the section, we don't have
+                # to grade it at all! We can assume 0%
+                if should_grade_section:
+                    scores = []
 
-                    graded = module_descriptor.graded
-                    if not total > 0:
-                        # We simply cannot grade a problem that is 12/0, because we might need it as a percentage
-                        graded = False
-
-                    scores.append(
-                        Score(
-                            correct,
-                            total,
-                            graded,
-                            module_descriptor.display_name_with_default,
-                            module_descriptor.location
+                    def create_module(descriptor):
+                        '''creates an XModule instance given a descriptor'''
+                        # TODO: We need the request to pass into here. If we could forego that, our arguments
+                        # would be simpler
+                        return get_module_for_descriptor(
+                            student, request, descriptor, field_data_cache, course.id, course=course
                         )
+
+                    descendants = yield_dynamic_descriptor_descendants(section_descriptor, student.id, create_module)
+                    for module_descriptor in descendants:
+                        user_access = has_access(
+                            student, 'load', module_descriptor, module_descriptor.location.course_key
+                        )
+                        if not user_access:
+                            continue
+
+                        (correct, total) = get_score(
+                            student,
+                            module_descriptor,
+                            create_module,
+                            scores_client,
+                            submissions_scores,
+                            max_scores_cache,
+                        )
+                        if correct is None and total is None:
+                            continue
+
+                        if settings.GENERATE_PROFILE_SCORES:    # for debugging!
+                            if total > 1:
+                                correct = random.randrange(max(total - 2, 1), total + 1)
+                            else:
+                                correct = total
+
+                        graded = module_descriptor.graded
+                        if not total > 0:
+                            # We simply cannot grade a problem that is 12/0, because we might need it as a percentage
+                            graded = False
+
+                        scores.append(
+                            Score(
+                                correct,
+                                total,
+                                graded,
+                                module_descriptor.display_name_with_default,
+                                module_descriptor.location
+                            )
+                        )
+
+                    __, graded_total = graders.aggregate_scores(scores, section_name)
+                    if keep_raw_scores:
+                        raw_scores += scores
+                else:
+                    graded_total = Score(0.0, 1.0, True, section_name, None)
+
+                #Add the graded total to totaled_scores
+                if graded_total.possible > 0:
+                    format_scores.append(graded_total)
+                else:
+                    log.info(
+                        "Unable to grade a section with a total possible score of zero. " +
+                        str(section_descriptor.location)
                     )
-
-                __, graded_total = graders.aggregate_scores(scores, section_name)
-                if keep_raw_scores:
-                    raw_scores += scores
-            else:
-                graded_total = Score(0.0, 1.0, True, section_name, None)
-
-            #Add the graded total to totaled_scores
-            if graded_total.possible > 0:
-                format_scores.append(graded_total)
-            else:
-                log.info(
-                    "Unable to grade a section with a total possible score of zero. " +
-                    str(section_descriptor.location)
-                )
 
         totaled_scores[section_format] = format_scores
 
-    # Grading policy might be overriden by a CCX, need to reset it
-    course.set_grading_policy(course.grading_policy)
-    grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
+    with outer_atomic():
+        # Grading policy might be overriden by a CCX, need to reset it
+        course.set_grading_policy(course.grading_policy)
+        grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
 
-    # We round the grade here, to make sure that the grade is an whole percentage and
-    # doesn't get displayed differently than it gets grades
-    grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
+        # We round the grade here, to make sure that the grade is an whole percentage and
+        # doesn't get displayed differently than it gets grades
+        grade_summary['percent'] = round(grade_summary['percent'] * 100 + 0.05) / 100
 
-    letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
-    grade_summary['grade'] = letter_grade
-    grade_summary['totaled_scores'] = totaled_scores   # make this available, eg for instructor download & debugging
-    if keep_raw_scores:
-        # way to get all RAW scores out to instructor
-        # so grader can be double-checked
-        grade_summary['raw_scores'] = raw_scores
+        letter_grade = grade_for_percentage(course.grade_cutoffs, grade_summary['percent'])
+        grade_summary['grade'] = letter_grade
+        grade_summary['totaled_scores'] = totaled_scores   # make this available, eg for instructor download & debugging
+        if keep_raw_scores:
+            # way to get all RAW scores out to instructor
+            # so grader can be double-checked
+            grade_summary['raw_scores'] = raw_scores
 
-    max_scores_cache.push_to_remote()
+        max_scores_cache.push_to_remote()
 
     return grade_summary
 
@@ -506,29 +516,24 @@ def grade_for_percentage(grade_cutoffs, percentage):
     return letter_grade
 
 
-@transaction.commit_manually
 def progress_summary(student, request, course, field_data_cache=None, scores_client=None):
     """
-    Wraps "_progress_summary" with the manual_transaction context manager just
-    in case there are unanticipated errors.
+    Returns progress summary for all chapters in the course.
     """
-    with manual_transaction():
-        progress = _progress_summary(student, request, course, field_data_cache, scores_client)
-        if progress:
-            return progress.chapters
-        else:
-            return None
+    progress = _progress_summary(student, request, course, field_data_cache, scores_client)
+    if progress:
+        return progress.chapters
+    else:
+        return None
 
 
-@transaction.commit_manually
 def get_weighted_scores(student, course, field_data_cache=None, scores_client=None):
     """
     Uses the _progress_summary method to return a ProgressSummmary object
     containing details of a students weighted scores for the course.
     """
-    with manual_transaction():
-        request = _get_mock_request(student)
-        return _progress_summary(student, request, course, field_data_cache, scores_client)
+    request = _get_mock_request(student)
+    return _progress_summary(student, request, course, field_data_cache, scores_client)
 
 
 # TODO: This method is not very good. It was written in the old course style and
@@ -555,7 +560,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
     will return None.
 
     """
-    with manual_transaction():
+    with outer_atomic():
         if field_data_cache is None:
             field_data_cache = field_data_cache_for_grading(course, student)
         if scores_client is None:
@@ -573,14 +578,17 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
     # XBlock --> submissions --> Django Rest Framework error strings -->
     # Django translation --> ... --> courseware --> submissions
     from submissions import api as sub_api  # installed from the edx-submissions repository
-    submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
+    with outer_atomic():
+        submissions_scores = sub_api.get_scores(
+            course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id)
+        )
 
-    max_scores_cache = MaxScoresCache.create_for_course(course)
-    # For the moment, we have to get scorable_locations from field_data_cache
-    # and not from scores_client, because scores_client is ignorant of things
-    # in the submissions API. As a further refactoring step, submissions should
-    # be hidden behind the ScoresClient.
-    max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
+        max_scores_cache = MaxScoresCache.create_for_course(course)
+        # For the moment, we have to get scorable_locations from field_data_cache
+        # and not from scores_client, because scores_client is ignorant of things
+        # in the submissions API. As a further refactoring step, submissions should
+        # be hidden behind the ScoresClient.
+        max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
 
     chapters = []
     locations_to_children = defaultdict(list)
@@ -594,7 +602,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
         sections = []
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            with manual_transaction():
+            with outer_atomic():
                 if section_module.hide_from_toc:
                     continue
 
@@ -743,19 +751,6 @@ def get_score(user, problem_descriptor, module_creator, scores_client, submissio
             max_scores_cache.set(problem_descriptor.location, total)
 
     return weighted_score(correct, total, problem_descriptor.weight)
-
-
-@contextmanager
-def manual_transaction():
-    """A context manager for managing manual transactions"""
-    try:
-        yield
-    except Exception:
-        transaction.rollback()
-        log.exception('Due to an error, this transaction has been rolled back')
-        raise
-    else:
-        transaction.commit()
 
 
 def iterate_grades_for(course_or_id, students, keep_raw_scores=False):

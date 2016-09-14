@@ -108,7 +108,7 @@ def get_credit_provider_info(request, provider_id):  # pylint: disable=unused-ar
     return JsonResponse(credit_provider_data)
 
 
-@transaction.commit_on_success
+@transaction.atomic
 def create_credit_request(course_key, provider_id, username):
     """
     Initiate a request for credit from a credit provider.

@@ -86,7 +86,7 @@ def config_course_cohorts_legacy(
         cohorted,
         cohorted_discussions=None,
         auto_cohort_groups=None,
-        always_cohort_inline_discussions=None  # pylint: disable=invalid-name
+        always_cohort_inline_discussions=None
 ):
     """
     Given a course with no discussion set up, add the discussions and set
@@ -148,7 +148,7 @@ def config_course_cohorts(
         manual_cohorts=[],
         discussion_topics=[],
         cohorted_discussions=[],
-        always_cohort_inline_discussions=True  # pylint: disable=invalid-name
+        always_cohort_inline_discussions=True
 ):
     """
     Set discussions and configure cohorts for a course.

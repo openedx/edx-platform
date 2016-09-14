@@ -14,11 +14,6 @@ import os
 from path import Path as path
 from tempfile import mkdtemp
 
-# Pylint gets confused by path.py instances, which report themselves as class
-# objects. As a result, pylint applies the wrong regex in validating names,
-# and throws spurious errors. Therefore, we disable invalid-name checking.
-# pylint: disable=invalid-name
-
 CONFIG_ROOT = path(__file__).abspath().dirname()
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
@@ -172,9 +167,8 @@ MOCK_SEARCH_BACKING_FILE = (
     TEST_ROOT / "index_file.dat"
 ).abspath()
 
-# Generate a random UUID so that different runs of acceptance tests don't break each other
-import uuid
-SECRET_KEY = uuid.uuid4().hex
+# this secret key should be the same as cms/envs/bok_choy.py's
+SECRET_KEY = "very_secret_bok_choy_key"
 
 # Set dummy values for profile image settings.
 PROFILE_IMAGE_BACKEND = {

@@ -148,7 +148,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         return fragment
 
 
-class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):  # pylint: disable=abstract-method
+class ImageAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Image annotation descriptor '''
     module_class = ImageAnnotationModule
     mako_template = "widgets/raw-edit.html"

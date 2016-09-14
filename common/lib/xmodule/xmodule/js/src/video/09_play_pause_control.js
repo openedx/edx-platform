@@ -25,10 +25,14 @@ define('video/09_play_pause_control.js', [], function() {
 
     PlayPauseControl.prototype = {
         template: [
-            '<a class="video_control play" href="#" title="',
-                gettext('Play'), '" role="button" aria-disabled="false">',
-                gettext('Play'),
-            '</a>'
+            '<button class="control video_control play" aria-disabled="false">',
+                '<span class="icon-fallback-img">',
+                    '<span class="icon fa fa-play" aria-hidden="true"></span>',
+                    '<span class="sr control-text">',
+                        gettext('Play'),
+                    '</span>',
+                '</span>',
+            '</button>'
         ].join(''),
 
         destroy: function () {
@@ -71,14 +75,28 @@ define('video/09_play_pause_control.js', [], function() {
 
         play: function () {
             this.el
-                .attr('title', this.i18n['Pause']).text(this.i18n['Pause'])
-                .removeClass('play').addClass('pause');
+                .addClass('pause')
+                .removeClass('play')
+                .find('.icon')
+                    .removeClass('fa-play')
+                    .addClass('fa-pause');
+
+            this.el
+                .find('.control-text')
+                    .text(gettext('Pause'));
         },
 
         pause: function () {
             this.el
-                .attr('title', this.i18n['Play']).text(this.i18n['Play'])
-                .removeClass('pause').addClass('play');
+                .removeClass('pause')
+                .addClass('play')
+                .find('.icon')
+                    .removeClass('fa-pause')
+                    .addClass('fa-play');
+
+            this.el
+                .find('.control-text')
+                    .text(gettext('Play'));
         }
     };
 

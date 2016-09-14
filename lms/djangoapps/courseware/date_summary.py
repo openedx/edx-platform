@@ -5,14 +5,16 @@ course-run-specific date which will be displayed to the user.
 """
 from datetime import datetime
 
+from babel.dates import format_timedelta
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.utils.translation import to_locale, get_language
 from edxmako.shortcuts import render_to_string
 from lazy import lazy
 import pytz
 
 from course_modes.models import CourseMode
-from verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from student.models import CourseEnrollment
 
 
@@ -68,7 +70,23 @@ class DateSummary(object):
         """Return the template context used to render this summary block."""
         date = ''
         if self.date is not None:
-            date = self.date.strftime(self.date_format)
+            # Translators: relative_date is a fuzzy description of the
+            # time from now until absolute_date. For example,
+            # absolute_date might be "Jan 01, 2020", and if today were
+            # December 5th, 2020, relative_date would be "1 month".
+            locale = to_locale(get_language())
+            try:
+                relative_date = format_timedelta(self.date - datetime.now(pytz.UTC), locale=locale)
+            # Babel doesn't have translations for Esperanto, so we get
+            # a KeyError when testing translations with
+            # ?preview-lang=eo. This should not happen with any other
+            # languages. See https://github.com/python-babel/babel/issues/107
+            except KeyError:
+                relative_date = format_timedelta(self.date - datetime.now(pytz.UTC))
+            date = _("in {relative_date} - {absolute_date}").format(
+                relative_date=relative_date,
+                absolute_date=self.date.strftime(self.date_format),
+            )
         return {
             'title': self.title,
             'date': date,
@@ -110,6 +128,7 @@ class TodaysDate(DateSummary):
     """
     css_class = 'todays-date'
     is_enabled = True
+    date_format = '%b %d, %Y (%H:%M {utc})'.format(utc=_('UTC'))
 
     # The date is shown in the title, no need to display it again.
     def get_context(self):

@@ -68,7 +68,7 @@ class SplitTestTransformer(BlockStructureTransformer):
                 group = child_to_group.get(child_location, None)
                 child.group_access[partition_for_this_block.id] = [group] if group else []
 
-    def transform(self, usage_info, block_structure):  # pylint: disable=unused-argument
+    def transform(self, usage_info, block_structure):
         """
         Mutates block_structure based on the given usage_info.
         """

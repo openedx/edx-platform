@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
-from verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification  # pylint: disable=import-error
+from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from util.testing import UrlResetMixin
 
 

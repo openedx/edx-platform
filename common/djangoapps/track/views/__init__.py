@@ -41,17 +41,18 @@ def _get_request_ip(request, default=''):
 
 
 def _get_request_value(request, value_name, default=''):
-    """Helper method to get header values from a request's REQUEST dict, if present."""
-    if request is not None and hasattr(request, 'REQUEST') and value_name in request.REQUEST:
-        return request.REQUEST[value_name]
-    else:
-        return default
+    """Helper method to get header values from a request's GET/POST dict, if present."""
+    if request is not None:
+        if request.method == 'GET':
+            return request.GET.get(value_name, default)
+        elif request.method == 'POST':
+            return request.POST.get(value_name, default)
+    return default
 
 
 def user_track(request):
     """
-    Log when POST call to "event" URL is made by a user. Uses request.REQUEST
-    to allow for GET calls.
+    Log when POST call to "event" URL is made by a user.
 
     GET or POST call should provide "event_type", "event", and "page" arguments.
     """

@@ -23,6 +23,10 @@ class Command(BaseCommand):
 
     help = "Preprocess asset template files to ready them for compilation."
 
+    def add_arguments(self, parser):
+        parser.add_argument('files', type=unicode, nargs='+', help='files to pre-process')
+        parser.add_argument('dest_dir', type=unicode, help='destination directory')
+
     def handle(self, *args, **options):
         theme_name = getattr(settings, "THEME_NAME", None)
         use_custom_theme = settings.FEATURES.get("USE_CUSTOM_THEME", False)
@@ -30,8 +34,8 @@ class Command(BaseCommand):
             # No custom theme, nothing to do!
             return
 
-        dest_dir = args[-1]
-        for source_file in args[:-1]:
+        dest_dir = options['dest_dir']
+        for source_file in options['files']:
             self.process_one_file(source_file, dest_dir, theme_name)
 
     def process_one_file(self, source_file, dest_dir, theme_name):

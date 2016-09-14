@@ -272,11 +272,9 @@ def run_jshint(options):
     jshint_report = jshint_report_dir / "jshint.report"
     _prepare_report_dir(jshint_report_dir)
 
-    jshint_directories = ["common/static/js", "cms/static/js", "lms/static/js"]
-
     sh(
-        "jshint {list} --config .jshintrc >> {jshint_report}".format(
-            list=(" ".join(jshint_directories)), jshint_report=jshint_report
+        "jshint . --config .jshintrc >> {jshint_report}".format(
+            jshint_report=jshint_report
         ),
         ignore_error=True
     )

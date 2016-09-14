@@ -47,7 +47,7 @@ class LoginSessionView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, request):
         """Return a description of the login form.
 
         This decouples clients from the API definition:
@@ -769,7 +769,7 @@ class PasswordResetView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, request):
         """Return a description of the password reset form.
 
         This decouples clients from the API definition:

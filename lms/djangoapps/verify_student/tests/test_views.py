@@ -42,11 +42,11 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
-from verify_student.views import (
+from lms.djangoapps.verify_student.views import (
     checkout_with_ecommerce_service, render_to_response, PayAndVerifyView,
     _compose_message_reverification_email
 )
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     VerificationDeadline, SoftwareSecurePhotoVerification,
     VerificationCheckpoint, VerificationStatus,
     IcrvStatusEmailsConfiguration,
@@ -1092,7 +1092,7 @@ class CheckoutTestMixin(object):
         self.assertEqual(data, {'foo': 'bar'})
 
 
-@patch('verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA)
+@patch('lms.djangoapps.verify_student.views.checkout_with_shoppingcart', return_value=TEST_PAYMENT_DATA)
 class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
     """ Test view behavior when the shoppingcart is used. """
 
@@ -1106,7 +1106,7 @@ class TestCreateOrderShoppingCart(CheckoutTestMixin, ModuleStoreTestCase):
 
 
 @override_settings(ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY)
-@patch('verify_student.views.checkout_with_ecommerce_service', return_value=TEST_PAYMENT_DATA)
+@patch('lms.djangoapps.verify_student.views.checkout_with_ecommerce_service', return_value=TEST_PAYMENT_DATA)
 class TestCreateOrderEcommerceService(CheckoutTestMixin, ModuleStoreTestCase):
     """ Test view behavior when the ecommerce service is used. """
 
@@ -1142,7 +1142,7 @@ class TestCheckoutWithEcommerceService(ModuleStoreTestCase):
             content_type="application/json",
         )
 
-        with mock.patch('verify_student.views.audit_log') as mock_audit_log:
+        with mock.patch('lms.djangoapps.verify_student.views.audit_log') as mock_audit_log:
             # Call the function
             actual_payment_data = checkout_with_ecommerce_service(
                 user,
@@ -1551,7 +1551,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('JSON should be dict', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_invalid_access_key(self):
         """
         Test for invalid access key.
@@ -1573,7 +1576,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('Access key invalid', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_wrong_edx_id(self):
         """
         Test for wrong id of Software secure verification attempt.
@@ -1595,7 +1601,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIn('edX ID Invalid-Id not found', response.content)
         self.assertEqual(response.status_code, 400)
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_pass_result(self):
         """
         Test for verification passed.
@@ -1617,7 +1626,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.status, u'approved')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_fail_result(self):
         """
         Test for failed verification.
@@ -1642,7 +1654,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_msg, u'"Invalid photo"')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_system_fail_result(self):
         """
         Test for software secure result system failure.
@@ -1665,7 +1680,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEqual(attempt.error_msg, u'"Memory overflow"')
         self.assertEquals(response.content, 'OK!')
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_unknown_result(self):
         """
         test for unknown software secure result
@@ -1686,7 +1704,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         )
         self.assertIn('Result Unknown not understood', response.content)
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_in_course_reverify_disabled(self):
         """
         Test for verification passed.
@@ -1712,7 +1733,10 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         user_status = VerificationStatus.objects.filter(user=self.user).count()
         self.assertEqual(user_status, 0)
 
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_pass_in_course_reverify_result(self):
         """
         Test for verification passed.
@@ -1773,8 +1797,11 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertEquals(response.content, 'OK!')
         self.assertEqual(len(mail.outbox), 0)
 
-    @mock.patch('verify_student.views._send_email')
-    @mock.patch('verify_student.ssencrypt.has_valid_signature', mock.Mock(side_effect=mocked_has_valid_signature))
+    @mock.patch('lms.djangoapps.verify_student.views._send_email')
+    @mock.patch(
+        'lms.djangoapps.verify_student.ssencrypt.has_valid_signature',
+        mock.Mock(side_effect=mocked_has_valid_signature)
+    )
     def test_reverification_on_callback(self, mock_send_email):
         """
         Test software secure callback flow for re-verification.
@@ -1848,6 +1875,12 @@ class TestReverifyView(TestCase):
         success = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(success, msg="Could not log in")
 
+    def test_reverify_view_can_do_initial_verification(self):
+        """
+        Test that a User can use reverify link for initial verification.
+        """
+        self._assert_can_reverify()
+
     def test_reverify_view_can_reverify_denied(self):
         # User has a denied attempt, so can reverify
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
@@ -1870,14 +1903,22 @@ class TestReverifyView(TestCase):
         # Allow the student to reverify
         self._assert_can_reverify()
 
-    def test_reverify_view_cannot_reverify_pending(self):
+    def test_reverify_view_can_reverify_pending(self):
+        """ Test that the user can still re-verify even if the previous photo
+        verification is in pending state.
+
+        A photo verification is considered in pending state when the user has
+        either submitted the photo verification (status in database: 'submitted')
+        or photo verification submission failed (status in database: 'must_retry').
+        """
+
         # User has submitted a verification attempt, but Software Secure has not yet responded
         attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
         attempt.mark_ready()
         attempt.submit()
 
-        # Cannot reverify because an attempt has already been submitted.
-        self._assert_cannot_reverify()
+        # Can re-verify because an attempt has already been submitted.
+        self._assert_can_reverify()
 
     def test_reverify_view_cannot_reverify_approved(self):
         # Submitted attempt has been approved
@@ -1921,8 +1962,6 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         """
         Build up a course tree with a Reverificaiton xBlock.
         """
-        # pylint: disable=attribute-defined-outside-init
-
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
 
@@ -1958,7 +1997,7 @@ class TestInCourseReverifyView(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, self.course_key, mode="verified")
 
         # mocking and patching for bi events
-        analytics_patcher = patch('verify_student.views.analytics')
+        analytics_patcher = patch('lms.djangoapps.verify_student.views.analytics')
         self.mock_tracker = analytics_patcher.start()
         self.addCleanup(analytics_patcher.stop)
 

@@ -14,7 +14,7 @@ MEDIA_ROOT = "/edx/var/edxapp/uploads"
 
 DEBUG = True
 USE_I18N = True
-TEMPLATE_DEBUG = True
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = True
 SITE_NAME = 'localhost:8000'
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'Devstack')
 # By default don't use a worker, execute tasks as if they were local functions
@@ -164,7 +164,7 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-from django.utils.translation import ugettext as _
+_ = lambda s: s
 LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {

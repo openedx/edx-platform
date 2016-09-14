@@ -31,7 +31,7 @@ def comprehensive_theme_changes(theme_dir):
 
     templates_dir = theme_dir / "lms" / "templates"
     if templates_dir.isdir():
-        changes['settings']['TEMPLATE_DIRS'] = [templates_dir] + settings.TEMPLATE_DIRS
+        changes['settings']['TEMPLATE_DIRS'] = [templates_dir] + settings.DEFAULT_TEMPLATE_ENGINE['DIRS']
         changes['mako_paths'].append(templates_dir)
 
     staticfiles_dir = theme_dir / "lms" / "static"

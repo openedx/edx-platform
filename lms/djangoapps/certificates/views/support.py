@@ -14,6 +14,7 @@ from django.http import (
     HttpResponseServerError
 )
 from django.views.decorators.http import require_GET, require_POST
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
@@ -122,6 +123,8 @@ def _validate_regen_post_params(params):
     return {"user": user, "course_key": course_key}, None
 
 
+# Grades can potentially be written - if so, let grading manage the transaction.
+@transaction.non_atomic_requests
 @require_POST
 @require_certificate_permission
 def regenerate_certificate_for_user(request):

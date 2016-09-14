@@ -443,7 +443,7 @@ class CreditRequirementStatus(TimeStampedModel):
         return cls.objects.filter(requirement__in=requirements, username=username)
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def add_or_update_requirement_status(cls, username, requirement, status="satisfied", reason=None):
         """
         Add credit requirement status for given username.
@@ -466,7 +466,7 @@ class CreditRequirementStatus(TimeStampedModel):
             requirement_status.save()
 
     @classmethod
-    @transaction.commit_on_success
+    @transaction.atomic
     def remove_requirement_status(cls, username, requirement):
         """
         Remove credit requirement status for given username.
@@ -490,6 +490,13 @@ class CreditRequirementStatus(TimeStampedModel):
             return
 
 
+def default_deadline_for_credit_eligibility():  # pylint: disable=invalid-name
+    """ The default deadline to use when creating a new CreditEligibility model. """
+    return datetime.datetime.now(pytz.UTC) + datetime.timedelta(
+        days=getattr(settings, "CREDIT_ELIGIBILITY_EXPIRATION_DAYS", 365)
+    )
+
+
 class CreditEligibility(TimeStampedModel):
     """
     A record of a user's eligibility for credit from a specific credit
@@ -504,11 +511,7 @@ class CreditEligibility(TimeStampedModel):
     # We save the deadline as a database field just in case
     # we need to override the deadline for particular students.
     deadline = models.DateTimeField(
-        default=lambda: (
-            datetime.datetime.now(pytz.UTC) + datetime.timedelta(
-                days=getattr(settings, "CREDIT_ELIGIBILITY_EXPIRATION_DAYS", 365)
-            )
-        ),
+        default=default_deadline_for_credit_eligibility,
         help_text=ugettext_lazy("Deadline for purchasing and requesting credit.")
     )
 
@@ -705,6 +708,6 @@ class CreditRequest(TimeStampedModel):
         """Unicode representation of a credit request."""
         return u"{course}, {provider}, {status}".format(
             course=self.course.course_key,
-            provider=self.provider.provider_id,  # pylint: disable=no-member
+            provider=self.provider.provider_id,
             status=self.status,
         )

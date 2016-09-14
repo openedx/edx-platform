@@ -5,7 +5,7 @@ Manually set Software Secure verification status.
 import sys
 
 from django.core.management.base import BaseCommand
-from verify_student.models import (
+from lms.djangoapps.verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationCheckpoint, VerificationStatus
 )
 
@@ -19,7 +19,7 @@ class Command(BaseCommand):
     args = "<{approved, denied}, SoftwareSecurePhotoVerification id, [reason_for_denial]>"
 
     def handle(self, *args, **kwargs):  # pylint: disable=unused-argument
-        from verify_student.views import _set_user_requirement_status
+        from lms.djangoapps.verify_student.views import _set_user_requirement_status
 
         status_to_set = args[0]
         receipt_id = args[1]

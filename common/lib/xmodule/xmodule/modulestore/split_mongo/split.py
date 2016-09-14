@@ -1953,7 +1953,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             else:
                 return None
 
-    # pylint: disable=unused-argument
     def create_xblock(
             self, runtime, course_key, block_type, block_id=None, fields=None,
             definition_id=None, parent_xblock=None, **kwargs
@@ -2068,7 +2067,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             else:
                 block_key = BlockKey(xblock.scope_ids.block_type, block_id)
             new_usage_id = xblock.scope_ids.usage_id.replace(block_id=block_key.id)
-            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)  # pylint: disable=protected-access
+            xblock.scope_ids = xblock.scope_ids._replace(usage_id=new_usage_id)
         else:
             is_new = False
             block_key = BlockKey(xblock.scope_ids.block_type, xblock.scope_ids.usage_id.block_id)

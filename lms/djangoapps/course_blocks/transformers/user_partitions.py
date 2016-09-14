@@ -161,19 +161,21 @@ class _MergedGroupAccess(object):
                 for merged_parent_access in merged_parent_access_list:
                     # pylint: disable=protected-access
                     if partition.id in merged_parent_access._access:
-                        # Since this parent has group access restrictions,
-                        # merge it with the running list of
-                        # parent-introduced restrictions.
+                        # Since this parent has group access
+                        # restrictions, merge it with the running list
+                        # of parent-introduced restrictions.
                         merged_parent_group_ids.update(merged_parent_access._access[partition.id])
                     else:
-                        # Since at least one parent chain has no group
-                        # access restrictions for this partition, allow
-                        # unfettered group access or this partition.
+                        # Since this parent chain has no group access
+                        # restrictions for this partition, allow
+                        # unfettered group access for this partition
+                        # and don't bother checking the rest of the
+                        # parents.
                         merged_parent_group_ids = None
                         break
 
             # Group access for this partition as stored on the xblock
-            xblock_partition_access = set(xblock_group_access.get(partition.id, [])) or None
+            xblock_partition_access = set(xblock_group_access.get(partition.id) or []) or None
 
             # Compute this block's access by intersecting the block's
             # own access with the merged access from its parent chains.
