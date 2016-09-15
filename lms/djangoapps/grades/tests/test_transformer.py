@@ -6,6 +6,8 @@ import datetime
 import pytz
 import random
 
+import ddt
+
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -17,6 +19,7 @@ from openedx.core.djangoapps.content.block_structure.api import get_cache
 from ..transformer import GradesTransformer
 
 
+@ddt.ddt
 class GradesTransformerTestCase(CourseStructureTestCase):
     """
     Verify behavior of the GradesTransformer
@@ -194,7 +197,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             )
             self.assertEqual(actual_subsections, {blocks[sub].location for sub in expected_subsections})
 
-    def test_ungraded_block_collection(self):
+    def test_unscored_block_collection(self):
         blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
         self.assert_collected_xblock_fields(
@@ -211,6 +214,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             blocks[u'course'].location,
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=None,
+            explicit_graded=None,
         )
 
     def test_grades_collected_basic(self):
@@ -226,6 +230,29 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             has_score=True,
             due=self.problem_metadata[u'due'],
             format=None,
+        )
+        self.assert_collected_transformer_block_fields(
+            block_structure,
+            blocks[u'problem'].location,
+            self.TRANSFORMER_CLASS_TO_TEST,
+            max_score=0,
+            explicit_graded=True,
+        )
+
+    @ddt.data(True, False, None)
+    def test_graded_at_problem(self, graded):
+        problem_metadata = {
+            u'has_score': True,
+        }
+        if graded is not None:
+            problem_metadata[u'graded'] = graded
+        blocks = self.build_course_with_problems(metadata=problem_metadata)
+        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        self.assert_collected_transformer_block_fields(
+            block_structure,
+            blocks[u'problem'].location,
+            self.TRANSFORMER_CLASS_TO_TEST,
+            explicit_graded=graded,
         )
 
     def test_collecting_staff_only_problem(self):

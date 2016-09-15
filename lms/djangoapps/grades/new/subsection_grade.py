@@ -11,6 +11,7 @@ from courseware.model_data import ScoresClient
 from lms.djangoapps.grades.scores import get_score, possibly_scored
 from lms.djangoapps.grades.models import BlockRecord, PersistentSubsectionGrade
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
+from lms.djangoapps.grades.transformer import GradesTransformer
 from student.models import anonymous_id_for_user, User
 from submissions import api as submissions_api
 from traceback import format_exc
@@ -173,7 +174,7 @@ class SubsectionGrade(object):
                 #
                 # Cannot grade a problem with a denominator of 0.
                 # TODO: None > 0 is not python 3 compatible.
-                block_graded = block.graded if possible > 0 else False
+                block_graded = self._get_explicit_graded(block, course_structure) if possible > 0 else False
 
                 self.locations_to_weighted_scores[block.location] = (
                     Score(
@@ -185,6 +186,17 @@ class SubsectionGrade(object):
                     ),
                     weight,
                 )
+
+    def _get_explicit_graded(self, block, course_structure):
+        """
+        Returns the explicit graded field value for the given block
+        """
+        field_value = course_structure.get_transformer_block_field(
+            block.location,
+            GradesTransformer,
+            GradesTransformer.EXPLICIT_GRADED_FIELD_NAME
+        )
+        return True if field_value is None else field_value
 
     def _persisted_model_params(self, student):
         """
