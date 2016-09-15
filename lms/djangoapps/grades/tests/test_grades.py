@@ -187,11 +187,11 @@ class TestProgressSummary(TestCase):
         self.loc_n = self.create_location('problem', 'n')
 
         weighted_scores = {
-            self.loc_h: self.create_score(2, 5),
-            self.loc_i: self.create_score(3, 5),
-            self.loc_j: self.create_score(0, 1),
-            self.loc_l: self.create_score(1, 3),
-            self.loc_n: self.create_score(3, 10),
+            self.loc_h: (self.create_score(2, 5), 1),
+            self.loc_i: (self.create_score(3, 5), 1),
+            self.loc_j: (self.create_score(0, 1), 1),
+            self.loc_l: (self.create_score(1, 3), 1),
+            self.loc_n: (self.create_score(3, 10), 1),
         }
         locations_to_scored_children = {
             self.loc_a: [self.loc_h, self.loc_i, self.loc_j, self.loc_l, self.loc_n],
