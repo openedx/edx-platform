@@ -5,7 +5,7 @@
     <% }) %>
     <li class="field comp-setting-entry metadata_entry">
         <div class="wrapper-comp-setting-text">
-            <label class="label setting-label"><%- gettext("Location ID") %></label>
+            <label class="label setting-label"><%- gettext("Component Location ID") %></label>
             <span class="setting-text"><%- locator %></span>
         </div>
     </li>
