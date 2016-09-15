@@ -155,7 +155,7 @@ class CourseGrade(object):
         all scored problems that are children of the chosen location.
         """
         if location in self.locations_to_weighted_scores:
-            score = self.locations_to_weighted_scores[location]
+            score, _ = self.locations_to_weighted_scores[location]
             return score.earned, score.possible
         children = self.course_structure.get_children(location)
         earned = 0.0
