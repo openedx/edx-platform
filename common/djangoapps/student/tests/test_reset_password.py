@@ -252,6 +252,25 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
         self.user = User.objects.get(pk=self.user.pk)
         self.assertTrue(self.user.is_active)
 
+    def test_password_reset_fail(self):
+        """Tests that if we provide mismatched passwords, user is not marked as active."""
+        self.assertFalse(self.user.is_active)
+
+        url = reverse(
+            'password_reset_confirm',
+            kwargs={'uidb36': self.uidb36, 'token': self.token}
+        )
+        request_params = {'new_password1': 'password1', 'new_password2': 'password2'}
+        confirm_request = self.request_factory.post(url, data=request_params)
+
+        # Make a password reset request with mismatching passwords.
+        resp = password_reset_confirm_wrapper(confirm_request, self.uidb36, self.token)
+
+        # Verify the response status code is: 200 with password reset fail and also verify that
+        # the user is not marked as active.
+        self.assertEqual(resp.status_code, 200)
+        self.assertFalse(User.objects.get(pk=self.user.pk).is_active)
+
     @patch('student.views.password_reset_confirm')
     @patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_reset_password_good_token_configuration_override(self, reset_confirm):

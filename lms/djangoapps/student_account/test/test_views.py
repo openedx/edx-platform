@@ -126,11 +126,8 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertTrue(result)
 
         # Try reusing the activation link to change the password again
-        response = self.client.post(
-            activation_link,
-            {'new_password1': self.OLD_PASSWORD, 'new_password2': self.OLD_PASSWORD},
-            follow=True
-        )
+        # Visit the activation link again.
+        response = self.client.get(activation_link)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "This password reset link is invalid. It may have been used already.")
 
