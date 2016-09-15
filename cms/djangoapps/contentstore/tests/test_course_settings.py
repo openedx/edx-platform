@@ -1072,7 +1072,7 @@ class CourseEnrollmentEndFieldTest(CourseTestCase):
     Base class to test the enrollment end fields in the course settings details view in Studio
     when using marketing site flag and global vs non-global staff to access the page.
     """
-    NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX Partner Manager to update these settings."
+    NOT_EDITABLE_HELPER_MESSAGE = "Contact your edX partner manager to update these settings."
     NOT_EDITABLE_DATE_WRAPPER = "<div class=\"field date is-not-editable\" id=\"field-enrollment-end-date\">"
     NOT_EDITABLE_TIME_WRAPPER = "<div class=\"field time is-not-editable\" id=\"field-enrollment-end-time\">"
     NOT_EDITABLE_DATE_FIELD = "<input type=\"text\" class=\"end-date date end\" \
