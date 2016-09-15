@@ -39,15 +39,16 @@ class ConditionalFields(object):
 
     sources_list = ReferenceList(
         display_name=_("Source Components"),
-        help=_("The location IDs of the components whose attributes are used to determine whether a learner is shown "
-               "the content of this conditional module."),
+        help=_("The component location IDs of all source components that are used to determine whether a learner is "
+               "shown the content of this conditional module. Copy the component location ID of a component from its "
+               "Settings dialog in Studio."),
         scope=Scope.content
     )
 
     conditional_attr = String(
         display_name=_("Conditional Attribute"),
-        help=_("The attribute from the course component used to determine whether a learner is shown "
-               "the content of this conditional module."),
+        help=_("The attribute of the source components that determines whether a learner is shown the content of this "
+               "conditional module."),
         scope=Scope.content,
         default='correct',
         values=lambda: [{'display_name': xml_attr, 'value': xml_attr}
@@ -56,7 +57,7 @@ class ConditionalFields(object):
 
     conditional_value = String(
         display_name=_("Conditional Value"),
-        help=_("The value of the conditional attribute that must be true for a learner to be shown "
+        help=_("The value that the conditional attribute of the source components must match before a learner is shown "
                "the content of this conditional module."),
         scope=Scope.content,
         default='True'
@@ -64,10 +65,11 @@ class ConditionalFields(object):
 
     conditional_message = String(
         display_name=_("Blocked Content Message"),
-        help=_("The message learners see when not all conditions are met for this block. "
-               "You can use the {link} variable to give learners a direct link to the required module."),
+        help=_("The message that is shown to learners when not all conditions are met to show the content of this "
+               "conditional module. Include {link} in the text of your message to give learners a direct link to "
+               "required units. For example, 'You must complete {link} before you can access this unit'."),
         scope=Scope.content,
-        default=_('{link} must be attempted before this will become visible.')
+        default=_('You must complete {link} before you can access this unit.')
     )
 
 

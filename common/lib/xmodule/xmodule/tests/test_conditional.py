@@ -335,7 +335,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         modules['cond_module'].definition_to_xml(Mock())
         expected_xml_attributes = {
             'attempted': 'true',
-            'message': '{link} must be attempted before this will become visible.',
+            'message': 'You must complete {link} before you can access this unit.',
             'sources': ''
         }
         self.assertDictEqual(modules['cond_module'].xml_attributes, expected_xml_attributes)
