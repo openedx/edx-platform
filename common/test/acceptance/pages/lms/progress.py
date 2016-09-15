@@ -13,14 +13,14 @@ class ProgressPage(CoursePage):
 
     def is_browser_on_page(self):
         is_present = (
-            self.q(css='div.course-info').present and
-            self.q(css='div#grade-detail-graph').present
+            self.q(css='.course-info').present and
+            self.q(css='#grade-detail-graph').present
         )
         return is_present
 
     @property
     def grading_formats(self):
-        return [label.replace(' Scores:', '') for label in self.q(css="div.scores h3").text]
+        return [label.replace(' Scores:', '') for label in self.q(css=".scores .hd").text]
 
     def section_score(self, chapter, section):
         """
