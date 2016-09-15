@@ -148,11 +148,14 @@ from xmodule.tabs import CourseTabList
 </section>
 
 <script type="text/javascript">
-$(document).ready(function() {
+(function() {
     var $helpModal = $("#help-modal"),
         $closeButton = $("#help-modal .close-modal"),
         $leanOverlay = $("#lean_overlay"),
         $feedbackForm = $("#feedback_form"),
+        focusableChildren,
+        numElements,
+        currentIndex,
         onModalClose = function() {
             $closeButton.off("click");
             $leanOverlay.off("click");
@@ -160,16 +163,64 @@ $(document).ready(function() {
             $('area,input,select,textarea,button').removeAttr('tabindex');
             $(".help-tab a").focus();
             $leanOverlay.removeAttr('tabindex');
+        },
+        initializeTabKeyValues = function(element_name) {
+            focusableChildren = $(element_name).find('a, input[type=text], input[type=submit], select, textarea, button');
+            focusableChildren = focusableChildren.add($closeButton);
+            numElements = focusableChildren.length;
+            currentIndex = 0;
+        },
+        focusElement = function() {
+            var focusableElement = focusableChildren[currentIndex];
+            if (focusableElement) {
+                focusableElement.focus();
+            }
+        },
+        focusPrevious = function () {
+            currentIndex--;
+            if (currentIndex < 0) {
+                currentIndex = numElements - 1;
+            }
+
+            focusElement();
+
+            return false;
+        },
+        focusNext = function () {
+            currentIndex++;
+            if (currentIndex >= numElements) {
+                currentIndex = 0;
+            }
+
+            focusElement();
+
+            return false;
         };
 
-    DialogTabControls.setKeydownListner($helpModal, $closeButton);
+        $helpModal.on('keydown', function (e) {
+            var keyCode = e.keyCode || e.which,
+                escapeKeyCode = 27,
+                tabKeyCode = 9;
+            if (keyCode === escapeKeyCode) {
+                e.preventDefault();
+                $closeButton.click();
+            }
+            if (keyCode == tabKeyCode && e.shiftKey) {
+                e.preventDefault();
+                focusPrevious();
+            }
+            else if (keyCode == tabKeyCode) {
+                e.preventDefault();
+                focusNext();
+            }
+        });
 
     $helpModal.click(function () {
         $helpModal.focus();
     });
 
     $(".help-tab").click(function() {
-        DialogTabControls.initializeTabKeyValues("#help_wrapper", $closeButton);
+        initializeTabKeyValues("#help_wrapper");
         $(".field-error").removeClass("field-error");
         $feedbackForm[0].reset();
         $("#feedback_form input[type='submit']").removeAttr("disabled");
@@ -187,7 +238,7 @@ $(document).ready(function() {
 
     showFeedback = function(event, issue_type, title, subject_label, details_label) {
         $("#help_wrapper").css("display", "none");
-        DialogTabControls.initializeTabKeyValues("#feedback_form_wrapper", $closeButton);
+        initializeTabKeyValues("#feedback_form_wrapper");
         $("#feedback_form input[name='issue_type']").val(issue_type);
         $("#feedback_form_wrapper").css("display", "block");
         $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
@@ -237,7 +288,7 @@ $(document).ready(function() {
     $feedbackForm.on("ajax:success", function(event, data, status, xhr) {
         $("#feedback_form_wrapper").css("display", "none");
         $("#feedback_success_wrapper").css("display", "block");
-        DialogTabControls.initializeTabKeyValues("#feedback_success_wrapper", $closeButton);
+        initializeTabKeyValues("#feedback_success_wrapper");
         $closeButton.focus();
     });
     $feedbackForm.on("ajax:error", function(event, xhr, status, error) {
@@ -277,7 +328,7 @@ $(document).ready(function() {
         // Make change explicit to assistive technology
         $("#feedback_error").focus();
     });
-});
+})(this)
 </script>
 
 %endif
