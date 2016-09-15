@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-01 11:13+0000\n"
-"PO-Revision-Date: 2016-09-01 11:13:42.383538\n"
+"POT-Creation-Date: 2016-09-15 11:17+0000\n"
+"PO-Revision-Date: 2016-09-15 11:17:57.818689\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -958,6 +958,13 @@ msgid ""
 "email, and their account will be activated immediately upon registration."
 msgstr ""
 
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is not selected, users will not be presented with the "
+"provider as an option to authenticate with on the login screen, but manual "
+"authentication using the correct link is still possible."
+msgstr ""
+
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
 msgid "Please wait"
@@ -1465,11 +1472,15 @@ msgid "This answer is partially correct."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This answer is unanswered."
+msgid "This answer is being processed."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
+msgid "Not yet answered."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
 msgstr ""
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
@@ -1540,6 +1551,11 @@ msgstr ""
 #. Translators: a "tag" is an XML element, such as "<b>" in HTML
 #: common/lib/capa/capa/inputtypes.py
 msgid "Expected a {expected_tag} tag; got {given_tag} instead"
+msgstr ""
+
+#. Translators: index here could be 1,2,3 and so on
+#: common/lib/capa/capa/responsetypes.py
+msgid "Question {index}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -2866,16 +2882,6 @@ msgstr ""
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable Subsection Grades Saved"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, the robust grades feature of "
-"saving subsection grades is enabled for this course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -4702,10 +4708,6 @@ msgstr ""
 msgid ""
 "Specified in seconds. Enable caching by setting this to a value greater than"
 " 0."
-msgstr ""
-
-#: lms/djangoapps/commerce/models.py
-msgid "Path to order receipt page."
 msgstr ""
 
 #: lms/djangoapps/commerce/signals.py
@@ -8573,6 +8575,10 @@ msgstr ""
 msgid "Enable course home page improvements."
 msgstr ""
 
+#: openedx/core/djangoapps/site_configuration/models.py
+msgid "Path to order receipt page."
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
 msgstr ""
@@ -9487,8 +9493,9 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
+#: cms/templates/widgets/header.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
+#: themes/edx.org/lms/templates/header.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr ""
 
@@ -9619,6 +9626,10 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "Discussions"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
@@ -9865,6 +9876,10 @@ msgstr ""
 
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
+msgstr ""
+
+#: lms/templates/help_modal.html
+msgid "Support"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -16275,8 +16290,8 @@ msgstr ""
 
 #: lms/templates/survey/survey.html
 msgid ""
-"If you have any questions about this course or this form, you can contact <a"
-" href=\"{mail_to_link}\"\">{mail_to_link}</a>."
+"If you have any questions about this course or this form, you can contact "
+"{link_start}{mail_to_link}{link_end}."
 msgstr ""
 
 #: lms/templates/verify_student/incourse_reverify.html
@@ -19708,10 +19723,6 @@ msgstr ""
 
 #: wiki/forms.py
 msgid "No changes made. Nothing to save."
-msgstr ""
-
-#: wiki/forms.py
-msgid "Select an option"
 msgstr ""
 
 #: wiki/forms.py

@@ -69,6 +69,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Abdallah Nassif <abdoosh00@gmail.com>, 2016
 # Abdelghani Gadiri <wh.gnu.linux@gmail.com>, 2014
 # qrfahasan <ahasan@qrf.org>, 2014,2016
 # Ahmad <reload_cobra2@yahoo.com>, 2015
@@ -109,7 +110,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-25 15:04+0000\n"
+"POT-Creation-Date: 2016-09-01 11:26+0000\n"
 "PO-Revision-Date: 2016-08-24 20:16+0000\n"
 "Last-Translator: AR C2 <e2f458fd4s512@outlook.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -6323,7 +6324,7 @@ msgstr "حذف البحث"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 msgid "Discussion Home"
-msgstr "الصفحة الرئيسية للنقاش"
+msgstr "صفحة المناقشة الرئيسية"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #, python-format

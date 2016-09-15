@@ -6,13 +6,19 @@
 # Translators:
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # anaseha <anaselhadjamor@gmail.com>, 2014
+# anaseha <anaselhadjamor@gmail.com>, 2014
 # Axel Billot <axelbillot@gmail.com>, 2015
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014-2015
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Daniel Le Berre, 2015
+# Daniel Le Berre, 2015
+# Dosto92 <hakim.poubelle@gmail.com>, 2014
+# Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Eric Fortin, 2014,2016
+# Eric Fortin, 2014,2016
 # Florent Dijoux <florent.dijx@gmail.com>, 2016
+# Françoise Docq, 2014
 # Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
@@ -26,6 +32,7 @@
 # Régis Millet <kulgar@ct2c.fr>, 2015
 # Laetitia Pfaender <l.pfaender@learning-tribes.com>, 2016
 # laurentFUN <laurent.at.fun@gmail.com>, 2014-2016
+# Manjari <mringuet@gmail.com>, 2014
 # Matthieu Falce <falce.matthieu@gmail.com>, 2016
 # moocit-france <contact@moocit.fr>, 2015-2016
 # Manjari <mringuet@gmail.com>, 2014
@@ -33,8 +40,10 @@
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # pacha <patrick.chau@wanadoo.fr>, 2015
+# pacha <patrick.chau@wanadoo.fr>, 2015
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
+# qcappart <quentin.c@swing.be>, 2014
 # qcappart <quentin.c@swing.be>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014-2016
 # Régis Behmo <transifex.stuff@behmo.com>, 2016
@@ -42,10 +51,12 @@
 # Richard Moch <richard.moch@gmail.com>, 2016
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
+# samuel <samuelecin@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2014-2015
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015-2016
 # Serge Bibauw <inyarr@gmail.com>, 2016
+# SLOG90 <slog90@gmail.com>, 2014
 # SLOG90 <slog90@gmail.com>, 2014
 # Tahar <taharbrahmi@hotmail.fr>, 2015
 # Xavier Antoviaque <xavier@antoviaque.org>, 2014
@@ -60,28 +71,40 @@
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Bertrand Marron <bertrand.marron@gmail.com>, 2014
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
+# Dosto92 <hakim.poubelle@gmail.com>, 2014
+# Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Eric Fortin, 2014,2016
+# Eric Fortin, 2014,2016
+# Françoise Docq, 2014
 # Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
+# Julien Rolland <julien.rolland33@gmail.com>, 2013
+# laurentFUN <laurent.at.fun@gmail.com>, 2014,2016
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Matthieu Falce <falce.matthieu@gmail.com>, 2016
 # moocit-france <contact@moocit.fr>, 2015-2016
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013,2015
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
+# Philippe Chiu <philippe.chiu@gmail.com>, 2013
 # Pierre-Emmanuel Colas <pecolas44@gmail.com>, 2015
 # Pierre Roland Bonvin <pierre@bonvin.name>, 2016
 # rafcha <raphael.chay@gmail.com>, 2014-2016
 # Richard Moch <richard.moch@gmail.com>, 2015-2016
+# SALHI Aissam <ais.salhy@gmail.com>, 2014
+# samuel <samuelecin@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015
 # SLOG90 <slog90@gmail.com>, 2014
+# SLOG90 <slog90@gmail.com>, 2014
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # Toreador <torrent_lover@hotmail.com>, 2014
+# Toreador <torrent_lover@hotmail.com>, 2014
+# yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -93,6 +116,8 @@
 # bekairi tahar <tahar48omar@gmail.com>, 2014
 # natg94 <bgenson@voo.be>, 2015
 # Eric Fortin, 2014,2016
+# Eric Fortin, 2014,2016
+# Françoise Docq, 2014
 # Françoise Docq, 2014
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Hélène Tindon <helene.tindon@gmail.com>, 2015
@@ -100,9 +125,11 @@
 # Kévin SEVERIN <kevin.severin@laposte.net>, 2015
 # Laetitia Pfaender <l.pfaender@learning-tribes.com>, 2016
 # laurentFUN <laurent.at.fun@gmail.com>, 2016
+# laurentFUN <laurent.at.fun@gmail.com>, 2016
 # Linda B.A <siria242@gmail.com>, 2016
 # Marie-Andrée Coulombe <coulombe.ma@gmail.com>, 2014
 # moocit-france <contact@moocit.fr>, 2015-2016
+# natg94 <bgenson@voo.be>, 2015
 # Olivier Lebon <oliv.lebon@wanadoo.fr>, 2015
 # rafcha <raphael.chay@gmail.com>, 2014-2016
 # Richard Moch <richard.moch@gmail.com>, 2016
@@ -115,25 +142,30 @@
 # 
 # Translators:
 # Daniel Le Berre, 2014
+# Daniel Le Berre, 2014
+# Eric Fortin, 2016
 # Eric Fortin, 2016
 # Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # INARES <contact@inares.org>, 2015
 # Laetitia Pfaender <l.pfaender@learning-tribes.com>, 2016
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
+# laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Matthieu Falce <falce.matthieu@gmail.com>, 2016
 # moocit-france <contact@moocit.fr>, 2015-2016
 # rafcha <raphael.chay@gmail.com>, 2014-2015
 # Richard Moch <richard.moch@gmail.com>, 2016
+# romain couturat <romain.couturat@fun-mooc.fr>, 2016
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # Tala Aoun <talaaoun@gmail.com>, 2016
+# yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-25 15:04+0000\n"
-"PO-Revision-Date: 2016-09-01 10:15+0000\n"
-"Last-Translator: Matthieu Falce <falce.matthieu@gmail.com>\n"
+"POT-Creation-Date: 2016-09-01 11:26+0000\n"
+"PO-Revision-Date: 2016-09-05 12:38+0000\n"
+"Last-Translator: laurentFUN <laurent.at.fun@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1830,7 +1862,7 @@ msgstr "Haute définition"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "off"
-msgstr "off"
+msgstr "arrêt"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
 msgid "on"
@@ -1978,7 +2010,7 @@ msgstr "title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
 msgid "text_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId}"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
@@ -2332,60 +2364,65 @@ msgid ""
 "Your request could not be completed. Reload the page and try again. If the "
 "issue persists, click the Help tab to report the problem."
 msgstr ""
+"Votre requête n'a pu être complétée. Recharger la page et essayez de "
+"nouveau. Si le problème persiste, cliquer sur l'onglet Aide afin de signaler"
+" le problème."
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex} out of {numItems} total"
-msgstr ""
+msgstr "Affiche {firstIndex} sur {numItems} au total"
 
 #: common/static/common/js/components/views/paging_header.js
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
-msgstr ""
+msgstr "Affiche {firstIndex}-{lastIndex} sur {numItems} au total"
 
 #: common/static/common/js/discussion/utils.js
 msgid ""
 "We had some trouble processing your request. Please ensure you have copied "
 "any "
 msgstr ""
+"Nous avons eu des problèmes pour traiter votre requête. Soyez certain que "
+"vous avez copié tout "
 
 #: common/static/common/js/discussion/utils.js
 msgid "Some images in this post have been omitted"
-msgstr ""
+msgstr "Quelques images dans ce message ont été omises"
 
 #: common/static/common/js/discussion/utils.js
 msgid "image omitted"
-msgstr ""
+msgstr "image manquante"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "there is currently {numVotes} vote"
 msgid_plural "there are currently {numVotes} votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "il y a actuellement {numVotes} vote"
+msgstr[1] "il y a actuellement {numVotes} votes"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numVotes} Vote"
+msgstr[1] "{numVotes} Votes"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
-msgstr ""
+msgstr "Aucun résultat trouvé pour {original_query}."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
-msgstr ""
+msgstr "Voir les messages de {username}."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
 msgid_plural "{numResponses} other responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numResponses} autre réponse"
+msgstr[1] "{numResponses} autres réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} response"
 msgid_plural "{numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{numResponses} réponse"
+msgstr[1] "{numResponses} réponses"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load next {numResponses} responses"
@@ -2645,7 +2682,7 @@ msgstr[1] "Cette annotation a  %(count)s drapeaux."
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
-msgstr ""
+msgstr "Une erreur inattendue est survenue. Veuillez réessayer."
 
 #: lms/djangoapps/support/static/support/js/views/enrollment.js
 msgid "Financial Assistance"
@@ -2666,6 +2703,8 @@ msgstr "Veuillez indiquer une raison."
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
 msgstr ""
+"Une erreur s'est produite lors du changement de cette inscription. Veuillez "
+"réessayer."
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -2673,7 +2712,7 @@ msgstr "dernière activité"
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "open slots"
-msgstr ""
+msgstr "places disponibles"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
 #: lms/templates/edxnotes/tab-item.underscore
@@ -2821,7 +2860,7 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/instructor_tools.js
 msgid "Team \"{team}\" successfully deleted."
-msgstr ""
+msgstr "Equipe \"{team}\" supprimée avec succès."
 
 #: lms/djangoapps/teams/static/teams/js/views/my_teams.js
 msgid "You are not currently a member of any team."
@@ -2886,7 +2925,7 @@ msgstr "Toutes les équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams.js
 msgid "Teams Pagination"
-msgstr ""
+msgstr "Pagination des équipes"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Topics"
@@ -2919,6 +2958,8 @@ msgstr ""
 msgid ""
 "Your request could not be completed due to a server problem. Reload the page"
 msgstr ""
+"Votre demande n'a pas pu être complété en raison d'un problème de serveur. "
+"Rafraîchissez la page"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Team Search"
@@ -2926,7 +2967,7 @@ msgstr "Recherche d'équipe"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Showing results for \"{searchString}\""
-msgstr ""
+msgstr "Affichage des résultats pour \"{searchString}\""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "Create a New Team"
@@ -2977,15 +3018,15 @@ msgstr "Tous les sujets"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The page \"{route}\" could not be found."
-msgstr ""
+msgstr "Page \"{route}\" non trouvée."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The topic \"{topic}\" could not be found."
-msgstr ""
+msgstr "Sujet \"{topic}\" non trouvé."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "The team \"{team}\" could not be found."
-msgstr ""
+msgstr "L'équipe \"{team}\" n'a pu être trouvée."
 
 #: lms/djangoapps/teams/static/teams/js/views/topic_card.js
 msgid "%(team_count)s Team"
@@ -3100,6 +3141,8 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating ORA data report. Please try again."
 msgstr ""
+"Erreur lors de la génération du rapport de données ORA. Merci d’essayer à "
+"nouveau."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -3132,12 +3175,17 @@ msgstr "Erreur lors du changement des permissions de l'utilisateur."
 msgid ""
 "Could not find a user with username or email address '<%- identifier %>'."
 msgstr ""
+"Impossible de trouver un utilisateur avec le nom d'utilisateur ou adresse "
+"email \"<%- identifier %>\"."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid ""
 "Error: User '<%- username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
 msgstr ""
+"Erreur : L'utilisateur \"<%- username %>\" n'a pas encore activé son compte."
+" Les utilisateurs doivent créer et activer leurs comptes avant qu'ils ne "
+"puissent se voir attribuer un rôle."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
@@ -3323,7 +3371,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "All learners in the {cohort_name} cohort"
-msgstr ""
+msgstr "Tous les apprenants de la cohorte {cohort_name}"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid ""
@@ -3657,7 +3705,7 @@ msgstr "Envoyé par"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Sent To"
-msgstr ""
+msgstr "Envoyé à"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Time Sent"
@@ -3721,11 +3769,11 @@ msgstr "Description du Lien"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "e.g. 'google'"
-msgstr ""
+msgstr "exemple 'google'"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Please provide a description of the link destination."
-msgstr ""
+msgstr "Veuillez fournir une description du lien de destination."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Insert Image (upload file or type URL)"
@@ -3752,10 +3800,12 @@ msgid ""
 "e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
 "the image."
 msgstr ""
+"exemple 'Ciel avec nuages'. La description est utile pour les utilisateurs "
+"qui ne peuvent pas voir l'image."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "How to create useful text alternatives."
-msgstr ""
+msgstr "Comment créer des textes alternatifs utiles."
 
 #: lms/static/js/Markdown.Editor.js
 msgid ""
@@ -3866,7 +3916,7 @@ msgstr "Vous avez été déconnecté de votre compte edX"
 
 #: lms/static/js/api_admin/views/catalog_preview.js
 msgid "Preview this query"
-msgstr ""
+msgstr "Aperçu de cette requête"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
@@ -3950,19 +4000,21 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners do not exist in LMS and not added to the"
-msgstr ""
+msgstr "apprenants n'existant pas dans le LMS et non ajouté dans le"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner does not exist in LMS and not added to the exception list"
 msgstr ""
+"apprenant n'existant pas dans le LMS et non ajouté dans la liste d'exception"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are already white listed and not added to"
-msgstr ""
+msgstr "apprenants déjà existant dans la liste blanche et non ajouté dans"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learner is already white listed and not added to the exception "
 msgstr ""
+"apprenant déjà existant dans la liste blanche et non ajouté à l'exception"
 
 #: lms/static/js/certificates/views/certificate_bulk_whitelist.js
 msgid " learners are not enrolled in course and not added to"
@@ -3977,22 +4029,27 @@ msgid ""
 "Certificate of <%= user %> has already been invalidated. Please check your "
 "spelling and retry."
 msgstr ""
+"Le certificat de <%= user %> a déjà été invalidé. Veuillez vérifier votre "
+"saisie et réessayer."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid "Certificate has been successfully invalidated for <%= user %>."
-msgstr ""
+msgstr "Invalidation réussie du certificat pour <%= user %>."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 #: lms/static/js/certificates/views/certificate_whitelist.js
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "Server Error, Please refresh the page and try again."
 msgstr ""
+"Erreur serveur. Veuillez rafraîchir la page, s'il vous plaît et réessayer."
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
 "The certificate for this learner has been re-validated and the system is re-"
 "running the grade for this learner."
 msgstr ""
+"Le certificat de cet apprenant a été re-validé et le système est en train de"
+" re-évaluer les notes de cet apprenant. "
 
 #: lms/static/js/certificates/views/certificate_invalidation_view.js
 msgid ""
@@ -4002,7 +4059,7 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist.js
 msgid "Student Removed from certificate white list successfully."
-msgstr ""
+msgstr "Étudiant retiré avec succès de la liste blanche des certificats."
 
 #: lms/static/js/certificates/views/certificate_whitelist.js
 msgid ""
@@ -4012,7 +4069,7 @@ msgstr ""
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid "<%= user %> already in exception list."
-msgstr ""
+msgstr "<%= user %> est déjà dans la liste d'exception."
 
 #: lms/static/js/certificates/views/certificate_whitelist_editor.js
 msgid ""
@@ -4087,6 +4144,8 @@ msgstr "Notes masquées"
 #: lms/static/js/edxnotes/views/search_box.js
 msgid "Please enter a term in the {anchorStart} search field{anchorEnd}."
 msgstr ""
+"Merci de saisir votre terme dans le {anchorStart} champ de "
+"recherche{anchorEnd}."
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
@@ -4259,6 +4318,11 @@ msgid ""
 "'{verifiedCohortName}'. To change the configuration for verified track "
 "cohorts, contact your edX partner manager."
 msgstr ""
+"Ce cours utilise des cohortes automatiques pour les apprenants vérifiés. "
+"Vous ne pouvez pas désactiver les cohortes, et vous ne pouvez pas renommer "
+"la cohorte manuelle nommée'{verifiedCohortName}'. Pour changer la "
+"configuration des cohortes vérifiées,contacter votre gestionnaire de "
+"partenariat edX."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
@@ -4266,12 +4330,19 @@ msgid ""
 " the required cohort does not exist. You must create a manually-assigned "
 "cohort named '{verifiedCohortName}' for the feature to work."
 msgstr ""
+"Ce cours a les cohortes automatiques activées pour les apprenants vérifiés, "
+"mais la cohorte requise n'existe pas. Vous devez créer manuellement une "
+"cohorte nommée '{verifiedCohortName}' pour que cette fonctionnalité "
+"fonctionne."
 
 #: lms/static/js/groups/views/verified_track_settings_notification.js
 msgid ""
 "This course has automatic cohorting enabled for verified track learners, but"
 " cohorts are disabled. You must enable cohorts for the feature to work."
 msgstr ""
+"Ce cours a les cohortes automatiques activées pour les apprenants vérifiés, "
+"mais les cohortes sont désactivées. Vous devez activer les cohortes pour que"
+" cette fonctionnalité fonctionne."
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
@@ -4299,6 +4370,7 @@ msgstr ""
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Error while regenerating certificates. Please try again."
 msgstr ""
+"Erreur lors de la génération des certificats. Merci d'essayer à nouveau."
 
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid ""
@@ -4409,6 +4481,9 @@ msgid ""
 "address you provided.  If you do not receive this message, "
 "{anchorStart}contact technical support{anchorEnd}."
 msgstr ""
+"Nous avons envoyé un courriel avec les instructions de réinitialisation de "
+"mot de passe à l'adresse que vous nous avez fourni. Si vous ne recevez pas "
+"ce message, {anchorStart}contacter le support technique{anchorEnd}."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4420,7 +4495,7 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
-msgstr ""
+msgstr "Informations générales du compte"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4448,6 +4523,11 @@ msgid ""
 "exactly as it appears on your government-issued photo ID, including any non-"
 "Roman characters."
 msgstr ""
+"C'est le nom utilisé pour la vérification d'identité qui apparaît dans votre"
+" certificat. Les autres apprenants ne voient jamais votre nom complet. "
+"Assurez vous de saisir votre nom exactement comme il apparaît sur votre "
+"photo d'identité émise par le gouvernement, en incluant les caractères "
+"autres que romains."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Email Address"
@@ -4468,7 +4548,7 @@ msgstr "Mot de passe"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset Your Password"
-msgstr ""
+msgstr "Réinitialiser votre mot de passe"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4476,6 +4556,9 @@ msgid ""
 " address for your {platform_name} account. Click the link in the message to "
 "reset your password."
 msgstr ""
+"En cliquant sur \"Réinitialiser votre mot de passe\", un message sera envoyé"
+" à l'adresse courriel de votre compte {platform_name}. Cliquez sur le lien "
+"dans le message pour réinitialiser votre mot de passe."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4491,20 +4574,22 @@ msgstr "Pays ou région"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Time Zone"
-msgstr ""
+msgstr "Fuseau Horaire"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "Select the time zone for displaying course dates. If you do not specify a "
 msgstr ""
+"Saisir un fuseau horaire pour afficher les dates de cours. Si vous ne "
+"spécifiez pas un "
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
-msgstr ""
+msgstr "Tous les fuseaux horaires"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
-msgstr ""
+msgstr "Information additionnelle"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Education Completed"
@@ -4526,45 +4611,51 @@ msgstr "Langue préférée"
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Linked Accounts"
-msgstr ""
+msgstr "Comptes liés"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "You can link your social media accounts to simplify signing in to "
 "{platform_name}."
 msgstr ""
+"Vous pouvez lier vos comptes de médias sociaux afin de simplifier la "
+"connexion à {platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NAME"
-msgstr ""
+msgstr "NOM DE LA COMMANDE"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER PLACED"
-msgstr ""
+msgstr "COMMANDES ENREGISTRÉES"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "TOTAL"
-msgstr ""
+msgstr "TOTAL"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NUMBER"
-msgstr ""
+msgstr "NUMÉRO DE LA COMMANDE"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "My Orders"
-msgstr ""
+msgstr "Mes Commandes"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
 "This page contains information about orders that you have placed with "
 "{platform_name}."
 msgstr ""
+"Cette page contient des informations à propos des commandes que vous avez "
+"passés avec {platform_name}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "We've sent a confirmation message to {new_email_address}. Click the link in "
 "the message to update your email address."
 msgstr ""
+"Un message de confirmation a été envoyé à {new_email_address}. Cliquer le "
+"lien dans le message afin de mettre à jour votre adresse email."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
@@ -4578,38 +4669,44 @@ msgid ""
 "We've sent a message to {email_address}. Click the link in the message to "
 "reset your password."
 msgstr ""
+"Un message a été envoyé à {email_address}. Cliquer le lien dans le message "
+"afin de réinitaliser votre mot de passe."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link your {accountName} account"
-msgstr ""
+msgstr "Liez votre compte {accountName}"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink This Account"
-msgstr ""
+msgstr "Dissocier votre compte"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "You can use your {accountName} account to sign in to your {platformName} "
 "account."
 msgstr ""
+"Vous pouvez utiliser votre compte {accountName} afin de vous connecter à "
+"votre compte {platformName}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlink your {accountName} account"
-msgstr ""
+msgstr "Dissociez votre compte {accountName}"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Link Your Account"
-msgstr ""
+msgstr "Liez votre compte"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid ""
 "Link your {accountName} account to your {platformName} account and use "
 "{accountName} to sign in to {platformName}."
 msgstr ""
+"Liez votre compte {accountName} à votre compte {platformName} et utilisez "
+"{accountName} pour vous connecter à {platformName}."
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Unlinking"
-msgstr "Supprimer le lien"
+msgstr "Dissocier"
 
 #: lms/static/js/student_account/views/account_settings_fields.js
 msgid "Linking"
@@ -4621,7 +4718,7 @@ msgstr "Lien supprimé."
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Account Information"
-msgstr ""
+msgstr "Information du compte"
 
 #: lms/static/js/student_account/views/account_settings_view.js
 msgid "Order History"
@@ -4629,7 +4726,7 @@ msgstr "Historique des commandes"
 
 #: lms/static/js/student_profile/views/badge_list_container.js
 msgid "Accomplishments Pagination"
-msgstr ""
+msgstr "Paginations des réalisations"
 
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 msgid "{platform_name} learners can see my:"
@@ -4695,11 +4792,11 @@ msgstr "Image de profil pour {username}"
 
 #: lms/static/js/student_profile/views/learner_profile_view.js
 msgid "About Me"
-msgstr ""
+msgstr "À propos de moi"
 
 #: lms/static/js/student_profile/views/learner_profile_view.js
 msgid "Accomplishments"
-msgstr ""
+msgstr "Accomplissements"
 
 #: lms/static/js/student_profile/views/learner_profile_view.js
 msgid "Profile"
@@ -4707,7 +4804,7 @@ msgstr "Profil"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Image Upload Error"
-msgstr "Erreur lors du téléchargement de l'image"
+msgstr "Erreur lors du téléversement de l'image"
 
 #: lms/static/js/verify_student/views/image_input_view.js
 msgid "Please verify that you have uploaded a valid image (PNG and JPEG)."
@@ -4725,7 +4822,7 @@ msgstr "Envoi de photos impossible"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education Verified Certificate"
-msgstr ""
+msgstr "Certificat vérififé professionel"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Professional Education"
@@ -4755,11 +4852,11 @@ msgstr "Payer avec {processor}"
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "All payment options are currently unavailable."
-msgstr ""
+msgstr "Toutes les options de paiement sont pour l'instant indisponibles."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Try the transaction again in a few minutes."
-msgstr ""
+msgstr "Réessayez la transaction dans quelques minutes."
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "Could not submit order"
@@ -5210,7 +5307,7 @@ msgstr ""
 
 #: cms/static/js/maintenance/force_publish_course.js
 msgid "Internal Server Error."
-msgstr ""
+msgstr "Erreur interne du serveur."
 
 #. Translators: This is the status of a video upload that is queued
 #. waiting for other uploads to complete
@@ -5231,7 +5328,7 @@ msgstr "Le chargement a échoué"
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name and asset_path are both required"
-msgstr ""
+msgstr "Titre de chapitre et asset_path sont touts deux nécessaires"
 
 #: cms/static/js/models/chapter.js
 msgid "Chapter name is required"
@@ -5247,7 +5344,7 @@ msgstr "Vous devez indiquer un nom"
 
 #: cms/static/js/models/course_update.js
 msgid "Action required: Enter a valid date."
-msgstr ""
+msgstr "Action requise : Entrez une date valide."
 
 #: cms/static/js/models/group.js
 msgid "Group name is required"
@@ -5289,6 +5386,8 @@ msgstr ""
 #: cms/static/js/models/settings/course_details.js
 msgid "The course start date must be later than the enrollment start date."
 msgstr ""
+"La date de début de cours ne peut pas être antérieure à la date de début des"
+" inscriptions."
 
 #: cms/static/js/models/settings/course_details.js
 msgid "The enrollment start date cannot be after the enrollment end date."
@@ -5329,6 +5428,8 @@ msgstr "Veuillez entrer un entier non négatif."
 #: cms/static/js/models/settings/course_grader.js
 msgid "Cannot drop more <%= types %> assignments than are assigned."
 msgstr ""
+"Impossible de déposer plus de <%= types %> qu'il n'est possible d'en "
+"assigner."
 
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Grace period must be specified in HH:MM format."
@@ -5337,12 +5438,12 @@ msgstr "Le délai doit être au format HH: MM."
 #: cms/static/js/models/settings/course_grading_policy.js
 msgid "Not able to set passing grade to less than %(minimum_grade_cutoff)s%."
 msgstr ""
-"Impossible de fixer la note minimale de passage en-dessous de "
+"Pas en mesure de fixer la note de passage à moins de "
 "%(minimum_grade_cutoff)s%."
 
 #: cms/static/js/models/textbook.js
 msgid "Textbook name is required"
-msgstr ""
+msgstr "Le nom du manuel est requis"
 
 #: cms/static/js/models/textbook.js
 msgid "Please add at least one chapter"
@@ -5373,9 +5474,8 @@ msgid "This component has validation issues."
 msgstr "Ce composant a des problèmes de validation."
 
 #: cms/static/js/programs/models/course_model.js
-#: cms/templates/js/programs/course_details.underscore
 msgid "Course Code"
-msgstr ""
+msgstr "Code de cours"
 
 #: cms/static/js/programs/models/course_model.js
 #: cms/templates/js/certificate-details.underscore
@@ -5386,85 +5486,87 @@ msgstr "Titre du cours"
 
 #: cms/static/js/programs/models/program_model.js
 msgid "Please select a valid organization."
-msgstr ""
+msgstr "Veuillez sélectionner une organisation valide, s'il vous plaît."
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is required"
-msgstr ""
+msgstr "{0} est obligatoire"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be accepted"
-msgstr ""
+msgstr "{0} doit être accepté"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be greater than or equal to {1}"
-msgstr ""
+msgstr "{0} doit être supérieur ou égal à {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be less than or equal to {1}"
-msgstr ""
+msgstr "{0} doit être inférieur ou égal à {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2}"
-msgstr ""
+msgstr "{0} doit être entre {1} et {2}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be {1} characters"
-msgstr ""
+msgstr "{0} doit être {1} caractères"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at least {1} characters"
-msgstr ""
+msgstr "{0} doit être d'au moins {1} caractères"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be at most {1} characters"
-msgstr ""
+msgstr "{0} doit être d'au plus {1} caractères"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be between {1} and {2} characters"
-msgstr ""
+msgstr "{0} doit être entre {1} et {2} caractères"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be one of: {1}"
-msgstr ""
+msgstr "{0} doit être l'un de : {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be the same as {1}"
-msgstr ""
+msgstr "{0} doit être identique à {1}"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must only contain digits"
-msgstr ""
+msgstr "{0} doit seulement contenir des chiffres"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a number"
-msgstr ""
+msgstr "{0} doit être un nombre"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid email"
-msgstr ""
+msgstr "{0} doit être une adresse email valide"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} must be a valid url"
-msgstr ""
+msgstr "{0} doit être une URL valide"
 
 #: cms/static/js/programs/utils/validation_config.js
 msgid "{0} is invalid"
-msgstr ""
+msgstr "{0} est invalide"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "confirm"
-msgstr ""
+msgstr "confirmer"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Publish this program?"
-msgstr ""
+msgstr "Publier ce programme ?"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid ""
 "After you publish this program, you cannot add or remove course codes or "
 "remove course runs."
 msgstr ""
+"Après la publication de ce programme, vous ne pouvez plus ajouter ou "
+"supprimer des codes de cours or supprimer des instances de cours."
 
 #: cms/static/js/programs/views/program_details_view.js
 #: cms/static/js/views/modals/course_outline_modals.js
@@ -5476,11 +5578,11 @@ msgstr "Publier"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Marketing Slug is required."
-msgstr ""
+msgstr "L'identifiant marketing est obligatoire."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
-msgstr ""
+msgstr "Vos chargements vidéos ne sont pas terminés."
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
@@ -5557,8 +5659,8 @@ msgstr "Non utilisé"
 #: cms/static/js/views/group_configuration_details.js
 msgid "Used in {count} unit"
 msgid_plural "Used in {count} units"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Utilisé par {count} unités."
+msgstr[1] "Utilisés par {count} unités."
 
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
@@ -5611,7 +5713,7 @@ msgstr "configuration des groupes"
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "Add your first group configuration"
-msgstr ""
+msgstr "Ajouter votre premier groupe de configuration"
 
 #: cms/static/js/views/group_configurations_list.js
 msgid "You have not created any group configurations yet."
@@ -5644,7 +5746,7 @@ msgstr "Tous droits réservés"
 
 #: cms/static/js/views/license.js
 msgid "You reserve all rights for your work"
-msgstr ""
+msgstr "Vous vous réservez tous les droits pour votre travail"
 
 #: cms/static/js/views/license.js
 msgid "Creative Commons"
@@ -5653,6 +5755,8 @@ msgstr "Creative Commons"
 #: cms/static/js/views/license.js
 msgid "You waive some rights for your work, such that others can use it too"
 msgstr ""
+"Vous renoncez à certains droits sur votre œuvre, pour que d'autres puissent "
+"également l'utiliser."
 
 #: cms/static/js/views/license.js
 msgid "Version"
@@ -5668,6 +5772,9 @@ msgid ""
 "but only if they give credit the way you request. Currently, this option is "
 "required."
 msgstr ""
+"Autoriser d'autres personnes à copier, diffuser, montrer et interpréter "
+"votre œuvre sous copyright mais seulement s'ils vous citent de la manière "
+"dont vous souhaitez. Pour l'instant, cette option est requise."
 
 #: cms/static/js/views/license.js
 msgid "Noncommercial"
@@ -5678,6 +5785,9 @@ msgid ""
 "Allow others to copy, distribute, display and perform your work - and "
 "derivative works based upon it - but for noncommercial purposes only."
 msgstr ""
+"Autoriser d'autres personnes à copier, distribuer, montrer et interpréter "
+"votre œuvre - et toute œuvre qui en est dérivée - mais seulement à des fins "
+"non commerciales."
 
 #: cms/static/js/views/license.js
 msgid "No Derivatives"
@@ -5689,10 +5799,13 @@ msgid ""
 "of your work, not derivative works based upon it. This option is "
 "incompatible with \"Share Alike\"."
 msgstr ""
+"Autoriser d'autres personnes à copier, diffuser, montrer et interpréter "
+"uniquement des copies à l'identique de votre œuvre et non pas des œuvres qui"
+" en seraient dérivées. Cette option est incompatible avec \"Share Alike\"."
 
 #: cms/static/js/views/license.js
 msgid "Share Alike"
-msgstr ""
+msgstr "Partage à l'identique"
 
 #: cms/static/js/views/license.js
 msgid ""
@@ -5700,6 +5813,9 @@ msgid ""
 "to the license that governs your work. This option is incompatible with \"No"
 " Derivatives\"."
 msgstr ""
+"Autoriser d'autres personnes à distribuer des travaux dérivés sous une "
+"license identique à celle s'appliquant à votre œuvre. Cette option est "
+"incompatible avec \"No Derivatives\"."
 
 #. Translators: "item_display_name" is the name of the item to be deleted.
 #: cms/static/js/views/list_item.js
@@ -5713,7 +5829,7 @@ msgstr ""
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "There was an error changing the user's role"
-msgstr ""
+msgstr "Il a eu une erreur lors du changement de rôle de cet utilisateur"
 
 #: cms/static/js/views/manage_users_and_roles.js
 msgid "Error adding user"
@@ -5764,19 +5880,19 @@ msgstr ""
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "{display_name} Settings"
-msgstr ""
+msgstr "Paramètres de {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Change the settings for {display_name}"
-msgstr ""
+msgstr "Modifier les paramètres pour {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish {display_name}"
-msgstr ""
+msgstr "Publier {display_name}"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish all unpublished changes for this {item}?"
-msgstr ""
+msgstr "Publier toutes les modifications non publiées pour cet {item} ?"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Basic"
@@ -5948,11 +6064,15 @@ msgid ""
 "No validation is performed on policy keys or value pairs. If you are having "
 "difficulties, check your formatting."
 msgstr ""
+"Aucune validation n'est effectuée sur les politiques de clés et les paires "
+"de valeurs. Si vous rencontrez des difficultés, vérifiez votre formatage."
 
 #: cms/static/js/views/settings/grader.js
 msgid ""
 "For grading to work, you must change all {oldName} subsections to {newName}."
 msgstr ""
+"Pour que le calcul des notes fonctionne, vous devez modifier toutes les "
+"sous-sections {oldName} à {newName}."
 
 #: cms/static/js/views/settings/main.js
 msgid "Course Credit Requirements"
@@ -5961,6 +6081,7 @@ msgstr "Critères d'obtention de crédit du cours"
 #: cms/static/js/views/settings/main.js
 msgid "The minimum grade for course credit is not set."
 msgstr ""
+"La note minimale d'obtention d'un crédit pour ce cours n'est pas fixée."
 
 #: cms/static/js/views/settings/main.js
 msgid "Course pacing cannot be changed once a course has started."
@@ -5970,19 +6091,19 @@ msgstr ""
 
 #: cms/static/js/views/settings/main.js
 msgid "{hours}:{minutes} (current UTC time)"
-msgstr ""
+msgstr "{hours}:{minutes} (heure actuelle UTC )"
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your course image."
-msgstr "Téléchargez votre image de cours."
+msgstr "Envoyez votre image de cours."
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your banner image."
-msgstr "Téléchargez l'image de votre bannière."
+msgstr "Envoyez l'image de votre bannière."
 
 #: cms/static/js/views/settings/main.js
 msgid "Upload your video thumbnail image."
-msgstr ""
+msgstr "Chargez votre image de vignette vidéo."
 
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
@@ -6155,7 +6276,7 @@ msgstr "Attention"
 
 #: cms/static/js/xblock_asides/structured_tags.js
 msgid "Updating Tags"
-msgstr ""
+msgstr "Mise à jour des étiquettes"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
@@ -7020,7 +7141,7 @@ msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid "timed"
-msgstr ""
+msgstr "temps limité"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 msgid ""
@@ -7124,7 +7245,7 @@ msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
-msgstr "Soumettre votre condidature"
+msgstr "Soumettre votre candidature"
 
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid ""
@@ -7147,7 +7268,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
-msgstr "Téléverser un fichier CSV"
+msgstr "Envoyez un fichier CSV"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
@@ -9525,6 +9646,9 @@ msgid ""
 "exam. The videos are then reviewed to ensure that learners follow all "
 "examination rules."
 msgstr ""
+"Les examens vérifiés sont minutés et un enregistrement vidéo est fait que "
+"chaque étudiant. Les vidéo sont ensuite vérifiées pour s'assurer que les "
+"conditions de l'examen étaient correctes;"
 
 #: cms/templates/js/timed-examination-preference-editor.underscore
 msgid "Practice Proctored"
@@ -9850,6 +9974,8 @@ msgid ""
 "EdX doesn\\'t have a timed transcript for this video. Please upload an .srt "
 "file."
 msgstr ""
+"EdX ne dispose pas de transcription synchronisée pour cette vidéo. Veuillez "
+"téléverser un fichier de transcription .srt."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid ""
@@ -9869,7 +9995,7 @@ msgstr "Oui, remplacer la transcription EdX par celle de YouTube"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 msgid "Timed Transcript Uploaded Successfully"
-msgstr ""
+msgstr "Transcription synchronisée importée avec succès"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 msgid ""

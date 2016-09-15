@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-01 11:13+0000\n"
-"PO-Revision-Date: 2016-09-01 11:13:42.383538\n"
+"POT-Creation-Date: 2016-09-15 11:17+0000\n"
+"PO-Revision-Date: 2016-09-15 11:17:57.818689\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1221,6 +1221,21 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
 
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is not selected, users will not be presented with the "
+"provider as an option to authenticate with on the login screen, but manual "
+"authentication using the correct link is still possible."
+msgstr ""
+"Ìf thïs öptïön ïs nöt séléçtéd, üsérs wïll nöt ßé préséntéd wïth thé "
+"prövïdér äs än öptïön tö äüthéntïçäté wïth ön thé lögïn sçréén, ßüt mänüäl "
+"äüthéntïçätïön üsïng thé çörréçt lïnk ïs stïll pössïßlé. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
+"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
+"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт#"
+
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
 msgid "Please wait"
@@ -1785,12 +1800,16 @@ msgstr ""
 "Thïs änswér ïs pärtïällý çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This answer is unanswered."
-msgstr "Thïs änswér ïs ünänswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/lib/capa/capa/inputtypes.py
 msgid "This answer is being processed."
 msgstr "Thïs änswér ïs ßéïng pröçésséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Not yet answered."
+msgstr "Nöt ýét änswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/lib/capa/capa/inputtypes.py wiki/forms.py
+msgid "Select an option"
+msgstr "Séléçt än öptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -1876,6 +1895,11 @@ msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
 "Éxpéçtéd ä {expected_tag} täg; göt {given_tag} ïnstéäd Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#. Translators: index here could be 1,2,3 and so on
+#: common/lib/capa/capa/responsetypes.py
+msgid "Question {index}"
+msgstr "Qüéstïön {index} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Correct"
@@ -3650,18 +3674,6 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт#"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable Subsection Grades Saved"
-msgstr "Énäßlé Süßséçtïön Grädés Sävéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, the robust grades feature of "
-"saving subsection grades is enabled for this course."
-msgstr ""
-"Éntér trüé ör fälsé. Ìf thïs välüé ïs trüé, thé rößüst grädés féätüré öf "
-"sävïng süßséçtïön grädés ïs énäßléd för thïs çöürsé. Ⱡ'σяєм #"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Learning Information"
@@ -6127,10 +6139,6 @@ msgid ""
 msgstr ""
 "Spéçïfïéd ïn séçönds. Énäßlé çäçhïng ßý séttïng thïs tö ä välüé gréätér thän"
 " 0. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/djangoapps/commerce/models.py
-msgid "Path to order receipt page."
-msgstr "Päth tö ördér réçéïpt pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -11116,6 +11124,10 @@ msgstr ""
 "Énäßlé çöürsé hömé pägé ïmprövéménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
+#: openedx/core/djangoapps/site_configuration/models.py
+msgid "Path to order receipt page."
+msgstr "Päth tö ördér réçéïpt pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
 msgstr ""
@@ -12191,8 +12203,9 @@ msgstr "Çhöösé Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 msgid "Account"
 msgstr "Àççöünt Ⱡ'σяєм ιρѕυм #"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
+#: cms/templates/widgets/header.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
+#: themes/edx.org/lms/templates/header.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Hélp Ⱡ'σяєм ι#"
 
@@ -12335,6 +12348,10 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
 msgstr "Dïsçüssïön - {course_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "Discussions"
+msgstr "Dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/templates/discussion/_discussion_inline.html
@@ -12599,6 +12616,10 @@ msgstr "Rését Mý Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє
 #: lms/templates/forgot_password_modal.html
 msgid "Email is incorrect."
 msgstr "Émäïl ïs ïnçörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/help_modal.html
+msgid "Support"
+msgstr "Süppört Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/help_modal.html
 msgid "{platform_name} Help"
@@ -20924,12 +20945,11 @@ msgstr ""
 
 #: lms/templates/survey/survey.html
 msgid ""
-"If you have any questions about this course or this form, you can contact <a"
-" href=\"{mail_to_link}\"\">{mail_to_link}</a>."
+"If you have any questions about this course or this form, you can contact "
+"{link_start}{mail_to_link}{link_end}."
 msgstr ""
-"Ìf ýöü hävé äný qüéstïöns äßöüt thïs çöürsé ör thïs förm, ýöü çän çöntäçt <a"
-" href=\"{mail_to_link}\"\">{mail_to_link}</a>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢т#"
+"Ìf ýöü hävé äný qüéstïöns äßöüt thïs çöürsé ör thïs förm, ýöü çän çöntäçt "
+"{link_start}{mail_to_link}{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
@@ -25621,10 +25641,6 @@ msgstr ""
 msgid "No changes made. Nothing to save."
 msgstr ""
 "Nö çhängés mädé. Nöthïng tö sävé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: wiki/forms.py
-msgid "Select an option"
-msgstr "Séléçt än öptïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: wiki/forms.py
 msgid "Slug"

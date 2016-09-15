@@ -96,7 +96,7 @@
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Luiz Penedo <inactive+luiz.penedo@transifex.com>, 2015
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
-# Mike Job Silva <mikejobrn@gmail.com>, 2015
+# Mike Job <mikejobrn@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Ned Batchelder <ned@edx.org>, 2016
 # niels006 <niels006@gmail.com>, 2014
@@ -110,6 +110,7 @@
 # Siderlan Santos <siderlan.santos@gmail.com>, 2015
 # Thiago Perrotta <inactive+thiagowfx@transifex.com>, 2014
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
+# Vinicius Ferreira de Souza <vinicius.fk9@gmail.com>, 2016
 # William Bellinazo Roca <williambr_1331@hotmail.com>, 2016
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -144,7 +145,7 @@
 # Drew Melim <nokostya.translation@gmail.com>, 2015
 # Sergio Silva <sergiohrs@gmail.com>, 2016
 # sgtmarciosilva <sgtmarciosilva@ibest.com.br>, 2015
-# Thiago Barroso Perrotta, 2016
+# Thiago Perrotta, 2016
 # Thiago Perrotta <inactive+thiagowfx@transifex.com>, 2014
 # Victor Hochgreb <victorfeec@gmail.com>, 2015
 # Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
@@ -172,7 +173,7 @@
 # Mariana Jó de Souza <mariana.jsouza@gmail.com>, 2015
 # mmauryx <matheus_w_dias@hotmail.com>, 2014
 # Maurício Gonçalves Melara Camargo <mauriciogmc@gmail.com>, 2015
-# Mike Job Silva <mikejobrn@gmail.com>, 2015
+# Mike Job <mikejobrn@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Renata Barboza-Murray, 2015
 # Ricardo Pietrobon <pietr007@gmail.com>, 2014
@@ -184,8 +185,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-25 15:04+0000\n"
-"PO-Revision-Date: 2016-08-16 19:42+0000\n"
+"POT-Creation-Date: 2016-09-01 11:26+0000\n"
+"PO-Revision-Date: 2016-09-05 02:00+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
