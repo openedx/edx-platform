@@ -428,7 +428,6 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
         })
@@ -449,7 +448,6 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
             query: ["true"],
@@ -471,7 +469,6 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["18"],
             "per_page": ["4"],
         })
@@ -497,7 +494,6 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
             "text": ["test search string"],
@@ -589,14 +585,16 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
             "sort_key": [cc_query],
         })
 
-    @ddt.data("asc", "desc")
-    def test_order_direction(self, query):
+    def test_order_direction(self):
+        """
+        Test order direction, of which "desc" is the only valid option.  The
+        option actually just gets swallowed, so it doesn't affect the params.
+        """
         threads = [make_minimal_cs_thread()]
         self.register_get_user_response(self.user)
         self.register_get_threads_response(threads, page=1, num_pages=1)
@@ -604,7 +602,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             self.url,
             {
                 "course_id": unicode(self.course.id),
-                "order_direction": query,
+                "order_direction": "desc",
             }
         )
         self.assert_last_query_params({
@@ -613,7 +611,6 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "sort_key": ["activity"],
             "page": ["1"],
             "per_page": ["10"],
-            "sort_order": [query],
         })
 
     def test_mutually_exclusive(self):
