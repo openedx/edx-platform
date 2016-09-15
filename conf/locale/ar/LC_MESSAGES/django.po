@@ -150,7 +150,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-25 15:05+0000\n"
+"POT-Creation-Date: 2016-09-01 11:27+0000\n"
 "PO-Revision-Date: 2016-07-26 14:02+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -9237,7 +9237,9 @@ msgstr ""
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search"
@@ -13750,10 +13752,6 @@ msgstr "العلامات"
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "البحث في المساق"
-
-#: lms/templates/courseware/courseware.html
-msgid "search"
-msgstr "بحث"
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
@@ -18269,12 +18267,10 @@ msgstr "لمحة عن edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© edX Inc.  All rights reserved except where noted.  EdX, Open edX and the "
-"edX and Open EdX logos are registered trademarks or trademarks of edX Inc."
-msgstr ""
-"© edX Inc. جميع الحrوق محفوظة باستثناء ملاحظات معيَّنة. إنّ edX وOpen edX "
-"وشعارَي edX وOpen edX هي علامات تجارية مسجَّلة أو علامات تجارية لمؤسّسة edX "
+"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
+"the edX and Open EdX logos are registered trademarks or trademarks of edX "
 "Inc."
+msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
