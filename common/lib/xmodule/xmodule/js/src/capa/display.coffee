@@ -28,7 +28,7 @@ class @Problem
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action button').click @refreshAnswers
-    @reviewButton = @$('.action .review-btn')
+    @reviewButton = @$('.notification-btn.review-btn')
     @reviewButton.click @scroll_to_problem_meta
     @submitButton = @$('.action .submit')
     @submitButtonLabel = @$('.action .submit .submit-label')
@@ -45,6 +45,10 @@ class @Problem
     @saveNotification = @$('.notification-save')
     @saveButtonLabel = @$('.action .save .save-label')
     @saveButton.click @save
+    @gentleAlertNotification = @$('.notification-gentle-alert')
+
+    # Hide the Gentle Alert notification until needed
+    @gentleAlertNotification.hide()
 
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
@@ -443,12 +447,9 @@ class @Problem
         @scroll_to_problem_meta()
 
   gentle_alert: (msg) =>
-    if @el.find('.capa_alert').length
-      @el.find('.capa_alert').remove()
-    alert_elem = "<div class='capa_alert'>" + msg + "</div>"
-    @el.find('.action').after(alert_elem)
-    @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
-    window.SR.readElts @el.find('.capa_alert')
+    @el.find('.notification-gentle-alert .notification-message').html(msg)
+    @gentleAlertNotification.show()
+    @gentleAlertNotification.focus()
 
   save: =>
     if not @submit_save_waitfor(@save_internal)

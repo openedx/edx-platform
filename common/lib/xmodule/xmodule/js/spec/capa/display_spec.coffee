@@ -840,5 +840,3 @@ describe 'Problem', ->
       # jump the next step and verify that we are not still continuing to poll
       jasmine.clock().tick(64000)
       expect(@problem.poll.calls.count()).toEqual(6)
-
-      expect($('.capa_alert').text()).toEqual("The grading process is still running. Refresh the page to see updates.")
