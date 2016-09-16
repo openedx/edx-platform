@@ -174,7 +174,7 @@
       }
     }
 
-    #grade-detail-graph {
+    .grade-detail-graph {
       min-height: 400px;
       width: 100%;
     }
@@ -304,8 +304,12 @@
               margin: lh(0.5) 0;
 
               .hd {
-                font-size: em(14);
                 display: inline-block;
+                width: auto;
+                margin: initial;
+                border: initial;
+                padding: initial;
+                font-size: em(14);
               }
 
               ol {

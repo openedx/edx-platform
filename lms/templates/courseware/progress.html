@@ -42,45 +42,41 @@ from django.utils.http import urlquote_plus
                 <h3 class="hd hd-3 progress-certificates-title">
                     ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}
                 </h3>
+
                 % if staff_access and studio_url is not None:
                 <div class="wrap-instructor-info">
                     <a class="instructor-info-action studio-view" href="${studio_url | h}">${_("View Grading in studio")}</a>
                 </div>
                 % endif
-                <!-- <div class="progress-certificates">
-                    <h4 class="hd hd-3 progress-certificates-title">
-                        ${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}
-                    </h4>
-                </div> -->
+
                 %if certificate_data:
                 <div class="wrapper-msg wrapper-auto-cert">
                     <div id="errors-info" class="errors-info"></div>
-                        %if passed:
-                        <div class="auto-cert-message" id="course-success">
-                            <div class="has-actions">
-                                <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
-                                <div class="msg-content">
-                                    <h4 class="hd hd-4 title">${certificate_data.title | h}</h4>
-                                    <p class="copy">${certificate_data.msg | h}</p>
-                                </div>
-                                <div class="msg-actions">
-                                    %if certificate_data.cert_web_view_url:
-                                    <a class="btn" href="${certificate_data.cert_web_view_url | h}">${_("View Certificate")}</a>
-                                    %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
-                                    <a class="btn" href="${certificate_data.download_url | h}">${_("Download Your Certificate")}</a>
-                                    %elif certificate_data.cert_status == CertificateStatuses.requesting:
-                                    <button class="btn generate_certs" data-endpoint="${post_url | h}" id="btn_generate_cert">${_('Request Certificate')}</button>
-                                    %endif
-                                </div>
+                    %if passed:
+                    <div class="auto-cert-message" id="course-success">
+                        <div class="has-actions">
+                            <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
+                            <div class="msg-content">
+                                <h4 class="hd hd-4 title">${certificate_data.title | h}</h4>
+                                <p class="copy">${certificate_data.msg | h}</p>
+                            </div>
+                            <div class="msg-actions">
+                                %if certificate_data.cert_web_view_url:
+                                <a class="btn" href="${certificate_data.cert_web_view_url | h}">${_("View Certificate")}</a>
+                                %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
+                                <a class="btn" href="${certificate_data.download_url | h}">${_("Download Your Certificate")}</a>
+                                %elif certificate_data.cert_status == CertificateStatuses.requesting:
+                                <button class="btn generate_certs" data-endpoint="${post_url | h}" id="btn_generate_cert">${_('Request Certificate')}</button>
+                                %endif
                             </div>
                         </div>
-                        %endif
                     </div>
+                    %endif
                 </div>
                 %endif
 
                 %if not course.disable_progress_graph:
-                <div class="grade-detail-graph" id="grade-detail-graph" aria-hidden="true"></div>
+                <div class="grade-detail-graph" id="grade-detail-graph"></div>
                 %endif
 
                 % if credit_course_requirements:
@@ -182,14 +178,14 @@ from django.utils.http import urlquote_plus
                                         %endif
                                         <div class="scores">
                                             %if len(section.scores) > 0:
-                                            <h6 class="hd hd-6"> ${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")} </h6>
+                                            <h6 class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</h6>
                                             <ol>
                                                 %for score in section.scores:
                                                 <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
                                                 %endfor
                                             </ol>
                                             %else:
-                                            <p class="no-scores"> ${_("No problem scores in this section")} </p>
+                                            <p class="no-scores">${_("No problem scores in this section")}</p>
                                             %endif
                                         </div>
                                     </div>
