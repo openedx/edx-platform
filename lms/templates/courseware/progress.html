@@ -85,7 +85,7 @@ from django.utils.http import urlquote_plus
 
                 % if credit_course_requirements:
                 <section class="credit-eligibility">
-                    <h3 class="hd hd-4">${_("Requirements for Course Credit")}</h3>
+                    <h3 class="hd hd-4 eligibility-heading">${_("Requirements for Course Credit")}</h3>
                     <div class="credit-eligibility-container">
                         %if credit_course_requirements['eligibility_status'] == 'not_eligible':
                         <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name) | h}</span>
