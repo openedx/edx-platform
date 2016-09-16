@@ -65,10 +65,15 @@ class EnrollUserWithEnrollmentCodeView(APIView):
     permission_classes = IsStaffOrOwner,
 
     def post(self, request):
-        user = User.objects.get(email=request.data.get('email'))
         enrollment_code = request.data.get('enrollment_code')
         limiter = BadRequestRateLimiter()
         error_reason = ""
+        try:
+            user = User.objects.get(email=request.data.get('email'))
+            user_is_valid = True
+        except User.DoesNotExist:
+            user_is_valid = False
+            error_reason = "User not found"
         try:
             reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(
                 enrollment_code,
@@ -79,7 +84,7 @@ class EnrollUserWithEnrollmentCodeView(APIView):
             reg_code_is_valid = False
             reg_code_already_redeemed = False
             error_reason = "Enrollment code not found"
-        if reg_code_is_valid and not reg_code_already_redeemed:
+        if user_is_valid and reg_code_is_valid and not reg_code_already_redeemed:
             course = get_course_by_id(course_registration.course_id, depth=0)
             redemption = RegistrationCodeRedemption.create_invoice_generated_registration_redemption(
                 course_registration,
