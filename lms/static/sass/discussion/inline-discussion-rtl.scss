@@ -1,0 +1,15 @@
+// Discussions - CSS application architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+
+// Load the RTL version of the edX Pattern Library
+$pattern-library-path: '../edx-pattern-library' !default;
+@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-rtl';
+
+@import '../build-base-v1-rtl';
+
+// base - elements
+@import '../elements/typography';
+
+// app - discussion
+@import 'build-discussion';

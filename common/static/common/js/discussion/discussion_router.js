@@ -1,4 +1,4 @@
-/* globals DiscussionThreadListView, DiscussionThreadView, DiscussionUtil, NewPostView */
+/* globals DiscussionThreadListView, DiscussionThreadView, DiscussionUtil, NewPostView, Thread */
 (function() {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
@@ -18,8 +18,19 @@
             return child;
         };
 
+    function getSingleThreadRoute(commentable_id, thread_id) {
+        return commentable_id + "/threads/" + thread_id;
+    }
+
     if (typeof Backbone !== "undefined" && Backbone !== null) {
         this.DiscussionRouter = (function(_super) {
+
+            var allThreadsRoute = "",
+                singleThreadRoute = getSingleThreadRoute(":forum_name", ":thread_id"), // :forum_name/threads/:thread_id
+                routes = {};
+
+            routes[allThreadsRoute] = "allThreads";
+            routes[singleThreadRoute] = "showThread";
 
             __extends(DiscussionRouter, _super);
 
@@ -40,16 +51,16 @@
                 this.showMain = function() {
                     return DiscussionRouter.prototype.showMain.apply(self, arguments);
                 };
+                this.renderThreadView = function() {
+                    return DiscussionRouter.prototype.renderThreadView.apply(self, arguments);
+                };
                 this.setActiveThread = function() {
                     return DiscussionRouter.prototype.setActiveThread.apply(self, arguments);
                 };
                 return DiscussionRouter.__super__.constructor.apply(this, arguments);
             }
 
-            DiscussionRouter.prototype.routes = {
-                "": "allThreads",
-                ":forum_name/threads/:thread_id": "showThread"
-            };
+            DiscussionRouter.prototype.routes = routes;
 
             DiscussionRouter.prototype.initialize = function(options) {
                 var self = this;
@@ -89,16 +100,44 @@
                 if (this.thread) {
                     return this.nav.setActiveThread(this.thread.get("id"));
                 } else {
-                    return this.nav.goHome;
+                    return this.nav.goHome();
                 }
             };
 
             DiscussionRouter.prototype.showThread = function(forum_name, thread_id) {
+                var self;
+                self = this;
                 this.thread = this.discussion.get(thread_id);
+
+                if (this.thread) {
+                    this.renderThreadView();
+                    return;
+                }
+
+                // if thread is not loaded yet for some reason - try loading it
+                DiscussionUtil.safeAjax({
+                    url: DiscussionUtil.urlFor('retrieve_single_thread', forum_name, thread_id)
+                }).done(function(data) {
+                    // if succeded - proceed normally
+                    self.thread = new Thread(data.content);
+                    self.discussion.add(self.thread);
+                    self.renderThreadView();
+                }).fail(function(xhr) {
+                    // otherwise display error message and navigate to all threads view
+                    var errorMessage = (xhr.status === 404) ?
+                            gettext("The thread you selected has been deleted. Please select another thread.") :
+                            gettext("We had some trouble loading more responses. Please try again.");
+
+                    DiscussionUtil.discussionAlert(gettext("Sorry"), errorMessage);
+                    this.allThreads();
+                });
+            };
+
+            DiscussionRouter.prototype.renderThreadView = function() {
                 this.thread.set("unread_comments_count", 0);
                 this.thread.set("read", true);
                 this.setActiveThread();
-                return this.showMain();
+                this.showMain();
             };
 
             DiscussionRouter.prototype.showMain = function() {
@@ -127,17 +166,14 @@
             };
 
             DiscussionRouter.prototype.navigateToThread = function(thread_id) {
-                var thread;
+                var thread, targetThreadRoute;
                 thread = this.discussion.get(thread_id);
-                return this.navigate("" + (thread.get("commentable_id")) + "/threads/" + thread_id, {
-                    trigger: true
-                });
+                targetThreadRoute = getSingleThreadRoute(thread.get("commentable_id"), thread_id);
+                this.navigate(targetThreadRoute, {trigger: true});
             };
 
             DiscussionRouter.prototype.navigateToAllThreads = function() {
-                return this.navigate("", {
-                    trigger: true
-                });
+                this.navigate(allThreadsRoute, {trigger: true});
             };
 
             DiscussionRouter.prototype.showNewPost = function() {

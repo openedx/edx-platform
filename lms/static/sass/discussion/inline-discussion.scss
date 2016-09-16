@@ -1,0 +1,17 @@
+// Discussions - CSS application architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+
+// From lms-discussion-main.scss
+
+// Load the LTR version of the edX Pattern Library
+$pattern-library-path: '../edx-pattern-library' !default;
+@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-ltr';
+
+@import '../build-base-v1';
+
+// base - elements
+@import '../elements/typography';
+
+// app - discussion
+@import 'build-discussion';
