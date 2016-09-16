@@ -30,11 +30,16 @@
             };
         });
 
-        testUpdate = function(view, thread, newTopicId, newTopicName) {
+        testUpdate = function(view, thread, newTopicId, newTopicName, mode) {
+            var discussionMode = mode || 'tab';
+
+
             spyOn($, 'ajax').and.callFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
                 expect(params.data.thread_type).toBe('discussion');
-                expect(params.data.commentable_id).toBe(newTopicId);
+                if (discussionMode !== 'inline') {
+                    expect(params.data.commentable_id).toBe(newTopicId);
+                }
                 expect(params.data.title).toBe('changed thread title');
                 params.success();
                 return {
@@ -43,18 +48,22 @@
                 };
             });
 
-            view.$el.find('a.topic-title').filter(function(idx, el) {
+            view.$el.find('.topic-title').filter(function(idx, el) {
                 return $(el).data('discussionId') === newTopicId;
             }).click(); // set new topic
             view.$('.edit-post-title').val('changed thread title'); // set new title
-            view.$("label[for$='post-type-discussion']").click(); // set new thread type
+            if (discussionMode !== 'inline') {
+                view.$("label[for$='post-type-discussion']").click(); // set new thread type
+            }
             view.$('.post-update').click();
             expect($.ajax).toHaveBeenCalled();
 
             expect(thread.get('title')).toBe('changed thread title');
             expect(thread.get('thread_type')).toBe('discussion');
-            expect(thread.get('commentable_id')).toBe(newTopicId);
-            expect(thread.get('courseware_title')).toBe(newTopicName);
+            if (discussionMode !== 'inline') {
+                expect(thread.get('commentable_id')).toBe(newTopicId);
+                expect(thread.get('courseware_title')).toBe(newTopicName);
+            }
             expect(view.$('.edit-post-title')).toHaveValue('');
             expect(view.$('.wmd-preview p')).toHaveText('');
         };
@@ -65,8 +74,8 @@
         });
 
         it('can save new data correctly in inline mode', function() {
-            this.createEditView({"mode": "inline"});
-            testUpdate(this.view, this.thread, 'other_topic', 'Other Topic');
+            this.createEditView({'mode': 'inline'});
+            testUpdate(this.view, this.thread, 'other_topic', 'Other Topic', 'inline');
         });
 
         testCancel = function(view) {
@@ -80,7 +89,7 @@
         });
 
         it('can close the view in inline mode', function() {
-            this.createEditView({"mode": "inline"});
+            this.createEditView({'mode': 'inline'});
             testCancel(this.view);
         });
 
@@ -94,14 +103,14 @@
                                 'is_cohorted': true,
                                 'id': 'topic'
                             },
-                            "General": {
-                                "sort_key": "General",
-                                "is_cohorted": false,
-                                "id": "6.00.1x_General"
+                            'General': {
+                                'sort_key': 'General',
+                                'is_cohorted': false,
+                                'id': '6.00.1x_General'
                             },
-                            "Basic Question": {
-                                "is_cohorted": false,
-                                "id": "6>00'1x\"Basic_Question"
+                            'Basic Question': {
+                                'is_cohorted': false,
+                                'id': "6>00'1x\"Basic_Question"
                             }
                         }
                     },
@@ -110,18 +119,18 @@
             });
 
             it('can save new data correctly for current discussion id without dots', function() {
-                this.createEditView({topicId: "topic"});
-                testUpdate(this.view, this.thread, "6.00.1x_General", "General");
+                this.createEditView({topicId: 'topic'});
+                testUpdate(this.view, this.thread, '6.00.1x_General', 'General');
             });
 
             it('can save new data correctly for current discussion id with dots', function() {
-                this.createEditView({topicId: "6.00.1x_General"});
-                testUpdate(this.view, this.thread, "6>00\'1x\"Basic_Question", "Basic Question");
+                this.createEditView({topicId: '6.00.1x_General'});
+                testUpdate(this.view, this.thread, "6>00\'1x\"Basic_Question", 'Basic Question');
             });
 
             it('can save new data correctly for current discussion id with special characters', function() {
                 this.createEditView({topicId: "6>00\'1x\"Basic_Question"});
-                testUpdate(this.view, this.thread, "6.00.1x_General", "General");
+                testUpdate(this.view, this.thread, '6.00.1x_General', 'General');
             });
         });
     });

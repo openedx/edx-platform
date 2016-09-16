@@ -110,7 +110,7 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
             'course_id': self.course_key,
             'can_create_thread': self.has_permission("create_thread"),
             'can_create_comment': self.has_permission("create_comment"),
-            'can_create_subcomment': self.has_permission("create_subcomment"),
+            'can_create_subcomment': self.has_permission("create_sub_comment"),
         }
 
         fragment.add_content(self.runtime.render_template('discussion/_discussion_inline.html', context))

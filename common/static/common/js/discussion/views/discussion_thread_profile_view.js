@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.DiscussionThreadProfileView = (function(_super) {
-
             __extends(DiscussionThreadProfileView, _super);
 
             function DiscussionThreadProfileView() {
@@ -28,7 +27,7 @@
             }
 
             DiscussionThreadProfileView.prototype.render = function() {
-                var element, params;
+                var params;
                 this.convertMath();
                 this.abbreviateBody();
                 params = $.extend(this.model.toJSON(), {
@@ -42,31 +41,27 @@
                         }
                     });
                 }
-                this.$el.html(_.template($("#profile-thread-template").html())(params));
-                this.$("span.timeago").timeago();
-                element = this.$(".post-body");
-                if (typeof MathJax !== "undefined" && MathJax !== null) {
-                    MathJax.Hub.Queue(["Typeset", MathJax.Hub, element[0]]);
-                }
+                edx.HtmlUtils.setHtml(
+                    this.$el,
+                    edx.HtmlUtils.template($('#profile-thread-template').html())(params)
+                );
+                this.$('span.timeago').timeago();
+                DiscussionUtil.typesetMathJax(this.$('.post-body'));
                 return this;
             };
 
             DiscussionThreadProfileView.prototype.convertMath = function() {
-                return this.model.set(
-                    'markdownBody',
-                    DiscussionUtil.postMathJaxProcessor(DiscussionUtil.markdownWithHighlight(this.model.get('body')))
-                );
+                var htmlSnippet = DiscussionUtil.postMathJaxProcessor(DiscussionUtil.markdownWithHighlight(this.model.get('body')));
+                this.model.set('markdownBody', htmlSnippet);
             };
 
             DiscussionThreadProfileView.prototype.abbreviateBody = function() {
                 var abbreviated;
                 abbreviated = DiscussionUtil.abbreviateHTML(this.model.get('markdownBody'), 140);
-                return this.model.set('abbreviatedBody', abbreviated);
+                this.model.set('abbreviatedBody', abbreviated);
             };
 
             return DiscussionThreadProfileView;
-
         })(Backbone.View);
     }
-
 }).call(window);

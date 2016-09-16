@@ -17,7 +17,7 @@
             this.view = new ResponseCommentShowView({
                 model: this.comment
             });
-            return spyOn(this.view, "convertMath");
+            return spyOn(this.view, 'convertMath');
         });
         it('defines the tag', function() {
             expect($('#jasmine-fixtures')).toExist();
@@ -39,7 +39,7 @@
                 var temp_array;
                 temp_array = [];
                 temp_array.push(window.user.get('id'));
-                this.comment.set("abuse_flaggers", temp_array);
+                this.comment.set('abuse_flaggers', temp_array);
                 this.comment.unflagAbuse();
                 return expect(this.comment.get('abuse_flaggers')).toEqual([]);
             });
@@ -53,12 +53,12 @@
                     }
                 });
                 this.view.render();
-                return DiscussionViewSpecHelper.checkButtonEvents(this.view, "_delete", ".action-delete");
+                return DiscussionViewSpecHelper.checkButtonEvents(this.view, '_delete', '.action-delete');
             });
             it('triggers the delete event', function() {
                 var triggerTarget;
                 triggerTarget = jasmine.createSpy();
-                this.view.bind("comment:_delete", triggerTarget);
+                this.view.bind('comment:_delete', triggerTarget);
                 this.view._delete();
                 return expect(triggerTarget).toHaveBeenCalled();
             });
@@ -72,30 +72,30 @@
                     }
                 });
                 this.view.render();
-                return DiscussionViewSpecHelper.checkButtonEvents(this.view, "edit", ".action-edit");
+                return DiscussionViewSpecHelper.checkButtonEvents(this.view, 'edit', '.action-edit');
             });
             it('triggers comment:edit when the edit button is clicked', function() {
                 var triggerTarget;
                 triggerTarget = jasmine.createSpy();
-                this.view.bind("comment:edit", triggerTarget);
+                this.view.bind('comment:edit', triggerTarget);
                 this.view.edit();
                 return expect(triggerTarget).toHaveBeenCalled();
             });
         });
-        describe("labels", function() {
+        describe('labels', function() {
             var expectOneElement;
             expectOneElement = function(view, selector, visible) {
                 var elements;
-                if (typeof visible === "undefined" || visible === null) {
+                if (typeof visible === 'undefined' || visible === null) {
                     visible = true;
                 }
                 view.render();
                 elements = view.$el.find(selector);
                 expect(elements.length).toEqual(1);
                 if (visible) {
-                    return expect(elements).not.toHaveClass("is-hidden");
+                    return expect(elements).not.toHaveClass('is-hidden');
                 } else {
-                    return expect(elements).toHaveClass("is-hidden");
+                    return expect(elements).toHaveClass('is-hidden');
                 }
             };
             it('displays the reported label when appropriate for a non-staff user', function() {
@@ -117,5 +117,4 @@
             });
         });
     });
-
 }).call(this);

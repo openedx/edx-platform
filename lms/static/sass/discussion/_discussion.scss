@@ -518,7 +518,7 @@ body.discussion, .discussion-course, div.discussion-body {
             }
           }
 
-          a {
+          a, button {
             display: block;
             padding: ($baseline*0.25) $baseline;
             font-size: 12px;
@@ -631,7 +631,7 @@ body.discussion, .discussion-course, div.discussion-body {
   @extend .discussion-module;
 
   .discussion-post {
-    padding-bottom: $baseline !important;
+    padding: $baseline !important;
   }
 }
 

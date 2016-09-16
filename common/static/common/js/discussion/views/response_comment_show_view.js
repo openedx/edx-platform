@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.ResponseCommentShowView = (function(_super) {
-
             __extends(ResponseCommentShowView, _super);
 
             function ResponseCommentShowView() {
@@ -34,53 +33,56 @@
                 return ResponseCommentShowView.__super__.constructor.apply(this, arguments);
             }
 
-            ResponseCommentShowView.prototype.tagName = "li";
+            ResponseCommentShowView.prototype.tagName = 'li';
 
             ResponseCommentShowView.prototype.render = function() {
-                this.template = _.template($("#response-comment-show-template").html());
-                this.$el.html(this.template(_.extend({
+                var template = edx.HtmlUtils.template($('#response-comment-show-template').html());
+                var context = _.extend({
                     cid: this.model.cid,
                     author_display: this.getAuthorDisplay(),
                     readOnly: $('.discussion-module').data('read-only')
-                }, this.model.attributes)));
+                }, this.model.attributes);
+
+                edx.HtmlUtils.setHtml(this.$el, template(context));
                 this.delegateEvents();
                 this.renderAttrs();
-                this.$el.find(".timeago").timeago();
+                this.$el.find('.timeago').timeago();
                 this.convertMath();
                 this.addReplyLink();
                 return this;
             };
 
             ResponseCommentShowView.prototype.addReplyLink = function() {
-                var html, name, p, _ref;
+                var html, name;
                 if (this.model.hasOwnProperty('parent')) {
-                    name = (_ref = this.model.parent.get('username')) !== null ? _ref : gettext("anonymous");
-                    html = "<a href='#comment_" + this.model.parent.id + "'>@" + name + "</a>:  ";
-                    p = this.$('.response-body p:first');
-                    return p.prepend(html);
+                    name = this.model.parent.get('username') || gettext('anonymous');
+                    html = edx.HtmlUtils.interpolateHtml(
+                        edx.HtmlUtils.HTML("<a href='#comment_{parent_id}'>@{name}</a>:  "),
+                        {
+                            parent_id: this.model.parent.id,
+                            name: name
+                        }
+                    );
+                    return edx.HtmlUtils.prepend(
+                        this.$('.response-body p:first'),
+                        html
+                    );
                 }
             };
 
             ResponseCommentShowView.prototype.convertMath = function() {
-                var body;
-                body = this.$el.find(".response-body");
-                body.html(DiscussionUtil.postMathJaxProcessor(DiscussionUtil.markdownWithHighlight(body.text())));
-                if (typeof MathJax !== "undefined" && MathJax !== null) {
-                    return MathJax.Hub.Queue(["Typeset", MathJax.Hub, body[0]]);
-                }
+                DiscussionUtil.convertMath(this.$el.find('.response-body'));
             };
 
             ResponseCommentShowView.prototype._delete = function(event) {
-                return this.trigger("comment:_delete", event);
+                return this.trigger('comment:_delete', event);
             };
 
             ResponseCommentShowView.prototype.edit = function(event) {
-                return this.trigger("comment:edit", event);
+                return this.trigger('comment:edit', event);
             };
 
             return ResponseCommentShowView;
-
         })(DiscussionContentShowView);
     }
-
 }).call(window);

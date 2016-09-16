@@ -165,3 +165,14 @@ li[class*=forum-nav-thread-label-] {
     margin-bottom: 0 !important; // overrides "#seq_content h1" styling
   }
 }
+
+// -------
+// Inline Discussion and Discussion Course Overrides
+// -------
+.vert-mod > div {
+  .discussion-course ul.post-errors,
+  .xblock-student_view-discussion ul.post-errors {
+    padding: 0;
+    list-style: none;
+  }
+}

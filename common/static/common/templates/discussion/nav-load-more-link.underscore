@@ -1,0 +1,5 @@
+<li class='forum-nav-load-more'>
+    <button class='btn-link forum-nav-load-more-link'>
+        <%- gettext("Load more") %>
+    </button>
+</li>
