@@ -98,6 +98,9 @@ case "$TEST_SUITE" in
         ;;
 
 
+    "commonlib-unit")
+        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
+        ;;
 
     *)
         echo "DEBUG: SKIPPING"

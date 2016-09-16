@@ -27,7 +27,7 @@ omit =
     openedx/core/djangoapps/debug/*
 
 concurrency=multiprocessing
-debug = config,dataio,pid
+debug = config,dataio,pid,dataop
 
 [report]
 ignore_errors = True
