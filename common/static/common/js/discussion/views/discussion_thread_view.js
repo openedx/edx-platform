@@ -62,7 +62,9 @@
 
             DiscussionThreadView.prototype.events = {
                 'click .discussion-submit-post': 'submitComment',
-                'click .add-response-btn': 'scrollToAddResponse'
+                'click .add-response-btn': 'scrollToAddResponse',
+                'click .forum-thread-expand': 'expand',
+                'click .forum-thread-collapse': 'collapse'
             };
 
             DiscussionThreadView.prototype.$ = function(selector) {
@@ -166,6 +168,45 @@
                     return this.renderAddResponseButton();
                 }
             });
+
+            DiscussionThreadView.prototype.expand = function(event) {
+                if (event) {
+                    event.preventDefault();
+                }
+                this.$el.addClass('expanded');
+                this.$el.find('.post-body').text(this.model.get('body'));
+                this.showView.convertMath();
+                this.$el.find('.forum-thread-expand').hide();
+                this.$el.find('.forum-thread-collapse').show();
+                this.$el.find('.post-extended-content').show();
+                if (!this.loadedResponses) {
+                    return this.loadInitialResponses();
+                }
+            };
+
+            DiscussionThreadView.prototype.collapse = function(event) {
+                if (event) {
+                    event.preventDefault();
+                }
+                this.$el.removeClass('expanded');
+                this.$el.find('.post-body').text(this.getAbbreviatedBody());
+                this.showView.convertMath();
+                this.$el.find('.forum-thread-expand').show();
+                this.$el.find('.forum-thread-collapse').hide();
+                return this.$el.find('.post-extended-content').hide();
+            };
+
+            DiscussionThreadView.prototype.getAbbreviatedBody = function() {
+                var abbreviated, cached;
+                cached = this.model.get('abbreviatedBody');
+                if (cached) {
+                    return cached;
+                } else {
+                    abbreviated = DiscussionUtil.abbreviateString(this.model.get('body'), 140);
+                    this.model.set('abbreviatedBody', abbreviated);
+                    return abbreviated;
+                }
+            };
 
             DiscussionThreadView.prototype.cleanup = function() {
                 // jQuery.ajax after 1.5 returns a jqXHR which doesn't implement .abort

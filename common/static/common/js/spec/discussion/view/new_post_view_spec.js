@@ -214,9 +214,9 @@
                 view.$('.js-post-title').val('Test Title');
                 view.$('.js-post-body textarea').val('Test body');
                 view.$('.wmd-preview p').html('Test body');
-                view.$('input[name=follow]').prop('checked', false);
-                view.$('input[name=anonymous]').prop('checked', true);
-                view.$('input[name=anonymous_to_peers]').prop('checked', true);
+                view.$('.js-follow').prop('checked', false);
+                view.$('.js-anon').prop('checked', true);
+                view.$('.js-anon-peers').prop('checked', true);
                 if (mode === 'tab') {
                     view.$("a[data-discussion-id='2b3a858d0c884eb4b272dbbe3f2ffddd']").click();
                 }
@@ -227,11 +227,11 @@
                 expect($("input[id$='post-type-question']")).not.toBeChecked();
                 expect(view.$('.js-post-title').val()).toEqual('');
                 expect(view.$('.js-post-body textarea').val()).toEqual('');
-                expect(view.$('input[name=follow]')).toBeChecked();
-                expect(view.$('input[name=anonymous]')).not.toBeChecked();
-                expect(view.$('input[name=anonymous_to_peers]')).not.toBeChecked();
+                expect(view.$('.js-follow')).toBeChecked();
+                expect(view.$('.js-anon')).not.toBeChecked();
+                expect(view.$('.js-anon-peers')).not.toBeChecked();
                 if (mode === 'tab') {
-                    return expect(view.$('.post-topic option:selected').text()).toEqual('General');
+                    return expect(view.$('.js-selected-topic').text()).toEqual('General');
                 }
             };
             return _.each(['tab', 'inline'], function(mode) {

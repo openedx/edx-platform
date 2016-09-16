@@ -190,21 +190,14 @@
         renderSingleThreadWithProps = function(props) {
             return makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render();
         };
-
-        makeView = function(discussion, props) {
-            return new DiscussionThreadListView(
-                _.extend(
-                    {
-                        el: $('#fixture-element'),
-                        collection: discussion,
-                        showThreadPreview: true,
-                        courseSettings: new DiscussionCourseSettings({
-                            is_discussion_division_enabled: true
-                        })
-                    },
-                    props
-                )
-            );
+        makeView = function(discussion) {
+            return new DiscussionThreadListView({
+                el: $('#fixture-element'),
+                collection: discussion,
+                courseSettings: new DiscussionCourseSettings({
+                    is_cohorted: true
+                })
+            });
         };
 
         expectFilter = function(filterVal) {
