@@ -31,7 +31,7 @@ ${block_content}
 </div>
 %  endif
 
-<section aria-hidden="true" role="dialog" tabindex="-1" id="${element_id}_xqa-modal" class="modal xqa-modal">
+<section aria-hidden="true" id="${element_id}_xqa-modal" class="modal xqa-modal" style="width:80%; left:20%; height:80%; overflow:auto" >
   <div class="inner-wrapper">
     <header>
       <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
@@ -39,7 +39,7 @@ ${block_content}
 
     <form id="${element_id}_xqa_form" class="xqa_form">
       <label for="${element_id}_xqa_entry">${_("Comment")}</label>
-      <input tabindex="0" id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
+      <input id="${element_id}_xqa_entry" type="text" placeholder="${_('comment')}">
       <label for="${element_id}_xqa_tag">${_("Tag")}</label>
       <span style="color:black;vertical-align: -10pt">${_('Optional tag (eg "done" or "broken"):') + '&nbsp; '}      </span>
       <input id="${element_id}_xqa_tag" type="text" placeholder="${_('tag')}" style="width:80px;display:inline">
@@ -53,8 +53,8 @@ ${block_content}
   </div>
 </section>
 
-<section aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
-  <div class="inner-wrapper">
+<section aria-hidden="true" class="modal staff-modal" id="${element_id}_debug" style="width:80%; left:20%; height:80%; overflow:auto; display:none" >
+  <div class="inner-wrapper" style="color:black">
     <header>
       <h2>${_('Staff Debug')}</h2>
     </header>
@@ -64,7 +64,7 @@ ${block_content}
       <h3>${_('Actions')}</h3>
       <div>
         <label for="sd_fu_${location.name | h}">${_('Username')}:</label>
-        <input type="text" tabindex="0" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
+        <input type="text" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
       </div>
       <div data-location="${location | h}" data-location-name="${location.name | h}">
         [
@@ -108,14 +108,14 @@ category = ${category | h}
   </div>
 </section>
 
-<section aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="${element_id}_history">
-  <div class="inner-wrapper">
+<section aria-hidden="true" class="modal history-modal" id="${element_id}_history" style="width:80%; left:20%; height:80%; overflow:auto;" >
+  <div class="inner-wrapper" style="color:black">
     <header>
       <h2>${_("Submission History Viewer")}</h2>
     </header>
     <form id="${element_id}_history_form">
       <label for="${element_id}_history_student_username">${_("User:")}</label>
-      <input tabindex="0" id="${element_id}_history_student_username" type="text" placeholder=""/>
+      <input id="${element_id}_history_student_username" type="text" placeholder=""/>
       <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
