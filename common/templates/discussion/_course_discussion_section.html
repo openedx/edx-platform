@@ -1,3 +1,6 @@
+<%!
+from json import dumps as json_dumps
+%>
 <section class="discussion container" id="discussion-container"
        data-roles="${roles}"
        data-course-id="${course_id}"
@@ -8,7 +11,10 @@
        data-sort-preference="${sort_preference}"
        data-flag-moderator="${flag_moderator}"
        data-user-cohort-id="${user_cohort}"
-       data-course-settings="${course_settings}">
+       data-course-settings="${course_settings}"
+       data-user-create-comment="${json_dumps(can_create_comment)}"
+       data-user-create-subcomment="${json_dumps(can_create_subcomment)}"
+       data-read-only="false">
 <div class="discussion-body">
   <div class="forum-nav"></div>
   <div class="discussion-column">

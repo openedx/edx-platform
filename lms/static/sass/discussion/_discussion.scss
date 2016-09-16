@@ -11,7 +11,7 @@
   .course-tabs .right, .discussion-course-new.right {
     @include float(right);
 
-  .new-post-btn {
+    .new-post-btn {
       @include blue-button;
       @include margin-right(4px);
     }
@@ -23,6 +23,12 @@
       color: $white;
     }
   }
+
+.container .discussion-body, .discussion-module, .discussion-course {
+  @include clearfix;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 
   .sidebar ul {
     list-style: none !important;

@@ -14,9 +14,7 @@ from path import Path as path
 JS_URLS = [
     # VENDOR
     'js/vendor/mustache.js',
-
-    # FIXME: Provides gettext, ngettext, interpolate; these are probably already available?
-    'xblock/discussion/js/vendor/i18n.js',
+    'js/discussion_forum.js',
 ]
 
 
