@@ -14,6 +14,7 @@ from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
     get_request_for_user
 )
+from lms.djangoapps.course_blocks.api import get_course_blocks
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -22,6 +23,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from .. import course_grades
 from ..course_grades import summary as grades_summary
 from ..module_grades import get_module_score
+from ..new.subsection_grade import SubsectionGradeFactory
 from ..new.course_grade import CourseGradeFactory
 
 
