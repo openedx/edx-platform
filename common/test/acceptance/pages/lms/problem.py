@@ -3,6 +3,7 @@ Problem Page.
 """
 from bok_choy.page_object import PageObject
 from common.test.acceptance.pages.common.utils import click_css
+from selenium.webdriver.common.keys import Keys
 
 
 class ProblemPage(PageObject):
@@ -151,6 +152,21 @@ class ProblemPage(PageObject):
         self.wait_for(lambda: self.q(css='.notification.warning.notification-save').focused,
                       'Waiting for the focus to be on the save notification')
 
+    def wait_for_gentle_alert_notification(self):
+        """
+        Wait for the Gentle Alert Notification to be present
+        """
+        self.wait_for_element_visibility('.notification.warning.notification-gentle-alert',
+                                         'Waiting for Gentle Alert notification to be visible')
+        self.wait_for(lambda: self.q(css='.notification.warning.notification-gentle-alert').focused,
+                      'Waiting for the focus to be on the gentle alert notification')
+
+    def is_gentle_alert_notification_visible(self):
+        """
+        Is the Gentle Alert Notification visible?
+        """
+        return self.q(css='.notification.warning.notification-gentle-alert').visible
+
     def is_reset_button_present(self):
         """ Check for the presence of the reset button. """
         return self.q(css='.problem .reset').present
@@ -244,6 +260,21 @@ class ProblemPage(PageObject):
             lambda: self.q(css='.notification-hint').focused,
             'Waiting for the focus to be on the hint notification'
         )
+
+    def click_review_in_notification(self):
+        """
+        Click on the "Review" button within the visible notification.
+        """
+        # The review button cannot be clicked on until it is tabbed to, so first tab to it.
+        # Multiple tabs may be required depending on the content (for instance, hints with links).
+        def tab_until_review_focused():
+            """ Tab until the review button is focused """
+            self.browser.switch_to_active_element().send_keys(Keys.TAB)
+            return self.q(css='.notification .review-btn').focused
+
+        self.wait_for(tab_until_review_focused, 'Waiting for the Review button to become focused')
+
+        click_css(self, '.notification .review-btn', require_notification=False)
 
     def get_hint_button_disabled_attr(self):
         """ Return the disabled attribute of all hint buttons (once hints are visible, there will be two). """

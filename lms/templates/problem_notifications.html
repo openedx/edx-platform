@@ -2,14 +2,17 @@
                                    notification_message, should_enable_next_hint"/>
 <%! from django.utils.translation import ugettext as _ %>
 
-<div class="notification ${notification_type} ${'notification-'}${notification_name}"
+<div class="notification ${notification_type} ${'notification-'}${notification_name} ${'is-hidden' if notification_name == 'gentle-alert' else '' }"
      tabindex="-1">
-    <span class="icon fa fa-${notification_icon}" aria-hidden="true"></span>
+    <span class="icon fa ${notification_icon}" aria-hidden="true"></span>
     <span class="notification-message" aria-describedby="${ id }-problem-title">${notification_message}
     </span>
     <div class="notification-btn-wrapper">
         % if notification_name is 'hint':
-        <button class="btn btn-default btn-small notification-btn hint-button" ${'' if should_enable_next_hint else 'disabled'}>${_('Next Hint')}</button>
+        <button class="btn btn-default btn-small notification-btn hint-button"
+                ${'' if should_enable_next_hint else 'disabled'}>
+          ${_('Next Hint')}
+        </button>
         % endif
         <button class="btn btn-default btn-small notification-btn review-btn sr">${_('Review')}</button>
     </div>
