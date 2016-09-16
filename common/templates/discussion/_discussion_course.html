@@ -2,17 +2,9 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="js_extra">
-    <%static:js group='discussion'/>
-</%block>
-
-<%block name="css_extra">
-    <%static:css group='discussion'/>
-</%block>
-
 <div class="discussion-course">
 
-  % if enable_new_post_btn and has_permission_to_create_thread:
+  % if enable_new_post_btn and can_create_thread:
   <div class="discussion-course-new right">
     <a href="#" class="new-post-btn" role="button"><span class="icon icon-edit new-post-icon"></span>${_("New Post")}</a>
   </div>
