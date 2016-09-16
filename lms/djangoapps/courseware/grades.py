@@ -71,7 +71,7 @@ class ProgressSummary(object):
         if location in self.weighted_scores:
             score = self.weighted_scores[location]
             return score.earned, score.possible
-        children = self.locations_to_children[location]
+        children = self.locations_to_children(location)
         earned = 0.0
         possible = 0.0
         for child in children:

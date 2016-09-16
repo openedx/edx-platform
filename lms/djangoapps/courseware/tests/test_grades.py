@@ -226,8 +226,9 @@ class TestProgressSummary(TestCase):
             self.loc_k: [],
             self.loc_m: [],
         }
+        locations_function = lambda location: locations_to_scored_children[location]
         self.progress_summary = ProgressSummary(
-            None, weighted_scores, locations_to_scored_children
+            None, weighted_scores, locations_function
         )
 
     def create_score(self, earned, possible):
