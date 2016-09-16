@@ -243,7 +243,7 @@ def ddt_named(parent, child):
     Helper to get more readable dynamically-generated test names from ddt.
     """
     args = RenamedTuple([parent, child])
-    setattr(args, '__name__', 'parent_{}_child_{}'.format(parent, child))
+    args.__name__ = 'parent_{}_child_{}'.format(parent, child)      # pylint: disable=attribute-defined-outside-init
     return args
 
 

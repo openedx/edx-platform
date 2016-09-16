@@ -232,7 +232,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
 
         query_features = [
             'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
-            'total_amount', 'created_at', 'customer_reference_number', 'recipient_name', 'recipient_email',
+            'total_amount', 'created', 'customer_reference_number', 'recipient_name', 'recipient_email',
             'created_by', 'internal_reference', 'invoice_number', 'codes', 'course_id'
         ]
 
@@ -270,6 +270,43 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             self.assertEqual(sale_record['created_by'], self.instructor)
             self.assertEqual(sale_record['total_used_codes'], 0)
             self.assertEqual(sale_record['total_codes'], 5)
+
+    def test_course_sale_no_codes(self):
+
+        query_features = [
+            'company_name', 'company_contact_name', 'company_contact_email', 'total_codes', 'total_used_codes',
+            'total_amount', 'created', 'customer_reference_number', 'recipient_name', 'recipient_email',
+            'created_by', 'internal_reference', 'invoice_number', 'codes', 'course_id'
+        ]
+
+        #create invoice
+        sale_invoice = Invoice.objects.create(
+            total_amount=0.00, company_name='Test1', company_contact_name='TestName',
+            company_contact_email='test@company.com', recipient_name='Testw_1', recipient_email='test2@test.com',
+            customer_reference_number='2Fwe23S', internal_reference="ABC", course_id=self.course.id
+        )
+        CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=sale_invoice,
+            qty=0,
+            unit_price=0.00,
+            course_id=self.course.id
+        )
+
+        course_sale_records_list = sale_record_features(self.course.id, query_features)
+
+        for sale_record in course_sale_records_list:
+            self.assertEqual(sale_record['total_amount'], sale_invoice.total_amount)
+            self.assertEqual(sale_record['recipient_email'], sale_invoice.recipient_email)
+            self.assertEqual(sale_record['recipient_name'], sale_invoice.recipient_name)
+            self.assertEqual(sale_record['company_name'], sale_invoice.company_name)
+            self.assertEqual(sale_record['company_contact_name'], sale_invoice.company_contact_name)
+            self.assertEqual(sale_record['company_contact_email'], sale_invoice.company_contact_email)
+            self.assertEqual(sale_record['internal_reference'], sale_invoice.internal_reference)
+            self.assertEqual(sale_record['customer_reference_number'], sale_invoice.customer_reference_number)
+            self.assertEqual(sale_record['invoice_number'], sale_invoice.id)
+            self.assertEqual(sale_record['created_by'], None)
+            self.assertEqual(sale_record['total_used_codes'], 0)
+            self.assertEqual(sale_record['total_codes'], 0)
 
     def test_sale_order_features_with_discount(self):
         """
@@ -480,7 +517,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(
                 course_registration['company_name'],
                 [
-                    getattr(registration_code.invoice_item.invoice, 'company_name')
+                    registration_code.invoice_item.invoice.company_name
                     for registration_code in registration_codes
                 ]
             )

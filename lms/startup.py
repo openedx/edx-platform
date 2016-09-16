@@ -2,8 +2,7 @@
 Module for code that should run during LMS startup
 """
 
-# pylint: disable=unused-argument
-
+import django
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
@@ -12,8 +11,8 @@ settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 from openedx.core.lib.django_startup import autostartup
 import edxmako
 import logging
-from monkey_patch import django_utils_translation
 import analytics
+from monkey_patch import third_party_auth
 
 
 import xmodule.x_module
@@ -26,7 +25,13 @@ def run():
     """
     Executed during django startup
     """
-    django_utils_translation.patch()
+    third_party_auth.patch()
+
+    # To override the settings before executing the autostartup() for python-social-auth
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
+        enable_third_party_auth()
+
+    django.setup()
 
     autostartup()
 
@@ -37,9 +42,6 @@ def run():
 
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
-
-    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
-        enable_third_party_auth()
 
     # Initialize Segment analytics module by setting the write_key.
     if settings.LMS_SEGMENT_KEY:
@@ -101,7 +103,7 @@ def enable_stanford_theme():
     theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
 
     # Include the theme's templates in the template search paths
-    settings.TEMPLATE_DIRS.insert(0, theme_root / 'templates')
+    settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].insert(0, theme_root / 'templates')
     edxmako.paths.add_lookup('main', theme_root / 'templates', prepend=True)
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
@@ -149,7 +151,7 @@ def enable_microsites():
 
     # if we have any valid microsites defined, let's wire in the Mako and STATIC_FILES search paths
     if microsite_config_dict:
-        settings.TEMPLATE_DIRS.append(microsites_root)
+        settings.DEFAULT_TEMPLATE_ENGINE['DIRS'].append(microsites_root)
         edxmako.paths.add_lookup('main', microsites_root)
 
         settings.STATICFILES_DIRS.insert(0, microsites_root)

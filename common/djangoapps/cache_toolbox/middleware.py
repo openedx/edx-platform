@@ -81,8 +81,13 @@ choice for most environments but you may be happy with the trade-offs of the
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import User
 from django.contrib.auth.middleware import AuthenticationMiddleware
+from logging import getLogger
 
+from openedx.core.djangoapps.safe_sessions.middleware import SafeSessionMiddleware
 from .model import cache_model
+
+
+log = getLogger(__name__)
 
 
 class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
@@ -92,7 +97,16 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
     def process_request(self, request):
         try:
             # Try and construct a User instance from data stored in the cache
-            request.user = User.get_cached(request.session[SESSION_KEY])
+            session_user_id = SafeSessionMiddleware.get_user_id_from_session(request)
+            request.user = User.get_cached(session_user_id)  # pylint: disable=no-member
+            if request.user.id != session_user_id:
+                log.error(
+                    "CacheBackedAuthenticationMiddleware cached user '%s' does not match requested user '%s'.",
+                    request.user.id,
+                    session_user_id,
+                )
+                # Raise an exception to fall through to the except clause below.
+                raise Exception
         except:
             # Fallback to constructing the User from the database.
             super(CacheBackedAuthenticationMiddleware, self).process_request(request)

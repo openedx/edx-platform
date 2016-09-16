@@ -26,6 +26,12 @@ from warnings import filterwarnings, simplefilter
 
 from openedx.core.lib.tempdir import mkdtemp_clean
 
+# This patch disables the commit_on_success decorator during tests
+# in TestCase subclasses.
+from util.testing import patch_testcase, patch_sessions
+patch_testcase()
+patch_sessions()
+
 # Silence noisy logs to make troubleshooting easier when tests fail.
 import logging
 LOG_OVERRIDES = [
@@ -182,10 +188,15 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'edx.db'
+        'NAME': TEST_ROOT / 'db' / 'edx.db',
+        'ATOMIC_REQUESTS': True,
     },
 
 }
+
+# This hack disables migrations during tests. We want to create tables directly from the models for speed.
+# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
+MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
 
 CACHES = {
     # This is the cache used for most things.
@@ -301,7 +312,7 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 # the same settings, we can generate this randomly and guarantee
 # that they are using the same secret.
 from random import choice
-from string import letters, digits, punctuation  # pylint: disable=deprecated-module
+from string import letters, digits, punctuation
 RANDOM_SHARED_SECRET = ''.join(
     choice(letters + digits + punctuation)
     for x in range(250)
@@ -501,8 +512,8 @@ FEATURES['ENABLE_EDXNOTES'] = True
 # Enable teams feature for tests.
 FEATURES['ENABLE_TEAMS'] = True
 
-# Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', 'openedx.core.djangoapps.call_stack_manager')
+# Add apps to Installed apps for testing
+INSTALLED_APPS += ('openedx.core.djangoapps.call_stack_manager',)
 
 # Enable courseware search for tests
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
@@ -518,7 +529,7 @@ FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
 
 ######### custom courses #########
-INSTALLED_APPS += ('ccx',)
+INSTALLED_APPS += ('lms.djangoapps.ccx',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.

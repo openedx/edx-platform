@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.conf.urls import patterns, url
 
-from verify_student import views
+from lms.djangoapps.verify_student import views
 
 
 urlpatterns = patterns(
@@ -111,7 +111,7 @@ urlpatterns = patterns(
 
 # Fake response page for incourse reverification ( software secure )
 if settings.FEATURES.get('ENABLE_SOFTWARE_SECURE_FAKE'):
-    from verify_student.tests.fake_software_secure import SoftwareSecureFakeView
+    from lms.djangoapps.verify_student.tests.fake_software_secure import SoftwareSecureFakeView
     urlpatterns += patterns(
         'verify_student.tests.fake_software_secure',
         url(r'^software-secure-fake-response', SoftwareSecureFakeView.as_view()),

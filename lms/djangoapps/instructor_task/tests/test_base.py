@@ -151,6 +151,7 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
     def login_username(self, username):
         """Login the user, given the `username`."""
         if self.current_user != username:
+            self.logout()
             user_email = User.objects.get(username=username).email
             self.login(user_email, "test")
             self.current_user = username

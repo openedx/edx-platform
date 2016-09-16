@@ -58,11 +58,11 @@ class ResponseTest(unittest.TestCase):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 
-    def build_problem(self, capa_system=None, **kwargs):
+    def build_problem(self, capa_system=None, **kwargs):  # pylint: disable=missing-docstring
         xml = self.xml_factory.build_xml(**kwargs)
         return new_loncapa_problem(xml, capa_system=capa_system)
 
-    def assert_grade(self, problem, submission, expected_correctness, msg=None):
+    def assert_grade(self, problem, submission, expected_correctness, msg=None):  # pylint: disable=missing-docstring
         input_dict = {'1_2_1': submission}
         correct_map = problem.grade_answers(input_dict)
         if msg is None:
@@ -70,11 +70,11 @@ class ResponseTest(unittest.TestCase):
         else:
             self.assertEquals(correct_map.get_correctness('1_2_1'), expected_correctness, msg)
 
-    def assert_answer_format(self, problem):
+    def assert_answer_format(self, problem):  # pylint: disable=missing-docstring
         answers = problem.get_question_answers()
         self.assertTrue(answers['1_2_1'] is not None)
 
-    def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
+    def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):  # pylint: disable=missing-docstring
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
             self.assertEqual(result, 'correct')
@@ -110,7 +110,7 @@ class ResponseTest(unittest.TestCase):
         return str(rand.randint(0, 1e9))
 
 
-class MultiChoiceResponseTest(ResponseTest):
+class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = MultipleChoiceResponseXMLFactory
 
     def test_multiple_choice_grade(self):
@@ -171,7 +171,7 @@ class MultiChoiceResponseTest(ResponseTest):
         self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0)
 
 
-class TrueFalseResponseTest(ResponseTest):
+class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = TrueFalseResponseXMLFactory
 
     def test_true_false_grade(self):
@@ -215,7 +215,7 @@ class TrueFalseResponseTest(ResponseTest):
         self.assert_grade(problem, ['choice_0'], 'correct')
 
 
-class ImageResponseTest(ResponseTest):
+class ImageResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = ImageResponseXMLFactory
 
     def test_rectangle_grade(self):
@@ -278,7 +278,7 @@ class ImageResponseTest(ResponseTest):
         self.assert_answer_format(problem)
 
 
-class SymbolicResponseTest(ResponseTest):
+class SymbolicResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = SymbolicResponseXMLFactory
 
     def test_grade_single_input_correct(self):
@@ -395,7 +395,7 @@ class SymbolicResponseTest(ResponseTest):
             )
 
 
-class OptionResponseTest(ResponseTest):
+class OptionResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = OptionResponseXMLFactory
 
     def test_grade(self):
@@ -593,7 +593,7 @@ class FormulaResponseTest(ResponseTest):
         self.assertFalse(problem.responders.values()[0].validate_answer('3*y+2*x'))
 
 
-class StringResponseTest(ResponseTest):
+class StringResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = StringResponseXMLFactory
 
     def test_backward_compatibility_for_multiple_answers(self):
@@ -948,7 +948,7 @@ class StringResponseTest(ResponseTest):
         self.assertEqual(hint, self._get_random_number_result(problem.seed))
 
 
-class CodeResponseTest(ResponseTest):
+class CodeResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = CodeResponseXMLFactory
 
     def setUp(self):
@@ -1164,7 +1164,7 @@ class CodeResponseTest(ResponseTest):
                 self.assertEquals(output[answer_id]['msg'], u'Invalid grader reply. Please contact the course staff.')
 
 
-class ChoiceResponseTest(ResponseTest):
+class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = ChoiceResponseXMLFactory
 
     def test_radio_group_grade(self):
@@ -1312,7 +1312,7 @@ class ChoiceResponseTest(ResponseTest):
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
 
 
-class JavascriptResponseTest(ResponseTest):
+class JavascriptResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = JavascriptResponseXMLFactory
 
     def test_grade(self):
@@ -1352,7 +1352,7 @@ class JavascriptResponseTest(ResponseTest):
             )
 
 
-class NumericalResponseTest(ResponseTest):
+class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = NumericalResponseXMLFactory
 
     # We blend the line between integration (using evaluator) and exclusively
@@ -1666,7 +1666,7 @@ class NumericalResponseTest(ResponseTest):
         self.assertFalse(responder.validate_answer('fish'))
 
 
-class CustomResponseTest(ResponseTest):
+class CustomResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = CustomResponseXMLFactory
 
     def test_inline_code(self):

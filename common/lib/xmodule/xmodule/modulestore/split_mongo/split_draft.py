@@ -552,8 +552,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         """
         published_block = self._get_head(xblock, ModuleStoreEnum.BranchName.published)
         if published_block is not None:
-            setattr(xblock, '_published_by', published_block.edit_info.edited_by)
-            setattr(xblock, '_published_on', published_block.edit_info.edited_on)
+            # pylint: disable=protected-access
+            xblock._published_by = published_block.edit_info.edited_by
+            xblock._published_on = published_block.edit_info.edited_on
 
     @contract(asset_key='AssetKey')
     def find_asset_metadata(self, asset_key, **kwargs):

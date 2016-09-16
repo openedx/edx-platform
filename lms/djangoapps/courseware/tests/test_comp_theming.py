@@ -18,7 +18,7 @@ class TestComprehensiveTheming(TestCase):
         super(TestComprehensiveTheming, self).setUp()
 
         # Clear the internal staticfiles caches, to get test isolation.
-        staticfiles.finders._finders.clear()                    # pylint: disable=protected-access
+        staticfiles.finders.get_finder.cache_clear()
 
     @with_comp_theme(settings.REPO_ROOT / 'themes/red-theme')
     @unittest.skip("Disabled until we can release theming to production")

@@ -141,7 +141,6 @@ class SampleCourseFactory(CourseFactory):
     """
     Factory for sample courses using block_info_tree definitions.
     """
-    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
         """
@@ -181,7 +180,6 @@ class ToyCourseFactory(SampleCourseFactory):
     run = '2012_Fall'
     display_name = 'Toy Course'
 
-    # pylint: disable=unused-argument
     @classmethod
     def _create(cls, target_class, **kwargs):
         """
@@ -189,17 +187,17 @@ class ToyCourseFactory(SampleCourseFactory):
         """
         store = kwargs.get('modulestore')
         user_id = kwargs.get('user_id', ModuleStoreEnum.UserID.test)
-        toy_course = super(ToyCourseFactory, cls)._create(
-            target_class,
-            block_info_tree=TOY_BLOCK_INFO_TREE,
-            textbooks=[["Textbook", "path/to/a/text_book"]],
-            wiki_slug="toy",
-            graded=True,
-            discussion_topics={"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
-            graceperiod=datetime.timedelta(days=2, seconds=21599),
-            start=datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
-            xml_attributes={"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
-            pdf_textbooks=[
+
+        fields = {
+            'block_info_tree': TOY_BLOCK_INFO_TREE,
+            'textbooks': [["Textbook", "path/to/a/text_book"]],
+            'wiki_slug': "toy",
+            'graded': True,
+            'discussion_topics': {"General": {"id": "i4x-edX-toy-course-2012_Fall"}},
+            'graceperiod': datetime.timedelta(days=2, seconds=21599),
+            'start': datetime.datetime(2015, 07, 17, 12, tzinfo=pytz.utc),
+            'xml_attributes': {"filename": ["course/2012_Fall.xml", "course/2012_Fall.xml"]},
+            'pdf_textbooks': [
                 {
                     "tab_title": "Sample Multi Chapter Textbook",
                     "id": "MyTextbook",
@@ -209,8 +207,13 @@ class ToyCourseFactory(SampleCourseFactory):
                     ]
                 }
             ],
-            course_image="just_a_test.jpg",
-            **kwargs
+            'course_image': "just_a_test.jpg",
+        }
+        fields.update(kwargs)
+
+        toy_course = super(ToyCourseFactory, cls)._create(
+            target_class,
+            **fields
         )
         with store.bulk_operations(toy_course.id, emit_signals=False):
             with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, toy_course.id):

@@ -130,14 +130,15 @@ class TestLoginWithAccessTokenView(TestCase):
         self.user = UserFactory()
         self.oauth2_client = Client.objects.create(client_type=provider.constants.CONFIDENTIAL)
 
-    def _verify_response(self, access_token, expected_status_code, expected_num_cookies):
+    def _verify_response(self, access_token, expected_status_code, expected_cookie_name=None):
         """
         Calls the login_with_access_token endpoint and verifies the response given the expected values.
         """
         url = reverse("login_with_access_token")
         response = self.client.post(url, HTTP_AUTHORIZATION="Bearer {0}".format(access_token))
         self.assertEqual(response.status_code, expected_status_code)
-        self.assertEqual(len(response.cookies), expected_num_cookies)
+        if expected_cookie_name:
+            self.assertIn(expected_cookie_name, response.cookies)
 
     def test_success(self):
         access_token = AccessToken.objects.create(
@@ -145,11 +146,9 @@ class TestLoginWithAccessTokenView(TestCase):
             client=self.oauth2_client,
             user=self.user,
         )
-        self._verify_response(access_token, expected_status_code=204, expected_num_cookies=1)
-        self.assertEqual(len(self.client.cookies), 1)
-        self.assertEqual(self.client.session['_auth_user_id'], self.user.id)
+        self._verify_response(access_token, expected_status_code=204, expected_cookie_name='sessionid')
+        self.assertEqual(int(self.client.session['_auth_user_id']), self.user.id)
 
     def test_unauthenticated(self):
-        self._verify_response("invalid_token", expected_status_code=401, expected_num_cookies=0)
-        self.assertEqual(len(self.client.cookies), 0)
+        self._verify_response("invalid_token", expected_status_code=401)
         self.assertNotIn("session_key", self.client.session)

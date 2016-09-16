@@ -44,7 +44,6 @@ from util.milestones_helpers import (
     seed_milestone_relationship_types,
 )
 
-# pylint: disable=missing-docstring
 # pylint: disable=protected-access
 
 
@@ -512,7 +511,7 @@ class CourseOverviewAccessTestCase(ModuleStoreTestCase):
 
         self.user_normal = UserFactory.create()
         self.user_beta_tester = BetaTesterFactory.create(course_key=self.course_not_started.id)
-        self.user_completed_pre_requisite = UserFactory.create()  # pylint: disable=invalid-name
+        self.user_completed_pre_requisite = UserFactory.create()
         fulfill_course_milestone(self.user_completed_pre_requisite, self.course_started.id)
         self.user_staff = UserFactory.create(is_staff=True)
         self.user_anonymous = AnonymousUserFactory.create()

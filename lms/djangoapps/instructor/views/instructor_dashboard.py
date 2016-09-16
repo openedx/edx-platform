@@ -39,7 +39,7 @@ from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeIte
 from course_modes.models import CourseMode, CourseModesArchive
 from instructor_email_widget.models import GroupedQuery
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
-from certificates.models import CertificateGenerationConfiguration, CertificateWhitelist
+from certificates.models import CertificateGenerationConfiguration, CertificateWhitelist, GeneratedCertificate
 from certificates import api as certs_api
 from util.date_utils import get_default_time_display
 
@@ -62,7 +62,7 @@ class InstructorDashboardTab(CourseTab):
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument,redefined-outer-name
+    def is_enabled(cls, course, user=None):
         """
         Returns true if the specified user has staff access.
         """
@@ -303,6 +303,8 @@ def _section_certificates(course):
         'enabled_for_course': certs_api.cert_generation_enabled(course.id),
         'instructor_generation_enabled': instructor_generation_enabled,
         'html_cert_enabled': html_cert_enabled,
+        'active_certificate': certs_api.get_active_web_certificate(course),
+        'certificate_statuses': GeneratedCertificate.get_unique_statuses(course_key=course.id),
         'urls': {
             'generate_example_certificates': reverse(
                 'generate_example_certificates',
@@ -314,6 +316,10 @@ def _section_certificates(course):
             ),
             'start_certificate_generation': reverse(
                 'start_certificate_generation',
+                kwargs={'course_id': course.id}
+            ),
+            'start_certificate_regeneration': reverse(
+                'start_certificate_regeneration',
                 kwargs={'course_id': course.id}
             ),
             'list_instructor_tasks_url': reverse(
@@ -350,7 +356,7 @@ def set_course_mode_price(request, course_id):
 
     CourseModesArchive.objects.create(
         course_id=course_id, mode_slug='honor', mode_display_name='Honor Code Certificate',
-        min_price=getattr(course_honor_mode[0], 'min_price'), currency=getattr(course_honor_mode[0], 'currency'),
+        min_price=course_honor_mode[0].min_price, currency=course_honor_mode[0].currency,
         expiration_datetime=datetime.datetime.now(pytz.utc), expiration_date=datetime.date.today()
     )
     course_honor_mode.update(

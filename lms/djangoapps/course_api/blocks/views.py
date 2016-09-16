@@ -161,7 +161,7 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
         """
 
         # validate request parameters
-        requested_params = request.QUERY_PARAMS.copy()
+        requested_params = request.query_params.copy()
         requested_params.update({'usage_key': usage_key_string})
         params = BlockListGetForm(requested_params, initial={'requesting_user': request.user})
         if not params.is_valid():
@@ -236,7 +236,7 @@ class BlocksInCourseView(BlocksView):
         """
 
         # convert the requested course_key to the course's root block's usage_key
-        course_key_string = request.QUERY_PARAMS.get('course_id', None)
+        course_key_string = request.query_params.get('course_id', None)
         if not course_key_string:
             raise ValidationError('course_id is required.')
 

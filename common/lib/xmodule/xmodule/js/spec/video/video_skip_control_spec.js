@@ -33,8 +33,6 @@
         it('add ARIA attributes to play control', function () {
             state.el.trigger('play');
             expect($('.skip-control')).toHaveAttrs({
-                'role': 'button',
-                'title': 'Do not show again',
                 'aria-disabled': 'false'
             });
         });

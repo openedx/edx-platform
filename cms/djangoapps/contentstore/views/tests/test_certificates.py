@@ -230,7 +230,7 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
         content = json.loads(response.content)
-        certificate_id = self._remove_ids(content)  # pylint: disable=unused-variable
+        certificate_id = self._remove_ids(content)
         self.assertEqual(content, expected)
         self.assert_event_emitted(
             'edx.certificate.configuration.created',

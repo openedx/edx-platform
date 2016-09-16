@@ -99,7 +99,7 @@ class CapaModule(CapaMixin, XModule):
             result = handlers[dispatch](data)
 
         except NotFoundError as err:
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             raise ProcessingError(not_found_error_message), None, traceback_obj
 
         except TimeExpiredError as err:
@@ -107,7 +107,7 @@ class CapaModule(CapaMixin, XModule):
             raise ProcessingError, (time_expired_error_message, err), traceback_obj
 
         except Exception as err:
-            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            _, _, traceback_obj = sys.exc_info()
             raise ProcessingError(generic_error_message), None, traceback_obj
 
         after = self.get_progress()

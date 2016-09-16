@@ -531,9 +531,9 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         get_coupon = Coupon.objects.get(id=1)
         request = HttpRequest()
         request.user = admin
-        setattr(request, 'session', 'session')
+        request.session = 'session'
         messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
+        request._messages = messages        # pylint: disable=protected-access
         coupon_admin = SoftDeleteCouponAdmin(Coupon, AdminSite())
         test_query_set = coupon_admin.queryset(request)
         test_actions = coupon_admin.get_actions(request)
@@ -1546,7 +1546,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.coupon_code})
         self.assertEqual(resp.status_code, 200)
 
-        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=getattr(expired_course_item, 'course_id'),
+        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=expired_course_item.course_id,
                                                             order=expired_course_item.order_id)
         self.assertEqual(coupon_redemption.count(), 1)
         # testing_course enrollment is closed but the course is in the cart
@@ -1557,7 +1557,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
 
         # now the redemption entry should be deleted from the table.
-        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=getattr(expired_course_item, 'course_id'),
+        coupon_redemption = CouponRedemption.objects.filter(coupon__course_id=expired_course_item.course_id,
                                                             order=expired_course_item.order_id)
         self.assertEqual(coupon_redemption.count(), 0)
         ((template, context), _tmp) = render_mock.call_args
@@ -2035,8 +2035,6 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.assertIn("There was an error in your date input.  It should be formatted as YYYY-MM-DD",
                       response.content.decode('UTF-8'))
 
-    CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
-
     def test_report_csv_itemized(self):
         report_type = 'itemized_purchase_report'
         start_date = '1970-01-01'
@@ -2051,7 +2049,10 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date)
         self.assertIn(",".join(report.header()), response.content)
-        self.assertIn(self.CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE, response.content)
+        self.assertIn(
+            ",1,purchased,1,40.00,40.00,usd,Registration for Course: Robot Super Course,",
+            response.content
+        )
 
     def test_report_csv_university_revenue_share(self):
         report_type = 'university_revenue_share'

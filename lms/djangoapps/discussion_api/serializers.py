@@ -195,7 +195,7 @@ class ThreadSerializer(_ContentSerializer):
     comment_list_url = serializers.SerializerMethodField()
     endorsed_comment_list_url = serializers.SerializerMethodField()
     non_endorsed_comment_list_url = serializers.SerializerMethodField()
-    read = serializers.BooleanField(read_only=True)
+    read = serializers.BooleanField(required=False)
     has_endorsed = serializers.BooleanField(read_only=True, source="endorsed")
     response_count = serializers.IntegerField(source="resp_total", read_only=True, required=False)
 

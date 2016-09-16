@@ -15,6 +15,7 @@ from django.contrib.auth.models import User
 
 class ExternalAuthMap(models.Model):
     class Meta(object):
+        app_label = "external_auth"
         unique_together = (('external_id', 'external_domain'), )
 
     external_id = models.CharField(max_length=255, db_index=True)

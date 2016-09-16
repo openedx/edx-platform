@@ -7,19 +7,19 @@ import itertools
 import mock
 from nose.plugins.skip import SkipTest
 
-from courseware.views import progress  # pylint: disable=import-error
+from courseware.views import progress
 from courseware.field_overrides import OverrideFieldData
 from datetime import datetime
 from django.conf import settings
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edxmako.middleware import MakoMiddleware  # pylint: disable=import-error
+from edxmako.middleware import MakoMiddleware
 from nose.plugins.attrib import attr
 from pytz import UTC
 from request_cache.middleware import RequestCache
 from student.models import CourseEnrollment
-from student.tests.factories import UserFactory  # pylint: disable=import-error
+from student.tests.factories import UserFactory
 from xblock.core import XBlock
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, \
 from xmodule.modulestore.tests.factories import check_mongo_calls_range, CourseFactory, check_sum_of_calls
 from xmodule.modulestore.tests.utils import ProceduralCourseTestMixin
 from ccx_keys.locator import CCXLocator
-from ccx.tests.factories import CcxFactory
+from lms.djangoapps.ccx.tests.factories import CcxFactory
 
 
 @attr('shard_1')
@@ -161,7 +161,7 @@ class FieldOverridePerformanceTestCase(ProceduralCourseTestMixin,
         with self.settings(MODULESTORE_BRANCH='published-only'):
             # Clear all caches before measuring
             for cache in settings.CACHES:
-                get_cache(cache).clear()
+                caches[cache].clear()
 
             # Refill the metadata inheritance cache
             modulestore().get_course(self.course.id, depth=None)
@@ -214,24 +214,24 @@ class TestFieldOverrideMongoPerformance(FieldOverridePerformanceTestCase):
 
     TEST_DATA = {
         # (providers, course_width, enable_ccx, view_as_ccx): # of sql queries, # of mongo queries, # of xblocks
-        ('no_overrides', 1, True, False): (27, 6, 13),
-        ('no_overrides', 2, True, False): (72, 6, 84),
-        ('no_overrides', 3, True, False): (267, 6, 335),
-        ('ccx', 1, True, False): (27, 6, 13),
-        ('ccx', 2, True, False): (72, 6, 84),
-        ('ccx', 3, True, False): (267, 6, 335),
-        ('ccx', 1, True, True): (27, 6, 13),
-        ('ccx', 2, True, True): (72, 6, 84),
-        ('ccx', 3, True, True): (267, 6, 335),
-        ('no_overrides', 1, False, False): (27, 6, 13),
-        ('no_overrides', 2, False, False): (72, 6, 84),
-        ('no_overrides', 3, False, False): (267, 6, 335),
-        ('ccx', 1, False, False): (27, 6, 13),
-        ('ccx', 2, False, False): (72, 6, 84),
-        ('ccx', 3, False, False): (267, 6, 335),
-        ('ccx', 1, False, True): (27, 6, 13),
-        ('ccx', 2, False, True): (72, 6, 84),
-        ('ccx', 3, False, True): (267, 6, 335),
+        ('no_overrides', 1, True, False): (50, 6, 13),
+        ('no_overrides', 2, True, False): (137, 6, 84),
+        ('no_overrides', 3, True, False): (482, 6, 335),
+        ('ccx', 1, True, False): (50, 6, 13),
+        ('ccx', 2, True, False): (137, 6, 84),
+        ('ccx', 3, True, False): (482, 6, 335),
+        ('ccx', 1, True, True): (48, 6, 13),
+        ('ccx', 2, True, True): (135, 6, 84),
+        ('ccx', 3, True, True): (480, 6, 335),
+        ('no_overrides', 1, False, False): (50, 6, 13),
+        ('no_overrides', 2, False, False): (137, 6, 84),
+        ('no_overrides', 3, False, False): (482, 6, 335),
+        ('ccx', 1, False, False): (50, 6, 13),
+        ('ccx', 2, False, False): (137, 6, 84),
+        ('ccx', 3, False, False): (482, 6, 335),
+        ('ccx', 1, False, True): (48, 6, 13),
+        ('ccx', 2, False, True): (135, 6, 84),
+        ('ccx', 3, False, True): (480, 6, 335),
     }
 
 
@@ -243,22 +243,22 @@ class TestFieldOverrideSplitPerformance(FieldOverridePerformanceTestCase):
     __test__ = True
 
     TEST_DATA = {
-        ('no_overrides', 1, True, False): (27, 4, 9),
-        ('no_overrides', 2, True, False): (72, 19, 54),
-        ('no_overrides', 3, True, False): (267, 84, 215),
-        ('ccx', 1, True, False): (27, 4, 9),
-        ('ccx', 2, True, False): (72, 19, 54),
-        ('ccx', 3, True, False): (267, 84, 215),
-        ('ccx', 1, True, True): (29, 4, 13),
-        ('ccx', 2, True, True): (74, 19, 84),
-        ('ccx', 3, True, True): (269, 84, 335),
-        ('no_overrides', 1, False, False): (27, 4, 9),
-        ('no_overrides', 2, False, False): (72, 19, 54),
-        ('no_overrides', 3, False, False): (267, 84, 215),
-        ('ccx', 1, False, False): (27, 4, 9),
-        ('ccx', 2, False, False): (72, 19, 54),
-        ('ccx', 3, False, False): (267, 84, 215),
-        ('ccx', 1, False, True): (27, 4, 9),
-        ('ccx', 2, False, True): (72, 19, 54),
-        ('ccx', 3, False, True): (267, 84, 215),
+        ('no_overrides', 1, True, False): (50, 4, 9),
+        ('no_overrides', 2, True, False): (137, 19, 54),
+        ('no_overrides', 3, True, False): (482, 84, 215),
+        ('ccx', 1, True, False): (50, 4, 9),
+        ('ccx', 2, True, False): (137, 19, 54),
+        ('ccx', 3, True, False): (482, 84, 215),
+        ('ccx', 1, True, True): (52, 4, 13),
+        ('ccx', 2, True, True): (139, 19, 84),
+        ('ccx', 3, True, True): (484, 84, 335),
+        ('no_overrides', 1, False, False): (50, 4, 9),
+        ('no_overrides', 2, False, False): (137, 19, 54),
+        ('no_overrides', 3, False, False): (482, 84, 215),
+        ('ccx', 1, False, False): (50, 4, 9),
+        ('ccx', 2, False, False): (137, 19, 54),
+        ('ccx', 3, False, False): (482, 84, 215),
+        ('ccx', 1, False, True): (48, 4, 9),
+        ('ccx', 2, False, True): (135, 19, 54),
+        ('ccx', 3, False, True): (480, 84, 215),
     }

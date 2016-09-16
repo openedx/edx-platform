@@ -3,13 +3,13 @@ Assert that the OLI Analytics Backend transmits events properly
 """
 from __future__ import absolute_import
 
+import datetime
 import json
 from mock import patch, Mock
 import logging
 
 from django.conf import settings
 from django.test import TestCase
-from south.utils import datetime_utils as datetime
 
 from student.tests.factories import UserFactory
 from track.backends.oli import OLIAnalyticsBackend
@@ -125,7 +125,7 @@ class TestOLIBackend(TestCase):
                 'course_id': u'edX/DemoX/Demo_Course',
                 'path': u'/courses/edX/DemoX/Demo_Course/xblock/i4x:;_;_edX;_DemoX;_problem;_c554538a57664fac80783b99d9d6da7c/handler/xmodule_handler/problem_check',
             },
-            'time': datetime.datetime.now(),
+            'time': datetime.datetime.utcnow(),
             'page': 'x_module',
         }
         # pylint: enable=line-too-long
@@ -154,7 +154,7 @@ class TestOLIBackend(TestCase):
                 'course_id': u'edX/DemoX/Demo_Course',
                 'path': u'/courses/edX/DemoX/Demo_Course/courseware/interactive_demonstrations/',
             },
-            'time': datetime.datetime.now(),
+            'time': datetime.datetime.utcnow(),
             'page': None,
         }
         # pylint: enable=line-too-long
@@ -238,7 +238,7 @@ class TestOLIBackend(TestCase):
                 'course_id': u'edX/DemoX/Demo_Course2',
                 'path': u'/courses/edX/DemoX/Demo_Course/xblock/i4x:;_;_edX;_DemoX;_problem;_c554538a57664fac80783b99d9d6da7c/handler/xmodule_handler/problem_check',
             },
-            'time': datetime.datetime.now(),
+            'time': datetime.datetime.utcnow(),
             'page': 'x_module',
         }
         # pylint: enable=line-too-long

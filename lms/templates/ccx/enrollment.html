@@ -47,7 +47,7 @@
 </div>
 
 <div class="member-lists-management" style="float:left;width:50%">
-  <form method="POST" action="ccx_manage_student">
+  <form method="POST" action="ccx_manage_student" class="ccx-manage-student-form">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <div class="auth-list-container active">
     <div class="member-list-widget">
@@ -84,6 +84,29 @@
         <label for="student-id" class="sr">${_("Enter username or email")}</label>
         <input name="student-id" id="student-id" class="add-field" placeholder="${_("Enter username or email")}" type="text">
         <input name="student-action" class="add" value="Add Student" type="button">
+        <div class="enroll-option">
+            <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="auto-enroll-helper" disabled>
+            <label style="display:inline" for="auto-enroll">${_("Auto Enroll")}</label>
+            <div class="hint auto-enroll-hint">
+              <span class="hint-caret"></span>
+              <p class="text-helper" id="auto-enroll-helper">
+                ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
+                ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                <br /><br />
+                ${_("Checking this box has no effect if 'Revoke' is clicked.")}
+              </p>
+            </div>
+        </div>
+        <div class="enroll-option ccx-notify-user">
+            <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="email-students-helper">
+            <label style="display:inline" for="email-students">${_("Notify users by email")}</label>
+            <div class="hint email-students-hint">
+              <span class="hint-caret"></span>
+              <p class="text-helper" id="email-students-helper">
+                ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+              </p>
+            </div>
+        </div>
       </div>
     </div>
   </div>

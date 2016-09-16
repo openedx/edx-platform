@@ -6,7 +6,6 @@ import mock
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from common.test.utils import nostderr
 from xmodule.modulestore.tests.factories import CourseFactory, LibraryFactory
 
 from contentstore.management.commands.reindex_course import Command as ReindexCommand
@@ -48,36 +47,30 @@ class TestReindexCourse(ModuleStoreTestCase):
 
     def test_given_no_arguments_raises_command_error(self):
         """ Test that raises CommandError for incorrect arguments """
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments .*"):
-                call_command('reindex_course')
+        with self.assertRaisesRegexp(CommandError, ".* requires one or more arguments.*"):
+            call_command('reindex_course')
 
-    @ddt.data('qwerty', 'invalid_key', 'xblock-v1:qwe+rty')
+    @ddt.data('qwerty', 'invalid_key', 'xblockv1:qwerty')
     def test_given_invalid_course_key_raises_not_found(self, invalid_key):
         """ Test that raises InvalidKeyError for invalid keys """
-        errstring = "Invalid course_key: '%s'." % invalid_key
-        with self.assertRaises(SystemExit) as ex:
-            with self.assertRaisesRegexp(CommandError, errstring):
-                call_command('reindex_course', invalid_key)
-        self.assertEqual(ex.exception.code, 1)
+        err_string = "Invalid course_key: '{0}'".format(invalid_key)
+        with self.assertRaisesRegexp(CommandError, err_string):
+            call_command('reindex_course', invalid_key)
 
     def test_given_library_key_raises_command_error(self):
         """ Test that raises CommandError if library key is passed """
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(SearchIndexingError, ".* is not a course key"):
-                call_command('reindex_course', unicode(self._get_lib_key(self.first_lib)))
+        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
+            call_command('reindex_course', unicode(self._get_lib_key(self.first_lib)))
 
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(SearchIndexingError, ".* is not a course key"):
-                call_command('reindex_course', unicode(self._get_lib_key(self.second_lib)))
+        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
+            call_command('reindex_course', unicode(self._get_lib_key(self.second_lib)))
 
-        with self.assertRaises(SystemExit), nostderr():
-            with self.assertRaisesRegexp(SearchIndexingError, ".* is not a course key"):
-                call_command(
-                    'reindex_course',
-                    unicode(self.second_course.id),
-                    unicode(self._get_lib_key(self.first_lib))
-                )
+        with self.assertRaisesRegexp(CommandError, ".* is not a course key"):
+            call_command(
+                'reindex_course',
+                unicode(self.second_course.id),
+                unicode(self._get_lib_key(self.first_lib))
+            )
 
     def test_given_id_list_indexes_courses(self):
         """ Test that reindexes courses when given single course key or a list of course keys """

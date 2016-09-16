@@ -1,9 +1,17 @@
+"""
+Utility Mixins for unit tests
+"""
+
+import json
 import sys
 
 from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import clear_url_caches, resolve
+from django.test import TestCase
+
+from util.db import OuterAtomic, CommitOnSuccessManager
 
 
 class UrlResetMixin(object):
@@ -90,3 +98,72 @@ class EventTestMixin(object):
         Reset the mock tracker in order to forget about old events.
         """
         self.mock_tracker.reset_mock()
+
+
+class PatchMediaTypeMixin(object):
+    """
+    Generic mixin for verifying unsupported media type in PATCH
+    """
+    def test_patch_unsupported_media_type(self):
+        response = self.client.patch(
+            self.url,
+            json.dumps({}),
+            content_type=self.unsupported_media_type
+        )
+        self.assertEqual(response.status_code, 415)
+
+
+def patch_testcase():
+    """
+    Disable commit_on_success decorators for tests in TestCase subclasses.
+
+    Since tests in TestCase classes are wrapped in an atomic block, we
+    cannot use transaction.commit() or transaction.rollback().
+    https://docs.djangoproject.com/en/1.8/topics/testing/tools/#django.test.TransactionTestCase
+    """
+
+    def enter_atomics_wrapper(wrapped_func):
+        """
+        Wrapper for TestCase._enter_atomics
+        """
+        wrapped_func = wrapped_func.__func__
+
+        def _wrapper(*args, **kwargs):
+            """
+            Method that performs atomic-entering accounting.
+            """
+            CommitOnSuccessManager.ENABLED = False
+            OuterAtomic.ALLOW_NESTED = True
+            if not hasattr(OuterAtomic, 'atomic_for_testcase_calls'):
+                OuterAtomic.atomic_for_testcase_calls = 0
+            OuterAtomic.atomic_for_testcase_calls += 1
+            return wrapped_func(*args, **kwargs)
+        return classmethod(_wrapper)
+
+    def rollback_atomics_wrapper(wrapped_func):
+        """
+        Wrapper for TestCase._rollback_atomics
+        """
+        wrapped_func = wrapped_func.__func__
+
+        def _wrapper(*args, **kwargs):
+            """
+            Method that performs atomic-rollback accounting.
+            """
+            CommitOnSuccessManager.ENABLED = True
+            OuterAtomic.ALLOW_NESTED = False
+            OuterAtomic.atomic_for_testcase_calls -= 1
+            return wrapped_func(*args, **kwargs)
+        return classmethod(_wrapper)
+
+    # pylint: disable=protected-access
+    TestCase._enter_atomics = enter_atomics_wrapper(TestCase._enter_atomics)
+    TestCase._rollback_atomics = rollback_atomics_wrapper(TestCase._rollback_atomics)
+
+
+def patch_sessions():
+    """
+    Override the Test Client's session and login to support safe cookies.
+    """
+    from openedx.core.djangoapps.safe_sessions.testing import safe_cookie_test_session_patch
+    safe_cookie_test_session_patch()

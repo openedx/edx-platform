@@ -78,7 +78,7 @@ class DiscussionModule(DiscussionFields, XModule):
         if user_service:
             user = user_service._django_user  # pylint: disable=protected-access
         if user:
-            course_key = course.id  # pylint: disable=no-member
+            course_key = course.id
             can_create_comment = has_permission(user, "create_comment", course_key)
             can_create_subcomment = has_permission(user, "create_sub_comment", course_key)
             can_create_thread = has_permission(user, "create_thread", course_key)

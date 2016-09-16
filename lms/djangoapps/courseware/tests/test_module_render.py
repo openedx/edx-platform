@@ -761,7 +761,7 @@ class TestProctoringRendering(ModuleStoreTestCase):
         factory = RequestFactory()
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
-        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
+        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access
         with self.modulestore.bulk_operations(self.course_key):
             self.toy_course = self.store.get_course(self.course_key, depth=2)
             self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
@@ -1917,8 +1917,9 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
             course=self.course
         )
 
-        self.assertFalse(getattr(runtime, u'user_is_beta_tester'))
-        self.assertEqual(getattr(runtime, u'days_early_for_beta'), 5)
+        # pylint: disable=no-member
+        self.assertFalse(runtime.user_is_beta_tester)
+        self.assertEqual(runtime.days_early_for_beta, 5)
 
 
 class PureXBlockWithChildren(PureXBlock):
@@ -2104,7 +2105,7 @@ class TestDisabledXBlockTypes(ModuleStoreTestCase):
     """
     Tests that verify disabled XBlock types are not loaded.
     """
-    # pylint: disable=attribute-defined-outside-init, no-member
+    # pylint: disable=no-member
     def setUp(self):
         super(TestDisabledXBlockTypes, self).setUp()
 

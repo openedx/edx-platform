@@ -97,7 +97,6 @@ def _export_drafts(modulestore, course_key, export_fs, xml_centric_course_key):
 
                 draft_node.module.runtime.export_fs = draft_course_dir
                 adapt_references(draft_node.module, xml_centric_course_key, draft_course_dir)
-                # pylint: disable=no-member
                 node = lxml.etree.Element('unknown')
 
                 draft_node.module.add_xml_to_node(node)
@@ -158,7 +157,7 @@ class ExportManager(object):
         with self.modulestore.bulk_operations(self.courselike_key):
 
             fsm = OSFS(self.root_dir)
-            root = lxml.etree.Element('unknown')  # pylint: disable=no-member
+            root = lxml.etree.Element('unknown')
 
             # export only the published content
             with self.modulestore.branch_setting(ModuleStoreEnum.Branch.published_only, self.courselike_key):
@@ -200,7 +199,7 @@ class CourseExportManager(ExportManager):
 
     def process_root(self, root, export_fs):
         with export_fs.open('course.xml', 'w') as course_xml:
-            lxml.etree.ElementTree(root).write(course_xml)  # pylint: disable=no-member
+            lxml.etree.ElementTree(root).write(course_xml)
 
     def process_extra(self, root, courselike, root_courselike_dir, xml_centric_courselike_key, export_fs):
         # Export the modulestore's asset metadata.
@@ -211,10 +210,10 @@ class CourseExportManager(ExportManager):
         course_assets = self.modulestore.get_all_asset_metadata(self.courselike_key, None)
         for asset_md in course_assets:
             # All asset types are exported using the "asset" tag - but their asset type is specified in each asset key.
-            asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)  # pylint: disable=no-member
+            asset = lxml.etree.SubElement(asset_root, AssetMetadata.ASSET_XML_TAG)
             asset_md.to_xml(asset)
         with OSFS(asset_dir).open(AssetMetadata.EXPORTED_ASSET_FILENAME, 'w') as asset_xml_file:
-            lxml.etree.ElementTree(asset_root).write(asset_xml_file)  # pylint: disable=no-member
+            lxml.etree.ElementTree(asset_root).write(asset_xml_file)
 
         # export the static assets
         policies_dir = export_fs.makeopendir('policies')
@@ -338,7 +337,6 @@ class LibraryExportManager(ExportManager):
         """
         # Create the Library.xml file, which acts as the index of all library contents.
         xml_file = export_fs.open(LIBRARY_ROOT, 'w')
-        # pylint: disable=no-member
         xml_file.write(lxml.etree.tostring(root, pretty_print=True, encoding='utf-8'))
         xml_file.close()
 

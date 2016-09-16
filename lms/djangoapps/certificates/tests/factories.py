@@ -38,6 +38,11 @@ class BadgeAssertionFactory(DjangoModelFactory):
         model = BadgeAssertion
 
     mode = 'honor'
+    data = {
+        'image': 'http://www.example.com/image.png',
+        'json': {'id': 'http://www.example.com/assertion.json'},
+        'issuer': 'http://www.example.com/issuer.json',
+    }
 
 
 class BadgeImageConfigurationFactory(DjangoModelFactory):
@@ -75,7 +80,8 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
             },
             "honor": {
                 "certificate_type": "Honor Code",
-                "certificate_title": "Certificate of Achievement"
+                "certificate_title": "Certificate of Achievement",
+                "logo_url": "http://www.edx.org/honor_logo.png"
             },
             "verified": {
                 "certificate_type": "Verified",
@@ -84,6 +90,13 @@ class CertificateHtmlViewConfigurationFactory(DjangoModelFactory):
             "xseries": {
                 "certificate_title": "XSeries Certificate of Achievement",
                 "certificate_type": "XSeries"
+            },
+            "microsites": {
+                "testmicrosite": {
+                    "company_about_url": "http://www.testmicrosite.org/about-us",
+                    "company_privacy_url": "http://www.testmicrosite.org/edx-privacy-policy",
+                    "company_tos_url": "http://www.testmicrosite.org/edx-terms-service"
+                }
             }
         }"""
 

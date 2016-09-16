@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-11-05 18:54+0000\n"
-"PO-Revision-Date: 2015-11-05 18:54:08.260388\n"
+"POT-Creation-Date: 2015-11-24 15:21+0000\n"
+"PO-Revision-Date: 2015-11-24 15:21:34.741609\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -437,6 +437,22 @@ msgid ""
 msgstr ""
 "Ýöü hävé älréädý çréätéd än äççöünt üsïng än éxtérnäl lögïn lïké WéßÀüth ör "
 "Shïßßöléth. Pléäsé çöntäçt {tech_support_email} för süppört. Ⱡ'σяєм ιρѕυм#"
+
+#: common/djangoapps/student/forms.py
+msgid ""
+"That e-mail address doesn't have an associated user account. Are you sure "
+"you've registered?"
+msgstr ""
+"Thät é-mäïl äddréss döésn't hävé än ässöçïätéd üsér äççöünt. Àré ýöü süré "
+"ýöü'vé régïstéréd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/djangoapps/student/forms.py
+msgid ""
+"The user account associated with this e-mail address cannot reset the "
+"password."
+msgstr ""
+"Thé üsér äççöünt ässöçïätéd wïth thïs é-mäïl äddréss çännöt rését thé "
+"pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: common/djangoapps/student/forms.py
 msgid "Username must be minimum of two characters long"
@@ -972,14 +988,6 @@ msgstr ""
 "¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
-
-#: common/djangoapps/third_party_auth/pipeline.py
-msgid ""
-"This account has not yet been activated. An activation email has been re-"
-"sent to {email_address}."
-msgstr ""
-"Thïs äççöünt häs nöt ýét ßéén äçtïvätéd. Àn äçtïvätïön émäïl häs ßéén ré-"
-"sént tö {email_address}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -2913,6 +2921,12 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Checklist to Follow When Developing a Course"
+msgstr ""
+"Çhéçklïst tö Föllöw Whén Dévélöpïng ä Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Getting Started With Studio"
 msgstr "Géttïng Stärtéd Wïth Stüdïö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
@@ -3856,9 +3870,9 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: common/lib/xmodule/xmodule/imageannotation_module.py
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Secret Token String for Annotation"
 msgstr ""
 "Séçrét Tökén Strïng för Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
@@ -4315,363 +4329,10 @@ msgstr ""
 "À lïçénsé défïnés höw thé çönténts öf thïs ßlöçk çän ßé shäréd änd réüséd. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Show Single Problem"
-msgstr "Shöw Sïnglé Prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"When True, only the single problem specified by \"Link to Problem Location\""
-" is shown. When False, a panel is displayed with all problems available for "
-"peer grading."
-msgstr ""
-"Whén Trüé, önlý thé sïnglé prößlém spéçïfïéd ßý \"Lïnk tö Prößlém Löçätïön\""
-" ïs shöwn. Whén Fälsé, ä pänél ïs dïspläýéd wïth äll prößléms äväïläßlé för "
-"péér grädïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂"
-" ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
-"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
-"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
-"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂є#"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Link to Problem Location"
-msgstr "Lïnk tö Prößlém Löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"The location of the problem being graded. Only used when \"Show Single "
-"Problem\" is True."
-msgstr ""
-"Thé löçätïön öf thé prößlém ßéïng grädéd. Önlý üséd whén \"Shöw Sïnglé "
-"Prößlém\" ïs Trüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid ""
-"Defines whether the student gets credit for grading this problem. Only used "
-"when \"Show Single Problem\" is True."
-msgstr ""
-"Défïnés whéthér thé stüdént géts çrédït för grädïng thïs prößlém. Önlý üséd "
-"whén \"Shöw Sïnglé Prößlém\" ïs Trüé. Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Due date that should be displayed."
-msgstr ""
-"Düé däté thät shöüld ßé dïspläýéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Amount of grace to give on the due date."
-msgstr ""
-"Àmöünt öf gräçé tö gïvé ön thé düé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Student data for a given peer grading problem."
-msgstr ""
-"Stüdént dätä för ä gïvén péér grädïng prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/peer_grading_module.py
-msgid "Peer Grading Interface"
-msgstr "Péér Grädïng Ìntérfäçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-#: lms/templates/ccx/schedule.html
+#: common/lib/xmodule/xmodule/seq_module.py lms/templates/ccx/schedule.html
 msgid "Due Date"
 msgstr "Düé Däté Ⱡ'σяєм ιρѕυм ∂#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Enter the date by which problems are due."
-msgstr ""
-"Éntér thé däté ßý whïçh prößléms äré düé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Entrance Exam"
-msgstr "Ìs Éntränçé Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
-"Exams for this course setting to take effect."
-msgstr ""
-"Täg thïs çöürsé mödülé äs än Éntränçé Éxäm. Nöté, ýöü müst énäßlé Éntränçé "
-"Éxäms för thïs çöürsé séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυ#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Time Limited"
-msgstr "Ìs Tïmé Lïmïtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This setting indicates whether students have a limited time to view or "
-"interact with this courseware component."
-msgstr ""
-"Thïs séttïng ïndïçätés whéthér stüdénts hävé ä lïmïtéd tïmé tö vïéw ör "
-"ïntéräçt wïth thïs çöürséwäré çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Time Limit in Minutes"
-msgstr "Tïmé Lïmït ïn Mïnütés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"The number of minutes available to students for viewing or interacting with "
-"this courseware component."
-msgstr ""
-"Thé nümßér öf mïnütés äväïläßlé tö stüdénts för vïéwïng ör ïntéräçtïng wïth "
-"thïs çöürséwäré çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Proctoring Enabled"
-msgstr "Ìs Pröçtörïng Énäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "This setting indicates whether this exam is a proctored exam."
-msgstr ""
-"Thïs séttïng ïndïçätés whéthér thïs éxäm ïs ä pröçtöréd éxäm. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid "Is Practice Exam"
-msgstr "Ìs Präçtïçé Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/xmodule/xmodule/seq_module.py
-msgid ""
-"This setting indicates whether this exam is for testing purposes only. "
-"Practice exams are not verified."
-msgstr ""
-"Thïs séttïng ïndïçätés whéthér thïs éxäm ïs för téstïng pürpösés önlý. "
-"Präçtïçé éxäms äré nöt vérïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Group ID {group_id}"
-msgstr "Gröüp ÌD {group_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Not Selected"
-msgstr "Nöt Séléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
-msgstr ""
-"Thïs nämé ïs üséd för örgänïzïng ýöür çöürsé çöntént, ßüt ïs nöt shöwn tö "
-"stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Content Experiment"
-msgstr "Çöntént Éxpérïmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-#: lms/djangoapps/lms_xblock/mixin.py
-msgid ""
-"The list of group configurations for partitioning students in content "
-"experiments."
-msgstr ""
-"Thé lïst öf gröüp çönfïgürätïöns för pärtïtïönïng stüdénts ïn çöntént "
-"éxpérïménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The configuration defines how users are grouped for this content experiment."
-" Caution: Changing the group configuration of a student-visible experiment "
-"will impact the experiment data."
-msgstr ""
-"Thé çönfïgürätïön défïnés höw üsérs äré gröüpéd för thïs çöntént éxpérïmént."
-" Çäütïön: Çhängïng thé gröüp çönfïgürätïön öf ä stüdént-vïsïßlé éxpérïmént "
-"wïll ïmpäçt thé éxpérïmént dätä. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕ#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Group Configuration"
-msgstr "Gröüp Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Which child module students in a particular group_id should see"
-msgstr ""
-"Whïçh çhïld mödülé stüdénts ïn ä pärtïçülär gröüp_ïd shöüld séé Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "{group_name} (inactive)"
-msgstr "{group_name} (ïnäçtïvé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "The experiment is not associated with a group configuration."
-msgstr ""
-"Thé éxpérïmént ïs nöt ässöçïätéd wïth ä gröüp çönfïgürätïön. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Select a Group Configuration"
-msgstr "Séléçt ä Gröüp Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment uses a deleted group configuration. Select a valid group "
-"configuration or delete this experiment."
-msgstr ""
-"Thé éxpérïmént üsés ä délétéd gröüp çönfïgürätïön. Séléçt ä välïd gröüp "
-"çönfïgürätïön ör délété thïs éxpérïmént. Ⱡ'σяєм ιρѕυм ∂σłσя#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment uses a group configuration that is not supported for "
-"experiments. Select a valid group configuration or delete this experiment."
-msgstr ""
-"Thé éxpérïmént üsés ä gröüp çönfïgürätïön thät ïs nöt süppörtéd för "
-"éxpérïménts. Séléçt ä välïd gröüp çönfïgürätïön ör délété thïs éxpérïmént. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
-"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
-" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment does not contain all of the groups in the configuration."
-msgstr ""
-"Thé éxpérïmént döés nöt çöntäïn äll öf thé gröüps ïn thé çönfïgürätïön. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "Add Missing Groups"
-msgstr "Àdd Mïssïng Gröüps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"The experiment has an inactive group. Move content into active groups, then "
-"delete the inactive group."
-msgstr ""
-"Thé éxpérïmént häs än ïnäçtïvé gröüp. Mövé çöntént ïntö äçtïvé gröüps, thén "
-"délété thé ïnäçtïvé gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/xmodule/xmodule/split_test_module.py
-msgid "This content experiment has issues that affect content visibility."
-msgstr ""
-"Thïs çöntént éxpérïmént häs ïssüés thät äfféçt çöntént vïsïßïlïtý. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/lib/xmodule/xmodule/tabs.py
-msgid "External Discussion"
-msgstr "Éxtérnäl Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: common/lib/xmodule/xmodule/textannotation_module.py
-msgid "Text Annotation"
-msgstr "Téxt Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/xmodule/xmodule/textannotation_module.py
-msgid "Source/Citation"
-msgstr "Söürçé/Çïtätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/xmodule/xmodule/textannotation_module.py
-msgid ""
-"Optional for citing source of any material used. Automatic citation can be "
-"done using <a href=\"http://easybib.com\">EasyBib</a>"
-msgstr ""
-"Öptïönäl för çïtïng söürçé öf äný mätérïäl üséd. Àütömätïç çïtätïön çän ßé "
-"döné üsïng <a href=\"http://easybib.com\">ÉäsýBïß</a> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт#"
-
-#: common/lib/xmodule/xmodule/textannotation_module.py
-msgid "Diacritic Marks"
-msgstr "Dïäçrïtïç Märks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/xmodule/xmodule/textannotation_module.py
-msgid ""
-"Add diacritic marks to be added to a text using the comma-separated form, "
-"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
-msgstr ""
-"Àdd dïäçrïtïç märks tö ßé äddéd tö ä téxt üsïng thé çömmä-sépärätéd förm, "
-"ï.é. märknämé;ürltömärk;ßäsélïné,märknämé2;ürltömärk2;ßäsélïné2 Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσ#"
-
-#: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Video Annotation"
-msgstr "Vïdéö Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "The external source URL for the video."
-msgstr ""
-"Thé éxtérnäl söürçé ÛRL för thé vïdéö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Source URL"
-msgstr "Söürçé ÛRL Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Poster Image URL"
-msgstr "Pöstér Ìmägé ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Poster URL"
-msgstr "Pöstér ÛRL Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Inputs"
-msgstr "Ìnpüts Ⱡ'σяєм ιρѕυ#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Number of text boxes available for students to input words/sentences."
-msgstr ""
-"Nümßér öf téxt ßöxés äväïläßlé för stüdénts tö ïnpüt wörds/sénténçés. Ⱡ'σяєм"
-" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Maximum Words"
-msgstr "Mäxïmüm Wörds Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Maximum number of words to be displayed in generated word cloud."
-msgstr ""
-"Mäxïmüm nümßér öf wörds tö ßé dïspläýéd ïn générätéd wörd çlöüd. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Show Percents"
-msgstr "Shöw Pérçénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Statistics are shown for entered words near that word."
-msgstr ""
-"Stätïstïçs äré shöwn för éntéréd wörds néär thät wörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Whether this student has posted words to the cloud."
-msgstr ""
-"Whéthér thïs stüdént häs pöstéd wörds tö thé çlöüd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Student answer."
-msgstr "Stüdént änswér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "All possible words from all students."
-msgstr ""
-"Àll pössïßlé wörds fröm äll stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυ#"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Top num_top_words words for word cloud."
-msgstr ""
-"Töp nüm_töp_wörds wörds för wörd çlöüd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the default date by which problems are due."
@@ -5178,6 +4839,284 @@ msgstr ""
 "Érrör sävïng ýöür sçöré.  Pléäsé nötïfý çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
 " αмєт, ¢σηѕє¢тєтυя α#"
 
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid "Show Single Problem"
+msgstr "Shöw Sïnglé Prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid ""
+"When True, only the single problem specified by \"Link to Problem Location\""
+" is shown. When False, a panel is displayed with all problems available for "
+"peer grading."
+msgstr ""
+"Whén Trüé, önlý thé sïnglé prößlém spéçïfïéd ßý \"Lïnk tö Prößlém Löçätïön\""
+" ïs shöwn. Whén Fälsé, ä pänél ïs dïspläýéd wïth äll prößléms äväïläßlé för "
+"péér grädïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂"
+" ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂є#"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid "Link to Problem Location"
+msgstr "Lïnk tö Prößlém Löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid ""
+"The location of the problem being graded. Only used when \"Show Single "
+"Problem\" is True."
+msgstr ""
+"Thé löçätïön öf thé prößlém ßéïng grädéd. Önlý üséd whén \"Shöw Sïnglé "
+"Prößlém\" ïs Trüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid ""
+"Defines whether the student gets credit for grading this problem. Only used "
+"when \"Show Single Problem\" is True."
+msgstr ""
+"Défïnés whéthér thé stüdént géts çrédït för grädïng thïs prößlém. Önlý üséd "
+"whén \"Shöw Sïnglé Prößlém\" ïs Trüé. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid "Due date that should be displayed."
+msgstr ""
+"Düé däté thät shöüld ßé dïspläýéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid "Amount of grace to give on the due date."
+msgstr ""
+"Àmöünt öf gräçé tö gïvé ön thé düé däté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid "Student data for a given peer grading problem."
+msgstr ""
+"Stüdént dätä för ä gïvén péér grädïng prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/peer_grading_module.py
+msgid "Peer Grading Interface"
+msgstr "Péér Grädïng Ìntérfäçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Enter the date by which problems are due."
+msgstr ""
+"Éntér thé däté ßý whïçh prößléms äré düé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Entrance Exam"
+msgstr "Ìs Éntränçé Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"Tag this course module as an Entrance Exam. Note, you must enable Entrance "
+"Exams for this course setting to take effect."
+msgstr ""
+"Täg thïs çöürsé mödülé äs än Éntränçé Éxäm. Nöté, ýöü müst énäßlé Éntränçé "
+"Éxäms för thïs çöürsé séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυ#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Time Limited"
+msgstr "Ìs Tïmé Lïmïtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether students have a limited time to view or "
+"interact with this courseware component."
+msgstr ""
+"Thïs séttïng ïndïçätés whéthér stüdénts hävé ä lïmïtéd tïmé tö vïéw ör "
+"ïntéräçt wïth thïs çöürséwäré çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Time Limit in Minutes"
+msgstr "Tïmé Lïmït ïn Mïnütés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"The number of minutes available to students for viewing or interacting with "
+"this courseware component."
+msgstr ""
+"Thé nümßér öf mïnütés äväïläßlé tö stüdénts för vïéwïng ör ïntéräçtïng wïth "
+"thïs çöürséwäré çömpönént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Proctoring Enabled"
+msgstr "Ìs Pröçtörïng Énäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "This setting indicates whether this exam is a proctored exam."
+msgstr ""
+"Thïs séttïng ïndïçätés whéthér thïs éxäm ïs ä pröçtöréd éxäm. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid "Is Practice Exam"
+msgstr "Ìs Präçtïçé Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/seq_module.py
+msgid ""
+"This setting indicates whether this exam is for testing purposes only. "
+"Practice exams are not verified."
+msgstr ""
+"Thïs séttïng ïndïçätés whéthér thïs éxäm ïs för téstïng pürpösés önlý. "
+"Präçtïçé éxäms äré nöt vérïfïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group ID {group_id}"
+msgstr "Gröüp ÌD {group_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Not Selected"
+msgstr "Nöt Séléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"This name is used for organizing your course content, but is not shown to "
+"students."
+msgstr ""
+"Thïs nämé ïs üséd för örgänïzïng ýöür çöürsé çöntént, ßüt ïs nöt shöwn tö "
+"stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Content Experiment"
+msgstr "Çöntént Éxpérïmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+#: lms/djangoapps/lms_xblock/mixin.py
+msgid ""
+"The list of group configurations for partitioning students in content "
+"experiments."
+msgstr ""
+"Thé lïst öf gröüp çönfïgürätïöns för pärtïtïönïng stüdénts ïn çöntént "
+"éxpérïménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The configuration defines how users are grouped for this content experiment."
+" Caution: Changing the group configuration of a student-visible experiment "
+"will impact the experiment data."
+msgstr ""
+"Thé çönfïgürätïön défïnés höw üsérs äré gröüpéd för thïs çöntént éxpérïmént."
+" Çäütïön: Çhängïng thé gröüp çönfïgürätïön öf ä stüdént-vïsïßlé éxpérïmént "
+"wïll ïmpäçt thé éxpérïmént dätä. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕ#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Group Configuration"
+msgstr "Gröüp Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Which child module students in a particular group_id should see"
+msgstr ""
+"Whïçh çhïld mödülé stüdénts ïn ä pärtïçülär gröüp_ïd shöüld séé Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "{group_name} (inactive)"
+msgstr "{group_name} (ïnäçtïvé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "The experiment is not associated with a group configuration."
+msgstr ""
+"Thé éxpérïmént ïs nöt ässöçïätéd wïth ä gröüp çönfïgürätïön. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Select a Group Configuration"
+msgstr "Séléçt ä Gröüp Çönfïgürätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment uses a deleted group configuration. Select a valid group "
+"configuration or delete this experiment."
+msgstr ""
+"Thé éxpérïmént üsés ä délétéd gröüp çönfïgürätïön. Séléçt ä välïd gröüp "
+"çönfïgürätïön ör délété thïs éxpérïmént. Ⱡ'σяєм ιρѕυм ∂σłσя#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment uses a group configuration that is not supported for "
+"experiments. Select a valid group configuration or delete this experiment."
+msgstr ""
+"Thé éxpérïmént üsés ä gröüp çönfïgürätïön thät ïs nöt süppörtéd för "
+"éxpérïménts. Séléçt ä välïd gröüp çönfïgürätïön ör délété thïs éxpérïmént. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment does not contain all of the groups in the configuration."
+msgstr ""
+"Thé éxpérïmént döés nöt çöntäïn äll öf thé gröüps ïn thé çönfïgürätïön. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "Add Missing Groups"
+msgstr "Àdd Mïssïng Gröüps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid ""
+"The experiment has an inactive group. Move content into active groups, then "
+"delete the inactive group."
+msgstr ""
+"Thé éxpérïmént häs än ïnäçtïvé gröüp. Mövé çöntént ïntö äçtïvé gröüps, thén "
+"délété thé ïnäçtïvé gröüp. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/split_test_module.py
+msgid "This content experiment has issues that affect content visibility."
+msgstr ""
+"Thïs çöntént éxpérïmént häs ïssüés thät äfféçt çöntént vïsïßïlïtý. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: common/lib/xmodule/xmodule/tabs.py
+msgid "External Discussion"
+msgstr "Éxtérnäl Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Text Annotation"
+msgstr "Téxt Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Source/Citation"
+msgstr "Söürçé/Çïtätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Optional for citing source of any material used. Automatic citation can be "
+"done using <a href=\"http://easybib.com\">EasyBib</a>"
+msgstr ""
+"Öptïönäl för çïtïng söürçé öf äný mätérïäl üséd. Àütömätïç çïtätïön çän ßé "
+"döné üsïng <a href=\"http://easybib.com\">ÉäsýBïß</a> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт#"
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid "Diacritic Marks"
+msgstr "Dïäçrïtïç Märks Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/lib/xmodule/xmodule/textannotation_module.py
+msgid ""
+"Add diacritic marks to be added to a text using the comma-separated form, "
+"i.e. markname;urltomark;baseline,markname2;urltomark2;baseline2"
+msgstr ""
+"Àdd dïäçrïtïç märks tö ßé äddéd tö ä téxt üsïng thé çömmä-sépärätéd förm, "
+"ï.é. märknämé;ürltömärk;ßäsélïné,märknämé2;ürltömärk2;ßäsélïné2 Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσ#"
+
 #: common/lib/xmodule/xmodule/video_module/transcripts_utils.py
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
@@ -5559,6 +5498,80 @@ msgstr ""
 msgid "Do not show bumper again"
 msgstr "Dö nöt shöw ßümpér ägäïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Video Annotation"
+msgstr "Vïdéö Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "The external source URL for the video."
+msgstr ""
+"Thé éxtérnäl söürçé ÛRL för thé vïdéö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Source URL"
+msgstr "Söürçé ÛRL Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Poster Image URL"
+msgstr "Pöstér Ìmägé ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/videoannotation_module.py
+msgid "Poster URL"
+msgstr "Pöstér ÛRL Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Inputs"
+msgstr "Ìnpüts Ⱡ'σяєм ιρѕυ#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Number of text boxes available for students to input words/sentences."
+msgstr ""
+"Nümßér öf téxt ßöxés äväïläßlé för stüdénts tö ïnpüt wörds/sénténçés. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Maximum Words"
+msgstr "Mäxïmüm Wörds Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Maximum number of words to be displayed in generated word cloud."
+msgstr ""
+"Mäxïmüm nümßér öf wörds tö ßé dïspläýéd ïn générätéd wörd çlöüd. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Show Percents"
+msgstr "Shöw Pérçénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Statistics are shown for entered words near that word."
+msgstr ""
+"Stätïstïçs äré shöwn för éntéréd wörds néär thät wörd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Whether this student has posted words to the cloud."
+msgstr ""
+"Whéthér thïs stüdént häs pöstéd wörds tö thé çlöüd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Student answer."
+msgstr "Stüdént änswér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "All possible words from all students."
+msgstr ""
+"Àll pössïßlé wörds fröm äll stüdénts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "Top num_top_words words for word cloud."
+msgstr ""
+"Töp nüm_töp_wörds wörds för wörd çlöüd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
 #: lms/djangoapps/branding/api.py
 msgid ""
 "© {org_name}.  All rights reserved except where noted.  EdX, Open edX and "
@@ -5677,18 +5690,6 @@ msgid ""
 msgstr ""
 "Ýöü çännöt çréäté ä ÇÇX fröm ä çöürsé üsïng ä dépréçätéd ïd. Pléäsé çréäté ä"
 " rérün öf thïs çöürsé ïn thé stüdïö tö ällöw thïs äçtïön.#"
-
-#: lms/djangoapps/ccx/views.py
-msgid "Could not find a user with name or email \"{email}\" "
-msgstr ""
-"Çöüld nöt fïnd ä üsér wïth nämé ör émäïl \"{email}\"  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/ccx/views.py
-msgid "Please enter a valid username or email."
-msgstr ""
-"Pléäsé éntér ä välïd üsérnämé ör émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
 
 #: lms/djangoapps/certificates/badge_handler.py
 msgid ""
@@ -5942,68 +5943,41 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт łαвσяυ#"
 
-#: lms/djangoapps/certificates/views/webview.py
-msgid "I completed the {course_title} course on {platform_name}."
-msgstr ""
-"Ì çömplétéd thé {course_title} çöürsé ön {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/djangoapps/certificates/views/webview.py
-msgid ""
-"I completed a course on {platform_name}. Take a look at my certificate."
-msgstr ""
-"Ì çömplétéd ä çöürsé ön {platform_name}. Täké ä löök ät mý çértïfïçäté. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #. Translators:  The format of the date includes the full name of the month
 #: lms/djangoapps/certificates/views/webview.py
 msgid "{month} {day}, {year}"
 msgstr "{month} {day}, {year} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
+#. Translators:  This text represents the verification of the certificate
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
-"a course of study offered by {partner_short_name}, an online learning "
-"initiative of {partner_long_name} through {platform_name}."
+"This is a valid {platform_name} certificate for {user_name}, who "
+"participated in {partner_short_name} {course_number}"
 msgstr ""
-"ä çöürsé öf stüdý öfféréd ßý {partner_short_name}, än önlïné léärnïng "
-"ïnïtïätïvé öf {partner_long_name} thröügh {platform_name}. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/certificates/views/webview.py
-msgid ""
-"a course of study offered by {partner_short_name}, through {platform_name}."
-msgstr ""
-"ä çöürsé öf stüdý öfféréd ßý {partner_short_name}, thröügh {platform_name}. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#. Translators: Accomplishments describe the awards/certifications obtained by
-#. students on this platform
-#: lms/djangoapps/certificates/views/webview.py
-msgid "About {platform_name} Accomplishments"
-msgstr ""
-"Àßöüt {platform_name} Àççömplïshménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/djangoapps/certificates/views/webview.py
-msgid "More Information About {user_name}'s Certificate:"
-msgstr ""
-"Möré Ìnförmätïön Àßöüt {user_name}'s Çértïfïçäté: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"Thïs ïs ä välïd {platform_name} çértïfïçäté för {user_name}, whö "
+"pärtïçïpätéd ïn {partner_short_name} {course_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя #"
 
-#. Translators:  This line appears on the page just before the generation date
-#. for the certificate
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears in the browser title bar
 #: lms/djangoapps/certificates/views/webview.py
-msgid "Issued On:"
-msgstr "Ìssüéd Ön: Ⱡ'σяєм ιρѕυм ∂σłσ#"
+msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
+msgstr ""
+"{partner_short_name} {course_number} Çértïfïçäté | {platform_name} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#. Translators:  The Certificate ID Number is an alphanumeric value unique to
-#. each individual certificate
+#. Translators:  This text fragment appears after the student's name
+#. (displayed in a large font) on the certificate
+#. screen.  The text describes the accomplishment represented by the
+#. certificate information displayed to the user
 #: lms/djangoapps/certificates/views/webview.py
-msgid "Certificate ID Number"
-msgstr "Çértïfïçäté ÌD Nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/certificates/views/webview.py
-msgid "About {platform_name} Certificates"
-msgstr "Àßöüt {platform_name} Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgid ""
+"successfully completed, received a passing grade, and was awarded a "
+"{platform_name} {certificate_type} Certificate of Completion in "
+msgstr ""
+"süççéssfüllý çömplétéd, réçéïvéd ä pässïng grädé, änd wäs äwärdéd ä "
+"{platform_name} {certificate_type} Çértïfïçäté öf Çömplétïön ïn  Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт #"
 
 #. Translators: This text describes the purpose (and therefore, value) of a
 #. course certificate
@@ -6026,6 +6000,56 @@ msgstr ""
 " αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
 "ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
 "яєρяєнєη∂єяιт ιη νσłυρтαтє νєł#"
+
+#. Translators:  'All rights reserved' is a legal term used in copyrighting to
+#. protect published content
+#: lms/djangoapps/certificates/views/webview.py
+msgid "All rights reserved"
+msgstr "Àll rïghts résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#. Translators:  This text is bound to the HTML 'title' element of the page
+#. and appears
+#. in the browser title bar when a requested certificate is not found or
+#. recognized
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Invalid Certificate"
+msgstr "Ìnvälïd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#. Translators: The &amp; characters represent an ampersand character and can
+#. be ignored
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Terms of Service &amp; Honor Code"
+msgstr ""
+"Térms öf Sérvïçé &amp; Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#. Translators: This line appears as a byline to a header image and describes
+#. the purpose of the page
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Certificate Validation"
+msgstr "Çértïfïçäté Välïdätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#. Translators: Accomplishments describe the awards/certifications obtained by
+#. students on this platform
+#: lms/djangoapps/certificates/views/webview.py
+msgid "About {platform_name} Accomplishments"
+msgstr ""
+"Àßöüt {platform_name} Àççömplïshménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#. Translators:  This line appears on the page just before the generation date
+#. for the certificate
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Issued On:"
+msgstr "Ìssüéd Ön: Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#. Translators:  The Certificate ID Number is an alphanumeric value unique to
+#. each individual certificate
+#: lms/djangoapps/certificates/views/webview.py
+msgid "Certificate ID Number"
+msgstr "Çértïfïçäté ÌD Nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid "About {platform_name} Certificates"
+msgstr "Àßöüt {platform_name} Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/djangoapps/certificates/views/webview.py
 msgid "How {platform_name} Validates Student Certificates"
@@ -6104,36 +6128,42 @@ msgstr ""
 "{platform_name} äçknöwlédgés thé föllöwïng stüdént äççömplïshmént Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#. Translators:  This text represents the verification of the certificate
+#. Translators:  This text represents the description of course
 #: lms/djangoapps/certificates/views/webview.py
 msgid ""
-"This is a valid {platform_name} certificate for {user_name}, who "
-"participated in {partner_short_name} {course_number}"
+"a course of study offered by {partner_short_name}, an online learning "
+"initiative of {partner_long_name} through {platform_name}."
 msgstr ""
-"Thïs ïs ä välïd {platform_name} çértïfïçäté för {user_name}, whö "
-"pärtïçïpätéd ïn {partner_short_name} {course_number} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"ä çöürsé öf stüdý öfféréd ßý {partner_short_name}, än önlïné léärnïng "
+"ïnïtïätïvé öf {partner_long_name} thröügh {platform_name}. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#. Translators:  This text represents the description of course
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"a course of study offered by {partner_short_name}, through {platform_name}."
+msgstr ""
+"ä çöürsé öf stüdý öfféréd ßý {partner_short_name}, thröügh {platform_name}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid "I completed the {course_title} course on {platform_name}."
+msgstr ""
+"Ì çömplétéd thé {course_title} çöürsé ön {platform_name}. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid ""
+"I completed a course on {platform_name}. Take a look at my certificate."
+msgstr ""
+"Ì çömplétéd ä çöürsé ön {platform_name}. Täké ä löök ät mý çértïfïçäté. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/certificates/views/webview.py
+msgid "More Information About {user_name}'s Certificate:"
+msgstr ""
+"Möré Ìnförmätïön Àßöüt {user_name}'s Çértïfïçäté: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя #"
-
-#. Translators:  This text is bound to the HTML 'title' element of the page
-#. and appears in the browser title bar
-#: lms/djangoapps/certificates/views/webview.py
-msgid "{partner_short_name} {course_number} Certificate | {platform_name}"
-msgstr ""
-"{partner_short_name} {course_number} Çértïfïçäté | {platform_name} Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#. Translators:  This text fragment appears after the student's name
-#. (displayed in a large font) on the certificate
-#. screen.  The text describes the accomplishment represented by the
-#. certificate information displayed to the user
-#: lms/djangoapps/certificates/views/webview.py
-msgid ""
-"successfully completed, received a passing grade, and was awarded a "
-"{platform_name} {certificate_type} Certificate of Completion in "
-msgstr ""
-"süççéssfüllý çömplétéd, réçéïvéd ä pässïng grädé, änd wäs äwärdéd ä "
-"{platform_name} {certificate_type} Çértïfïçäté öf Çömplétïön ïn  Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт #"
 
 #. Translators: This line is displayed to a user who has completed a course
 #. and achieved a certification
@@ -6166,33 +6196,6 @@ msgstr ""
 msgid "More about {fullname}'s accomplishment"
 msgstr ""
 "Möré äßöüt {fullname}'s äççömplïshmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#. Translators:  'All rights reserved' is a legal term used in copyrighting to
-#. protect published content
-#: lms/djangoapps/certificates/views/webview.py
-msgid "All rights reserved"
-msgstr "Àll rïghts résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#. Translators:  This text is bound to the HTML 'title' element of the page
-#. and appears
-#. in the browser title bar when a requested certificate is not found or
-#. recognized
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Invalid Certificate"
-msgstr "Ìnvälïd Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#. Translators: The &amp; characters represent an ampersand character and can
-#. be ignored
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Terms of Service &amp; Honor Code"
-msgstr ""
-"Térms öf Sérvïçé &amp; Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#. Translators: This line appears as a byline to a header image and describes
-#. the purpose of the page
-#: lms/djangoapps/certificates/views/webview.py
-msgid "Certificate Validation"
-msgstr "Çértïfïçäté Välïdätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
@@ -6239,6 +6242,15 @@ msgstr "Sçöré Ⱡ'σяєм ιρѕ#"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 msgid "problems"
 msgstr "prößléms Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "{course_id} is not a valid course key."
+msgstr ""
+"{course_id} ïs nöt ä välïd çöürsé kéý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/commerce/api/v1/serializers.py
+msgid "Course {course_id} does not exist."
+msgstr "Çöürsé {course_id} döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/commerce/signals.py
 msgid ""
@@ -6307,15 +6319,6 @@ msgstr ""
 "Ìf ýöür çöürsé döés nöt äppéär ön ýöür däshßöärd, çöntäçt "
 "{payment_support_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: lms/djangoapps/commerce/api/v1/serializers.py
-msgid "{course_id} is not a valid course key."
-msgstr ""
-"{course_id} ïs nöt ä välïd çöürsé kéý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/commerce/api/v1/serializers.py
-msgid "Course {course_id} does not exist."
-msgstr "Çöürsé {course_id} döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
 #: lms/djangoapps/course_wiki/tab.py lms/djangoapps/course_wiki/views.py
 #: lms/templates/wiki/base.html
 msgid "Wiki"
@@ -6367,6 +6370,14 @@ msgid "You do not have access to this course on a mobile device"
 msgstr ""
 "Ýöü dö nöt hävé äççéss tö thïs çöürsé ön ä mößïlé dévïçé Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "in {relative_date} - {absolute_date}"
+msgstr "ïn {relative_date} - {absolute_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/courseware/date_summary.py
+msgid "UTC"
+msgstr "ÛTÇ Ⱡ'σяєм#"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Today is {date}"
@@ -6593,6 +6604,14 @@ msgid "Unable to switch to specified branch. Please check your branch name."
 msgstr ""
 "Ûnäßlé tö swïtçh tö spéçïfïéd ßränçh. Pléäsé çhéçk ýöür ßränçh nämé. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/dashboard/management/commands/git_add_course.py
+msgid ""
+"Import the specified git repository and optional branch into the modulestore"
+" and optionally specified directory."
+msgstr ""
+"Ìmpört thé spéçïfïéd gït répösïtörý änd öptïönäl ßränçh ïntö thé mödüléstöré"
+" änd öptïönällý spéçïfïéd dïréçtörý. Ⱡ'σяєм ιρѕυм ∂σłσя#"
 
 #. Translators: This message means that the user could not be authenticated
 #. (that is, we could
@@ -6857,14 +6876,6 @@ msgstr "rölé Ⱡ'σяєм ι#"
 msgid "full_name"
 msgstr "füll_nämé Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: lms/djangoapps/dashboard/management/commands/git_add_course.py
-msgid ""
-"Import the specified git repository and optional branch into the modulestore"
-" and optionally specified directory."
-msgstr ""
-"Ìmpört thé spéçïfïéd gït répösïtörý änd öptïönäl ßränçh ïntö thé mödüléstöré"
-" änd öptïönällý spéçïfïéd dïréçtörý. Ⱡ'σяєм ιρѕυм ∂σłσя#"
-
 #: lms/djangoapps/django_comment_client/base/views.py
 msgid "Title can't be empty"
 msgstr "Tïtlé çän't ßé émptý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
@@ -6937,10 +6948,10 @@ msgid "Credit Card - Individual"
 msgstr "Çrédït Çärd - Ìndïvïdüäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "manually enrolled by {username} - reason: {reason}"
+msgid "manually enrolled by username: {username}"
 msgstr ""
-"mänüällý énrölléd ßý {username} - réäsön: {reason} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
+"mänüällý énrölléd ßý üsérnämé: {username} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
 
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "Manually Enrolled"
@@ -7484,6 +7495,28 @@ msgstr ""
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Please select one or more certificate statuses that require certificate "
+"regeneration."
+msgstr ""
+"Pléäsé séléçt öné ör möré çértïfïçäté stätüsés thät réqüïré çértïfïçäté "
+"régénérätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Please select certificate statuses from the list only."
+msgstr ""
+"Pléäsé séléçt çértïfïçäté stätüsés fröm thé lïst önlý. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid ""
+"Certificate regeneration task has been started. You can view the status of "
+"the generation task in the \"Pending Tasks\" section."
+msgstr ""
+"Çértïfïçäté régénérätïön täsk häs ßéén stärtéd. Ýöü çän vïéw thé stätüs öf "
+"thé générätïön täsk ïn thé \"Péndïng Täsks\" séçtïön. Ⱡ'σяєм#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Invalid Json data"
@@ -8041,6 +8074,10 @@ msgstr "Çürréntlý Énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α�
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Source"
 msgstr "Énröllmént Söürçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/instructor_task/tasks_helper.py
+msgid "Manual (Un)Enrollment Reason"
+msgstr "Mänüäl (Ûn)Énröllmént Réäsön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Enrollment Role"
@@ -8711,208 +8748,6 @@ msgstr "Dïsçläïmér Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "TERMS AND CONDITIONS"
 msgstr "TÉRMS ÀND ÇÖNDÌTÌÖNS Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order Number"
-msgstr "Ördér Nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Customer Name"
-msgstr "Çüstömér Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Original Transaction"
-msgstr "Däté öf Örïgïnäl Tränsäçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Date of Refund"
-msgstr "Däté öf Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Amount of Refund"
-msgstr "Àmöünt öf Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Service Fees (if any)"
-msgstr "Sérvïçé Féés (ïf äný) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Purchase Time"
-msgstr "Pürçhäsé Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Order ID"
-msgstr "Ördér ÌD Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Unit Cost"
-msgstr "Ûnït Çöst Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Cost"
-msgstr "Tötäl Çöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
-msgid "Currency"
-msgstr "Çürrénçý Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Comments"
-msgstr "Çömménts Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "University"
-msgstr "Ûnïvérsïtý Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Announce Date"
-msgstr "Çöürsé Ànnöünçé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
-#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
-msgid "Course Start Date"
-msgstr "Çöürsé Stärt Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Close Date"
-msgstr "Çöürsé Régïsträtïön Çlösé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Course Registration Period"
-msgstr "Çöürsé Régïsträtïön Pérïöd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Enrolled"
-msgstr "Tötäl Énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Audit Enrollment"
-msgstr "Àüdït Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Honor Code Enrollment"
-msgstr "Hönör Çödé Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Verified Enrollment"
-msgstr "Vérïfïéd Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
-msgid "Gross Revenue"
-msgstr "Gröss Révénüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Gross Revenue over the Minimum"
-msgstr "Gröss Révénüé övér thé Mïnïmüm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Verified Students Contributing More than the Minimum"
-msgstr ""
-"Nümßér öf Vérïfïéd Stüdénts Çöntrïßütïng Möré thän thé Mïnïmüm Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Refunds"
-msgstr "Nümßér öf Réfünds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Dollars Refunded"
-msgstr "Döllärs Réfündéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Transactions"
-msgstr "Nümßér öf Tränsäçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Payments Collected"
-msgstr "Tötäl Päýménts Çölléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Number of Successful Refunds"
-msgstr "Nümßér öf Süççéssfül Réfünds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/djangoapps/shoppingcart/reports.py
-msgid "Total Amount of Refunds"
-msgstr "Tötäl Àmöünt öf Réfünds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You must be logged-in to add to a shopping cart"
-msgstr ""
-"Ýöü müst ßé löggéd-ïn tö ädd tö ä shöppïng çärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "The course you requested does not exist."
-msgstr ""
-"Thé çöürsé ýöü réqüéstéd döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "The course {course_id} is already in your cart."
-msgstr ""
-"Thé çöürsé {course_id} ïs älréädý ïn ýöür çärt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You are already registered in course {course_id}."
-msgstr ""
-"Ýöü äré älréädý régïstéréd ïn çöürsé {course_id}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Course added to cart."
-msgstr "Çöürsé äddéd tö çärt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Discount does not exist against code '{code}'."
-msgstr ""
-"Dïsçöünt döés nöt éxïst ägäïnst çödé '{code}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "This enrollment code ({enrollment_code}) is no longer valid."
-msgstr ""
-"Thïs énröllmént çödé ({enrollment_code}) ïs nö löngér välïd. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "This enrollment code ({enrollment_code}) is not valid."
-msgstr ""
-"Thïs énröllmént çödé ({enrollment_code}) ïs nöt välïd. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid ""
-"Code '{registration_code}' is not valid for any course in the shopping cart."
-msgstr ""
-"Çödé '{registration_code}' ïs nöt välïd för äný çöürsé ïn thé shöppïng çärt."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid ""
-"Cart item quantity should not be greater than 1 when applying activation "
-"code"
-msgstr ""
-"Çärt ïtém qüäntïtý shöüld nöt ßé gréätér thän 1 whén äpplýïng äçtïvätïön "
-"çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Only one coupon redemption is allowed against an order"
-msgstr ""
-"Önlý öné çöüpön rédémptïön ïs ällöwéd ägäïnst än ördér Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "success"
-msgstr "süççéss Ⱡ'σяєм ιρѕυм #"
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "You do not have permission to view this page."
-msgstr ""
-"Ýöü dö nöt hävé pérmïssïön tö vïéw thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid "The payment processor did not return a required parameter: {0}"
@@ -9736,6 +9571,208 @@ msgstr ""
 "            ön ýöür légäçý Smärt Àüthörïzätïön séttïngs.\n"
 "            Pössïßlé äçtïön: rétrý wïth ä dïfférént förm öf päýmént.\n"
 "             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Order Number"
+msgstr "Ördér Nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Customer Name"
+msgstr "Çüstömér Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Date of Original Transaction"
+msgstr "Däté öf Örïgïnäl Tränsäçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Date of Refund"
+msgstr "Däté öf Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Amount of Refund"
+msgstr "Àmöünt öf Réfünd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Service Fees (if any)"
+msgstr "Sérvïçé Féés (ïf äný) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Purchase Time"
+msgstr "Pürçhäsé Tïmé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Order ID"
+msgstr "Ördér ÌD Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Unit Cost"
+msgstr "Ûnït Çöst Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Cost"
+msgstr "Tötäl Çöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
+msgid "Currency"
+msgstr "Çürrénçý Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Comments"
+msgstr "Çömménts Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "University"
+msgstr "Ûnïvérsïtý Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Course Announce Date"
+msgstr "Çöürsé Ànnöünçé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/shoppingcart/reports.py cms/templates/settings.html
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Course Start Date"
+msgstr "Çöürsé Stärt Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Course Registration Close Date"
+msgstr "Çöürsé Régïsträtïön Çlösé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Course Registration Period"
+msgstr "Çöürsé Régïsträtïön Pérïöd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Enrolled"
+msgstr "Tötäl Énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Audit Enrollment"
+msgstr "Àüdït Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Honor Code Enrollment"
+msgstr "Hönör Çödé Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Verified Enrollment"
+msgstr "Vérïfïéd Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/instructor/instructor_dashboard_2/executive_summary.html
+msgid "Gross Revenue"
+msgstr "Gröss Révénüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Gross Revenue over the Minimum"
+msgstr "Gröss Révénüé övér thé Mïnïmüm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Verified Students Contributing More than the Minimum"
+msgstr ""
+"Nümßér öf Vérïfïéd Stüdénts Çöntrïßütïng Möré thän thé Mïnïmüm Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Refunds"
+msgstr "Nümßér öf Réfünds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Dollars Refunded"
+msgstr "Döllärs Réfündéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Transactions"
+msgstr "Nümßér öf Tränsäçtïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Payments Collected"
+msgstr "Tötäl Päýménts Çölléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Number of Successful Refunds"
+msgstr "Nümßér öf Süççéssfül Réfünds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/shoppingcart/reports.py
+msgid "Total Amount of Refunds"
+msgstr "Tötäl Àmöünt öf Réfünds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "You must be logged-in to add to a shopping cart"
+msgstr ""
+"Ýöü müst ßé löggéd-ïn tö ädd tö ä shöppïng çärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "The course you requested does not exist."
+msgstr ""
+"Thé çöürsé ýöü réqüéstéd döés nöt éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "The course {course_id} is already in your cart."
+msgstr ""
+"Thé çöürsé {course_id} ïs älréädý ïn ýöür çärt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "You are already registered in course {course_id}."
+msgstr ""
+"Ýöü äré älréädý régïstéréd ïn çöürsé {course_id}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Course added to cart."
+msgstr "Çöürsé äddéd tö çärt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Discount does not exist against code '{code}'."
+msgstr ""
+"Dïsçöünt döés nöt éxïst ägäïnst çödé '{code}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "This enrollment code ({enrollment_code}) is no longer valid."
+msgstr ""
+"Thïs énröllmént çödé ({enrollment_code}) ïs nö löngér välïd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "This enrollment code ({enrollment_code}) is not valid."
+msgstr ""
+"Thïs énröllmént çödé ({enrollment_code}) ïs nöt välïd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid ""
+"Code '{registration_code}' is not valid for any course in the shopping cart."
+msgstr ""
+"Çödé '{registration_code}' ïs nöt välïd för äný çöürsé ïn thé shöppïng çärt."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid ""
+"Cart item quantity should not be greater than 1 when applying activation "
+"code"
+msgstr ""
+"Çärt ïtém qüäntïtý shöüld nöt ßé gréätér thän 1 whén äpplýïng äçtïvätïön "
+"çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "Only one coupon redemption is allowed against an order"
+msgstr ""
+"Önlý öné çöüpön rédémptïön ïs ällöwéd ägäïnst än ördér Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "success"
+msgstr "süççéss Ⱡ'σяєм ιρѕυм #"
+
+#: lms/djangoapps/shoppingcart/views.py
+msgid "You do not have permission to view this page."
+msgstr ""
+"Ýöü dö nöt hävé pérmïssïön tö vïéw thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/djangoapps/student_account/views.py
 msgid "No user with the provided email address exists."
@@ -10598,26 +10635,6 @@ msgstr ""
 msgid "Create new merged version"
 msgstr "Çréäté néw mérgéd vérsïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
-#: lms/templates/wiki/preview_inline.html
-msgid "Previewing revision:"
-msgstr "Prévïéwïng révïsïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/wiki/preview_inline.html
-msgid "Previewing a merge between two revisions:"
-msgstr ""
-"Prévïéwïng ä mérgé ßétwéén twö révïsïöns: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: lms/templates/wiki/preview_inline.html
-msgid "This revision has been deleted."
-msgstr "Thïs révïsïön häs ßéén délétéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/wiki/preview_inline.html
-msgid "Restoring to this revision will mark the article as deleted."
-msgstr ""
-"Réstörïng tö thïs révïsïön wïll märk thé ärtïçlé äs délétéd. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
 #: lms/templates/wiki/includes/anonymous_blocked.html
 #, python-format
 msgid ""
@@ -10785,7 +10802,8 @@ msgstr ""
 "ön öthér ärtïçlés whïçh mäý ör mäý nöt ßé ä gööd thïng. Ⱡ#"
 
 #: lms/templates/wiki/plugins/attachments/index.html
-#: lms/templates/dashboard.html lms/templates/courseware/courses.html
+#: lms/templates/dashboard.html lms/templates/index.html
+#: lms/templates/courseware/courses.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -10844,6 +10862,26 @@ msgid "There are no attachments for this article."
 msgstr ""
 "Théré äré nö ättäçhménts för thïs ärtïçlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
+
+#: lms/templates/wiki/preview_inline.html
+msgid "Previewing revision:"
+msgstr "Prévïéwïng révïsïön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/templates/wiki/preview_inline.html
+msgid "Previewing a merge between two revisions:"
+msgstr ""
+"Prévïéwïng ä mérgé ßétwéén twö révïsïöns: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: lms/templates/wiki/preview_inline.html
+msgid "This revision has been deleted."
+msgstr "Thïs révïsïön häs ßéén délétéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/wiki/preview_inline.html
+msgid "Restoring to this revision will mark the article as deleted."
+msgstr ""
+"Réstörïng tö thïs révïsïön wïll märk thé ärtïçlé äs délétéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "You cannot create two cohorts with the same name"
@@ -11037,11 +11075,67 @@ msgid "Enable Student Dashboard Displays"
 msgstr ""
 "Énäßlé Stüdént Däshßöärd Dïspläýs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
+#: openedx/core/djangoapps/programs/models.py
+msgid "Cache Time To Live"
+msgstr "Çäçhé Tïmé Tö Lïvé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: openedx/core/djangoapps/programs/models.py
+msgid ""
+"Specified in seconds. Enable caching by setting this to a value greater than"
+" 0."
+msgstr ""
+"Spéçïfïéd ïn séçönds. Énäßlé çäçhïng ßý séttïng thïs tö ä välüé gréätér thän"
+" 0. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
 #: openedx/core/djangoapps/self_paced/models.py
 msgid "Enable course home page improvements."
 msgstr ""
 "Énäßlé çöürsé hömé pägé ïmprövéménts. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
+
+#: openedx/core/djangoapps/user_api/accounts/api.py
+msgid "The '{field_name}' field cannot be edited."
+msgstr ""
+"Thé '{field_name}' fïéld çännöt ßé édïtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тє#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Delete failed for user preference '{preference_key}'."
+msgstr ""
+"Délété fäïléd för üsér préférénçé '{preference_key}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Preference '{preference_key}' cannot be set to an empty value."
+msgstr ""
+"Préférénçé '{preference_key}' çännöt ßé sét tö än émptý välüé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Invalid user preference key '{preference_key}'."
+msgstr ""
+"Ìnvälïd üsér préférénçé kéý '{preference_key}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєт#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid ""
+"Value '{preference_value}' is not valid for user preference "
+"'{preference_key}'."
+msgstr ""
+"Välüé '{preference_value}' ïs nöt välïd för üsér préférénçé "
+"'{preference_key}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/user_api/preferences/api.py
+msgid "Save failed for user preference '{key}' with value '{value}'."
+msgstr ""
+"Sävé fäïléd för üsér préférénçé '{key}' wïth välüé '{value}'. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/user_api/preferences/views.py
+msgid "No data provided for user preference update"
+msgstr ""
+"Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #. Translators: This example email address is used as a placeholder in
 #. a field on the login form meant to hold the user's email address.
@@ -11097,11 +11191,10 @@ msgstr ""
 msgid "Jane Doe"
 msgstr "Jäné Döé Ⱡ'σяєм ιρѕυм ∂#"
 
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: These instructions appear on the registration form,
 #. immediately
 #. below a field meant to hold the user's full name.
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Needed for any certificates you may earn"
 msgstr ""
 "Néédéd för äný çértïfïçätés ýöü mäý éärn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -11176,50 +11269,6 @@ msgid "You must agree to the {platform_name} {terms_of_service}."
 msgstr ""
 "Ýöü müst ägréé tö thé {platform_name} {terms_of_service}. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢т#"
-
-#: openedx/core/djangoapps/user_api/accounts/api.py
-msgid "The '{field_name}' field cannot be edited."
-msgstr ""
-"Thé '{field_name}' fïéld çännöt ßé édïtéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тє#"
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Delete failed for user preference '{preference_key}'."
-msgstr ""
-"Délété fäïléd för üsér préférénçé '{preference_key}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя#"
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Preference '{preference_key}' cannot be set to an empty value."
-msgstr ""
-"Préférénçé '{preference_key}' çännöt ßé sét tö än émptý välüé. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Invalid user preference key '{preference_key}'."
-msgstr ""
-"Ìnvälïd üsér préférénçé kéý '{preference_key}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєт#"
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid ""
-"Value '{preference_value}' is not valid for user preference "
-"'{preference_key}'."
-msgstr ""
-"Välüé '{preference_value}' ïs nöt välïd för üsér préférénçé "
-"'{preference_key}'. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/user_api/preferences/api.py
-msgid "Save failed for user preference '{key}' with value '{value}'."
-msgstr ""
-"Sävé fäïléd för üsér préférénçé '{key}' wïth välüé '{value}'. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: openedx/core/djangoapps/user_api/preferences/views.py
-msgid "No data provided for user preference update"
-msgstr ""
-"Nö dätä prövïdéd för üsér préférénçé üpdäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
@@ -11333,10 +11382,6 @@ msgstr "Bäd çöürsé löçätïön prövïdéd Ⱡ'σяєм ιρѕυм ∂σ�
 msgid "Missing branch on fresh clone"
 msgstr "Mïssïng ßränçh ön frésh çlöné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
-#: cms/djangoapps/contentstore/utils.py
-msgid "Deleted group"
-msgstr "Délétéd gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
 #: cms/djangoapps/contentstore/management/commands/git_export.py
 msgid ""
 "Take the specified course and attempt to export it to a git repository\n"
@@ -11344,6 +11389,10 @@ msgid ""
 msgstr ""
 "Täké thé spéçïfïéd çöürsé änd ättémpt tö éxpört ït tö ä gït répösïtörý\n"
 ". Çöürsé dïréçtörý müst älréädý ßé ä gït répösïtörý. Ûsägé:  gït_éxpört <course_loc> <git_url> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αη#"
+
+#: cms/djangoapps/contentstore/utils.py
+msgid "Deleted group"
+msgstr "Délétéd gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid ""
@@ -12807,6 +12856,7 @@ msgstr ""
 "ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/module-error.html
+#: lms/templates/courseware/courseware-error.html
 msgid ""
 "We're sorry, this module is temporarily unavailable. Our staff is working to"
 " fix it as soon as possible. Please email us at {tech_support_email} to "
@@ -13166,6 +13216,12 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/register.html
+msgid "Your legal name, used for any certificates you earn."
+msgstr ""
+"Ýöür légäl nämé, üséd för äný çértïfïçätés ýöü éärn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/register.html
 msgid "cannot be changed later"
 msgstr "çännöt ßé çhängéd lätér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
@@ -13377,7 +13433,7 @@ msgstr "{course_number} Téxtßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 msgid "Textbook Navigation"
 msgstr "Téxtßöök Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#: lms/templates/staticbook.html
+#: lms/templates/staticbook.html lms/templates/courseware/gradebook.html
 msgid "Page"
 msgstr "Pägé Ⱡ'σяєм ι#"
 
@@ -13474,10 +13530,10 @@ msgstr "Répö Löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 msgid "Repo Branch (optional)"
 msgstr "Répö Bränçh (öptïönäl) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
-#. Translators: Github is a popular website for hosting code
+#. Translators: GitHub is a popular website for hosting code
 #: lms/templates/sysadmin_dashboard.html
-msgid "Load new course from github"
-msgstr "Löäd néw çöürsé fröm gïthüß Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+msgid "Load new course from GitHub"
+msgstr "Löäd néw çöürsé fröm GïtHüß Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #. Translators: 'dir' is short for 'directory'
 #: lms/templates/sysadmin_dashboard.html
@@ -13976,6 +14032,12 @@ msgstr "Révöké äççéss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/templates/ccx/enrollment.html
 msgid "Enter username or email"
 msgstr "Éntér üsérnämé ör émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/ccx/enrollment.html
+msgid "Checking this box has no effect if 'Revoke' is clicked."
+msgstr ""
+"Çhéçkïng thïs ßöx häs nö éfféçt ïf 'Révöké' ïs çlïçkéd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/ccx/grading_policy.html
 msgid "WARNING"
@@ -14646,22 +14708,6 @@ msgstr "{course_number} Çöürséwäré Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 msgid "Course Utilities"
 msgstr "Çöürsé Ûtïlïtïés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#: lms/templates/courseware/courseware-error.html
-msgid ""
-"We're sorry, this module is temporarily unavailable. Our staff is working to"
-" fix it as soon as possible. Please email us at {tech_support_email}' to "
-"report any problems or downtime."
-msgstr ""
-"Wé'ré sörrý, thïs mödülé ïs témpörärïlý ünäväïläßlé. Öür stäff ïs wörkïng tö"
-" fïx ït äs söön äs pössïßlé. Pléäsé émäïl üs ät {tech_support_email}' tö "
-"répört äný prößléms ör döwntïmé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒƒι¢ια ∂#"
-
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "Çöürsé Séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -14715,6 +14761,18 @@ msgstr "Grädéßöök Ⱡ'σяєм ιρѕυм ∂σł#"
 #: lms/templates/courseware/gradebook.html
 msgid "Search students"
 msgstr "Séärçh stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/courseware/gradebook.html
+msgid "previous page"
+msgstr "prévïöüs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/courseware/gradebook.html
+msgid "of"
+msgstr "öf Ⱡ'σя#"
+
+#: lms/templates/courseware/gradebook.html
+msgid "next page"
+msgstr "néxt pägé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/courseware/info.html
 msgid "{course_number} Course Info"
@@ -17150,6 +17208,14 @@ msgid "Generate Certificates"
 msgstr "Généräté Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Course certificate generation requires an activated web certificate "
+"configuration."
+msgstr ""
+"Çöürsé çértïfïçäté générätïön réqüïrés än äçtïvätéd wéß çértïfïçäté "
+"çönfïgürätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -17167,6 +17233,26 @@ msgid "The status for any active tasks appears in a table below."
 msgstr ""
 "Thé stätüs för äný äçtïvé täsks äppéärs ïn ä täßlé ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate Certificates"
+msgstr "Régénéräté Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Select one or more certificate statuses below using your mouse and ctrl or "
+"command key."
+msgstr ""
+"Séléçt öné ör möré çértïfïçäté stätüsés ßélöw üsïng ýöür möüsé änd çtrl ör "
+"çömmänd kéý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid ""
+"Select certificate statuses that need regeneration and click Regenerate "
+"Certificates button."
+msgstr ""
+"Séléçt çértïfïçäté stätüsés thät nééd régénérätïön änd çlïçk Régénéräté "
+"Çértïfïçätés ßüttön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Certificate Exceptions"
@@ -24995,10 +25081,11 @@ msgstr ""
 
 #: wiki/views/article.py
 #, python-format
-msgid "The article %s is now set to display revision #%d"
+msgid ""
+"The article %(title)s is now set to display revision #%(revision_number)d"
 msgstr ""
-"Thé ärtïçlé %s ïs nöw sét tö dïspläý révïsïön #%d Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Thé ärtïçlé %(title)s ïs nöw sét tö dïspläý révïsïön #%(revision_number)d "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: wiki/views/article.py
 msgid "New title"

@@ -610,12 +610,12 @@ class TestCourseReIndex(CourseTestCase):
         response = non_staff_client.get(index_url, {}, HTTP_ACCEPT='application/json')
         self.assertEqual(response.status_code, 403)
 
-    def test_content_type_none(self):
+    def test_empty_content_type(self):
         """
-        Test json content type is set if none is selected
+        Test json content type is set if '' is selected
         """
         index_url = reverse_course_url('course_search_index_handler', self.course.id)
-        response = self.client.get(index_url, {}, CONTENT_TYPE=None)
+        response = self.client.get(index_url, {}, CONTENT_TYPE='')
 
         # A course with the default release date should display as "Unscheduled"
         self.assertIn(self.SUCCESSFUL_RESPONSE, response.content)

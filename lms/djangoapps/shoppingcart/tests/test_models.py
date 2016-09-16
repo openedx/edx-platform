@@ -253,13 +253,13 @@ class OrderTest(ModuleStoreTestCase):
             {
                 'orderId': 1,
                 'currency': 'usd',
-                'total': '40',
+                'total': '40.00',
                 'products': [
                     {
                         'sku': u'CertificateItem.honor',
                         'name': unicode(self.course_key),
                         'category': unicode(self.course_key.org),
-                        'price': '40',
+                        'price': '40.00',
                         'id': 1,
                         'quantity': 1
                     }
@@ -676,7 +676,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
 
         test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
 
-        self.assertEqual(test_redemption.id, redemption.id)  # pylint: disable=no-member
+        self.assertEqual(test_redemption.id, redemption.id)
 
     def test_regcode_multi_redemptions(self):
         """
@@ -702,7 +702,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
                 course_enrollment=enrollment
             )
             redemption.save()
-            ids.append(redemption.id)  # pylint: disable=no-member
+            ids.append(redemption.id)
 
         test_redemption = RegistrationCodeRedemption.registration_code_used_for_enrollment(enrollment)
 
@@ -848,13 +848,13 @@ class CertificateItemTest(ModuleStoreTestCase):
             {
                 'orderId': 1,
                 'currency': 'usd',
-                'total': '40',
+                'total': '40.00',
                 'products': [
                     {
                         'sku': u'CertificateItem.verified',
                         'name': unicode(self.course_key),
                         'category': unicode(self.course_key.org),
-                        'price': '40',
+                        'price': '40.00',
                         'id': 1,
                         'quantity': 1
                     }

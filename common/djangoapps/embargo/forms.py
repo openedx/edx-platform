@@ -27,6 +27,7 @@ class RestrictedCourseForm(forms.ModelForm):
     """
     class Meta(object):
         model = RestrictedCourse
+        fields = '__all__'
 
     def clean_course_key(self):
         """Validate the course key.
@@ -60,6 +61,7 @@ class IPFilterForm(forms.ModelForm):
 
     class Meta(object):
         model = IPFilter
+        fields = '__all__'
 
     def _is_valid_ip(self, address):
         """Whether or not address is a valid ipv4 address or ipv6 address"""
