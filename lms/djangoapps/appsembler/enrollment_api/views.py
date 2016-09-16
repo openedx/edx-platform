@@ -84,7 +84,7 @@ class EnrollUserWithEnrollmentCodeView(APIView):
             reg_code_is_valid = False
             reg_code_already_redeemed = False
             error_reason = "Enrollment code not found"
-        if user_is_valid and reg_code_is_valid and not reg_code_already_redeemed:
+        if user_is_valid and reg_code_is_valid:
             course = get_course_by_id(course_registration.course_id, depth=0)
             redemption = RegistrationCodeRedemption.create_invoice_generated_registration_redemption(
                 course_registration,
@@ -144,8 +144,6 @@ class EnrollmentCodeStatusView(APIView):
             registration_code.save()
 
         if action == 'restore':
-            if redemption:
-                CourseEnrollment.enroll(redemption.course_enrollment.user, registration_code.course_id)
             registration_code.is_valid = True
             registration_code.save()
         return Response(data={'success': True})
