@@ -179,10 +179,14 @@ div.problem {
 
   form > label, .problem-group-label {
     display: block;
-    margin-bottom: 0;
+    margin-bottom: $baseline;
     font: inherit;
     color: inherit;
     -webkit-font-smoothing: initial;
+  }
+
+  .problem-group-label + .question-description {
+    margin-top: -$baseline;
   }
 
 }
@@ -757,11 +761,6 @@ div.problem {
 // ====================
 .problem {
   .capa_inputtype.textline, .inputtype.formulaequationinput {
-
-    label {
-      margin-top: $baseline / 2;
-      display: inline-block;
-    }
 
     input {
       @include box-sizing(border-box);
