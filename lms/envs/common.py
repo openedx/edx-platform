@@ -1349,6 +1349,10 @@ discussion_forum_js = [
 ]
 
 discussion_vendor_js = [
+    'js/vendor/edx_ui_toolkit_shim.js',
+    'js/vendor/i18n_shim.js',
+    'js/vendor/URI_shim.js',
+    'js/vendor/leanModal_shim.js',
     'js/Markdown.Converter.js',
     'js/Markdown.Sanitizer.js',
     'js/Markdown.Editor.js',

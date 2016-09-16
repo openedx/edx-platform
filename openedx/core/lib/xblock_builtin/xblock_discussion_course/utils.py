@@ -1,21 +1,14 @@
 """
-Utils for Discussion XBlock and Course Discussion XBlock
+Utils for DiscussionCourseXBlock
 """
 
 import os
 
-from django.templatetags.static import static
+from django.conf import settings
 
 from mako.template import Template as MakoTemplate
 
 from path import Path as path
-
-
-JS_URLS = [
-    # VENDOR
-    'js/vendor/mustache.js',
-    'js/discussion_forum.js',
-]
 
 
 def _(text):
@@ -23,6 +16,18 @@ def _(text):
     A noop underscore function that marks strings for extraction.
     """
     return text
+
+
+def get_js_dependencies(group):
+    """
+    Returns list of JS dependencies belonging to `group` in settings.PIPELINE_JS.
+
+    Respects `PIPELINE_ENABLED` setting.
+    """
+    if settings.PIPELINE_ENABLED:
+        return [settings.PIPELINE_JS[group]['output_filename']]
+    else:
+        return settings.PIPELINE_JS[group]['source_filenames']
 
 
 def render_mustache_templates():
@@ -54,19 +59,3 @@ def render_mustache_templates():
         for file_name in os.listdir(mustache_dir)
         if is_valid_file_name(file_name)
     )
-
-
-def add_resources_to_fragment(fragment):
-    """
-    Add resources specified in JS_URLS to a given fragment.
-    """
-    for url in JS_URLS:
-        fragment.add_javascript_url(asset_to_static_url(url))
-
-
-def asset_to_static_url(asset_path):
-    """
-    :param str asset_path: path to asset
-    :return: str|unicode url of asset
-    """
-    return static(asset_path)
