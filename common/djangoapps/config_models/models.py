@@ -41,7 +41,10 @@ class ConfigurationModelManager(models.Manager):
         """
         assert self.model.KEY_FIELDS != (), "Just use model.current() if there are no KEY_FIELDS"
         return self.get_queryset().extra(           # pylint: disable=no-member
-            where=["id IN ({subquery})".format(subquery=self._current_ids_subquery())],
+            where=["{table_name}.id IN ({subquery})".format(
+                table_name=self.model._meta.db_table,  # pylint: disable=protected-access
+                subquery=self._current_ids_subquery(),
+            )],
             select={'is_active': 1},  # This annotation is used by the admin changelist. sqlite requires '1', not 'True'
         )
 
@@ -53,11 +56,17 @@ class ConfigurationModelManager(models.Manager):
         if self.model.KEY_FIELDS:
             subquery = self._current_ids_subquery()
             return self.get_queryset().extra(           # pylint: disable=no-member
-                select={'is_active': "id IN ({subquery})".format(subquery=subquery)}
+                select={'is_active': "{table_name}.id IN ({subquery})".format(
+                    table_name=self.model._meta.db_table,  # pylint: disable=protected-access
+                    subquery=subquery,
+                )}
             )
         else:
             return self.get_queryset().extra(           # pylint: disable=no-member
-                select={'is_active': "id = {pk}".format(pk=self.model.current().pk)}
+                select={'is_active': "{table_name}.id = {pk}".format(
+                    table_name=self.model._meta.db_table,  # pylint: disable=protected-access
+                    pk=self.model.current().pk,
+                )}
             )
 
 
