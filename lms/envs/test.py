@@ -424,7 +424,8 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
-PLATFORM_NAME = "edX"
+# Include a non-ascii character in PLATFORM_NAME to uncover possible UnicodeEncodeErrors in tests.
+PLATFORM_NAME = u"édX"
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites

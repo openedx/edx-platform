@@ -588,7 +588,7 @@ class LoginSessionViewTest(UserAPITestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": "The email address you used to register with {platform_name}".format(
+                "instructions": u"The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -756,7 +756,7 @@ class PasswordResetViewTest(UserAPITestCase):
                 "required": True,
                 "label": "Email",
                 "placeholder": "username@domain.com",
-                "instructions": "The email address you used to register with {platform_name}".format(
+                "instructions": u"The email address you used to register with {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "restrictions": {
@@ -1126,7 +1126,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "name": "goals",
                 "type": "textarea",
                 "required": False,
-                "label": "Tell us why you're interested in {platform_name}".format(
+                "label": u"Tell us why you're interested in {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 )
             }
@@ -1185,7 +1185,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1194,7 +1194,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_label}".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1209,7 +1209,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required"},
             {
-                "label": "I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1218,7 +1218,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_label}".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1239,7 +1239,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1248,7 +1248,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_label}".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1261,7 +1261,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} {link_label}".format(
+                "label": u"I agree to the {platform_name} {link_label}".format(
                     platform_name=settings.PLATFORM_NAME,
                     link_label=link_label
                 ),
@@ -1270,7 +1270,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} {link_label}".format(
+                    "required": u"You must agree to the {platform_name} {link_label}".format(
                         platform_name=settings.PLATFORM_NAME,
                         link_label=link_label
                     )
@@ -1286,7 +1286,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} Honor Code".format(
+                "label": u"I agree to the {platform_name} Honor Code".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "honor_code",
@@ -1294,7 +1294,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} Honor Code".format(
+                    "required": u"You must agree to the {platform_name} Honor Code".format(
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1305,7 +1305,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self._assert_reg_field(
             {"honor_code": "required", "terms_of_service": "required"},
             {
-                "label": "I agree to the {platform_name} Terms of Service".format(
+                "label": u"I agree to the {platform_name} Terms of Service".format(
                     platform_name=settings.PLATFORM_NAME
                 ),
                 "name": "terms_of_service",
@@ -1313,7 +1313,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                 "type": "checkbox",
                 "required": True,
                 "errorMessages": {
-                    "required": "You must agree to the {platform_name} Terms of Service".format(  # pylint: disable=line-too-long
+                    "required": u"You must agree to the {platform_name} Terms of Service".format(  # pylint: disable=line-too-long
                         platform_name=settings.PLATFORM_NAME
                     )
                 }
@@ -1479,7 +1479,10 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
         self.assertEqual(len(mail.outbox), 1)
         sent_email = mail.outbox[0]
         self.assertEqual(sent_email.to, [self.EMAIL])
-        self.assertEqual(sent_email.subject, "Activate Your edX Account")
+        self.assertEqual(
+            sent_email.subject,
+            u"Activate Your {platform} Account".format(platform=settings.PLATFORM_NAME)
+        )
         self.assertIn(
             u"you need to activate your {platform} account".format(platform=settings.PLATFORM_NAME),
             sent_email.body
