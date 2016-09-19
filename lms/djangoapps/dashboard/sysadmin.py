@@ -345,7 +345,7 @@ class Courses(SysadminDashboardView):
         # Try the data dir, then try to find it in the git import dir
         if not gdir.exists():
             git_repo_dir = getattr(settings, 'GIT_REPO_DIR', git_import.DEFAULT_GIT_REPO_DIR)
-            gdir = path(git_repo_dir / cdir)
+            gdir = path(git_repo_dir) / cdir
             if not gdir.exists():
                 return info
 
