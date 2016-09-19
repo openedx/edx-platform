@@ -211,7 +211,6 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'icon-aria-hidden',  # TNL-4637
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -456,7 +455,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'icon-aria-hidden',  # TNL-4641
             ]
         })
 
@@ -465,7 +463,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'icon-aria-hidden',  # TNL-4641
             ]
         })
 
@@ -527,7 +524,6 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
             'ignore': [
                 'section',  # TODO: AC-491
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
-                'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -537,7 +533,6 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
             'ignore': [
                 'section',  # TODO: AC-491
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
-                'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -824,7 +819,6 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.visit()
@@ -922,7 +916,6 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1328,7 +1321,6 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'icon-aria-hidden',  # TNL-4641
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
