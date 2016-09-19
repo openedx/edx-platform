@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
-from .signals import SCORE_CHANGED
+from .signals import SCORE_CHANGED, SUBSECTION_SCORE_UPDATED
 from ..config.models import PersistentGradesEnabledFlag
 from ..transformer import GradesTransformer
 from ..new.subsection_grade import SubsectionGradeFactory
@@ -95,8 +95,6 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
     """
     student = kwargs['user']
     course_key = CourseLocator.from_string(kwargs['course_id'])
-    if not PersistentGradesEnabledFlag.feature_enabled(course_key):
-        return
 
     scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
     collected_block_structure = get_course_in_cache(course_key)
@@ -115,6 +113,12 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
             subsection_usage_key,
             collected_block_structure=collected_block_structure,
         )
-        subsection_grade_factory.update(
+        subsection_grade = subsection_grade_factory.update(
             transformed_subsection_structure[subsection_usage_key], transformed_subsection_structure
+        )
+        SUBSECTION_SCORE_UPDATED.send(
+            sender=None,
+            course=course,
+            user=student,
+            subsection_grade=subsection_grade,
         )
