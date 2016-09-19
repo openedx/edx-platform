@@ -80,6 +80,9 @@
 
     .comment-actions-list {
         @include float(right);
+        @include right($baseline / 2);
+        position: absolute;
+        top: $baseline / 2;
     }
 }
 
