@@ -1,7 +1,7 @@
 <%page args="grade_summary, grade_cutoffs, graph_div_id, show_grade_breakdown = True, show_grade_cutoffs = True, **kwargs"/>
 <%!
-  import json
-  import math
+import json
+import math
 %>
 
 $(function () {
@@ -115,6 +115,28 @@ $(function () {
   var droppedScores = ${ json.dumps(droppedScores) };
   var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
   
+  var a11y = [];
+  // add series
+  if (detail_tooltips['Completion']) {
+      for (var i = 0; i < detail_tooltips['Completion'].length; i++) {
+          a11y.push(detail_tooltips['Completion'][i]);
+      }
+  }
+  
+  if (detail_tooltips['Comprehension']) {
+      for (var i = 0; i < detail_tooltips['Comprehension'].length; i++) {
+          a11y.push(detail_tooltips['Comprehension'][i]);
+      }
+  }
+  
+  if (detail_tooltips['Dropped Scores']) {
+      for (var i = 0; i < detail_tooltips['Dropped Scores'].length; i++) {
+          a11y.push(detail_tooltips['Dropped Scores'][i]);
+      }
+  }
+  
+  console.log(a11y);
+  
   //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
   
@@ -128,13 +150,42 @@ $(function () {
     markings.push({yaxis: {from: ascending_grades[i], to: ascending_grades[i+1]}, color: colors[(i-1) % colors.length]});
 
   var options = {
-    series: {stack: true,
-              lines: {show: false, steps: false },
-              bars: {show: true, barWidth: 0.8, align: 'center', lineWidth: 0, fill: .8 },},
-    xaxis: {tickLength: 0, min: 0.0, max: ${tickIndex - sectionSpacer}, ticks: ticks, labelAngle: 90},
-    yaxis: {ticks: grade_cutoff_ticks, min: 0.0, max: 1.0, labelWidth: 100},
-    grid: { hoverable: true, clickable: true, borderWidth: 1, markings: markings },
-    legend: {show: false},
+    series: {
+        stack: true,
+        lines: {
+            show: false,
+            steps: false
+        },
+        bars: {
+            show: true,
+            barWidth: 0.8,
+            align: 'center',
+            lineWidth: 0,
+            fill: .8
+        },
+    },
+    xaxis: {
+        tickLength: 0,
+        min: 0.0,
+        max: ${tickIndex - sectionSpacer},
+        ticks: ticks,
+        labelAngle: 90
+    },
+    yaxis: {
+        ticks: grade_cutoff_ticks,
+        min: 0.0,
+        max: 1.0,
+        labelWidth: 100
+    },
+    grid: {
+        hoverable: true,
+        clickable: true,
+        borderWidth: 1,
+        markings: markings
+    },
+    legend: {
+        show: false
+    },
   };
   
   var $grade_detail_graph = $("#${graph_div_id}");
@@ -146,6 +197,7 @@ $(function () {
       $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
     %endif
   }
+  
       
   var previousPoint = null;
   $grade_detail_graph.bind("plothover", function (event, pos, item) {
