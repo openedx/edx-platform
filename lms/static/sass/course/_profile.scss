@@ -17,7 +17,7 @@
       margin: 0;
       padding: lh(0.5);
 
-      h1 {
+      .hd {
         margin: 0;
         padding-right: 30px;
       }
@@ -138,7 +138,7 @@
       @extend h1.top-header;
       margin-bottom: lh();
 
-      h1 {
+      .hd {
         @include float(left);
         font-size: 1em;
         font-weight: 100;
@@ -174,7 +174,7 @@
       }
     }
 
-    #grade-detail-graph {
+    .grade-detail-graph {
       min-height: 400px;
       width: 100%;
     }
@@ -246,7 +246,7 @@
       margin-top: lh();
       padding-left: 0;
 
-      > section {
+      > div {
         @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
         display: table;
@@ -257,7 +257,7 @@
           border-bottom: 0px;
         }
 
-        h2 {
+        .hd {
           @include border-right(1px dashed #ddd);
           @include box-sizing(border-box);
           display: table-cell;
@@ -285,7 +285,7 @@
               border-bottom: 0;
             }
 
-            h3 {
+            .hd {
               color: $gray-d1;
 
               span {
@@ -303,9 +303,13 @@
             .scores {
               margin: lh(0.5) 0;
 
-              h3 {
-                font-size: em(14);
+              .hd {
                 display: inline-block;
+                width: auto;
+                margin: initial;
+                border: initial;
+                padding: initial;
+                font-size: em(14);
               }
 
               ol {
