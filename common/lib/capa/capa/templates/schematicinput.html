@@ -1,3 +1,4 @@
+<%! from capa.util import remove_markup %>
 <div>
   <div class="script_placeholder" data-src="${setup_script}"/>
   <input type="hidden"
@@ -8,7 +9,7 @@
     analyses="${analyses}"
     name="input_${id}"
     id="input_${id}"
-    aria-label="${response_data['label']}"
+    aria-label="${remove_markup(response_data['label'])}"
     aria-describedby="answer_${id}"
     value="${value|h}"
     initial_value="${initial_value|h}"

@@ -322,14 +322,14 @@ class InputTypeBase(object):
             'msg': self.msg,
             'response_data': self.response_data,
             'STATIC_URL': self.capa_system.STATIC_URL,
-            'describedby': '',
+            'describedby_html': '',
         }
 
         # Don't add aria-describedby attribute if there are no descriptions
         if self.response_data.get('descriptions'):
             description_ids = ' '.join(self.response_data.get('descriptions').keys())
             context.update(
-                {'describedby': 'aria-describedby="{}"'.format(description_ids)}
+                {'describedby_html': 'aria-describedby="{}"'.format(description_ids)}
             )
 
         context.update(
