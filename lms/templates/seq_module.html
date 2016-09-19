@@ -54,7 +54,12 @@
     ${item['content']}
   </div>
   % endfor
-  <div id="seq_content"></div>
+  <div id="seq_content">
+    <p class="loading-spinner">
+        <span class="icon fa fa-spinner fa-pulse fa-2x fa-fw" aria-hidden="true"></span>
+        <span class="sr">${_('Loading')}</span>
+    </p>
+  </div>
 
   <nav class="sequence-bottom" aria-label="${_('Section')}">
     <button class="sequence-nav-button button-previous">
