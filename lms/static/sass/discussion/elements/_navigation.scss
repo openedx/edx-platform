@@ -166,6 +166,11 @@
     background-color: $forum-color-background;
     margin-bottom: 0;
 
+    &:last-child {
+        // Overrides pattern library default li:last-child style
+        border-bottom: 1px solid $forum-color-border;
+    }
+
     .forum-nav-thread-link {
         @include border-left(3px solid transparent);
         display: flex;
