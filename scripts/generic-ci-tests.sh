@@ -71,7 +71,7 @@ END
 case "$TEST_SUITE" in
 
     "lms-unit")
-        PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' -v --with-xunitmp"
+        PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' --verbosity=4 --with-xunitmp"
         case "$SHARD" in
             "all")
                 paver test_system -s lms $PAVER_ARGS
@@ -94,12 +94,12 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
+        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s cms --with-flaky --cov-args="-p" --verbosity=4 --with-xunitmp
         ;;
 
 
     "commonlib-unit")
-        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
+        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_lib --with-flaky --cov-args="-p" --verbosity=4 --with-xunit
         ;;
 
     *)
