@@ -1,4 +1,3 @@
-<li role="menuitem" class="topic-menu-item">
-    <span class="topic-title"><%- text %></span>
-    <ul role="menu" class="topic-submenu"><%= entries %></ul>
-</li>
+<optgroup label="<%- text %>">
+    <%= edx.HtmlUtils.ensureHtml(entries) %>
+</optgroup>
