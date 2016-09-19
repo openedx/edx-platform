@@ -297,6 +297,9 @@ FEATURES = {
     # Dashboard search feature
     'ENABLE_DASHBOARD_SEARCH': False,
 
+    # Dashboard sidebar
+    'ENABLE_DASHBOARD_SIDEBAR': True,
+
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
 

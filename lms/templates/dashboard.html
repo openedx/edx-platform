@@ -135,26 +135,27 @@ from openedx.core.djangolib.markup import HTML, Text
     </div>
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-        <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
-          <form>
-            <label for="dashboard-search-input">${_('Search Your Courses')}</label>
-            <div class="search-field-wrapper">
-              <input id="dashboard-search-input" type="text" class="search-field"/>
-              <button type="submit" class="search-button" title="${_('Search')}">
-                <span class="icon fa fa-search" aria-hidden="true"></span>
-              </button>
-              <button type="button" class="cancel-button" title="${_('Clear search')}">
-                <span class="icon fa fa-remove" aria-hidden="true"></span>
-              </button>
-            </div>
-          </form>
-        </div>
+      <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
+        <form>
+          <label for="dashboard-search-input">${_('Search Your Courses')}</label>
+          <div class="search-field-wrapper">
+            <input id="dashboard-search-input" type="text" class="search-field"/>
+            <button type="submit" class="search-button" title="${_('Search')}">
+              <span class="icon fa fa-search" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="cancel-button" title="${_('Clear search')}">
+              <span class="icon fa fa-remove" aria-hidden="true"></span>
+            </button>
+          </div>
+        </form>
+      </div>
       % endif
 
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
-        <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
+      <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
       % endif
 
+      % if settings.FEATURES.get('ENABLE_DASHBOARD_SIDEBAR'):
       <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
         <header class="profile">
           <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
@@ -174,8 +175,10 @@ from openedx.core.djangolib.markup import HTML, Text
             <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
           </ul>
-            </div>
         </div>
+      </div>
+      % endif
+
     </div>
 </main>
 

@@ -160,8 +160,9 @@ FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
 
 
-########################## Dashboard Search #######################
+########################## Dashboard #######################
 FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+FEATURES['ENABLE_DASHBOARD_SIDEBAR'] = True
 
 
 ########################## Certificates Web/HTML View #######################
