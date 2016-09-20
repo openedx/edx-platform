@@ -13,8 +13,38 @@ from opaque_keys.edx.keys import CourseKey
 from student.models import User, CourseEnrollment
 from lms.djangoapps.verify_student.models import VerificationCheckpoint, VerificationStatus, SkippedReverification
 
+from .models import SoftwareSecurePhotoVerification
 
 log = logging.getLogger(__name__)
+
+
+class VerificationService(object):
+    """
+    Learner verification XBlock service
+    """
+
+    def get_status(self, user_id):
+        """
+        Returns the user's current photo verification status.
+
+        Args:
+            user_id: the user's id
+
+        Returns: one of the following strings
+            'none' - no such verification exists
+            'expired' - verification has expired
+            'approved' - verification has been approved
+            'pending' - verification process is still ongoing
+            'must_reverify' - verification has been denied and user must resubmit photos
+        """
+        user = User.objects.get(id=user_id)
+        return SoftwareSecurePhotoVerification.user_status(user)
+
+    def reverify_url(self):
+        """
+        Returns the URL for a user to verify themselves.
+        """
+        return reverse('verify_student_reverify')
 
 
 class ReverificationService(object):

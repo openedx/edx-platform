@@ -137,10 +137,11 @@ class ProctoringFields(object):
 
 
 @XBlock.wants('proctoring')
+@XBlock.wants('verification')
 @XBlock.wants('milestones')
 @XBlock.wants('credit')
-@XBlock.needs("user")
-@XBlock.needs("bookmarks")
+@XBlock.needs('user')
+@XBlock.needs('bookmarks')
 class SequenceModule(SequenceFields, ProctoringFields, XModule):
     """
     Layout module which lays out content in a temporal sequence
@@ -433,6 +434,7 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
 
         proctoring_service = self.runtime.service(self, 'proctoring')
         credit_service = self.runtime.service(self, 'credit')
+        verification_service = self.runtime.service(self, 'verification')
 
         # Is this sequence designated as a Timed Examination, which includes
         # Proctored Exams
@@ -464,6 +466,14 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
                     context.update({
                         'credit_state': credit_state
                     })
+
+            # inject verification status
+            if verification_service:
+                verification_status, __ = verification_service.get_status(user_id)
+                context.update({
+                    'verification_status': verification_status,
+                    'reverify_url': verification_service.reverify_url(),
+                })
 
             # See if the edx-proctoring subsystem wants to present
             # a special view to the student rather
