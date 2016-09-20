@@ -33,7 +33,7 @@ def persistence_safe_fallback():
     except DatabaseError:
         # Error deliberately logged, then swallowed. It's assumed that the wrapped code is not guaranteed to succeed.
         # TODO: enqueue a celery task to finish the task asynchronously, see TNL-5471
-        log.warning("Persistent Grades: Persistence Error, falling back.\n{}".format(format_exc()))
+        log.warning("Persistent Grades: database_error.safe_fallback.\n{}".format(format_exc()))
 
 
 class SubsectionGrade(object):
@@ -80,7 +80,7 @@ class SubsectionGrade(object):
                 student, descendant_key, course_structure, scores_client, submissions_scores, persisted_values={},
             )
         self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
-        self._log_event(log.warning, u"init_from_structure", student)
+        self._log_event(log.info, u"init_from_structure", student)
 
     def init_from_model(self, student, model, course_structure, scores_client, submissions_scores):
         """
@@ -112,7 +112,7 @@ class SubsectionGrade(object):
             section=self.display_name,
             module_id=self.location,
         )
-        self._log_event(log.warning, u"init_from_model", student)
+        self._log_event(log.info, u"init_from_model", student)
 
     @classmethod
     def bulk_create_models(cls, student, subsection_grades, course_key):
@@ -275,7 +275,7 @@ class SubsectionGradeFactory(object):
         If read_only is True, doesn't save any updates to the grades.
         """
         self._log_event(
-            log.warning, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location)
+            log.info, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location)
         )
 
         block_structure = self._get_block_structure(block_structure)
@@ -298,7 +298,7 @@ class SubsectionGradeFactory(object):
         """
         Bulk creates all the unsaved subsection_grades to this point.
         """
-        self._log_event(log.warning, u"bulk_create_unsaved")
+        self._log_event(log.info, u"bulk_create_unsaved")
 
         with persistence_safe_fallback():
             SubsectionGrade.bulk_create_models(self.student, self._unsaved_subsection_grades, self.course.id)
