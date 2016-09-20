@@ -148,6 +148,8 @@ class ProblemTypeTestMixin(object):
         When I answer a "<ProblemType>" problem "correctly"
         Then my "<ProblemType>" answer is marked "correct"
         And The "<ProblemType>" problem displays a "correct" answer
+        And a success notification is shown
+        And clicking on "Review" moves focus to the problem meta area
         And a "problem_check" server event is emitted
         And a "problem_check" browser event is emitted
         """
@@ -162,6 +164,9 @@ class ProblemTypeTestMixin(object):
         self.problem_page.click_submit()
         self.wait_for_status('correct')
         self.problem_page.wait_success_notification()
+        # Check that clicking on "Review" goes to the problem meta location
+        self.problem_page.click_review_in_notification()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
         # Check for corresponding tracking event
         expected_events = [
@@ -262,8 +267,9 @@ class ProblemTypeTestMixin(object):
         When I select and answer and click the "Save" button
         Then I should see the Save notification
         And the Save button should not be disabled
+        And clicking on "Review" moves focus to the problem meta area
         And if I change the answer selected
-        And the Save notification should be removed
+        Then the Save notification should be removed
         """
         self.problem_page.wait_for(
             lambda: self.problem_page.problem_name == self.problem_name,
@@ -276,9 +282,13 @@ class ProblemTypeTestMixin(object):
         # Ensure "Save" button is enabled after save is complete.
         self.assertTrue(self.problem_page.is_save_button_enabled())
         self.problem_page.wait_for_save_notification()
-        self.answer_problem(correctness='incorrect')
+        # Check that clicking on "Review" goes to the problem meta location
+        self.problem_page.click_review_in_notification()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+
+        # Not all problems will detect the change and remove the save notification
         if self.can_update_save_notification:
-            # Not all problems will detect the change and remove the save notification
+            self.answer_problem(correctness='incorrect')
             self.assertFalse(self.problem_page.is_save_notification_visible())
 
     @attr(shard=7)
@@ -663,6 +673,7 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         I can input a string answer
         Then I will see a Gentle alert notification
         And focus will shift to that notification
+        And clicking on "Review" moves focus to the problem meta area
         """
         # Make sure we're looking at the right problem
         self.problem_page.wait_for(
@@ -674,6 +685,9 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.answer_problem(correctness='error')
         self.problem_page.click_submit()
         self.problem_page.wait_for_gentle_alert_notification()
+        # Check that clicking on "Review" goes to the problem meta location
+        self.problem_page.click_review_in_notification()
+        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
 
 
 class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
