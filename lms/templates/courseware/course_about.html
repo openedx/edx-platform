@@ -114,6 +114,10 @@ from openedx.core.lib.courses import course_image_url
             ${course.display_name_with_default_escaped}
             <button type="button">${course.display_org_with_default | h}</button>
           </h1>
+          <br>
+          <h3>
+            ${get_course_about_section(request, course, 'short_description')}
+          </h3>
         </div>
 
         <div class="main-cta">
