@@ -135,7 +135,16 @@ $(function () {
       }
   }
   
-  console.log(a11y);
+  for (var i = 0; i < ticks.length; i++) {
+      if (a11y[i]) {
+          ticks[i][1] = '<span aria-hidden="true">' + ticks[i][1] + '</span> ' + '<span class="sr">' + a11y[i] + '</span>';
+      }
+  }
+  
+  // let's hide the vertical axis
+  for (var i = 0; i < grade_cutoff_ticks.length; i++) {
+      grade_cutoff_ticks[i][1] = '<span aria-hidden="true">' + grade_cutoff_ticks[i][1] + '</span>';
+  }
   
   //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
