@@ -2,8 +2,8 @@
 
 import datetime
 import json
+from nose.plugins.attrib import attr
 import ddt
-import unittest
 
 from ..helpers import EventsTestMixin
 from .test_video_module import VideoBaseTest
@@ -61,7 +61,6 @@ class VideoEventsTestMixin(EventsTestMixin, VideoBaseTest):
 class VideoEventsTest(VideoEventsTestMixin):
     """ Test video player event emission """
 
-    @unittest.skip('AN-5867')
     def test_video_control_events(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode without HTML5 sources
@@ -150,6 +149,7 @@ class VideoEventsTest(VideoEventsTestMixin):
         assert_events_equal(static_fields_pattern, load_video_event)
 
 
+@attr('shard_8')
 @ddt.ddt
 class VideoBumperEventsTest(VideoEventsTestMixin):
     """ Test bumper video event emission """

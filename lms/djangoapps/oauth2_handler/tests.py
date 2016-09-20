@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 # Will also run default tests for IDTokens and UserInfo
-from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
+from edx_oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
 
 class BaseTestMixin(ModuleStoreTestCase):

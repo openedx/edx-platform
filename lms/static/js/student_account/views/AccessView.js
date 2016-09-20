@@ -19,10 +19,6 @@
         function($, utility, _, _s, Backbone, LoginModel, PasswordResetModel, RegisterModel, LoginView,
                  PasswordResetView, RegisterView, InstitutionLoginView, HintedLoginView) {
 
-        if (_.isUndefined(_s)) {
-            _s = _.str;
-        }
-
         return Backbone.View.extend({
             tpl: '#access-tpl',
             events: {
@@ -89,7 +85,7 @@
             },
 
             render: function() {
-                $(this.el).html( _.template( this.tpl, {
+                $(this.el).html( _.template(this.tpl)({
                     mode: this.activeForm
                 }));
 
@@ -102,9 +98,9 @@
                 //get & check current url hash part & load form accordingly
                 if (Backbone.history.getHash() === 'forgot-password-modal') {
                     this.resetPassword();
-                } else {
-                    this.loadForm(this.activeForm);
                 }
+                this.loadForm(this.activeForm);
+
             },
 
             loadForm: function( type ) {

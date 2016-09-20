@@ -257,13 +257,13 @@ class XQueueCertInterface(object):
         self.request.session = {}
 
         is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
-        grade = grades.grade(student, self.request, course)
+        grade = grades.grade(student, course)
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
         cert_mode = enrollment_mode
         is_eligible_for_certificate = is_whitelisted or CourseMode.is_eligible_for_certificate(enrollment_mode)
-
+        unverified = False
         # For credit mode generate verified certificate
         if cert_mode == CourseMode.CREDIT_MODE:
             cert_mode = CourseMode.VERIFIED
@@ -274,12 +274,30 @@ class XQueueCertInterface(object):
             template_pdf = "certificate-template-{id.org}-{id.course}-verified.pdf".format(id=course_id)
         elif mode_is_verified and not user_is_verified:
             template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
-            cert_mode = GeneratedCertificate.MODES.honor
+            if CourseMode.mode_for_course(course_id, CourseMode.HONOR):
+                cert_mode = GeneratedCertificate.MODES.honor
+            else:
+                unverified = True
         else:
             # honor code and audit students
             template_pdf = "certificate-template-{id.org}-{id.course}.pdf".format(id=course_id)
         if forced_grade:
             grade['grade'] = forced_grade
+
+        LOGGER.info(
+            (
+                u"Certificate generated for student %s in the course: %s with template: %s. "
+                u"given template: %s, "
+                u"user is verified: %s, "
+                u"mode is verified: %s"
+            ),
+            student.username,
+            unicode(course_id),
+            template_pdf,
+            template_file,
+            user_is_verified,
+            mode_is_verified
+        )
 
         cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)  # pylint: disable=no-member
 
@@ -370,6 +388,20 @@ class XQueueCertInterface(object):
                 student.id,
                 cert.status,
                 unicode(course_id)
+            )
+            return cert
+
+        if unverified:
+            cert.status = status.unverified
+            cert.save()
+            LOGGER.info(
+                (
+                    u"User %s has a verified enrollment in course %s "
+                    u"but is missing ID verification. "
+                    u"Certificate status has been set to unverified"
+                ),
+                student.id,
+                unicode(course_id),
             )
             return cert
 

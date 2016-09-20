@@ -19,7 +19,8 @@ __test__ = False  # do not collect
     ("mode=", "m", "dev or run"),
     ("coverage", "c", "Run test under coverage"),
     ("port=", "p", "Port to run test server on (dev mode only)"),
-    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+    ('skip-clean', 'C', 'skip cleaning repository before running tests'),
+    ('skip_clean', None, 'deprecated in favor of skip-clean'),
 ], share_with=["pavelib.utils.tests.utils.clean_reports_dir"])
 def test_js(options):
     """

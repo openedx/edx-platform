@@ -150,9 +150,9 @@ Areas of particular concern with their own detailed guidelines are:
   around the world.
 
 
-.. _Accessibility: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/accessibility.html
+.. _Accessibility: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/accessibility.html
 .. _website accessibility policy: https://www.edx.org/accessibility
-.. _Internationalization: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/internationalization/index.html
+.. _Internationalization: http://edx.readthedocs.org/projects/edx-developer-guide/en/latest/conventions/internationalization/index.html
 
 
 Step 4: Approval by Community Manager and Product Owner
@@ -204,7 +204,7 @@ By opening up a pull request, we expect the following things:
    unable to participate in the review process.
 
 3. If you have questions, you will ask them by either commenting on the pull
-   request or asking us in IRC or on the mailing list.
+   request or asking us in Slack or on the mailing list.
 
 4. If you do not respond to comments on your pull request within 7 days, we
    will close it. You are welcome to re-open it when you are ready to engage.

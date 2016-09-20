@@ -1,9 +1,11 @@
 """
 Tests for vertical module.
 """
-
+import ddt
+from mock import Mock
 from fs.memoryfs import MemoryFS
 from xmodule.tests import get_test_system
+from xmodule.tests.helpers import StubUserService
 from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests.xml import factories as xml
 from xmodule.x_module import STUDENT_VIEW, AUTHOR_VIEW
@@ -37,18 +39,42 @@ class BaseVerticalBlockTest(XModuleXmlImportTest):
         self.vertical = course_seq.get_children()[0]
         self.vertical.xmodule_runtime = self.module_system
 
+        self.username = "bilbo"
+        self.default_context = {"bookmarked": False, "username": self.username}
 
+
+@ddt.ddt
 class VerticalBlockTestCase(BaseVerticalBlockTest):
     """
     Tests for the VerticalBlock.
     """
-    def test_render_student_view(self):
+    def assert_bookmark_info_in(self, content):
+        """
+        Assert content has all the bookmark info.
+        """
+        self.assertIn('bookmark_id', content)
+        self.assertIn('{},{}'.format(self.username, unicode(self.vertical.location)), content)
+        self.assertIn('bookmarked', content)
+        self.assertIn('show_bookmark_button', content)
+
+    @ddt.unpack
+    @ddt.data(
+        {'context': None},
+        {'context': {}}
+    )
+    def test_render_student_view(self, context):
         """
         Test the rendering of the student view.
         """
-        html = self.module_system.render(self.vertical, STUDENT_VIEW, {}).content
+        self.module_system._services['bookmarks'] = Mock()  # pylint: disable=protected-access
+        self.module_system._services['user'] = StubUserService()  # pylint: disable=protected-access
+
+        html = self.module_system.render(
+            self.vertical, STUDENT_VIEW, self.default_context if context is None else context
+        ).content
         self.assertIn(self.test_html_1, html)
         self.assertIn(self.test_html_2, html)
+        self.assert_bookmark_info_in(html)
 
     def test_render_studio_view(self):
         """

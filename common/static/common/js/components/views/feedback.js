@@ -59,7 +59,8 @@
                 */
                 },
 
-                initialize: function() {
+                initialize: function(options) {
+                    this.options = _.extend({}, this.options, options);
                     if (!this.options.type) {
                         throw "SystemFeedback: type required (given " +
                             JSON.stringify(this.options) + ")";

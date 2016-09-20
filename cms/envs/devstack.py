@@ -41,14 +41,19 @@ STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-############################# ADVANCED COMPONENTS #############################
+############################ PYFS XBLOCKS SERVICE #############################
+# Set configuration for Django pyfilesystem
 
-# Make it easier to test advanced components in local dev
-FEATURES['ALLOW_ALL_ADVANCED_COMPONENTS'] = True
+DJFS = {
+    'type': 'osfs',
+    'directory_root': 'cms/static/djpyfs',
+    'url_root': '/static/djpyfs',
+}
 
 ################################# CELERY ######################################
 
@@ -73,7 +78,12 @@ DEBUG_TOOLBAR_PANELS = (
 )
 
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar'
+    # Profile panel is incompatible with wrapped views
+    # See https://github.com/jazzband/django-debug-toolbar/issues/792
+    'DISABLE_PANELS': (
+        'debug_toolbar.panels.profiling.ProfilingPanel',
+    ),
+    'SHOW_TOOLBAR_CALLBACK': 'cms.envs.devstack.should_show_debug_toolbar',
 }
 
 

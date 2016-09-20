@@ -1,11 +1,12 @@
 """
 Helper methods related to EdxNotes.
 """
-
 import json
 import logging
 from json import JSONEncoder
 from uuid import uuid4
+import urlparse
+from urllib import urlencode
 
 import requests
 from datetime import datetime
@@ -19,8 +20,8 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
-from capa.util import sanitize_html
-from courseware.views import get_current_child
+from edxnotes.plugins import EdxNotesTab
+from courseware.views.views import get_current_child
 from courseware.access import has_access
 from openedx.core.lib.token_utils import get_id_token
 from student.models import anonymous_id_for_user
@@ -30,10 +31,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 log = logging.getLogger(__name__)
-HIGHLIGHT_TAG = "span"
-HIGHLIGHT_CLASS = "note-highlight"
 # OAuth2 Client name for edxnotes
 CLIENT_NAME = "edx-notes"
+DEFAULT_PAGE = 1
+DEFAULT_PAGE_SIZE = 25
 
 
 class NoteJSONEncoder(JSONEncoder):
@@ -63,22 +64,33 @@ def get_token_url(course_id):
     })
 
 
-def send_request(user, course_id, path="", query_string=None):
+def send_request(user, course_id, page, page_size, path="", text=None):
     """
-    Sends a request with appropriate parameters and headers.
+    Sends a request to notes api with appropriate parameters and headers.
+
+    Arguments:
+        user: Current logged in user
+        course_id: Course id
+        page: requested or default page number
+        page_size: requested or default page size
+        path: `search` or `annotations`. This is used to calculate notes api endpoint.
+        text: text to search.
+
+    Returns:
+        Response received from notes api
     """
     url = get_internal_endpoint(path)
     params = {
         "user": anonymous_id_for_user(user, None),
         "course_id": unicode(course_id).encode("utf-8"),
+        "page": page,
+        "page_size": page_size,
     }
 
-    if query_string:
+    if text:
         params.update({
-            "text": query_string,
-            "highlight": True,
-            "highlight_tag": HIGHLIGHT_TAG,
-            "highlight_class": HIGHLIGHT_CLASS,
+            "text": text,
+            "highlight": True
         })
 
     try:
@@ -87,9 +99,11 @@ def send_request(user, course_id, path="", query_string=None):
             headers={
                 "x-annotator-auth-token": get_edxnotes_id_token(user)
             },
-            params=params
+            params=params,
+            timeout=(settings.EDXNOTES_CONNECT_TIMEOUT, settings.EDXNOTES_READ_TIMEOUT)
         )
     except RequestException:
+        log.error("Failed to connect to edx-notes-api: url=%s, params=%s", url, str(params))
         raise EdxNotesServiceUnavailable(_("EdxNotes Service is unavailable. Please try again in a few minutes."))
 
     return response
@@ -125,15 +139,13 @@ def preprocess_collection(user, course, collection):
     store = modulestore()
     filtered_collection = list()
     cache = {}
+    include_path_info = ('course_structure' not in settings.NOTES_DISABLED_TABS)
     with store.bulk_operations(course.id):
         for model in collection:
             update = {
-                u"text": sanitize_html(model["text"]),
-                u"quote": sanitize_html(model["quote"]),
                 u"updated": dateutil_parse(model["updated"]),
             }
-            if "tags" in model:
-                update[u"tags"] = [sanitize_html(tag) for tag in model["tags"]]
+
             model.update(update)
             usage_id = model["usage_id"]
             if usage_id in cache:
@@ -160,42 +172,46 @@ def preprocess_collection(user, course, collection):
                 log.debug("Unit not found: %s", usage_key)
                 continue
 
-            section = unit.get_parent()
-            if not section:
-                log.debug("Section not found: %s", usage_key)
-                continue
-            if section in cache:
-                usage_context = cache[section]
-                usage_context.update({
-                    "unit": get_module_context(course, unit),
-                })
-                model.update(usage_context)
-                cache[usage_id] = cache[unit] = usage_context
-                filtered_collection.append(model)
-                continue
+            if include_path_info:
+                section = unit.get_parent()
+                if not section:
+                    log.debug("Section not found: %s", usage_key)
+                    continue
+                if section in cache:
+                    usage_context = cache[section]
+                    usage_context.update({
+                        "unit": get_module_context(course, unit),
+                    })
+                    model.update(usage_context)
+                    cache[usage_id] = cache[unit] = usage_context
+                    filtered_collection.append(model)
+                    continue
 
-            chapter = section.get_parent()
-            if not chapter:
-                log.debug("Chapter not found: %s", usage_key)
-                continue
-            if chapter in cache:
-                usage_context = cache[chapter]
-                usage_context.update({
-                    "unit": get_module_context(course, unit),
-                    "section": get_module_context(course, section),
-                })
-                model.update(usage_context)
-                cache[usage_id] = cache[unit] = cache[section] = usage_context
-                filtered_collection.append(model)
-                continue
+                chapter = section.get_parent()
+                if not chapter:
+                    log.debug("Chapter not found: %s", usage_key)
+                    continue
+                if chapter in cache:
+                    usage_context = cache[chapter]
+                    usage_context.update({
+                        "unit": get_module_context(course, unit),
+                        "section": get_module_context(course, section),
+                    })
+                    model.update(usage_context)
+                    cache[usage_id] = cache[unit] = cache[section] = usage_context
+                    filtered_collection.append(model)
+                    continue
 
             usage_context = {
                 "unit": get_module_context(course, unit),
-                "section": get_module_context(course, section),
-                "chapter": get_module_context(course, chapter),
+                "section": get_module_context(course, section) if include_path_info else {},
+                "chapter": get_module_context(course, chapter) if include_path_info else {},
             }
             model.update(usage_context)
-            cache[usage_id] = cache[unit] = cache[section] = cache[chapter] = usage_context
+            if include_path_info:
+                cache[section] = cache[chapter] = usage_context
+
+            cache[usage_id] = cache[unit] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
@@ -207,7 +223,7 @@ def get_module_context(course, item):
     """
     item_dict = {
         'location': unicode(item.location),
-        'display_name': item.display_name_with_default,
+        'display_name': item.display_name_with_default_escaped,
     }
     if item.category == 'chapter' and item.get_parent():
         # course is a locator w/o branch and version
@@ -239,39 +255,97 @@ def get_index(usage_key, children):
     return children.index(usage_key)
 
 
-def search(user, course, query_string):
+def construct_pagination_urls(request, course_id, api_next_url, api_previous_url):
     """
-    Returns search results for the `query_string(str)`.
+    Construct next and previous urls for LMS. `api_next_url` and `api_previous_url`
+    are returned from notes api but we need to transform them according to LMS notes
+    views by removing and replacing extra information.
+
+    Arguments:
+        request: HTTP request object
+        course_id: course id
+        api_next_url: notes api next url
+        api_previous_url: notes api previous url
+
+    Returns:
+        next_url: lms notes next url
+        previous_url: lms notes previous url
     """
-    response = send_request(user, course.id, "search", query_string)
-    try:
-        content = json.loads(response.content)
-        collection = content["rows"]
-    except (ValueError, KeyError):
-        log.warning("invalid JSON: %s", response.content)
-        raise EdxNotesParseError(_("Server error. Please try again in a few minutes."))
+    def lms_url(url):
+        """
+        Create lms url from api url.
+        """
+        if url is None:
+            return None
 
-    content.update({
-        "rows": preprocess_collection(user, course, collection)
-    })
+        keys = ('page', 'page_size', 'text')
+        parsed = urlparse.urlparse(url)
+        query_params = urlparse.parse_qs(parsed.query)
 
-    return json.dumps(content, cls=NoteJSONEncoder)
+        encoded_query_params = urlencode({key: query_params.get(key)[0] for key in keys if key in query_params})
+        return "{}?{}".format(request.build_absolute_uri(base_url), encoded_query_params)
+
+    base_url = reverse("notes", kwargs={"course_id": course_id})
+    next_url = lms_url(api_next_url)
+    previous_url = lms_url(api_previous_url)
+
+    return next_url, previous_url
 
 
-def get_notes(user, course):
+def get_notes(request, course, page=DEFAULT_PAGE, page_size=DEFAULT_PAGE_SIZE, text=None):
     """
-    Returns all notes for the user.
+    Returns paginated list of notes for the user.
+
+    Arguments:
+        request: HTTP request object
+        course: Course descriptor
+        page: requested or default page number
+        page_size: requested or default page size
+        text: text to search. If None then return all results for the current logged in user.
+
+    Returns:
+        Paginated dictionary with these key:
+            start: start of the current page
+            current_page: current page number
+            next: url for next page
+            previous: url for previous page
+            count: total number of notes available for the sent query
+            num_pages: number of pages available
+            results: list with notes info dictionary. each item in this list will be a dict
     """
-    response = send_request(user, course.id, "annotations")
+    path = 'search' if text else 'annotations'
+    response = send_request(request.user, course.id, page, page_size, path, text)
+
     try:
         collection = json.loads(response.content)
     except ValueError:
-        return None
+        log.error("Invalid JSON response received from notes api: response_content=%s", response.content)
+        raise EdxNotesParseError(_("Invalid JSON response received from notes api."))
 
-    if not collection:
-        return None
+    # Verify response dict structure
+    expected_keys = ['total', 'rows', 'num_pages', 'start', 'next', 'previous', 'current_page']
+    keys = collection.keys()
+    if not keys or not all(key in expected_keys for key in keys):
+        log.error("Incorrect data received from notes api: collection_data=%s", str(collection))
+        raise EdxNotesParseError(_("Incorrect data received from notes api."))
 
-    return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
+    filtered_results = preprocess_collection(request.user, course, collection['rows'])
+    # Notes API is called from:
+    # 1. The annotatorjs in courseware. It expects these attributes to be named "total" and "rows".
+    # 2. The Notes tab Javascript proxied through LMS. It expects these attributes to be called "count" and "results".
+    collection['count'] = collection['total']
+    del collection['total']
+    collection['results'] = filtered_results
+    del collection['rows']
+
+    collection['next'], collection['previous'] = construct_pagination_urls(
+        request,
+        course.id,
+        collection['next'],
+        collection['previous']
+    )
+
+    return collection
 
 
 def get_endpoint(api_url, path=""):
@@ -328,7 +402,7 @@ def get_course_position(course_module):
     urlargs['chapter'] = chapter.url_name
     if course_module.position is not None:
         return {
-            'display_name': chapter.display_name_with_default,
+            'display_name': chapter.display_name_with_default_escaped,
             'url': reverse('courseware_chapter', kwargs=urlargs),
         }
 
@@ -340,7 +414,7 @@ def get_course_position(course_module):
 
     urlargs['section'] = section.url_name
     return {
-        'display_name': section.display_name_with_default,
+        'display_name': section.display_name_with_default_escaped,
         'url': reverse('courseware_section', kwargs=urlargs)
     }
 
@@ -354,26 +428,6 @@ def generate_uid():
 
 def is_feature_enabled(course):
     """
-    Returns True if Student Notes feature is enabled for the course,
-    False otherwise.
-
-    In order for the application to be enabled it must be:
-        1) enabled globally via FEATURES.
-        2) present in the course tab configuration.
-        3) Harvard Annotation Tool must be disabled for the course.
+    Returns True if Student Notes feature is enabled for the course, False otherwise.
     """
-    return (settings.FEATURES.get("ENABLE_EDXNOTES")
-            and [t for t in course.tabs if t["type"] == "edxnotes"]  # tab found
-            and not is_harvard_notes_enabled(course))
-
-
-def is_harvard_notes_enabled(course):
-    """
-    Returns True if Harvard Annotation Tool is enabled for the course,
-    False otherwise.
-
-    Checks for 'textannotation', 'imageannotation', 'videoannotation' in the list
-    of advanced modules of the course.
-    """
-    modules = set(['textannotation', 'imageannotation', 'videoannotation'])
-    return bool(modules.intersection(course.advanced_modules))
+    return EdxNotesTab.is_enabled(course)

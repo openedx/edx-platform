@@ -1,8 +1,10 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "login" %></%def>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 <%block name="title">${_("Sign In")}</%block>
 <%block name="bodyclass">not-signedin view-signin</%block>
@@ -51,6 +53,6 @@ from django.utils.translation import ugettext as _
 
 <%block name="requirejs">
   require(["js/factories/login"], function(LoginFactory) {
-      LoginFactory("${reverse('homepage')}");
+      LoginFactory("${reverse('homepage') | n, js_escaped_string}");
   });
 </%block>

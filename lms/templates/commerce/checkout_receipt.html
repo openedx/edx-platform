@@ -19,7 +19,6 @@ from django.utils.translation import ugettext as _
 </%block>
 <%block name="js_extra">
 <script src="${static.url('js/vendor/jquery.ajax-retry.js')}"></script>
-<script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
 <script src="${static.url('js/src/tooltip_manager.js')}"></script>
 <script src="${static.url('js/commerce/credit.js')}"></script>
 <script src="${static.url('js/commerce/views/receipt_view.js')}"></script>
@@ -29,8 +28,7 @@ from django.utils.translation import ugettext as _
 <div id="error-container" class="hidden">
     <div id="error" class="wrapper-msg wrapper-msg-activate">
         <div class=" msg msg-activate">
-            <i class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></i>
-
+            <span class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></span>
             <div class="msg-content">
                 <h3 class="title">
                     <span class="sr">${error_summary}</span>
@@ -53,7 +51,8 @@ from django.utils.translation import ugettext as _
 <div class="container">
     <section class="wrapper carousel">
         <div id="receipt-container" class="pay-and-verify hidden" data-is-payment-complete='${is_payment_complete}'
-             data-platform-name='${platform_name}' data-verified='${verified}' data-username='${username}'>
+             data-platform-name='${platform_name}' data-verified='${verified}' data-username='${username}'
+                data-is-request-in-themed-site='${is_request_in_themed_site}'>
             <h1>${_("Loading Order Data...")}</h1>
             <span>${ _("Please wait while we retrieve your order details.") }</span>
         </div>

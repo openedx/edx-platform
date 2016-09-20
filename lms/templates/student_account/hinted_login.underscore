@@ -8,7 +8,11 @@
     <p class="instructions"><%- _.sprintf( gettext("Would you like to sign in using your %(providerName)s credentials?"), { providerName: hintedProvider.name } ) %></p>
 
     <button class="action action-primary action-update proceed-button button-<%- hintedProvider.id %> hinted-login-<%- hintedProvider.id %>">
-        <div class="icon fa <%- hintedProvider.iconClass %>" aria-hidden="true"></div>
+        <span class="icon <% if ( hintedProvider.iconClass ) { %>fa <%- hintedProvider.iconClass %><% } %>" aria-hidden="true">
+            <% if ( hintedProvider.iconImage ) { %>
+                <img class="icon-image" src="<%- hintedProvider.iconImage %>" alt="<%- hintedProvider.name %> icon" />
+            <% } %>
+        </span>
         <%- _.sprintf( gettext("Sign in using %(providerName)s"), { providerName: hintedProvider.name } ) %>
     </button>
 

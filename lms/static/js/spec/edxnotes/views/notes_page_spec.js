@@ -1,21 +1,19 @@
 define([
     'jquery', 'underscore', 'common/js/spec_helpers/template_helpers',
-    'common/js/spec_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
-    'js/edxnotes/views/page_factory', 'js/spec/edxnotes/custom_matchers'
-], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory, customMatchers) {
+    'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
+    'js/edxnotes/views/page_factory'
+], function($, _, TemplateHelpers, AjaxHelpers, Helpers, NotesFactory) {
     'use strict';
     describe('EdxNotes NotesPage', function() {
         var notes = Helpers.getDefaultNotes();
 
         beforeEach(function() {
-            customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
             TemplateHelpers.installTemplates([
                 'templates/edxnotes/note-item', 'templates/edxnotes/tab-item'
             ]);
-            this.view = new NotesFactory({notesList: notes});
+            this.view = new NotesFactory({notes: notes, pageSize: 10});
         });
-
 
         it('should be displayed properly', function() {
             var requests = AjaxHelpers.requests(this),
@@ -35,8 +33,13 @@ define([
             this.view.$('.search-notes-input').val('test_query');
             this.view.$('.search-notes-submit').click();
             AjaxHelpers.respondWithJson(requests, {
-                total: 0,
-                rows: []
+                'count': 0,
+                'current_page': 1,
+                'num_pages': 1,
+                'start': 0,
+                'next': null,
+                'previous': null,
+                'results': []
             });
             expect(this.view.$('#view-search-results')).toHaveClass('is-active');
             expect(this.view.$('#view-recent-activity')).toExist();

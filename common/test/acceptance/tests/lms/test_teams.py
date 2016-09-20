@@ -7,23 +7,22 @@ import time
 
 from dateutil.parser import parse
 import ddt
-from flaky import flaky
 from nose.plugins.attrib import attr
 from selenium.common.exceptions import TimeoutException
 from uuid import uuid4
 
-from ..helpers import get_modal_alert, EventsTestMixin, UniqueCourseTest
-from ...fixtures import LMS_BASE_URL
-from ...fixtures.course import CourseFixture
-from ...fixtures.discussion import (
+from common.test.acceptance.tests.helpers import get_modal_alert, EventsTestMixin, UniqueCourseTest
+from common.test.acceptance.fixtures import LMS_BASE_URL
+from common.test.acceptance.fixtures.course import CourseFixture
+from common.test.acceptance.fixtures.discussion import (
     Thread,
     MultipleThreadFixture
 )
-from ...pages.lms.auto_auth import AutoAuthPage
-from ...pages.lms.course_info import CourseInfoPage
-from ...pages.lms.learner_profile import LearnerProfilePage
-from ...pages.lms.tab_nav import TabNavPage
-from ...pages.lms.teams import (
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.pages.lms.course_info import CourseInfoPage
+from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
+from common.test.acceptance.pages.lms.tab_nav import TabNavPage
+from common.test.acceptance.pages.lms.teams import (
     TeamsPage,
     MyTeamsPage,
     BrowseTopicsPage,
@@ -32,7 +31,7 @@ from ...pages.lms.teams import (
     EditMembershipPage,
     TeamPage
 )
-from ...pages.common.utils import confirm_prompt
+from common.test.acceptance.pages.common.utils import confirm_prompt
 
 
 TOPICS_PER_PAGE = 12
@@ -298,6 +297,7 @@ class TeamsTabTest(TeamsTabBase):
                     team_id=team['id']
                 ))
         )
+        self.teams_page.wait_for_page()
         self.teams_page.wait_for_ajax()
         self.assertTrue(self.teams_page.q(css=selector).present)
         self.assertTrue(self.teams_page.q(css=selector).visible)
@@ -520,6 +520,23 @@ class BrowseTopicsTest(TeamsTabBase):
         self.topics_page.press_previous_page_button()
         self.assertEqual(len(self.topics_page.topic_cards), TOPICS_PER_PAGE)
         self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-12 out of 13 total'))
+
+    def test_topic_pagination_one_page(self):
+        """
+        Scenario: Browsing topics when there are fewer topics than the page size i.e. 12
+            all topics should show on one page
+        Given I am enrolled in a course with team configuration and topics
+        When I visit the Teams page
+        And I browse topics
+        And I should see corrected number of topic cards
+        And I should see the correct page header
+        And I should not see a pagination footer
+        """
+        self.set_team_configuration({u"max_team_size": 10, u"topics": self.create_topics(10)})
+        self.topics_page.visit()
+        self.assertEqual(len(self.topics_page.topic_cards), 10)
+        self.assertTrue(self.topics_page.get_pagination_header_text().startswith('Showing 1-10 out of 10 total'))
+        self.assertFalse(self.topics_page.pagination_controls_visible())
 
     def test_topic_description_truncation(self):
         """
@@ -812,7 +829,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
-    @flaky  # TODO: fix flaky test. See TNL-3489
     def test_search(self):
         """
         Scenario: User should be able to search for a team

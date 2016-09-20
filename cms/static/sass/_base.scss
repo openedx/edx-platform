@@ -36,6 +36,11 @@ body, input, button {
   font-family: 'Open Sans', sans-serif;
 }
 
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
+    outline: none;
+}
+
 a {
   @include transition(color $tmg-f2 ease-in-out 0s);
   text-decoration: none;
@@ -626,7 +631,7 @@ hr.divide {
 // ====================
 
 // UI - semantically hide text
-.sr {
+.sr, .sr-only {
   @extend %cont-text-sr;
 }
 
@@ -646,23 +651,25 @@ hr.divider {
 }
 
 // ui - skipnav
-.nav-skip {
+.nav-skip,
+.transcript-skip {
   @extend %t-action3;
-  display: block;
+  display: inline-block;
   position: absolute;
   left: 0px;
   top: -($baseline*30);
-  width: 1px;
-  height: 1px;
   overflow: hidden;
   background: $white;
   border-bottom: 1px solid $gray-l4;
   padding: ($baseline*0.75) ($baseline/2);
 
-  &:focus, &:active {
-    position: static;
+  &:focus,
+  &:active {
+    position: relative;
+    top: auto;
     width: auto;
     height: auto;
+    margin: 0;
   }
 }
 
@@ -725,4 +732,3 @@ hr.divider {
     color: $gray-l1;
   }
 }
-

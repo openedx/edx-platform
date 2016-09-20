@@ -20,10 +20,14 @@ log = logging.getLogger(__name__)
 CLASS_PRIORITY = ['video', 'problem']
 
 
+@XBlock.needs('user', 'bookmarks')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
     """
+
+    resources_dir = 'assets/vertical'
+
     mako_template = 'widgets/sequence-edit.html'
     js_module_name = "VerticalBlock"
 
@@ -38,7 +42,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment = Fragment()
         contents = []
 
-        child_context = {} if not context else copy(context)
+        if context:
+            child_context = copy(context)
+        else:
+            child_context = {
+                'bookmarked': self.runtime.service(self, 'bookmarks').is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
+                'username': self.runtime.service(self, 'user').get_current_user().opt_attrs['edx-platform.username']
+            }
+
         child_context['child_of_vertical'] = True
 
         # pylint: disable=no-member
@@ -54,7 +65,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
+            'show_bookmark_button': True,
+            'bookmarked': child_context['bookmarked'],
+            'bookmark_id': "{},{}".format(child_context['username'], unicode(self.location))
         }))
+
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))
+        fragment.initialize_js('VerticalStudentView')
+
         return fragment
 
     def author_view(self, context):

@@ -19,7 +19,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
-from microsite_configuration import microsite
 
 from courseware.access import has_access
 from courseware.date_summary import (
@@ -37,6 +36,7 @@ import branding
 
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 log = logging.getLogger(__name__)
@@ -242,7 +242,7 @@ def get_course_about_section(request, course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_course_info_section_module(request, course, section_key):
+def get_course_info_section_module(request, user, course, section_key):
     """
     This returns the course info module for a given section_key.
 
@@ -255,10 +255,10 @@ def get_course_info_section_module(request, course, section_key):
     usage_key = course.id.make_usage_key('course_info', section_key)
 
     # Use an empty cache
-    field_data_cache = FieldDataCache([], course.id, request.user)
+    field_data_cache = FieldDataCache([], course.id, user)
 
     return get_module(
-        request.user,
+        user,
         request,
         usage_key,
         field_data_cache,
@@ -269,7 +269,7 @@ def get_course_info_section_module(request, course, section_key):
     )
 
 
-def get_course_info_section(request, course, section_key):
+def get_course_info_section(request, user, course, section_key):
     """
     This returns the snippet of html to be rendered on the course info page,
     given the key for the section.
@@ -280,7 +280,7 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-    info_module = get_course_info_section_module(request, course, section_key)
+    info_module = get_course_info_section_module(request, user, course, section_key)
 
     html = ''
     if info_module is not None:
@@ -289,8 +289,8 @@ def get_course_info_section(request, course, section_key):
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(
-                u"Error rendering course=%s, section_key=%s",
-                course, section_key
+                u"Error rendering course_id=%s, section_key=%s",
+                unicode(course.id), section_key
             )
 
     return html
@@ -373,20 +373,19 @@ def get_course_syllabus_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_courses(user, domain=None):
-    '''
-    Returns a list of courses available, sorted by course.number
-    '''
-    courses = branding.get_visible_courses()
+def get_courses(user, org=None, filter_=None):
+    """
+    Returns a list of courses available, sorted by course.number and optionally
+    filtered by org code (case-insensitive).
+    """
+    courses = branding.get_visible_courses(org=org, filter_=filter_)
 
-    permission_name = microsite.get_value(
+    permission_name = configuration_helpers.get_value(
         'COURSE_CATALOG_VISIBILITY_PERMISSION',
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
 
     courses = [c for c in courses if has_access(user, permission_name, c)]
-
-    courses = sorted(courses, key=lambda course: course.number)
 
     return courses
 
@@ -395,7 +394,7 @@ def get_permission_for_course_about():
     """
     Returns the CourseOverview object for the course after checking for access.
     """
-    return microsite.get_value(
+    return configuration_helpers.get_value(
         'COURSE_ABOUT_VISIBILITY_PERMISSION',
         settings.COURSE_ABOUT_VISIBILITY_PERMISSION
     )
@@ -454,10 +453,8 @@ def get_studio_url(course, page):
     Args:
         course (CourseDescriptor)
     """
-    is_studio_course = course.course_edit_method == "Studio"
-    is_mongo_course = modulestore().get_modulestore_type(course.id) != ModuleStoreEnum.Type.xml
     studio_link = None
-    if is_studio_course and is_mongo_course:
+    if course.course_edit_method == "Studio":
         studio_link = get_cms_course_link(course, page)
     return studio_link
 

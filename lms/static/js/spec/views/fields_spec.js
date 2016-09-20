@@ -1,4 +1,4 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers',
+define(['backbone', 'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'common/js/spec_helpers/template_helpers', 'js/views/fields', 'js/spec/views/fields_helpers',
         'string_utils'],
     function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews, FieldViewsSpecHelpers) {
@@ -25,7 +25,11 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
 
             beforeEach(function () {
                 timerCallback = jasmine.createSpy('timerCallback');
-                jasmine.Clock.useMock();
+                jasmine.clock().install();
+            });
+
+            afterEach(function() {
+                jasmine.clock().uninstall();
             });
 
             it("updates messages correctly for all fields", function() {

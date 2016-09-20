@@ -24,6 +24,7 @@
 // * +Content - Text Wrap - Extend
 // * +Content - Text Truncate - Extend
 // * +Icon - Font-Awesome  - Extend
+// * +Icon - SSO icon images
 
 // +Font Sizing - Mixin
 // ====================
@@ -312,10 +313,6 @@
     background-color: $gray-l1;
     color: $white;
   }
-
-  span {
-    @extend %cont-text-sr;
-  }
 }
 
 // button with no button shell until hover for understated actions
@@ -404,14 +401,18 @@
 // +Content - Screenreader Text - Extend
 // ====================
 %cont-text-sr {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
+    // clip has been deprecated but is still supported
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
+    position: absolute;
+    margin: -1px;
+    height: 1px;
+    width: 1px;
+    border: 0;
+    padding: 0;
+    overflow: hidden;
+    // ensure there are spaces in sr text
+    word-wrap: normal;
 }
 
 // +Content - Text Wrap - Extend
@@ -443,4 +444,18 @@
   border: 0;
   padding: 0;
   margin: 0;
+}
+
+
+// * +Icon - SSO icon images
+// ====================
+
+%sso-icon {
+  .icon-image {
+    width: auto;
+    height: auto;
+    max-height: 1.4em;
+    max-width: 1.4em;
+    margin-top: -2px;
+  }
 }

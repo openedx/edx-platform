@@ -37,7 +37,7 @@
             render: function( html ) {
                 var fields = html || '';
 
-                $(this.el).html( _.template( this.tpl, {
+                $(this.el).html(_.template(this.tpl)({
                     // We pass the context object to the template so that
                     // we can perform variable interpolation using sprintf
                     context: {

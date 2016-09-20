@@ -1,11 +1,13 @@
 <div class="team-profile">
     <div class="page-content-main">
-        <div class="discussion-module" data-course-id="<%= courseID %>" data-discussion-id="<%= discussionTopicID %>"
-                data-read-only="<%= readOnly %>"
-                data-user-create-comment="<%= !readOnly %>"
-                data-user-create-subcomment="<%= !readOnly %>">
+        <div class="discussion-module" data-course-id="<%- courseID %>" data-discussion-id="<%- discussionTopicID %>"
+                data-read-only="<%- readOnly %>"
+                data-user-create-comment="<%- !readOnly %>"
+                data-user-create-subcomment="<%- !readOnly %>">
             <% if ( !readOnly) { %>
-                <button type="button" class="btn new-post-btn"><i class="icon fa fa-edit new-post-icon" aria-hidden="true"></i><%- gettext("New Post") %></button>
+                <button type="button" class="btn-neutral btn-small new-post-btn">
+                    <%- gettext("Add a Post") %>
+                </button>
             <% } %>
         </div>
     </div>
@@ -32,7 +34,7 @@
         <% if (country) { %>
             <div class="team-country">
                 <span class="sr"><%- gettext("The country that team members primarily identify with.") %></span>
-                <i class="icon fa fa-globe fa-fw" aria-hidden="true"></i>
+                <span class="icon fa fa-globe fa-fw" aria-hidden="true"></span>
                 <span>
                     <%- gettext(country) %>
                 </span>
@@ -41,7 +43,7 @@
         <% if (language) { %>
             <div class="team-language">
                 <span class="sr"><%- gettext("The language that team members primarily use to communicate with each other.") %></span>
-                <i class="icon fa fa-comment-o fa-fw" aria-hidden="true"></i>
+                <span class="icon fa fa-comment-o fa-fw" aria-hidden="true"></span>
                 <span>
                     <%- gettext(language) %>
                 </span>

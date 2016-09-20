@@ -1,3 +1,0 @@
-"""
-Users Sharing preferences API
-"""

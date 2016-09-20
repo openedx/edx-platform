@@ -25,6 +25,7 @@
 
                 initialize: function(options){
                     this.certificateWhiteListEditorView = options.certificateWhiteListEditorView;
+                    this.active_certificate = options.active_certificate;
                     // Re-render the view when an item is added to the collection
                     this.listenTo(this.collection, 'change add remove', this.render);
                 },
@@ -32,7 +33,12 @@
                 render: function(){
                     var template = this.loadTemplate('certificate-white-list');
                     this.$el.html(template({certificates: this.collection.models}));
-
+                    if (!this.active_certificate || this.collection.isEmpty()){
+                        this.$("#generate-exception-certificates").addClass("is-disabled");
+                    }
+                    else {
+                        this.$("#generate-exception-certificates").removeClass("is-disabled");
+                    }
                 },
 
                 loadTemplate: function(name) {
@@ -49,7 +55,9 @@
                         model.destroy(
                             {
                                 success: function() {
-                                    self.showMessage('Student Removed from certificate white list successfully.');
+                                    self.escapeAndShowMessage(
+                                        gettext('Student Removed from certificate white list successfully.')
+                                    );
                                 },
                                 error: this.showError(this),
                                 wait: true,
@@ -58,9 +66,8 @@
                         );
                     }
                     else{
-                        this.showMessage(
-                            'Could not find Certificate Exception in white list. ' +
-                            'Please refresh the page and try again'
+                        this.escapeAndShowMessage(
+                            gettext('Could not find Certificate Exception in white list. Please refresh the page and try again') // jshint ignore:line
                         );
                     }
                 },
@@ -72,15 +79,15 @@
                     );
                 },
 
-                showMessage: function(message){
+                escapeAndShowMessage: function(message){
                     $(this.message_div +  ">p" ).remove();
-                    $(this.message_div).removeClass('hidden').append("<p>"+ gettext(message) + "</p>").focus();
+                    $(this.message_div).removeClass('hidden').append("<p>"+ _.escape(message) + "</p>").focus();
                     $(this.message_div).fadeOut(6000, "linear");
                 },
 
                 showSuccess: function(caller_object){
                     return function(xhr){
-                        caller_object.showMessage(xhr.message);
+                        caller_object.escapeAndShowMessage(xhr.message);
                     };
                 },
 
@@ -88,11 +95,12 @@
                     return function(xhr){
                         try{
                             var response = JSON.parse(xhr.responseText);
-                            caller_object.showMessage(response.message);
+                            caller_object.escapeAndShowMessage(response.message);
                         }
                         catch(exception){
-                            caller_object.showMessage(
-                                "Server Error, Please refresh the page and try again.");
+                            caller_object.escapeAndShowMessage(
+                                gettext("Server Error, Please refresh the page and try again.")
+                            );
                         }
                     };
                 }

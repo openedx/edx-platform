@@ -1,7 +1,11 @@
 ## mako
 <%! import json %>
-<%! from django.utils.translation import ugettext as _ %>
-<%! from openedx.core.lib.js_utils import escape_json_dumps %>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
@@ -33,20 +37,20 @@
 
 <%static:require_module module_name="teams/js/teams_tab_factory" class_name="TeamsTabFactory">
     TeamsTabFactory({
-        courseID: '${ unicode(course.id) }',
-        topics: ${ escape_json_dumps(topics) | n },
-        userInfo: ${ escape_json_dumps(user_info) | n },
-        topicUrl: '${ topic_url }',
-        topicsUrl: '${ topics_url }',
-        teamsUrl: '${ teams_url }',
-        teamsDetailUrl: '${ teams_detail_url }',
-        teamMembershipsUrl: '${ team_memberships_url }',
-        teamMembershipDetailUrl: '${ team_membership_detail_url }',
-        myTeamsUrl: '${ my_teams_url }',
-        maxTeamSize: ${ course.teams_max_size },
-        languages: ${ escape_json_dumps(languages) | n },
-        countries: ${ escape_json_dumps(countries) | n },
-        teamsBaseUrl: '${ teams_base_url }'
+        courseID: '${unicode(course.id) | n, js_escaped_string}',
+        topics: ${topics | n, dump_js_escaped_json},
+        userInfo: ${user_info | n, dump_js_escaped_json},
+        topicUrl: '${topic_url | n, js_escaped_string}',
+        topicsUrl: '${topics_url | n, js_escaped_string}',
+        teamsUrl: '${teams_url | n, js_escaped_string}',
+        teamsDetailUrl: '${teams_detail_url | n, js_escaped_string}',
+        teamMembershipsUrl: '${team_memberships_url | n, js_escaped_string}',
+        teamMembershipDetailUrl: '${team_membership_detail_url | n, js_escaped_string}',
+        myTeamsUrl: '${my_teams_url | n, js_escaped_string}',
+        maxTeamSize: ${course.teams_max_size | n, dump_js_escaped_json},
+        languages: ${languages | n, dump_js_escaped_json},
+        countries: ${countries | n, dump_js_escaped_json},
+        teamsBaseUrl: '${teams_base_url | n, js_escaped_string}'
     });
 </%static:require_module>
 </%block>

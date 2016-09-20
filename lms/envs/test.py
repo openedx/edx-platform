@@ -24,12 +24,14 @@ from path import Path as path
 from uuid import uuid4
 from warnings import filterwarnings, simplefilter
 
+from util.db import NoOpMigrationModules
 from openedx.core.lib.tempdir import mkdtemp_clean
 
-# This patch disabes the commit_on_success decorator during tests
+# This patch disables the commit_on_success decorator during tests
 # in TestCase subclasses.
-from util.testing import patch_testcase
+from util.testing import patch_testcase, patch_sessions
 patch_testcase()
+patch_sessions()
 
 # Silence noisy logs to make troubleshooting easier when tests fail.
 import logging
@@ -60,17 +62,17 @@ FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
 FEATURES['ENABLE_SERVICE_STATUS'] = True
 
-FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-
-FEATURES['ENABLE_INSTRUCTOR_LEGACY_DASHBOARD'] = True
-
 FEATURES['ENABLE_SHOPPING_CART'] = True
 
 FEATURES['ENABLE_VERIFIED_CERTIFICATES'] = True
 
 # Enable this feature for course staff grade downloads, to enable acceptance tests
-FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
+FEATURES['ENABLE_GRADE_DOWNLOADS'] = True
 FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
+
+GRADES_DOWNLOAD['ROOT_PATH'] += "-{}".format(os.getpid())
+FINANCIAL_REPORTS['ROOT_PATH'] += "-{}".format(os.getpid())
+
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
@@ -87,7 +89,7 @@ PARENTAL_CONSENT_AGE_LIMIT = 13
 SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
 # Nose Test Runner
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+TEST_RUNNER = 'openedx.core.djangolib.nose.NoseTestSuiteRunner'
 
 _SYSTEM = 'lms'
 
@@ -98,7 +100,10 @@ _NOSEID_DIR.makedirs_p()
 
 NOSE_ARGS = [
     '--id-file', _NOSEID_DIR / 'noseids',
-    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
+]
+
+NOSE_PLUGINS = [
+    'openedx.core.djangolib.testing.utils.NoseDatabaseIsolation'
 ]
 
 # Local Directories
@@ -166,8 +171,8 @@ update_module_store_settings(
     doc_store_settings={
         'host': MONGO_HOST,
         'port': MONGO_PORT_NUM,
-        'db': 'test_xmodule',
-        'collection': 'test_modulestore{0}'.format(THIS_UUID),
+        'db': 'test_xmodule_{}'.format(THIS_UUID),
+        'collection': 'test_modulestore',
     },
 )
 
@@ -175,7 +180,7 @@ CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': MONGO_HOST,
-        'db': 'xcontent',
+        'db': 'test_xcontent_{}'.format(THIS_UUID),
         'port': MONGO_PORT_NUM,
     }
 }
@@ -183,23 +188,27 @@ CONTENTSTORE = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'edx.db',
         'ATOMIC_REQUESTS': True,
     },
-
+    'student_module_history': {
+        'ENGINE': 'django.db.backends.sqlite3',
+    },
 }
 
-# This hack disables migrations during tests. We want to create tables directly from the models for speed.
-# See https://groups.google.com/d/msg/django-developers/PWPj3etj3-U/kCl6pMsQYYoJ.
-MIGRATION_MODULES = {app: "app.migrations_not_used_in_tests" for app in INSTALLED_APPS}
+if os.environ.get('DISABLE_MIGRATIONS'):
+    # Create tables directly from apps' models. This can be removed once we upgrade
+    # to Django 1.9, which allows setting MIGRATION_MODULES to None in order to skip migrations.
+    MIGRATION_MODULES = NoOpMigrationModules()
+
+# Make sure we test with the extended history table
+FEATURES['ENABLE_CSMH_EXTENDED'] = True
+INSTALLED_APPS += ('coursewarehistoryextended',)
 
 CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_loc_mem_cache',
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
 
     # The general cache is what you get if you use our util.cache. It's used for
@@ -209,31 +218,16 @@ CACHES = {
     # push process.
     'general': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        'KEY_PREFIX': 'general',
-        'VERSION': 4,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
     'mongo_metadata_inheritance': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
-        'TIMEOUT': 300,
-        'KEY_FUNCTION': 'util.memcache.safe_key',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
     'loc_cache': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_location_mem_cache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     },
     'course_structure_cache': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    },
-    'block_cache': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_location_block_cache',
-    },
-    'lms.course_blocks': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'edx_location_course_blocks',
     },
 }
 
@@ -267,6 +261,7 @@ AUTHENTICATION_BACKENDS = (
     'social.backends.google.GoogleOAuth2',
     'social.backends.linkedin.LinkedinOAuth2',
     'social.backends.facebook.FacebookOAuth2',
+    'social.backends.azuread.AzureADOAuth2',
     'social.backends.twitter.TwitterOAuth',
     'third_party_auth.dummy.DummyBackend',
     'third_party_auth.saml.SAMLAuthBackend',
@@ -302,9 +297,7 @@ OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
-FEATURES['ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
-FEATURES['ENABLE_COURSE_BLOCKS_NAVIGATION_API'] = True
 
 ###################### Payment ##############################3
 # Enable fake payment processing page
@@ -354,6 +347,7 @@ MKTG_URL_LINK_MAP = {
     'PRESS': 'press',
     'BLOG': 'blog',
     'DONATE': 'donate',
+    'SITEMAP.XML': 'sitemap_xml',
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
@@ -432,48 +426,57 @@ PLATFORM_NAME = "edX"
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites
+FEATURES['USE_MICROSITES'] = True
+MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_sites'
 MICROSITE_CONFIGURATION = {
-    "test_microsite": {
-        "domain_prefix": "testmicrosite",
-        "university": "test_microsite",
-        "platform_name": "Test Microsite",
-        "logo_image_url": "test_microsite/images/header-logo.png",
-        "email_from_address": "test_microsite@edx.org",
-        "payment_support_email": "test_microsite@edx.org",
+    "test_site": {
+        "domain_prefix": "test-site",
+        "university": "test_site",
+        "platform_name": "Test Site",
+        "logo_image_url": "test_site/images/header-logo.png",
+        "email_from_address": "test_site@edx.org",
+        "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
-        "SITE_NAME": "test_microsite.localhost",
-        "course_org_filter": "TestMicrositeX",
+        "SITE_NAME": "test_site.localhost",
+        "course_org_filter": "TestSiteX",
         "course_about_show_social_links": False,
-        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "css_overrides_file": "test_site/css/test_site.css",
         "show_partners": False,
         "show_homepage_promo_video": False,
-        "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
-        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
-        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>",
+        "course_index_overlay_text": "This is a Test Site Overlay Text.",
+        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
+        "homepage_overlay_html": "<h1>This is a Test Site Overlay HTML</h1>",
         "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
         "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
         "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
         "ENABLE_SHOPPING_CART": True,
         "ENABLE_PAID_COURSE_REGISTRATION": True,
-        "SESSION_COOKIE_DOMAIN": "test_microsite.localhost",
+        "SESSION_COOKIE_DOMAIN": "test_site.localhost",
+        "LINKEDIN_COMPANY_ID": "test",
+        "FACEBOOK_APP_ID": "12345678908",
+        "urls": {
+            'ABOUT': 'test-site/about',
+            'PRIVACY': 'test-site/privacy',
+            'TOS_AND_HONOR': 'test-site/tos-and-honor',
+        },
     },
-    "microsite_with_logistration": {
+    "site_with_logistration": {
         "domain_prefix": "logistration",
         "university": "logistration",
         "platform_name": "Test logistration",
-        "logo_image_url": "test_microsite/images/header-logo.png",
-        "email_from_address": "test_microsite@edx.org",
-        "payment_support_email": "test_microsite@edx.org",
+        "logo_image_url": "test_site/images/header-logo.png",
+        "email_from_address": "test_site@edx.org",
+        "payment_support_email": "test_site@edx.org",
         "ENABLE_MKTG_SITE": False,
         "ENABLE_COMBINED_LOGIN_REGISTRATION": True,
-        "SITE_NAME": "test_microsite.localhost",
+        "SITE_NAME": "test_site.localhost",
         "course_org_filter": "LogistrationX",
         "course_about_show_social_links": False,
-        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "css_overrides_file": "test_site/css/test_site.css",
         "show_partners": False,
         "show_homepage_promo_video": False,
         "course_index_overlay_text": "Logistration.",
-        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
+        "course_index_overlay_logo_file": "test_site/images/header-logo.png",
         "homepage_overlay_html": "<h1>This is a Logistration HTML</h1>",
         "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
         "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
@@ -487,15 +490,17 @@ MICROSITE_CONFIGURATION = {
         "domain_prefix": "www",
     }
 }
-MICROSITE_ROOT_DIR = COMMON_ROOT / 'test' / 'test_microsites'
-MICROSITE_TEST_HOSTNAME = 'testmicrosite.testserver'
+
+MICROSITE_TEST_HOSTNAME = 'test-site.testserver'
 MICROSITE_LOGISTRATION_HOSTNAME = 'logistration.testserver'
 
-FEATURES['USE_MICROSITES'] = True
+TEST_THEME = COMMON_ROOT / "test" / "test-theme"
 
 # add extra template directory for test-only templates
 MAKO_TEMPLATES['main'].extend([
-    COMMON_ROOT / 'test' / 'templates'
+    COMMON_ROOT / 'test' / 'templates',
+    COMMON_ROOT / 'test' / 'test_sites',
+    REPO_ROOT / 'openedx' / 'core' / 'djangolib' / 'tests' / 'templates',
 ])
 
 
@@ -518,6 +523,8 @@ MONGODB_LOG = {
     'db': 'xlog',
 }
 
+NOTES_DISABLED_TABS = []
+
 # Enable EdxNotes for tests.
 FEATURES['ENABLE_EDXNOTES'] = True
 
@@ -538,7 +545,7 @@ FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
 
 ######### custom courses #########
-INSTALLED_APPS += ('lms.djangoapps.ccx',)
+INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
 FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # Set dummy values for profile image settings.
@@ -565,3 +572,17 @@ FEATURES['ORGANIZATIONS_APP'] = True
 
 # Financial assistance page
 FEATURES['ENABLE_FINANCIAL_ASSISTANCE_FORM'] = True
+
+JWT_AUTH.update({
+    'JWT_SECRET_KEY': 'test-secret',
+    'JWT_ISSUER': 'https://test-provider/oauth2',
+    'JWT_AUDIENCE': 'test-key',
+})
+
+# Set the default Oauth2 Provider Model so that migrations can run in
+# verbose mode
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
+
+COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]

@@ -14,13 +14,15 @@
 class @Calculator
   constructor: ->
     @hintButton = $('#calculator_hint')
+    @calcInput = $('#calculator_input')
     @hintPopup = $('.help')
     @hintsList = @hintPopup.find('.hint-item')
-    @selectHint($('#' + @hintPopup.attr('aria-activedescendant')));
+    @selectHint($('#' + @hintPopup.attr('data-calculator-hint')));
 
     $('.calc').click @toggle
     $('form#calculator').submit(@calculate).submit (e) ->
       e.preventDefault()
+
     @hintButton
       .click(($.proxy(@handleClickOnHintButton, @)))
 
@@ -34,6 +36,9 @@ class @Calculator
       .keyup($.proxy(@handleKeyUpOnHint, @))
 
     @handleClickOnDocument = $.proxy(@handleClickOnDocument, @)
+    
+    @calcInput
+      .focus(($.proxy(@inputClickHandler, @)))
 
   KEY:
     TAB   : 9
@@ -51,19 +56,19 @@ class @Calculator
     $calcWrapper = $('#calculator_wrapper')
     text = gettext('Open Calculator')
     isExpanded = false
+    icon = 'fa-calculator'    
 
-    $('div.calc-main').toggleClass 'open'
+    $('.calc-main').toggleClass 'open'
     if $calc.hasClass('closed')
       $calcWrapper
-        .find('input, a')
-        .attr 'tabindex', -1
+        .attr('aria-hidden', 'true')
     else
       text = gettext('Close Calculator')
+      icon = 'fa-close'
       isExpanded = true
 
       $calcWrapper
-        .find('input, a,')
-        .attr 'tabindex', 0
+        .attr('aria-hidden', 'false')
       # TODO: Investigate why doing this without the timeout causes it to jump
       # down to the bottom of the page. I suspect it's because it's putting the
       # focus on the text field before it transitions onto the page.
@@ -74,14 +79,24 @@ class @Calculator
         'title': text
         'aria-expanded': isExpanded
       .find('.utility-control-label').text text
+      
+    $calc
+      .find('.icon')
+      .removeClass('fa-calculator')
+      .removeClass('fa-close')
+      .addClass(icon)
 
     $calc.toggleClass 'closed'
+    
+  inputClickHandler: ->
+    $('#calculator_output').removeClass('has-result')
 
   showHint: ->
     @hintPopup
       .addClass('shown')
       .attr('aria-hidden', false)
 
+    $('#calculator_output').removeClass('has-result')
 
     $(document).on('click', @handleClickOnDocument)
 
@@ -89,6 +104,8 @@ class @Calculator
     @hintPopup
       .removeClass('shown')
       .attr('aria-hidden', true)
+      
+    $('#calculator_output').removeClass('has-result')
 
     $(document).off('click', @handleClickOnDocument)
 
@@ -98,7 +115,7 @@ class @Calculator
 
     @activeHint = element;
     @activeHint.focus();
-    @hintPopup.attr('aria-activedescendant', element.attr('id'));
+    @hintPopup.attr('data-calculator-hint', element.attr('id'));
 
   prevHint: () ->
     prev = @activeHint.prev(); # the previous hint
@@ -203,4 +220,5 @@ class @Calculator
     $.getWithPrefix '/calculate', { equation: $('#calculator_input').val() }, (data) ->
       $('#calculator_output')
         .val(data.result)
+        .addClass('has-result')
         .focus()

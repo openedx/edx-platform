@@ -5,7 +5,7 @@
             'underscore',
             'backbone',
             'common/js/spec_helpers/template_helpers',
-            'common/js/spec_helpers/ajax_helpers',
+            'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
             'js/student_account/views/AccessView',
             'js/student_account/views/FormView',
             'js/student_account/enrollment',
@@ -78,11 +78,11 @@
                 view = new AccessView(_.extend(options, {el: $logistrationElement}));
 
                 // Mock the redirect call
-                spyOn( view, 'redirect' ).andCallFake( function() {} );
+                spyOn( view, 'redirect' ).and.callFake( function() {} );
 
                 // Mock the enrollment and shopping cart interfaces
-                spyOn( EnrollmentInterface, 'enroll' ).andCallFake( function() {} );
-                spyOn( ShoppingCartInterface, 'addCourseToCart' ).andCallFake( function() {} );
+                spyOn( EnrollmentInterface, 'enroll' ).and.callFake( function() {} );
+                spyOn( ShoppingCartInterface, 'addCourseToCart' ).and.callFake( function() {} );
             };
 
             var assertForms = function(visibleType, hiddenType) {
@@ -101,6 +101,7 @@
             };
 
             beforeEach(function() {
+                spyOn(window.history, 'pushState');
                 setFixtures('<div id="login-and-registration-container" class="login-register" />');
                 TemplateHelpers.installTemplate('templates/student_account/access');
                 TemplateHelpers.installTemplate('templates/student_account/login');
@@ -138,9 +139,6 @@
 
             it('toggles between the login and registration forms', function() {
                 ajaxSpyAndInitialize(this, 'login');
-
-                // Prevent URL from updating
-                spyOn(history, 'pushState').andCallFake( function() {} );
 
                 // Simulate selection of the registration form
                 selectForm('register');

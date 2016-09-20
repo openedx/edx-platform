@@ -63,7 +63,7 @@ Graded sections:
 Listing grading context for course {}
 graded sections:
 []
-all descriptors:
+all graded blocks:
 length=0""".format(world.course_key)
     assert_in(expected_config, world.css_text('#data-grade-config-text'))
 

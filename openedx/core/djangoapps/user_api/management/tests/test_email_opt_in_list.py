@@ -5,10 +5,12 @@ import tempfile
 import shutil
 import csv
 from collections import defaultdict
+from nose.plugins.attrib import attr
 from unittest import skipUnless
 
 import ddt
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core.management.base import CommandError
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -21,6 +23,7 @@ from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 
 
+@attr('shard_2')
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EmailOptInListTest(ModuleStoreTestCase):
@@ -255,6 +258,24 @@ class EmailOptInListTest(ModuleStoreTestCase):
         with self.assertRaisesRegexp(CommandError, "^File already exists"):
             email_opt_in_list.Command().handle(temp_file.name, self.TEST_ORG)
 
+    def test_no_user_profile(self):
+        """
+        Tests that command does not break if a user has no profile.
+        """
+        self._create_courses_and_enrollments((self.TEST_ORG, True))
+        self._set_opt_in_pref(self.user, self.TEST_ORG, True)
+
+        # Remove the user profile, and re-fetch user
+        self.assertTrue(hasattr(self.user, 'profile'))
+        self.user.profile.delete()
+        user = User.objects.get(id=self.user.id)
+
+        # Test that user do not have profile
+        self.assertFalse(hasattr(user, 'profile'))
+
+        output = self._run_command(self.TEST_ORG)
+        self._assert_output(output, (user, self.courses[0].id, True))
+
     def _create_courses_and_enrollments(self, *args):
         """Create courses and enrollments.
 
@@ -391,7 +412,11 @@ class EmailOptInListTest(ModuleStoreTestCase):
         for user, course_id, opt_in_pref in args:
             self.assertIn({
                 "email": user.email.encode('utf-8'),
-                "full_name": user.profile.name.encode('utf-8'),
+                "full_name": (
+                    user.profile.name.encode('utf-8')
+                    if hasattr(user, 'profile')
+                    else ''
+                ),
                 "course_id": unicode(course_id).encode('utf-8'),
                 "is_opted_in_for_email": unicode(opt_in_pref),
                 "preference_set_datetime": (

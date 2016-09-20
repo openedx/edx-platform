@@ -17,6 +17,7 @@ from mock import patch
 from social.apps.django_app.default.models import UserSocialAuth
 
 from external_auth.models import ExternalAuthMap
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, RegistrationFactory, UserProfileFactory
 from student.views import login_oauth_token
 from third_party_auth.tests.utils import (
@@ -28,10 +29,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class LoginTest(TestCase):
+class LoginTest(CacheIsolationTestCase):
     '''
     Test student.views.login_user() view
     '''
+
+    ENABLED_CACHES = ['default']
 
     def setUp(self):
         super(LoginTest, self).setUp()
@@ -123,7 +126,7 @@ class LoginTest(TestCase):
         # Should now be unable to login
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value="This account has not been activated")
+                              value="Before you sign in, you need to activate your account")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
@@ -135,7 +138,7 @@ class LoginTest(TestCase):
         # Should now be unable to login
         response, mock_audit_log = self._login_response('test@edx.org', 'test_password')
         self._assert_response(response, success=False,
-                              value="This account has not been activated")
+                              value="Before you sign in, you need to activate your account")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
         self._assert_not_in_audit_log(mock_audit_log, 'warning', [u'test'])
 
@@ -256,6 +259,48 @@ class LoginTest(TestCase):
         self.user = User.objects.get(pk=self.user.pk)
 
         self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
+
+        # second login should log out the first
+        response = client2.post(self.url, creds)
+        self._assert_response(response, success=True)
+
+        try:
+            # this test can be run with either lms or studio settings
+            # since studio does not have a dashboard url, we should
+            # look for another url that is login_required, in that case
+            url = reverse('dashboard')
+        except NoReverseMatch:
+            url = reverse('upload_transcripts')
+        response = client1.get(url)
+        # client1 will be logged out
+        self.assertEqual(response.status_code, 302)
+
+    @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
+    def test_single_session_with_no_user_profile(self):
+        """
+        Assert that user login with cas (Central Authentication Service) is
+        redirect to dashboard in case of lms or upload_transcripts in case of
+        cms
+        """
+        user = UserFactory.build(username='tester', email='tester@edx.org')
+        user.set_password('test_password')
+        user.save()
+
+        # Assert that no profile is created.
+        self.assertFalse(hasattr(user, 'profile'))
+
+        creds = {'email': 'tester@edx.org', 'password': 'test_password'}
+        client1 = Client()
+        client2 = Client()
+
+        response = client1.post(self.url, creds)
+        self._assert_response(response, success=True)
+
+        # Reload the user from the database
+        user = User.objects.get(pk=user.pk)
+
+        # Assert that profile is created.
+        self.assertTrue(hasattr(user, 'profile'))
 
         # second login should log out the first
         response = client2.post(self.url, creds)

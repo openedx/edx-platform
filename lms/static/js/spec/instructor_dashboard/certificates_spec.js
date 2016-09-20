@@ -1,7 +1,7 @@
 /*global define, onCertificatesReady */
 define([
         'jquery',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/instructor_dashboard/certificates'
     ],
     function($, AjaxHelpers) {
@@ -65,21 +65,21 @@ define([
             });
 
             it("does not regenerate certificates if user cancels operation in confirm popup", function() {
-                spyOn(window, 'confirm').andReturn(false);
+                spyOn(window, 'confirm').and.returnValue(false);
                 $regenerate_certificates_button.click();
                 expect(window.confirm).toHaveBeenCalled();
                 AjaxHelpers.expectNoRequests(requests);
             });
 
             it("sends regenerate certificates request if user accepts operation in confirm popup", function() {
-                spyOn(window, 'confirm').andReturn(true);
+                spyOn(window, 'confirm').and.returnValue(true);
                 $regenerate_certificates_button.click();
                 expect(window.confirm).toHaveBeenCalled();
                 AjaxHelpers.expectRequest(requests, 'POST', expected.url);
             });
 
             it("sends regenerate certificates request with selected certificate statuses", function() {
-                spyOn(window, 'confirm').andReturn(true);
+                spyOn(window, 'confirm').and.returnValue(true);
 
                 select_options(expected.selected_statuses);
 
@@ -88,7 +88,7 @@ define([
             });
 
             it("displays error message in case of server side error", function() {
-                spyOn(window, 'confirm').andReturn(true);
+                spyOn(window, 'confirm').and.returnValue(true);
                 select_options(expected.selected_statuses);
 
                 $regenerate_certificates_button.click();
@@ -97,7 +97,7 @@ define([
             });
 
             it("displays error message returned by the server in case of unsuccessful request", function() {
-                spyOn(window, 'confirm').andReturn(true);
+                spyOn(window, 'confirm').and.returnValue(true);
                 select_options(expected.selected_statuses);
 
                 $regenerate_certificates_button.click();
@@ -106,7 +106,7 @@ define([
             });
 
             it("displays success message returned by the server in case of successful request", function() {
-                spyOn(window, 'confirm').andReturn(true);
+                spyOn(window, 'confirm').and.returnValue(true);
                 select_options(expected.selected_statuses);
 
                 $regenerate_certificates_button.click();

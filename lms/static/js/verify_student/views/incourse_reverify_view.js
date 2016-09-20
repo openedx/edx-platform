@@ -6,7 +6,7 @@
  */
  var edx = edx || {};
 
- (function( $, _, _s, Backbone, gettext ) {
+ (function( $, _, _s, Backbone, gettext, HtmlUtils ) {
     'use strict';
 
     edx.verify_student = edx.verify_student || {};
@@ -40,14 +40,15 @@
         },
 
         render: function() {
-            var renderedTemplate = _.template(
-                $( this.templateId ).html(),
-                {
-                    courseKey: this.courseKey,
-                    platformName: this.platformName
-                }
+            HtmlUtils.setHtml(
+                this.el,
+                HtmlUtils.template($( this.templateId ).html())(
+                    {
+                        courseKey: this.courseKey,
+                        platformName: this.platformName
+                    }
+                )
             );
-            $( this.el ).html( renderedTemplate );
 
             // Render the webcam view *after* the parent view
             // so that the container div for the webcam
@@ -101,4 +102,4 @@
                 .attr('aria-disabled', !isEnabled);
         }
     });
-})(jQuery, _, _.str, Backbone, gettext);
+})(jQuery, _, _.str, Backbone, gettext, edx.HtmlUtils);

@@ -3,9 +3,11 @@ Tests for discussion pages
 """
 
 import datetime
-from pytz import UTC
 from uuid import uuid4
+
+from flaky import flaky
 from nose.plugins.attrib import attr
+from pytz import UTC
 
 from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
@@ -202,6 +204,18 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.click_new_post_button()
         self.assertIsNotNone(self.page.new_post_form)
 
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.page.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+                'color-contrast',  # TNL-4635
+                'link-href',  # TNL-4636
+                'icon-aria-hidden',  # TNL-4637
+            ]
+        })
+        self.page.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_2')
 class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePaginationTestMixin):
@@ -330,6 +344,32 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         # Verify that the focus is changed
         self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.thread_page_1.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+                'aria-valid-attr-value',  # TNL-4638
+                'color-contrast',  # TNL-4639
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4641
+            ]
+        })
+
+        self.thread_page_1.a11y_audit.check_for_accessibility_errors()
+
+        self.thread_page_2.a11y_audit.config.set_rules({
+            "ignore": [
+                'section',  # TODO: AC-491
+                'aria-valid-attr-value',  # TNL-4638
+                'color-contrast',  # TNL-4639
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4641
+            ]
+        })
+
+        self.thread_page_2.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_2')
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
@@ -367,17 +407,43 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
 
     def test_originally_open_thread_vote_display(self):
         page = self.setup_openclosed_thread_page()
-        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
-        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
-        self.assertFalse(page._is_element_visible('.response_response1 .action-vote'))
-        self.assertTrue(page._is_element_visible('.response_response1 .display-vote'))
+        self.assertFalse(page.is_element_visible('.thread-main-wrapper .action-vote'))
+        self.assertTrue(page.is_element_visible('.thread-main-wrapper .display-vote'))
+        self.assertFalse(page.is_element_visible('.response_response1 .action-vote'))
+        self.assertTrue(page.is_element_visible('.response_response1 .display-vote'))
 
     def test_originally_closed_thread_vote_display(self):
         page = self.setup_openclosed_thread_page(True)
-        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
-        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
-        self.assertTrue(page._is_element_visible('.response_response1 .action-vote'))
-        self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
+        self.assertTrue(page.is_element_visible('.thread-main-wrapper .action-vote'))
+        self.assertFalse(page.is_element_visible('.thread-main-wrapper .display-vote'))
+        self.assertTrue(page.is_element_visible('.response_response1 .action-vote'))
+        self.assertFalse(page.is_element_visible('.response_response1 .display-vote'))
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        page = self.setup_openclosed_thread_page()
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'aria-valid-attr-value',  # TNL-4643
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+            ]
+        })
+        page.a11y_audit.check_for_accessibility_errors()
+
+        page = self.setup_openclosed_thread_page(True)
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'aria-valid-attr-value',  # TNL-4643
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+            ]
+        })
+        page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_2')
@@ -446,6 +512,145 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.set_response_editor_value(response_id, new_response)
         page.submit_response_edit(response_id, new_response)
 
+    def test_edit_response_add_link(self):
+        """
+        Scenario: User submits valid input to the 'add link' form
+            Given I am editing a response on a discussion page
+            When I click the 'add link' icon in the editor toolbar
+            And enter a valid url to the URL input field
+            And enter a valid string in the Description input field
+            And click the 'OK' button
+            Then the edited response should contain the new link
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+
+        response_id = "response_self_author"
+        url = "http://example.com"
+        description = "example"
+
+        page.start_response_edit(response_id)
+        page.set_response_editor_value(response_id, "")
+        page.add_content_via_editor_button(
+            "link", response_id, url, description)
+        page.submit_response_edit(response_id, description)
+
+        expected_response_html = (
+            '<p><a href="{}">{}</a></p>'.format(url, description)
+        )
+        actual_response_html = page.q(
+            css=".response_{} .response-body".format(response_id)
+        ).html[0]
+        self.assertEqual(expected_response_html, actual_response_html)
+
+    def test_edit_response_add_image(self):
+        """
+        Scenario: User submits valid input to the 'add image' form
+            Given I am editing a response on a discussion page
+            When I click the 'add image' icon in the editor toolbar
+            And enter a valid url to the URL input field
+            And enter a valid string in the Description input field
+            And click the 'OK' button
+            Then the edited response should contain the new image
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+
+        response_id = "response_self_author"
+        url = "http://www.example.com/something.png"
+        description = "image from example.com"
+
+        page.start_response_edit(response_id)
+        page.set_response_editor_value(response_id, "")
+        page.add_content_via_editor_button(
+            "image", response_id, url, description)
+        page.submit_response_edit(response_id, '')
+
+        expected_response_html = (
+            '<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
+        )
+        actual_response_html = page.q(
+            css=".response_{} .response-body".format(response_id)
+        ).html[0]
+        self.assertEqual(expected_response_html, actual_response_html)
+
+    def test_edit_response_add_image_error_msg(self):
+        """
+        Scenario: User submits invalid input to the 'add image' form
+            Given I am editing a response on a discussion page
+            When I click the 'add image' icon in the editor toolbar
+            And enter an invalid url to the URL input field
+            And enter an empty string in the Description input field
+            And click the 'OK' button
+            Then I should be shown 2 error messages
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+        page.start_response_edit("response_self_author")
+        page.add_content_via_editor_button(
+            "image", "response_self_author", '', '')
+        page.verify_link_editor_error_messages_shown()
+
+    def test_edit_response_add_decorative_image(self):
+        """
+        Scenario: User submits invalid input to the 'add image' form
+            Given I am editing a response on a discussion page
+            When I click the 'add image' icon in the editor toolbar
+            And enter a valid url to the URL input field
+            And enter an empty string in the Description input field
+            And I check the 'image is decorative' checkbox
+            And click the 'OK' button
+            Then the edited response should contain the new image
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+
+        response_id = "response_self_author"
+        url = "http://www.example.com/something.png"
+        description = ""
+
+        page.start_response_edit(response_id)
+        page.set_response_editor_value(response_id, "Some content")
+        page.add_content_via_editor_button(
+            "image", response_id, url, description, is_decorative=True)
+        page.submit_response_edit(response_id, "Some content")
+
+        expected_response_html = (
+            '<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
+                url, description)
+        )
+        actual_response_html = page.q(
+            css=".response_{} .response-body".format(response_id)
+        ).html[0]
+        self.assertEqual(expected_response_html, actual_response_html)
+
+    def test_edit_response_add_link_error_msg(self):
+        """
+        Scenario: User submits invalid input to the 'add link' form
+            Given I am editing a response on a discussion page
+            When I click the 'add link' icon in the editor toolbar
+            And enter an invalid url to the URL input field
+            And enter an empty string in the Description input field
+            And click the 'OK' button
+            Then I should be shown 2 error messages
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+        page.start_response_edit("response_self_author")
+        page.add_content_via_editor_button(
+            "link", "response_self_author", '', '')
+        page.verify_link_editor_error_messages_shown()
+
     def test_edit_response_as_student(self):
         """
         Scenario: Students should be able to edit the response they created not responses of other users
@@ -488,11 +693,11 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             And I try to edit the response created by other users
             Then the response should be edited and rendered successfully
             And I try to vote the response created by moderator
-            Then the response should be voted successfully
+            Then the response should not be able to be voted
             And I try to vote the response created by other users
             Then the response should be voted successfully
             And I try to report the response created by moderator
-            Then the response should be reported successfully
+            Then the response should not be able to be reported
             And I try to report the response created by other users
             Then the response should be reported successfully
             And I try to endorse the response created by moderator
@@ -506,12 +711,30 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.visit()
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
-        page.vote_response('response_self_author')
+        page.cannot_vote_response('response_self_author')
         page.vote_response('response_other_author')
-        page.report_response('response_self_author')
+        page.cannot_report_response('response_self_author')
         page.report_response('response_other_author')
         page.endorse_response('response_self_author')
         page.endorse_response('response_other_author')
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'aria-valid-attr-value',  # TNL-4638
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+                'duplicate-id',  # TNL-4647
+            ]
+        })
+        page.visit()
+        page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_2')
@@ -595,6 +818,23 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.cancel_comment_edit("comment_self_author", original_body)
         self.assertFalse(page.is_comment_editor_visible("comment_self_author"))
         self.assertTrue(page.is_add_comment_visible("response1"))
+
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("comment_edit_test_thread")
+        page.visit()
+        page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'aria-valid-attr-value',  # TNL-4643
+                'color-contrast',  # TNL-4644
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4645
+            ]
+        })
+        page.a11y_audit.check_for_accessibility_errors()
 
 
 @attr('shard_2')
@@ -726,22 +966,22 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
 
-    def test_dual_discussion_module(self):
+    def test_dual_discussion_xblock(self):
         """
-        Scenario: Two discussion module in one unit shouldn't override their actions
+        Scenario: Two discussion xblocks in one unit shouldn't override their actions
         Given that I'm on courseware page where there are two inline discussion
-        When I click on one discussion module new post button
-        Then it should add new post form of that module in DOM
-        And I should be shown new post form of that module
-        And I shouldn't be shown second discussion module new post form
-        And I click on second discussion module new post button
-        Then it should add new post form of second module in DOM
+        When I click on one discussion xblock new post button
+        Then it should add new post form of that xblock in DOM
+        And I should be shown new post form of that xblock
+        And I shouldn't be shown second discussion xblock new post form
+        And I click on second discussion xblock new post button
+        Then it should add new post form of second xblock in DOM
         And I should be shown second discussion new post form
-        And I shouldn't be shown first discussion module new post form
+        And I shouldn't be shown first discussion xblock new post form
         And I have two new post form in the DOM
-        When I click back on first module new post button
-        And I should be shown new post form of that module
-        And I shouldn't be shown second discussion module new post form
+        When I click back on first xblock new post button
+        And I should be shown new post form of that xblock
+        And I shouldn't be shown second discussion xblock new post form
         """
         self.discussion_page.wait_for_page()
         self.additional_discussion_page.wait_for_page()
@@ -958,6 +1198,18 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
             self.SEARCHED_USERNAME
         ).wait_for_page()
 
+    @attr('a11y')
+    def test_page_accessibility(self):
+        self.page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section',  # TODO: AC-491
+                'color-contrast',  # TNL-4639
+                'link-href',  # TNL-4640
+                'icon-aria-hidden',  # TNL-4641
+            ]
+        })
+        self.page.a11y_audit.check_for_accessibility_errors()
+
 
 @attr('shard_2')
 class DiscussionSortPreferenceTest(UniqueCourseTest):
@@ -981,14 +1233,14 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         Test to check the default sorting preference of user. (Default = date )
         """
         selected_sort = self.sort_page.get_selected_sort_preference()
-        self.assertEqual(selected_sort, "date")
+        self.assertEqual(selected_sort, "activity")
 
     def test_change_sort_preference(self):
         """
         Test that if user sorting preference is changing properly.
         """
         selected_sort = ""
-        for sort_type in ["votes", "comments", "date"]:
+        for sort_type in ["votes", "comments", "activity"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
             selected_sort = self.sort_page.get_selected_sort_preference()
@@ -999,7 +1251,7 @@ class DiscussionSortPreferenceTest(UniqueCourseTest):
         Test that user last preference is saved.
         """
         selected_sort = ""
-        for sort_type in ["votes", "comments", "date"]:
+        for sort_type in ["votes", "comments", "activity"]:
             self.assertNotEqual(selected_sort, sort_type)
             self.sort_page.change_sort_preference(sort_type)
             selected_sort = self.sort_page.get_selected_sort_preference()

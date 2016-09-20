@@ -2,7 +2,7 @@
 <div class="cohort-management-settings">
     <form action="" method="post" name="" id="cohort-management-settings-form" class="cohort-management-settings-form">
         <% if (isNewCohort) { %>
-            <h3 class="form-title"><%- gettext('Add a New Cohort') %></h3>
+            <h3 class="hd hd-3 form-title"><%- gettext('Add a New Cohort') %></h3>
             <div class="tab-content is-visible new-cohort-form">
         <% } %>
         <div class="form-fields">
@@ -25,8 +25,13 @@
                             <%- gettext('Cohort Name') %> *
                             <span class="sr"><%- gettext('(Required Field)')%></span>
                     </label>
-                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input cohort-name" id="cohort-name"
-                           placeholder="<%- placeholder_value %>" required="required" type="text">
+                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input cohort-name
+                        <% if (cohort.disableEditingName) { %>
+                           readonly" readonly
+                        <% } else { %>
+                           "
+                        <% } %>
+                        id="cohort-name" placeholder="<%- placeholder_value %>" required="required" type="text">
                 </div>
                 <hr class="divider divider-lv1">
                 <% if (isDefaultCohort) { %>
@@ -46,7 +51,7 @@
                 </div>
                 <% if (isDefaultCohort) { %>
                     <p class="copy-error">
-                        <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                         <%- gettext("There must be one cohort to which students can automatically be assigned.") %>
                     </p>
                 <% } %>
@@ -91,16 +96,15 @@
                                 <% if (hasSelectedContentGroup && !foundSelected) { %>
                                     <div class="msg-inline">
                                         <p class="copy-error">
-                                            <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                            <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                                             <%=
-                                            interpolate(
-                                                // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
-                                                gettext('%(screen_reader_start)sWarning:%(screen_reader_end)s The previously selected content group was deleted. Select another content group.'),
+                                            HtmlUtils.interpolateHtml(
+                                                // Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                                                gettext('{screen_reader_start}Warning:{screen_reader_end} The previously selected content group was deleted. Select another content group.'),
                                                 {
-                                                    screen_reader_start: '<span class="sr">',
-                                                    screen_reader_end: '</span>'
-                                                },
-                                                true
+                                                    screen_reader_start: HtmlUtils.HTML('<span class="sr">'),
+                                                    screen_reader_end: HtmlUtils.HTML('</span>')
+                                                }
                                             )
                                             %>
                                         </p>
@@ -111,16 +115,15 @@
                             <div class="input-group-other">
                                 <div class="msg-inline">
                                     <p class="copy-error">
-                                        <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                        <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
                                         <%=
-                                        interpolate(
-                                            // Translators: Any text between %(screen_reader_start)s and %(screen_reader_end)s is only read by screen readers and never shown in the browser.
-                                            gettext('%(screen_reader_start)sWarning:%(screen_reader_end)s No content groups exist.'),
+                                        HtmlUtils.interpolateHtml(
+                                            // Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                                            gettext('{screen_reader_start}Warning:{screen_reader_end} No content groups exist.'),
                                             {
-                                                screen_reader_start: '<span class="sr">',
-                                                screen_reader_end: '</span>'
-                                            },
-                                            true
+                                                screen_reader_start: HtmlUtils.HTML('<span class="sr">'),
+                                                screen_reader_end: HtmlUtils.HTML('</span>')
+                                            }
                                         )
                                         %>
                                         <a class="link-to-group-settings" href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a>

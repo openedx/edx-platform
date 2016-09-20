@@ -25,7 +25,13 @@ describe 'Histogram', ->
   describe 'render', ->
     it 'call flot with correct option', ->
       new Histogram(1, [[1, 1], [2, 2], [3, 3]])
-      expect($.plot).toHaveBeenCalledWith $("#histogram_1"), [
+
+      firstArg = $.plot.calls.mostRecent().args[0]
+      secondArg = $.plot.calls.mostRecent().args[1]
+      thirdArg = $.plot.calls.mostRecent().args[2]
+
+      expect(firstArg.selector).toEqual($("#histogram_1").selector)
+      expect(secondArg).toEqual([
         data: [[1, Math.log(2)], [2, Math.log(3)], [3, Math.log(4)]]
         bars:
           show: true
@@ -33,7 +39,8 @@ describe 'Histogram', ->
           lineWidth: 0
           fill: 1.0
         color: "#b72121"
-      ],
+      ])
+      expect(thirdArg).toEqual(
         xaxis:
           min: -1
           max: 4
@@ -44,3 +51,4 @@ describe 'Histogram', ->
           max: Math.log(4) * 1.1
           ticks: [[Math.log(2), '1'], [Math.log(3), '2'], [Math.log(4), '3']]
           labelWidth: 50
+      )

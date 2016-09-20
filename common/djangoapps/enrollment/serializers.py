@@ -98,3 +98,4 @@ class ModeSerializer(serializers.Serializer):
     expiration_datetime = serializers.DateTimeField()
     description = serializers.CharField()
     sku = serializers.CharField()
+    bulk_sku = serializers.CharField()

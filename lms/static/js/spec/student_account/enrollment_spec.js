@@ -1,4 +1,4 @@
-define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/enrollment'],
+define(['edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/student_account/enrollment'],
     function( AjaxHelpers, EnrollmentInterface ) {
         'use strict';
 
@@ -11,7 +11,7 @@ define(['common/js/spec_helpers/ajax_helpers', 'js/student_account/enrollment'],
 
             beforeEach(function() {
                 // Mock the redirect call
-                spyOn(EnrollmentInterface, 'redirect').andCallFake(function() {});
+                spyOn(EnrollmentInterface, 'redirect').and.callFake(function() {});
             });
 
             it('enrolls a user in a course', function() {

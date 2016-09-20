@@ -10,10 +10,12 @@ define([ // jshint ignore:line
     'common/js/components/views/feedback_prompt',
     'common/js/components/views/feedback_notification',
     'js/models/uploads',
-    'js/views/uploads'
+    'js/views/uploads',
+    'text!templates/signatory-editor.underscore'
 ],
 function ($, _, Backbone, gettext,
-          TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog) {
+          TemplateUtils, ViewUtils, PromptView, NotificationView, FileUploadModel, FileUploadDialog,
+          signatoryEditorTemplate) {
     'use strict';
     var SignatoryEditorView = Backbone.View.extend({
         tagName: 'div',
@@ -41,7 +43,6 @@ function ($, _, Backbone, gettext,
             this.model.bind('change', this.render);
             this.eventAgg = options.eventAgg;
             this.isEditingAllCollections = options.isEditingAllCollections;
-            this.template = this.loadTemplate('signatory-editor');
         },
 
         getModelIndex: function(givenModel) {
@@ -77,7 +78,7 @@ function ($, _, Backbone, gettext,
                 is_editing_all_collections: this.isEditingAllCollections,
                 total_saved_signatories: this.getTotalSignatoriesOnServer()
             });
-            return $(this.el).html(this.template(attributes));
+            return $(this.el).html(_.template(signatoryEditorTemplate)(attributes));
         },
 
         setSignatoryName: function(event) {
@@ -129,9 +130,9 @@ function ($, _, Backbone, gettext,
             if (event && event.preventDefault) { event.preventDefault(); }
             var model = this.model;
             var self = this;
-            var titleText = gettext('Delete "<%= signatoryName %>" from the list of signatories?');
+            var titleTextTemplate = _.template(gettext('Delete "<%= signatoryName %>" from the list of signatories?'));
             var confirm = new PromptView.Warning({
-                title: _.template(titleText, {signatoryName: model.get('name')}),
+                title: titleTextTemplate({signatoryName: model.get('name')}),
                 message: gettext('This action cannot be undone.'),
                 actions: {
                     primary: {

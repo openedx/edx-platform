@@ -98,25 +98,25 @@ def _verify_page_names(first, second):
 
 @step(u'the built-in pages are in the default order$')
 def built_in_pages_in_default_order(step):
-    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress']
+    expected_pages = ['Home', 'Course', 'Wiki', 'Progress']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the built-in pages are switched$')
 def built_in_pages_switched(step):
-    expected_pages = ['Courseware', 'Course Info', 'Progress', 'Wiki']
+    expected_pages = ['Home', 'Course', 'Progress', 'Wiki']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the pages are in the default order$')
 def pages_in_default_order(step):
-    expected_pages = ['Courseware', 'Course Info', 'Wiki', 'Progress', 'First', 'Empty']
+    expected_pages = ['Home', 'Course', 'Wiki', 'Progress', 'First', 'Empty']
     see_pages_in_expected_order(expected_pages)
 
 
 @step(u'the pages are switched$$')
 def pages_are_switched(step):
-    expected_pages = ['Courseware', 'Course Info', 'Progress', 'First', 'Empty', 'Wiki']
+    expected_pages = ['Home', 'Course', 'Progress', 'First', 'Empty', 'Wiki']
     see_pages_in_expected_order(expected_pages)
 
 

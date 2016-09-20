@@ -102,7 +102,7 @@
         <div class="accordion-group">
           <div class="accordion-heading">
             <a class="accordion-toggle" style="float: left;" href="{% url 'wiki:diff' revision.id %}">
-              <i class="icon fa fa-plus"></i>
+              <span class="icon fa fa-plus" aria-hidden="true"></span>
               {% include "wiki/includes/revision_info.html" with current_revision=article.current_revision %}
               <div style="color: #CCC;">
                 <small>
@@ -130,7 +130,7 @@
                       document.revisions_form.action='{% url 'wiki:preview_revision' article.id %}';
                       $('#previewRevisionModal .switch-to-revision').attr('href', '{% url 'wiki:change_revision' path=urlpath.path article_id=article.id revision_id=revision.id %}');
                       document.revisions_form.submit();">
-                  <i class="icon fa fa-eye"></i>
+                  <span class="icon fa fa-eye" aria-hidden="true"></span>
                   {% trans "Preview this revision" %}
                 </a>
 
@@ -180,17 +180,17 @@
               document.revisions_form.action=$('input[type=radio]:checked').attr('merge-button-href');
               $('.merge-revision-commit').attr('href', $('input[type=radio]:checked').attr('merge-button-commit-href'));
               document.revisions_form.submit();">
-            <i class="icon fa fa-random"></i>
+            <span class="icon fa fa-random" aria-hidden="true"></span>
             {% trans "Merge selected with current..." %}
           </a>
         {% else %}
           <button type="submit" disabled="true" name="preview" value="1" class="btn btn-large">
-            <i class="icon fa fa-lock"></i>
+            <span class="icon fa fa-lock" aria-hidden="true"></span>
             {% trans "Merge selected with current..." %}
           </button>
         {% endif %}
         <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.action=$('input[type=radio]:checked').attr('switch-button-href')">
-          <i class="icon fa fa-flag"></i>
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
           {% trans "Switch to selected version" %}
         </button>
       </div>
@@ -201,7 +201,7 @@
   <input type="hidden" name="r" value="" />
   <section id="previewRevisionModal" class="modal" aria-hidden="true">
     <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title">
-      <button class="close-modal"><i class="icon fa fa-remove"></i> <span class="sr">{% trans 'Close' %}</span></button>
+      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
 
       <header>
         <h2 id="preview-title">{% trans "Wiki Revision Preview" %}<span class="sr">, {% trans "window open" %}</span></h2>
@@ -212,17 +212,17 @@
       </div>
       <div class="modal-footer">
       <a id="previewRevisionModalBackToHistory" href="#" class="btn btn-large" data-dismiss="modal">
-        <i class="icon fa fa-circle-arrow-left"></i>
+        <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
         {% trans "Back to history view" %}
       </a>
       {% if article|can_write:user %}
         <a href="#" class="btn btn-large btn-primary switch-to-revision">
-          <i class="icon fa fa-flag"></i>
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
           {% trans "Switch to this version" %}
         </a>
       {% else %}
         <a href="#" class="btn btn-large btn-primary disabled">
-          <i class="icon fa fa-lock"></i>
+          <span class="icon fa fa-lock" aria-hidden="true"></span>
           {% trans "Switch to this version" %}
         </a>
       {% endif %}
@@ -232,7 +232,7 @@
 
   <section id="mergeModal" class="modal" aria-hidden="true">
     <div class="inner-wrapper" role="dialog" aria-labelledby="merge-title">
-      <button class="close-modal"><i class="icon fa fa-remove"></i> <span class="sr">{% trans 'Close' %}</span></button>
+      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
 
       <header>
         <h2 id="merge-title">{% trans "Merge Revision" %}<span class="sr">, {% trans "window open" %}</span></h2>
@@ -240,24 +240,24 @@
       </header>
       <div class="modal-header">
         <h1>{% trans "Merge with current" %}</h1>
-        <p class="lead"><i class="icon fa fa-info-circle"></i> {% trans "When you merge a revision with the current, all data will be retained from both versions and merged at its approximate location from each revision." %} <strong>{% trans "After this, it's important to do a manual review." %}</strong></p>
+        <p class="lead"><span class="icon fa fa-info-circle" aria-hidden="true"></span> {% trans "When you merge a revision with the current, all data will be retained from both versions and merged at its approximate location from each revision." %} <strong>{% trans "After this, it's important to do a manual review." %}</strong></p>
       </div>
       <div class="modal-body">
         <iframe name="mergeWindow"></iframe>
       </div>
       <div class="modal-footer">
         <a id="mergeModalBackToHistory" href="#" class="btn btn-large" data-dismiss="modal">
-          <i class="icon fa fa-circle-arrow-left"></i>
+          <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
           {% trans "Back to history view" %}
         </a>
         {% if article|can_write:user %}
         <a href="#" class="btn btn-large btn-primary merge-revision-commit">
-          <i class="icon fa fa-file"></i>
+          <span class="icon fa fa-file" aria-hidden="true"></span>
           {% trans "Create new merged version" %}
         </a>
         {% else %}
           <a href="#" class="btn btn-large btn-primary disabled">
-            <i class="icon fa fa-lock"></i>
+            <span class="icon fa fa-lock" aria-hidden="true"></span>
             {% trans "Create new merged version" %}
           </a>
         {% endif %}

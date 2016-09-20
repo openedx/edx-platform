@@ -28,20 +28,20 @@
                     % else:
                         <li class="action-item action-edit nav-item">
                             <a href="#" class="button edit-button action-button">
-                                <i class="icon fa fa-pencil"></i>
+                                <span class="icon fa fa-pencil" aria-hidden="true"></span>
                                 <span class="action-button-text">Edit</span>
                             </a>
                         </li>
                 % endif
                     <li class="nav-item">
                         <a href="#" class="button new-button new-component-button">
-                            <i class="icon fa fa-plus icon-inline"></i>
+                            <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
                             <span class="action-button-text">Add Component</span>
                         </a>
                    </li>
                    <li class="action-item action-toggle-preview nav-item">
                        <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
-                           <i class="icon fa fa-refresh"></i>
+                           <span class="icon fa fa-refresh" aria-hidden="true"></span>
                            <span class="action-button-text preview-text"></span>
                        </a>
                    </li>
@@ -59,7 +59,7 @@
                     <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
                     </section>
                     <div class="ui-loading is-hidden">
-                        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">Loading...</span></p>
+                        <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">Loading...</span></p>
                     </div>
                 </article>
                 <aside class="content-supplementary" role="complementary">

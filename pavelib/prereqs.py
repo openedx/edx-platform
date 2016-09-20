@@ -1,15 +1,16 @@
 """
-Install Python, Ruby, and Node prerequisites.
+Install Python and Node prerequisites.
 """
 
 from distutils import sysconfig
 import hashlib
 import os
+import re
+import sys
 
 from paver.easy import sh, task
 
 from .utils.envs import Env
-import sys
 
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
@@ -24,6 +25,7 @@ PYTHON_REQ_FILES = [
     'requirements/edx/github.txt',
     'requirements/edx/local.txt',
     'requirements/edx/base.txt',
+    'requirements/edx/paver.txt',
     'requirements/edx/post.txt',
 ]
 
@@ -51,6 +53,15 @@ def no_prereq_install():
         return vals[val]
     except KeyError:
         return False
+
+
+def create_prereqs_cache_dir():
+    """Create the directory for storing the hashes, if it doesn't exist already."""
+    try:
+        os.makedirs(PREREQS_STATE_DIR)
+    except OSError:
+        if not os.path.isdir(PREREQS_STATE_DIR):
+            raise
 
 
 def compute_fingerprint(path_list):
@@ -105,12 +116,7 @@ def prereq_cache(cache_name, paths, install_func):
         # Update the cache with the new hash
         # If the code executed within the context fails (throws an exception),
         # then this step won't get executed.
-        try:
-            os.makedirs(PREREQS_STATE_DIR)
-        except OSError:
-            if not os.path.isdir(PREREQS_STATE_DIR):
-                raise
-
+        create_prereqs_cache_dir()
         with open(cache_file_path, "w") as cache_file:
             # Since the pip requirement files are modified during the install
             # process, we need to store the hash generated AFTER the installation
@@ -118,13 +124,6 @@ def prereq_cache(cache_name, paths, install_func):
             cache_file.write(post_install_hash)
     else:
         print '{cache} unchanged, skipping...'.format(cache=cache_name)
-
-
-def ruby_prereqs_installation():
-    """
-    Installs Ruby prereqs
-    """
-    sh('bundle install --quiet')
 
 
 def node_prereqs_installation():
@@ -146,18 +145,6 @@ def python_prereqs_installation():
 
 
 @task
-def install_ruby_prereqs():
-    """
-    Installs Ruby prereqs
-    """
-    if no_prereq_install():
-        print NO_PREREQ_MESSAGE
-        return
-
-    prereq_cache("Ruby prereqs", ["Gemfile"], ruby_prereqs_installation)
-
-
-@task
 def install_node_prereqs():
     """
     Installs Node prerequisites
@@ -167,6 +154,17 @@ def install_node_prereqs():
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
+
+
+# To add a package to the uninstall list, just add it to this list! No need
+# to touch any other part of this file.
+PACKAGES_TO_UNINSTALL = [
+    "South",                        # Because it interferes with Django 1.8 migrations.
+    "edxval",                       # Because it was bork-installed somehow.
+    "django-storages",
+    "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
+    "edx-oauth2-provider",          # Because it moved from github to pypi
+]
 
 
 @task
@@ -180,14 +178,19 @@ def uninstall_python_packages():
     them.
 
     """
-    # So that we don't constantly uninstall things, use a version number of the
-    # uninstallation needs.  Check it, and skip this if we're up to date.
-    expected_version = 2
-    state_file_path = os.path.join(PREREQS_STATE_DIR, "python_uninstall_version.txt")
+    # So that we don't constantly uninstall things, use a hash of the packages
+    # to be uninstalled.  Check it, and skip this if we're up to date.
+    hasher = hashlib.sha1()
+    hasher.update(repr(PACKAGES_TO_UNINSTALL))
+    expected_version = hasher.hexdigest()
+    state_file_path = os.path.join(PREREQS_STATE_DIR, "Python_uninstall.sha1")
+    create_prereqs_cache_dir()
+
     if os.path.isfile(state_file_path):
         with open(state_file_path) as state_file:
-            version = int(state_file.read())
+            version = state_file.read()
         if version == expected_version:
+            print 'Python uninstalls unchanged, skipping...'
             return
 
     # Run pip to find the packages we need to get rid of.  Believe it or not,
@@ -195,23 +198,13 @@ def uninstall_python_packages():
     # to really really get rid of it.
     for _ in range(3):
         uninstalled = False
-        frozen = sh("pip freeze", capture=True).splitlines()
+        frozen = sh("pip freeze", capture=True)
 
-        # Uninstall South
-        if any(line.startswith("South") for line in frozen):
-            sh("pip uninstall --disable-pip-version-check -y South")
-            uninstalled = True
-
-        # Uninstall edx-val
-        if any("edxval" in line for line in frozen):
-            sh("pip uninstall --disable-pip-version-check -y edxval")
-            uninstalled = True
-
-        # Uninstall django-storages
-        if any("django-storages==" in line for line in frozen):
-            sh("pip uninstall --disable-pip-version-check -y django-storages")
-            uninstalled = True
-
+        for package_name in PACKAGES_TO_UNINSTALL:
+            if package_in_frozen(package_name, frozen):
+                # Uninstall the pacakge
+                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
+                uninstalled = True
         if not uninstalled:
             break
     else:
@@ -221,7 +214,24 @@ def uninstall_python_packages():
 
     # Write our version.
     with open(state_file_path, "w") as state_file:
-        state_file.write(str(expected_version))
+        state_file.write(expected_version)
+
+
+def package_in_frozen(package_name, frozen_output):
+    """Is this package in the output of 'pip freeze'?"""
+    # Look for either:
+    #
+    #   PACKAGE-NAME==
+    #
+    # or:
+    #
+    #   blah_blah#egg=package_name-version
+    #
+    pattern = r"(?mi)^{pkg}==|#egg={pkg_under}-".format(
+        pkg=re.escape(package_name),
+        pkg_under=re.escape(package_name.replace("-", "_")),
+    )
+    return bool(re.search(pattern, frozen_output))
 
 
 @task
@@ -232,6 +242,8 @@ def install_python_prereqs():
     if no_prereq_install():
         print NO_PREREQ_MESSAGE
         return
+
+    uninstall_python_packages()
 
     # Include all of the requirements files in the fingerprint.
     files_to_fingerprint = list(PYTHON_REQ_FILES)
@@ -258,13 +270,11 @@ def install_python_prereqs():
 @task
 def install_prereqs():
     """
-    Installs Ruby, Node and Python prerequisites
+    Installs Node and Python prerequisites
     """
     if no_prereq_install():
         print NO_PREREQ_MESSAGE
         return
 
-    install_ruby_prereqs()
     install_node_prereqs()
-    uninstall_python_packages()
     install_python_prereqs()

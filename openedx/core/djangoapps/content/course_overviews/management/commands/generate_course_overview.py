@@ -1,8 +1,8 @@
 """
 Command to load course overviews.
 """
+
 import logging
-from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
@@ -38,18 +38,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        course_keys = []
         if options['all']:
-            course_keys = [course.id for course in modulestore().get_courses()]
+            course_keys = [course.id for course in modulestore().get_course_summaries()]
         else:
             if len(args) < 1:
                 raise CommandError('At least one course or --all must be specified.')
             try:
                 course_keys = [CourseKey.from_string(arg) for arg in args]
             except InvalidKeyError:
-                log.fatal('Invalid key specified.')
-
-            if not course_keys:
-                log.fatal('No courses specified.')
+                raise CommandError('Invalid key specified.')
 
         CourseOverview.get_select_courses(course_keys)

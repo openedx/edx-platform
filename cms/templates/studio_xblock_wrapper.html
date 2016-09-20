@@ -2,7 +2,9 @@
 from django.utils.translation import ugettext as _
 from contentstore.views.helpers import xblock_studio_url
 from contentstore.utils import is_visible_to_specific_content_groups
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
 %>
 <%
 xblock_url = xblock_studio_url(xblock)
@@ -24,10 +26,10 @@ messages = xblock.validate().to_json()
 <script>
     require(["jquery", "js/factories/xblock_validation"], function($, XBlockValidationFactory) {
         XBlockValidationFactory(
-            ${escape_json_dumps(messages) | n},
-            $.parseJSON("${bool(xblock_url)}".toLowerCase()),  // xblock_url will be None or a string
-            $.parseJSON("${bool(is_root)}".toLowerCase()),  // is_root will be None or a boolean
-            $('div.xblock-validation-messages[data-locator="${xblock.location | h}"]')
+            ${messages | n, dump_js_escaped_json},
+            ${bool(xblock_url) | n, dump_js_escaped_json},  // xblock_url will be None or a string
+            ${bool(is_root) | n, dump_js_escaped_json},  // is_root will be None or a boolean
+            $('div.xblock-validation-messages[data-locator="${xblock.location | n, js_escaped_string}"]')
         );
     });
 </script>
@@ -55,7 +57,7 @@ messages = xblock.validate().to_json()
         <div class="header-details">
             % if show_inline:
             <a href="#" data-tooltip="${_('Expand or Collapse')}" class="action expand-collapse collapse">
-                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
+                <span class="icon fa fa-caret-down ui-toggle-expansion" aria-hidden="true"></span>
                 <span class="sr">${_('Expand or Collapse')}</span>
             </a>
             % endif
@@ -68,14 +70,14 @@ messages = xblock.validate().to_json()
                         % if not show_inline:
                             <li class="action-item action-edit">
                                 <a href="#" class="edit-button action-button">
-                                    <i class="icon fa fa-pencil"></i>
+                                    <span class="icon fa fa-pencil" aria-hidden="true"></span>
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </a>
                             </li>
                             % if can_edit_visibility:
                                 <li class="action-item action-visibility">
                                     <a href="#" data-tooltip="${_("Visibility Settings")}" class="visibility-button action-button">
-                                        <i class="icon fa fa-eye" aria-hidden="true"></i>
+                                        <span class="icon fa fa-eye" aria-hidden="true"></span>
                                         <span class="sr">${_("Visibility")}</span>
                                     </a>
                                 </li>
@@ -83,7 +85,7 @@ messages = xblock.validate().to_json()
                             % if can_add:
                                 <li class="action-item action-duplicate">
                                     <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
-                                    <i class="icon fa fa-copy"></i>
+                                    <span class="icon fa fa-copy" aria-hidden="true"></span>
                                     <span class="sr">${_("Duplicate")}</span>
                                     </a>
                                 </li>
@@ -93,7 +95,7 @@ messages = xblock.validate().to_json()
                             <!-- If we can add, we can delete. -->
                             <li class="action-item action-delete">
                                 <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                                <i class="icon fa fa-trash-o"></i>
+                                <span class="icon fa fa-trash-o" aria-hidden="true"></span>
                                 <span class="sr">${_("Delete")}</span>
                                 </a>
                             </li>
@@ -124,7 +126,7 @@ messages = xblock.validate().to_json()
                     <a href="${xblock_url}" class="action-button">
                         ## Translators: this is a verb describing the action of viewing more details
                         <span class="action-button-text">${_('View')}</span>
-                        <i class="icon fa fa-arrow-right"></i>
+                        <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
                     </a>
                 </li>
             </ul>
@@ -150,7 +152,9 @@ messages = xblock.validate().to_json()
  % endif   
 
 % if not is_root:
+    <!-- footer for xblock_aside -->
     </section>
+
     % if is_reorderable:
         </li>
     % else:

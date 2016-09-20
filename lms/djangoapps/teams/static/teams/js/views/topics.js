@@ -11,11 +11,12 @@
             type: 'topics',
 
             srInfo: {
-                id: "heading-browse-topics",
-                text: gettext("All topics")
+                id: 'heading-browse-topics',
+                text: gettext('All topics')
             },
 
             initialize: function (options) {
+                this.options = _.extend({}, options);
                 this.itemViewClass = TopicCardView.extend({
                     router: options.router,
                     srInfo: this.srInfo

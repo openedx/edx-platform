@@ -1,7 +1,7 @@
 /*global define, sinon */
 define([
         'jquery',
-        'common/js/spec_helpers/ajax_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'js/certificates/models/certificate_exception',
         'js/certificates/views/certificate_whitelist',
         'js/certificates/views/certificate_whitelist_editor',
@@ -30,7 +30,7 @@ define([
 
             beforeEach(function() {
 
-                certificate_exception = new CertificateExceptionModel({user_name: 'test_user'});
+                certificate_exception = new CertificateExceptionModel({user_name: 'test_user'}, {url: 'test/url/'});
                 certificate_exception.set({
                     notes: "Test notes"
                 });
@@ -182,7 +182,7 @@ define([
                 setFixtures("<script type='text/template' id='certificate-white-list-tpl'>" + fixture + "</script>" +
                     "<div class='white-listed-students' id='white-listed-students'></div>");
 
-                var certificate_white_list = new CertificateWhiteListCollection(certificates_exceptions_json, {
+                this.certificate_white_list = new CertificateWhiteListCollection(certificates_exceptions_json, {
                     parse: true,
                     canBeEmpty: true,
                     url: certificate_exception_url,
@@ -190,12 +190,31 @@ define([
 
                 });
 
-                view = new CertificateWhiteListView({collection: certificate_white_list});
+                view = new CertificateWhiteListView({
+                    collection: this.certificate_white_list,
+                    active_certificate: true
+                });
                 view.render();
             });
 
             it("verifies view is initialized and rendered successfully", function() {
                 expect(view).not.toBe(undefined);
+                expect(view.$el.find('table tbody tr').length).toBe(2);
+            });
+
+            it("verifies that Generate Exception Certificate button is disabled", function() {
+                expect(view.$el.find('table tbody tr').length).toBe(2);
+                expect(view.$el.find('#generate-exception-certificates').first()).not.toHaveClass('is-disabled');
+
+                // Render the view with active_certificate set to false.
+                view = new CertificateWhiteListView({
+                    collection: this.certificate_white_list,
+                    active_certificate: false
+                });
+                view.render();
+
+                // Verify that `Generate Exception Certificate` is disabled even when Collection is not empty.
+                expect(view.$el.find('#generate-exception-certificates').first()).toHaveClass('is-disabled');
                 expect(view.$el.find('table tbody tr').length).toBe(2);
             });
 

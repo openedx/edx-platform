@@ -49,6 +49,9 @@ function () {
         });
 
         this.el.off('controls:show');
+        if (this.controlHideTimeout) {
+            clearTimeout(this.controlHideTimeout);
+        }
         delete this.videoControl;
     }
 

@@ -100,6 +100,13 @@ class BasketsView(APIView):
             msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
             return DetailResponse(msg, status=HTTP_409_CONFLICT)
 
+        # Check to see if enrollment for this course is closed.
+        course = courses.get_course(course_key)
+        if CourseEnrollment.is_enrollment_closed(user, course):
+            msg = Messages.ENROLLMENT_CLOSED.format(course_id=course_id)
+            log.info(u'Unable to enroll user %s in closed course %s.', user.id, course_id)
+            return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
+
         # If there is no audit or honor course mode, this most likely
         # a Prof-Ed course. Return an error so that the JS redirects
         # to track selection.

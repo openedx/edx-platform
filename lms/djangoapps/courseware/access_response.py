@@ -56,6 +56,14 @@ class AccessResponse(object):
             "user_message": self.user_message
         }
 
+    def __repr__(self):
+        return "AccessResponse({!r}, {!r}, {!r}, {!r})".format(
+            self.has_access,
+            self.error_code,
+            self.developer_message,
+            self.user_message
+        )
+
 
 class AccessError(AccessResponse):
     """

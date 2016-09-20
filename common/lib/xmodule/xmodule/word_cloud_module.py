@@ -248,4 +248,5 @@ class WordCloudModule(WordCloudFields, XModule):
 class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
+    resources_dir = None
     template_dir_name = 'word_cloud'

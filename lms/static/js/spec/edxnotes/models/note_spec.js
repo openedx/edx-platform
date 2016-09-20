@@ -4,10 +4,23 @@ define([
     'use strict';
     describe('EdxNotes NoteModel', function() {
         beforeEach(function () {
-            this.collection = new NotesCollection([
-                {quote: Helpers.LONG_TEXT, text: 'text\n with\r\nline\n\rbreaks \r'},
-                {quote: Helpers.SHORT_TEXT, text: 'text\n with\r\nline\n\rbreaks \r'}
-            ]);
+            this.collection = new NotesCollection(
+                {
+                    'count': 2,
+                    'current_page': 1,
+                    'num_pages': 1,
+                    'start': 0,
+                    'next': null,
+                    'previous': null,
+                    'results': [
+                        {quote: Helpers.LONG_TEXT, text: 'text\n with\r\nline\n\rbreaks \r'},
+                        {quote: Helpers.SHORT_TEXT, text: 'text\n with\r\nline\n\rbreaks \r'}
+                    ]
+                },
+                {
+                    perPage: 10, parse: true
+                }
+            );
         });
 
         it('has correct values on initialization', function () {
@@ -33,7 +46,7 @@ define([
 
         it('can return appropriate `text`', function () {
             var model = this.collection.at(0);
-            expect(model.getText()).toBe('text<br> with<br>line<br>breaks <br>');
+            expect(model.get('text')).toBe('text\n with\r\nline\n\rbreaks \r');
         });
     });
 });

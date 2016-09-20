@@ -1,7 +1,12 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/html-utils', 
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/views/fields',
         'string_utils'],
-    function (Backbone, $, _, AjaxHelpers, TemplateHelpers, FieldViews) {
+    function (Backbone, $, _, HtmlUtils, AjaxHelpers, TemplateHelpers, FieldViews) {
         'use strict';
 
         var API_URL = '/api/end_point/v1';
@@ -118,7 +123,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expectMessageContains(view, view.helpMessage);
             view.showSuccessMessage();
             expectMessageContains(view, view.indicators.success);
-            jasmine.Clock.tick(7000);
+            jasmine.clock().tick(7000);
             // Message gets reset
             expectMessageContains(view, view.helpMessage);
 
@@ -126,7 +131,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             expectMessageContains(view, view.indicators.success);
             // But if we change the message, it should not get reset.
             view.showHelpMessage("Do not reset this!");
-            jasmine.Clock.tick(7000);
+            jasmine.clock().tick(7000);
             expectMessageContains(view, "Do not reset this!");
         };
 
@@ -240,8 +245,8 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
             verifyEditableField(view, _.extend({
                     valueSelector: '.u-field-value',
                     valueInputSelector: '.u-field-value > input'
-                }, data
-            ), requests);
+                }, data),
+                requests);
         };
 
         var verifyDropDownField = function (view, data, requests) {

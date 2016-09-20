@@ -12,11 +12,11 @@ body.view-in-course {
   }
 
   // courseware header
-  header.global,
-  header.global.slim {
+  .header-global,
+  .header-global.slim {
     width: auto;
 
-    .nav-wrapper {
+    .wrapper-header {
       min-width: auto;
       padding-right: 2%;
       padding-left: 2%;
@@ -32,7 +32,14 @@ body.view-in-course {
   .wrapper-course-material .course-material,
   .wrapper-preview-menu .preview-menu  {
     width: auto;
+  }
+
+  .wrapper-preview-menu .preview-menu {
     padding: 15px 2%;
+  }
+
+  .wrapper-course-material .course-material {
+    padding: ($baseline/2) 0 0 0;
   }
 
   .wrapper-course-material .course-material .course-tabs {
@@ -72,7 +79,7 @@ body.view-in-course {
   // post-container footer (creative commons)
   .container-footer {
     max-width: none;
-    min-width: none;
+    min-width: 0;
     width: auto;
   }
 

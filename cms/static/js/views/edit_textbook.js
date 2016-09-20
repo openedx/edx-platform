@@ -13,7 +13,7 @@ define(["js/views/baseview", "underscore", "jquery", "js/views/edit_chapter", "c
         className: "textbook",
         render: function() {
             this.$el.html(this.template({
-                name: this.model.escape('name'),
+                name: this.model.get('name'),
                 error: this.model.validationError
             }));
             this.addAll();

@@ -1,33 +1,33 @@
 <td class="thumb-col">
     <div class="thumb">
         <% if (thumbnail !== '') { %>
-        <img src="<%= thumbnail %>" alt="<%= gettext('No description available') %>">
+        <img src="<%- thumbnail %>" alt="<%- gettext('No description available') %>">
         <% } %>
     </div>
 </td>
 <td class="name-col">
-    <span class="title"><a data-tooltip="<%= gettext('Open/download this file') %>" href="<%= url %>" class="filename"><%= display_name %></a></span>
+    <span class="title"><a data-tooltip="<%- gettext('Open/download this file') %>" href="<%- url %>" class="filename"><%- display_name %></a></span>
 
     <div class="embeddable-xml"></div>
 </td>
 <td class="type-col">
-    <%= asset_type %>
+    <%- asset_type %>
 </td>
 <td class="date-col">
-    <%= date_added %>
+    <%- date_added %>
 </td>
 <td class="embed-col">
     <ul>
         <li class="embed-url">
             <label>
-                <span class="label"><%= gettext('Studio:') %></span>
-                <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly>
+                <span class="label"><%- gettext('Studio:') %></span>
+                <input type="text" class="embeddable-xml-input" value="<%- portable_url %>" readonly>
             </label>
         </li>
         <li class="external-url">
             <label>
-                <span class="label"><%= gettext('Web:') %></span>
-                <input type="text" class="embeddable-xml-input" value="<%= external_url %>" readonly>
+                <span class="label"><%- gettext('Web:') %></span>
+                <input type="text" class="embeddable-xml-input" value="<%- external_url %>" readonly>
             </label>
         </li>
     </ul>
@@ -36,12 +36,12 @@
 <td class="actions-col">
     <ul class="actions-list">
         <li class="action-item action-delete">
-            <a href="#" data-tooltip="<%= gettext('Delete this asset') %>" class="remove-asset-button action-button"><i class="icon fa fa-times-circle" aria-hidden="true"></i> <span class="sr"><%= gettext('Delete this asset') %></span></a>
+            <a href="#" data-tooltip="<%- gettext('Delete this asset') %>" class="remove-asset-button action-button"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr"><%- gettext('Delete this asset') %></span></a>
         </li>
         <li class="action-item action-lock">
-            <label for="<%= uniqueId %>"><span class="sr"><%= gettext('Lock this asset') %></span></label>
-            <input type="checkbox" id="<%= uniqueId %>" class="lock-checkbox" data-tooltip="<%= gettext('Lock/unlock file') %>" />
-            <div class="action-button"><i class="icon fa fa-lock"></i><i class="icon fa fa-unlock-alt" aria-hidden="true"></i></div>
+            <label for="<%- uniqueId %>"><span class="sr"><%- gettext('Lock this asset') %></span></label>
+            <input type="checkbox" id="<%- uniqueId %>" class="lock-checkbox" data-tooltip="<%- gettext('Lock/unlock file') %>" />
+            <div class="action-button"><span class="icon fa fa-lock" aria-hidden="true"></span><span class="icon fa fa-unlock-alt" aria-hidden="true"></span></div>
         </li>
     </ul>
 </td>

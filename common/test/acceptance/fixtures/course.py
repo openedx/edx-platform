@@ -13,8 +13,8 @@ from path import Path as path
 
 from opaque_keys.edx.keys import CourseKey
 
-from . import STUDIO_BASE_URL
-from .base import XBlockContainerFixture, FixtureError
+from common.test.acceptance.fixtures import STUDIO_BASE_URL
+from common.test.acceptance.fixtures.base import XBlockContainerFixture, FixtureError
 
 
 class XBlockFixtureDesc(object):
@@ -22,7 +22,8 @@ class XBlockFixtureDesc(object):
     Description of an XBlock, used to configure a course fixture.
     """
 
-    def __init__(self, category, display_name, data=None, metadata=None, grader_type=None, publish='make_public'):
+    def __init__(self, category, display_name, data=None,
+                 metadata=None, grader_type=None, publish='make_public', **kwargs):
         """
         Configure the XBlock to be created by the fixture.
         These arguments have the same meaning as in the Studio REST API:
@@ -41,6 +42,7 @@ class XBlockFixtureDesc(object):
         self.publish = publish
         self.children = []
         self.locator = None
+        self.fields = kwargs
 
     def add_children(self, *args):
         """
@@ -59,13 +61,15 @@ class XBlockFixtureDesc(object):
 
         XBlocks are always set to public visibility.
         """
-        return json.dumps({
+        returned_data = {
             'display_name': self.display_name,
             'data': self.data,
             'metadata': self.metadata,
             'graderType': self.grader_type,
-            'publish': self.publish
-        })
+            'publish': self.publish,
+            'fields': self.fields,
+        }
+        return json.dumps(returned_data)
 
     def __str__(self):
         """
@@ -298,8 +302,8 @@ class CourseFixture(XBlockContainerFixture):
             self._course_key = response.json()['course_key']
         else:
             raise FixtureError(
-                "Could not create course {0}.  Status was {1}".format(
-                    self._course_dict, response.status_code))
+                "Could not create course {0}.  Status was {1}\nResponse content was: {2}".format(
+                    self._course_dict, response.status_code, response.content))
 
     def _configure_course(self):
         """
@@ -354,7 +358,7 @@ class CourseFixture(XBlockContainerFixture):
             'children': None,
             'data': handouts_html,
             'id': self._handouts_loc,
-            'metadata': dict()
+            'metadata': dict(),
         })
 
         response = self.session.post(url, data=payload, headers=self.headers)

@@ -118,6 +118,7 @@ SORTED_COUNTRIES = [
     (u"KZ", u"Kazakhstan"),
     (u"KE", u"Kenya"),
     (u"KI", u"Kiribati"),
+    (u"XK", u"Kosovo"),
     (u"KW", u"Kuwait"),
     (u"KG", u"Kyrgyzstan"),
     (u"LA", u"Laos"),

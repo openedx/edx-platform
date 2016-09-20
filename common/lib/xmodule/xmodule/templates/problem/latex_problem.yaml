@@ -89,11 +89,11 @@ metadata:
 data: |
     <?xml version="1.0"?>
     <problem showanswer="closed" rerandomize="never" weight="10" display_name="lec1_Q2">
-      <p>If you have a problem that is already written in LaTeX, you can use this problem type to 
-      easily convert your code into XML. After you paste your code into the LaTeX editor, 
+      <p>If you have a problem that is already written in LaTeX, you can use this problem type to
+      easily convert your code into XML. After you paste your code into the LaTeX editor,
       you only need to make a few minor adjustments.</p>
-      <p>For more information, see 
-      <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_in_latex.html" target="_blank">
+      <p>For more information, see
+      <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/problem_in_latex.html" target="_blank">
       Problem Written in LaTeX</a> in <i>Building and Running an edX Course</i>.</p>
       <p>You can use the following example problems as models.</p>
        <p><strong>Example Option Problem</strong></p>

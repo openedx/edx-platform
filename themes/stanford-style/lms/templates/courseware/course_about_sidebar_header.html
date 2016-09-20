@@ -1,0 +1,15 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<header>
+  <div class="social-sharing">
+    <div class="sharing-message">${_("Share with friends and family!")}</div>
+    <a href="http://twitter.com/intent/tweet?text=I+just+enrolled+in+${course.number}+${course.display_name_with_default_escaped}!+(http://class.stanford.edu)" class="share">
+      <span class="icon fa fa-twitter" aria-hidden="true"></span><span class="sr">${_("Tweet that you've enrolled in this course")}</span>
+    </a>
+    <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20enrolled%20in%20${course.number}%20${course.display_name_with_default_escaped}+(http://class.stanford.edu)" class="share">
+      <span class="icon fa fa-envelope" aria-hidden="true"></span><span class="sr">${_("Email someone to say you've enrolled in this course")}</span>
+    </a>
+  </div>
+</header>

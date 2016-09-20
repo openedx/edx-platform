@@ -2,7 +2,7 @@
 Course API
 """
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from rest_framework.exceptions import PermissionDenied
 
 from lms.djangoapps.courseware.courses import (
@@ -10,7 +10,6 @@ from lms.djangoapps.courseware.courses import (
     get_course_overview_with_access,
     get_permission_for_course_about,
 )
-
 from .permissions import can_view_courses_for_username
 
 
@@ -20,6 +19,8 @@ def get_effective_user(requesting_user, target_username):
     """
     if target_username == requesting_user.username:
         return requesting_user
+    elif target_username == '':
+        return AnonymousUser()
     elif can_view_courses_for_username(requesting_user, target_username):
         return User.objects.get(username=target_username)
     else:
@@ -43,7 +44,7 @@ def course_detail(request, username, course_key):
         course_key (CourseKey): Identifies the course of interest
 
     Return value:
-        `CourseDescriptor` object representing the requested course
+        `CourseOverview` object representing the requested course
     """
     user = get_effective_user(request.user, username)
     return get_course_overview_with_access(
@@ -53,7 +54,7 @@ def course_detail(request, username, course_key):
     )
 
 
-def list_courses(request, username):
+def list_courses(request, username, org=None, filter_=None):
     """
     Return a list of available courses.
 
@@ -69,9 +70,17 @@ def list_courses(request, username):
             The name of the user the logged-in user would like to be
             identified as
 
+    Keyword Arguments:
+        org (string):
+            If specified, visible `CourseOverview` objects are filtered
+            such that only those belonging to the organization with the provided
+            org code (e.g., "HarvardX") are returned. Case-insensitive.
+        filter_ (dict):
+            If specified, visible `CourseOverview` objects are filtered
+            by the given key-value pairs.
 
     Return value:
-        List of `CourseDescriptor` objects representing the collection of courses.
+        List of `CourseOverview` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
-    return get_courses(user)
+    return get_courses(user, org=org, filter_=filter_)

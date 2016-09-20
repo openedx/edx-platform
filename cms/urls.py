@@ -5,6 +5,7 @@ from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.program import ProgramAuthoringView, ProgramsIdTokenView
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
+from student.views import LogoutView
 
 admin.autodiscover()
 
@@ -35,16 +36,10 @@ urlpatterns = patterns(
     url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
         'openedx.core.djangoapps.common_views.xblock.xblock_resource', name='xblock_resource_url'),
 
-    # temporary landing page for a course
-    url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
-        'contentstore.views.landing', name='landing'),
-
     url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
     url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
     url(r'^organizations$', OrganizationListView.as_view(), name='organizations'),
 
-    # temporary landing page for edge
-    url(r'^edge$', 'contentstore.views.edge', name='edge'),
     # noop to squelch ajax errors
     url(r'^event$', 'contentstore.views.event', name='event'),
 
@@ -52,6 +47,14 @@ urlpatterns = patterns(
     url(r'^heartbeat$', include('heartbeat.urls')),
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
+
+    url(r'^i18n/', include('django.conf.urls.i18n')),
+
+    # User API endpoints
+    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+
+    # Update session view
+    url(r'^lang_pref/session_language', 'lang_pref.views.update_session_language', name='session_language'),
 )
 
 # User creation and updating views
@@ -63,7 +66,7 @@ urlpatterns += patterns(
 
     # ajax view that actually does the work
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
-    url(r'^logout$', 'student.views.logout_user', name='logout'),
+    url(r'^logout$', LogoutView.as_view(), name='logout'),
 )
 
 # restful api
@@ -74,7 +77,7 @@ urlpatterns += patterns(
     url(r'^howitworks$', 'howitworks'),
     url(r'^signup$', 'signup', name='signup'),
     url(r'^signin$', 'login_page', name='login'),
-    url(r'^request_course_creator$', 'request_course_creator'),
+    url(r'^request_course_creator$', 'request_course_creator', name='request_course_creator'),
 
     url(r'^course_team/{}(?:/(?P<email>.+))?$'.format(COURSELIKE_KEY_PATTERN), 'course_team_handler'),
     url(r'^course_info/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_info_handler'),
@@ -121,12 +124,6 @@ JS_INFO_DICT = {
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
     'packages': ('openassessment',),
 }
-
-urlpatterns += patterns(
-    '',
-    # Serve catalog of localized strings to be rendered by Javascript
-    url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', JS_INFO_DICT),
-)
 
 if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):
     urlpatterns += (

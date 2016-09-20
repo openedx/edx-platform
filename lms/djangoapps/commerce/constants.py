@@ -17,3 +17,4 @@ class Messages(object):
     NO_HONOR_MODE = u'Course {course_id} does not have an honor mode.'
     NO_DEFAULT_ENROLLMENT_MODE = u'Course {course_id} does not have an honor or audit mode.'
     ENROLLMENT_EXISTS = u'User {username} is already enrolled in {course_id}.'
+    ENROLLMENT_CLOSED = u'Enrollment is closed for {course_id}.'
