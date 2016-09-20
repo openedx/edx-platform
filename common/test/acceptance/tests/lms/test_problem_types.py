@@ -823,18 +823,6 @@ class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'unanswered': ['.grader-status .unanswered ~ .debug'],
     }
 
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for CodeProblemTypeTest
-        """
-        super(CodeProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-286
-            ]
-        })
-
     def answer_problem(self, correctness):
         """
         Answer code problem.

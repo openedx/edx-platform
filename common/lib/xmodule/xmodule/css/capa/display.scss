@@ -902,6 +902,12 @@ div.problem {
   }
 }
 
+.capa-message {
+  display: inline-block;
+  color: $gray-d1;
+  -webkit-font-smoothing: antialiased;
+}
+
 // +Problem - Actions
 // ====================
 div.problem .action {
