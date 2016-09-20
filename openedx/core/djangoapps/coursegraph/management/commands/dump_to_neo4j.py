@@ -2,18 +2,23 @@
 This file contains a management command for exporting the modulestore to
 neo4j, a graph database.
 """
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 import logging
 
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.utils import six
+from opaque_keys.edx.keys import CourseKey
 from py2neo import Graph, Node, Relationship, authenticate
 from py2neo.compat import integer, string, unicode as neo4j_unicode
 from request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import CourseKey
+
+from openedx.core.djangoapps.coursegraph.utils import (
+    CommandLastRunCache,
+    CourseLastPublishedCache,
+)
+
 
 log = logging.getLogger(__name__)
 
@@ -25,13 +30,17 @@ bolt_log.setLevel(logging.ERROR)
 ITERABLE_NEO4J_TYPES = (tuple, list, set, frozenset)
 PRIMITIVE_NEO4J_TYPES = (integer, string, neo4j_unicode, float, bool)
 
+COMMAND_LAST_RUN_CACHE = CommandLastRunCache()
+COURSE_LAST_PUBLISHED_CACHE = CourseLastPublishedCache()
+
 
 class ModuleStoreSerializer(object):
     """
     Class with functionality to serialize a modulestore into subgraphs,
     one graph per course.
     """
-    def load_course_keys(self, courses=None):
+
+    def __init__(self, courses=None):
         """
         Sets the object's course_keys attribute from the `courses` parameter.
         If that parameter isn't furnished, loads all course_keys from the
@@ -148,7 +157,6 @@ class ModuleStoreSerializer(object):
 
         return coerced_value
 
-
     @staticmethod
     def add_to_transaction(neo4j_entities, transaction):
         """
@@ -159,12 +167,40 @@ class ModuleStoreSerializer(object):
         for entity in neo4j_entities:
             transaction.create(entity)
 
+    @staticmethod
+    def should_dump_course(course_key):
+        """
+        Only dump the course if it's been changed since the last time it's been
+        dumped.
+        :param course_key: a CourseKey object.
+        :return: bool. Whether or not this course should be dumped to neo4j.
+        """
 
-    def dump_courses_to_neo4j(self, graph):
+        last_this_command_was_run = COMMAND_LAST_RUN_CACHE.get(course_key)
+        last_course_had_published_event = COURSE_LAST_PUBLISHED_CACHE.get(
+            course_key
+        )
+
+        # if we have no record of this course being serialized, serialize it
+        if last_this_command_was_run is None:
+            return True
+
+        # if we've serialized the course recently and we have no published
+        # events, we can skip re-serializing it
+        if last_this_command_was_run and last_course_had_published_event is None:
+            return False
+
+        # otherwise, serialize if the command was run before the course's last
+        # published event
+        return last_this_command_was_run < last_course_had_published_event
+
+    def dump_courses_to_neo4j(self, graph, override_cache=False):
         """
         Parameters
         ----------
         graph: py2neo graph object
+        override_cache: serialize the courses even if they'be been recently
+            serialized
 
         Returns two lists: one of the courses that were successfully written
           to neo4j, and one of courses that were not.
@@ -185,6 +221,11 @@ class ModuleStoreSerializer(object):
                 index + 1,
                 total_number_of_courses,
             )
+
+            if not (override_cache or self.should_dump_course(course_key)):
+                log.info("skipping dumping %s, since it hasn't changed", course_key)
+                continue
+
             nodes, relationships = self.serialize_course(course_key)
             log.info(
                 "%d nodes and %d relationships in %s",
@@ -217,6 +258,7 @@ class ModuleStoreSerializer(object):
                 unsuccessful_courses.append(course_string)
 
             else:
+                COMMAND_LAST_RUN_CACHE.set(course_key)
                 successful_courses.append(course_string)
 
         return successful_courses, unsuccessful_courses
@@ -228,20 +270,34 @@ class Command(BaseCommand):
 
     Takes the following named arguments:
       host: the host of the neo4j server
-      port: the port on the server that accepts https requests
+      https_port: the port on the neo4j server that accepts https requests
+      http_port: the port on the neo4j server that accepts http requests
+      secure: if set, connects to server over https, otherwise uses http
       user: the username for the neo4j user
       password: the user's password
+      courses: list of course key strings to serialize. If not specified, all
+        courses in the modulestore are serialized.
+      override: if true, dump all--or all specified--courses, regardless of when
+        they were last dumped. If false, or not set, only dump those courses that
+        were updated since the last time the command was run.
 
     Example usage:
-      python manage.py lms dump_to_neo4j --host localhost --port 7473 \
-        --user user --password password --settings=aws
+      python manage.py lms dump_to_neo4j --host localhost --https_port 7473 \
+        --secure --user user --password password --settings=aws
     """
     def add_arguments(self, parser):
         parser.add_argument('--host', type=unicode)
-        parser.add_argument('--port', type=int)
+        parser.add_argument('--https_port', type=int, default=7473)
+        parser.add_argument('--http_port', type=int, default=7474)
+        parser.add_argument('--secure', action='store_true')
         parser.add_argument('--user', type=unicode)
         parser.add_argument('--password', type=unicode)
         parser.add_argument('--courses', type=unicode, nargs='*')
+        parser.add_argument(
+            '--override',
+            action='store_true',
+            help='dump all--or all specified--courses, ignoring cache',
+        )
 
     def handle(self, *args, **options):  # pylint: disable=unused-argument
         """
@@ -249,12 +305,14 @@ class Command(BaseCommand):
         those graphs to neo4j.
         """
         host = options['host']
-        port = options['port']
+        https_port = options['https_port']
+        http_port = options['http_port']
+        secure = options['secure']
         neo4j_user = options['user']
         neo4j_password = options['password']
 
         authenticate(
-            "{host}:{port}".format(host=host, port=port),
+            "{host}:{port}".format(host=host, port=https_port if secure else http_port),
             neo4j_user,
             neo4j_password,
         )
@@ -263,20 +321,26 @@ class Command(BaseCommand):
             bolt=True,
             password=neo4j_password,
             user=neo4j_user,
-            https_port=port,
+            https_port=https_port,
+            http_port=http_port,
             host=host,
-            secure=True
+            secure=secure,
         )
 
-        mss = ModuleStoreSerializer()
-        mss.load_course_keys(options['courses'])
+        mss = ModuleStoreSerializer(options['courses'])
 
-        successful_courses, unsuccessful_courses = mss.dump_courses_to_neo4j(graph)
+        successful_courses, unsuccessful_courses = mss.dump_courses_to_neo4j(
+            graph, override_cache=options['override']
+        )
+
+        if not successful_courses and not unsuccessful_courses:
+            print("No courses exported to neo4j at all!")
+            return
 
         if successful_courses:
             print(
                 "These courses exported to neo4j successfully:\n\t" +
-                 "\n\t".join(successful_courses)
+                "\n\t".join(successful_courses)
             )
         else:
             print("No courses exported to neo4j successfully.")

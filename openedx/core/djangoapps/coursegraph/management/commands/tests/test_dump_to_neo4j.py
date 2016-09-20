@@ -4,17 +4,20 @@ Tests for the dump_to_neo4j management command.
 """
 from __future__ import unicode_literals
 
+from datetime import datetime
+
 import ddt
 import mock
-from courseware.management.commands.dump_to_neo4j import (
-    ModuleStoreSerializer,
-    ITERABLE_NEO4J_TYPES,
-)
 from django.core.management import call_command
-from django.core.management.base import CommandError
 from django.utils import six
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import (
+    ModuleStoreSerializer,
+    ITERABLE_NEO4J_TYPES,
+)
+from openedx.core.djangoapps.coursegraph.signals import _listen_for_course_publish
 
 
 class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
@@ -44,7 +47,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
     Tests for the dump to neo4j management command
     """
 
-    @mock.patch('courseware.management.commands.dump_to_neo4j.Graph')
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
     @ddt.data(1, 2)
     def test_dump_specific_courses(self, number_of_courses, mock_graph_class):
         """
@@ -59,7 +62,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
             'dump_to_neo4j',
             courses=self.course_strings[:number_of_courses],
             host='mock_host',
-            port=7473,
+            http_port=7474,
             user='mock_user',
             password='mock_password',
         )
@@ -68,7 +71,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         self.assertEqual(mock_transaction.commit.call_count, number_of_courses)
         self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
 
-    @mock.patch('courseware.management.commands.dump_to_neo4j.Graph')
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
     def test_dump_all_courses(self, mock_graph_class):
         """
         Test if you don't specify which courses to dump, then you'll dump
@@ -82,7 +85,7 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         call_command(
             'dump_to_neo4j',
             host='mock_host',
-            port=7473,
+            http_port=7474,
             user='mock_user',
             password='mock_password',
         )
@@ -97,13 +100,17 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
     """
     Tests for the ModuleStoreSerializer
     """
+    @classmethod
+    def setUpClass(cls):
+        """Any ModuleStore course/content operations can go here."""
+        super(TestModuleStoreSerializer, cls).setUpClass()
+        cls.mss = ModuleStoreSerializer()
+
     def test_serialize_item(self):
         """
         Tests the serialize_item method.
         """
-        mss = ModuleStoreSerializer()
-        mss.load_course_keys()
-        fields, label = mss.serialize_item(self.course)
+        fields, label = self.mss.serialize_item(self.course)
         self.assertEqual(label, "course")
         self.assertIn("edited_on", fields.keys())
         self.assertIn("display_name", fields.keys())
@@ -117,9 +124,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests the serialize_course method.
         """
-        mss = ModuleStoreSerializer()
-        mss.load_course_keys()
-        nodes, relationships = mss.serialize_course(
+        nodes, relationships = self.mss.serialize_course(
             self.course.id
         )
         self.assertEqual(len(nodes), 9)
@@ -154,7 +159,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         """
         Tests the coerce_types helper for the neo4j base types
         """
-        coerced_value = ModuleStoreSerializer().coerce_types(original_value)
+        coerced_value = self.mss.coerce_types(original_value)
         self.assertEqual(coerced_value, coerced_expected)
 
     def test_dump_to_neo4j(self):
@@ -166,10 +171,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_transaction = mock.Mock()
         mock_graph.begin.return_value = mock_transaction
 
-        mss = ModuleStoreSerializer()
-        mss.load_course_keys()
-
-        successful, unsuccessful = mss.dump_courses_to_neo4j(mock_graph)
+        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
 
         self.assertEqual(mock_graph.begin.call_count, 2)
         self.assertEqual(mock_transaction.commit.call_count, 2)
@@ -193,9 +195,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         mock_graph.begin.return_value = mock_transaction
         mock_transaction.run.side_effect = ValueError('Something went wrong!')
 
-        mss = ModuleStoreSerializer()
-        mss.load_course_keys()
-        successful, unsuccessful = mss.dump_courses_to_neo4j(mock_graph)
+        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
 
         self.assertEqual(mock_graph.begin.call_count, 2)
         self.assertEqual(mock_transaction.commit.call_count, 0)
@@ -203,3 +203,76 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
 
         self.assertEqual(len(successful), 0)
         self.assertItemsEqual(unsuccessful, self.course_strings)
+
+    @ddt.data(
+        (True, 2),
+        (False, 0),
+    )
+    @ddt.unpack
+    def test_dump_to_neo4j_cache(self, override_cache, expected_number_courses):
+        """
+        Tests the caching mechanism and override to make sure we only publish
+        recently updated courses.
+        """
+        mock_graph = mock.Mock()
+
+        # run once to warm the cache
+        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
+        self.assertEqual(len(successful + unsuccessful), len(self.course_strings))
+
+        # when run the second time, only dump courses if the cache override
+        # is enabled
+        successful, unsuccessful = self.mss.dump_courses_to_neo4j(
+            mock_graph, override_cache=override_cache
+        )
+        self.assertEqual(len(successful + unsuccessful), expected_number_courses)
+
+    def test_dump_to_neo4j_published(self):
+        """
+        Tests that we only dump those courses that have been published after
+        the last time the command was been run.
+        """
+        mock_graph = mock.Mock()
+
+        # run once to warm the cache
+        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
+        self.assertEqual(len(successful + unsuccessful), len(self.course_strings))
+
+        # simulate one of the courses being published
+        _listen_for_course_publish(None, self.course.id)
+
+        # make sure only the published course was dumped
+        successful, unsuccessful = self.mss.dump_courses_to_neo4j(mock_graph)
+        self.assertEqual(len(unsuccessful), 0)
+        self.assertEqual(len(successful), 1)
+        self.assertEqual(successful[0], unicode(self.course.id))
+
+    @ddt.data(
+        (datetime(2016, 3, 30), datetime(2016, 3, 31), True),
+        (datetime(2016, 3, 31), datetime(2016, 3, 30), False),
+        (datetime(2016, 3, 31), None, False),
+        (None, datetime(2016, 3, 30), True),
+        (None, None, True),
+    )
+    @ddt.unpack
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.COMMAND_LAST_RUN_CACHE')
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.COURSE_LAST_PUBLISHED_CACHE')
+    def test_should_dump_course(
+            self,
+            last_command_run,
+            last_course_published,
+            should_dump,
+            mock_course_last_published_cache,
+            mock_command_last_run_cache,
+    ):
+        """
+        Tests whether a course should be dumped given the last time it was
+        dumped and the last time it was published.
+        """
+        mock_command_last_run_cache.get.return_value = last_command_run
+        mock_course_last_published_cache.get.return_value = last_course_published
+        mock_course_key = mock.Mock
+        self.assertEqual(
+            self.mss.should_dump_course(mock_course_key),
+            should_dump
+        )
