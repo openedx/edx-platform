@@ -86,10 +86,14 @@ def get_score(user, block, scores_client, submissions_scores_cache, weight, poss
     if score and score.total is not None:
         # We have a valid score, just use it.
         earned = score.correct if score.correct is not None else 0.0
-        if possible is None:
-            possible = score.total
-        elif possible != score.total:
-            log.error(u"Persisted Grades: possible value {} != score.total value {}".format(possible, score.total))
+        if possible is not None and possible != score.total:
+            log.error(
+                u"Persistent Grades: scores.get_score, inconsistency: possible value {} != score.total value {}".format(
+                    possible,
+                    score.total
+                )
+            )
+        possible = score.total
     else:
         # This means we don't have a valid score entry and we don't have a
         # cached_max_score on hand. We know they've earned 0.0 points on this.
