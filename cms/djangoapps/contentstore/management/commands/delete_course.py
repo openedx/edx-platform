@@ -3,7 +3,6 @@
 
     Arguments:
         arg1 (str): Course key of the course to delete
-        arg2 (str): 'commit'
 
     Returns:
         none
