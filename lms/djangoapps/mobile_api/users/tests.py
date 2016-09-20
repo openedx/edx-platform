@@ -292,16 +292,11 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         for course in courses:
             self.enroll(course.id)
 
-        response = self.api_response(qargs={'org':'edX'})
+        response = self.api_response(data={'org':'edX'})
 
         # Verify only edX courses are returned
-        self.assertEqual(len(response.data), 3)
-        for course_index in range(3):
-            result = response.data[course_index]['course']
-            self.assertEqual(result['org'], 'edX')
-
-        # Verify most recently enrolled course is staff only but still returned
-        self.assertFalse(response.data[0]['course']['courseware_access']['has_access'])
+        for entry in response.data:
+            self.assertEqual(entry['course']['org'], 'edX')
 
 
 @attr(shard=2)
