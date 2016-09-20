@@ -17,7 +17,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage, FakeSoftwareSecureVerificationPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
 from ...pages.lms.staff_view import StaffPage
@@ -201,6 +201,28 @@ class ProctoredExamTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
+    def _verify_user(self):
+        """
+        Takes user through the verification flow and then marks the verification as 'approved'.
+        """
+        # Immediately verify the user
+        self.immediate_verification_page.immediate_verification()
+
+        # Take face photo and proceed to the ID photo step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Take ID photo and proceed to the review photos step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Submit photos and proceed to the enrollment confirmation step
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Mark the verification as passing.
+        verification = FakeSoftwareSecureVerificationPage(self.browser).visit()
+        verification.mark_approved()
+
     def test_can_create_proctored_exam_in_studio(self):
         """
         Given that I am a staff member
@@ -221,6 +243,7 @@ class ProctoredExamTest(UniqueCourseTest):
         select advanced settings tab
         When I Make the exam proctored.
         And I login as a verified student.
+        And I verify the user's ID.
         And visit the courseware as a verified student.
         Then I can see an option to take the exam as a proctored exam.
         """
@@ -234,6 +257,8 @@ class ProctoredExamTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
         self._login_as_a_verified_user()
+
+        self._verify_user()
 
         self.courseware_page.visit()
         self.assertTrue(self.courseware_page.can_start_proctored_exam)
