@@ -78,9 +78,6 @@ FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 # Enable the milestones app in tests to be consistent with it being enabled in production
 FEATURES['MILESTONES_APP'] = True
 
-# Enable persistent subsection grades, so that feature can be tested.
-FEATURES['ENABLE_SUBSECTION_GRADES_SAVED'] = True
-
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
@@ -300,6 +297,9 @@ OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+
+########################### Grades #################################
+FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
 
 ###################### Payment ##############################3
 # Enable fake payment processing page
@@ -590,3 +590,13 @@ COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 
 LMS_ROOT_URL = "http://localhost:8000"
+
+# Test configuration for neo4j
+NEO4J_CONFIG = {
+    'bolt': True,
+    'password': 'password',
+    'user': 'neo4j',
+    'https_port': 7473,
+    'host': 'localhost',
+    'secure': True,
+}

@@ -4,6 +4,7 @@
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
+<%def name="online_help_token()"><% return "programs" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from openedx.core.djangolib.js_utils import (

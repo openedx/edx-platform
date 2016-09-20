@@ -175,25 +175,6 @@ body.discussion {
     }
 }
 
-// Layout control for discussion modules that does not apply to the discussion board
-.discussion-module {
-    .discussion {
-        clear: both;
-        padding-top: ($baseline/2);
-    }
-
-    .btn-brand {
-        @include blue-button;
-        display: inline-block;
-        padding-bottom: ($baseline/10);
-        height: 37px;
-
-        &:hover, &:focus {
-            border-color: #222;
-        }
-    }
-}
-
 // Styling for discussion threads
 .discussion-thread {
     padding: 0;
@@ -276,17 +257,17 @@ body.discussion {
 
         .post-tools {
             box-shadow: 0 1px 1px $shadow inset;
-            background: $gray-l6;
+            background: $white;
 
             &:hover {
-                background: #fcfcfc;
+                background: $forum-color-hover-thread;
 
                 .icon {
                     color: $link-hover;
                 }
             }
 
-            a {
+            .btn-link {
                 display: block;
                 padding: ($baseline*0.25) $baseline;
                 font-size: $forum-small-font-size;

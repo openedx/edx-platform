@@ -9,7 +9,6 @@ from mock import patch
 from abc import ABCMeta
 from courseware.models import StudentModule
 from django.conf import settings
-from django.test import TestCase
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
 from nose.plugins.attrib import attr
@@ -18,6 +17,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
@@ -40,7 +40,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TE
 
 
 @attr(shard=1)
-class TestSettableEnrollmentState(TestCase):
+class TestSettableEnrollmentState(CacheIsolationTestCase):
     """ Test the basis class for enrollment tests. """
     def setUp(self):
         super(TestSettableEnrollmentState, self).setUp()
@@ -62,7 +62,7 @@ class TestSettableEnrollmentState(TestCase):
         self.assertEqual(mes, ees)
 
 
-class TestEnrollmentChangeBase(TestCase):
+class TestEnrollmentChangeBase(CacheIsolationTestCase):
     """
     Test instructor enrollment administration against database effects.
 
@@ -565,7 +565,7 @@ class SettableEnrollmentState(EmailEnrollmentState):
 
 
 @attr(shard=1)
-class TestSendBetaRoleEmail(TestCase):
+class TestSendBetaRoleEmail(CacheIsolationTestCase):
     """
     Test edge cases for `send_beta_role_email`
     """

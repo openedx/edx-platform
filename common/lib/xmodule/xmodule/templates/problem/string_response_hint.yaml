@@ -1,54 +1,33 @@
 ---
 metadata:
     display_name: Text Input with Hints and Feedback
-    markdown: | 
+    markdown: |
 
-        You can provide feedback for the correct answer in text input problems, as well as for specific incorrect answers.
+        You can use this template as a guide to the simple editor markdown and OLX markup to use for text input with hints and feedback problems. Edit this component to replace this template with your own assessment.
 
-        Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on how to arrive at the correct answer.
+        >>Add the question text, or prompt, here. This text is required.||You can add an optional tip or note related to the prompt like this. <<
 
-        Be sure to select Settings to specify a Display Name and other values that apply.
+        = the correct answer {{You can specify optional feedback like this, which appears after this answer is submitted.}}
+        or= optional acceptable variant of the correct answer
+        not= optional incorrect answer such as a frequent misconception  {{You can specify optional feedback for none, a subset, or all of the answers.}}
 
-        Use the following example problem as a model.
-
-        >>Which U.S. state has the largest land area?<<
-
-        =Alaska {{Alaska is 576,400 square miles, more than double the land area
-        of the second largest state, Texas.}}
-
-        not=Texas {{While many people think Texas is the largest state, it is actually the second largest, with 261,797 square miles.}}
-
-        not=California {{California is the third largest state, with 155,959 square miles.}}
-
-        ||Consider the square miles, not population.||
-        ||Consider all 50 states, not just the continental United States.||
+        ||You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.||
+        ||If you add more than one hint, a different hint appears each time learners select the hint button.||
 
 hinted: true
-data: |
-  <problem>
-
-    <p>You can provide feedback for the correct answer in text input problems, as well as for specific incorrect answers.</p>
-
-    <p>Use feedback on expected incorrect answers to address common misconceptions and to provide guidance on how to arrive at the correct answer.</p>
-
-    <p>Use the following example problem as a model.</p>
- 
-    <p>Which U.S. state has the largest land area?</p>
-
-    <stringresponse answer="Alaska" type="ci" >
-
-    <correcthint>Alaska is 576,400 square miles, more than double the land area of the second largest state, Texas.</correcthint>
-
-    <stringequalhint answer="Texas">While many people think Texas is the largest state, it is actually the second largest, with 261,797 square miles.</stringequalhint>
-
-    <stringequalhint answer="California">California is the third largest state, with 155,959 square miles.</stringequalhint>
-
-    <textline label="Which U.S. state has the largest land area?" size="20"/>
-    </stringresponse>
-
-    <demandhint>
-      <hint>Consider the square miles, not population.</hint>
-      <hint>Consider all 50 states, not just the continental United States.</hint>
-    </demandhint>
-
-  </problem>
+data:   |
+        <problem>
+            <stringresponse answer="the correct answer" type="ci">
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for text input with hints and feedback problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Add the question text, or prompt, here. This text is required.</label>
+                <description>You can add an optional tip or note related to the prompt like this.</description>
+                <correcthint>You can specify optional feedback like this, which appears after this answer is submitted.</correcthint>
+                <additional_answer answer="optional acceptable variant of the correct answer"/>
+                <stringequalhint answer="optional incorrect answer such as a frequent misconception">You can specify optional feedback for none, a subset, or all of the answers.</stringequalhint>
+                <textline size="20"/>
+            </stringresponse>
+            <demandhint>
+                <hint>You can add an optional hint like this. Problems that have a hint include a hint button, and this text appears the first time learners select the button.</hint>
+                <hint>If you add more than one hint, a different hint appears each time learners select the hint button.</hint>
+            </demandhint>
+        </problem>

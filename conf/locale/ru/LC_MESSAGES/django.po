@@ -103,6 +103,7 @@
 # Pavel Yushchenko <pavelyushchenko@gmail.com>, 2013
 # Maria Artemieva <maria.m.artemieva@gmail.com>, 2015
 # Marina Dolinsky <marinadolinsky613@gmail.com>, 2014
+# Maruschin Eugene <maruschin@gmail.com>, 2016
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # mchalyk <mchalyk@gmail.com>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
@@ -162,6 +163,7 @@
 # Matevos <mat.meh.89@hotmail.com>, 2015
 # mcha121 <mcha-12-1@bk.ru>, 2014
 # Michael Savin <m.savin.ru@gmail.com>, 2015-2016
+# Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Natalia Vavilina <nfgenius@gmail.com>, 2015
 # Ничик Дмитрий Валерьевич <dmi.nichik@gmail.com>, 2013
 # Nikolay K Medvedev <elsin16@gmail.com>, 2014-2015
@@ -191,7 +193,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:40+0000\n"
+"POT-Creation-Date: 2016-09-01 11:27+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -202,11 +204,12 @@ msgstr ""
 "Language: ru\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion"
 msgstr "Обсуждение"
 
@@ -395,6 +398,7 @@ msgstr "Вы зачислены на курс «Кодекса чести»"
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -2093,7 +2097,6 @@ msgstr "Содержание пояснения в формате XML"
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-#: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Display name for this module"
 msgstr "Отображаемое название модуля"
 
@@ -4764,20 +4767,38 @@ msgid "Poster URL"
 msgstr "URL автора"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "The label for this word cloud on the course page."
+msgstr ""
+
+#: lms/templates/annotatable.html lms/templates/imageannotation.html
+#: lms/templates/textannotation.html lms/templates/videoannotation.html
+#: lms/templates/peer_grading/peer_grading.html
+msgid "Instructions"
+msgstr "Инструкции"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid ""
+"Add instructions to help learners understand how to use the word cloud. "
+"Clear instructions are important, especially for learners who have "
+"accessibility requirements."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Inputs"
 msgstr "Добавленные"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Number of text boxes available for students to input words/sentences."
-msgstr "Количество текстовых полей для ввода слов/предложений."
+msgid ""
+"The number of text boxes available for learners to add words and sentences."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Maximum Words"
 msgstr "Максимальное количество слов"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Maximum number of words to be displayed in generated word cloud."
-msgstr "Максимальное количество слов, отображаемое в созданной коллекции."
+msgid "The maximum number of words displayed in the generated word cloud."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Show Percents"
@@ -4789,16 +4810,16 @@ msgstr ""
 "Статистические данные для каждого слова отображаются рядом с этим словом."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Whether this student has posted words to the cloud."
-msgstr "Добавлял ли обучающийся слова к коллекции."
+msgid "Whether this learner has posted words to the cloud."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Student answer."
 msgstr "Ответ слушателя."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "All possible words from all students."
-msgstr "Все слова, добавленные обучающимися."
+msgid "All possible words from all learners."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
@@ -4960,6 +4981,7 @@ msgstr "Условия предоставления услуг и Кодекс �
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -4975,6 +4997,7 @@ msgstr "Политика по доступности материалов"
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: themes/example/lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -9365,7 +9388,9 @@ msgstr ""
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search"
@@ -10109,21 +10134,6 @@ msgstr ""
 "Название подтемы обсуждения.  Это название отображается в левой "
 "навигационной панели форума курса."
 
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option requires an argument"
-msgstr "%s пункт требует ввода параметра"
-
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option requires %d arguments"
-msgstr "%s пункт требует ввода %d параметров"
-
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option does not take a value"
-msgstr "%s пункт не предполагает ввода значения"
-
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "invalid JSON"
@@ -10585,6 +10595,7 @@ msgstr ""
 "Дополнительные заметки о пользователе (например, почему отказано в доступе)"
 
 #: cms/djangoapps/maintenance/views.py
+#: cms/templates/maintenance/_force_publish_course.html
 msgid "Force Publish Course"
 msgstr "Обеспечить публикацию курса"
 
@@ -10611,6 +10622,7 @@ msgstr "Соответствующий курс не найден."
 #: cms/djangoapps/maintenance/views.py
 msgid "Force publishing course is not supported with old mongo courses."
 msgstr ""
+"Принудительная публикация не поддерживается старой версией Mongo-курсов."
 
 #: cms/djangoapps/maintenance/views.py
 msgid "Course is already in published state."
@@ -10695,6 +10707,7 @@ msgstr "Номер курса:"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "Курсы"
@@ -10833,6 +10846,7 @@ msgid "Choose Language"
 msgstr "Выберите язык"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 msgid "Account"
 msgstr "Учётная запись"
 
@@ -10893,6 +10907,7 @@ msgstr "Отправить сообщение на адрес {email}"
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/example/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "Свяжитесь с нами"
@@ -10906,6 +10921,7 @@ msgid "Usermenu dropdown"
 msgstr "Выпадающий список меню пользователя"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Выйти"
@@ -10963,11 +10979,40 @@ msgstr "Отправить"
 msgid "Please refresh the page to see the changes applied."
 msgstr "Пожалуйста, перезагрузите страницу, чтобы применить изменения."
 
-#: lms/templates/annotatable.html lms/templates/imageannotation.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-#: lms/templates/peer_grading/peer_grading.html
-msgid "Instructions"
-msgstr "Инструкции"
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "Обсуждение - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr "Добавить тему"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "Список тем обсуждения"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "Форма для новой темы"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "Личные данные пользователя"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr "Обсуждение недоступно"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr ""
+"Обсуждения в режиме технической поддержки. Они будут доступны снова совсем "
+"скоро!"
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -10994,11 +11039,11 @@ msgstr "Нажмите, чтобы добавить"
 msgid "Bookmark"
 msgstr "Добавить в закладки"
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
 msgstr "ПОДРОБНЕЕ"
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "Starts"
 msgstr "Начало"
 
@@ -11008,6 +11053,7 @@ msgstr "Посмотреть все курсы"
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/example/lms/templates/header.html
 msgid "Dashboard"
 msgstr "Панель управления"
 
@@ -11104,6 +11150,7 @@ msgstr "Чтобы просмотреть этот блок, Вам необхо
 #: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "Enroll"
 msgstr "Внести в список"
 
@@ -11252,9 +11299,14 @@ msgid "Tell us the details"
 msgstr "Сообщите нам детали "
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
-"Упомяните сообщения об ошибках, шаги, которые привели к этой проблеме и т.д."
+"Опишите, что вы делали, когда столкнулись с проблемой. Укажите всё, что "
+"может помочь нам разрешить проблему, включая текст увиденных вами сообщений "
+"об ошибке."
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -11285,13 +11337,8 @@ msgid "Brief description of the problem"
 msgstr "Краткое описание проблемы"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
-msgstr ""
-"Подробности о проблеме, с которой Вы "
-"столкнулись{asterisk}{begin_span}Опишите сообщения об ошибках, "
-"обстоятельства, при которых возникла проблема и т. д.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
+msgstr "Подробности обнаруженной проблемы{asterisk}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -11628,7 +11675,8 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Необработанные данные:"
 
-#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/example/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Глобально"
 
@@ -11668,6 +11716,7 @@ msgid "Register"
 msgstr "Регистрация"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "Вход"
@@ -12329,7 +12378,7 @@ msgstr ""
 msgid "Dashboard for:"
 msgstr "Панель управления для:"
 
-#: lms/templates/user_dropdown.html
+#: lms/templates/user_dropdown.html themes/example/lms/templates/header.html
 msgid "Profile"
 msgstr "Профиль"
 
@@ -12396,12 +12445,12 @@ msgid "Download Handout"
 msgstr "Скачать материалы"
 
 #: lms/templates/word_cloud.html
-msgid "Your words:"
-msgstr "Ваши слова:"
+msgid "{num} of {total}"
+msgstr "{num} из {total}"
 
 #: lms/templates/word_cloud.html
-msgid "Total number of words:"
-msgstr "Общее количество слов:"
+msgid "Your words were:"
+msgstr "Вы ввели следующие слова:"
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
@@ -12461,7 +12510,7 @@ msgstr "Идентификатор клиента API"
 
 #: lms/templates/api_admin/status.html
 msgid "API Client Secret"
-msgstr ""
+msgstr "API Client Secret"
 
 #: lms/templates/api_admin/status.html
 msgid "Redirect URLs"
@@ -13823,10 +13872,12 @@ msgid "This content is graded"
 msgstr "Этот элемент курса проверен "
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "Произошла ошибка. Повторите попытку позже."
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -13907,6 +13958,7 @@ msgid "Additional Resources"
 msgstr "Дополнительные ресурсы"
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "принять участие"
 
@@ -14018,10 +14070,6 @@ msgstr "Закладки"
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "Поиск курсов"
-
-#: lms/templates/courseware/courseware.html
-msgid "search"
-msgstr "искать"
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
@@ -14758,11 +14806,6 @@ msgstr ""
 msgid "Results:"
 msgstr "Результаты:"
 
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr "Добавить тему"
-
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "Показать обсуждение"
@@ -14786,21 +14829,12 @@ msgid "filter topics"
 msgstr "избранные темы"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "Все обсуждения"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Отслеживаемые сообщения"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr "Темы обсуждения; список текущих:"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "Поиск по всем сообщениям"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -14875,35 +14909,6 @@ msgstr[0] "%s комментарий"
 msgstr[1] "%s комментария"
 msgstr[2] "%s комментариев"
 msgstr[3] "%s комментариев"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "Обсуждение - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "Список тем обсуждения"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "Форма для новой темы"
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "Мы сожалеем"
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr ""
-"В настоящее время на форумах ведутся технические работы. Мы восстановим их "
-"работу в ближайшее время!"
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "Личные данные пользователя"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -18665,12 +18670,10 @@ msgstr "Об edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© edX Inc.  All rights reserved except where noted.  EdX, Open edX and the "
-"edX and Open EdX logos are registered trademarks or trademarks of edX Inc."
-msgstr ""
-"© edX Inc. Все права защищены, за исключением оговоренных случаев.  EdX, "
-"Open edX и их логотипы являются зарегистрированными товарными знаками edX "
+"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
+"the edX and Open EdX logos are registered trademarks or trademarks of edX "
 "Inc."
+msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
@@ -18689,6 +18692,83 @@ msgstr ""
 "{b_start}Поддержите нашу Миссию: {b_end} EdX, это некоммерческая "
 "организация, поступления от подтверждённых сертификатов помогают нам "
 "финансировать свободное образование для всех, глобально"
+
+#: themes/example/lms/templates/header.html
+msgid "Create Account"
+msgstr "Создать учётную запись"
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Want to purchase this course for a group?"
+msgstr "Хотите приобрести этот курс для группы слушателей?"
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"You can purchase enrollment codes for this course to distribute to your team"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Purchase for a Group"
+msgstr "Приобрести для группы"
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"Bulk discounts may apply for groups larger than 10. Contact "
+"{link_start}harvardxplus@harvard.edu{link_end} for more information."
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Email Us"
+msgstr "Напишите нам"
+
+#: themes/example/lms/templates/courseware/courses.html
+msgid "Lorem ipsum dolor sit amet."
+msgstr "Lorem ipsum dolor sit amet."
+
+#: themes/example/lms/templates/static_templates/about.html
+msgid "About Us"
+msgstr "О нас"
+
+#: themes/example/lms/templates/static_templates/contact.html
+msgid "Thank you for your inquiry"
+msgstr "Спасибо за ваш запрос"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "FAQ's"
+msgstr "Вопросы и ответы"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "General FAQs"
+msgstr "Общие вопросы и ответы"
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Lorem ipsum dolor sit amet"
+msgstr "Lorem ipsum dolor sit amet"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Academic Planning"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Back to top"
+msgstr "Наверх"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Registration"
+msgstr "Регистрация"
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Finances"
+msgstr ""
+
+#: themes/example/lms/templates/student_account/login_and_register.html
+msgid "Sign in or Create Account"
+msgstr "Вход или Создание учётной записи"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -19386,6 +19466,10 @@ msgid ""
 "the course team; review course updates and other assets for dated material; "
 "and seed the discussions and wiki."
 msgstr ""
+"В данный момент все содержимое курса скрыто, на курс не зачислен ни один "
+"слушатель.  Обязательно проверьте и обновите все даты, включая дату начала "
+"курса; создайте команду курса; проверьте раздел новостей и другие материалы "
+"на предмет дат; задайте базовые темы обсуждений и вики."
 
 #: cms/templates/course_outline.html cms/templates/index.html
 msgid "Dismiss"
@@ -19525,11 +19609,11 @@ msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Learn more about grading policy settings"
-msgstr ""
+msgstr "Узнать больше о настройках правил оценивания"
 
 #: cms/templates/course_outline.html
 msgid "Changing the content learners see"
-msgstr ""
+msgstr "Изменение материалов, доступных слушателям"
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -19546,6 +19630,10 @@ msgid ""
 "{em_start}Hide{em_end} option. Grades for hidden sections, subsections, and "
 "units are not included in grade calculations."
 msgstr ""
+"Чтобы закрыть слушателям доступ к разделу, подразделу или блоку, нажмите "
+"значок настроек соответствующего элемента и выберите "
+"{em_start}Скрыть{em_end}. Оценки за скрытые разделы, подразделы и блоки не "
+"учитываются при выводе итоговой оценки."
 
 #: cms/templates/course_outline.html
 msgid ""
@@ -19554,10 +19642,14 @@ msgid ""
 "{em_start}Hide content after due date{em_end}. Grades for the subsection "
 "remain included in grade calculations."
 msgstr ""
+"Чтобы скрыть содержимое подраздела от слушателей по окончании срока его "
+"сдачи, нажмите на соответствующий значок настроек, затем выберите "
+"{em_start}Скрыть содержимое по окончании срока{em_end}. Оценки за подраздел "
+"будут учтены при выводе итоговой оценки."
 
 #: cms/templates/course_outline.html
 msgid "Learn more about content visibility settings"
-msgstr ""
+msgstr "Узнать больше о настройках видимости содержимого"
 
 #. Translators: Pages refer to the tabs that appear in the top navigation of
 #. each course.
@@ -20050,7 +20142,7 @@ msgstr ""
 #: cms/templates/group_configurations.html
 #: cms/templates/settings_advanced.html
 msgid "Details & Schedule"
-msgstr ""
+msgstr "Подробности и расписание"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -20078,7 +20170,7 @@ msgstr "{studio_name} Поможет вам систематизировать �
 
 #: cms/templates/howitworks.html
 msgid "Enlarge image"
-msgstr ""
+msgstr "Увеличить изображение"
 
 #: cms/templates/howitworks.html
 msgid "Keeping Your Course Organized"
@@ -20090,6 +20182,10 @@ msgid ""
 "{strong_start}Outline{strong_end} editor, providing a simple hierarchy and "
 "easy drag and drop to help you and your students stay organized."
 msgstr ""
+"В основе любого курса лежит его структура. В {studio_name} есть редактор "
+"{strong_start}Структуры{strong_end}, который создаст простую иерархию "
+"разделов и позволит перетаскивать элементы мышью. Это поможет Вам "
+"организовать свою работу и работу Ваших студентов."
 
 #: cms/templates/howitworks.html
 msgid "Simple Organization For Content"
@@ -20100,6 +20196,8 @@ msgid ""
 "{studio_name} uses a simple hierarchy of {strong_start}sections{strong_end} "
 "and {strong_start}subsections{strong_end} to organize your content."
 msgstr ""
+"{studio_name} предлагает простую иерархию {strong_start}разделов{strong_end}"
+" и {strong_start}подразделов{strong_end} для организации материалов курса."
 
 #: cms/templates/howitworks.html
 msgid "Change Your Mind Anytime"
@@ -20123,6 +20221,8 @@ msgid ""
 "Build and release {strong_start}sections{strong_end} to your students "
 "incrementally. You don't have to have it all done at once."
 msgstr ""
+"Создавайте {strong_start}разделы{strong_end} и делайте их доступными для "
+"студентов постепенно. Не обязательно делать все сразу."
 
 #: cms/templates/howitworks.html
 msgid "Learning is More than Just Lectures"
@@ -20221,6 +20321,9 @@ msgid ""
 " it to go live and {studio_name} takes care of the rest. Build your course "
 "incrementally."
 msgstr ""
+"Закончив создание {strong_start}раздела{strong_end}, установите время, с "
+"которого он будет доступен пользователям, а {studio_name} сделает всё "
+"остальное. Создавайте свой курс постепенно."
 
 #: cms/templates/howitworks.html
 msgid "Work in Teams"
@@ -20240,7 +20343,7 @@ msgstr "Зарегистрируйтесь в {studio_name} сегодня!"
 
 #: cms/templates/howitworks.html
 msgid "Sign Up & Start Making Your {platform_name} Course"
-msgstr ""
+msgstr "Зарегистрироваться и начать создание курса на {platform_name}"
 
 #: cms/templates/howitworks.html
 msgid "Already have a {studio_name} Account? Sign In"
@@ -20255,6 +20358,8 @@ msgid ""
 "Simple two-level outline to organize your course. Drag and drop, and see "
 "your course at a glance."
 msgstr ""
+"Простая двухуровневая структура организации курса. Перетаскивайте элементы, "
+"чтобы составить план курса."
 
 #: cms/templates/howitworks.html
 msgid "More than Just Lectures"
@@ -21293,7 +21398,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Schedule & Details Settings"
-msgstr ""
+msgstr "Настройки расписания и подробностей"
 
 #: cms/templates/settings.html cms/templates/widgets/header.html
 msgid "Schedule & Details"
@@ -21451,6 +21556,11 @@ msgid ""
 "registration dates as shown on your course summary page, follow the "
 "instructions provided by your Program Manager."
 msgstr ""
+"Эти даты определяют, {strong_start}когда материалы курса станут доступны для"
+" просмотра{strong_end}, но это {strong_start}не они отображаются на странице"
+" \"Описание курса\"{strong_end}. Чтобы установить даты начала курса и "
+"регистрации, отображаемые на странице \"Описание курса\", следуйте "
+"инструкциям администратора программ."
 
 #: cms/templates/settings.html
 msgid "Course Details"
@@ -21482,24 +21592,24 @@ msgstr "Название курса"
 
 #: cms/templates/settings.html
 msgid "Displayed as title on the course details page. Limit to 50 characters."
-msgstr ""
+msgstr "Заголовок на странице \"Информация о курсе\". Не более 50 знаков."
 
 #: cms/templates/settings.html
 msgid "Course Subtitle"
-msgstr ""
+msgstr "Подзаголовок курса"
 
 #: cms/templates/settings.html
 msgid ""
 "Displayed as subtitle on the course details page. Limit to 150 characters."
-msgstr ""
+msgstr "Подзаголовок на странице \"Информация о курсе\".  Не более 150 знаков."
 
 #: cms/templates/settings.html
 msgid "Course Duration"
-msgstr ""
+msgstr "Продолжительность курса"
 
 #: cms/templates/settings.html
 msgid "Displayed on the course details page. Limit to 50 characters."
-msgstr ""
+msgstr "Отображается на странице \"Информация о курсе\".  Не более 50 знаков."
 
 #: cms/templates/settings.html
 msgid "Course Description"
@@ -21507,7 +21617,7 @@ msgstr "Описание курса"
 
 #: cms/templates/settings.html
 msgid "Displayed on the course details page. Limit to 1000 characters."
-msgstr ""
+msgstr "Отображается на странице \"Информация о курсе\". Не более 1000 знаков."
 
 #: cms/templates/settings.html
 msgid "Course Short Description"
@@ -21530,6 +21640,8 @@ msgid ""
 "Introductions, prerequisites, FAQs that are used on {a_link_start}your "
 "course summary page{a_link_end} (formatted in HTML)"
 msgstr ""
+"Вводная информация, требования, часто задаваемые вопросы, которые появятся "
+"на {a_link_start}странице \"Описание курса\"{a_link_end} (в формате HTML)"
 
 #: cms/templates/settings.html
 msgid "Course Card Image"
@@ -21540,6 +21652,8 @@ msgid ""
 "You can manage this image along with all of your other {a_link_start}files "
 "and uploads{a_link_end}"
 msgstr ""
+"Вы можете управлять этим изображением, а также остальными "
+"{a_link_start}загруженными файлами{a_link_end}"
 
 #: cms/templates/settings.html
 msgid ""
@@ -21566,25 +21680,30 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Upload Course Card Image"
-msgstr ""
+msgstr "Загрузить изображение для \"визитной карточки\" курса"
 
 #: cms/templates/settings.html
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG"
 " format, and minimum suggested dimensions are 1440px wide by 400px tall)"
 msgstr ""
+"Изображение для Вашего курса отсутствует. Пожалуйста, загрузите его (формат "
+"JPEG или PNG, рекомендуемые размеры - не менее 1440 пикселей в ширину и 400 "
+"пикселей в высоту)"
 
 #. Translators: This is the placeholder text for a field that requests the URL
 #. for a course banner image
 #: cms/templates/settings.html
 msgid "Your banner image URL"
-msgstr ""
+msgstr "Ссылка URL на изображение заголовка курса"
 
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your banner image (Note: only JPEG "
 "or PNG format supported)"
 msgstr ""
+"Пожалуйста, введите корректные путь и наименование изображения заголовка "
+"вашего курса (Примечание: поддерживаются только форматы JPEG и PNG)"
 
 #: cms/templates/settings.html
 msgid "Upload Course Banner Image"
@@ -21600,6 +21719,9 @@ msgid ""
 "one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by "
 "200px tall)"
 msgstr ""
+"Изображение-миниатюра для ознакомительного видео к Вашему курсу отсутствует."
+"  Пожалуйста, загрузите его (формат JPEG или PNG, рекомендуемые размеры - не"
+" менее 375 пикселей в ширину и 200 пикселей в высоту)"
 
 #. Translators: This is the placeholder text for a field that requests the URL
 #. for a course video thumbnail image
@@ -21612,6 +21734,8 @@ msgid ""
 "Please provide a valid path and name to your video thumbnail image (Note: "
 "only JPEG or PNG format supported)"
 msgstr ""
+"Пожалуйста, введите корректные путь и наименование изображения-миниатюры к "
+"видео (Примечание: поддерживаются только форматы JPEG и PNG)"
 
 #: cms/templates/settings.html
 msgid "Upload Video Thumbnail Image"
@@ -21654,7 +21778,7 @@ msgstr "Преподаватели"
 
 #: cms/templates/settings.html
 msgid "Add details about the instructors for this course"
-msgstr ""
+msgstr "Добавить информацию о преподавателях курса"
 
 #: cms/templates/settings.html
 msgid "Add Instructor"
@@ -21795,6 +21919,8 @@ msgid ""
 "{strong_start}Warning{strong_end}: Do not modify these policies unless you "
 "are familiar with their purpose."
 msgstr ""
+"{strong_start}Предупреждение{strong_end}: Не изменяйте эти настройки, если "
+"Вы не знакомы с их назначением."
 
 #: cms/templates/settings_advanced.html
 msgid "Show Deprecated Settings"
@@ -21830,6 +21956,9 @@ msgid ""
 " you use double quotation marks (\") around the string. Do not use single "
 "quotation marks (')."
 msgstr ""
+"{em_start}Примечание:{em_end} При вводе строковых значений настроек "
+"обязательно помещайте их внутри двойных кавычек (\"). Не используйте "
+"одинарные кавычки (')."
 
 #: cms/templates/settings_graders.html
 msgid "Grading Settings"
@@ -21845,7 +21974,7 @@ msgstr "Ваша общая оценочная шкала для итогово�
 
 #: cms/templates/settings_graders.html
 msgid "Add grade"
-msgstr ""
+msgstr "Добавить оценку"
 
 #: cms/templates/settings_graders.html
 msgid "Credit Eligibility"
@@ -22221,25 +22350,27 @@ msgstr "Ваш статус автора курсов в {studio_name}"
 
 #: cms/templates/maintenance/_force_publish_course.html
 msgid "Required data to force publish course."
-msgstr ""
+msgstr "Информация, обязательная для принудительной публикации курса."
 
 #: cms/templates/maintenance/_force_publish_course.html
 msgid "course-v1:edX+DemoX+Demo_Course"
-msgstr ""
+msgstr "course-v1:edX+DemoX+Demo_Course"
 
 #: cms/templates/maintenance/_force_publish_course.html
 msgid "Reset values"
-msgstr ""
+msgstr "Сброс значений"
 
 #: cms/templates/maintenance/base.html cms/templates/maintenance/index.html
 msgid "Maintenance Dashboard"
-msgstr ""
+msgstr "Панель технического обслуживания"
 
 #: cms/templates/registration/reg_complete.html
 msgid ""
 "We've sent an email message to {email} with instructions for activating your"
 " account."
 msgstr ""
+"Сообщение с инструкцией по активации Вашей учётной записи отправлено на "
+"электронный адрес {email}."
 
 #. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
 #. Inc.'. Please do not translate any of these trademarks and company names.
@@ -22282,7 +22413,7 @@ msgstr "Текущая библиотека:"
 
 #: cms/templates/widgets/header.html
 msgid "Language preference"
-msgstr ""
+msgstr "Выбор языка"
 
 #: cms/templates/widgets/header.html
 msgid "Account Navigation"
@@ -22362,7 +22493,7 @@ msgstr "Вы зашли как:"
 
 #: cms/templates/widgets/user_dropdown.html
 msgid "Maintenance"
-msgstr ""
+msgstr "Техническое обслуживание"
 
 #: wiki/forms.py
 msgid "Only localhost... muahahaha"

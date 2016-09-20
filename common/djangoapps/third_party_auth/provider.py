@@ -37,9 +37,9 @@ class Registry(object):
         return sorted(cls._enabled_providers(), key=lambda provider: provider.name)
 
     @classmethod
-    def accepting_logins(cls):
-        """Returns list of providers that can be used to initiate logins currently"""
-        return [provider for provider in cls.enabled() if provider.accepts_logins]
+    def displayed_for_login(cls):
+        """Returns list of providers that can be used to initiate logins in the UI"""
+        return [provider for provider in cls.enabled() if provider.display_for_login]
 
     @classmethod
     def get(cls, provider_id):

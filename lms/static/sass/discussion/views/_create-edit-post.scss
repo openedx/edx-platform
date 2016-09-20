@@ -11,6 +11,11 @@
   padding: $baseline;
   max-width: 1180px;
 
+  .post-errors {
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
   .post-field {
     margin-bottom: $baseline;
 
@@ -24,8 +29,10 @@
         display: inline-block;
         width: 100%;
         vertical-align: top;
-        border-width: 0;
-        padding: 0 ($baseline/2);
+        &:not([type="text"]) {
+          border-width: 0;
+          padding: 0;
+        }
       }
 
       .field-label-text {
@@ -49,6 +56,9 @@
       width: 50%;
       font-size: $forum-small-font-size;
 
+      &#new-post-editor-description {
+          @include padding-left(0);
+      }
     }
   }
 
@@ -67,22 +77,6 @@
 // UI: inputs
 .forum-new-post-form,
 .edit-post-form {
-  .post-topic-button {
-    @include white-button;
-    @extend %cont-truncated;
-    z-index: 1000;
-    padding: 0 $baseline 0 ($baseline*0.75);
-    width: 100%;
-    height: 40px;
-    font-size: $forum-base-font-size;
-    line-height: 36px;
-
-    .drop-arrow {
-      @include float(right);
-      color: #999;
-    }
-  }
-
   .post-type-input {
     @extend %text-sr;
   }
@@ -98,8 +92,14 @@
     height: 40px;
     text-align: center;
     color: $gray-d3;
+    border: 1px solid $forum-color-border;
     font-weight: 600;
     line-height: 36px;
+    @include float(left);
+
+    &:last-of-type {
+      @include float(right);
+    }
 
     .icon {
       @include margin-right($baseline/4);
@@ -107,6 +107,7 @@
   }
 
   .post-type-input:checked + .post-type-label {
+    border: none;
     background-color: $forum-color-active-thread;
     color: $forum-color-active-text;
     background-image: none;
@@ -123,11 +124,15 @@
     border-radius: $forum-border-radius;
     padding: 0 $baseline/2;
     height: 40px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     color: #333;
     font-weight: 700;
     font-size: $forum-large-font-size;
     font-family: 'Open Sans', sans-serif;
+  }
+
+  select.field-input {
+    border: 1px solid $forum-color-border !important;  // !important required to override -webkit-appearance
+    height: 40px;
   }
 
   .post-option {
@@ -139,12 +144,12 @@
     padding: ($baseline/2);
 
     &:hover {
-      border-color: $gray-l3;
+      border-color: $forum-color-border;
     }
 
     &.is-enabled {
-      border-color: $blue;
-      color: $blue;
+      border-color: $forum-color-following;
+      color: $forum-color-following;
     }
 
     .post-option-input {
@@ -160,16 +165,10 @@
 // ====================
 
 // UI: actions
-.forum-new-post-form {
+.forum-new-post-form,
+.edit-post-form {
   .submit {
-    @include blue-button;
     @include margin-right($baseline/2);
-    display: inline-block;
-  }
-
-  .cancel {
-    @include white-button;
-    display: inline-block;
   }
 }
 
@@ -179,85 +178,8 @@
 .forum-new-post-form,
 .edit-post-form {
   .post-errors {
-    margin-bottom: $baseline;
-    border-radius: $forum-border-radius;
     padding: 0;
-    background: $error-color;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) inset, 0 1px 0 rgba(255, 255, 255, .2);
-    color: $white;
+    margin: 0 0 $baseline 0;
     list-style: none;
-
-    .post-error {
-      padding: ($baseline/2) $baseline 12px 45px;
-      border-bottom: 1px solid $forum-color-error;
-      background: url('#{$static-path}/images/white-error-icon.png') no-repeat 15px 14px;
-
-      &:last-child {
-        border-bottom: none;
-      }
-    }
-  }
-}
-
-// ====================
-
-// UI: topic menu
-
-// TO-DO: refactor to use _navigation.scss as general topic selector
-.forum-new-post-form .post-topic ,
-.edit-post-form .post-topic {
-  position: relative;
-
-  .topic-menu-wrapper {
-    box-sizing: border-box;
-    @extend %ui-depth4;
-    position: absolute;
-    top: 40px;
-    left: 0;
-    width: 100%;
-    background: $forum-color-background;
-    box-shadow: 0 2px 1px $shadow;
-  }
-
-  .topic-filter-label {
-    border-bottom: 1px solid $forum-color-border;
-  }
-
-  .topic-filter-input {
-    box-sizing: border-box;
-    border: none;
-    border-bottom: 1px solid $forum-color-border;
-    padding: 0 15px;
-    width: 100%;
-    height: 30px;
-    color: #333;
-    font-size: $forum-small-font-size;
-    line-height: 16px;
-  }
-
-  .topic-menu {
-    overflow-y: scroll;
-    max-height: 400px;
-    list-style: none;
-    margin-left: ($baseline/2);
-  }
-
-  .topic-submenu {
-    list-style: none;
-    margin-left: $baseline;
-  }
-
-  .topic-title {
-    display: block;
-    padding: ($baseline/4) ($baseline/2);
-    font-size: $forum-base-font-size;
-  }
-
-  a.topic-title {
-    @include transition(none);
-
-    &:hover, &:focus {
-      background-color: $gray-l4;
-    }
   }
 }

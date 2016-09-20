@@ -347,11 +347,11 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 18, 8),
-        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 18, 8),
+        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 18, 7),
+        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 18, 7),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 17, 8),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 17, 8),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 17, 7),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 17, 7),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(

@@ -734,7 +734,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -752,7 +752,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -812,7 +812,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -830,7 +830,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }

@@ -62,8 +62,8 @@ body.discussion {
 
     // alert controls
     .search-alert-controls {
+      @include text-align(right);
       width: 28%;
-      text-align: right;
 
       .control {
         @include transition(none);

@@ -77,6 +77,10 @@ from lms.envs.common import (
     REDIRECT_CACHE_KEY_PREFIX,
 
     JWT_AUTH,
+
+    # django-debug-toolbar
+    DEBUG_TOOLBAR_PATCH_SETTINGS,
+    BLOCK_STRUCTURES_SETTINGS,
 )
 from path import Path as path
 from warnings import simplefilter
@@ -208,12 +212,6 @@ FEATURES = {
 
     # Show Language selector
     'SHOW_LANGUAGE_SELECTOR': False,
-
-    # Temporary feature flag for disabling saving of subsection grades.
-    # There is also an advanced setting in the course module.  The
-    # feature flag and the advanced setting must both be true for
-    # a course to use saved grades.
-    'ENABLE_SUBSECTION_GRADES_SAVED': False,
 }
 
 ENABLE_JASMINE = False
@@ -710,15 +708,6 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
-
-########################## DJANGO DEBUG TOOLBAR ###############################
-
-# We don't enable Django Debug Toolbar universally, but whenever we do, we want
-# to avoid patching settings.  Patched settings can cause circular import
-# problems: http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
-
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-
 ################################# CELERY ######################################
 
 # Message configuration
@@ -887,7 +876,8 @@ INSTALLED_APPS = (
     'edx_jsme',    # Molecular Structure
 
     'openedx.core.djangoapps.content.course_overviews',
-    'openedx.core.djangoapps.content.course_structures',
+    'openedx.core.djangoapps.content.course_structures.apps.CourseStructuresConfig',
+    'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
 
     # Credit courses
     'openedx.core.djangoapps.credit',
@@ -921,7 +911,7 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
-    'lms.djangoapps.grades',
+    'lms.djangoapps.grades.apps.GradesConfig',
 
     # Microsite configuration application
     'microsite_configuration',
@@ -1196,3 +1186,7 @@ PARTNER_SUPPORT_EMAIL = ''
 
 # Affiliate cookie tracking
 AFFILIATE_COOKIE_NAME = 'affiliate_id'
+
+############## Settings for Studio Context Sensitive Help ##############
+
+DOC_LINK_BASE_URL = None

@@ -59,8 +59,22 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
             Returns:
                 The URL for the documentation
             """
+
+            # Read an optional configuration property that sets the base
+            # URL of documentation links. By default, DOC_LINK_BASE_URL
+            # is null, this test determines whether it is set to a non-null
+            # value. If it is set, this funtion will use its string value
+            # as the base of documentation link URLs. If it is not set, the
+            # function reads the base of the documentation link URLs from
+            # the .ini configuration file, lms_config.ini or cms_config.ini.
+            if settings.DOC_LINK_BASE_URL:
+                doc_base_url = settings.DOC_LINK_BASE_URL
+            else:
+                doc_base_url = config_file_object.get("help_settings", "url_base")
+
+            # Construct and return the URL for the documentation link.
             return "{url_base}/{language}/{version}/{page_path}".format(
-                url_base=config_file_object.get("help_settings", "url_base"),
+                url_base=doc_base_url,
                 language=get_config_value_with_default("locales", settings.LANGUAGE_CODE),
                 version=config_file_object.get("help_settings", "version"),
                 page_path=get_config_value_with_default("pages", page_token),
@@ -69,10 +83,25 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
         def get_pdf_url():
             """
             Returns:
-                The URL for the PDF document using the pdf_settings and the help_settings (version) in the configuration
+                The URL for the PDF document using the pdf_settings and the
+                help_settings (version) in the configuration
             """
+
+            # Read an optional configuration property that sets the base
+            # URL of pdf links. By default, DOC_LINK_BASE_URL
+            # is null, this test determines whether it is set to a non-null
+            # value. If it is set, this funtion will use its string value
+            # as the base of documentation link URLs. If it is not set, the
+            # function reads the base of the documentation link URLs from
+            # the .ini configuration file, lms_config.ini or cms_config.ini.
+            if settings.DOC_LINK_BASE_URL:
+                pdf_base_url = settings.DOC_LINK_BASE_URL
+            else:
+                pdf_base_url = config_file_object.get("pdf_settings", "pdf_base")
+
+            # Construct and return the URL for the PDF link.
             return "{pdf_base}/{version}/{pdf_file}".format(
-                pdf_base=config_file_object.get("pdf_settings", "pdf_base"),
+                pdf_base=pdf_base_url,
                 version=config_file_object.get("help_settings", "version"),
                 pdf_file=config_file_object.get("pdf_settings", "pdf_file"),
             )

@@ -49,7 +49,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
 # Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
-COPYRIGHT_YEAR = "2015"
+COPYRIGHT_YEAR = "2016"
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
@@ -356,12 +356,6 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
-
-    # Temporary feature flag for disabling saving of subsection grades.
-    # There is also an advanced setting in the course module.  The
-    # feature flag and the advanced setting must both be true for
-    # a course to use saved grades.
-    'ENABLE_SUBSECTION_GRADES_SAVED': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1705,6 +1699,15 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/groups/views/cohorts_dashboard_factory': 'js/groups/views/cohorts_dashboard_factory.js',
     'draggabilly': 'js/vendor/draggabilly.js'
 }
+
+########################## DJANGO DEBUG TOOLBAR ###############################
+
+# We don't enable Django Debug Toolbar universally, but whenever we do, we want
+# to avoid patching settings.  Patched settings can cause circular import
+# problems: http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup
+
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
 ################################# CELERY ######################################
 
 # Celery's task autodiscovery won't find tasks nested in a tasks package.
@@ -1760,6 +1763,23 @@ CELERY_QUEUES = {
 
 # let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
+
+################################ Block Structures ###################################
+
+BLOCK_STRUCTURES_SETTINGS = dict(
+    # Delay, in seconds, after a new edit of a course is published
+    # before updating the block structures cache.  This is needed
+    # for a better chance at getting the latest changes when there
+    # are secondary reads in sharded mongoDB clusters. See TNL-5041
+    # for more info.
+    BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY=30,
+
+    # Delay, in seconds, between retry attempts if a task fails.
+    BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY=30,
+
+    # Maximum number of retries per task.
+    BLOCK_STRUCTURES_TASK_MAX_RETRIES=5,
+)
 
 ################################ Bulk Email ###################################
 
@@ -1891,7 +1911,7 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',
-    'lms.djangoapps.grades',
+    'lms.djangoapps.grades.apps.GradesConfig',
 
     # Student support tools
     'support',
@@ -2012,7 +2032,8 @@ INSTALLED_APPS = (
 
     # Course data caching
     'openedx.core.djangoapps.content.course_overviews',
-    'openedx.core.djangoapps.content.course_structures',
+    'openedx.core.djangoapps.content.course_structures.apps.CourseStructuresConfig',
+    'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
     'lms.djangoapps.course_blocks',
 
     # Old course structure API
@@ -2950,3 +2971,12 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 # The cache is cleared when Redirect models are saved/deleted
 REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
 REDIRECT_CACHE_KEY_PREFIX = 'redirects'
+
+############## Settings for Neo4j ############################
+
+# This should be set in configuration
+NEO4J_CONFIG = None
+
+############## Settings for LMS Context Sensitive Help ##############
+
+DOC_LINK_BASE_URL = None

@@ -203,7 +203,7 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.accepting_logins():
+        for enabled in third_party_auth.provider.Registry.displayed_for_login():
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
@@ -347,7 +347,7 @@ def get_user_orders(user):
                                     'order_date': strftime_localized(
                                         date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
                                     ),
-                                    'receipt_url': commerce_configuration.receipt_page + order['number']
+                                    'receipt_url': commerce_configuration.get_receipt_page_url(order['number'])
                                 }
                                 user_orders.append(order_data)
                             except KeyError:
@@ -487,6 +487,8 @@ def account_settings_context(request):
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
             'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
-        } for state in auth_states]
+            # We only want to include providers if they are either currently available to be logged
+            # in with, or if the user is already authenticated with them.
+        } for state in auth_states if state.provider.display_for_login or state.has_account]
 
     return context

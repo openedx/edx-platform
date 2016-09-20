@@ -1011,6 +1011,7 @@ class StudentAdminPage(PageObject):
     """
     url = None
     EE_CONTAINER = ".entrance-exam-grade-container"
+    CS_CONTAINER = ".course-specific-container"
 
     def is_browser_on_page(self):
         """
@@ -1026,6 +1027,13 @@ class StudentAdminPage(PageObject):
         return self.q(css='{} input[name=entrance-exam-student-select-grade]'.format(self.EE_CONTAINER))
 
     @property
+    def rescore_problem_input(self):
+        """
+        Returns input box for rescore/reset all on a problem
+        """
+        return self.q(css='{} input[name=problem-select-all]'.format(self.CS_CONTAINER))
+
+    @property
     def reset_attempts_button(self):
         """
         Returns reset student attempts button.
@@ -1038,6 +1046,20 @@ class StudentAdminPage(PageObject):
         Returns rescore student submission button.
         """
         return self.q(css='{} input[name=rescore-entrance-exam]'.format(self.EE_CONTAINER))
+
+    @property
+    def rescore_all_submissions_button(self):
+        """
+        Returns rescore student submission button.
+        """
+        return self.q(css='{} input[name=rescore-problem-all]'.format(self.CS_CONTAINER))
+
+    @property
+    def show_background_tasks_button(self):
+        """
+        Return Show Background Tasks button.
+        """
+        return self.q(css='{} input[name=task-history-all]'.format(self.CS_CONTAINER))
 
     @property
     def skip_entrance_exam_button(self):
@@ -1115,6 +1137,18 @@ class StudentAdminPage(PageObject):
         """
         return self.rescore_submission_button.click()
 
+    def click_rescore_all_button(self):
+        """
+        clicks rescore all for problem button.
+        """
+        return self.rescore_all_submissions_button.click()
+
+    def click_show_background_tasks_button(self):
+        """
+        clicks show background tasks button.
+        """
+        return self.show_background_tasks_button.click()
+
     def click_skip_entrance_exam_button(self):
         """
         clicks let student skip entrance exam button.
@@ -1133,12 +1167,19 @@ class StudentAdminPage(PageObject):
         """
         return self.background_task_history_button.click()
 
-    def set_student_email(self, email_addres):
+    def set_student_email(self, email_address):
         """
         Sets given email address as value of student email address/username input box.
         """
         input_box = self.student_email_input.first.results[0]
-        input_box.send_keys(email_addres)
+        input_box.send_keys(email_address)
+
+    def set_problem_to_rescore(self, problem_locator):
+        """
+        Sets the problem for which to rescore/reset all scores.
+        """
+        input_box = self.rescore_problem_input.first.results[0]
+        input_box.send_keys(problem_locator)
 
 
 class CertificatesPage(PageObject):

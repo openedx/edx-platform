@@ -12,7 +12,8 @@
       "backend_name": "google-oauth2",
       "key": "test",
       "secret": "test",
-      "other_settings": "{}"
+      "other_settings": "{}",
+      "visible": true
     }
   },
   {
@@ -28,7 +29,8 @@
       "backend_name": "facebook",
       "key": "test",
       "secret": "test",
-      "other_settings": "{}"
+      "other_settings": "{}",
+      "visible": true
     }
   },
   {
@@ -44,7 +46,8 @@
       "backend_name": "dummy",
       "key": "",
       "secret": "",
-      "other_settings": "{}"
+      "other_settings": "{}",
+      "visible": true
     }
   }
 ]

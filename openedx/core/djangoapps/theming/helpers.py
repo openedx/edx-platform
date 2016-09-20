@@ -11,7 +11,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from request_cache.middleware import RequestCache
 
 from microsite_configuration import microsite
-
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from logging import getLogger
 logger = getLogger(__name__)  # pylint: disable=invalid-name
@@ -21,7 +21,10 @@ def get_template_path(relative_path, **kwargs):
     """
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     """
-    if microsite.is_request_in_microsite():
+    # We need to give priority to theming over microsites
+    # So, we apply microsite override only if there is no associated site theme
+    # and associated microsite is present.
+    if not current_request_has_associated_site_theme() and microsite.is_request_in_microsite():
         relative_path = microsite.get_template_path(relative_path, **kwargs)
     return relative_path
 
@@ -30,7 +33,8 @@ def is_request_in_themed_site():
     """
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     """
-    return microsite.is_request_in_microsite()
+    # We need to give priority to theming/site-configuration over microsites
+    return configuration_helpers.is_site_configuration_enabled() or microsite.is_request_in_microsite()
 
 
 def get_template(uri):
@@ -38,7 +42,10 @@ def get_template(uri):
     This is a proxy function to hide microsite_configuration behind comprehensive theming.
     :param uri: uri of the template
     """
-    return microsite.get_template(uri)
+    # We need to give priority to theming over microsites
+    # So, we apply microsite template override only when there is no associated theme,
+    if not current_request_has_associated_site_theme():
+        return microsite.get_template(uri)
 
 
 def get_template_path_with_theme(relative_path):
@@ -190,6 +197,18 @@ def get_current_theme():
         return None
 
 
+def current_request_has_associated_site_theme():
+    """
+    True if current request has an associated SiteTheme, False otherwise.
+
+    Returns:
+        True if current request has an associated SiteTheme, False otherwise
+    """
+    request = get_current_request()
+    site_theme = getattr(request, 'site_theme', None)
+    return bool(site_theme and site_theme.id)
+
+
 def get_theme_base_dir(theme_dir_name, suppress_error=False):
     """
     Returns absolute path to the directory that contains the given theme.
@@ -298,7 +317,12 @@ def is_comprehensive_theming_enabled():
     Returns:
          (bool): True if comprehensive theming is enabled else False
     """
+    # We need to give priority to theming over microsites
+    if settings.ENABLE_COMPREHENSIVE_THEMING and current_request_has_associated_site_theme():
+        return True
+
     # Disable theming for microsites
+    # Microsite configurations take priority over the default site theme.
     if microsite.is_request_in_microsite():
         return False
 

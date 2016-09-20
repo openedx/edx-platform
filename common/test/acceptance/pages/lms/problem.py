@@ -104,7 +104,7 @@ class ProblemPage(PageObject):
         """
         Fill in the answer to a numerical problem.
         """
-        self.q(css='div.problem section.inputtype input').fill(text)
+        self.q(css='div.problem div.inputtype input').fill(text)
         self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
@@ -129,11 +129,16 @@ class ProblemPage(PageObject):
         self.q(css='div.problem button.reset').click()
         self.wait_for_ajax()
 
+    def click_show_hide_button(self):
+        """ Click the Show/Hide button. """
+        self.q(css='div.problem div.action .show').click()
+        self.wait_for_ajax()
+
     def wait_for_status_icon(self):
         """
         wait for status icon
         """
-        self.wait_for_element_visibility('div.problem section.inputtype div .status', 'wait for status icon')
+        self.wait_for_element_visibility('div.problem div.inputtype div .status', 'wait for status icon')
 
     def wait_for_expected_status(self, status_selector, message):
         """
@@ -170,19 +175,19 @@ class ProblemPage(PageObject):
         """
         Is there a "correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.correct span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.correct span.status").is_present()
 
     def simpleprob_is_partially_correct(self):
         """
         Is there a "partially correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.partially-correct span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.partially-correct span.status").is_present()
 
     def simpleprob_is_incorrect(self):
         """
         Is there an "incorrect" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.incorrect span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.incorrect span.status").is_present()
 
     def click_clarification(self, index=0):
         """
@@ -199,3 +204,34 @@ class ProblemPage(PageObject):
         """
         self.wait_for_element_visibility('body > .tooltip', 'A tooltip is visible.')
         return self.q(css='body > .tooltip').text[0]
+
+    def is_solution_tag_present(self):
+        """
+        Check if solution/explanation is shown.
+        """
+        solution_selector = '.solution-span div.detailed-solution'
+        return self.q(css=solution_selector).is_present()
+
+    def is_correct_choice_highlighted(self, correct_choices):
+        """
+        Check if correct answer/choice highlighted for choice group.
+        """
+        xpath = '//fieldset/div[contains(@class, "field")][{0}]/label[contains(@class, "choicegroup_correct")]'
+        for choice in correct_choices:
+            if not self.q(xpath=xpath.format(choice)).is_present():
+                return False
+        return True
+
+    @property
+    def problem_question(self):
+        """
+        Return the question text of the problem.
+        """
+        return self.q(css="div.problem .wrapper-problem-response legend").text[0]
+
+    @property
+    def problem_question_descriptions(self):
+        """
+        Return a list of question descriptions of the problem.
+        """
+        return self.q(css="div.problem .wrapper-problem-response .question-description").text

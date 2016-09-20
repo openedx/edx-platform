@@ -5,6 +5,7 @@
 // #UNITS:          Basic units of measurement
 // #GRID:           Grid and layout variables
 // #COLORS:         Base, palette and theme color definitions + application
+// #COLORS-EDX-SPECIFIC: edX specific colors not yet refactored to use updated color scheme
 // #TYPOGRAPHY:     Font definitions and scales
 // #DEPTH:          UI depth-based scale
 // #SPACING:        General UI spacing variables and scale
@@ -160,7 +161,7 @@ $blue-t2: rgba($blue, 0.50);
 $blue-t3: rgba($blue, 0.75);
 
 $uxpl-blue-base: rgb(0, 117, 180); // wcag2a compliant
-$uxpl-blue-hover-active: rgb(41, 145, 195); // wcag2a compliant
+$uxpl-blue-hover-active: rgb(6, 86, 131); // wcag2a compliant
 
 $uxpl-green-base: rgb(0, 129, 0); // wcag2a compliant
 $uxpl-green-hover-active: rgb(0, 155, 0); // wcag2a compliant
@@ -219,7 +220,13 @@ $alert-color: rgb(212, 64, 64) !default;
 $warning-color: rgb(237, 189, 60) !default;
 $success-color: rgb(37, 184, 90) !default;
 
-// newer color variables
+
+// ----------------------------
+// #COLORS- EDX-SPECIFIC
+// ----------------------------
+
+// old color variables
+// DEPRECATED: Do not continue to use these colors, instead use pattern libary and base colors above.
 $dark-gray1: rgb(74,74,74);
 $light-gray1: rgb(242,242,242);
 $light-gray2: rgb(171,171,171);
@@ -232,6 +239,7 @@ $green1: rgb(97,161,46);
 $red1: rgb(208,2,27);
 
 // edx-specific: marketing site variables
+// DEPRECATED: Do not continue to use these colors, instead use pattern libary and base colors above.
 $m-gray: rgb(138,140,143); //C8F
 $m-gray-l1: rgb(151,153,155);
 $m-gray-l2: rgb(164,166,168);
@@ -246,7 +254,7 @@ $m-gray-t1: rgba($m-gray,0.25);
 $m-gray-t2: rgba($m-gray,0.50);
 $m-gray-t3: rgba($m-gray,0.75);
 
-$m-blue: rgb(26,161,222);
+$m-blue: $uxpl-blue-base;  // uxpl blue base
 $m-blue-l1: rgb(43,172,230);
 $m-blue-l2: rgb(66,181,233);
 $m-blue-l3: rgb(89,190,236);
@@ -264,7 +272,7 @@ $m-blue-t1: rgba($m-blue,0.25);
 $m-blue-t2: rgba($m-blue,0.50);
 $m-blue-t3: rgba($m-blue,0.75);
 
-$m-pink: rgb(181,42,103);
+$m-pink: $uxpl-pink-base; // uxpl pink base
 $m-pink-l1: rgb(202,47,115);
 $m-pink-l2: rgb(211,63,128);
 $m-pink-l3: rgb(215,84,142);
@@ -274,7 +282,7 @@ $m-pink-d1: rgb(160,37,91);
 $m-pink-d2: rgb(140,32,79);
 $m-pink-d3: rgb(119,28,68);
 
-$m-green: rgb(0, 136, 1);
+$m-green: $uxpl-green-base; // uxpl green base
 $m-green-s1: rgb(96, 188, 97);
 $m-green-l1: tint($m-green,20%);
 $m-green-l2: tint($m-green,40%);
@@ -305,7 +313,7 @@ $professional-color-lvl4: $m-pink-l3;
 $professional-color-lvl5: $m-pink-l4;
 
 // edx-specific: honor code
-$honorcode-color-lvl1: rgb(50, 165, 217);
+$honorcode-color-lvl1: $m-blue;
 $honorcode-color-lvl2: tint($honorcode-color-lvl1, 33%);
 
 // edx-specific: audit
@@ -372,7 +380,7 @@ $body-line-height: golden-ratio(.875em, 1) !default;
 $base-font-color: rgb(60,60,60) !default;
 $baseFontColor: $base-font-color;
 
-$lighter-base-font-color: rgb(100,100,100) !default;
+$lighter-base-font-color: rgb(100,100,100) $base-font-color;
 $very-light-text: rgb(255,255,255) !default;
 $text-color: rgb(51, 51, 51) !default;
 

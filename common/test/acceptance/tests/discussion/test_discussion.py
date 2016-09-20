@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from nose.plugins.attrib import attr
 from pytz import UTC
+from flaky import flaky
 
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest
@@ -210,9 +211,6 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4635
-                'link-href',  # TNL-4636
-                'icon-aria-hidden',  # TNL-4637
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -457,10 +455,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4638
-                'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4641
             ]
         })
 
@@ -469,10 +463,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4638
-                'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4641
             ]
         })
 
@@ -533,10 +523,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4643
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -545,10 +532,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4643
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -792,6 +776,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
 
+    @flaky  # TODO fix this, see TNL-5453
     def test_vote_report_endorse_after_edit(self):
         """
         Scenario: Moderator should be able to vote, report or endorse after editing the response.
@@ -834,11 +819,6 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4638
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
-                'duplicate-id',  # TNL-4647
             ]
         })
         page.visit()
@@ -936,10 +916,6 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-valid-attr-value',  # TNL-4643
-                'color-contrast',  # TNL-4644
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4645
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1345,9 +1321,6 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'link-href',  # TNL-4640
-                'icon-aria-hidden',  # TNL-4641
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

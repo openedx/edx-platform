@@ -11,6 +11,7 @@ class AzureADOauth2IntegrationTest(base.Oauth2IntegrationTest):
         super(AzureADOauth2IntegrationTest, self).setUp()
         self.provider = self.configure_azure_ad_provider(
             enabled=True,
+            visible=True,
             key='azure_ad_oauth2_key',
             secret='azure_ad_oauth2_secret',
         )

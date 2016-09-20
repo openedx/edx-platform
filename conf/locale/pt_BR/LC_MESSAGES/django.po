@@ -150,7 +150,7 @@
 # Marcos João Alves <noidmvp@gmail.com>, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # marianemurakami <mhmurakami@gmail.com>, 2014
-# Mike Job Silva <mikejobrn@gmail.com>, 2015
+# Mike Job <mikejobrn@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Nayse Hillesheim <nayse.hillesheim@gmail.com>, 2015
 # Ned Batchelder <ned@edx.org>, 2016
@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:40+0000\n"
+"POT-Creation-Date: 2016-09-01 11:27+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -263,8 +263,7 @@ msgstr ""
 #. Translators: 'Discussion' refers to the tab in the courseware that leads to
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
-#: lms/djangoapps/courseware/tabs.py
-#: lms/djangoapps/django_comment_client/forum/views.py
+#: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
 msgid "Discussion"
 msgstr "Discussão"
 
@@ -453,6 +452,7 @@ msgstr "Você está matriculado como um aluno sob o Código de Honra"
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -2129,7 +2129,6 @@ msgstr "Dados XML para a anotação"
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-#: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Display name for this module"
 msgstr "Exibir nome para este módulo"
 
@@ -4725,23 +4724,38 @@ msgid "Poster URL"
 msgstr "URL do pôster"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid "The label for this word cloud on the course page."
+msgstr ""
+
+#: lms/templates/annotatable.html lms/templates/imageannotation.html
+#: lms/templates/textannotation.html lms/templates/videoannotation.html
+#: lms/templates/peer_grading/peer_grading.html
+msgid "Instructions"
+msgstr "Instruções"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+msgid ""
+"Add instructions to help learners understand how to use the word cloud. "
+"Clear instructions are important, especially for learners who have "
+"accessibility requirements."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Inputs"
 msgstr "Entradas"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Number of text boxes available for students to input words/sentences."
+msgid ""
+"The number of text boxes available for learners to add words and sentences."
 msgstr ""
-"Número de caixas de texto disponíveis para que os alunos insiram "
-"palavras/frases."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Maximum Words"
 msgstr "Limite máximo de palavras"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Maximum number of words to be displayed in generated word cloud."
+msgid "The maximum number of words displayed in the generated word cloud."
 msgstr ""
-"Número máximo de palavras a serem exibidas na nuvem de palavras gerada."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Show Percents"
@@ -4754,16 +4768,16 @@ msgstr ""
 "palavra."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "Whether this student has posted words to the cloud."
-msgstr "Se o aluno publicou palavras na nuvem."
+msgid "Whether this learner has posted words to the cloud."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Student answer."
 msgstr "Resposta do aluno."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "All possible words from all students."
-msgstr "Todas as palavras possíveis dos alunos."
+msgid "All possible words from all learners."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
@@ -4909,6 +4923,7 @@ msgstr "Termos de Serviço e Código de Honra"
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -4924,6 +4939,7 @@ msgstr "Política de Assessibilidade"
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: themes/example/lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -9286,7 +9302,9 @@ msgstr ""
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search"
@@ -10018,21 +10036,6 @@ msgstr ""
 "Um nome de subcategoria para a discussão. Este nome aparecerá no painel à "
 "esquerda do fórum de discussão do curso."
 
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option requires an argument"
-msgstr ""
-
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option requires %d arguments"
-msgstr ""
-
-#: pavelib/utils/passthrough_opts.py
-#, python-format
-msgid "%s option does not take a value"
-msgstr ""
-
 #: cms/djangoapps/contentstore/course_group_config.py
 #: cms/djangoapps/contentstore/views/certificates.py
 msgid "invalid JSON"
@@ -10604,6 +10607,7 @@ msgstr "Número do curso:"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "Cursos"
@@ -10741,6 +10745,7 @@ msgid "Choose Language"
 msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 msgid "Account"
 msgstr "Conta"
 
@@ -10801,6 +10806,7 @@ msgstr "Enviar um e-mail para {email}"
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
+#: themes/example/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "Contate-nos"
@@ -10814,6 +10820,7 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Sair"
@@ -10871,11 +10878,38 @@ msgstr "Enviar"
 msgid "Please refresh the page to see the changes applied."
 msgstr ""
 
-#: lms/templates/annotatable.html lms/templates/imageannotation.html
-#: lms/templates/textannotation.html lms/templates/videoannotation.html
-#: lms/templates/peer_grading/peer_grading.html
-msgid "Instructions"
-msgstr "Instruções"
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion - {course_number}"
+msgstr "Discussão - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Add a Post"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "Discussion thread list"
+msgstr "Discussões"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "New topic form"
+msgstr "Novo formulário de tópico"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+msgid "User Profile"
+msgstr "Perfil do usuário"
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid "Discussion unavailable"
+msgstr ""
+
+#: lms/djangoapps/discussion/templates/discussion/maintenance.html
+msgid ""
+"The discussions are currently undergoing maintenance. We'll have them back "
+"up shortly!"
+msgstr ""
 
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
 #: lms/templates/textannotation.html lms/templates/videoannotation.html
@@ -10902,11 +10936,11 @@ msgstr "Clique para adicionar"
 msgid "Bookmark"
 msgstr "Adicionar a favoritos"
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
 msgstr "SAIBA MAIS"
 
-#: lms/templates/course.html
+#: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "Starts"
 msgstr "Inicia"
 
@@ -10916,6 +10950,7 @@ msgstr "Ver todos os cursos"
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
+#: themes/example/lms/templates/header.html
 msgid "Dashboard"
 msgstr "Painel de controle"
 
@@ -11011,6 +11046,7 @@ msgstr ""
 #: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "Enroll"
 msgstr "Inscrever-se"
 
@@ -11151,8 +11187,11 @@ msgid "Tell us the details"
 msgstr "Descreva os detalhes"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
-msgstr "Inclua mensagens de erro, passos que levaram ao problema, etc. "
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -11184,9 +11223,7 @@ msgid "Brief description of the problem"
 msgstr "Descrição sucinta do problema"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11513,7 +11550,8 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Dados brutos:"
 
-#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/example/lms/templates/header.html
+#: themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Global"
 
@@ -11553,6 +11591,7 @@ msgid "Register"
 msgstr "Registre-se"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
+#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "Entrar"
@@ -12202,7 +12241,7 @@ msgstr ""
 msgid "Dashboard for:"
 msgstr "Painel de controle para:"
 
-#: lms/templates/user_dropdown.html
+#: lms/templates/user_dropdown.html themes/example/lms/templates/header.html
 msgid "Profile"
 msgstr ""
 
@@ -12273,12 +12312,12 @@ msgid "Download Handout"
 msgstr "Baixar apostila"
 
 #: lms/templates/word_cloud.html
-msgid "Your words:"
-msgstr "As suas palavras:"
+msgid "{num} of {total}"
+msgstr ""
 
 #: lms/templates/word_cloud.html
-msgid "Total number of words:"
-msgstr "Número total de palavras:"
+msgid "Your words were:"
+msgstr ""
 
 #: lms/templates/api_admin/api_access_request_form.html
 msgid "API Access Request"
@@ -13542,10 +13581,12 @@ msgid "This content is graded"
 msgstr "Este conteúdo é classificado"
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "Ocorreu um erro. Por favor, tente novamente mais tarde."
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -13625,6 +13666,7 @@ msgid "Additional Resources"
 msgstr "Recursos adicionais "
 
 #: lms/templates/courseware/course_about.html
+#: themes/example/lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "matricular-se"
 
@@ -13739,10 +13781,6 @@ msgstr "Favoritos"
 #: lms/templates/courseware/courseware.html
 msgid "Course Search"
 msgstr "Busca de Cursos"
-
-#: lms/templates/courseware/courseware.html
-msgid "search"
-msgstr "procurar"
 
 #: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
@@ -14469,11 +14507,6 @@ msgstr ""
 msgid "Results:"
 msgstr "Resultados:"
 
-#: lms/templates/discussion/_discussion_course_navigation.html
-#: lms/templates/discussion/_discussion_inline.html
-msgid "Add a Post"
-msgstr ""
-
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
 msgstr "Mostrar Discussão"
@@ -14497,21 +14530,12 @@ msgid "filter topics"
 msgstr "filtrar tópicos"
 
 #: lms/templates/discussion/_filter_dropdown.html
-#: lms/templates/discussion/_thread_list_template.html
 msgid "All Discussions"
 msgstr "Todas as Discussões"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Posts I'm Following"
 msgstr "Publicações que estou seguindo"
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Discussion topics; currently listing: "
-msgstr ""
-
-#: lms/templates/discussion/_thread_list_template.html
-msgid "Search all posts"
-msgstr "Pesquisar todos os posts"
 
 #. Translators: This labels a filter menu in forum navigation
 #: lms/templates/discussion/_thread_list_template.html
@@ -14582,35 +14606,6 @@ msgid "%s comment"
 msgid_plural "%s comments"
 msgstr[0] "%s comentários"
 msgstr[1] "%s comentários"
-
-#: lms/templates/discussion/index.html
-#: lms/templates/discussion/user_profile.html
-msgid "Discussion - {course_number}"
-msgstr "Discussão - {course_number}"
-
-#: lms/templates/discussion/index.html
-msgid "Discussion thread list"
-msgstr "Discussões"
-
-#: lms/templates/discussion/index.html
-msgid "New topic form"
-msgstr "Novo formulário de tópico"
-
-#: lms/templates/discussion/maintenance.html
-msgid "We're sorry"
-msgstr "Desculpe-nos"
-
-#: lms/templates/discussion/maintenance.html
-msgid ""
-"The forums are currently undergoing maintenance. We'll have them back up "
-"shortly!"
-msgstr ""
-"Os fóruns estão em manutenção no momento. Estarão ativos novamente em breve!"
-" "
-
-#: lms/templates/discussion/user_profile.html
-msgid "User Profile"
-msgstr "Perfil do usuário"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -18329,8 +18324,9 @@ msgstr "Sobre o edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© edX Inc.  All rights reserved except where noted.  EdX, Open edX and the "
-"edX and Open EdX logos are registered trademarks or trademarks of edX Inc."
+"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
+"the edX and Open EdX logos are registered trademarks or trademarks of edX "
+"Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -18350,6 +18346,83 @@ msgstr ""
 "{b_start} Apoie nossa Missão: {b_end} EdX, sem fins lucrativos, baseia-se em"
 " certificados autênticos para apoiar um fundo gratuito global de educação "
 "para todos."
+
+#: themes/example/lms/templates/header.html
+msgid "Create Account"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Want to purchase this course for a group?"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"You can purchase enrollment codes for this course to distribute to your team"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Purchase for a Group"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid ""
+"Bulk discounts may apply for groups larger than 10. Contact "
+"{link_start}harvardxplus@harvard.edu{link_end} for more information."
+msgstr ""
+
+#: themes/example/lms/templates/courseware/course_about.html
+msgid "Email Us"
+msgstr ""
+
+#: themes/example/lms/templates/courseware/courses.html
+msgid "Lorem ipsum dolor sit amet."
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/about.html
+msgid "About Us"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/contact.html
+msgid "Thank you for your inquiry"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "FAQ's"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "General FAQs"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Lorem ipsum dolor sit amet"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Academic Planning"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+#: themes/example/lms/templates/static_templates/honor.html
+#: themes/example/lms/templates/static_templates/privacy.html
+#: themes/example/lms/templates/static_templates/tos.html
+msgid "Back to top"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Registration"
+msgstr ""
+
+#: themes/example/lms/templates/static_templates/faq.html
+msgid "Finances"
+msgstr ""
+
+#: themes/example/lms/templates/student_account/login_and_register.html
+msgid "Sign in or Create Account"
+msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.

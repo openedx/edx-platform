@@ -10,7 +10,7 @@
             </span><select aria-describedby="field_help_visible_to" class="field-input js-group-select" name="group_id" <% if (!is_commentable_cohorted) { print("disabled"); } %>>
                 <option value=""><%- gettext("All Groups") %></option>
                 <% _.each(cohort_options, function(opt) { %>
-                <option value="<%= opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
+                <option value="<%- opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
                 <% }); %>
              </select>
         </label><div class="field-help" id="field_help_visible_to">
@@ -20,13 +20,16 @@
     <% } %>
     <div class="post-field">
         <label class="field-label">
-            <span class="sr"><%- gettext("Title:") %></span>
-            <input aria-describedby="field_help_title" type="text" class="field-input js-post-title" name="title" placeholder="<%- gettext('Title') %>">
+            <span class="field-label-text"><%- gettext("Title:") %></span><input aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
         </label><span class="field-help" id="field_help_title">
             <%- gettext("Add a clear and descriptive title to encourage participation.") %>
         </span>
     </div>
-    <div class="post-field js-post-body editor" name="body" data-placeholder="<%- gettext('Enter your question or comment') %>"></div>
+
+    <div class="post-field">
+        <p class="sr-only field-help" id="new-post-editor-description"><%- gettext('Enter your question or comment.') %></p>
+        <div class="js-post-body editor" aria-describedby="new-post-editor-description" name="body"></div>
+    </div>
     <div class="post-options">
         <label class="post-option is-enabled">
             <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
@@ -46,7 +49,7 @@
         <% } %>
     </div>
     <div>
-        <input type="submit" class="submit" value="<%- gettext('Add Post') %>">
-        <button type="button" class="cancel"><%- gettext('Cancel') %></button>
+        <button type="submit" class="btn-brand submit"><%- gettext('Add Post') %></button>
+        <button type="button" class="btn cancel"><%- gettext('Cancel') %></button>
     </div>
 </form>
