@@ -151,6 +151,15 @@ class ProblemPage(PageObject):
         self.wait_for(lambda: self.q(css='.notification.warning.notification-save').focused,
                       'Waiting for the focus to be on the save notification')
 
+    def wait_for_gentle_alert_notification(self):
+        """
+        Wait for the Gentle Alert Notification to be present
+        """
+        self.wait_for_element_visibility('.notification.warning.notification-gentle-alert',
+                                         'Waiting for Gentle Alert notification to be visible')
+        self.wait_for(lambda: self.q(css='.notification.warning.notification-gentle-alert').focused,
+                      'Waiting for the focus to be on the gentle alert notification')
+
     def is_reset_button_present(self):
         """ Check for the presence of the reset button. """
         return self.q(css='.problem .reset').present

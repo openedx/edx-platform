@@ -453,7 +453,7 @@ describe 'Problem', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
         @problem.show()
         expect(window.SR.readElts).toHaveBeenCalled()
- 
+
       it 'sends the answers when elements to the SR element, answers are strings', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: '1_1': 'One', '1_2': 'Two')
         @problem.show()
@@ -840,3 +840,6 @@ describe 'Problem', ->
       # jump the next step and verify that we are not still continuing to poll
       jasmine.clock().tick(64000)
       expect(@problem.poll.calls.count()).toEqual(6)
+
+      expect($('.notification-gentle-alert .notification-message').is(':visible')).toBe(true)
+      expect($('.notification-gentle-alert .notification-message').text()).toEqual("The grading process is still running. Refresh the page to see updates.")

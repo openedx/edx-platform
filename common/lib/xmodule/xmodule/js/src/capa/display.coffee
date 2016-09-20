@@ -47,9 +47,6 @@ class @Problem
     @saveButton.click @save
     @gentleAlertNotification = @$('.notification-gentle-alert')
 
-    # Hide the Gentle Alert notification until needed
-    @gentleAlertNotification.hide()
-
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
       icon = $(ev.target).children "i"
@@ -377,6 +374,7 @@ class @Problem
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
         else
+          @saveNotification.remove()
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
 

@@ -647,8 +647,33 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         """
         Answer numerical problem.
         """
-        textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
+        textvalue = ''
+        if correctness == 'correct':
+            textvalue = "pi + 1"
+        elif correctness == 'error':
+            textvalue = 'notNum'
+        else:
+            textvalue = str(random.randint(-2, 2))
         self.problem_page.fill_answer(textvalue)
+
+    def test_error_input_gentle_alert(self):
+        """
+        Scenario: I can answer a problem with erroneous input and will see a gentle alert
+        Given a Numerical Problem type
+        I can input a string answer
+        Then I will see a Gentle alert notification
+        And focus will shift to that notification
+        """
+        # Make sure we're looking at the right problem
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+
+        # Answer the problem with an erroneous input to cause a gentle alert
+        self.answer_problem(correctness='error')
+        self.problem_page.click_submit()
+        self.problem_page.wait_for_gentle_alert_notification()
 
 
 class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):

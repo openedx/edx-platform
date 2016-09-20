@@ -2,8 +2,8 @@
                                    notification_message, should_enable_next_hint"/>
 <%! from django.utils.translation import ugettext as _ %>
 
-<div class="notification ${notification_type} ${'notification-'}${notification_name}"
-     tabindex="-1" ${'style="display: none"'if notification_name == 'error' else '' } >
+<div class="notification ${notification_type} ${'notification-'}${notification_name} ${'is-hidden' if notification_name == 'gentle-alert' else '' }"
+     tabindex="-1" >
     <span class="icon fa ${notification_icon}" aria-hidden="true"></span>
     <span class="notification-message" aria-describedby="${ id }-problem-title">${notification_message}
     </span>
