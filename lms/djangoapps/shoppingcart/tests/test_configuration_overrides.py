@@ -117,8 +117,6 @@ class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         self.courseless_donation_order_id = cart.id
 
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_site)
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_all_orgs", fake_all_orgs)
     def test_shows_orders_with_current_site_courses_only(self):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
@@ -136,8 +134,6 @@ class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
         self.assertNotIn(receipt_url_cert, content)
         self.assertNotIn(receipt_url_donation, content)
 
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=None))
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_all_orgs", fake_all_orgs)
     def test_shows_orders_with_non_site_courses_only_when_no_configuration_override_exists(self):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
