@@ -94,12 +94,12 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s cms --with-flaky --cov-args="-p" --verbosity=4 --with-xunitmp
+        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
         ;;
 
 
     "commonlib-unit")
-        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_lib --with-flaky --cov-args="-p" --verbosity=4 --with-xunit
+        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
         ;;
 
     *)
