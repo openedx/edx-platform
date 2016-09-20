@@ -111,7 +111,6 @@ h2 {
 }
 
 .problem-hint {
-  color: $color-copy-tip;
   margin-bottom: 20px;
 }
 
@@ -278,7 +277,6 @@ div.problem {
       @include padding-left($baseline*1.75);
       position: relative;
       font-size: $base-font-size;
-      line-height: $base-line-height;
     }
 
     input[type="radio"],
@@ -1055,19 +1053,35 @@ div.problem {
 
   .notification {
     margin-top: $baseline / 2;
-    padding: ($baseline * 0.4) ($baseline / 2);
+    padding: ($baseline * 0.4) ($baseline / 2) ($baseline / 5);
+    line-height: 1.5em;
     min-width: auto;
+
     &.success {
       @include notification-by-type($success-color);
     }
     &.error {
       @include notification-by-type($error-color);
     }
-    &.info {
-      @include notification-by-type($info-color);
-    }
     &.warning {
       @include notification-by-type($warning-color);
+    }
+    &.hint {
+      border: 1px solid $uxpl-gray-background;
+      border-radius: 6px;
+
+      .icon {
+        @include margin-right(3 * $baseline / 4);
+        color: $uxpl-gray-dark;
+      }
+
+      li {
+        color: $uxpl-gray-base;
+
+        strong {
+          color: $uxpl-gray-dark;
+        }
+      }
     }
     .icon {
       position: relative;
@@ -1077,6 +1091,19 @@ div.problem {
     .notification-message {
       display: inline-block;
       width: flex-grid(8,10);
+      // Make notification tall enough that when the "Review" button is displayed,
+      // the notification does not grow in height.
+      margin-bottom: 8px;
+
+      ol {
+        list-style: none outside none;
+        padding: 0;
+        margin: 0;
+
+        li:not(:last-child) {
+          margin-bottom: $baseline / 4;
+        }
+      }
     }
     .notification-btn-wrapper {
       @include float(right);
