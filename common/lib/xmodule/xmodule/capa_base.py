@@ -613,7 +613,11 @@ class CapaMixin(CapaFields):
             'html': self.get_problem_html(encapsulate=False, demand_hint_text=total_text, hint_index=hint_index)
         }
 
-    def get_problem_html(self, encapsulate=True, demand_hint_text=None, hint_index=0, save_notification_message=None):
+    def get_problem_html(self, encapsulate=True,
+                         demand_hint_text=None,
+                         hint_index=0,
+                         save_notification_message=None,
+                         submit_notification=False):
         """
         Return html for the problem.
 
@@ -624,6 +628,7 @@ class CapaMixin(CapaFields):
         demand_hint_text (str): the demand hint text (optional, default is None)
         hint_index (int): the index of the last demand hint being shown (optional, default is 0)
         save_notification_message (str): the save notification message to show (optional, default is None)
+        submit_notification (bool): True if the submit notification should be added
         """
         try:
             html = self.lcp.get_html()
@@ -653,7 +658,8 @@ class CapaMixin(CapaFields):
         # so add 1 to check if others exist.
         should_enable_next_hint = demand_hint_possible and hint_index + 1 < len(demand_hints)
 
-        answer_notification_type, answer_notification_message = self._get_answer_notification()
+        answer_notification_type, answer_notification_message = self._get_answer_notification(
+            render_notifications=submit_notification)
 
         context = {
             'problem': content,
@@ -693,56 +699,62 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def _get_answer_notification(self):
-        """ Generate the answer notification type and message from the current problem status. """
+    def _get_answer_notification(self, render_notifications):
+        """
+        Generate the answer notification type and message from the current problem status.
+
+         Arguments:
+             render_notifications (bool): If false the method will return an None for type and message
+        """
         answer_notification_message = None
         answer_notification_type = None
 
-        progress = self.get_progress()
-        id_list = self.lcp.correct_map.keys()
-        if len(id_list) == 1:
-            # Only one answer available
-            answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
-        elif len(id_list) > 1:
-            # Check the multiple answers that are available
-            answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
-            for answer_id in id_list[1:]:
-                if self.lcp.correct_map.get_correctness(answer_id) != answer_notification_type:
-                    # There is at least 1 of the following combinations of correctness states
-                    # Correct and incorrect, Correct and partially correct, or Incorrect and partially correct
-                    # which all should have a message type of Partially Correct
-                    answer_notification_type = 'partially-correct'
-                    break
+        if render_notifications:
+            progress = self.get_progress()
+            id_list = self.lcp.correct_map.keys()
+            if len(id_list) == 1:
+                # Only one answer available
+                answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+            elif len(id_list) > 1:
+                # Check the multiple answers that are available
+                answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+                for answer_id in id_list[1:]:
+                    if self.lcp.correct_map.get_correctness(answer_id) != answer_notification_type:
+                        # There is at least 1 of the following combinations of correctness states
+                        # Correct and incorrect, Correct and partially correct, or Incorrect and partially correct
+                        # which all should have a message type of Partially Correct
+                        answer_notification_type = 'partially-correct'
+                        break
 
-        # Build the notification message based on the notification type and translate it.
-        ungettext = self.runtime.service(self, "i18n").ungettext
-        if answer_notification_type == 'incorrect':
-            if progress is not None:
-                answer_notification_message = ungettext(
-                    "Incorrect ({progress} point)",
-                    "Incorrect ({progress} points)",
-                    progress.frac()[1]
-                ).format(progress=str(progress))
-            else:
-                answer_notification_message = _('Incorrect')
-        elif answer_notification_type == 'correct':
-            if progress is not None:
-                answer_notification_message = ungettext(
-                    "Correct ({progress} point)",
-                    "Correct ({progress} points)",
-                    progress.frac()[1]
-                ).format(progress=str(progress))
-            else:
-                answer_notification_message = _('Correct')
-        elif answer_notification_type == 'partially-correct':
-            if progress is not None:
-                answer_notification_message = ungettext(
-                    "Partially correct ({progress} point)",
-                    "Partially correct ({progress} points)",
-                    progress.frac()[1]
-                ).format(progress=str(progress))
-            else:
-                answer_notification_message = _('Partially Correct')
+            # Build the notification message based on the notification type and translate it.
+            ungettext = self.runtime.service(self, "i18n").ungettext
+            if answer_notification_type == 'incorrect':
+                if progress is not None:
+                    answer_notification_message = ungettext(
+                        "Incorrect ({progress} point)",
+                        "Incorrect ({progress} points)",
+                        progress.frac()[1]
+                    ).format(progress=str(progress))
+                else:
+                    answer_notification_message = _('Incorrect')
+            elif answer_notification_type == 'correct':
+                if progress is not None:
+                    answer_notification_message = ungettext(
+                        "Correct ({progress} point)",
+                        "Correct ({progress} points)",
+                        progress.frac()[1]
+                    ).format(progress=str(progress))
+                else:
+                    answer_notification_message = _('Correct')
+            elif answer_notification_type == 'partially-correct':
+                if progress is not None:
+                    answer_notification_message = ungettext(
+                        "Partially correct ({progress} point)",
+                        "Partially correct ({progress} points)",
+                        progress.frac()[1]
+                    ).format(progress=str(progress))
+                else:
+                    answer_notification_message = _('Partially Correct')
 
         return answer_notification_type, answer_notification_message
 
@@ -941,7 +953,7 @@ class CapaMixin(CapaFields):
         Used if we want to reconfirm we have the right thing e.g. after
         several AJAX calls.
         """
-        return {'html': self.get_problem_html(encapsulate=False)}
+        return {'html': self.get_problem_html(encapsulate=False, submit_notification=True)}
 
     @staticmethod
     def make_dict_of_responses(data):
@@ -1178,7 +1190,7 @@ class CapaMixin(CapaFields):
             )
 
         # render problem into HTML
-        html = self.get_problem_html(encapsulate=False)
+        html = self.get_problem_html(encapsulate=False, submit_notification=True)
 
         return {
             'success': success,
