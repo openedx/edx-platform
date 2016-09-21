@@ -227,7 +227,7 @@ $(function () {
     
     %if show_grade_breakdown:
       var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
-      $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
+      $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px"><span class="sr">Overall grade:</span> ${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
     %endif
   }
   
@@ -237,7 +237,6 @@ $(function () {
     $("#x").text(pos.x.toFixed(2));
     $("#y").text(pos.y.toFixed(2));
     if (item) {
-        // console.log(item);÷
       if (previousPoint != (item.dataIndex, item.seriesIndex)) {
         previousPoint = (item.dataIndex, item.seriesIndex);
             
