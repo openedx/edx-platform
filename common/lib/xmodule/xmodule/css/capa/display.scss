@@ -1093,10 +1093,6 @@ div.problem {
     &:first-child {
       margin-bottom: $baseline / 4;
     }
-    &:active,
-    &:focus {
-      box-shadow: none;
-    }
   }
 
   // override default button hover
