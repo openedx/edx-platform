@@ -7,11 +7,11 @@ data: |
       <p>The example below is from <a href="https://www.edx.org/course/mit/7-00x/introduction-biology-secret-life/1014" target="_blank">7.00x: Introduction to Biology</a> and shows a subset of the biochemical reactions that cells carry out. </p>
       <p>You can view the chemical structures of the molecules by clicking on them. The magnified view also lists the enzymes involved in each step.</p>
       <div class="zooming-image-place" style="position: relative;">
-        <a class="edx-zoom" href="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_detail_01.png">
-            <img alt="Enable image zoom" src="https://studio.edx.org/c4x/edX/DemoX/asset/pathways_overview_01.png" />
+        <a class="edx-zoom" href="https://files.edx.org/zoomimg-image/large-map.jpg">
+            <img alt="Enable image zoom" src="https://files.edx.org/zoomimg-image/small-map.jpg" />
             <span class="indicator icon fa fa-search-plus" aria-hidden="true"></span>
           </a>
-        <div class="script_placeholder" data-src="https://studio.edx.org/c4x/edX/DemoX/asset/image-zoom-tool.js" />
+        <div class="script_placeholder" data-src="https://files.edx.org/zooming-image/image-zoom-tool.js" />
       </div>
       <script type="text/javascript">// <![CDATA[
       JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
