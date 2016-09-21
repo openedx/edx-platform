@@ -115,16 +115,8 @@ $(function () {
   var droppedScores = ${ json.dumps(droppedScores) };
   var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
   
-  var order = [];
-  var serez = [];
+  var series_order_object = [];
   var c = 0, s, t;
-  
-  // loop through ticks and make a new object with only the ticks
-  for (var i = 0; i < ticks.length; i++) {
-      t = {};
-      t.tick = ticks[i][0];
-      order.push(t);
-  }
   
   // loop through the series and extract the matching tick and the series label
   for (var k = 0; k < series.length; k++) {
@@ -133,39 +125,39 @@ $(function () {
             s = {};
             s.tick = series[k]['data'][m][0];
             s.label = series[k]['label'];
-            serez.push(s);
+            series_order_object.push(s);
         }
     } else {
         s = {};
         s.tick = series[k]['data'][0][0];
         s.label = series[k]['label'];
-        serez.push(s);
+        series_order_object.push(s);
     }
   }
   
-  // reorder the serez object to match the ticks, which is the correct order
-  serez.sort(function(a, b) {
+  // reorder the series_order_object object to match the ticks, which is the correct order
+  series_order_object.sort(function(a, b) {
       return a.tick-b.tick;
   });
   
   // add a new description property with the additional context
-  for (var n = 0; n < serez.length; n++) {
-      if (detail_tooltips[serez[n].label].length > 1) {
-          serez[n].description = detail_tooltips[serez[n].label][c];
+  for (var n = 0; n < series_order_object.length; n++) {
+      if (detail_tooltips[series_order_object[n].label].length > 1) {
+          series_order_object[n].description = detail_tooltips[series_order_object[n].label][c];
           c++;
       } else {
-          serez[n].description = detail_tooltips[serez[n].label][0];
+          series_order_object[n].description = detail_tooltips[series_order_object[n].label][0];
       }
   }
   
-  // update the ticks output to include the additional context from serez
+  // update the ticks output to include the additional context from series_order_object
   for (var i = 0; i < ticks.length; i++) {
-      if (serez[i]) {
-          ticks[i][1] = '<span aria-hidden="true">' + ticks[i][1] + '</span> ' + '<span class="sr">' + serez[i].description + '</span>';
+      if (series_order_object[i]) {
+          ticks[i][1] = '<span aria-hidden="true">' + ticks[i][1] + '</span> ' + '<span class="sr">' + series_order_object[i].description + '</span>';
       }
   }
   
-  // let's hide the vertical axis
+  // hide the vertical axis since they are audibly lacking context
   for (var i = 0; i < grade_cutoff_ticks.length; i++) {
       grade_cutoff_ticks[i][1] = '<span aria-hidden="true">' + grade_cutoff_ticks[i][1] + '</span>';
   }
