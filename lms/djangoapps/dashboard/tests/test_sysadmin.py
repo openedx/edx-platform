@@ -297,9 +297,9 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """
 
         self._setstaff_login()
+        mongoengine.connect(TEST_MONGODB_LOG['db'])
         # make sure logs are empty
         CourseImportLog.objects.delete()
-        mongoengine.connect(TEST_MONGODB_LOG['db'])
 
         for _ in xrange(15):
             CourseImportLog(
