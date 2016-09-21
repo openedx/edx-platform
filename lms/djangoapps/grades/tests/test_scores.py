@@ -162,9 +162,9 @@ class TestGetScore(TestCase):
 
 
 @ddt.ddt
-class TestInternalWeightedScore(TestCase):
+class TestWeightedScore(TestCase):
     """
-    Tests the internal helper method: _weighted_score
+    Tests the helper method: weighted_score
     """
     @ddt.data(
         (0, 0, 1),
@@ -177,7 +177,7 @@ class TestInternalWeightedScore(TestCase):
     @ddt.unpack
     def test_cannot_compute(self, raw_earned, raw_possible, weight):
         self.assertEquals(
-            scores._weighted_score(raw_earned, raw_possible, weight),
+            scores.weighted_score(raw_earned, raw_possible, weight),
             (raw_earned, raw_possible),
         )
 
@@ -192,13 +192,13 @@ class TestInternalWeightedScore(TestCase):
     @ddt.unpack
     def test_computed(self, raw_earned, raw_possible, weight, expected_score):
         self.assertEquals(
-            scores._weighted_score(raw_earned, raw_possible, weight),
+            scores.weighted_score(raw_earned, raw_possible, weight),
             expected_score,
         )
 
     def test_assert_on_invalid_r_possible(self):
         with self.assertRaises(AssertionError):
-            scores._weighted_score(raw_earned=1, raw_possible=None, weight=1)
+            scores.weighted_score(raw_earned=1, raw_possible=None, weight=1)
 
 
 @ddt.ddt
