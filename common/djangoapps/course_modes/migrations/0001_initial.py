@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('mode_display_name', models.CharField(max_length=255, verbose_name='Display Name')),
                 ('min_price', models.IntegerField(default=0, verbose_name='Price')),
                 ('currency', models.CharField(default=b'usd', max_length=8)),
-                ('expiration_datetime', models.DateTimeField(default=None, help_text='OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. Leave this blank if users can enroll in this mode until enrollment closes for the course.', null=True, verbose_name='Upgrade Deadline', blank=True)),
+                ('_expiration_datetime', models.DateTimeField(db_column=b'expiration_datetime', default=None, help_text='OPTIONAL: After this date/time, users will no longer be able to enroll in this mode. Leave this blank if users can enroll in this mode until enrollment closes for the course.', null=True, verbose_name='Upgrade Deadline', blank=True)),
                 ('expiration_date', models.DateField(default=None, null=True, blank=True)),
                 ('suggested_prices', models.CommaSeparatedIntegerField(default=b'', max_length=255, blank=True)),
                 ('description', models.TextField(null=True, blank=True)),
