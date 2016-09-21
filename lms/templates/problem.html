@@ -21,7 +21,7 @@ from openedx.core.djangolib.markup import HTML
             <%include file="problem_notifications.html" args="
              notification_name='hint',
              notification_type='hint',
-             notification_icon='question',
+             notification_icon='fa-question',
              notification_message=hint_notification_message,
              should_enable_next_hint=should_enable_next_hint"
            />
@@ -66,12 +66,12 @@ from openedx.core.djangolib.markup import HTML
         ${_("You have used {num_used} of {num_total} attempts").format(num_used=attempts_used, num_total=attempts_allowed)}
     % endif
     </div>
-
+  </div>
     % if answer_notification_type:
         % if 'correct' == answer_notification_type:
             <%include file="problem_notifications.html" args="
                 notification_type='success',
-                notification_icon='check',
+                notification_icon='fa-check',
                 notification_name='submit',
                 notification_message=answer_notification_message"
             />
@@ -79,7 +79,7 @@ from openedx.core.djangolib.markup import HTML
         % if 'incorrect' == answer_notification_type:
             <%include file="problem_notifications.html" args="
                 notification_type='error',
-                notification_icon='close',
+                notification_icon='fa-close',
                 notification_name='submit',
                 notification_message=answer_notification_message"
             />
@@ -87,7 +87,7 @@ from openedx.core.djangolib.markup import HTML
         % if 'partially-correct' == answer_notification_type:
             <%include file="problem_notifications.html" args="
                 notification_type='success',
-                notification_icon='asterisk',
+                notification_icon='fa-asterisk',
                 notification_name='submit',
                 notification_message=answer_notification_message"
             />
@@ -96,11 +96,15 @@ from openedx.core.djangolib.markup import HTML
     % if save_notification_message:
       <%include file="problem_notifications.html" args="
         notification_type='warning',
-        notification_icon='save',
+        notification_icon='fa-save',
         notification_name='save',
         notification_message=save_notification_message"
       />
     % endif
-
-  </div>
+    <%include file="problem_notifications.html" args="
+      notification_type='warning',
+      notification_icon='fa-exclamation-circle',
+      notification_name='gentle-alert',
+      notification_message=''"
+    />
 </div>

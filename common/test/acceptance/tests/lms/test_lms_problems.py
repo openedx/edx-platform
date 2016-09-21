@@ -144,6 +144,10 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         # Now both "hint" buttons should be disabled, as there are no more hints.
         self.assertEqual(['true', 'true'], problem_page.get_hint_button_disabled_attr())
 
+        # Now click on "Review" and make sure the focus goes to the correct place.
+        problem_page.click_review_in_notification()
+        self.assertTrue(problem_page.is_focus_on_problem_meta())
+
         # Check corresponding tracking events
         actual_events = self.wait_for_events(
             event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
