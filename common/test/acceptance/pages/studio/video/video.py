@@ -32,7 +32,7 @@ CLASS_SELECTORS = {
 
 BUTTON_SELECTORS = {
     'create_video': 'button[data-category="video"]',
-    'handout_download': '.video-handout.video-download-button a',
+    'handout_download': '.wrapper-handouts .btn-link',
     'handout_download_editor': '.wrapper-comp-setting.file-uploader .download-action',
     'upload_asset': '.upload-action',
     'asset_submit': '.action-upload',
