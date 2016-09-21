@@ -239,11 +239,6 @@ div.problem {
   input[type="checkbox"] {
     @include margin(($baseline/4) ($baseline/2) ($baseline/4) ($baseline/4));
   }
-
-  text {
-    @include margin-left(25px);
-    display: inline;
-  }
 }
 
 // +Problem - Choice Group
