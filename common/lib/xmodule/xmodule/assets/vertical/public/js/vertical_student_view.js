@@ -1,7 +1,11 @@
 /* JavaScript for Vertical Student View. */
 window.VerticalStudentView = function(runtime, element) {
     'use strict';
-    RequireJS.require(['course_bookmarks/js/views/bookmark_button'], function(BookmarkButton) {
+    if (typeof RequireJS === "undefined") {
+        console.log("Cannot initialize VerticalStudentView. RequireJS is not defined.");
+        return;
+    }
+    RequireJS.require(['js/bookmarks/views/bookmark_button'], function(BookmarkButton) {
         var $element = $(element);
         var $bookmarkButtonElement = $element.find('.bookmark-button');
 
