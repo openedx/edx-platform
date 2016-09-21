@@ -140,10 +140,14 @@ class EnrollmentCodeStatusView(APIView):
         if action == 'cancel':
             if redemption:
                 CourseEnrollment.unenroll(redemption.course_enrollment.user, registration_code.course_id)
+                redemption.delete()
             registration_code.is_valid = False
             registration_code.save()
 
         if action == 'restore':
+            if redemption:
+                CourseEnrollment.unenroll(redemption.course_enrollment.user, registration_code.course_id)
+                redemption.delete()
             registration_code.is_valid = True
             registration_code.save()
         return Response(data={'success': True})
