@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='courseregcodeitem',
             name='mode',
-            field=models.SlugField(default=b'audit'),
+            field=models.SlugField(default=b'honor'),
         ),
         migrations.AlterField(
             model_name='paidcourseregistration',
             name='mode',
-            field=models.SlugField(default=b'audit'),
+            field=models.SlugField(default=b'honor'),
         ),
     ]
