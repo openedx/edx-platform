@@ -46,6 +46,7 @@ class @Problem
     @saveButtonLabel = @$('.action .save .save-label')
     @saveButton.click @save
     @gentleAlertNotification = @$('.notification-gentle-alert')
+    @submitNotification = @$('.notification-submit')
 
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
@@ -444,8 +445,13 @@ class @Problem
         window.SR.readElts(answer_text)
         @scroll_to_problem_meta()
 
+  clear_all_notifications: =>
+    @submitNotification.remove()
+    @saveNotification.remove()
+
   gentle_alert: (msg) =>
     @el.find('.notification-gentle-alert .notification-message').html(msg)
+    @clear_all_notifications()
     @gentleAlertNotification.show()
     @gentleAlertNotification.focus()
 

@@ -160,6 +160,56 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         raise NotImplementedError()
 
 
+class ProblemNotificationTests(ProblemsTest):
+    """
+    Tests that the notifications are visible when expected.
+    """
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 10},
+                                 grader_type='Final Exam')
+
+    def test_notification_updates(self):
+        """
+        Verifies that the notification is removed and not visible when it should be
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        problem_page.click_choice("choice_2")
+        self.assertFalse(problem_page.is_success_notification_visible())
+        problem_page.click_submit()
+        problem_page.wait_success_notification()
+        # Clicking Save should clear the submit notification
+        problem_page.click_save()
+        self.assertFalse(problem_page.is_success_notification_visible())
+        problem_page.wait_for_save_notification()
+        # Changing the answer should clear the save notification
+        problem_page.click_choice("choice_1")
+        self.assertFalse(problem_page.is_save_notification_visible())
+        problem_page.click_save()
+        # Submitting the problem again should clear the save notification
+        problem_page.click_submit()
+        problem_page.wait_incorrect_notification()
+        self.assertFalse(problem_page.is_save_notification_visible())
+
+
 class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.
