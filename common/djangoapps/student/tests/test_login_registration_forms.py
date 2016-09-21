@@ -54,8 +54,8 @@ class LoginFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStoreTes
         self.url = reverse("signin_user")
         self.course_id = unicode(self.course.id)
         self.courseware_url = reverse("courseware", args=[self.course_id])
-        self.configure_google_provider(enabled=True)
-        self.configure_facebook_provider(enabled=True)
+        self.configure_google_provider(enabled=True, visible=True)
+        self.configure_facebook_provider(enabled=True, visible=True)
 
     @patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data(THIRD_PARTY_AUTH_PROVIDERS)
@@ -170,8 +170,8 @@ class RegisterFormTest(ThirdPartyAuthTestMixin, UrlResetMixin, SharedModuleStore
 
         self.url = reverse("register_user")
         self.course_id = unicode(self.course.id)
-        self.configure_google_provider(enabled=True)
-        self.configure_facebook_provider(enabled=True)
+        self.configure_google_provider(enabled=True, visible=True)
+        self.configure_facebook_provider(enabled=True, visible=True)
 
     @patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data(*THIRD_PARTY_AUTH_PROVIDERS)

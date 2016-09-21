@@ -7,6 +7,7 @@ from django.db import models
 from django.contrib.sites.models import Site
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy as _
 
 from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
@@ -25,12 +26,19 @@ class SiteConfiguration(models.Model):
         site (OneToOneField): one to one field relating each configuration to a single site
         values (JSONField):  json field to store configurations for a site
     """
+    DEFAULT_RECEIPT_PAGE_URL = '/commerce/checkout/receipt/?orderNum='
+
     site = models.OneToOneField(Site, related_name='configuration')
     enabled = models.BooleanField(default=False, verbose_name="Enabled")
     values = JSONField(
         null=False,
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
+    )
+    receipt_page_url = models.CharField(
+        max_length=255,
+        default=DEFAULT_RECEIPT_PAGE_URL,
+        help_text=_('Path to order receipt page.')
     )
 
     def __unicode__(self):

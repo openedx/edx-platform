@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import json
 import logging
 import unittest
-from urlparse import urljoin
 
 import ddt
 from django.conf import settings
@@ -30,6 +29,7 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from config_models.models import cache
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories as programs_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
@@ -589,7 +589,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
         self.mock_tracker.reset_mock()
 
 
-class EnrollInCourseTest(EnrollmentEventTestMixin, TestCase):
+class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
     """Tests enrolling and unenrolling in courses."""
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

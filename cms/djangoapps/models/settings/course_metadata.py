@@ -100,9 +100,6 @@ class CourseMetadata(object):
         if not XBlockStudioConfigurationFlag.is_enabled():
             filtered_list.append('allow_unsupported_xblocks')
 
-        if not settings.FEATURES.get('ENABLE_SUBSECTION_GRADES_SAVED'):
-            filtered_list.append('enable_subsection_grades_saved')
-
         return filtered_list
 
     @classmethod

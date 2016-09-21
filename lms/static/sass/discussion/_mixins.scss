@@ -6,13 +6,13 @@
   border: 1px solid;
   border-radius: $forum-border-radius;
   height: 35px;
+  background-image: none;
   color: $white;
   line-height: 35px;
   font-size: $forum-base-font-size;
   white-space: nowrap;  // Prevent word-break in Arabic in Google Chrome
   text-shadow: none;
   padding: 0 ($baseline*0.75);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 }
 
 @mixin white-button {
@@ -27,10 +27,10 @@
 }
 
 @mixin discussion-wmd-input {
+  @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
   box-sizing: border-box;
   margin-top: 0;
   border: 1px solid $forum-color-border;
-  border-radius: $forum-border-radius $forum-border-radius 0 0;
   padding: ($baseline/2);
   width: 100%;
   height: 125px;
@@ -42,8 +42,8 @@
 }
 
 @mixin discussion-wmd-preview-container {
-  box-sizing: border-box;
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
+  box-sizing: border-box;
   border: 1px solid $gray-l1;
   border-top: none;
   width: 100%;

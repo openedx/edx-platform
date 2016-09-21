@@ -283,6 +283,16 @@ class InheritingFieldData(KvsFieldData):
         super(InheritingFieldData, self).__init__(**kwargs)
         self.inheritable_names = set(inheritable_names)
 
+    def has_default_value(self, name):
+        """
+        Return whether or not the field `name` has a default value
+        """
+        has_default_value = getattr(self._kvs, 'has_default_value', False)
+        if callable(has_default_value):
+            return has_default_value(name)
+
+        return has_default_value
+
     def default(self, block, name):
         """
         The default for an inheritable name is found on a parent.
@@ -294,6 +304,15 @@ class InheritingFieldData(KvsFieldData):
             # node of the tree, the block's default will be used.
             field = block.fields[name]
             ancestor = block.get_parent()
+            # In case, if block's parent is of type 'library_content',
+            # bypass inheritance and use kvs' default instead of reusing
+            # from parent as '_copy_from_templates' puts fields into
+            # defaults.
+            if ancestor and \
+               ancestor.location.category == 'library_content' and \
+               self.has_default_value(name):
+                return super(InheritingFieldData, self).default(block, name)
+
             while ancestor is not None:
                 if field.is_set_on(ancestor):
                     return field.read_json(ancestor)

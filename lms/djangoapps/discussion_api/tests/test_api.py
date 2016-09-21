@@ -627,10 +627,8 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["1"],
-            "recursive": ["False"],
             "commentable_ids": ["topic_x,topic_meow"]
         })
 
@@ -640,10 +638,8 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["6"],
             "per_page": ["14"],
-            "recursive": ["False"],
         })
 
     def test_thread_content(self):
@@ -853,10 +849,8 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
-            "recursive": ["False"],
             "text": ["test search string"],
         })
 
@@ -886,7 +880,6 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["11"],
         })
@@ -918,10 +911,8 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["11"],
-            "recursive": ["False"],
             query: ["true"],
         })
 
@@ -961,21 +952,22 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": [cc_query],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["11"],
-            "recursive": ["False"],
         })
 
-    @ddt.data("asc", "desc")
-    def test_order_direction_query(self, http_query):
+    def test_order_direction(self):
+        """
+        Only "desc" is supported for order.  Also, since it is simply swallowed,
+        it isn't included in the params.
+        """
         self.register_get_threads_response([], page=1, num_pages=0)
         result = get_thread_list(
             self.request,
             self.course.id,
             page=1,
             page_size=11,
-            order_direction=http_query,
+            order_direction="desc",
         ).data
 
         expected_result = make_paginated_api_response(
@@ -991,11 +983,24 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": [http_query],
             "page": ["1"],
             "per_page": ["11"],
-            "recursive": ["False"],
         })
+
+    def test_invalid_order_direction(self):
+        """
+        Test with invalid order_direction (e.g. "asc")
+        """
+        with self.assertRaises(ValidationError) as assertion:
+            self.register_get_threads_response([], page=1, num_pages=0)
+            get_thread_list(           # pylint: disable=expression-not-assigned
+                self.request,
+                self.course.id,
+                page=1,
+                page_size=11,
+                order_direction="asc",
+            ).data
+        self.assertIn("order_direction", assertion.exception.message_dict)
 
 
 @attr(shard=2)
@@ -1176,11 +1181,12 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
             {
-                "recursive": ["False"],
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
+                "recursive": ["False"],
                 "resp_skip": ["70"],
                 "resp_limit": ["14"],
+                "with_responses": ["True"],
             }
         )
 

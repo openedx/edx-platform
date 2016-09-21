@@ -32,8 +32,8 @@
     "karma-junit-reporter": "^0.4.1",
     "karma-requirejs": "^0.2.6",
     "karma-spec-reporter": "^0.0.20",
-    "pa11y": "3.6.0",
-    "pa11y-reporter-1.0-json": "1.0.2",
+    "pa11y": "4.0.1",
+    "pa11y-reporter-json-oldnode": "1.0.0",
     "plato": "1.2.2"
   }
 }

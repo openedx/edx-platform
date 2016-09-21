@@ -53,8 +53,7 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         """ Don't show every single field in the admin change list """
         return (
             'name', 'enabled', 'backend_name', 'entity_id', 'metadata_source',
-            'has_data', 'icon_class', 'icon_image', 'change_date',
-            'changed_by', 'edit_link'
+            'has_data', 'mode', 'change_date', 'changed_by', 'edit_link',
         )
 
     def has_data(self, inst):
@@ -65,6 +64,13 @@ class SAMLProviderConfigAdmin(KeyedConfigurationModelAdmin):
         return bool(data and data.is_valid())
     has_data.short_description = u'Metadata Ready'
     has_data.boolean = True
+
+    def mode(self, inst):
+        """ Indicate if debug_mode is enabled or not"""
+        if inst.debug_mode:
+            return '<span style="color: red;">Debug</span>'
+        return "Normal"
+    mode.allow_tags = True
 
     def save_model(self, request, obj, form, change):
         """

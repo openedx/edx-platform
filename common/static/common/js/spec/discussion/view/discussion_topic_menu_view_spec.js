@@ -98,7 +98,7 @@
             var dropdownText;
             this.createTopicView();
             this.view.maxNameWidth = this.defaultTextWidth + 1;
-            this.view.$el.find('a.topic-title').first().click();
+            this.view.$el.find('.topic-menu-entry').first().click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(this.completeText).toEqual(dropdownText);
         });
@@ -106,11 +106,11 @@
         it('truncation happens with specific title lengths', function() {
             var dropdownText;
             this.createTopicView();
-            this.view.$el.find('a.topic-title')[2].click();
+            this.view.$el.find('.topic-menu-entry')[2].click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText).toEqual('…/Very long category name');
 
-            this.view.$el.find('a.topic-title')[5].click();
+            this.view.$el.find('.topic-menu-entry')[5].click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText).toEqual('… / What Are Your Goals f …');
         });
@@ -118,7 +118,7 @@
         it('truncation happens with longer title lengths', function() {
             var dropdownText;
             this.createTopicView();
-            this.view.$el.find('a.topic-title')[3].click();
+            this.view.$el.find('.topic-menu-entry')[3].click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText).toEqual('… / Very very very very l …');
         });
@@ -126,7 +126,7 @@
         it('titles are escaped before display', function() {
             var dropdownText;
             this.createTopicView();
-            this.view.$el.find('a.topic-title')[4].click();
+            this.view.$el.find('.topic-menu-entry')[4].click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText).toContain('em&gt;');
         });
@@ -135,7 +135,7 @@
             var dropdownText;
             this.createTopicView();
             this.view.maxNameWidth = this.selectedOptionText.length + 100;
-            this.view.$el.find('a.topic-title').first().click();
+            this.view.$el.find('button.topic-title').first().click();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(dropdownText.indexOf('/ span>')).toEqual(-1);
         });
@@ -150,6 +150,15 @@
             this.view.render();
             dropdownText = this.view.$el.find('.js-selected-topic').text();
             expect(completeText).toEqual(dropdownText);
+        });
+
+        it("defaults to the first topic if you don't click one", function() {
+            this.createTopicView();
+            expect(
+                this.view.$el.find('.js-selected-topic').text()
+            ).toMatch(
+                this.view.$el.find('.topic-menu-entry')[0].innerHTML
+            );
         });
 
         it('click outside of the dropdown close it', function() {

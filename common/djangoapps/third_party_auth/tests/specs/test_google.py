@@ -19,6 +19,7 @@ class GoogleOauth2IntegrationTest(base.Oauth2IntegrationTest):
         super(GoogleOauth2IntegrationTest, self).setUp()
         self.provider = self.configure_google_provider(
             enabled=True,
+            visible=True,
             key='google_oauth2_key',
             secret='google_oauth2_secret',
         )

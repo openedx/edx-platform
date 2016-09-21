@@ -35,9 +35,9 @@ class ThirdPartyOAuthTestMixin(ThirdPartyAuthTestMixin):
             UserSocialAuth.objects.create(user=self.user, provider=self.BACKEND, uid=self.social_uid)
         self.oauth_client = self._create_client()
         if self.BACKEND == 'google-oauth2':
-            self.configure_google_provider(enabled=True)
+            self.configure_google_provider(enabled=True, visible=True)
         elif self.BACKEND == 'facebook':
-            self.configure_facebook_provider(enabled=True)
+            self.configure_facebook_provider(enabled=True, visible=True)
 
     def _create_client(self):
         """

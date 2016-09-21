@@ -31,4 +31,8 @@
 
 .discussion-column {
     min-height: 500px;
+
+    .new-post-article {
+        margin-top: -$baseline;
+    }
 }

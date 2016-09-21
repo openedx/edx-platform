@@ -1523,3 +1523,10 @@ div.problem .annotation-input {
     background: url('#{$static-path}/images/partially-correct-icon.png') center center no-repeat;
   }
 }
+
+// Loading Spinner
+// ====================
+.problems-wrapper .loading-spinner {
+  text-align: center;
+  color: $gray-d1;
+}
