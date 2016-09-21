@@ -115,29 +115,53 @@ $(function () {
   var droppedScores = ${ json.dumps(droppedScores) };
   var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
   
-  var a11y = [];
-  // add series
-  if (detail_tooltips['Completion']) {
-      for (var i = 0; i < detail_tooltips['Completion'].length; i++) {
-          a11y.push(detail_tooltips['Completion'][i]);
-      }
-  }
+  var order = [];
+  var serez = [];
+  var c = 0, s, t;
   
-  if (detail_tooltips['Comprehension']) {
-      for (var i = 0; i < detail_tooltips['Comprehension'].length; i++) {
-          a11y.push(detail_tooltips['Comprehension'][i]);
-      }
-  }
-  
-  if (detail_tooltips['Dropped Scores']) {
-      for (var i = 0; i < detail_tooltips['Dropped Scores'].length; i++) {
-          a11y.push(detail_tooltips['Dropped Scores'][i]);
-      }
-  }
-  
+  // loop through ticks and make a new object with only the ticks
   for (var i = 0; i < ticks.length; i++) {
-      if (a11y[i]) {
-          ticks[i][1] = '<span aria-hidden="true">' + ticks[i][1] + '</span> ' + '<span class="sr">' + a11y[i] + '</span>';
+      t = {};
+      t.tick = ticks[i][0];
+      order.push(t);
+  }
+  
+  // loop through the series and extract the matching tick and the series label
+  for (var k = 0; k < series.length; k++) {
+    if (series[k]['data'].length > 1) {
+        for (var m = 0; m < series[k]['data'].length; m++) {
+            s = {};
+            s.tick = series[k]['data'][m][0];
+            s.label = series[k]['label'];
+            serez.push(s);
+        }
+    } else {
+        s = {};
+        s.tick = series[k]['data'][0][0];
+        s.label = series[k]['label'];
+        serez.push(s);
+    }
+  }
+  
+  // reorder the serez object to match the ticks, which is the correct order
+  serez.sort(function(a, b) {
+      return a.tick-b.tick;
+  });
+  
+  // add a new description property with the additional context
+  for (var n = 0; n < serez.length; n++) {
+      if (detail_tooltips[serez[n].label].length > 1) {
+          serez[n].description = detail_tooltips[serez[n].label][c];
+          c++;
+      } else {
+          serez[n].description = detail_tooltips[serez[n].label][0];
+      }
+  }
+  
+  // update the ticks output to include the additional context from serez
+  for (var i = 0; i < ticks.length; i++) {
+      if (serez[i]) {
+          ticks[i][1] = '<span aria-hidden="true">' + ticks[i][1] + '</span> ' + '<span class="sr">' + serez[i].description + '</span>';
       }
   }
   
@@ -145,7 +169,7 @@ $(function () {
   for (var i = 0; i < grade_cutoff_ticks.length; i++) {
       grade_cutoff_ticks[i][1] = '<span aria-hidden="true">' + grade_cutoff_ticks[i][1] + '</span>';
   }
-  
+    
   //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
   series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
   
@@ -213,6 +237,7 @@ $(function () {
     $("#x").text(pos.x.toFixed(2));
     $("#y").text(pos.y.toFixed(2));
     if (item) {
+        // console.log(item);÷
       if (previousPoint != (item.dataIndex, item.seriesIndex)) {
         previousPoint = (item.dataIndex, item.seriesIndex);
             
