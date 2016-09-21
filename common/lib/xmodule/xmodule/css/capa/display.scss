@@ -904,31 +904,6 @@ div.problem .action {
   @include margin($baseline 0);
   min-height: $baseline;
 
-  // override default button hover
-  button {
-    &:hover {
-      background-image: none;
-      box-shadow: none;
-    }
-    &:focus {
-      box-shadow: none;
-    }
-    &.btn-default {
-      background-color: transparent;
-    }
-    &.btn-brand {
-      &:hover {
-        background-color: $btn-brand-focus-background;
-      }
-      &.check {
-        &.is-disabled {
-          background: $btn-brand-disabled-background;
-          color: $btn-brand-disabled-color;
-        }
-      }
-    }
-  }
-
   .problem-action-buttons-wrapper {
     margin-bottom: $baseline / 2;
 
@@ -1117,6 +1092,38 @@ div.problem {
     clear: both;
     &:first-child {
       margin-bottom: $baseline / 4;
+    }
+  }
+
+  // override default button hover
+  button {
+    &:hover {
+      background-image: none;
+      box-shadow: none;
+    }
+    &:focus {
+      box-shadow: none;
+    }
+    &.btn-default {
+      background-color: transparent;
+    }
+    &.btn-brand {
+      &:hover {
+        background-color: $btn-brand-focus-background;
+      }
+      &.check {
+        &.is-disabled {
+          background: $btn-brand-disabled-background;
+          color: $btn-brand-disabled-color;
+        }
+      }
+    }
+  }
+
+  .review-btn {
+    color: $blue;
+    &.sr {
+      color: $blue;
     }
   }
 
