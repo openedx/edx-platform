@@ -143,6 +143,12 @@ class ProblemPage(PageObject):
         """
         return self.q(css='.notification.warning.notification-save').visible
 
+    def is_success_notification_visible(self):
+        """
+        Is the Submit Notification Visible?
+        """
+        return self.q(css='.notification.success.notification-submit').visible
+
     def wait_for_save_notification(self):
         """
         Wait for the Save Notification to be present
