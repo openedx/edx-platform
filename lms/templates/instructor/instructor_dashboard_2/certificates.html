@@ -130,8 +130,14 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
                 </div>
                 <div>
                     <label>
-                        <input id="certificate_status_verified_users_with_audit_certs}" type="checkbox" name="certificate_statuses" value="verified_users_with_audit_certs">
-                        ${_("Regenerate for verified learners with audit certificates. ({count})").format(count=section_data['verified_users_with_audit_certs'])}
+                        <input id="certificate_status_${section_data['status'].audit_passing}" type="checkbox" name="certificate_statuses" value="${section_data['status'].audit_passing}">
+                        ${_("Regenerate for learners with audit passing state. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].audit_passing, 0))}
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input id="certificate_status_${section_data['status'].audit_notpassing}" type="checkbox" name="certificate_statuses" value="${section_data['status'].audit_notpassing}">
+                        ${_("Regenerate for learners with audit not passing state. ({count})").format(count=section_data['certificate_statuses_with_count'].get(section_data['status'].audit_notpassing, 0))}
                     </label>
                 </div>
                 <div>

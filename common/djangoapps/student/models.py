@@ -943,17 +943,12 @@ class CourseEnrollmentManager(models.Manager):
 
         return is_course_full
 
-    def users_enrolled_in(self, course_id, mode=None):
-        """
-        Returns a queryset of User for every user enrolled in the course.
-
-        course_id (CourseKey): The key of the course associated with the enrollment.
-        mode (String): The enrolled mode of the users.
-        """
-        _query = {'courseenrollment__course_id': course_id, 'courseenrollment__is_active': True}
-        if mode:
-            _query['courseenrollment__mode'] = mode
-        return User.objects.filter(**_query)
+    def users_enrolled_in(self, course_id):
+        """Return a queryset of User for every user enrolled in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=True
+        )
 
     def enrollment_counts(self, course_id):
         """

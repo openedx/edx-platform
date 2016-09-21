@@ -2866,8 +2866,8 @@ def start_certificate_regeneration(request, course_id):
         CertificateStatuses.downloadable,
         CertificateStatuses.error,
         CertificateStatuses.notpassing,
-        # verified users with audit passing and not passing certificate statuses.
-        'verified_users_with_audit_certs'
+        CertificateStatuses.audit_passing,
+        CertificateStatuses.audit_notpassing,
     ]
     if not set(certificates_statuses).issubset(allowed_statuses):
         return JsonResponse(

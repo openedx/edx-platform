@@ -1429,10 +1429,6 @@ def generate_students_certificates(
         specific_student_id = task_input.get('specific_student_id')
         students_to_generate_certs_for = students_to_generate_certs_for.filter(id=specific_student_id)
 
-    # Verified users with audit passing and not passing certificate statuses.
-    elif student_set == "verified_users_with_audit_certs":
-        students_to_generate_certs_for = CourseEnrollment.objects.users_enrolled_in(course_id, mode='verified')
-
     task_progress = TaskProgress(action_name, students_to_generate_certs_for.count(), start_time)
 
     current_step = {'step': 'Calculating students already have certificates'}
