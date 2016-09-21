@@ -67,6 +67,12 @@ from openedx.core.djangolib.markup import HTML
     % endif
     </div>
   </div>
+    <%include file="problem_notifications.html" args="
+      notification_type='warning',
+      notification_icon='fa-exclamation-circle',
+      notification_name='gentle-alert',
+      notification_message=''"
+    />
     % if answer_notification_type:
         % if 'correct' == answer_notification_type:
             <%include file="problem_notifications.html" args="
@@ -101,10 +107,4 @@ from openedx.core.djangolib.markup import HTML
         notification_message=save_notification_message"
       />
     % endif
-    <%include file="problem_notifications.html" args="
-      notification_type='warning',
-      notification_icon='fa-exclamation-circle',
-      notification_name='gentle-alert',
-      notification_message=''"
-    />
 </div>
