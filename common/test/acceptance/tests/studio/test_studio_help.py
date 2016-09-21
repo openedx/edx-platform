@@ -4,6 +4,7 @@ Test the Studio help links.
 
 from flaky import flaky
 from bok_choy.web_app_test import WebAppTest
+from unittest import skip
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest, ContainerBase
@@ -564,25 +565,25 @@ class CourseOutlineHelpTest(StudioCourseTest):
         )
         self.course_outline_page.visit()
 
-    # This scenario depends upon TNL-5460
-    # def test_course_outline_nav_help(self):
-    #     """
-    #     Scenario: Help link in navigation bar is working on Course Outline page
-    #     Given that I am on the Course Outline page
-    #     And I want help about the process
-    #     And I click the 'Help' in the navigation bar
-    #     Then Help link should open.
-    #     And help url should end with 'developing_course/course_outline.html'
-    #     """
-    #     href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
-    #            '/en/latest/developing_course/course_outline.html'
-    #
-    #     # Assert that help link is correct.
-    #     assert_nav_help_link(
-    #         test=self,
-    #         page=self.course_outline_page,
-    #         href=href
-    #     )
+    @skip("This scenario depends upon TNL-5460")
+    def test_course_outline_nav_help(self):
+        """
+        Scenario: Help link in navigation bar is working on Course Outline page
+        Given that I am on the Course Outline page
+        And I want help about the process
+        And I click the 'Help' in the navigation bar
+        Then Help link should open.
+        And help url should end with 'developing_course/course_outline.html'
+        """
+        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+               '/en/latest/developing_course/course_outline.html'
+
+        # Assert that help link is correct.
+        assert_nav_help_link(
+            test=self,
+            page=self.course_outline_page,
+            href=href
+        )
 
     def test_course_outline_side_bar_help(self):
         """
@@ -790,6 +791,14 @@ class StudioUnitHelpTest(ContainerBase):
         super(StudioUnitHelpTest, self).setUp(is_staff=is_staff)
 
     def populate_course_fixture(self, course_fixture):
+        """
+        Populates the course fixture.
+
+        We are modifying 'advanced_modules' setting of the
+        course.
+
+        Also add a section with a subsection and a unit.
+        """
         course_fixture.add_advanced_settings(
             {u"advanced_modules": {"value": ["split_test"]}}
         )
@@ -1099,6 +1108,12 @@ class GroupExperimentConfigurationHelpTest(ContainerBase):
         self.group_configuration_page.visit()
 
     def populate_course_fixture(self, course_fixture):
+        """
+        Populates the course fixture.
+
+        We are modifying 'advanced_modules' setting of the
+        course.
+        """
         course_fixture.add_advanced_settings(
             {u"advanced_modules": {"value": ["split_test"]}}
         )

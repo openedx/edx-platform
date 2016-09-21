@@ -306,5 +306,6 @@ class HelpMixin(object):
         else:
             element_css = SIDE_BAR_HELP_CSS
 
-        self.q(css=element_css).results[index].click()
-        return self.q(css=element_css).results[index]
+        help_element = self.q(css=element_css).results[index]
+        help_element.click()
+        return help_element
