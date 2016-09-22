@@ -49,7 +49,7 @@ Feature: LMS.LTI component
   And I submit answer to LTI 1 question
   And I click on the "Progress" tab
   Then I see text "Problem Scores: 5/10"
-  And I see graph with total progress "5%"
+  And I see graph with total progress "Overall grade: 5%"
   Then I click on the "Instructor" tab
   And I click the "Student Admin" button
   And I click on the "View Gradebook" link
@@ -77,7 +77,7 @@ Feature: LMS.LTI component
   And I submit answer to LTI 1 question
   And I click on the "Progress" tab
   Then I see text "Problem Scores: 5/10"
-  And I see graph with total progress "5%"
+  And I see graph with total progress "Overall grade: 5%"
 
   #9
   Scenario: Graded LTI component in LMS is correctly works with LTI2v0 PUT callback
