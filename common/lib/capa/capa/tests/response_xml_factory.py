@@ -172,6 +172,8 @@ class ResponseXMLFactory(object):
                 correctness = 'false'
             elif 'partial' in correct_val:
                 correctness = 'partial'
+            else:
+                correctness = correct_val
 
             choice_element.set('correct', correctness)
 
