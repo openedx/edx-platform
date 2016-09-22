@@ -1,7 +1,7 @@
 """
 Test saved subsection grade functionality.
 """
-
+# pylint: disable=protected-access
 import ddt
 from django.conf import settings
 from django.db.utils import DatabaseError
@@ -116,7 +116,7 @@ class SubsectionGradeFactoryTest(GradeTestBase):
         ) as mock_create_grade:
             with patch(
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_saved_grade',
-                wraps=self.subsection_grade_factory._get_saved_grade  # pylint: disable=protected-access
+                wraps=self.subsection_grade_factory._get_saved_grade
             ) as mock_get_saved_grade:
                 with self.assertNumQueries(14):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
@@ -205,8 +205,8 @@ class SubsectionGradeTest(GradeTestBase):
         input_grade.init_from_structure(
             self.request.user,
             self.course_structure,
-            self.subsection_grade_factory._scores_client,  # pylint: disable=protected-access
-            self.subsection_grade_factory._submissions_scores,  # pylint: disable=protected-access
+            self.subsection_grade_factory._submissions_scores,
+            self.subsection_grade_factory._csm_scores,
         )
         self.assertEqual(PersistentSubsectionGrade.objects.count(), 0)
 
@@ -224,8 +224,8 @@ class SubsectionGradeTest(GradeTestBase):
             self.request.user,
             saved_model,
             self.course_structure,
-            self.subsection_grade_factory._scores_client,  # pylint: disable=protected-access
-            self.subsection_grade_factory._submissions_scores,  # pylint: disable=protected-access
+            self.subsection_grade_factory._submissions_scores,
+            self.subsection_grade_factory._csm_scores,
         )
 
         self.assertEqual(input_grade.url_name, loaded_grade.url_name)
