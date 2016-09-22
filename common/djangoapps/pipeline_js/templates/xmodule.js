@@ -6,9 +6,8 @@
 ## and attach them to the global context manually.
 define(["jquery", "underscore", "codemirror", "tinymce",
         "jquery.tinymce", "jquery.qtip", "jquery.scrollTo", "jquery.flot",
-        "jquery.cookie",
-        "utility"],
-       function($, _, CodeMirror, tinymce) {
+        "jquery.cookie", "pretty-print", "utility"],
+       function($, _, CodeMirror) {
     window.$ = $;
     window._ = _;
     require(['mathjax']);

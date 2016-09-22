@@ -271,8 +271,6 @@
     "Bulk Exceptions": "Exce\u00e7\u00f5es em massa", 
     "Bullet list": "Marcadores", 
     "Bulleted List (Ctrl+U)": "Lista com marcadores (Ctrl+U)", 
-    "By: Community TA": "Por: Comunidade TA", 
-    "By: Staff": "Por: Equipe", 
     "Can we match the photo you took with the one on your ID?": "Podemos comparar a foto que voc\u00ea tirou com a do seu documento de identifica\u00e7\u00e3o?", 
     "Cancel": "Cancelar", 
     "Cancel enrollment code": "Cancelar c\u00f3digo de matr\u00edcula", 

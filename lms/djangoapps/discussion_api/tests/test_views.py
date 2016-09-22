@@ -428,10 +428,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
-            "recursive": ["False"],
         })
 
     @ddt.data("unread", "unanswered")
@@ -450,8 +448,6 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
-            "recursive": ["False"],
             "page": ["1"],
             "per_page": ["10"],
             query: ["true"],
@@ -473,10 +469,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["18"],
             "per_page": ["4"],
-            "recursive": ["False"],
         })
 
     def test_text_search(self):
@@ -500,10 +494,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "sort_order": ["desc"],
             "page": ["1"],
             "per_page": ["10"],
-            "recursive": ["False"],
             "text": ["test search string"],
         })
 
@@ -593,15 +585,16 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
-            "sort_order": ["desc"],
-            "recursive": ["False"],
             "page": ["1"],
             "per_page": ["10"],
             "sort_key": [cc_query],
         })
 
-    @ddt.data("asc", "desc")
-    def test_order_direction(self, query):
+    def test_order_direction(self):
+        """
+        Test order direction, of which "desc" is the only valid option.  The
+        option actually just gets swallowed, so it doesn't affect the params.
+        """
         threads = [make_minimal_cs_thread()]
         self.register_get_user_response(self.user)
         self.register_get_threads_response(threads, page=1, num_pages=1)
@@ -609,17 +602,15 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pro
             self.url,
             {
                 "course_id": unicode(self.course.id),
-                "order_direction": query,
+                "order_direction": "desc",
             }
         )
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
             "course_id": [unicode(self.course.id)],
             "sort_key": ["activity"],
-            "recursive": ["False"],
             "page": ["1"],
             "per_page": ["10"],
-            "sort_order": [query],
         })
 
     def test_mutually_exclusive(self):
@@ -711,6 +702,7 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "username": self.user.username,
             "created_at": "2015-05-19T00:00:00Z",
             "updated_at": "2015-05-19T00:00:00Z",
+            "read": True,
         })
         self.register_post_thread_response(cs_thread)
         request_data = {
@@ -741,12 +733,12 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "voted": False,
             "vote_count": 0,
             "comment_count": 1,
-            "unread_comment_count": 1,
+            "unread_comment_count": 0,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            "read": False,
+            "read": True,
             "has_endorsed": False,
             "response_count": 0,
         }
@@ -895,7 +887,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
     @ddt.unpack
     def test_closed_thread(self, field, value):
         self.register_get_user_response(self.user)
-        self.register_thread({"closed": True})
+        self.register_thread({"closed": True, "read": True})
         self.register_flag_response("thread", "test_thread")
         request_data = {field: value}
         response = self.request_patch(request_data)
@@ -904,11 +896,12 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         self.assertEqual(
             response_data,
             self.expected_response_data({
+                "read": True,
                 "closed": True,
                 "abuse_flagged": value,
                 "editable_fields": ["abuse_flagged", "read"],
                 "comment_count": 1,
-                "unread_comment_count": 1,
+                "unread_comment_count": 0,
             })
         )
 
@@ -1125,11 +1118,12 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
             {
-                "recursive": ["False"],
                 "resp_skip": ["0"],
                 "resp_limit": ["10"],
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
+                "recursive": ["False"],
+                "with_responses": ["True"],
             }
         )
 
@@ -1158,11 +1152,12 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase, Pr
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
             {
-                "recursive": ["False"],
                 "resp_skip": ["68"],
                 "resp_limit": ["4"],
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
+                "recursive": ["False"],
+                "with_responses": ["True"],
             }
         )
 

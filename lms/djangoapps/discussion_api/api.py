@@ -96,6 +96,8 @@ def _get_thread_and_context(request, thread_id, retrieve_kwargs=None):
     """
     retrieve_kwargs = retrieve_kwargs or {}
     try:
+        if "with_responses" not in retrieve_kwargs:
+            retrieve_kwargs["with_responses"] = False
         if "mark_as_read" not in retrieve_kwargs:
             retrieve_kwargs["mark_as_read"] = False
         cc_thread = Thread(id=thread_id).retrieve(**retrieve_kwargs)
@@ -496,8 +498,9 @@ def get_thread_list(
     order_by: The key in which to sort the threads by. The only values are
         "last_activity_at", "comment_count", and "vote_count". The default is
         "last_activity_at".
-    order_direction: The direction in which to sort the threads by. The only
-        values are "asc" or "desc". The default is "desc".
+    order_direction: The direction in which to sort the threads by. The default
+        and only value is "desc". This will be removed in a future major
+        version.
     requested_fields: Indicates which additional fields to return
         for each thread. (i.e. ['profile_image'])
 
@@ -526,9 +529,9 @@ def get_thread_list(
             "order_by":
                 ["Invalid value. '{}' must be 'last_activity_at', 'comment_count', or 'vote_count'".format(order_by)]
         })
-    if order_direction not in ["asc", "desc"]:
+    if order_direction != "desc":
         raise ValidationError({
-            "order_direction": ["Invalid value. '{}' must be 'asc' or 'desc'".format(order_direction)]
+            "order_direction": ["Invalid value. '{}' must be 'desc'".format(order_direction)]
         })
 
     course = _get_course(course_key, request.user)
@@ -544,7 +547,6 @@ def get_thread_list(
         "per_page": page_size,
         "text": text_search,
         "sort_key": cc_map.get(order_by),
-        "sort_order": order_direction,
     }
 
     if view:
@@ -616,6 +618,7 @@ def get_comment_list(request, thread_id, endorsed, page, page_size, requested_fi
         request,
         thread_id,
         retrieve_kwargs={
+            "with_responses": True,
             "recursive": False,
             "user_id": request.user.id,
             "response_skip": response_skip,
@@ -974,10 +977,15 @@ def get_thread(request, thread_id, requested_fields=None):
         requested_fields: Indicates which additional fields to return for
         thread. (i.e. ['profile_image'])
     """
+    # Possible candidate for optimization with caching:
+    #   Param with_responses=True required only to add "response_count" to response.
     cc_thread, context = _get_thread_and_context(
         request,
         thread_id,
-        retrieve_kwargs={"user_id": unicode(request.user.id)}
+        retrieve_kwargs={
+            "with_responses": True,
+            "user_id": unicode(request.user.id),
+        }
     )
     return _serialize_discussion_entities(request, context, [cc_thread], requested_fields, DiscussionEntity.thread)[0]
 
@@ -1011,6 +1019,7 @@ def get_response_comments(request, comment_id, page, page_size, requested_fields
             request,
             cc_comment["thread_id"],
             retrieve_kwargs={
+                "with_responses": True,
                 "recursive": True,
             }
         )

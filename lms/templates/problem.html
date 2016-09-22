@@ -12,9 +12,7 @@ from openedx.core.djangolib.markup import HTML
 <div class="problem-progress"></div>
 
 <div class="problem">
-    <div aria-live="polite">
-        ${ HTML(problem['html']) }
-    </div>
+  ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
     % if demand_hint_possible:

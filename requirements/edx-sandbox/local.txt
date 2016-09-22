@@ -1,8 +1,8 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb - to check licensing
-#   * One of @e0d, @jarv, or @feanil - to check system requirements
+#   * @edx/ospr - to check licensing
+#   * @edx/devops - to check system requirements
 
 # Install these packages from the edx-platform working tree
 # NOTE: if you change code in these packages, you MUST change the version

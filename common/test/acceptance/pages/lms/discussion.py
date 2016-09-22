@@ -188,11 +188,10 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def vote_response(self, response_id):
         current_count = self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
         self._find_within(".response_{} .discussion-response .action-vote".format(response_id)).first.click()
-        self.wait_for_ajax()
-        EmptyPromise(
+        self.wait_for(
             lambda: current_count != self.get_response_vote_count(response_id),
-            "Response is voted"
-        ).fulfill()
+            description="Vote updated for {response_id}".format(response_id=response_id)
+        )
 
     def cannot_vote_response(self, response_id):
         """Assert that the voting button is not visible on this response"""
@@ -582,7 +581,7 @@ class DiscussionUserProfilePage(CoursePage):
 
     TEXT_NEXT = u'Next >'
     TEXT_PREV = u'< Previous'
-    PAGING_SELECTOR = "a.discussion-pagination[data-page-number]"
+    PAGING_SELECTOR = ".discussion-pagination[data-page-number]"
 
     def __init__(self, browser, course_id, user_id, username, page=1):
         super(DiscussionUserProfilePage, self).__init__(browser, course_id)
@@ -712,7 +711,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
             return self.q(css=".search-alert").filter(lambda elem: text in elem.text)
 
         for alert_id in _match_messages(text).attrs("id"):
-            self.q(css="{}#{} a.dismiss".format(self.ALERT_SELECTOR, alert_id)).click()
+            self.q(css="{}#{} .dismiss".format(self.ALERT_SELECTOR, alert_id)).click()
         EmptyPromise(
             lambda: _match_messages(text).results == [],
             "waiting for dismissed alerts to disappear"

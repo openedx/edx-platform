@@ -162,7 +162,7 @@
                             {
                                 placeholder: '',
                                 name: 'honor_code',
-                                label: 'I agree to the <a href="/honor">Terms of Service and Honor Code</a>',
+                                label: 'I agree to the Terms of Service and Honor Code',
                                 defaultValue: '',
                                 type: 'checkbox',
                                 required: true,

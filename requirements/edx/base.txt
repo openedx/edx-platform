@@ -1,8 +1,8 @@
 # DON'T JUST ADD NEW DEPENDENCIES!!!
 #
 # If you open a pull request that adds a new dependency, you should notify:
-#   * @mollydb - to check licensing
-#   * support@edx.org - to check system requirements
+#   * @edx/ospr - to check licensing
+#   * @edx/devops - to check system requirements
 
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
@@ -38,13 +38,13 @@ git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc432894737119
 django==1.8.14
 djangorestframework-jwt==1.8.0
 djangorestframework-oauth==1.1.0
-edx-ccx-keys==0.1.2
+edx-ccx-keys==0.2.1
 edx-drf-extensions==0.5.1
 edx-lint==0.4.3
 edx-django-oauth2-provider==1.1.1
-edx-django-sites-extensions==2.0.1
+edx-django-sites-extensions==2.1.1
 edx-oauth2-provider==1.1.3
-edx-opaque-keys==0.3.2
+edx-opaque-keys==0.3.4
 edx-organizations==0.4.1
 edx-rest-api-client==1.2.1
 edx-search==0.1.2
@@ -67,7 +67,7 @@ networkx==1.7
 nose-xunitmp==0.3.2
 oauthlib==1.0.3
 paramiko==1.9.0
-path.py==7.2
+path.py==8.2.1
 piexif==1.0.2
 Pillow==3.1.1
 polib==1.0.3
@@ -138,13 +138,13 @@ ipaddr==2.1.11
 django-cors-headers==1.1.0
 
 # Debug toolbar
-django_debug_toolbar==1.3.2
+django_debug_toolbar==1.5
 
 # Used for testing
 before_after==0.1.3
 bok-choy==0.5.3
 chrono==1.0.2
-coverage==4.0.2
+coverage==4.2
 ddt==0.8.0
 diff-cover==0.9.8
 django-crum==0.5
@@ -185,4 +185,8 @@ pynliner==0.5.2
 sailthru-client==2.2.3
 
 # Release utils for the edx release pipeline
-edx-django-release-util==0.1.0
+edx-django-release-util==0.1.1
+
+# Used to communicate with Neo4j, which is used internally for
+# modulestore inspection
+py2neo==3.1.2

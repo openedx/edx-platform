@@ -1,5 +1,5 @@
 ###################################
-Enrollment API Enrollment Resource 
+Enrollment API Enrollment Resource
 ###################################
 
 With the Enrollment API **Enrollment** resource, you can complete the
@@ -8,7 +8,7 @@ following tasks.
 .. contents::
    :local:
    :depth: 1
-  
+
 
 .. _Get the Users Enrollment Status in a Course:
 
@@ -20,7 +20,7 @@ Get the User's Enrollment Status in a Course
 
 **Example response showing the user's enrollment status in a course**
 
-.. code-block:: json
+.. code-block:: none
 
     HTTP 200 OK
     Content-Type: application/json
@@ -28,26 +28,26 @@ Get the User's Enrollment Status in a Course
     Allow: GET, HEAD, OPTIONS
 
     {
-        "created": "2014-11-19T04:06:55Z", 
-        "mode": "honor", 
-        "is_active": true, 
+        "created": "2014-11-19T04:06:55Z",
+        "mode": "honor",
+        "is_active": true,
         "course_details": {
-            "course_id": "edX/DemoX/Demo_Course", 
-            "enrollment_end": null, 
+            "course_id": "edX/DemoX/Demo_Course",
+            "enrollment_end": null,
             "course_modes": [
                 {
-                    "slug": "honor", 
-                    "name": "Honor Code Certificate", 
-                    "min_price": 0, 
-                    "suggested_prices": [], 
-                    "currency": "usd", 
-                    "expiration_datetime": null, 
+                    "slug": "honor",
+                    "name": "Honor Code Certificate",
+                    "min_price": 0,
+                    "suggested_prices": [],
+                    "currency": "usd",
+                    "expiration_datetime": null,
                     "description": null
                 }
-            ], 
-            "enrollment_start": null, 
+            ],
+            "enrollment_start": null,
             "invite_only": false
-        }, 
+        },
         "user": "staff"
     }
 
@@ -61,7 +61,7 @@ Get the User's Enrollment Information for a Course
 
 **Example response showing a user's course enrollment information**
 
-.. code-block:: json
+.. code-block:: none
 
     HTTP 200 OK
     Content-Type: application/json
@@ -69,20 +69,20 @@ Get the User's Enrollment Information for a Course
     Allow: GET, HEAD, OPTIONS
 
     {
-        "course_id": "edX/DemoX/Demo_Course", 
-        "enrollment_end": null, 
+        "course_id": "edX/DemoX/Demo_Course",
+        "enrollment_end": null,
         "course_modes": [
             {
-                "slug": "honor", 
-                "name": "Honor Code Certificate", 
-                "min_price": 0, 
-                "suggested_prices": [], 
-                "currency": "usd", 
-                "expiration_datetime": null, 
+                "slug": "honor",
+                "name": "Honor Code Certificate",
+                "min_price": 0,
+                "suggested_prices": [],
+                "currency": "usd",
+                "expiration_datetime": null,
                 "description": null
             }
-        ], 
-        "enrollment_start": null, 
+        ],
+        "enrollment_start": null,
         "invite_only": false
     }
 
@@ -98,7 +98,7 @@ View a User's Enrollments or Enroll a User in a Course
 
 **Example response showing a user who is enrolled in two courses**
 
-.. code-block:: json
+.. code-block:: none
 
     HTTP 200 OK
     Content-Type: application/json
@@ -107,49 +107,49 @@ View a User's Enrollments or Enroll a User in a Course
 
     [
         {
-            "created": "2014-09-19T18:08:37Z", 
-            "mode": "honor", 
-            "is_active": true, 
+            "created": "2014-09-19T18:08:37Z",
+            "mode": "honor",
+            "is_active": true,
             "course_details": {
-                "course_id": "edX/DemoX/Demo_Course", 
-                "enrollment_end": null, 
+                "course_id": "edX/DemoX/Demo_Course",
+                "enrollment_end": null,
                 "course_modes": [
                     {
-                        "slug": "honor", 
-                        "name": "Honor Code Certificate", 
-                        "min_price": 0, 
-                        "suggested_prices": [], 
-                        "currency": "usd", 
-                        "expiration_datetime": null, 
+                        "slug": "honor",
+                        "name": "Honor Code Certificate",
+                        "min_price": 0,
+                        "suggested_prices": [],
+                        "currency": "usd",
+                        "expiration_datetime": null,
                         "description": null
                     }
-                ], 
-                "enrollment_start": null, 
+                ],
+                "enrollment_start": null,
                 "invite_only": false
-            }, 
+            },
             "user": "honor"
-        }, 
+        },
         {
-            "created": "2014-09-19T18:09:35Z", 
-            "mode": "honor", 
-            "is_active": true, 
+            "created": "2014-09-19T18:09:35Z",
+            "mode": "honor",
+            "is_active": true,
             "course_details": {
-                "course_id": "ArbisoftX/BulkyEmail101/2014-15", 
-                "enrollment_end": null, 
+                "course_id": "ArbisoftX/BulkyEmail101/2014-15",
+                "enrollment_end": null,
                 "course_modes": [
                     {
-                        "slug": "honor", 
-                        "name": "Honor Code Certificate", 
-                        "min_price": 0, 
-                        "suggested_prices": [], 
-                        "currency": "usd", 
-                        "expiration_datetime": null, 
+                        "slug": "honor",
+                        "name": "Honor Code Certificate",
+                        "min_price": 0,
+                        "suggested_prices": [],
+                        "currency": "usd",
+                        "expiration_datetime": null,
                         "description": null
                     }
-                ], 
-                "enrollment_start": "2014-05-01T04:00:00Z", 
+                ],
+                "enrollment_start": "2014-05-01T04:00:00Z",
                 "invite_only": false
-            }, 
+            },
             "user": "honor"
         }
     ]

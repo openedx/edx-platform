@@ -4,6 +4,7 @@ Bok choy acceptance tests for problems in the LMS
 
 See also old lettuce tests in lms/djangoapps/courseware/features/problems.feature
 """
+from nose.plugins.attrib import attr
 from textwrap import dedent
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest
@@ -51,7 +52,7 @@ class ProblemsTest(UniqueCourseTest):
             email=self.email,
             password=self.password,
             course_id=self.course_id,
-            staff=False
+            staff=True
         ).visit()
 
     def get_problem(self):
@@ -77,7 +78,8 @@ class ProblemClarificationTest(ProblemsTest):
                         <clarification>Return on Investment <strong>(per year)</strong></clarification> over 20 years.
                     </p>
                     <numericalresponse answer="6.5">
-                        <textline label="Enter the annual ROI" trailing_text="%" />
+                        <label>Enter the annual ROI</label>
+                        <textline trailing_text="%" />
                     </numericalresponse>
                 </text>
             </problem>
@@ -263,7 +265,8 @@ class ProblemWithMathjax(ProblemsTest):
             <problem>
                 <p>Check mathjax has rendered [mathjax]E=mc^2[/mathjax]</p>
                 <multiplechoiceresponse>
-                  <choicegroup label="Answer this?" type="MultipleChoice">
+                  <label>Answer this?</label>
+                  <choicegroup type="MultipleChoice">
                     <choice correct="true">Choice1 <choicehint>Correct choice message</choicehint></choice>
                     <choice correct="false">Choice2<choicehint>Wrong choice message</choicehint></choice>
                   </choicegroup>
@@ -310,7 +313,8 @@ class ProblemPartialCredit(ProblemsTest):
             <problem>
                 <p>The answer is 1. Partial credit for -1.</p>
                 <numericalresponse answer="1" partial_credit="list">
-                    <formulaequationinput label="How many miles away from Earth is the sun? Use scientific notation to answer." />
+                    <label>How many miles away from Earth is the sun? Use scientific notation to answer.</label>
+                    <formulaequationinput/>
                     <responseparam type="tolerance" default="0.01" />
                     <responseparam partial_answers="-1" />
                 </numericalresponse>
@@ -343,9 +347,9 @@ class LogoutDuringAnswering(ProblemsTest):
         """
         xml = dedent("""
             <problem>
-                <p>The answer is 1</p>
                 <numericalresponse answer="1">
-                    <formulaequationinput label="where are the songs of spring?" />
+                    <label>The answer is 1</label>
+                    <formulaequationinput/>
                     <responseparam type="tolerance" default="0.01" />
                 </numericalresponse>
             </problem>
@@ -412,3 +416,187 @@ class LogoutDuringAnswering(ProblemsTest):
 
         self.assertTrue(problem_page.is_browser_on_page())
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+
+
+class ProblemQuestionDescriptionTest(ProblemsTest):
+    """TestCase Class to verify question and description rendering."""
+    descriptions = [
+        "A vegetable is an edible part of a plant in tuber form.",
+        "A fruit is a fertilized ovary of a plant and contains seeds."
+    ]
+
+    def get_problem(self):
+        """
+        Create a problem with question and description.
+        """
+        xml = dedent("""
+            <problem>
+                <choiceresponse>
+                    <label>Eggplant is a _____?</label>
+                    <description>{}</description>
+                    <description>{}</description>
+                    <checkboxgroup>
+                        <choice correct="true">vegetable</choice>
+                        <choice correct="false">fruit</choice>
+                    </checkboxgroup>
+                </choiceresponse>
+            </problem>
+        """.format(*self.descriptions))
+        return XBlockFixtureDesc('problem', 'Label with Description', data=xml)
+
+    def test_question_with_description(self):
+        """
+        Scenario: Test that question and description are rendered as expected.
+        Given I am enrolled in a course.
+        When I visit a unit page with a CAPA question.
+        Then label and description should be rendered correctly.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        problem_page.wait_for_element_visibility(problem_page.CSS_PROBLEM_HEADER, 'wait for problem header')
+        self.assertEqual(problem_page.problem_name, 'Label with Description')
+        self.assertEqual(problem_page.problem_question, 'Eggplant is a _____?')
+        self.assertEqual(problem_page.problem_question_descriptions, self.descriptions)
+
+
+class CAPAProblemA11yBaseTestMixin(object):
+    """Base TestCase Class to verify CAPA problem accessibility."""
+
+    def test_a11y(self):
+        """
+        Verifies that there are no accessibility issues for a particular problem type
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # Set the scope to the problem question
+        problem_page.a11y_audit.config.set_scope(
+            include=['section.wrapper-problem-response']
+        )
+
+        # Run the accessibility audit.
+        problem_page.a11y_audit.check_for_accessibility_errors()
+
+
+@attr('a11y')
+class CAPAProblemChoiceA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """TestCase Class to verify accessibility for checkboxes and multiplechoice CAPA problems."""
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+        <problem>
+            <choiceresponse>
+                <label>question 1 text here</label>
+                <description>description 2 text 1</description>
+                <description>description 2 text 2</description>
+                <checkboxgroup>
+                    <choice correct="true">True</choice>
+                    <choice correct="false">False</choice>
+                </checkboxgroup>
+            </choiceresponse>
+            <multiplechoiceresponse>
+                <label>question 2 text here</label>
+                <description>description 2 text 1</description>
+                <description>description 2 text 2</description>
+                <choicegroup type="MultipleChoice">
+                    <choice correct="false">Alpha <choicehint>A hint</choicehint></choice>
+                    <choice correct="true">Beta</choice>
+                </choicegroup>
+            </multiplechoiceresponse>
+         </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'Problem A11Y TEST', data=xml)
+
+
+@attr('a11y')
+class ProblemTextInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """TestCase Class to verify TextInput problem accessibility."""
+
+    def get_problem(self):
+        """
+        TextInput problem XML.
+        """
+        xml = dedent("""
+        <problem>
+            <stringresponse answer="fight" type="ci">
+                <label>who wishes to _____ must first count the cost.</label>
+                <description>Appear weak when you are strong, and strong when you are weak.</description>
+                <description>In the midst of chaos, there is also opportunity.</description>
+                <textline size="40"/>
+            </stringresponse>
+            <stringresponse answer="force" type="ci">
+                <label>A leader leads by example not by _____.</label>
+                <description>The supreme art of war is to subdue the enemy without fighting.</description>
+                <description>Great results, can be achieved with small forces.</description>
+                <textline size="40"/>
+            </stringresponse>
+        </problem>""")
+        return XBlockFixtureDesc('problem', 'TEXTINPUT PROBLEM', data=xml)
+
+
+@attr('a11y')
+class CAPAProblemDropDownA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """TestCase Class to verify accessibility for dropdowns(optioninput) CAPA problems."""
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+        <problem>
+            <optionresponse>
+                <p>You can use this template as a guide to the simple editor markdown and OLX markup to use for
+                 dropdown problems. Edit this component to replace this template with your own assessment.</p>
+                <label>Which of the following is a fruit</label>
+                <description>Choose wisely</description>
+                <optioninput>
+                    <option correct="False">radish</option>
+                    <option correct="True">appple</option>
+                    <option correct="False">carrot</option>
+                </optioninput>
+            </optionresponse>
+        </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'Problem A11Y TEST', data=xml)
+
+
+@attr('a11y')
+class ProblemNumericalInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """Tests NumericalInput accessibility."""
+
+    def get_problem(self):
+        """NumericalInput problem XML."""
+        xml = dedent("""
+        <problem>
+            <numericalresponse answer="10*i">
+                <label>The square of what number is -100?</label>
+                <description>Use scientific notation to answer.</description>
+                <formulaequationinput/>
+            </numericalresponse>
+        </problem>""")
+        return XBlockFixtureDesc('problem', 'NUMERICALINPUT PROBLEM', data=xml)
+
+
+@attr('a11y')
+class ProblemMathExpressionInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
+    """Tests MathExpressionInput accessibility."""
+
+    def get_problem(self):
+        """MathExpressionInput problem XML."""
+        xml = dedent(r"""
+        <problem>
+            <script type="loncapa/python">
+        derivative = "n*x^(n-1)"
+            </script>
+
+            <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
+                <label>Let \( x\) be a variable, and let \( n\) be an arbitrary constant. What is the derivative of \( x^n\)?</label>
+                <description>Enter the equation</description>
+                <responseparam type="tolerance" default="0.00001"/>
+                <formulaequationinput size="40"/>
+            </formularesponse>
+        </problem>""")
+        return XBlockFixtureDesc('problem', 'MATHEXPRESSIONINPUT PROBLEM', data=xml)

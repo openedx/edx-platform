@@ -17,6 +17,9 @@ from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
 from courseware.testutils import FieldOverrideTestMixin
+from django_comment_client.utils import has_forum_access
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
+from django_comment_common.utils import are_permissions_roles_seeded
 from instructor.access import (
     allow_access,
     list_with_level,
@@ -422,6 +425,10 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         # assert that staff and instructors of master course has staff and instructor roles on ccx
         list_staff_master_course = list_with_level(self.course, 'staff')
         list_instructor_master_course = list_with_level(self.course, 'instructor')
+
+        # assert that forum roles are seeded
+        self.assertTrue(are_permissions_roles_seeded(course_key))
+        self.assertTrue(has_forum_access(self.coach.username, course_key, FORUM_ROLE_ADMINISTRATOR))
 
         with ccx_course(course_key) as course_ccx:
             list_staff_ccx_course = list_with_level(course_ccx, 'staff')

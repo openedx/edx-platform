@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-18 16:54+0000\n"
-"PO-Revision-Date: 2016-08-18 16:55:20.212629\n"
+"POT-Creation-Date: 2016-09-15 11:16+0000\n"
+"PO-Revision-Date: 2016-09-15 11:17:58.277591\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1451,8 +1451,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Tïtlé Ⱡ'σяєм ιρѕ#"
 
@@ -1883,6 +1881,26 @@ msgstr "Türn ön tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 msgid "Turn off transcripts"
 msgstr "Türn öff tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr ""
+"{start_strong}{total}{end_strong} wörds süßmïttéd ïn tötäl. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr ""
+"téxt_wörd_{uniqueId} tïtlé_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr "tïtlé_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr "téxt_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -1900,12 +1918,11 @@ msgstr "Shöw Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "Sörrý Ⱡ'σяєм ιρѕ#"
 
@@ -1938,7 +1955,6 @@ msgstr ""
 "äný ünsävéd wörk änd thén rélöäd thé pägé. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/common/js/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 "Wé häd sömé tröüßlé pröçéssïng ýöür réqüést. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυм "
@@ -1947,7 +1963,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
@@ -2091,7 +2106,6 @@ msgid "Current conversation"
 msgstr "Çürrént çönvérsätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2121,7 +2135,6 @@ msgid "Show posts by %(username)s."
 msgstr "Shöw pösts ßý %(username)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2137,7 +2150,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr ""
@@ -2186,7 +2198,7 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 "Wé häd sömé tröüßlé löädïng thé pägé ýöü réqüéstéd. Pléäsé trý ägäïn. Ⱡ'σяєм"
@@ -2297,12 +2309,6 @@ msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
 msgstr[0] "{numVotes} Vöté Ⱡ'σяєм ιρѕυм ∂#"
 msgstr[1] "{numVotes} Vötés Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
-msgstr[0] "{unread_count} néw çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-msgstr[1] "{unread_count} néw çömménts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
@@ -2488,6 +2494,7 @@ msgstr "Püßlïç Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -2968,6 +2975,7 @@ msgid "Search teams"
 msgstr "Séärçh téäms Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "Àll Töpïçs Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -3042,6 +3050,10 @@ msgid "Close Calculator"
 msgstr "Çlösé Çälçülätör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/static/coffee/src/customwmd.js
+msgid "HTML preview of post"
+msgstr "HTML prévïéw öf pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/static/coffee/src/customwmd.js
 msgid "Post body"
 msgstr "Pöst ßödý Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -3076,7 +3088,6 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/templates/search/search_loading.underscore
-#: lms/templates/student_account/account_settings_section.underscore
 msgid "Loading"
 msgstr "Löädïng Ⱡ'σяєм ιρѕυм #"
 
@@ -5578,6 +5589,7 @@ msgstr ""
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Stäff Ⱡ'σяєм ιρѕ#"
 
@@ -6749,6 +6761,12 @@ msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Status"
 msgstr "Stätüs Ⱡ'σяєм ιρѕυ#"
 
+#: cms/templates/js/publish-history.underscore
+#: cms/templates/js/staff-lock-editor.underscore
+#: common/static/common/templates/discussion/new-post-alert.underscore
+msgid "message"
+msgstr "méssägé Ⱡ'σяєм ιρѕυм #"
+
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
 msgstr "Lärgé Ⱡ'σяєм ιρѕ#"
@@ -6795,12 +6813,13 @@ msgid "Find discussions"
 msgstr "Fïnd dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
+msgid "Use the All Topics menu to find specific topics."
 msgstr ""
-"Ûsé thé Dïsçüssïön Töpïçs ménü tö fïnd spéçïfïç töpïçs. Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Ûsé thé Àll Töpïçs ménü tö fïnd spéçïfïç töpïçs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
 msgstr "Séärçh äll pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
@@ -6894,6 +6913,10 @@ msgstr "Ûnrépört Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Vote for this post,"
 msgstr "Vöté för thïs pöst, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
+#: common/static/common/templates/discussion/new-post-alert.underscore
+msgid "Error posting your message."
+msgstr "Érrör pöstïng ýöür méssägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible To:"
 msgstr "Vïsïßlé Tö: Ⱡ'σяєм ιρѕυм ∂σłσя #"
@@ -6911,18 +6934,20 @@ msgstr ""
 "stüdénts ör spéçïfý ä sïnglé çöhört. Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title:"
 msgstr "Tïtlé: Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Add a clear and descriptive title to encourage participation."
 msgstr ""
 "Àdd ä çléär änd désçrïptïvé tïtlé tö énçöürägé pärtïçïpätïön. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Enter your question or comment"
-msgstr "Éntér ýöür qüéstïön ör çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Enter your question or comment."
+msgstr "Éntér ýöür qüéstïön ör çömmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6941,6 +6966,7 @@ msgid "Add Post"
 msgstr "Àdd Pöst Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr "Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -6977,8 +7003,8 @@ msgid "Editing post"
 msgstr "Édïtïng pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Edit post title"
-msgstr "Édït pöst tïtlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Edit your post below."
+msgstr "Édït ýöür pöst ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Update post"
@@ -7006,17 +7032,13 @@ msgid "Following"
 msgstr "Föllöwïng Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr "Bý: Stäff Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr "Bý: Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
 msgstr "fmt Ⱡ'σяєм#"
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
+msgstr "{unread_comments_count} néw Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #, python-format
@@ -7169,7 +7191,7 @@ msgstr ""
 "Àdd ýöür pöst tö ä rélévänt töpïç tö hélp öthérs fïnd ït. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr "Àçtïvé Thréäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -8102,18 +8124,18 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
-"file, download course profile information or cohort results on {link_start} "
-"the Data Download page. {link_end}"
+"file, download course profile information or cohort results on the "
+"{link_start}Data Download{link_end} page."
 msgstr ""
 "Tö révïéw stüdént çöhört ässïgnménts ör séé thé résülts öf üplöädïng ä ÇSV "
-"fïlé, döwnlöäd çöürsé pröfïlé ïnförmätïön ör çöhört résülts ön {link_start} "
-"thé Dätä Döwnlöäd pägé. {link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
-" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
-"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
-"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
-"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι "
-"σƒ#"
+"fïlé, döwnlöäd çöürsé pröfïlé ïnförmätïön ör çöhört résülts ön thé "
+"{link_start}Dätä Döwnlöäd{link_end} pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
+"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
+"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
+"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
+" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι"
+" σƒƒι¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
@@ -10195,11 +10217,6 @@ msgid "Last published %(last_published_date)s by %(publish_username)s"
 msgstr ""
 "Läst püßlïshéd %(last_published_date)s ßý %(publish_username)s Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: cms/templates/js/publish-history.underscore
-#: cms/templates/js/staff-lock-editor.underscore
-msgid "message"
-msgstr "méssägé Ⱡ'σяєм ιρѕυм #"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore

@@ -5,6 +5,7 @@
 <%page expression_filter="h"/>
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
+<%def name="online_help_token()"><% return "discussions" %></%def>
 <%!
 import json
 from django.utils.translation import ugettext as _
@@ -58,14 +59,15 @@ DiscussionBoardFactory({
     <header class="page-header has-secondary">
         ## Breadcrumb navigation
         <div class="page-header-main">
-            <div class="sr-is-focusable" tabindex="-1"></div>
-            <div class="has-breadcrumbs"></div>
+            <nav aria-label="${_('Discussions')}" class="sr-is-focusable" tabindex="-1">
+                <div class="has-breadcrumbs"></div>
+            </nav>
         </div>
         <div class="page-header-secondary">
             ## Add Post button
             % if has_permission(user, 'create_thread', course.id):
             <div class="form-actions">
-                <button class="btn btn-small new-post-btn">${_("Add a Post")}</button>
+                <button class="btn-brand btn-small new-post-btn">${_("Add a Post")}</button>
             </div>
             % endif
             ## Search box

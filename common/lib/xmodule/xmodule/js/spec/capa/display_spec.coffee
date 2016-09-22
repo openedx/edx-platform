@@ -314,7 +314,7 @@ describe 'Problem', ->
         html = '''
         <div id="problem_sel">
         <select>
-        <option value="val0"></option>
+        <option value="val0">Select an option</option>
         <option value="val1">1</option>
         <option value="val2">2</option>
         </select>

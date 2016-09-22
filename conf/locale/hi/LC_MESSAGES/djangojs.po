@@ -48,7 +48,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-16 19:39+0000\n"
+"POT-Creation-Date: 2016-09-01 11:26+0000\n"
 "PO-Revision-Date: 2016-08-16 19:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -1808,6 +1808,22 @@ msgstr ""
 msgid "Turn off transcripts"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr ""
+
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
 msgid "Hide Discussion"
@@ -1825,12 +1841,11 @@ msgstr " चर्चा दिखाएं"
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
 #: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
 #: common/static/common/js/discussion/views/response_comment_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "Sorry"
 msgstr "माफ़ करें"
 
@@ -1870,7 +1885,6 @@ msgstr ""
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 msgid "…"
 msgstr "…"
@@ -1983,7 +1997,6 @@ msgid "Current conversation"
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
@@ -2011,7 +2024,6 @@ msgid "Show posts by %(username)s."
 msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
@@ -2023,7 +2035,6 @@ msgid "We had some trouble loading responses. Please reload the page."
 msgstr "जवाब लोड करने में कुछ असुविधा हुई। कृपया दोबारा पेज लोड करें।"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/discussion_router.js
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
 msgstr "जवाब लोड करने में कुछ और असुविधा हुई। कृपया दोबारा कोशिश करें।"
@@ -2067,7 +2078,7 @@ msgid "Are you sure you want to delete this post?"
 msgstr "क्या आप वाकई इस पोस्ट को हटाना चाहते हैं?"
 
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
-#: common/static/common/js/discussion/views/discussion_user_profile_view.js
+#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
 msgstr ""
 
@@ -2151,12 +2162,6 @@ msgstr[1] ""
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "{numVotes} Vote"
 msgid_plural "{numVotes} Votes"
-msgstr[0] ""
-msgstr[1] ""
-
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "{unread_count} new comment"
-msgid_plural "{unread_count} new comments"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2337,6 +2342,7 @@ msgstr ""
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/common/templates/components/search-field.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Search"
@@ -2739,6 +2745,7 @@ msgid "Search teams"
 msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr ""
 
@@ -2797,6 +2804,10 @@ msgid "Close Calculator"
 msgstr "कैलक्यूलेटर बंद करें"
 
 #: lms/static/coffee/src/customwmd.js
+msgid "HTML preview of post"
+msgstr ""
+
+#: lms/static/coffee/src/customwmd.js
 msgid "Post body"
 msgstr "बाकी पोस्ट करें"
 
@@ -2823,7 +2834,6 @@ msgstr ""
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/templates/search/search_loading.underscore
-#: lms/templates/student_account/account_settings_section.underscore
 msgid "Loading"
 msgstr ""
 
@@ -5810,10 +5820,11 @@ msgid "Find discussions"
 msgstr "चर्चाओं को ढूंढें"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
-msgid "Use the Discussion Topics menu to find specific topics."
+msgid "Use the All Topics menu to find specific topics."
 msgstr ""
 
 #: common/static/common/templates/discussion/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 msgid "Search all posts"
 msgstr ""
 
@@ -5946,6 +5957,7 @@ msgid "Add Post"
 msgstr ""
 
 #: common/static/common/templates/discussion/post-user-display.underscore
+#: common/static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr ""
 
@@ -6011,16 +6023,12 @@ msgid "Following"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Staff"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-msgid "By: Community TA"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 msgid "fmt"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-list-item.underscore
+msgid "{unread_comments_count} new"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
@@ -6157,7 +6165,7 @@ msgstr ""
 msgid "Add your post to a relevant topic to help others find it."
 msgstr ""
 
-#: common/static/common/templates/discussion/user-profile.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr ""
 
@@ -6990,8 +6998,8 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
-"file, download course profile information or cohort results on {link_start} "
-"the Data Download page. {link_end}"
+"file, download course profile information or cohort results on the "
+"{link_start}Data Download{link_end} page."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore

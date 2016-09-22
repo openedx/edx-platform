@@ -36,7 +36,7 @@
                 this.$('#' + formId + '-post-type-' + this.threadType).attr('checked', true);
                 // Only allow the topic field for course threads, as standalone threads
                 // cannot be moved.
-                if (this.context === 'course') {
+                if (this.isTabMode()) {
                     this.topicView = new DiscussionTopicMenuView({
                         topicId: this.topicId,
                         course_settings: this.course_settings

@@ -882,3 +882,15 @@
     color: $link-color !important;
   }
 }
+
+.doc-link {
+    @include float(right);
+    @include margin(($baseline*0.75), ($baseline*0.75), ($baseline*0.75), ($baseline*0.75));
+    font-size: 14px;
+    font-weight: bold;
+    color: $base-font-color;
+
+    &:visited {
+      color: $base-font-color;
+    }
+}

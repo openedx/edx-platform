@@ -6,6 +6,8 @@ import datetime
 import pytz
 import random
 
+import ddt
+
 from student.tests.factories import UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
@@ -17,6 +19,7 @@ from openedx.core.djangoapps.content.block_structure.api import get_cache
 from ..transformer import GradesTransformer
 
 
+@ddt.ddt
 class GradesTransformerTestCase(CourseStructureTestCase):
     """
     Verify behavior of the GradesTransformer
@@ -102,7 +105,99 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             }
         ])
 
-    def test_ungraded_block_collection(self):
+    def build_complicated_hypothetical_course(self):
+        """
+        Create a test course with a very odd structure as a stress-test for various methods.
+
+        Current design is to test containing_subsection logic in collect_unioned_set_field.
+        I can't reasonably draw this in ascii art (due to intentional complexities), so here's an overview:
+            We have 1 course, containing 1 chapter, containing 2 subsections.
+
+            From here, it starts to get hairy. Call our subsections A and B.
+            Subsection A contains 3 verticals (call them 1, 2, and 3), and another subsection (C)
+            Subsection B contains vertical 3 and subsection C
+            Subsection C contains 1 problem (b)
+            Vertical 1 contains 1 vertical (11)
+            Vertical 2 contains no children
+            Vertical 3 contains no children
+            Vertical 11 contains 1 problem (aa) and vertical 2
+            Problem b contains no children
+        """
+        return self.build_course([
+            {
+                u'org': u'GradesTestOrg',
+                u'course': u'GB101',
+                u'run': u'cannonball',
+                u'metadata': {u'format': u'homework'},
+                u'#type': u'course',
+                u'#ref': u'course',
+                u'#children': [
+                    {
+                        u'#type': u'chapter',
+                        u'#ref': u'chapter',
+                        u'#children': [
+                            {
+                                u'#type': u'sequential',
+                                u'#ref': 'sub_A',
+                                u'#children': [
+                                    {
+                                        u'#type': u'vertical',
+                                        u'#ref': 'vert_1',
+                                        u'#children': [
+                                            {
+                                                u'#type': u'vertical',
+                                                u'#ref': u'vert_A11',
+                                                u'#children': [{u'#type': u'problem', u'#ref': u'prob_A1aa'}]
+                                            },
+                                        ]
+                                    },
+                                    {u'#type': u'vertical', u'#ref': 'vert_2', '#parents': [u'vert_A11']},
+                                ]
+                            },
+                            {
+                                u'#type': u'sequential',
+                                u'#ref': u'sub_B',
+                                u'#children': [
+                                    {u'#type': u'vertical', u'#ref': 'vert_3', '#parents': ['sub_A']},
+                                    {
+                                        u'#type': u'sequential',
+                                        u'#ref': 'sub_C',
+                                        '#parents': ['sub_A'],
+                                        u'#children': [{u'#type': u'problem', u'#ref': u'prob_BCb'}]
+                                    },
+                                ]
+                            },
+                        ]
+                    }
+                ]
+            }
+        ])
+
+    def test_collect_containing_subsection(self):
+        expected_subsections = {
+            'course': set(),
+            'chapter': set(),
+            'sub_A': {'sub_A'},
+            'sub_B': {'sub_B'},
+            'sub_C': {'sub_A', 'sub_B', 'sub_C'},
+            'vert_1': {'sub_A'},
+            'vert_2': {'sub_A'},
+            'vert_3': {'sub_A', 'sub_B'},
+            'vert_A11': {'sub_A'},
+            'prob_A1aa': {'sub_A'},
+            'prob_BCb': {'sub_A', 'sub_B', 'sub_C'},
+        }
+        blocks = self.build_complicated_hypothetical_course()
+        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        for block_ref, expected_subsections in expected_subsections.iteritems():
+            actual_subsections = block_structure.get_transformer_block_field(
+                blocks[block_ref].location,
+                self.TRANSFORMER_CLASS_TO_TEST,
+                'subsections',
+            )
+            self.assertEqual(actual_subsections, {blocks[sub].location for sub in expected_subsections})
+
+    def test_unscored_block_collection(self):
         blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
         self.assert_collected_xblock_fields(
@@ -119,6 +214,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             blocks[u'course'].location,
             self.TRANSFORMER_CLASS_TO_TEST,
             max_score=None,
+            explicit_graded=None,
         )
 
     def test_grades_collected_basic(self):
@@ -134,6 +230,29 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             has_score=True,
             due=self.problem_metadata[u'due'],
             format=None,
+        )
+        self.assert_collected_transformer_block_fields(
+            block_structure,
+            blocks[u'problem'].location,
+            self.TRANSFORMER_CLASS_TO_TEST,
+            max_score=0,
+            explicit_graded=True,
+        )
+
+    @ddt.data(True, False, None)
+    def test_graded_at_problem(self, graded):
+        problem_metadata = {
+            u'has_score': True,
+        }
+        if graded is not None:
+            problem_metadata[u'graded'] = graded
+        blocks = self.build_course_with_problems(metadata=problem_metadata)
+        block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
+        self.assert_collected_transformer_block_fields(
+            block_structure,
+            blocks[u'problem'].location,
+            self.TRANSFORMER_CLASS_TO_TEST,
+            explicit_graded=graded,
         )
 
     def test_collecting_staff_only_problem(self):

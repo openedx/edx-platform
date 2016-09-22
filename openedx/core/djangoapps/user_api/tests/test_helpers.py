@@ -88,7 +88,9 @@ class FormDescriptionTest(TestCase):
             },
             error_messages={
                 "required": "You must provide a value!"
-            }
+            },
+            supplementalLink="",
+            supplementalText="",
         )
 
         self.assertEqual(desc.to_json(), json.dumps({
@@ -109,7 +111,9 @@ class FormDescriptionTest(TestCase):
                     },
                     "errorMessages": {
                         "required": "You must provide a value!"
-                    }
+                    },
+                    "supplementalLink": "",
+                    "supplementalText": ""
                 }
             ]
         }))
