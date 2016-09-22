@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-15 11:16+0000\n"
-"PO-Revision-Date: 2016-09-15 11:17:58.277591\n"
+"POT-Creation-Date: 2016-09-22 14:30+0000\n"
+"PO-Revision-Date: 2016-09-22 14:31:51.058301\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1924,7 +1924,6 @@ msgstr "صث اشي سخوث فقخعزمث حقخذثسسهرل غخعق قثض
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_topic_menu_view.js
 #: common/static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "…"
@@ -6441,14 +6440,6 @@ msgid "Topic Area:"
 msgstr "فخحهذ شقثش:"
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Discussion topics; currently listing: "
-msgstr "يهسذعسسهخر فخحهذس; ذعققثرفمغ مهسفهرل: "
-
-#: common/static/common/templates/discussion/topic.underscore
-msgid "Filter topics"
-msgstr "بهمفثق فخحهذس"
-
-#: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
 msgstr "شيي غخعق حخسف فخ ش قثمثدشرف فخحهذ فخ اثمح خفاثقس بهري هف."
 
@@ -9150,6 +9141,10 @@ msgstr "شيي"
 #: cms/templates/js/video/metadata-translations-entry.underscore
 msgid "Clear Value"
 msgstr "ذمثشق دشمعث"
+
+#: cms/templates/js/metadata-editor.underscore
+msgid "Component Location ID"
+msgstr "ذخوحخرثرف مخذشفهخر هي"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
