@@ -19,6 +19,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.management import call_command
+from django.db import transaction
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.utils.decorators import method_decorator
@@ -810,6 +811,12 @@ class MgmtCommands(SysadminDashboardView):
     """
     Render views for management commands
     """
+
+    # This decorator is for the regenerate_user command, but affects all sysadmin
+    # management commands
+    @transaction.non_atomic_requests
+    def dispatch(self, *args, **kwargs):
+        return super(MgmtCommands, self).dispatch(*args, **kwargs)
 
     def get(self, request):
         """
