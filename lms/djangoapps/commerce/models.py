@@ -9,7 +9,8 @@ from config_models.models import ConfigurationModel
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 from logging import getLogger
-logger = getLogger(__name__)  # pylint: disable=invalid-name
+
+LOGGER = getLogger(__name__)
 
 
 class CommerceConfiguration(ConfigurationModel):
@@ -38,6 +39,11 @@ class CommerceConfiguration(ConfigurationModel):
             'Specified in seconds. Enable caching by setting this to a value greater than 0.'
         )
     )
+    receipt_page = models.CharField(
+        max_length=255,
+        default='/commerce/checkout/receipt/?orderNum=',
+        help_text=_('Path to order receipt page.')
+    )
     site = models.ForeignKey(
         Site,
         on_delete=models.SET_NULL,
@@ -48,13 +54,16 @@ class CommerceConfiguration(ConfigurationModel):
     def __unicode__(self):
         return "Commerce configuration"
 
+    @property
+    def is_cache_enabled(self):
+        """Whether responses from the Ecommerce API will be cached."""
+        return self.cache_ttl > 0
+
     def get_receipt_page_url(self, order_number):
         """
         Return absolute receipt page URL.
-
         Arguments:
             order_number (str): Order number
-
         Returns:
             Absolute receipt page URL, consisting of site domain and site receipt page.
         """
@@ -67,13 +76,8 @@ class CommerceConfiguration(ConfigurationModel):
                     order_number=order_number
                 )
             except AttributeError:
-                logger.info("Site Configuration is not enabled for site (%s).", site)
+                LOGGER.info("Site Configuration is not enabled for site (%s).", site)
         return '{default_receipt_page_url}{order_number}'.format(
             default_receipt_page_url=SiteConfiguration.DEFAULT_RECEIPT_PAGE_URL,
             order_number=order_number
         )
-
-    @property
-    def is_cache_enabled(self):
-        """Whether responses from the Ecommerce API will be cached."""
-        return self.cache_ttl > 0
