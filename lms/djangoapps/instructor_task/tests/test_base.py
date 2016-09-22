@@ -208,15 +208,24 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         else:
             return TEST_COURSE_KEY.make_usage_key('problem', problem_url_name)
 
+    def _option_problem_factory_args(self, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
+        """
+        Returns the factory args for the option problem type.
+        """
+        return {
+            'question_text': 'The correct answer is {0}'.format(correct_answer),
+            'options': [OPTION_1, OPTION_2],
+            'correct_option': correct_answer,
+            'num_responses': num_responses,
+            'num_inputs': num_inputs,
+        }
+
     def define_option_problem(self, problem_url_name, parent=None, **kwargs):
         """Create the problem definition so the answer is Option 1"""
         if parent is None:
             parent = self.problem_section
         factory = OptionResponseXMLFactory()
-        factory_args = {'question_text': 'The correct answer is {0}'.format(OPTION_1),
-                        'options': [OPTION_1, OPTION_2],
-                        'correct_option': OPTION_1,
-                        'num_responses': 2}
+        factory_args = self._option_problem_factory_args()
         problem_xml = factory.build_xml(**factory_args)
         ItemFactory.create(parent_location=parent.location,
                            parent=parent,
@@ -225,13 +234,10 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                            data=problem_xml,
                            **kwargs)
 
-    def redefine_option_problem(self, problem_url_name):
+    def redefine_option_problem(self, problem_url_name, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
         """Change the problem definition so the answer is Option 2"""
         factory = OptionResponseXMLFactory()
-        factory_args = {'question_text': 'The correct answer is {0}'.format(OPTION_2),
-                        'options': [OPTION_1, OPTION_2],
-                        'correct_option': OPTION_2,
-                        'num_responses': 2}
+        factory_args = self._option_problem_factory_args(correct_answer, num_inputs, num_responses)
         problem_xml = factory.build_xml(**factory_args)
         location = InstructorTaskTestCase.problem_location(problem_url_name)
         item = self.module_store.get_item(location)

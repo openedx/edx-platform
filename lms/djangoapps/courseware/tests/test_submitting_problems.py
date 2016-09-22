@@ -354,7 +354,21 @@ class TestCourseGrader(TestSubmittingProblems):
         self.add_dropdown_to_section(self.homework.location, 'p3', 1)
         self.refresh_course()
 
-    def weighted_setup(self):
+    def weighted_setup(self, hw_weight=0.25, final_weight=0.75):
+        """
+        Set up a simple course for testing weighted grading functionality.
+        """
+        # pylint: disable=attribute-defined-outside-init
+
+        self.set_weighted_policy(hw_weight, final_weight)
+
+        # set up a structure of 1 homework and 1 final
+        self.homework = self.add_graded_section_to_course('homework')
+        self.problem = self.add_dropdown_to_section(self.homework.location, 'H1P1')
+        self.final = self.add_graded_section_to_course('Final Section', 'Final')
+        self.final_question = self.add_dropdown_to_section(self.final.location, 'FinalQuestion')
+
+    def set_weighted_policy(self, hw_weight=0.25, final_weight=0.75):
         """
         Set up a simple course for testing weighted grading functionality.
         """
@@ -366,22 +380,16 @@ class TestCourseGrader(TestSubmittingProblems):
                     "min_count": 1,
                     "drop_count": 0,
                     "short_label": "HW",
-                    "weight": 0.25
+                    "weight": hw_weight
                 }, {
                     "type": "Final",
                     "name": "Final Section",
                     "short_label": "Final",
-                    "weight": 0.75
+                    "weight": final_weight
                 }
             ]
         }
         self.add_grading_policy(grading_policy)
-
-        # set up a structure of 1 homework and 1 final
-        self.homework = self.add_graded_section_to_course('homework')
-        self.problem = self.add_dropdown_to_section(self.homework.location, 'H1P1')
-        self.final = self.add_graded_section_to_course('Final Section', 'Final')
-        self.final_question = self.add_dropdown_to_section(self.final.location, 'FinalQuestion')
 
     def dropping_setup(self):
         """
@@ -618,6 +626,17 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.submit_question_answer('FinalQuestion', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(1.0)
+
+    def test_grade_updates_on_weighted_change(self):
+        """
+        Test that the course grade updates when the
+        assignment weights change.
+        """
+        self.weighted_setup()
+        self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
+        self.check_grade_percent(0.25)
+        self.set_weighted_policy(0.75, 0.25)
+        self.check_grade_percent(0.75)
 
     def dropping_homework_stage1(self):
         """
