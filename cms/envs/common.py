@@ -1190,3 +1190,6 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 ############## Settings for Studio Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = None
+
+# Theme directory locale paths
+COMPREHENSIVE_THEME_LOCALE_PATHS = []
