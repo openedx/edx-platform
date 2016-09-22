@@ -289,6 +289,7 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         ]
 
         # Enroll in all the courses
+        self.assertEqual(len(response.data), 3)
         for course in courses:
             self.enroll(course.id)
 
