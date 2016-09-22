@@ -13,10 +13,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='commerceconfiguration',
-            name='receipt_page',
-        ),
         migrations.AddField(
             model_name='commerceconfiguration',
             name='site',
