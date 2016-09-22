@@ -157,6 +157,14 @@ $(function () {
       }
   }
   
+  console.log('--------');
+  console.log('`ticks` comes straight from the passed in data; matches the x-axis order');
+  console.log(ticks);
+  console.log('This is the series object I\'ve built, ordered to match the order of `ticks`; contains additional context');
+  console.log(series_order_object);
+  console.log('`detail_tooltips` is also passed in and contains the rest of the context; we have to match it to the series (which matches the `ticks`)');
+  console.log(detail_tooltips);
+  
   // hide the vertical axis since they are audibly lacking context
   for (var i = 0; i < grade_cutoff_ticks.length; i++) {
       grade_cutoff_ticks[i][1] = '<span aria-hidden="true">' + grade_cutoff_ticks[i][1] + '</span>';
