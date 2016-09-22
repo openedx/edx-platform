@@ -144,9 +144,19 @@ $(function () {
   for (var n = 0; n < series_order_object.length; n++) {
       if (detail_tooltips[series_order_object[n].label].length > 1) {
           series_order_object[n].description = detail_tooltips[series_order_object[n].label][c];
+          for (var m = 0; m < droppedScores[0].length; m++) {
+              if (series_order_object[n].tick === droppedScores[0][m]) {
+                  series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
+              }
+          }
           c++;
       } else {
           series_order_object[n].description = detail_tooltips[series_order_object[n].label][0];
+          for (var m = 0; m < droppedScores[0].length; m++) {
+              if (series_order_object[n].tick === droppedScores[0][m]) {
+                  series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
+              }
+          }
       }
   }
   
@@ -156,14 +166,10 @@ $(function () {
           ticks[i][1] = '<span aria-hidden="true">' + ticks[i][1] + '</span> ' + '<span class="sr">' + series_order_object[i].description + '</span>';
       }
   }
-  
-  console.log('--------');
-  console.log('`ticks` comes straight from the passed in data; matches the x-axis order');
-  console.log(ticks);
-  console.log('This is the series object I\'ve built, ordered to match the order of `ticks`; contains additional context');
+  // console.log(series)
   console.log(series_order_object);
-  console.log('`detail_tooltips` is also passed in and contains the rest of the context; we have to match it to the series (which matches the `ticks`)');
-  console.log(detail_tooltips);
+  // console.log(droppedScores);
+  // console.log(detail_tooltips);
   
   // hide the vertical axis since they are audibly lacking context
   for (var i = 0; i < grade_cutoff_ticks.length; i++) {
@@ -227,7 +233,7 @@ $(function () {
     
     %if show_grade_breakdown:
       var o = plot.pointOffset({x: ${overviewBarX} , y: ${totalScore}});
-      $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px"><span class="sr">Overall grade:</span> ${"{totalscore:.0%}".format(totalscore=totalScore)}</div>');
+      $grade_detail_graph.append('<div style="position:absolute;left:' + (o.left - 12) + 'px;top:' + (o.top - 20) + 'px">${'{overall_wrap_start}{overall_text}{overall_wrap_close}{totalscore:.0%}'.format(overall_wrap_start="<span class=sr>", overall_wrap_close="</span>", overall_text="Overall score:", totalscore=totalScore)}</div>');
     %endif
   }
   
