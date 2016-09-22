@@ -10,6 +10,7 @@ import ddt
 
 from ..helpers import UniqueCourseTest, auto_auth, create_multiple_choice_problem
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from lettuce import world, step
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage
@@ -253,12 +254,26 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         self.assertEqual(self._get_section_score(), section_score)
         self.assertTrue(self.progress_page.text_on_page(text))
 
+    def _check_for_sr_text_in_chart(self):
+        """
+        Checks for sr text in the graph.
+        """
+        selector = 'grade-detail-graph'
+        sr_class = 'class="sr"'
+        xpath = '//div[@id="{parent}"]//div[text()="{sr_class}"]'.format(
+            parent=selector,
+            sr_class=sr_class
+        )
+        graph = world.browser.find_by_xpath(xpath)
+        self.assertTrue("Necessary sr class and text not found!", graph.size() > 0)
+
     def test_subsection_grading_policy_on_progress_page(self):
         with self._logged_in_session():
             self._check_scores_and_page_text([(0, 1), (0, 1)], (0, 2), "Homework 1 - Test Subsection 1 - 0% (0/2)")
             self.courseware_page.visit()
             self._answer_problem_correctly()
             self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
+            self._check_for_sr_text_in_chart()
 
         self._set_policy_for_subsection("Not Graded")
 
@@ -271,3 +286,19 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         self._set_policy_for_subsection("Homework")
         with self._logged_in_session():
             self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
+            self._check_for_sr_text_in_chart()
+
+
+    @attr('a11y')
+    class ProgressPageA11yTest(ProgressPageBaseTest):
+        """
+        Class to test the accessibility of the progress page.
+        """
+
+        def test_progress_page_a11y(self):
+            """
+            Test the accessibility of the progress page.
+            """
+            self.log_in_as_unique_user()
+            self.progress_page.visit()
+            self.progress_page.a11y_audit.check_for_accessibility_errors()
