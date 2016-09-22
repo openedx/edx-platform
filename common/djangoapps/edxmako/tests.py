@@ -1,4 +1,3 @@
-
 from mock import patch, Mock
 import unittest
 import ddt
