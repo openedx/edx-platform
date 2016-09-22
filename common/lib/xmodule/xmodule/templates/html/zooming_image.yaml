@@ -5,7 +5,7 @@ data: |
       <h3 class="hd hd-3">Zooming Image Tool</h3>
       <p>Use the Zooming Image Tool to enable learners to see details of large, complex images.</p>
       <p>With the Zooming Image Tool, the learner can move the mouse pointer over a part of the image to enlarge it and see more detail.</p>
-      <p>To use the Zooming Image Tool, you must first add the <a href="http://files.edx.org/image-zoom-tool.js" target="_blank">image-zoom-tool.js JavaScript file</a> to your course.</p>
+      <p>To use the Zooming Image Tool, you must first add the <a href="http://files.edx.org/zooming-image/image-zoom-tool.js">image-zoom-tool.js JavaScript file</a> to your course.</p>
       <p>You must also add both the regular and magnified image files to your course, and they must have the same aspect ratio.</p>
       <p>The following HTML code shows the format required to use the Zooming Image tool. For the example in this template, you must replace the values in <i>italics</i>.</p>
       <p>Your small and large image should have the same aspect ratio.</p>
@@ -38,11 +38,11 @@ data: |
       <p>You can view the chemical structures of the molecules by clicking on them. The magnified view also lists the enzymes involved in each step.</p>
       <p class="sr">Press spacebar to open the magnifier.</p>
       <div class="zooming-image-place" style="position: relative;">
-        <a class="edx-zoom" href="https://files.edx.org/zoomimg-image/large-map.jpg">
-            <img alt="magnify" src="https://files.edx.org/zooming-image/small-map.jpg" />
+        <a class="edx-zoom" href="http://files.edx.org/zoomimg-image/large-map.jpg">
+            <img alt="magnify" src="http://files.edx.org/zooming-image/small-map.jpg" />
             <span class="indicator icon fa fa-search-plus" aria-hidden="true"></span>
           </a>
-        <div class="script_placeholder" data-src="https://files.edx.org/zooming-image/image-zoom-tool.js" />
+        <div class="script_placeholder" data-src="http://files.edx.org/zooming-image/image-zoom-tool.js" />
       </div>
       <script type="text/javascript">// <![CDATA[
       JavascriptLoader.executeModuleScripts($('.zooming-image-place').eq(0), function() {
