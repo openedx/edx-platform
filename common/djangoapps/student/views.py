@@ -105,6 +105,7 @@ from student.helpers import (
     check_verify_status_by_course,
     auth_pipeline_urls, get_next_url_for_login_page,
     DISABLE_UNENROLL_CERT_STATES,
+    destroy_oauth_tokens
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
@@ -2116,6 +2117,7 @@ def password_reset(request):
                 "user_id": request.user.id,
             }
         )
+        destroy_oauth_tokens(request.user)
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
