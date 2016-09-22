@@ -96,7 +96,7 @@ class SignInHelpTest(WebAppTest):
         """
         sign_in_page = self.index_page.click_sign_in()
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -128,7 +128,7 @@ class SignUpHelpTest(WebAppTest):
         """
         sign_up_page = self.index_page.click_sign_up()
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -159,7 +159,7 @@ class HomeHelpTest(StudioCourseTest):
         And help url should end with 'getting_started/get_started.html'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -179,7 +179,7 @@ class HomeHelpTest(StudioCourseTest):
         And help url should end with 'getting_started/get_started.html'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -215,7 +215,7 @@ class NewCourseHelpTest(WebAppTest):
         And help url should end with 'getting_started/get_started.html'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -235,7 +235,7 @@ class NewCourseHelpTest(WebAppTest):
         And help url should end with 'getting_started/get_started.html'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -271,7 +271,7 @@ class NewLibraryHelpTest(WebAppTest):
         And help url should end with 'getting_started/get_started.html'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -291,7 +291,7 @@ class NewLibraryHelpTest(WebAppTest):
         And help url should end with 'getting_started/get_started.html'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -327,7 +327,7 @@ class LibraryTabHelpTest(WebAppTest):
         self.assertTrue(self.dashboard_page.has_new_library_button)
         click_css(self.dashboard_page, '#course-index-tabs .libraries-tab', 0, False)
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.
@@ -359,8 +359,8 @@ class LibraryHelpTest(StudioLibraryTest):
         """
         self.library_page.visit()
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
-               'en/latest/course_components/libraries.html'
+        href = "http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/" \
+               "en/latest/course_components/libraries.html"
 
         # Assert that help link is correct.
         assert_nav_help_link(
@@ -381,7 +381,7 @@ class LibraryHelpTest(StudioLibraryTest):
         """
         self.library_page.visit()
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/course_components/libraries.html'
 
         # Assert that help link is correct.
@@ -405,7 +405,7 @@ class LibraryHelpTest(StudioLibraryTest):
         """
         self.library_user_page.visit()
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/course_components/libraries.html#give-other-users-access-to-your-library'
 
         # Assert that help link is correct.
@@ -435,7 +435,7 @@ class LibraryImportHelpTest(StudioLibraryTest):
         And help url should end with 'creating_content/libraries.html#import-a-library'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/course_components/libraries.html#import-a-library'
 
         # Assert that help link is correct.
@@ -455,7 +455,7 @@ class LibraryImportHelpTest(StudioLibraryTest):
         And help url should end with 'creating_content/libraries.html#import-a-library'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/course_components/libraries.html#import-a-library'
 
         # Assert that help link is correct.
@@ -486,7 +486,7 @@ class LibraryExportHelpTest(StudioLibraryTest):
         And help url should end with 'creating_content/libraries.html#export-a-library'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/course_components/libraries.html#export-a-library'
 
         # Assert that help link is correct.
@@ -506,7 +506,7 @@ class LibraryExportHelpTest(StudioLibraryTest):
         And help url should end with 'creating_content/libraries.html#export-a-library'
         """
         # The href we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/course_components/libraries.html#export-a-library'
 
         # Assert that help link is correct.
@@ -540,7 +540,7 @@ class NewProgramHelpTest(ProgramsConfigMixin, WebAppTest):
         And help url should end with 'index.html'
         """
         self.program_page.click_new_program_button()
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/index.html'
 
         # Assert that help link is correct.
@@ -575,7 +575,7 @@ class CourseOutlineHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'developing_course/course_outline.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/developing_course/course_outline.html'
 
         # Assert that help link is correct.
@@ -594,7 +594,7 @@ class CourseOutlineHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'developing_course/course_outline.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/developing_course/course_outline.html'
 
         # Assert that help link is correct.
@@ -630,7 +630,7 @@ class CourseUpdateHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'course_assets/handouts_updates.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/course_assets/handouts_updates.html'
 
         # Assert that help link is correct.
@@ -664,7 +664,7 @@ class AssetIndexHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'course_assets/course_files.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/course_assets/course_files.html'
 
         # Assert that help link is correct.
@@ -683,7 +683,7 @@ class AssetIndexHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'course_assets/course_files.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/course_assets/course_files.html'
 
         # Assert that help link is correct.
@@ -718,7 +718,7 @@ class CoursePagesHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'course_assets/pages.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/course_assets/pages.html'
 
         # Assert that help link is correct.
@@ -752,7 +752,7 @@ class UploadTextbookHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'course_assets/textbooks.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/course_assets/textbooks.html'
 
         # Assert that help link is correct.
@@ -771,7 +771,7 @@ class UploadTextbookHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'course_assets/textbooks.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/course_assets/textbooks.html'
 
         # Assert that help link is correct.
@@ -821,7 +821,7 @@ class StudioUnitHelpTest(ContainerBase):
         And help url should end with 'developing_course/course_units.html'
         """
         unit_page = self.go_to_unit_page()
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/developing_course/course_units.html'
 
         # Assert that help link is correct.
@@ -857,7 +857,7 @@ class SettingsHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'set_up_course/setting_up_student_view.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/set_up_course/setting_up_student_view.html'
 
         # Assert that help link is correct.
@@ -893,7 +893,7 @@ class GradingPageHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'grading/index.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/grading/index.html'
 
         # Assert that help link is correct.
@@ -929,7 +929,7 @@ class CourseTeamSettingsHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'set_up_course/course_staffing.html#add-course-team-members'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/set_up_course/course_staffing.html#add-course-team-members'
 
         # Assert that help link is correct.
@@ -966,7 +966,7 @@ class CourseGroupConfigurationHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'index.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/index.html'
 
         # Assert that help link is correct.
@@ -986,7 +986,7 @@ class CourseGroupConfigurationHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'course_features/cohorts/cohorted_courseware.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/course_features/cohorts/cohorted_courseware.html'
 
         # Assert that help link is correct.
@@ -1023,7 +1023,7 @@ class AdvancedSettingHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'index.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/index.html'
 
         # Assert that help link is correct.
@@ -1059,7 +1059,7 @@ class CertificatePageHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'set_up_course/creating_course_certificates.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/set_up_course/creating_course_certificates.html'
 
         # Assert that help link is correct.
@@ -1078,7 +1078,7 @@ class CertificatePageHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'set_up_course/creating_course_certificates.html'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course' \
                '/en/latest/set_up_course/creating_course_certificates.html'
 
         # Assert that help link is correct.
@@ -1129,7 +1129,7 @@ class GroupExperimentConfigurationHelpTest(ContainerBase):
         And help url should end with
         'content_experiments_configure.html#set-up-group-configurations-in-edx-studio'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/course_features' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/course_features' \
                '/content_experiments/content_experiments_configure.html#set-up-group-configurations-in-edx-studio'
         # Assert that help link is correct.
         assert_side_bar_help_link(
@@ -1165,7 +1165,7 @@ class ToolsImportHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'releasing_course/export_import_course.html#import-a-course'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/releasing_course/export_import_course.html#import-a-course'
 
         # Assert that help link is correct.
@@ -1184,7 +1184,7 @@ class ToolsImportHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'releasing_course/export_import_course.html#import-a-course'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/releasing_course/export_import_course.html#import-a-course'
 
         # Assert that help link is correct.
@@ -1221,7 +1221,7 @@ class ToolsExportHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'releasing_course/export_import_course.html#export-a-course'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/releasing_course/export_import_course.html#export-a-course'
 
         # Assert that help link is correct.
@@ -1240,7 +1240,7 @@ class ToolsExportHelpTest(StudioCourseTest):
         Then Help link should open.
         And help url should end with 'releasing_course/export_import_course.html#export-a-course'
         """
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/en/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/' \
                'latest/releasing_course/export_import_course.html#export-a-course'
 
         # Assert that help link is correct.
@@ -1271,7 +1271,7 @@ class StudioWelcomeHelpTest(WebAppTest):
         And help url should contain 'getting_started/get_started.html'
         """
         # The url we want to see in anchor help element.
-        href = 'http://edx.readthedocs.org/projects/edx-partner-course-staff/' \
+        href = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/' \
                'en/latest/getting_started/get_started.html'
 
         # Assert that help link is correct.

@@ -379,19 +379,6 @@ def auto_auth(browser, username, email, staff, course_id):
     AutoAuthPage(browser, username=username, email=email, course_id=course_id, staff=staff).visit()
 
 
-def get_url_with_changed_domain(url):
-    """
-    Replaces .org with .io in the url
-
-    Arguments:
-        url (str): The url to perform replace operation on.
-
-    Returns:
-        str: The updated url
-    """
-    return url.replace('.org/', '.io/')
-
-
 def assert_link(test, expected_link, actual_link):
     """
     Assert that 'href' and text inside help DOM element are correct.
@@ -414,10 +401,7 @@ def assert_opened_help_link_is_correct(test, url):
     """
     test.browser.switch_to_window(test.browser.window_handles[-1])
     # Assert that url in the browser is the same.
-    # Please note that .org domain in href attribute of help anchor DOM element
-    # is changed into .io domain. This is because browser is redirected from .org
-    # domain to .io domain.
-    test.assertEqual(get_url_with_changed_domain(url), test.browser.current_url)
+    test.assertEqual(url, test.browser.current_url)
     test.assertNotIn('Maze Found', test.browser.title)
 
 
