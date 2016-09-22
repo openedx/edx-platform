@@ -12,9 +12,9 @@ paver coverage
 # a param to the coverage job on jenkins.
 #pip install coveralls==1.0
 #COVERALLS_REPO_TOKEN=$1 TRAVIS_BRANCH=$2 coveralls
-pip install codecov
+pip install codecov==2.0.5
 CODE_COV_TOKEN=$1
-codecov --token=$1
+codecov --token=$CODE_COV_TOKEN
 
 # Get coverage reports for bok choy
 # paver bokchoy_coverage
