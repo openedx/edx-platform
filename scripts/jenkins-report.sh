@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 
+# Note: this script is in a temporary state. In an effort to get the
+# platform off of coveralls and onto codecov, we will be temporarily
+# using both.
+
 # This script is used by the edx-platform-unit-coverage jenkins job.
 
-if [ $# -eq 1 ]; then
+if [ $# -eq 2 ]; then
     COMMIT=$1
 else
     echo "Incorrect number of arguments passed to this script!"
-    echo "Please supply a git hash to specify the commit being tested"
+    echo "Please supply the following values to this script:"
+    echo "1) git hash of the commit being tested"
+    echo "2) coveralls token"
     exit 1
 fi
 
@@ -21,6 +27,13 @@ paver coverage
 # available as an environment variable.
 pip install codecov==2.0.5
 codecov --token=$CODE_COV_TOKEN --commit=$COMMIT
+
+# THIS BLOCK WILL BE REMOVED
+# Send the coverage data to coveralls. Setting 'TRAVIS_BRANCH' allows the
+# data to be sorted by branch in the coveralls UI. The branch is passed as
+# a param to the coverage job on jenkins.
+pip install coveralls==1.0
+COVERALLS_REPO_TOKEN=$2 TRAVIS_BRANCH=$COMMIT coveralls
 
 # Get coverage reports for bok choy
 # paver bokchoy_coverage
