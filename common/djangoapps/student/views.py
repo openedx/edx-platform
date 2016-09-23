@@ -56,6 +56,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
     LogoutViewConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
@@ -1775,12 +1776,10 @@ def create_account_with_params(request, params):
         )
     )
     if send_email:
-        dest_addr = user.email
         context = {
             'name': profile.name,
             'key': registration.activation_key,
         }
-
         # composes activation email
         subject = render_to_string('emails/activation_email_subject.txt', context)
         # Email subject *must not* contain newlines
@@ -1791,21 +1790,7 @@ def create_account_with_params(request, params):
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
-        try:
-            if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-                message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                           '-' * 80 + '\n\n' + message)
-                mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
-            else:
-                user.email_user(subject, message, from_address)
-        except Exception:  # pylint: disable=broad-except
-            log.error(
-                u'Unable to send activation email to user from "%s" to "%s"',
-                from_address,
-                dest_addr,
-                exc_info=True
-            )
+        send_activation_email.delay(user, subject, message, from_address)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
