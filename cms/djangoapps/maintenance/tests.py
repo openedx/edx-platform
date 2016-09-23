@@ -120,7 +120,7 @@ class MaintenanceViewAccessTests(MaintenanceViewTestCase):
         response = self.client.get(url)
         self.assertContains(
             response,
-            'Must be {platform_name} staff to perform this action.'.format(platform_name=settings.PLATFORM_NAME),
+            u'Must be {platform_name} staff to perform this action.'.format(platform_name=settings.PLATFORM_NAME),
             status_code=403
         )
 

@@ -1106,7 +1106,7 @@ class DonationTest(ModuleStoreTestCase):
             donation,
             donation_type="general",
             unit_cost=self.COST,
-            line_desc="Donation for edX"
+            line_desc=u"Donation for {}".format(settings.PLATFORM_NAME)
         )
 
     def test_donate_to_course(self):
