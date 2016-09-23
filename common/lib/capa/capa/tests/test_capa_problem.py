@@ -6,7 +6,7 @@ import textwrap
 from lxml import etree
 import unittest
 
-from . import new_loncapa_problem
+from capa.tests.helpers import new_loncapa_problem
 
 
 @ddt.ddt
