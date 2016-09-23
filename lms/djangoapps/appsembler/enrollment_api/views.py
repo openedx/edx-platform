@@ -119,6 +119,13 @@ class EnrollUserWithEnrollmentCodeView(APIView):
 
 
 class EnrollmentCodeStatusView(APIView):
+    """
+    This endpoint controls the status of the enrollment codes. Receives two parameters: enrollment_code and the action
+    cancel or restore.
+    cancel: If the code was user for enroll an user, the user is unenrolled and the code becomes unavailable.
+    restore: If the code was user for enroll an user, the user is unenrolled and the code becomes available for use it
+    again.
+    """
     authentication_classes = OAuth2AuthenticationAllowInactiveUser, EnrollmentCrossDomainSessionAuth
     permission_classes = IsStaffOrOwner,
 
@@ -134,16 +141,24 @@ class EnrollmentCodeStatusView(APIView):
                     'success': False},
                 status=400
             )
-
+        # check if the code was in use (redeemed)
         redemption = RegistrationCodeRedemption.get_registration_code_redemption(registration_code.code,
                                                                                  registration_code.course_id)
         if action == 'cancel':
             if redemption:
+                # if was redeemed, unenroll the user from the course and delete the redemption object.
                 CourseEnrollment.unenroll(redemption.course_enrollment.user, registration_code.course_id)
+                redemption.delete()
+            # make the enrollment code unavailable
             registration_code.is_valid = False
             registration_code.save()
 
         if action == 'restore':
+            if redemption:
+                # if was redeemed, unenroll the user from the course and delete the redemption object.
+                CourseEnrollment.unenroll(redemption.course_enrollment.user, registration_code.course_id)
+                redemption.delete()
+            # make the enrollment code available
             registration_code.is_valid = True
             registration_code.save()
         return Response(data={'success': True})
