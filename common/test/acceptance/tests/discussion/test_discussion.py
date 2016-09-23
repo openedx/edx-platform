@@ -211,6 +211,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -455,6 +456,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
 
@@ -463,6 +465,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
 
@@ -819,6 +822,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         page.visit()
@@ -916,6 +920,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1321,6 +1326,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

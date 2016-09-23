@@ -57,7 +57,10 @@ VIDEO_MENUS = {
     'language': '.lang .menu',
     'speed': '.speed .menu',
     'download_transcript': '.video-tracks .a11y-menu-list',
-    'transcript-format': '.video-tracks .a11y-menu-button',
+    'transcript-format': {
+        'srt': '.wrapper-download-transcripts .list-download-transcripts .btn-link[data-value="srt"]',
+        'txt': '.wrapper-download-transcripts .list-download-transcripts .btn-link[data-value="txt"]'
+    },
     'transcript-skip': '.sr-is-focusable.transcript-start',
 }
 
@@ -584,7 +587,7 @@ class VideoPage(PageObject):
             bool: Transcript download result.
 
         """
-        transcript_selector = self.get_element_selector(VIDEO_MENUS['transcript-format'])
+        transcript_selector = self.get_element_selector(VIDEO_MENUS['transcript-format'][transcript_format])
 
         # check if we have a transcript with correct format
         if '.' + transcript_format not in self.q(css=transcript_selector).text[0]:
@@ -595,14 +598,13 @@ class VideoPage(PageObject):
             'txt': 'text/plain',
         }
 
-        transcript_url_selector = self.get_element_selector(VIDEO_BUTTONS['download_transcript'])
-        url = self.q(css=transcript_url_selector).attrs('href')[0]
+        link = self.q(css=transcript_selector)
+        url = link.attrs('href')[0]
+        link.click()
+
         result, headers, content = self._get_transcript(url)
 
         if result is False:
-            return False
-
-        if formats[transcript_format] not in headers.get('content-type', ''):
             return False
 
         if text_to_search not in content.decode('utf-8'):
@@ -673,45 +675,6 @@ class VideoPage(PageObject):
         """
         selector = self.get_element_selector(VIDEO_MENUS[menu_name])
         return self.q(css=selector).present
-
-    def select_transcript_format(self, transcript_format):
-        """
-        Select transcript with format `transcript_format`.
-
-        Arguments:
-            transcript_format (st): Transcript file format `srt` or `txt`.
-
-        Returns:
-            bool: Selection Result.
-
-        """
-        button_selector = self.get_element_selector(VIDEO_MENUS['transcript-format'])
-
-        button = self.q(css=button_selector).results[0]
-
-        hover = ActionChains(self.browser).move_to_element(button)
-        hover.perform()
-
-        if '...' not in self.q(css=button_selector).text[0]:
-            return False
-
-        menu_selector = self.get_element_selector(VIDEO_MENUS['download_transcript'])
-        menu_items = self.q(css=menu_selector + ' a').results
-        for item in menu_items:
-            if item.get_attribute('data-value') == transcript_format:
-                ActionChains(self.browser).move_to_element(item).click().perform()
-                self.wait_for_ajax()
-                break
-
-        self.browser.execute_script("window.scrollTo(0, 0);")
-
-        if self.q(css=menu_selector + ' .active a').attrs('data-value')[0] != transcript_format:
-            return False
-
-        if '.' + transcript_format not in self.q(css=button_selector).text[0]:
-            return False
-
-        return True
 
     @property
     def sources(self):

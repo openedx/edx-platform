@@ -833,7 +833,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
     def test_basic(self):
         self.register_get_user_response(self.user)
-        self.register_thread({"created_at": "Test Created Date", "updated_at": "Test Updated Date"})
+        self.register_thread({"created_at": "Test Created Date", "updated_at": "Test Updated Date", "read": True})
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
@@ -849,6 +849,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "created_at": "Test Created Date",
                 "updated_at": "Test Updated Date",
                 "comment_count": 1,
+                "read": True,
             })
         )
         self.assertEqual(
@@ -864,7 +865,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "anonymous_to_peers": ["False"],
                 "closed": ["False"],
                 "pinned": ["False"],
-                "read": ["False"],
+                "read": ["True"],
             }
         )
 

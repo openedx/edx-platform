@@ -55,6 +55,22 @@
     width: 100%;
 }
 
+.forum-nav-browse-menu-following {
+    .icon {
+        @include float(left);
+        @include left($baseline / 2);
+        position: relative;
+        top: 13px;
+    }
+    .forum-nav-browse-title {
+        @include padding-left($baseline * 1.5);
+    }
+}
+
+.forum-nav-browse-menu-item {
+  margin-bottom: 0;
+}
+
 .forum-nav-browse-title {
     @include text-align(left);
     display: block;
@@ -66,10 +82,11 @@
     background: transparent;
     box-shadow: none;
     background-image: none;
-    color: $link-color;
+    cursor: pointer;
 
     &:hover,
-    &:focus {
+    &:focus,
+    &.is-focused {
         // switched from a to button;
         // need to override button styles
         background-image: none !important;
@@ -165,6 +182,11 @@
     border-bottom: 1px solid $forum-color-border;
     background-color: $forum-color-background;
     margin-bottom: 0;
+
+    &:last-child {
+        // Overrides pattern library default li:last-child style
+        border-bottom: 1px solid $forum-color-border;
+    }
 
     .forum-nav-thread-link {
         @include border-left(3px solid transparent);

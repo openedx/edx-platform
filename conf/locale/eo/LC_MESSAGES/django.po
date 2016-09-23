@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-15 11:17+0000\n"
-"PO-Revision-Date: 2016-09-15 11:17:57.818689\n"
+"POT-Creation-Date: 2016-09-22 14:31+0000\n"
+"PO-Revision-Date: 2016-09-22 14:31:50.606322\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -11337,31 +11337,45 @@ msgstr "Çömpäný Ⱡ'σяєм ιρѕυм #"
 msgid "Please select your Country."
 msgstr "Pléäsé séléçt ýöür Çöüntrý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Review the Honor Code"
+msgstr "Révïéw thé Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
 msgstr "Térms öf Sérvïçé änd Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "I agree to the {platform_name} {terms_of_service}."
+msgid "Review the Terms of Service and Honor Code"
 msgstr ""
-"Ì ägréé tö thé {platform_name} {terms_of_service}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σ#"
+"Révïéw thé Térms öf Sérvïçé änd Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #. Translators: "Terms of Service" is a legal document users must agree to
 #. in order to register a new account.
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "You must agree to the {platform_name} {terms_of_service}."
+msgid "I agree to the {platform_name} {terms_of_service}"
 msgstr ""
-"Ýöü müst ägréé tö thé {platform_name} {terms_of_service}. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢т#"
+"Ì ägréé tö thé {platform_name} {terms_of_service} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢#"
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "You must agree to the {platform_name} {terms_of_service}"
+msgstr ""
+"Ýöü müst ägréé tö thé {platform_name} {terms_of_service} Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢#"
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Review the Terms of Service"
+msgstr "Révïéw thé Térms öf Sérvïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
@@ -11569,7 +11583,7 @@ msgstr "{platform_name} Süppört Lévéls: Ⱡ'σяєм ιρѕυм ∂σłσя 
 msgid "HTML"
 msgstr "HTML Ⱡ'σяєм ι#"
 
-#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
 msgid "Video"
 msgstr "Vïdéö Ⱡ'σяєм ιρѕ#"
 
@@ -12690,19 +12704,10 @@ msgid "Tell us the details"
 msgstr "Téll üs thé détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
+msgid "Include error messages, steps which lead to the issue, etc"
 msgstr ""
-"Désçrïßé whät ýöü wéré döïng whén ýöü énçöüntéréd thé ïssüé. Ìnçlüdé äný "
-"détäïls thät wïll hélp üs tö tröüßléshööt, ïnçlüdïng érrör méssägés thät ýöü"
-" säw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
-"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
-" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
-"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
-" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
-"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
+"Ìnçlüdé érrör méssägés, stéps whïçh léäd tö thé ïssüé, étç Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -12738,10 +12743,13 @@ msgstr ""
 "Brïéf désçrïptïön öf thé prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
+msgid ""
+"Details of the problem you are encountering{asterisk}{begin_span}Include "
+"error messages, steps which lead to the issue, etc.{end_span}"
 msgstr ""
-"Détäïls öf thé prößlém ýöü äré énçöüntérïng{asterisk} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
-" αмєт, ¢σηѕє¢тєтυя α#"
+"Détäïls öf thé prößlém ýöü äré énçöüntérïng{asterisk}{begin_span}Ìnçlüdé "
+"érrör méssägés, stéps whïçh léäd tö thé ïssüé, étç.{end_span} Ⱡ'σяєм ιρѕυм "
+"∂σłσя #"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -13974,12 +13982,28 @@ msgstr ""
 "Nö pläýäßlé vïdéö söürçés föünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/video.html
-msgid "Download video"
-msgstr "Döwnlöäd vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+msgid "Downloads and transcripts"
+msgstr "Döwnlöäds änd tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr "Döwnlöäd vïdéö fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/video.html
+msgid "Transcripts"
+msgstr "Tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/video.html
+msgid "Download {file}"
+msgstr "Döwnlöäd {file} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/video.html
 msgid "Download transcript"
 msgstr "Döwnlöäd tränsçrïpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/templates/video.html
+msgid "Handouts"
+msgstr "Händöüts Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/video.html
 msgid "Download Handout"

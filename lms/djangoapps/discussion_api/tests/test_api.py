@@ -2047,7 +2047,7 @@ class UpdateThreadTest(
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
             "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            'read': False,
+            'read': True,
             'has_endorsed': False,
             'response_count': 0
         }

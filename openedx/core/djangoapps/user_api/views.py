@@ -807,7 +807,7 @@ class RegistrationView(APIView):
         # Translators: This is a legal document users must agree to
         # in order to register a new account.
         terms_label = _(u"Terms of Service")
-        terms_link = marketing_link("TIS")
+        terms_link = marketing_link("TOS")
         terms_text = _(u"Review the Terms of Service")
 
         # Translators: "Terms of service" is a legal document users must agree to

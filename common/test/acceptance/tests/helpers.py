@@ -17,6 +17,9 @@ from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, Promise
 from bok_choy.page_object import XSS_INJECTION
+from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
+from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from opaque_keys.edx.locator import CourseLocator
 from pymongo import MongoClient, ASCENDING
 from openedx.core.lib.tests.assertions.events import assert_event_matches, is_matching_event, EventMatchTolerates
@@ -348,6 +351,32 @@ def get_element_padding(page, selector):
 def is_404_page(browser):
     """ Check if page is 404 """
     return 'Page not found (404)' in browser.find_element_by_tag_name('h1').text
+
+
+def create_multiple_choice_problem(problem_name):
+    """
+    Return the Multiple Choice Problem Descriptor, given the name of the problem.
+    """
+    factory = MultipleChoiceResponseXMLFactory()
+    xml_data = factory.build_xml(
+        question_text='The correct answer is Choice 2',
+        choices=[False, False, True, False],
+        choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+    )
+
+    return XBlockFixtureDesc(
+        'problem',
+        problem_name,
+        data=xml_data,
+        metadata={'rerandomize': 'always'}
+    )
+
+
+def auto_auth(browser, username, email, staff, course_id):
+    """
+    Logout and login with given credentials.
+    """
+    AutoAuthPage(browser, username=username, email=email, course_id=course_id, staff=staff).visit()
 
 
 class EventsTestMixin(TestCase):
