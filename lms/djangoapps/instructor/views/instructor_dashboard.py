@@ -437,7 +437,6 @@ def _section_course_info(course, access):
         section_data['grade_cutoffs'] = reduce(advance, sorted_cutoffs, "")[:-2]
     except Exception:  # pylint: disable=broad-except
         section_data['grade_cutoffs'] = "Not Available"
-    # section_data['offline_grades'] = offline_grades_available(course_key)
 
     try:
         section_data['course_errors'] = [(escape(a), '') for (a, _unused) in modulestore().get_course_errors(course.id)]
