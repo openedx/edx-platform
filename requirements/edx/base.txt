@@ -144,7 +144,7 @@ django_debug_toolbar==1.5
 before_after==0.1.3
 bok-choy==0.5.3
 chrono==1.0.2
-coverage==4.2
+git+https://github.com/nedbat/coveragepy.git@321e1921ca02a3dc3507eb095efd38efe6c79ba9#egg=coverage==0.0
 ddt==0.8.0
 diff-cover==0.9.8
 django-crum==0.5
