@@ -815,6 +815,12 @@ div.problem {
         border: 2px solid $gray-l4;
       }
 
+      .status {
+        &:after {
+          content: ''; // clear out correct or incorrect icon
+        }
+      }
+
     }
   }
 
