@@ -141,8 +141,8 @@ $uxpl-gray-background: rgb(217, 217, 217);
 // Alert styles
 $error-color: rgb(203, 7, 18) !default;
 $success-color: rgb(0, 155, 0) !default;
-$warning-color: rgb(255, 192 ,31) !default;
-
+$warning-color: rgb(255, 192, 31) !default;
+$warning-color-accent: rgb(255, 252, 221) !default;
 
 // BUTTONS
 
@@ -219,3 +219,4 @@ $btn-small-padding-horizontal: spacing-horizontal(small);
     color: $color;
   }
 }
+
