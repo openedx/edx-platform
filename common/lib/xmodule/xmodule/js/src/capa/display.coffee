@@ -184,7 +184,6 @@ class @Problem
 
   render: (content, focus_callback) ->
     if content
-      @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
       JavascriptLoader.executeModuleScripts @el, () =>
         @setupInputTypes()
@@ -192,7 +191,6 @@ class @Problem
         @queueing(focus_callback)
         @renderProgressState()
         focus_callback?()
-      @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
