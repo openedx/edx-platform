@@ -1,83 +1,40 @@
-<div class="ccx-schedule-container">
-  <div id="ccx-schedule"></div>
-  <div id="new-ccx-schedule"></div>
-</div>
+<%block name="jsextra">
+  <link rel="stylesheet" type="text/css" href="${static.url('xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker.css')}" />
+  <style>
+    .ui-timepicker-list { z-index: 100000; }
+    .ui-datepicker { z-index: 100000 !important; }
+    input.date, input.time { width: auto !important; display: inline !important; }
+  </style>
+</%block>
 
-<section id="enter-date-modal" class="modal" aria-hidden="true">
-  <div class="inner-wrapper" role="dialog">
+<div id="ccx-schedule-container"></div>
+
+<section id="enter-date-modal" class="modal"
+         tabindex="-1" role="dialog" aria-labelledby="ccx_schedule_set_date_heading">
+  <div class="inner-wrapper">
     <button class="close-modal">
-      <span class="fa-remove" aria-hidden="true"></span>
-      <span class="sr">
-        Close
-      </span>
+      <i class="icon fa fa-remove" aria-hidden="true"></i>
+      <span class="sr">${_("Close")}</span>
     </button>
     <header>
-      <h2></h2>
+      <h2 id="ccx_schedule_set_date_heading"></h2>
     </header>
-    <form role="form">
+    <form class="ccx-form">
+      <div class="field" aria-live="assertive" aria-atomic="true" aria-relevant="text">
+          <p class="request-response-error" id="date-modal-error-message" tabindex="-1" role="alert"></p>
+      </div>
       <div class="field datepair">
-        <label></label>
-        <input placeholder="Date" class="date" type="text" name="date"/ size="11">
-        <input placeholder="Time" class="time" type="text" name="time"/ size="6">
+        <label class="sr form-label" for="ccx_dialog_date">${_('Date format four digit year dash two digit month dash two digit day')}</label>
+        <input placeholder="${_('Date')}" class="date" type="text" name="date" id="ccx_dialog_date" size="11" />
+        <label class="sr form-label" for="ccx_dialog_time">${_('Time format two digit hours colon two digit minutes')}</label>
+        <input placeholder="${_('Time')}" class="time" type="text" name="time" id="ccx_dialog_time" size="6" />
       </div>
       <div class="field">
-        <button type="submit" class="btn btn-primary">Set date</button>
+        <button class="btn btn-primary" id="date-picker-dialog-btn">${_('Set date')}</button>
       </div>
     </form>
   </div>
 </section>
 
-<div class="ccx-schedule-sidebar">
-  <div class="ccx-sidebar-panel" id="dirty-schedule">
-    <h2>Save changes</h2>
-    <form role="form">
-      <p>You have unsaved changes.</p>
-      <div class="field">
-        <br/>
-        <button id="save-changes">Save changes</button>
-      </div>
-    </form>
-  </div>
-  <div class="ccx-sidebar-panel" id="ajax-error">
-    <h2>Error</h2>
-    <p>There was an error saving changes.</p>
-  </div>
-  <div class="ccx-sidebar-panel">
-    <h2>Schedule a Unit</h2>
-    <form role="form" id="add-unit" name="add-unit" class="ccx-form">
-      <div class="field">
-        <b>Section</b><br/>
-        <select name="chapter"></select>
-      </div>
-      <div class="field">
-        <b>Subsection</b><br/>
-        <select name="sequential"></select>
-      </div>
-      <div class="field">
-        <b>Unit</b><br/>
-        <select name="vertical"></select>
-      </div>
-      <div class="field datepair">
-        <b>Start Date</b><br/>
-        <input placeholder="Date" type="date" class="date" name="start_date"/>
-        <input placeholder="time" type="time" class="time" name="start_time"/>
-      </div>
-      <div class="field datepair">
-        <b>Due Date</b> (Optional)<br/>
-        <input placeholder="Date" type="date" class="date" name="due_date"/>
-        <input placeholder="time" type="time" class="time" name="due_time"/>
-      </div>
-      <div class="field">
-        <br/>
-        <button id="add-unit-button">Add Unit</button>
-      </div>
-      <div class="field">
-        <br/>
-        <button id="add-all">Add All Units</button>
-      </div>
-    </form>
-    <div id="all-units-added">
-      All units have been added.
-    </div>
-  </div>
-</div>
+
+

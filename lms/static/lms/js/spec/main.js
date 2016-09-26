@@ -85,7 +85,14 @@
             'js/student_profile/views/learner_profile_fields': 'js/student_profile/views/learner_profile_fields',
             'js/student_profile/views/learner_profile_factory': 'js/student_profile/views/learner_profile_factory',
             'js/student_profile/views/learner_profile_view': 'js/student_profile/views/learner_profile_view',
-            'js/ccx/schedule': 'js/ccx/schedule',
+
+            'js/ccx/collection/schedule_collection': 'js/ccx/collection/schedule_collection',
+            'js/ccx/model/schedule_model': 'js/ccx/model/schedule_model',
+            'js/ccx/view/ccx_schedule': 'js/ccx/view/ccx_schedule',
+            'js/ccx/view/schedule_date_button': 'js/ccx/view/schedule_date_button',
+            'js/ccx/view/schedule_right_container': 'js/ccx/view/schedule_right_container',
+            'js/ccx/view/schedule_tree': 'js/ccx/view/schedule_tree',
+
 
             'js/bookmarks/collections/bookmarks': 'js/bookmarks/collections/bookmarks',
             'js/bookmarks/models/bookmark': 'js/bookmarks/models/bookmark',
@@ -326,10 +333,6 @@
             'js/shoppingcart/shoppingcart.js': {
                 exports: 'js/shoppingcart/shoppingcart',
                 deps: ['jquery', 'underscore', 'gettext']
-            },
-            'js/ccx/schedule': {
-                exports: 'js/ccx/schedule',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'moment']
             },
             'js/commerce/views/receipt_view': {
                 exports: 'edx.commerce.ReceiptView',

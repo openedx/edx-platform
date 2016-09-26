@@ -1,0 +1,43 @@
+<div>
+  <div align="right">
+    <button id="ccx_expand_all_btn" class="ccx-button-link">
+      <span class="fa fa-expand" aria-hidden="true"></span> <%- gettext('Expand All') %>
+    </button>
+    <button id="ccx_collapse_all_btn" class="ccx-button-link">
+      <span class="fa fa-compress" aria-hidden="true"></span> <%- gettext('Collapse All') %>
+    </button>
+  </div>
+  <br/>
+  <table class="ccx-schedule">
+    <caption class="sr">
+      <%- gettext('CCX Schedule') %>
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col"><%- gettext('Unit') %></th>
+        <th scope="col"><%- gettext('Start Date') %></th>
+        <th scope="col"><%- gettext('Due Date') %></th>
+        <th scope="col"><button id="remove-all" class="ccx-button-link">
+          <span class="fa fa-remove" aria-hidden="true"></span> <%- gettext('remove all') %>
+        </button></th>
+      </tr>
+    </thead>
+    <tbody id="ccx-schedule_tbody">
+      <% _.each(chapters, function(chapter) { %>
+        <tr class="chapter expanded" data-location="<%= HtmlUtils.ensureHtml(chapter.location) %>" data-depth="1">
+          <%= HtmlUtils.ensureHtml(templateTreeNode({unit: chapter, location: chapter.location})) %>
+        </tr>
+        <% _.each(chapter.children, function(subSection) { %>
+          <tr class="sequential expanded" data-location="<%= HtmlUtils.ensureHtml(chapter.location) %> <%= HtmlUtils.ensureHtml(subSection.location) %>" data-depth="2">
+            <%= HtmlUtils.ensureHtml(templateTreeNode({unit:subSection, location: chapter.location + " " + subSection.location})) %>
+          </tr>
+          <% _.each(subSection.children, function(vertical) { %>
+            <tr class="vertical expanded" data-location="<%= HtmlUtils.ensureHtml(chapter.location) %> <%= HtmlUtils.ensureHtml(subSection.location) %> <%= HtmlUtils.ensureHtml(vertical.location) %>" data-depth="3">
+               <%= HtmlUtils.ensureHtml(templateTreeNode({unit:vertical, location: chapter.location + " " + subSection.location + " " + vertical.location})) %>
+            </tr>
+          <% }) %>
+        <% }) %>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

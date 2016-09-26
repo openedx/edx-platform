@@ -1,0 +1,30 @@
+<% if(unsavedChanges) { %>
+   <div class="ccx-sidebar-panel" id="dirty-schedule" tabindex="-1" role="region"
+           aria-labelledby="ccx_schedule_save_changes_heading">
+     <h2 id="ccx_schedule_save_changes_heading"><%- gettext('Save changes') %></h2>
+     <form>
+       <p id="message_save" class="text-helper"><%- gettext('You have unsaved changes.') %></p>
+       <div class="field">
+         <br/>
+         <button id="save-changes"
+           aria-describedby="message_save"
+           class="ccx-schedule-save-changes">
+           <%- gettext('Save changes') %>
+         </button>
+       </div>
+     </form>
+   </div>
+<% } %>
+
+<div class="ccx-sidebar-panel" aria-labelledby="ccx_schedule_unit" id="ccx_schedule_unit_panel" role="region">
+ <h2 id="ccx_schedule_unit"><%- gettext('Schedule a Unit') %></h2>
+ <% if (chaptersAvailable) { %>
+   <form role="form" id="add-unit" name="add-unit" class="ccx-form">
+     <%= HtmlUtils.ensureHtml(addUnitCCXForm) %>
+   </form>
+ <% } else { %>
+   <div id="all-units-added" tabindex="-1" role="region">
+      <%- gettext('All units have been added.') %>
+   </div>
+ <% } %>
+</div>

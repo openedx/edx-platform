@@ -21,11 +21,11 @@ from openedx.core.djangolib.js_utils import (
 <%include file="/courseware/course_navigation.html" args="active_page='ccx_coach'" />
 
 <section class="container">
+  <h2 class="sr">${_("CCX Coach Dashboard")}</h2>
   <div class="instructor-dashboard-wrapper-2">
         <main id="main" aria-label="Content" tabindex="-1">
         <section class="instructor-dashboard-content-2" id="ccx-coach-dashboard-content" aria-labelledby="header-ccx-dashboard">
           <h2 class="hd hd-2" id="header-ccx-dashboard">${_("CCX Coach Dashboard")}</h2>
-
           %if not ccx:
             % if messages:
               <ul class="messages">
@@ -72,6 +72,7 @@ from openedx.core.djangolib.js_utils import (
             <%include file="enrollment.html" args="" />
           </section>
           <section id="schedule" class="idash-section" aria-label="${_('Schedule')}">
+            <h2 class="sr">${_('Schedule')}</h2>
             <%include file="schedule.html" args="" />
           </section>
           <section id="student_admin" class="idash-section" aria-label="${_('Student Grades')}">

@@ -17,11 +17,11 @@ from openedx.core.djangolib.markup import HTML, Text
 
 
   <div class="enroll-option">
-    <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="auto-enroll-helper" disabled>
-    <label style="display:inline" for="auto-enroll">${_("Auto Enroll")}</label>
+    <input type="checkbox" name="auto-enroll" id="auto-enroll-batch" value="Auto-Enroll" checked="yes" aria-describedby="auto-enroll-helper-batch" disabled>
+    <label style="display:inline" for="auto-enroll-batch">${_("Auto Enroll")}</label>
     <div class="hint auto-enroll-hint">
       <span class="hint-caret"></span>
-      <p class="text-helper" id="auto-enroll-helper">
+      <p class="text-helper" id="auto-enroll-helper-batch">
 	${Text(_("If this option is {em_start}checked{em_end}, users who have not yet registered for {platform_name} will be automatically enrolled.")).format(
         em_start=HTML('<em>'),
         em_end=HTML('</em>'),
@@ -39,11 +39,11 @@ from openedx.core.djangolib.markup import HTML, Text
   </div>
 
   <div class="enroll-option">
-    <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="email-students-helper">
-    <label style="display:inline" for="email-students">${_("Notify users by email")}</label>
+    <input type="checkbox" name="email-students" id="email-students-batch" value="Notify-students-by-email" checked="yes" aria-describedby="email-students-helper-batch">
+    <label style="display:inline" for="email-students-batch">${_("Notify users by email")}</label>
     <div class="hint email-students-hint">
       <span class="hint-caret"></span>
-      <p class="text-helper" id="email-students-helper">
+      <p class="text-helper" id="email-students-helper-batch">
 	${Text(_("If this option is {em_start}checked{em_end}, users will receive an email notification.")).format(
         em_start=HTML('<em>'),
         em_end=HTML('</em>'),

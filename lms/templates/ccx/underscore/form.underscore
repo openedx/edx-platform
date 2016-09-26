@@ -1,0 +1,181 @@
+<div class="field">
+  <label for="ccx_chapter" class="form-label"><b><%- gettext('Section') %></b></label>
+  <select name="chapter" id="ccx_chapter" >
+    <option value="none"><%- gettext("Select a chapter...") %></option>
+    <% _.each(chapters, function(chapter) { %>
+        <% if (selectedChapter && selectedChapter.location === chapter.location) { %>
+            <option value="<%= HtmlUtils.ensureHtml(chapter.location) %>" selected>
+              <%= HtmlUtils.ensureHtml(chapter.display_name) %>
+            </option>
+        <% } else {%>
+           <option value="<%= HtmlUtils.ensureHtml(chapter.location) %>">
+             <%= HtmlUtils.ensureHtml(chapter.display_name) %>
+           </option>
+        <% } %>
+    <% }) %>
+  </select>
+</div>
+
+<div class="field">
+  <label for="ccx_sequential" class="form-label"><b><%- gettext('subsection') %></b></label>
+  <% if (selectedChapter) {  %>
+    <select name="sequential" id="ccx_sequential">
+      <option value="all"><%- gettext("All subsections") %></option>
+      <% _.each(selectedChapter.children, function(subSection) { %>
+        <% if (selectedSubsection && selectedSubsection.location === subSection.location) { %>
+          <option value="<%= HtmlUtils.ensureHtml(subSection.location) %>" selected>
+            <%= HtmlUtils.ensureHtml(subSection.display_name) %>
+          </option>
+        <% } else {%>
+          <option value="<%= HtmlUtils.ensureHtml(subSection.location) %>">
+             <%= HtmlUtils.ensureHtml(subSection.display_name) %>
+          </option>
+        <% } %>
+      <% }) %>
+    </select>
+  <% } else { %>
+    <select name="sequential" id="ccx_sequential" disabled></select>
+  <% } %>
+</div>
+
+<div class="field">
+  <label for="ccx_vertical" class="form-label"><b><%- gettext('Unit') %></b></label>
+  <% if (selectedSubsection) {  %>
+    <select name="vertical" id="ccx_vertical">
+       <option value="all"><%- gettext("All units") %></option>
+       <% _.each(selectedSubsection.children, function(vertical) { %>
+         <option value="<%= HtmlUtils.ensureHtml(vertical.location) %>">
+             <%= HtmlUtils.ensureHtml(vertical.display_name) %>
+         </option>
+      <% }) %>
+    </select>
+  <% } else { %>
+    <select name="vertical" id="ccx_vertical" disabled></select>
+  <% } %>
+</div>
+
+<div class="ccx_start_date_time_fields">
+  <div class="field datepair">
+    <label for="ccx_start_date" class="form-label">
+      <b><%- gettext('Start Date') %></b>
+      <span class="sr">
+        <%
+          // Translators: This explains to people using a screen reader how to interpret the format of YYYY-MM-DD
+        %>
+        <%- gettext('format four digit year dash two digit month dash two digit day') %>
+      </span>
+    </label>
+    <% if (selectedSubsection) {  %>
+      <% if (selectedSubsection.start) {  %>
+        <input placeholder="<%- gettext('yyyy-mm-dd') %>" value="<%= HtmlUtils.ensureHtml(selectedSubsection.start.split(' ')[0]) %>"
+          type="text" class="date" name="start_date" id="ccx_start_date" />
+      <% } else { %>
+         <input placeholder="<%- gettext('yyyy-mm-dd') %>"
+          type="text" class="date" name="start_date" id="ccx_start_date" />
+      <% } %>
+    <% } else if (selectedChapter) {  %>
+      <% if (selectedChapter.start) {  %>
+        <input placeholder="<%- gettext('yyyy-mm-dd') %>" value="<%= HtmlUtils.ensureHtml(selectedChapter.start.split(' ')[0]) %>"
+          type="text" class="date" name="start_date" id="ccx_start_date" />
+      <% } else { %>
+         <input placeholder="<%- gettext('yyyy-mm-dd') %>"
+          type="text" class="date" name="start_date" id="ccx_start_date" />
+      <% } %>
+    <% } else { %>
+      <input placeholder="<%- gettext('yyyy-mm-dd') %>"
+        type="text" class="date" name="start_date" id="ccx_start_date" disabled />
+    <% } %>
+
+     <%
+       // Translators: This explains to people using a screen reader how to interpret the format of HH:MM
+     %>
+     <label for="ccx_start_time" class="sr form-label">
+        <%- gettext('Start time format two digit hours colon two digit minutes') %>
+     </label>
+     <% if (selectedSubsection) {  %>
+       <% if (selectedSubsection.start) {  %>
+         <input placeholder="<%- gettext('time') %>" value="<%= HtmlUtils.ensureHtml(selectedSubsection.start.split(' ')[1]) %>"
+          type="text" class="time" name="start_time" id="ccx_start_time" />
+       <% } else { %>
+         <input placeholder="<%- gettext('time') %>"
+          type="text" class="time" name="start_time" id="ccx_start_time" />
+      <% } %>
+    <% } else if (selectedChapter) {  %>
+      <% if (selectedChapter.start) {  %>
+        <input placeholder="<%- gettext('time') %>" value="<%= HtmlUtils.ensureHtml(selectedChapter.start.split(' ')[1]) %>"
+          type="text" class="time" name="start_time" id="ccx_start_time" />
+      <% } else { %>
+         <input placeholder="<%- gettext('time') %>"
+          type="text" class="time" name="start_time" id="ccx_start_time" />
+      <% } %>
+    <% } else { %>
+      <input placeholder="<%- gettext('time') %>"
+       type="text" class="time" name="start_time" id="ccx_start_time" disabled />
+    <% } %>
+  </div>
+</div>
+
+<div class="ccx_due_date_time_fields">
+  <div class="field datepair">
+    <label for="ccx_due_date" class="form-label">
+      <b><%- gettext('Due Date') %></b> <%- gettext('(Optional)') %>
+      <span class="sr">
+        <%
+          // Translators: This explains to people using a screen reader how to interpret the format of YYYY-MM-DD
+        %>
+        <%- gettext('format four digit year dash two digit month dash two digit day') %>
+      </span>
+    </label>
+    <% if (selectedSubsection) {  %>
+      <% if (selectedSubsection.due) {  %>
+        <input placeholder="<%- gettext('yyyy-mm-dd') %>" value="<%= HtmlUtils.ensureHtml(selectedSubsection.due.split(' ')[0]) %>"
+            type="text" class="date" name="due_date" id="ccx_due_date" />
+      <% } else { %>
+         <input placeholder="<%- gettext('yyyy-mm-dd') %>"
+            type="text" class="date" name="due_date" id="ccx_due_date" />
+      <% } %>
+    <% } else if (selectedChapter) {  %>
+      <input placeholder="<%- gettext('yyyy-mm-dd') %>" value=""
+        type="text" class="date" name="due_date" id="ccx_due_date" disabled />
+    <% } else { %>
+      <input placeholder="<%- gettext('yyyy-mm-dd') %>"
+        type="text" class="date" name="due_date" id="ccx_due_date" disabled />
+    <% } %>
+
+    <%
+      // Translators: This explains to people using a screen reader how to interpret the format of HH:MM
+    %>
+    <label for="ccx_due_time" class="sr form-label">
+      <%- gettext('Due Time format two digit hours colon two digit minutes') %>
+    </label>
+    <% if (selectedSubsection) {  %>
+       <% if (selectedSubsection.due) {  %>
+        <input placeholder="<%- gettext('time') %>" value="<%= HtmlUtils.ensureHtml(selectedSubsection.due.split(' ')[1]) %>"
+           type="text" class="time" name="due_time" id="ccx_due_time"/>
+       <% } else { %>
+         <input placeholder="<%- gettext('time') %>"
+           type="text" class="time" name="due_time" id="ccx_due_time"/>
+      <% } %>
+    <% } else if (selectedChapter) {  %>
+      <input placeholder="<%- gettext('time') %>" value=""
+        type="text" class="time" name="due_time" id="ccx_due_time" disabled />
+    <% } else { %>
+      <input placeholder="<%- gettext('time') %>"
+        type="text" class="time" name="due_time" id="ccx_due_time" disabled />
+    <% } %>
+  </div>
+</div>
+
+<div class="field">
+  <br/>
+  <% if (enableAddUnitToScheduleButton) { %>
+    <button id="add-unit-button"> <%- gettext('Add Unit') %> </button>
+  <% } else { %>
+    <button id="add-unit-button" disabled> <%- gettext('Add Unit') %> </button>
+  <% } %>
+</div>
+
+<div class="field">
+  <br/>
+  <button id="add-all"><%- gettext('Add All Units') %></button>
+</div>
