@@ -160,6 +160,7 @@ nose-exclude
 nose-ignore-docstring
 nose-randomly==1.2.0
 nosexcover==1.0.7
+pa11ycrawler==1.5.4
 pep8==1.5.7
 PyContracts==1.7.1
 python-subunit==0.0.16
