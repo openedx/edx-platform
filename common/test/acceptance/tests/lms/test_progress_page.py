@@ -300,6 +300,5 @@ class ProgressPageA11yTest(ProgressPageBaseTest):
         """
         Test the accessibility of the progress page.
         """
-        self.log_in_as_unique_user()
         self.progress_page.visit()
         self.progress_page.a11y_audit.check_for_accessibility_errors()
