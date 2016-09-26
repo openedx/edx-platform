@@ -85,8 +85,6 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('course_id', xmodule_django.models.CourseKeyField(default=None, max_length=255, blank=True)),
                 ('whitelist', models.BooleanField(default=0)),
-                ('created', django_extensions.db.fields.CreationDateTimeField(auto_now_add=True, verbose_name='created')),
-                ('notes', models.TextField(default=None, null=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
         ),

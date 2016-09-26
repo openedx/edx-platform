@@ -4,9 +4,12 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.utils.timezone
 from django.conf import settings
+import django_extensions.db.fields
 import model_utils.fields
 import xmodule_django.models
 import certificates.models
+import datetime
+from django.utils.timezone import utc
 
 
 class Migration(migrations.Migration):
@@ -18,6 +21,22 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='certificatewhitelist',
+            name='created',
+            field=django_extensions.db.fields.CreationDateTimeField(
+                auto_now_add=True,
+                verbose_name='created',
+                default=datetime.datetime(2016, 9, 15, 6, 54, 3, 634153, tzinfo=utc)
+            ),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='certificatewhitelist',
+            name='notes',
+            field=models.TextField(default=None, null=True),
+        ),
+
         migrations.CreateModel(
             name='CertificateGenerationHistory',
             fields=[
