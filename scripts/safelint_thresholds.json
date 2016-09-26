@@ -1,16 +1,16 @@
 {
     "rules": {
-        "javascript-concat-html": 181,
+        "javascript-concat-html": 176,
         "javascript-escape": 7,
         "javascript-interpolate": 37,
-        "javascript-jquery-append": 92,
-        "javascript-jquery-html": 225,
+        "javascript-jquery-append": 91,
+        "javascript-jquery-html": 222,
         "javascript-jquery-insert-into-target": 26,
         "javascript-jquery-insertion": 22,
         "javascript-jquery-prepend": 9,
         "mako-html-entities": 0,
-        "mako-invalid-html-filter": 26,
-        "mako-invalid-js-filter": 199,
+        "mako-invalid-html-filter": 19,
+        "mako-invalid-js-filter": 197,
         "mako-js-html-string": 0,
         "mako-js-missing-quotes": 0,
         "mako-missing-default": 201,
@@ -25,8 +25,8 @@
         "python-interpolate-html": 66,
         "python-parse-error": 0,
         "python-requires-html-or-text": 0,
-        "python-wrap-html": 260,
-        "underscore-not-escaped": 621
+        "python-wrap-html": 256,
+        "underscore-not-escaped": 617
     },
-    "total": 2050
+    "total": 2032
 }
