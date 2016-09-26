@@ -23,12 +23,10 @@ source scripts/jenkins-common.sh
 # Get the diff coverage and html reports for unit tests
 paver coverage
 
-# Send the coverage data to codecov. Setting the 'COMMMIT' allows the data
-# to be sorted by a branch in the codecov UI. The branch is passed as a
-# param to the coverage job on Jenkins. The 'CODE_COV_TOKEN' should be
+# Send the coverage data to codecov. The 'CODE_COV_TOKEN' should be
 # available as an environment variable.
 pip install codecov==2.0.5
-codecov --token=$CODE_COV_TOKEN --commit=$COMMIT
+codecov --token=$CODE_COV_TOKEN
 
 # THIS BLOCK WILL BE REMOVED
 # Send the coverage data to coveralls. Setting 'TRAVIS_BRANCH' allows the
