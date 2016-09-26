@@ -2,10 +2,9 @@
           DiscussionUser, DiscussionUserProfileView, DiscussionUtil */
 (function() {
     'use strict';
-    var DiscussionApp, DiscussionProfileApp;
 
     if (typeof Backbone !== "undefined" && Backbone !== null) {
-        DiscussionApp = {
+        this.DiscussionApp = {
             start: function(elem) {
                 var content_info, course_settings, discussion, element, sort_preference, thread_pages, threads,
                     user, user_info;
@@ -34,13 +33,20 @@
                     course_settings: course_settings
                 });
                 /* jshint +W031*/
-                return Backbone.history.start({
-                    pushState: true,
-                    root: "/courses/" + $$course_id + "/discussion/forum/"
-                });
+
+                // Avoid re-initializing Backbone.history
+                if (!Backbone.History.started) {
+                    // Changes the current URL to the given root when links
+                    // inside this component are clicked.
+                    Backbone.history.start({
+                        pushState: true,
+                        root: "/courses/" + $$course_id + "/discussion/forum/"
+                    });
+                }
             }
         };
-        DiscussionProfileApp = {
+
+        this.DiscussionProfileApp = {
             start: function(elem) {
                 var element, numPages, page, threads, user_info;
                 DiscussionUtil.loadRoles({
@@ -63,14 +69,5 @@
                 });
             }
         };
-        $(function() {
-            $("section.discussion").each(function(index, elem) {
-                return DiscussionApp.start(elem);
-            });
-            return $("section.discussion-user-threads").each(function(index, elem) {
-                return DiscussionProfileApp.start(elem);
-            });
-        });
     }
-
 }).call(window);

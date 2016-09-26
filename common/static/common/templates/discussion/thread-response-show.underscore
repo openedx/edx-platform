@@ -38,7 +38,9 @@
         <% } %>
       </p>
       <div class="post-labels">
-          <span class="post-label-reported"><span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %></span>
+          <span class="post-label post-label-reported">
+              <span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %>
+          </span>
       </div>
       </div>
       <div class="response-header-actions">

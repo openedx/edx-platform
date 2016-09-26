@@ -1855,7 +1855,7 @@ class TeamsPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockReq
     @ddt.unpack
     def test_create_sub_comment(self, user, commentable_id, status_code, mock_request):
         """
-        Verify that create_subcomment is limited to members of the team or users with 'edit_content' permission.
+        Verify that create_sub_comment is limited to members of the team or users with 'edit_content' permission.
         """
         commentable_id = getattr(self, commentable_id)
         self._setup_mock(

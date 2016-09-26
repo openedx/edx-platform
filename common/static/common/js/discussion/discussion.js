@@ -18,9 +18,8 @@
             return child;
         };
 
-    if (typeof Backbone !== "undefined" && Backbone !== null) {
+    if (typeof Backbone !== 'undefined' && Backbone !== null) {
         this.Discussion = (function(_super) {
-
             __extends(Discussion, _super);
 
             function Discussion() {
@@ -37,11 +36,11 @@
                 this.pages = options.pages || 1;
                 this.current_page = 1;
                 this.sort_preference = options.sort;
-                this.bind("add", function(item) {
+                this.bind('add', function(item) {
                     item.discussion = self;
                 });
                 this.setSortComparator(this.sort_preference);
-                return this.on("thread:remove", function(thread) {
+                return this.on('thread:remove', function(thread) {
                     self.remove(thread);
                 });
             };
@@ -58,15 +57,15 @@
 
             Discussion.prototype.setSortComparator = function(sortBy) {
                 switch (sortBy) {
-                    case 'activity':
-                        this.comparator = this.sortByDateRecentFirst;
-                        break;
-                    case 'votes':
-                        this.comparator = this.sortByVotes;
-                        break;
-                    case 'comments':
-                        this.comparator = this.sortByComments;
-                        break;
+                case 'activity':
+                    this.comparator = this.sortByDateRecentFirst;
+                    break;
+                case 'votes':
+                    this.comparator = this.sortByVotes;
+                    break;
+                case 'comments':
+                    this.comparator = this.sortByComments;
+                    break;
                 }
             };
 
@@ -91,23 +90,23 @@
                 data = {
                     page: this.current_page + 1
                 };
-                if (_.contains(["unread", "unanswered", "flagged"], options.filter)) {
+                if (_.contains(['unread', 'unanswered', 'flagged'], options.filter)) {
                     data[options.filter] = true;
                 }
                 switch (mode) {
-                    case 'search':
-                        url = DiscussionUtil.urlFor('search');
-                        data.text = options.search_text;
-                        break;
-                    case 'commentables':
-                        url = DiscussionUtil.urlFor('search');
-                        data.commentable_ids = options.commentable_ids;
-                        break;
-                    case 'all':
-                        url = DiscussionUtil.urlFor('threads');
-                        break;
-                    case 'followed':
-                        url = DiscussionUtil.urlFor('followed_threads', options.user_id);
+                case 'search':
+                    url = DiscussionUtil.urlFor('search');
+                    data.text = options.search_text;
+                    break;
+                case 'commentables':
+                    url = DiscussionUtil.urlFor('search');
+                    data.commentable_ids = options.commentable_ids;
+                    break;
+                case 'all':
+                    url = DiscussionUtil.urlFor('threads');
+                    break;
+                case 'followed':
+                    url = DiscussionUtil.urlFor('followed_threads', options.user_id);
                 }
                 if (options.group_id) {
                     data.group_id = options.group_id;
@@ -164,15 +163,15 @@
 
             Discussion.prototype.sortByVotes = function(thread1, thread2) {
                 var thread1_count, thread2_count;
-                thread1_count = parseInt(thread1.get("votes").up_count);
-                thread2_count = parseInt(thread2.get("votes").up_count);
+                thread1_count = parseInt(thread1.get('votes').up_count);
+                thread2_count = parseInt(thread2.get('votes').up_count);
                 return this.pinnedThreadsSortComparatorWithCount(thread1, thread2, thread1_count, thread2_count);
             };
 
             Discussion.prototype.sortByComments = function(thread1, thread2) {
                 var thread1_count, thread2_count;
-                thread1_count = parseInt(thread1.get("comments_count"));
-                thread2_count = parseInt(thread2.get("comments_count"));
+                thread1_count = parseInt(thread1.get('comments_count'));
+                thread2_count = parseInt(thread2.get('comments_count'));
                 return this.pinnedThreadsSortComparatorWithCount(thread1, thread2, thread1_count, thread2_count);
             };
 
@@ -200,7 +199,7 @@
 
             Discussion.prototype.pinnedThreadsSortComparatorWithDate = function(thread, ascending) {
                 var preferredDate, threadLastActivityAtTime, today;
-                threadLastActivityAtTime = new Date(thread.get("last_activity_at")).getTime();
+                threadLastActivityAtTime = new Date(thread.get('last_activity_at')).getTime();
                 if (thread.get('pinned')) {
                     today = new Date();
                     preferredDate = new Date(today.getTime() + (24 * 60 * 60 * 1000) + threadLastActivityAtTime);
@@ -215,8 +214,6 @@
             };
 
             return Discussion;
-
         })(Backbone.Collection);
     }
-
 }).call(window);

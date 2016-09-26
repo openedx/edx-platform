@@ -1,7 +1,7 @@
 /* globals DiscussionSpecHelper, DiscussionContentView, Thread */
 (function() {
     'use strict';
-    describe("DiscussionContentView", function() {
+    describe('DiscussionContentView', function() {
         beforeEach(function() {
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
@@ -15,7 +15,7 @@
                 votes: {
                     up_count: '42'
                 },
-                type: "thread",
+                type: 'thread',
                 roles: []
             };
             this.thread = new Thread(this.threadData);
@@ -32,7 +32,7 @@
             return expect(this.view.el.tagName.toLowerCase()).toBe('div');
         });
 
-        it("defines the class", function() {
+        it('defines the class', function() {
             return expect(this.view.model).toBeDefined();
         });
 
@@ -49,7 +49,7 @@
             var temp_array;
             temp_array = [];
             temp_array.push(window.user.get('id'));
-            this.thread.set("abuse_flaggers", temp_array);
+            this.thread.set('abuse_flaggers', temp_array);
             this.thread.unflagAbuse();
             return expect(this.thread.get('abuse_flaggers')).toEqual([]);
         });
