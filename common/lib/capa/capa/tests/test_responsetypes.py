@@ -17,7 +17,7 @@ import mock
 from pytz import UTC
 import requests
 
-from . import new_loncapa_problem, test_capa_system, load_fixture
+from capa.tests.helpers import new_loncapa_problem, test_capa_system, load_fixture
 import calc
 
 from capa.responsetypes import LoncapaProblemError, \

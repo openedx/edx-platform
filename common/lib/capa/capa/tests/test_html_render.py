@@ -6,7 +6,7 @@ import textwrap
 import mock
 
 from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
-from . import test_capa_system, new_loncapa_problem
+from capa.tests.helpers import test_capa_system, new_loncapa_problem
 
 
 class CapaHtmlRenderTest(unittest.TestCase):

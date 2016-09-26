@@ -5,7 +5,7 @@ Tests the logic of the "answer-pool" attribute, e.g.
 
 import unittest
 import textwrap
-from . import test_capa_system, new_loncapa_problem
+from capa.tests.helpers import test_capa_system, new_loncapa_problem
 from capa.responsetypes import LoncapaProblemError
 
 

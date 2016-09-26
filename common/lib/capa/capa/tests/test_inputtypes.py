@@ -24,7 +24,7 @@ import unittest
 import textwrap
 import xml.sax.saxutils as saxutils
 
-from . import test_capa_system
+from capa.tests.helpers import test_capa_system
 from capa import inputtypes
 from capa.checker import DemoSystem
 from mock import ANY, patch
