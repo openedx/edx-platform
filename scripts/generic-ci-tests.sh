@@ -77,10 +77,10 @@ case "$TEST_SUITE" in
                 paver test_system -s lms $PAVER_ARGS
                 ;;
             [1-3])
-                COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s lms --attr="shard=$SHARD" --with-flaky --processes=-1 --cov-args="-p" -v --with-xunitmp
+                COVERAGE_DEBUG_FILE=reports/coverage_debug_lms$SHARD.log paver test_system -s lms --attr="shard=$SHARD" --with-flaky --processes=-1 --cov-args="-p" -v --with-xunitmp
                 ;;
             4|"noshard")
-                COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s lms --attr='!shard' --with-flaky --processes=-1 --cov-args="-p" -v --with-xunitmp
+                COVERAGE_DEBUG_FILE=reports/coverage_debug_lms$SHARD.log paver test_system -s lms --attr='!shard' --with-flaky --processes=-1 --cov-args="-p" -v --with-xunitmp
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -94,12 +94,12 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
+        COVERAGE_DEBUG_FILE=reports/coverage_debug_cms.log paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
         ;;
 
 
     "commonlib-unit")
-        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
+        COVERAGE_DEBUG_FILE=reports/coverage_debug_lib.log paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
         ;;
 
     *)
