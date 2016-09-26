@@ -7,6 +7,7 @@ from selenium.webdriver import ActionChains
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.login import LoginPage
 from common.test.acceptance.pages.studio.signup import SignupPage
+from common.test.acceptance.pages.studio.utils import HelpMixin
 
 
 class HeaderMixin(object):
@@ -30,7 +31,7 @@ class HeaderMixin(object):
         return next_page.wait_for_page()
 
 
-class IndexPage(PageObject, HeaderMixin):
+class IndexPage(PageObject, HeaderMixin, HelpMixin):
     """
     Home page for Studio when not logged in.
     """
@@ -40,7 +41,7 @@ class IndexPage(PageObject, HeaderMixin):
         return self.q(css='.wrapper-text-welcome').visible
 
 
-class DashboardPage(PageObject):
+class DashboardPage(PageObject, HelpMixin):
     """
     Studio Dashboard page with courses.
     The user must be logged in to access this page.
@@ -321,3 +322,11 @@ class DashboardPageWithPrograms(DashboardPage):
             element.find_element_by_css_selector('.course-org .value').text,  # org key
         )
         return self.q(css='div.programs-tab li.course-item').map(div2info).results
+
+    def click_new_program_button(self):
+        """
+        Click on the new program button.
+        """
+        self.q(css='.button.new-button.new-program-button').click()
+        self.wait_for_ajax()
+        self.wait_for_element_visibility(".account-username", "New program page is open")
