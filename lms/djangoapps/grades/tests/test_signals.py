@@ -244,7 +244,7 @@ class ScoreChangedUpdatesSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course(enable_subsection_grades=False)
             self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(0):
+            with check_mongo_calls(2) and self.assertNumQueries(3):
                 recalculate_subsection_grade_handler(None, **self.score_changed_kwargs)
 
     @skip("Pending completion of TNL-5089")
