@@ -147,7 +147,7 @@ $(function() {
 
     SRAlert = (function() {
         function SRAlert() {
-            $('body').append('<div id="reader-feedback" class="sr" style="display:none" aria-hidden="false" aria-atomic="true" aria-live="assertive"></div>');
+            $('body').append('<div id="reader-feedback" class="sr" aria-live="polite"></div>');
             this.el = $('#reader-feedback');
         }
 
