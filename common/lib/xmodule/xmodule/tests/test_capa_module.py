@@ -1239,29 +1239,19 @@ class CapaModuleTest(unittest.TestCase):
         module.get_problem_html()  # ignoring html result
         context = module.system.render_template.call_args[0][1]
         self.assertEqual(context['demand_hint_possible'], True)
-        self.assertIsNone(context['hint_notification_message'])
 
         # Check the AJAX call that gets the hint by index
         result = module.get_demand_hint(0)
-        context = module.system.render_template.call_args[0][1]
-        self.assertIn(u'<strong>Hint (1 of 2): </strong>Demand 1', unicode(context['hint_notification_message']))
-        self.assertNotIn(u'<strong>Hint (2 of 2): </strong>Demand 2', unicode(context['hint_notification_message']))
         self.assertEqual(result['hint_index'], 0)
-        self.assertTrue(context['should_enable_next_hint'])
+        self.assertTrue(result['should_enable_next_hint'])
 
         result = module.get_demand_hint(1)
-        context = module.system.render_template.call_args[0][1]
-        self.assertIn(u'<strong>Hint (1 of 2): </strong>Demand 1', unicode(context['hint_notification_message']))
-        self.assertIn(u'<strong>Hint (2 of 2): </strong>Demand 2', unicode(context['hint_notification_message']))
         self.assertEqual(result['hint_index'], 1)
-        self.assertFalse(context['should_enable_next_hint'])
+        self.assertFalse(result['should_enable_next_hint'])
 
         result = module.get_demand_hint(2)  # here the server wraps around to index 0
-        context = module.system.render_template.call_args[0][1]
-        self.assertIn(u'<strong>Hint (1 of 2): </strong>Demand 1', unicode(context['hint_notification_message']))
-        self.assertNotIn(u'<strong>Hint (2 of 2): </strong>Demand 2', unicode(context['hint_notification_message']))
         self.assertEqual(result['hint_index'], 0)
-        self.assertTrue(context['should_enable_next_hint'])
+        self.assertTrue(result['should_enable_next_hint'])
 
     def test_demand_hint_logging(self):
         module = CapaFactory.create(xml=self.demand_xml)

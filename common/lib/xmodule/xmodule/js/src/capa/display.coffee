@@ -142,7 +142,7 @@ class @Problem
       # If queueing status changed, then render
       @new_queued_items = $(response.html).find(".xqueue")
       if @new_queued_items.length isnt @num_queued_items
-        @el.html(response.html).promise().done =>
+        edx.HtmlUtils.setHtml(@el, edx.HtmlUtils.HTML(response.html)).promise().done =>
           focus_callback?()
         JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
@@ -373,7 +373,7 @@ class @Problem
           if @el.hasClass 'showed'
             @el.removeClass 'showed'
         else
-          @saveNotification.remove()
+          @saveNotification.hide()
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
 
@@ -404,7 +404,7 @@ class @Problem
               answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
           else
             answer = @$("#answer_#{key}, #solution_#{key}")
-            answer.html(value)
+            edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value))
             Collapsible.setCollapsibles(answer)
 
             # Sometimes, `value` is just a string containing a MathJax formula.
@@ -445,10 +445,11 @@ class @Problem
 
   clear_all_notifications: =>
     @submitNotification.remove()
-    @saveNotification.remove()
+    @gentleAlertNotification.hide()
+    @saveNotification.hide()
 
   gentle_alert: (msg) =>
-    @el.find('.notification-gentle-alert .notification-message').html(msg)
+    edx.HtmlUtils.setHtml(@el.find('.notification-gentle-alert .notification-message'), edx.HtmlUtils.HTML(msg))
     @clear_all_notifications()
     @gentleAlertNotification.show()
     @gentleAlertNotification.focus()
@@ -463,7 +464,10 @@ class @Problem
       saveMessage = response.msg
       if response.success
         @el.trigger('contentChanged', [@id, response.html])
-        @render(response.html, @focus_on_save_notification)
+        edx.HtmlUtils.setHtml(@el.find('.notification-save .notification-message'), edx.HtmlUtils.HTML(saveMessage))
+        @clear_all_notifications()
+        @saveNotification.show()
+        @focus_on_save_notification()
       else
         @gentle_alert saveMessage
 
@@ -519,7 +523,7 @@ class @Problem
           one_text_input_filled = true
         if bind
           $(text_field).on 'input', (e) =>
-            @saveNotification.remove()
+            @saveNotification.hide()
             @submitAnswersAndSubmitButton()
             return
           return
@@ -533,7 +537,7 @@ class @Problem
           checked = true
         if bind
           $(checkbox_or_radio).on 'click', (e) =>
-            @saveNotification.remove()
+            @saveNotification.hide()
             @submitAnswersAndSubmitButton()
             return
           return
@@ -547,7 +551,7 @@ class @Problem
         answered = false
       if bind
         $(select_field).on 'change', (e) =>
-          @saveNotification.remove()
+          @saveNotification.hide()
           @submitAnswersAndSubmitButton()
           return
         return
@@ -866,8 +870,21 @@ class @Problem
       next_index = parseInt(hint_index) + 1
     $.postWithPrefix "#{@url}/hint_button", hint_index: next_index, input_id: @id, (response) =>
       if response.success
-        @render(response.html, @focus_on_hint_notification)
-        hint_container = @.$('.problem-hint')
+        hint_msg_container = @.$('.problem-hint .notification-message')
         hint_container.attr('hint_index', response.hint_index)
+        edx.HtmlUtils.setHtml(hint_msg_container, edx.HtmlUtils.HTML(response.msg))
+        # Update any Mathjax entries
+        MathJax.Hub.Queue [
+          'Typeset'
+          MathJax.Hub
+          hint_container[0]
+        ]
+        # Enable/Disable the next hint button
+        if response.should_enable_next_hint
+          @hintButton.removeAttr 'disabled'
+        else
+          @hintButton.attr({'disabled': 'disabled'})
+        @el.find('.notification-hint').show()
+        @focus_on_hint_notification()
       else
         @gentle_alert response.msg

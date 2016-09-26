@@ -137,6 +137,12 @@ class ProblemPage(PageObject):
         self.q(css='.problem .show').click()
         self.wait_for_ajax()
 
+    def is_hint_notification_visible(self):
+        """
+        Is the Hint Notification visible?
+        """
+        return self.q(css='.notification.hint.notification-hint').visible
+
     def is_save_notification_visible(self):
         """
         Is the Save Notification Visible?
