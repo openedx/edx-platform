@@ -262,7 +262,12 @@ class LoncapaResponse(object):
         tree = etree.Element('section')
         tree.set('class', 'wrapper-problem-response')
         tree.set('tabindex', '-1')
-        tree.set('aria-label', response_label)
+        # tree.set('aria-labelledby', '{id}-problem-title question-title'.format(id=self.xml.get('id')))
+
+        section_heading = etree.SubElement(tree, 'h4')
+        section_heading.set('id', 'question-title')
+        section_heading.set('class', 'sr')
+        section_heading.set('value', response_label)
 
         if self.xml.get('multiple_inputtypes'):
             # add <div> to wrap all inputtypes
