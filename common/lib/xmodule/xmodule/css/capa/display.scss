@@ -1094,6 +1094,7 @@ div.problem {
   .notification-btn {
     @include float(right);
     padding: ($baseline / 10) ($baseline / 4);
+    min-width: ($baseline * 3);
     display: block;
     clear: both;
 
@@ -1132,6 +1133,7 @@ div.problem {
   }
 
   .review-btn {
+    color: $blue; // notification type has other colors
     &.sr {
       color: $blue;
     }
