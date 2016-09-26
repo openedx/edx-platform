@@ -16,17 +16,14 @@ from openedx.core.djangolib.markup import HTML
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
     % if demand_hint_possible:
-    <div class="problem-hint">
-        % if hint_notification_message is not None:
-            <%include file="problem_notifications.html" args="
-             notification_name='hint',
-             notification_type='hint',
-             notification_icon='fa-question',
-             notification_message=hint_notification_message,
-             should_enable_next_hint=should_enable_next_hint"
-           />
-        % endif
-        </div>
+      <div class="problem-hint">
+        <%include file="problem_notifications.html" args="
+         notification_name='hint',
+         notification_type='hint',
+         notification_icon='fa-question',
+         notification_message=''"
+       />
+      </div>
     % endif
     <div class="problem-action-buttons-wrapper">
     % if demand_hint_possible:
@@ -99,12 +96,10 @@ from openedx.core.djangolib.markup import HTML
             />
         % endif
     % endif
-    % if save_notification_message:
-      <%include file="problem_notifications.html" args="
-        notification_type='warning',
-        notification_icon='fa-save',
-        notification_name='save',
-        notification_message=save_notification_message"
-      />
-    % endif
+    <%include file="problem_notifications.html" args="
+      notification_type='warning',
+      notification_icon='fa-save',
+      notification_name='save',
+      notification_message=''"
+    />
 </div>
