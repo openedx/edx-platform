@@ -7,6 +7,7 @@ from __future__ import absolute_import
 
 from config_models.models import ConfigurationModel, cache
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -22,6 +23,7 @@ from .lti import LTIAuthBackend, LTI_PARAMS_KEY
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import get_current_request
 
 log = logging.getLogger(__name__)
 
@@ -104,6 +106,14 @@ class ProviderConfig(ConfigurationModel):
         help_text=_(
             'Secondary providers are displayed less prominently, '
             'in a separate list of "Institution" login providers.'
+        ),
+    )
+    site = models.ForeignKey(
+        Site,
+        default=settings.SITE_ID,
+        related_name='%(class)ss',
+        help_text=_(
+            'The Site that this provider configuration belongs to.'
         ),
     )
     skip_registration_form = models.BooleanField(
@@ -226,7 +236,14 @@ class ProviderConfig(ConfigurationModel):
         Determines whether the provider ought to be shown as an option with
         which to authenticate on the login screen, registration screen, and elsewhere.
         """
-        return bool(self.enabled and self.accepts_logins and self.visible)
+        return bool(self.enabled_for_current_site and self.accepts_logins and self.visible)
+
+    @property
+    def enabled_for_current_site(self):
+        """
+        Determines if the provider is able to be used with the current site.
+        """
+        return self.enabled and self.site == Site.objects.get_current(get_current_request())
 
 
 class OAuth2ProviderConfig(ProviderConfig):
@@ -235,7 +252,7 @@ class OAuth2ProviderConfig(ProviderConfig):
     Also works for OAuth1 providers.
     """
     prefix = 'oa2'
-    KEY_FIELDS = ('backend_name', )  # Backend name is unique
+    KEY_FIELDS = ('provider_slug', )  # Backend name is unique
     backend_name = models.CharField(
         max_length=50, blank=False, db_index=True,
         help_text=(
@@ -244,6 +261,12 @@ class OAuth2ProviderConfig(ProviderConfig):
             # To be precise, it's set by AUTHENTICATION_BACKENDS - which aws.py sets from THIRD_PARTY_AUTH_BACKENDS
         )
     )
+    provider_slug = models.SlugField(
+        max_length=30, db_index=True,
+        help_text=(
+            'A short string uniquely identifying this provider. '
+            'Cannot contain spaces and should be a usable as a CSS class. Examples: "ubc", "mit-staging"'
+        ))
     key = models.TextField(blank=True, verbose_name="Client ID")
     secret = models.TextField(
         blank=True,
@@ -406,6 +429,15 @@ class SAMLConfiguration(ConfigurationModel):
     Service Provider and allow users to authenticate via third party SAML
     Identity Providers (IdPs)
     """
+    KEY_FIELDS = ('site_id', )
+    site = models.ForeignKey(
+        Site,
+        default=settings.SITE_ID,
+        related_name='%(class)ss',
+        help_text=_(
+            'The Site that this SAML configuration belongs to.'
+        ),
+    )
     private_key = models.TextField(
         help_text=(
             'To generate a key pair as two files, run '
