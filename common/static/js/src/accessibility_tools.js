@@ -147,8 +147,14 @@ $(function() {
 
     SRAlert = (function() {
         function SRAlert() {
-            $('body').append('<div id="reader-feedback" class="sr" aria-live="polite"></div>');
-            this.el = $('#reader-feedback');
+            // This initialization sometimes gets done twice, so take to only create a single reader-feedback div.
+            var readerFeedbackID = 'reader-feedback',
+                $readerFeedbackSelector = $('#' + readerFeedbackID);
+
+            if ($readerFeedbackSelector.length === 0) {
+                $('body').append('<div id="' + readerFeedbackID + '" class="sr" aria-live="polite"></div>');
+            }
+            this.el = $('#' + readerFeedbackID);
         }
 
         SRAlert.prototype.clear = function() {
@@ -170,5 +176,5 @@ $(function() {
         return SRAlert;
     })();
 
-    window.SR = new SRAlert;
+    window.SR = new SRAlert();
 });
