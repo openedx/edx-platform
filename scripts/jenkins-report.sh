@@ -9,7 +9,12 @@
 # This script is used by the edx-platform-unit-coverage jenkins job.
 
 if [ $# -eq 2 ]; then
-    COMMIT=$2
+    if [ $2 == "master" ]; then
+        # get the git hash for this commit on master
+        COMMIT=`git rev-parse HEAD`
+    else
+        COMMIT=$2
+    fi
 else
     echo "Incorrect number of arguments passed to this script!"
     echo "Please supply the following values to this script:"
@@ -28,7 +33,7 @@ paver coverage
 # param to the coverage job on Jenkins. The 'CODE_COV_TOKEN' should be
 # available as an environment variable.
 pip install codecov==2.0.5
-codecov --token=$CODE_COV_TOKEN --commit=$COMMIT
+codecov --token=$CODE_COV_TOKEN --commit=$COMMIT --required
 
 # THIS BLOCK WILL BE REMOVED
 # Send the coverage data to coveralls. Setting 'TRAVIS_BRANCH' allows the
