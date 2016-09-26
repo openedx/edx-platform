@@ -217,6 +217,7 @@ class CohortManagementSection(PageObject):
     The Cohort Management section of the Instructor dashboard.
     """
     url = None
+    cohort_help_css = '.setup-value .incontext-help.action-secondary.action-help'
     csv_browse_button_selector_css = '.csv-upload #file-upload-form-file'
     csv_upload_button_selector_css = '.csv-upload #file-upload-form-submit'
     content_group_selector_css = 'select.input-cohort-group-association'
@@ -227,6 +228,17 @@ class CohortManagementSection(PageObject):
         'course-wide': '.cohort-course-wide-discussions-form',
         'inline': '.cohort-inline-discussions-form'
     }
+
+    def get_cohort_help_element_and_click_help(self):
+        """
+        Clicks help link and returns it. Specifically, clicks 'What does it mean'
+
+        Returns:
+            help_element (WebElement): help link element
+        """
+        help_element = self.q(css=self.cohort_help_css).results[0]
+        help_element.click()
+        return help_element
 
     def is_browser_on_page(self):
         """
