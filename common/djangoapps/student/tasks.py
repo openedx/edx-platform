@@ -2,6 +2,7 @@
 This file contains celery tasks for sending email
 """
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.core import mail
 
 from celery.task import task  # pylint: disable=no-name-in-module, import-error
@@ -12,10 +13,11 @@ log = get_task_logger(__name__)
 
 
 @task(bind=True)
-def send_activation_email(self, user, subject, message, from_address):
+def send_activation_email(self, user_id, subject, message, from_address):
     """
     Sending an activation email to the users.
     """
+    user = User.objects.get(id=user_id)
     max_retries = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
     retries = self.request.retries + 1
     dest_addr = user.email
