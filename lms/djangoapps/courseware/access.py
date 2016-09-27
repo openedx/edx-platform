@@ -318,7 +318,7 @@ def _can_enroll_courselike(user, courselike):
     course_key = courselike.id
 
     if settings.FEATURES.get('RESTRICT_ENROLL_NO_ATSIGN_USERNAMES') and '@' in user.username:
-        log.warning("ENROLLMENT DENIED in %s because @ in username %s" % (course_key, user.username))
+        log.warning("ENROLLMENT DENIED in %s because @ in username %s", course_key, user.username)
         return ACCESS_DENIED
 
     # If using a registration method to restrict enrollment (e.g., Shibboleth)

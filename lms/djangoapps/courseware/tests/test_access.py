@@ -7,6 +7,7 @@ import ddt
 import itertools
 import pytz
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from ccx_keys.locator import CCXLocator
 from django.test.client import RequestFactory
@@ -473,6 +474,15 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTes
             invitation_only=False
         )
         self.assertFalse(access._has_access_course(user, 'enroll', course))
+
+        user = UserFactory.create(username="test@a.com")
+        course = Mock(
+            enrollment_start=yesterday, enrollment_end=tomorrow,
+            id=SlashSeparatedCourseKey('edX', 'test', '2012_Fall'), enrollment_domain='',
+            invitation_only=False
+        )
+        with patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_NO_ATSIGN_USERNAMES': True}):
+            self.assertFalse(access._has_access_course(user, 'enroll', course))
 
     def test__user_passed_as_none(self):
         """Ensure has_access handles a user being passed as null"""
