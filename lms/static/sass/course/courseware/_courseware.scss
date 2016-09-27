@@ -22,9 +22,8 @@ html.video-fullscreen {
   overflow: hidden;
 
   &.studio-view {
-    position: relative;
-    top: -($baseline/2);
     margin: 0;
+    display: inline;
   }
 
   .instructor-info-action {
