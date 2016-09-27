@@ -22,7 +22,7 @@ git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=
 # git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.1#egg=course-edx-platform-extensions==1.0.1
 # git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.1#egg=progress-edx-platform-extensions==1.0.1
 
-git+https://github.com/edx-solutions/api-integration.git@677af7808bd65b1b78a2203a3a4f60dee7b4dc62#egg=api-integration
+git+https://github.com/edx-solutions/api-integration.git@dfd1d29b9887967762634b36ca24c307e66e6f3d#egg=api-integration
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@d5c232d85ff36aef6cbe24f096ce2a21dd4e6193#egg=organizations-edx-platform-extensions
 git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@d1491cdb54f5c6854f492bb7485655b1ed244dd4#egg=gradebook-edx-platform-extensions
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@e8380f49b8c7deed2fb136e236f4ceefecbbfb9d#egg=projects-edx-platform-extensions
