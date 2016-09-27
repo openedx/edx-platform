@@ -3,6 +3,9 @@
         <label>What value when squared is approximately equal to 2 (give your answer to 2 decimal places)?</label>
         <responseparam default=".01" type="tolerance"/>
         <formulaequationinput/>
+        <additional_answer answer="10">
+            <correcthint>This is an additional hint.</correcthint>
+        </additional_answer>
 
         <correcthint label="Nice">
             The square root of two turns up in the strangest places.

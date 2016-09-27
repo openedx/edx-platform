@@ -567,50 +567,108 @@
                     // Line split here, trim off leading xxx= in each function
                     var answersList = p.split('\n'),
 
-                        processNumericalResponse = function(val) {
-                            var params, answer, string, textHint, hintLine, value;
-                            // Numeric case is just a plain leading = with a single answer
-                            value = val.replace(/^\=\s*/, '');
+                        isRangeToleranceCase = function(answer) {
+                            return _.contains(
+                                ['[', '('], answer[0]) && _.contains([']', ')'], answer[answer.length - 1]
+                            );
+                        },
 
-                            textHint = extractHint(value);
-                            hintLine = '';
-                            if (textHint.hint) {
-                                value = textHint.nothint;
-                                hintLine = '  <correcthint' + textHint.labelassign + '>' + textHint.hint +
-                                    '</correcthint>\n';
+                        getAnswerData = function(answerValue) {
+                            var answerData = {},
+                                answerParams = /(.*?)\+\-\s*(.*?$)/.exec(answerValue);
+                            if (answerParams) {
+                                answerData.answer = answerParams[1].replace(/\s+/g, ''); // inputs like 5*2 +- 10
+                                answerData.default = answerParams[2];
+                            } else {
+                                answerData.answer = answerValue.replace(/\s+/g, ''); // inputs like 5*2
                             }
+                            return answerData;
+                        },
 
-                            if (_.contains(['[', '('], value[0]) && _.contains([']', ')'], value[value.length - 1])) {
-                                // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
-                                // = (5*2)*3 should not be used as range tolerance
-                                string = '<numericalresponse answer="' + value + '">\n';
-                                string += '  <formulaequationinput />\n';
-                                string += hintLine;
-                                string += '</numericalresponse>\n\n';
-                                return string;
-                            }
+                        processNumericalResponse = function(answerValues) {
+                            var firstAnswer, answerData, numericalResponseString, additionalAnswerString,
+                                textHint, hintLine, additionalTextHint, additionalHintLine, orMatch, hasTolerance;
 
-                            if (isNaN(parseFloat(value))) {
+                            // First string case is s?= [e.g. = 100]
+                            firstAnswer = answerValues[0].replace(/^\=\s*/, '');
+
+                            // If answer is not numerical
+                            if (isNaN(parseFloat(firstAnswer)) && !isRangeToleranceCase(firstAnswer)) {
                                 return false;
                             }
 
-                            // Tries to extract parameters from string like 'expr +- tolerance'
-                            params = /(.*?)\+\-\s*(.*?$)/.exec(value);
-
-                            if (params) {
-                                answer = params[1].replace(/\s+/g, ''); // support inputs like 5*2 +- 10
-                                string = '<numericalresponse answer="' + answer + '">\n';
-                                string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-                            } else {
-                                answer = value.replace(/\s+/g, ''); // support inputs like 5*2
-                                string = '<numericalresponse answer="' + answer + '">\n';
+                            textHint = extractHint(firstAnswer);
+                            hintLine = '';
+                            if (textHint.hint) {
+                                firstAnswer = textHint.nothint;
+                                // safe-lint: disable=javascript-concat-html
+                                hintLine = '  <correcthint' + textHint.labelassign + '>' +
+                                // safe-lint: disable=javascript-concat-html
+                                    textHint.hint + '</correcthint>\n';
                             }
 
-                            string += '  <formulaequationinput />\n';
-                            string += hintLine;
-                            string += '</numericalresponse>\n\n';
+                            // Range case
+                            if (isRangeToleranceCase(firstAnswer)) {
+                                // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
+                                // = (5*2)*3 should not be used as range tolerance
+                                // safe-lint: disable=javascript-concat-html
+                                numericalResponseString = '<numericalresponse answer="' + firstAnswer + '">\n';
+                            } else {
+                                answerData = getAnswerData(firstAnswer);
+                                // safe-lint: disable=javascript-concat-html
+                                numericalResponseString = '<numericalresponse answer="' + answerData.answer + '">\n';
+                                if (answerData.default) {
+                                    // safe-lint: disable=javascript-concat-html
+                                    numericalResponseString += '  <responseparam type="tolerance" default="' +
+                                    // safe-lint: disable=javascript-concat-html
+                                        answerData.default + '" />\n';
+                                }
+                            }
 
-                            return string;
+                            // Additional answer case or= [e.g. or= 10]
+                            // Since answerValues[0] is firstAnswer, so we will not include this in additional answers.
+                            additionalAnswerString = '';
+                            for (i = 1; i < answerValues.length; i++) {
+                                additionalHintLine = '';
+                                additionalTextHint = extractHint(answerValues[i]);
+                                orMatch = /^or\=\s*(.*)/.exec(additionalTextHint.nothint);
+                                if (orMatch) {
+                                    hasTolerance = /(.*?)\+\-\s*(.*?$)/.exec(orMatch[1]);
+                                    // Do not add additional_answer if additional answer is not numerical (eg. or= ABC)
+                                    // or contains range tolerance case (eg. or= (5,7)
+                                    // or has tolerance (eg. or= 10 +- 0.02)
+                                    if (isNaN(parseFloat(orMatch[1])) ||
+                                        isRangeToleranceCase(orMatch[1]) ||
+                                        hasTolerance) {
+                                        continue;
+                                    }
+
+                                    if (additionalTextHint.hint) {
+                                        // safe-lint: disable=javascript-concat-html
+                                        additionalHintLine = '<correcthint' +
+                                            // safe-lint: disable=javascript-concat-html
+                                            additionalTextHint.labelassign + '>' +
+                                            // safe-lint: disable=javascript-concat-html
+                                            additionalTextHint.hint + '</correcthint>';
+                                    }
+
+                                    // safe-lint: disable=javascript-concat-html
+                                    additionalAnswerString += '  <additional_answer answer="' + orMatch[1] + '">';
+                                    additionalAnswerString += additionalHintLine;
+                                    additionalAnswerString += '</additional_answer>\n';
+                                }
+                            }
+
+                            // Add additional answers string to numerical problem string.
+                            if (additionalAnswerString) {
+                                numericalResponseString += additionalAnswerString;
+                            }
+
+                            numericalResponseString += '  <formulaequationinput />\n';
+                            numericalResponseString += hintLine;
+                            numericalResponseString += '</numericalresponse>\n\n';
+
+                            return numericalResponseString;
                         },
 
                         processStringResponse = function(values) {
@@ -657,7 +715,7 @@
                             return string;
                         };
 
-                    return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
+                    return processNumericalResponse(answersList) || processStringResponse(answersList);
                 });
 
 

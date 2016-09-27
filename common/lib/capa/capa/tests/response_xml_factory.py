@@ -204,6 +204,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
 
         *answer*: The correct answer (e.g. "5")
 
+        *correcthint*: The feedback describing correct answer.
+
+        *additional_answers*: A dict of additional answers along with their correcthint.
+
         *tolerance*: The tolerance within which a response
         is considered correct.  Can be a decimal (e.g. "0.01")
         or percentage (e.g. "2%")
@@ -219,6 +223,8 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         """
 
         answer = kwargs.get('answer', None)
+        correcthint = kwargs.get('correcthint', '')
+        additional_answers = kwargs.get('additional_answers', {})
         tolerance = kwargs.get('tolerance', None)
         credit_type = kwargs.get('credit_type', None)
         partial_range = kwargs.get('partial_range', None)
@@ -232,6 +238,13 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             else:
                 response_element.set('answer', str(answer))
 
+        for additional_answer, additional_correcthint in additional_answers.items():
+            additional_element = etree.SubElement(response_element, 'additional_answer')
+            additional_element.set('answer', str(additional_answer))
+            if additional_correcthint:
+                correcthint_element = etree.SubElement(additional_element, 'correcthint')
+                correcthint_element.text = str(additional_correcthint)
+
         if tolerance:
             responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('type', 'tolerance')
@@ -243,6 +256,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             # The line below throws a false positive pylint violation, so it's excepted.
             responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('partial_answers', partial_answers)
+
+        if correcthint:
+            correcthint_element = etree.SubElement(response_element, 'correcthint')
+            correcthint_element.text = str(correcthint)
 
         return response_element
 
@@ -732,7 +749,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *regexp*: Whether the response is regexp
 
-            *additional_answers*: list of additional asnwers.
+            *additional_answers*: list of additional answers.
 
             *non_attribute_answers*: list of additional answers to be coded in the
                 non-attribute format
