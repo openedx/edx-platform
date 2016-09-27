@@ -264,8 +264,9 @@ class LoncapaResponse(object):
         tree.set('tabindex', '-1')
         # tree.set('aria-labelledby', '{id}-problem-title question-title'.format(id=self.xml.get('id')))
 
+        # question title for screen readers
         section_heading = etree.SubElement(tree, 'h4')
-        section_heading.set('id', 'question-title')
+        section_heading.set('id', '{id}-question-title'.format(id=self.xml.get('id')))
         section_heading.set('class', 'sr')
         section_heading.set('value', response_label)
 
