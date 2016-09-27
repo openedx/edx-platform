@@ -152,7 +152,8 @@ class ConditionalModule(ConditionalFields, XModule):
         an AJAX call.
         """
         if not self.is_condition_satisfied():
-            defmsg = "{link} must be attempted before this will become visible."
+            # a message attribute can be added to the <conditional> tag...
+            defmsg = ""
             message = self.descriptor.xml_attributes.get('message', defmsg)
             context = {'module': self,
                        'message': message}
