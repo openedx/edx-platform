@@ -637,6 +637,7 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
     factory_kwargs = {
         'question_text': 'The answer is pi + 1',
         'answer': '4.14159',
+        'additional_answer': '100',
         'tolerance': '0.00001',
         'math_display': True,
     }
