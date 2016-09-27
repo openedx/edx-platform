@@ -258,6 +258,28 @@ class PhotoVerification(StatusModel):
         ).order_by('-created_at')
 
     @classmethod
+    def get_expiration_datetime(cls, user, queryset=None):
+        """
+        Check whether the user has an approved verification and return the
+        "expiration_datetime" of most recent "approved" verification.
+
+        Arguments:
+            user (Object): User
+            queryset: If a queryset is provided, that will be used instead
+                of hitting the database.
+
+        Returns:
+            expiration_datetime: expiration_datetime of most recent "approved"
+            verification.
+        """
+        if queryset is None:
+            queryset = cls.objects.filter(user=user)
+
+        photo_verification = queryset.filter(status='approved').first()
+        if photo_verification:
+            return photo_verification.expiration_datetime
+
+    @classmethod
     def user_has_valid_or_pending(cls, user, earliest_allowed_date=None, queryset=None):
         """
         Check whether the user has an active or pending verification attempt
@@ -384,7 +406,7 @@ class PhotoVerification(StatusModel):
 
         Arguments:
             deadline (datetime): The date at which the verification was active
-                (created before and expired after).
+                (created before and expiration datetime is after today).
 
         Returns:
             bool
@@ -392,7 +414,7 @@ class PhotoVerification(StatusModel):
         """
         return (
             self.created_at < deadline and
-            self.expiration_datetime > deadline
+            self.expiration_datetime > datetime.now(pytz.UTC)
         )
 
     def parsed_error_msg(self):
@@ -943,6 +965,18 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             return 'Not ID Verified'
         else:
             return 'ID Verified'
+
+    @classmethod
+    def is_verification_expiring_soon(cls, expiration_datetime):
+        """
+        Returns True if verification is expiring within EXPIRING_SOON_WINDOW.
+        """
+        if expiration_datetime:
+            if (expiration_datetime - datetime.now(pytz.UTC)).days <= settings.VERIFY_STUDENT.get(
+                    "EXPIRING_SOON_WINDOW"):
+                return True
+
+        return False
 
 
 class VerificationDeadline(TimeStampedModel):

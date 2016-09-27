@@ -1376,12 +1376,22 @@ class ReverifyView(View):
         """
         status, _ = SoftwareSecurePhotoVerification.user_status(request.user)
 
+        expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(request.user)
+        can_reverify = False
+        if expiration_datetime:
+            if SoftwareSecurePhotoVerification.is_verification_expiring_soon(expiration_datetime):
+                # The user has an active verification, but the verification
+                # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
+                # In this case user can resubmit photos for reverification.
+                can_reverify = True
+
         # If the user has no initial verification or if the verification
         # process is still ongoing 'pending' or expired then allow the user to
         # submit the photo verification.
         # A photo verification is marked as 'pending' if its status is either
         # 'submitted' or 'must_retry'.
-        if status in ["none", "must_reverify", "expired", "pending"]:
+
+        if status in ["none", "must_reverify", "expired", "pending"] or can_reverify:
             context = {
                 "user_full_name": request.user.profile.name,
                 "platform_name": configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
