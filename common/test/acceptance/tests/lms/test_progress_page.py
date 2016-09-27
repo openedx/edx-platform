@@ -10,7 +10,7 @@ import ddt
 
 from ..helpers import UniqueCourseTest, auto_auth, create_multiple_choice_problem
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from lettuce import world, step
+from lettuce import world
 from nose.plugins.attrib import attr
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.courseware import CoursewarePage
@@ -257,16 +257,12 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
 
     def _check_for_sr_text_in_chart(self):
         """
-        Checks for sr text in the graph.
+        Ensures we have at least one .sr text in the graph.
+        We can assume if there's one, the JS is working correctly.
         """
         selector = 'grade-detail-graph'
-        sr_class = 'class="sr"'
-        xpath = '//div[@id="{parent}"]//div[text()="{sr_class}"]'.format(
-            parent=selector,
-            sr_class=sr_class
-        )
-        graph = world.browser.find_by_xpath(xpath)
-        self.assertTrue("Necessary sr class and text not found!", graph.size() > 0)
+        graph_container = self.progress_page.q(css='#' + selector)[0]
+        self.assertTrue("Necessary screenreader element not found!", graph_container.find_element_by_class_name('sr'))
 
     def test_subsection_grading_policy_on_progress_page(self):
         with self._logged_in_session():
@@ -274,7 +270,6 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             self.courseware_page.visit()
             self._answer_problem_correctly()
             self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
-            self._check_for_sr_text_in_chart()
 
         self._set_policy_for_subsection("Not Graded")
 
@@ -283,11 +278,12 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
             self.assertEqual(self._get_section_score(), (1, 2))
             self.assertFalse(self.progress_page.text_on_page("Homework 1 - Test Subsection 1"))
+            self._check_for_sr_text_in_chart()
 
         self._set_policy_for_subsection("Homework")
+
         with self._logged_in_session():
             self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
-            self._check_for_sr_text_in_chart()
 
 
 @attr('a11y')
