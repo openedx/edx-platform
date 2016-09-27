@@ -79,7 +79,7 @@ class StaffDebugPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css='section.staff-modal').present
+        return self.q(css='.staff-modal').present
 
     def reset_attempts(self, user=None):
         """

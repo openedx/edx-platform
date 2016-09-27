@@ -153,8 +153,9 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Expect that the response has been turned into a <section> with correct attributes
         response_element = rendered_html.find("section")
-        self.assertEqual(response_element.tag, "section")
-        self.assertEqual(response_element.attrib["aria-label"], "Question 1")
+
+        # question index for screen readers
+        self.assertEqual(response_element.find('h4').text, 'Question 1')
 
         # Expect that the response <section>
         # that contains a <div> for the textline
@@ -199,7 +200,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
             expected_calls
         )
 
-    def test_correct_aria_label(self):
+    def test_correct_question_index_for_sr(self):
+        """Verify that question index for screen readers is being set correctly"""
         xml = """
                  <problem>
                      <choiceresponse>
@@ -219,8 +221,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         rendered_html = etree.XML(problem.get_html())
         sections = rendered_html.findall('section')
-        self.assertEqual(sections[0].attrib['aria-label'], 'Question 1')
-        self.assertEqual(sections[1].attrib['aria-label'], 'Question 2')
+        self.assertEqual(sections[0].find('h4').text, 'Question 1')
+        self.assertEqual(sections[1].find('h4').text, 'Question 2')
 
     def test_render_response_with_overall_msg(self):
         # CustomResponse script that sets an overall_message
