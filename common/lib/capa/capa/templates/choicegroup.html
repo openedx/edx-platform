@@ -14,7 +14,7 @@
         <p class="question-description" id="${description_id}">${description_text}</p>
       % endfor
         % for choice_id, choice_label in choices:
-          <div class="field" aria-live="polite" aria-atomic="true">
+          <div class="field">
             <%
               label_class = 'response-label field-label label-inline'
             %>
@@ -68,6 +68,6 @@
     <div class="capa_alert">${submitted_message}</div>
     %endif
     % if msg:
-    <span class="message" aria-describedby="${id}-legend" aria-live="polite" tabindex="-1">${HTML(msg)}</span>
+    <span class="message" aria-describedby="${id}-legend" tabindex="-1">${HTML(msg)}</span>
     % endif
 </form>
