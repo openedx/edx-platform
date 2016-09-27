@@ -275,6 +275,31 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
 
 
+    def test_org_query(self):
+        self.login()
+
+        # Create list of courses with various organizations
+        courses = [
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True),
+            CourseFactory.create(org='edX', mobile_available=True, visible_to_staff_only=True),
+            CourseFactory.create(org='Proversity.org', mobile_available=True),
+            CourseFactory.create(org='MITx', mobile_available=True),
+            CourseFactory.create(org='HarvardX', mobile_available=True),
+        ]
+
+        # Enroll in all the courses
+        self.assertEqual(len(response.data), 3)
+        for course in courses:
+            self.enroll(course.id)
+
+        response = self.api_response(data={'org':'edX'})
+
+        # Verify only edX courses are returned
+        for entry in response.data:
+            self.assertEqual(entry['course']['org'], 'edX')
+
+
 @attr(shard=2)
 class CourseStatusAPITestCase(MobileAPITestCase):
     """
