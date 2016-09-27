@@ -83,7 +83,7 @@
                  <span class="sr"><%- gettext('Unit') %>&nbsp;</span>
                  <%= subchild.display_name %>
               </td>
-              <% /* Start: Changed By Labster */ %>
+              <% /* Start: Added By Labster */ %>
               <td class="date start-date">
                 <button class="ccx-button-link">
                   <%= subchild.start %>
@@ -96,8 +96,8 @@
                   <span class="sr"><%- gettext('Click to change') %></span>
                 </button>
               </td>
-              <% /* End: Changed By Labster */ %>
-<% /*
+              <% /* End: Added By Labster */ %>
+<!--
               <td class="date start-date no-link">
                 <% if (subchild.start) { %>
                   <%= subchild.start %>
@@ -118,7 +118,7 @@
                   <%- gettext('Unscheduled') %>
                 <% } %>
               </td>
-*/ %>
+-->
               <td>
                 <button class="remove-unit ccx-button-link" aria-label="<%- interpolate(
                     gettext('Remove unit %(unitName)s'), {unitName: subchild.display_name}, true) %>">
