@@ -366,7 +366,7 @@ class @Problem
     $.postWithPrefix "#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'
-          window.SR.readElts($(response.contents).find('.status'))
+          window.SR.readTexts(@get_sr_status(response.contents))
           @el.trigger('contentChanged', [@id, response.contents])
           @render(response.contents, @focus_on_submit_notification)
           @updateProgress response
@@ -377,6 +377,29 @@ class @Problem
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
 
+  get_sr_status: (contents) =>
+    # This method builds up an array of strings to send to the page screen-reader span.
+    # It first gets all elements with class "status", and then looks to see if they are contained
+    # in sections with aria-labels. If so, labels are prepended to the status element text.
+    # If not, just the text of the status elements are returned.
+    status_elements = $(contents).find('.status')
+    labeled_status = []
+    for element in status_elements
+      parent_section = $(element).closest('section')
+      added_status = false
+      if parent_section
+        aria_label = parent_section.attr('aria-label')
+        if aria_label
+          `// Translators: This is only translated to allow for reording of label and associated status.`
+          template = gettext("{label}: {status}")
+          labeled_status.push(edx.StringUtils.interpolate(template, {label: aria_label, status: $(element).text()}))
+          added_status = true
+
+      if not added_status
+        labeled_status.push($(element).text())
+
+    return labeled_status
+  
   reset: =>
     @disableAllButtonsWhileRunning @reset_internal, false
 
@@ -394,14 +417,12 @@ class @Problem
   show: =>
     if !@el.hasClass 'showed'
       Logger.log 'problem_show', problem: @id
-      answer_text = []
       $.postWithPrefix "#{@url}/problem_show", (response) =>
         answers = response.answers
         $.each answers, (key, value) =>
           if $.isArray(value)
             for choice in value
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
-              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
           else
             answer = @$("#answer_#{key}, #solution_#{key}")
             edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value))
@@ -418,10 +439,6 @@ class @Problem
                 solution = $(value).find('.detailed-solution')
             catch e
                 solution = {}
-            if solution.length
-              answer_text.push(solution)
-            else
-              answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
 
         # TODO remove the above once everything is extracted into its own
         # inputtype functions.
@@ -440,7 +457,7 @@ class @Problem
         @el.addClass 'showed'
         @el.find('.show').attr('disabled', 'disabled')
         @updateProgress response
-        window.SR.readElts(answer_text)
+        window.SR.readText(gettext('Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'))
         @scroll_to_problem_meta()
 
   clear_all_notifications: =>
