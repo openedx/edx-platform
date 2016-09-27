@@ -370,9 +370,6 @@ GENERATE_PROFILE_SCORES = False
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
-# Used with Email sending
-RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
-
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms

@@ -1791,32 +1791,21 @@ def create_account_with_params(request, params):
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
-        retries = settings.RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS
-        while retries:
-            try:
-                if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                    dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-                    message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                               '-' * 80 + '\n\n' + message)
-                    mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
-                else:
-                    user.email_user(subject, message, from_address)
-                # Log that the Activation Email has been sent to user without an exception
-                log.info("Activataion Email has been sent to User {user_email}".format(
-                    user_email=dest_addr
-                ))
-                break
-            except Exception:  # pylint: disable=broad-except
-                retries -= 1
-                if retries <= 0:
-                    break
-                log.error(
-                    u'Unable to send activation email to user from "%s" to "%s"',
-                    from_address,
-                    dest_addr,
-                    exc_info=True
-                )
-
+        try:
+            if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+                dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
+                message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                           '-' * 80 + '\n\n' + message)
+                mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
+            else:
+                user.email_user(subject, message, from_address)
+        except Exception:  # pylint: disable=broad-except
+            log.error(
+                u'Unable to send activation email to user from "%s" to "%s"',
+                from_address,
+                dest_addr,
+                exc_info=True
+            )
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
