@@ -144,17 +144,21 @@ $(function () {
   for (var n = 0; n < series_order_object.length; n++) {
       if (detail_tooltips[series_order_object[n].label].length > 1) {
           series_order_object[n].description = detail_tooltips[series_order_object[n].label][c];
-          for (var m = 0; m < droppedScores[0].length; m++) {
-              if (series_order_object[n].tick === droppedScores[0][m]) {
-                  series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
+          if (droppedScores[0]) {
+              for (var m = 0; m < droppedScores[0].length; m++) {
+                  if (series_order_object[n].tick === droppedScores[0][m]) {
+                      series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
+                  }
               }
+              c++;
           }
-          c++;
       } else {
           series_order_object[n].description = detail_tooltips[series_order_object[n].label][0];
-          for (var m = 0; m < droppedScores[0].length; m++) {
-              if (series_order_object[n].tick === droppedScores[0][m]) {
-                  series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
+          if (droppedScores[0]) {
+              for (var m = 0; m < droppedScores[0].length; m++) {
+                  if (series_order_object[n].tick === droppedScores[0][m]) {
+                      series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
+                  }
               }
           }
       }

@@ -10,7 +10,6 @@ import ddt
 
 from ..helpers import UniqueCourseTest, auto_auth, create_multiple_choice_problem
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
-from lettuce import world
 from nose.plugins.attrib import attr
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.courseware import CoursewarePage
