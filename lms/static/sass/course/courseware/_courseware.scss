@@ -411,7 +411,7 @@ html.video-fullscreen {
       }
     }
 
-    .sequence .path {
+    .path {
       @extend %t-copy-sub1;
       margin-top: -($baseline);
       margin-bottom: $baseline;
