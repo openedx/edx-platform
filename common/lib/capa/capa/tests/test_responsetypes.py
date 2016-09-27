@@ -1347,8 +1347,9 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
             ['[0, 1.6e-5]', ['1.6*10^-5'], ["2"]],
             ['(1.6e-5, 10]', ["2"], ['1.6*10^-5']],
         ]
+        additional_answers = ['100', '1000']
         for given_answer, correct_responses, incorrect_responses in problem_setup:
-            problem = self.build_problem(answer=given_answer)
+            problem = self.build_problem(answer=given_answer, additional_answers=additional_answers)
             self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_range_tolerance_partial_credit(self):

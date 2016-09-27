@@ -202,6 +202,8 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
 
         *answer*: The correct answer (e.g. "5")
 
+        *additional_answers*: The list of additional answers.
+
         *tolerance*: The tolerance within which a response
         is considered correct.  Can be a decimal (e.g. "0.01")
         or percentage (e.g. "2%")
@@ -217,6 +219,7 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         """
 
         answer = kwargs.get('answer', None)
+        additional_answers = kwargs.get('additional_answers', [])
         tolerance = kwargs.get('tolerance', None)
         credit_type = kwargs.get('credit_type', None)
         partial_range = kwargs.get('partial_range', None)
@@ -229,6 +232,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
                 response_element.set('answer', repr(answer))
             else:
                 response_element.set('answer', str(answer))
+
+        for additional_answer in additional_answers:
+            additional_element = etree.SubElement(response_element, "additional_answer")
+            additional_element.set("answer", str(additional_answer))
 
         if tolerance:
             responseparam_element = etree.SubElement(response_element, 'responseparam')
@@ -730,7 +737,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *regexp*: Whether the response is regexp
 
-            *additional_answers*: list of additional asnwers.
+            *additional_answers*: list of additional answers.
 
             *non_attribute_answers*: list of additional answers to be coded in the
                 non-attribute format

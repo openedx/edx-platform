@@ -761,6 +761,7 @@ class ProblemNumericalInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsTest):
             <numericalresponse answer="10*i">
                 <label>The square of what number is -100?</label>
                 <description>Use scientific notation to answer.</description>
+                <additional_answer answer="100"></additional_answer>
                 <formulaequationinput/>
             </numericalresponse>
         </problem>""")
