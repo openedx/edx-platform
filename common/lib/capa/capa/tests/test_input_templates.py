@@ -11,6 +11,7 @@ from lxml import etree
 from mako.template import Template as MakoTemplate
 from mako import exceptions
 from capa.inputtypes import Status
+from xmodule.stringify import stringify_children
 
 
 class TemplateError(Exception):
@@ -31,7 +32,12 @@ class TemplateTestCase(unittest.TestCase):
     # for example: choicegroup.html
     TEMPLATE_NAME = None
     DESCRIBEDBY = 'aria-describedby="desc-1 desc-2"'
-    DESCRIPTIONS = OrderedDict([('desc-1', 'description text 1'), ('desc-2', 'description text 2')])
+    DESCRIPTIONS = OrderedDict(
+        [
+            ('desc-1', 'description text 1'),
+            ('desc-2', '<em>description</em> <mark>text</mark> 2')
+        ]
+    )
     DESCRIPTION_IDS = ' '.join(DESCRIPTIONS.keys())
     RESPONSE_DATA = {
         'label': 'question text 101',
@@ -48,7 +54,7 @@ class TemplateTestCase(unittest.TestCase):
                                           'templates',
                                           self.TEMPLATE_NAME)
         with open(self.template_path) as f:
-            self.template = MakoTemplate(f.read())
+            self.template = MakoTemplate(f.read(), default_filters=['decode.utf8'])
 
         self.context = {}
 
@@ -118,27 +124,24 @@ class TemplateTestCase(unittest.TestCase):
         self.assertGreater(len(element_list), 0, "Could not find element at '%s'" % str(xpath))
 
         if exact:
-            self.assertEqual(text, element_list[0].text)
+            self.assertEqual(text, element_list[0].text.strip())
         else:
-            self.assertIn(text, element_list[0].text)
+            self.assertIn(text, element_list[0].text.strip())
 
-    def assert_description(self, describedby_xpaths, descriptions=True):
+    def assert_description(self, describedby_xpaths):
         """
         Verify that descriptions information is correct.
 
         Arguments:
             describedby_xpaths (list): list of xpaths to check aria-describedby attribute
-            descriptions (bool): tells whether we need to check description <p> tags
         """
         xml = self.render_to_xml(self.context)
 
-        # TODO! This check should be removed once description <p> tags are added into all templates.
-        if descriptions:
-            # Verify that each description <p> tag has correct id, text and order
-            descriptions = OrderedDict(
-                (tag.get('id'), tag.text) for tag in xml.xpath('//p[@class="question-description"]')
-            )
-            self.assertEqual(self.DESCRIPTIONS, descriptions)
+        # Verify that each description <p> tag has correct id, text and order
+        descriptions = OrderedDict(
+            (tag.get('id'), stringify_children(tag)) for tag in xml.xpath('//p[@class="question-description"]')
+        )
+        self.assertEqual(self.DESCRIPTIONS, descriptions)
 
         # for each xpath verify that description_ids are set correctly
         for describedby_xpath in describedby_xpaths:
@@ -157,7 +160,7 @@ class TemplateTestCase(unittest.TestCase):
         Arguments:
             describedby_xpaths (list): list of xpaths to check aria-describedby attribute
         """
-        self.context['describedby'] = ''
+        self.context['describedby_html'] = ''
         xml = self.render_to_xml(self.context)
 
         # for each xpath verify that description_ids are set correctly
@@ -199,6 +202,44 @@ class TemplateTestCase(unittest.TestCase):
                 self.context['status'].display_tooltip
             )
 
+    def assert_label(self, xpath=None, aria_label=False):
+        """
+        Verify label is rendered correctly.
+
+        Arguments:
+            xpath (str): xpath expression for label element
+            aria_label (bool): check aria-label attribute value
+        """
+        labels = [
+            {
+                'actual': "You see, but you do not observe. The distinction is clear.",
+                'expected': "You see, but you do not observe. The distinction is clear.",
+            },
+            {
+                'actual': "I choose to have <mark>faith</mark> because without that, I have <em>nothing</em>.",
+                'expected': "I choose to have faith because without that, I have nothing.",
+            }
+        ]
+
+        response_data = {
+            'response_data': {
+                'descriptions': {},
+                'label': ''
+            }
+        }
+        self.context.update(response_data)
+
+        for label in labels:
+            self.context['response_data']['label'] = label['actual']
+            xml = self.render_to_xml(self.context)
+
+            if aria_label:
+                self.assert_has_xpath(xml, "//*[@aria-label='%s']" % label['expected'], self.context)
+            else:
+                element_list = xml.xpath(xpath)
+                self.assertEqual(len(element_list), 1)
+                self.assertEqual(stringify_children(element_list[0]), label['actual'])
+
 
 class ChoiceGroupTemplateTest(TemplateTestCase):
     """
@@ -218,7 +259,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             'name_array_suffix': '1',
             'value': '3',
             'response_data': self.RESPONSE_DATA,
-            'describedby': self.DESCRIBEDBY,
+            'describedby_html': self.DESCRIBEDBY,
         }
 
     def test_problem_marked_correct(self):
@@ -429,9 +470,10 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             self.assert_no_xpath(xml, "//div[@class='capa_alert']", self.context)
 
     def test_label(self):
-        xml = self.render_to_xml(self.context)
-        xpath = "//legend"
-        self.assert_has_text(xml, xpath, self.context['response_data']['label'])
+        """
+        Verify label element value rendering.
+        """
+        self.assert_label(xpath="//legend")
 
     def test_description(self):
         """
@@ -464,7 +506,7 @@ class TextlineTemplateTest(TemplateTestCase):
             'preprocessor': None,
             'trailing_text': None,
             'response_data': self.RESPONSE_DATA,
-            'describedby': self.DESCRIBEDBY,
+            'describedby_html': self.DESCRIBEDBY,
         }
 
     def test_section_class(self):
@@ -487,8 +529,10 @@ class TextlineTemplateTest(TemplateTestCase):
         self.assert_status(status_div=True)
 
     def test_label(self):
-        xml = self.render_to_xml(self.context)
-        self.assert_has_xpath(xml, "//label[@class='problem-group-label']", self.RESPONSE_DATA['label'])
+        """
+        Verify label element value rendering.
+        """
+        self.assert_label(xpath="//label[@class='problem-group-label']")
 
     def test_hidden(self):
         self.context['hidden'] = True
@@ -588,7 +632,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'reported_status': 'REPORTED_STATUS',
             'trailing_text': None,
             'response_data': self.RESPONSE_DATA,
-            'describedby': self.DESCRIBEDBY,
+            'describedby_html': self.DESCRIBEDBY,
         }
 
     def test_no_size(self):
@@ -614,6 +658,12 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         Verify status information.
         """
         self.assert_status(status_div=True)
+
+    def test_label(self):
+        """
+        Verify label element value rendering.
+        """
+        self.assert_label(xpath="//label[@class='problem-group-label']")
 
 
 class AnnotationInputTemplateTest(TemplateTestCase):
@@ -802,13 +852,13 @@ class OptionInputTemplateTest(TemplateTestCase):
             'value': 0,
             'default_option_text': 'Select an option',
             'response_data': self.RESPONSE_DATA,
-            'describedby': self.DESCRIBEDBY,
+            'describedby_html': self.DESCRIBEDBY,
         }
 
     def test_select_options(self):
 
         # Create options 0-4, and select option 2
-        self.context['options'] = [(id_num, '<b>Option {0}</b>'.format(id_num))
+        self.context['options'] = [(id_num, 'Option {0}'.format(id_num))
                                    for id_num in range(5)]
         self.context['value'] = 2
 
@@ -818,15 +868,12 @@ class OptionInputTemplateTest(TemplateTestCase):
         xpath = "//option[@value='option_2_dummy_default']"
         self.assert_has_xpath(xml, xpath, self.context)
 
-        # Should have each of the options, with the correct description
-        # The description HTML should NOT be escaped
-        # (that's why we descend into the <b> tag)
         for id_num in range(5):
-            xpath = "//option[@value='{0}']/b".format(id_num)
+            xpath = "//option[@value='{0}']".format(id_num)
             self.assert_has_text(xml, xpath, 'Option {0}'.format(id_num))
 
         # Should have the correct option selected
-        xpath = "//option[@selected='true']/b"
+        xpath = "//option[@selected='true']"
         self.assert_has_text(xml, xpath, 'Option 2')
 
     def test_status(self):
@@ -836,9 +883,10 @@ class OptionInputTemplateTest(TemplateTestCase):
         self.assert_status(status_class=True)
 
     def test_label(self):
-        xml = self.render_to_xml(self.context)
-        xpath = "//label[@class='problem-group-label']"
-        self.assert_has_xpath(xml, xpath, self.RESPONSE_DATA['label'])
+        """
+        Verify label element value rendering.
+        """
+        self.assert_label(xpath="//label[@class='problem-group-label']")
 
     def test_description(self):
         """
@@ -1077,7 +1125,59 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
             xpath = "//div[@class='indicator-container']/span"
             self.assert_no_xpath(xml, xpath, self.context)
 
-    def test_label(self):
-        xml = self.render_to_xml(self.context)
-        xpath = "//fieldset[@aria-label='%s']" % self.context['response_data']['label']
-        self.assert_has_xpath(xml, xpath, self.context)
+    def test_aria_label(self):
+        """
+        Verify aria-label attribute rendering.
+        """
+        self.assert_label(aria_label=True)
+
+
+class ChemicalEquationTemplateTest(TemplateTestCase):
+    """Test mako template for `<chemicalequationinput>` input"""
+
+    TEMPLATE_NAME = 'chemicalequationinput.html'
+
+    def setUp(self):
+        super(ChemicalEquationTemplateTest, self).setUp()
+        self.context = {
+            'id': '1',
+            'status': Status('correct'),
+            'previewer': 'dummy.js',
+            'value': '101',
+        }
+
+    def test_aria_label(self):
+        """
+        Verify aria-label attribute rendering.
+        """
+        self.assert_label(aria_label=True)
+
+
+class SchematicInputTemplateTest(TemplateTestCase):
+    """Test mako template for `<schematic>` input"""
+
+    TEMPLATE_NAME = 'schematicinput.html'
+
+    def setUp(self):
+        super(SchematicInputTemplateTest, self).setUp()
+        self.context = {
+            'id': '1',
+            'status': Status('correct'),
+            'previewer': 'dummy.js',
+            'value': '101',
+            'STATIC_URL': '/dummy-static/',
+            'msg': '',
+            'initial_value': 'two large batteries',
+            'width': '100',
+            'height': '100',
+            'parts': 'resistors, capacitors, and flowers',
+            'setup_script': '/dummy-static/js/capa/schematicinput.js',
+            'analyses': 'fast, slow, and pink',
+            'submit_analyses': 'maybe',
+        }
+
+    def test_aria_label(self):
+        """
+        Verify aria-label attribute rendering.
+        """
+        self.assert_label(aria_label=True)
