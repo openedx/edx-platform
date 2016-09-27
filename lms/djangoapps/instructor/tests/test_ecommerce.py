@@ -15,10 +15,11 @@ from shoppingcart.models import Coupon, CourseRegistrationCode
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 
 @attr(shard=1)
-class TestECommerceDashboardViews(SharedModuleStoreTestCase):
+class TestECommerceDashboardViews(SiteMixin, SharedModuleStoreTestCase):
     """
     Check for E-commerce view on the new instructor dashboard
     """
@@ -52,6 +53,25 @@ class TestECommerceDashboardViews(SharedModuleStoreTestCase):
         self.assertIn(self.e_commerce_link, response.content)
         # Coupons should show up for White Label sites with priced honor modes.
         self.assertIn('Coupon Code List', response.content)
+
+    def test_reports_section_under_e_commerce_tab(self):
+        """
+        Test reports section, under E-commerce Tab, is in the Instructor Dashboard
+        """
+        self.use_site(site=self.site_other)
+        self.client.login(username=self.instructor.username, password="test")
+        response = self.client.get(self.url)
+        self.assertIn(self.e_commerce_link, response.content)
+        self.assertIn('Create Enrollment Report', response.content)
+
+    def test_reports_section_not_under_e_commerce_tab(self):
+        """
+        Test reports section, under E-commerce Tab, should not be available in the Instructor Dashboard with default
+        value
+        """
+        response = self.client.get(self.url)
+        self.assertIn(self.e_commerce_link, response.content)
+        self.assertNotIn('Create Enrollment Report', response.content)
 
     def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
         response = self.client.get(self.url)

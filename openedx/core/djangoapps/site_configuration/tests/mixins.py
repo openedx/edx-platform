@@ -30,6 +30,7 @@ class SiteMixin(object):
                 "SITE_NAME": self.site_other.domain,
                 "course_org_filter": "fakeOtherX",
                 "ENABLE_MKTG_SITE": True,
+                "SHOW_ECOMMERCE_REPORTS": True,
                 "MKTG_URLS": {
                     "ROOT": "https://marketing.fakeother",
                     "ABOUT": "/fake-about"

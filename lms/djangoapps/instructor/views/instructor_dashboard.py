@@ -53,6 +53,7 @@ from util.date_utils import get_default_time_display
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from openedx.core.djangolib.markup import HTML, Text
 
@@ -103,6 +104,8 @@ def instructor_dashboard_2(request, course_id):
 
     is_white_label = CourseMode.is_white_label(course_key)
 
+    reports_enabled = configuration_helpers.get_value('SHOW_ECOMMERCE_REPORTS', False)
+
     sections = [
         _section_course_info(course, access),
         _section_membership(course, access, is_white_label),
@@ -151,7 +154,7 @@ def instructor_dashboard_2(request, course_id):
 
     # Gate access to Ecommerce tab
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
-        sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, is_white_label))
+        sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label, reports_enabled))
 
     # Gate access to Special Exam tab depending if either timed exams or proctored exams
     # are enabled in the course
