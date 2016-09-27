@@ -152,25 +152,43 @@ $(function() {
                 $readerFeedbackSelector = $('#' + readerFeedbackID);
 
             if ($readerFeedbackSelector.length === 0) {
-                $('body').append('<div id="' + readerFeedbackID + '" class="sr" aria-live="polite"></div>');
+                edx.HtmlUtils.append(
+                    $('body'),
+                    edx.HtmlUtils.interpolateHtml(
+                        edx.HtmlUtils.HTML('<div id="{readerFeedbackID}" class="sr" aria-live="polite"></div>'),
+                        {readerFeedbackID: readerFeedbackID}
+                    )
+                );
             }
             this.el = $('#' + readerFeedbackID);
         }
 
         SRAlert.prototype.clear = function() {
-            return this.el.html(' ');
+            edx.HtmlUtils.setHtml(this.el, '');
         };
 
         SRAlert.prototype.readElts = function(elts) {
-            var feedback = '';
+            var texts = [];
             $.each(elts, function(idx, value) {
-                return feedback += '<p>' + $(value).html() + '</p>\n';
+                texts.push($(value).html());
             });
-            return this.el.html(feedback);
+            return this.readTexts(texts);
         };
 
         SRAlert.prototype.readText = function(text) {
-            return this.el.text(text);
+            return this.readTexts([text]);
+        };
+
+        SRAlert.prototype.readTexts = function(texts) {
+            var htmlFeedback = edx.HtmlUtils.HTML('');
+            $.each(texts, function(idx, value) {
+                htmlFeedback = edx.HtmlUtils.interpolateHtml(
+                    edx.HtmlUtils.HTML('{previous_feedback}<p>{value}</p>\n'),
+                    // "value" may be HTML, if an element is being passed
+                    {previous_feedback: htmlFeedback, value: edx.HtmlUtils.HTML(value)}
+                );
+            });
+            edx.HtmlUtils.setHtml(this.el, htmlFeedback);
         };
 
         return SRAlert;
