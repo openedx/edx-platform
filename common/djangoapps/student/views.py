@@ -1790,7 +1790,7 @@ def create_account_with_params(request, params):
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
-        send_activation_email.delay(user.id, subject, message, from_address)
+        send_activation_email.delay(user, subject, message, from_address)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
