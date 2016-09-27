@@ -433,42 +433,59 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           // Line split here, trim off leading xxx= in each function
           var answersList = p.split('\n'),
 
-              processNumericalResponse = function (value) {
+              processNumericalResponse = function (values) {
                   // Numeric case is just a plain leading = with a single answer
-                  value = value.replace(/^\=\s*/, '');
+                  // First string case is s?=
+                  var firstAnswer = values.shift();
+                  firstAnswer = firstAnswer.replace(/^\=\s*/, '');
+
                   var params, answer, string;
 
-                  var textHint = extractHint(value);
+                  var textHint = extractHint(firstAnswer);
                   var hintLine = '';
                   if (textHint.hint) {
-                    value = textHint.nothint;
+                    firstAnswer = textHint.nothint;
                     hintLine = '  <correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>\n'
                   }
 
-                  if (_.contains([ '[', '(' ], value[0]) && _.contains([ ']', ')' ], value[value.length-1]) ) {
+                  if (_.contains([ '[', '(' ], firstAnswer[0]) && _.contains([ ']', ')' ], firstAnswer[firstAnswer.length-1]) ) {
                     // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
                     // = (5*2)*3 should not be used as range tolerance
-                    string = '<numericalresponse answer="' + value +  '">\n';
+                    string = '<numericalresponse answer="' + firstAnswer +  '">\n';
                     string += '  <formulaequationinput />\n';
                     string += hintLine;
                     string += '</numericalresponse>\n\n';
                     return string;
                   }
 
-                  if (isNaN(parseFloat(value))) {
+                  if (isNaN(parseFloat(firstAnswer))) {
                       return false;
                   }
 
                   // Tries to extract parameters from string like 'expr +- tolerance'
-                  params = /(.*?)\+\-\s*(.*?$)/.exec(value);
+                  params = /(.*?)\+\-\s*(.*?$)/.exec(firstAnswer);
 
                   if(params) {
                       answer = params[1].replace(/\s+/g, ''); // support inputs like 5*2 +- 10
                       string = '<numericalresponse answer="' + answer + '">\n';
                       string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
                   } else {
-                      answer = value.replace(/\s+/g, ''); // support inputs like 5*2
+                      answer = firstAnswer.replace(/\s+/g, ''); // support inputs like 5*2
                       string = '<numericalresponse answer="' + answer + '">\n';
+                  }
+
+                  // Subsequent case or=
+                  for (i = 0; i < values.length; i += 1) {
+                      var textHint = extractHint(values[i]);
+                      var orMatch = /^or\=\s*(.*)/.exec(textHint.nothint);
+                      if (orMatch) {
+                          // additional_answer with answer= attribute
+                          string += '  <additional_answer answer="' + orMatch[1] + '">';
+                          if (textHint.hint) {
+                              string += '<correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>';
+                          }
+                          string += '</additional_answer>\n';
+                      }
                   }
 
                   string += '  <formulaequationinput />\n';
@@ -518,7 +535,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                   return string;
               };
 
-          return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
+          return processNumericalResponse(answersList) || processStringResponse(answersList);
       });
 
 
