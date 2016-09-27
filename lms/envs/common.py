@@ -372,7 +372,6 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
 # Used with Email sending
 RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
-RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
 
 ############################# SET PATH INFORMATION #############################
