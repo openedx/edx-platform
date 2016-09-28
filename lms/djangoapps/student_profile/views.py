@@ -101,3 +101,7 @@ def learner_profile_context(request, profile_username, user_is_staff):
         context['data']['badges_api_url'] = reverse("badges_api:user_assertions", kwargs={'username': profile_username})
 
     return context
+
+def another_abandoned_function():
+    message = "I am all alone"
+    return

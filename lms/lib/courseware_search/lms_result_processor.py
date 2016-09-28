@@ -63,3 +63,7 @@ class LmsSearchResultProcessor(SearchResultProcessor):
         if has_access(user, 'staff', self.get_course_key()):
             return False
         return self.get_usage_key() not in self.get_course_blocks(user).get_block_keys()
+
+    def abandoned_function(self):
+        message = "No one will ever find me here"
+        return
