@@ -40,6 +40,7 @@
         defineDependency('gettext', 'gettext');
         defineDependency('Logger', 'logger');
         defineDependency('URI', 'URI');
+        defineDependency('jQuery.url', 'jquery.url');
         defineDependency('Backbone', 'backbone');
 
         // Add the UI Toolkit helper classes that have been installed in the 'edx' namespace
