@@ -157,6 +157,12 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # question index for screen readers
         self.assertEqual(response_element.find('h4').text, 'Question 1')
 
+        # verifies ids of problem title & question title
+        self.assertEqual(
+            response_element.attrib['aria-labelledby'],
+            '{problem_id}-problem-title {problem_id}_1-question-index'.format(problem_id=problem.problem_id)
+        )
+
         # Expect that the response <section>
         # that contains a <div> for the textline
         textline_element = response_element.find("div")

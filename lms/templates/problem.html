@@ -5,13 +5,13 @@ from openedx.core.djangolib.markup import HTML
 %>
 
 <%namespace name='static' file='static_content.html'/>
-<h3 class="hd hd-2 problem-header" id="${ id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
+<h3 class="hd hd-2 problem-header" id="${ short_id }-problem-title" aria-describedby="${ id }-problem-progress" tabindex="-1">
   ${ problem['name'] }
 </h3>
 
 <div class="problem-progress" id="${ id }-problem-progress"></div>
 
-<div class="problem" aria-labelledby="${ id }-problem-title">
+<div class="problem" aria-labelledby="${ short_id }-problem-title">
   ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
@@ -47,7 +47,7 @@ from openedx.core.djangolib.markup import HTML
     % endif
     % if answer_available:
     <span class="problem-action-button-wrapper">
-        <button class="show problem-action-btn btn-default btn-small" aria-describedby="${ id }-problem-title"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span class="show-label">${_('Show Answer')}</span></button>
+        <button class="show problem-action-btn btn-default btn-small" aria-describedby="${ short_id }-problem-title"><span class="icon fa fa-info-circle" aria-hidden="true"></span><span class="show-label">${_('Show Answer')}</span></button>
     </span>
     % endif
     </div>

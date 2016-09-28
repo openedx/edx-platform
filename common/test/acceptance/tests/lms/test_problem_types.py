@@ -416,7 +416,6 @@ class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.a11y_audit.config.set_rules({
             "ignore": [
                 'label',  # TODO: AC-491
-                'section',  # TODO: AC-491
             ]
         })
 
@@ -1046,18 +1045,6 @@ class SymbolicProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         'incorrect': ['div.capa_inputtype div.incorrect'],
         'unanswered': ['div.capa_inputtype div.unanswered'],
     }
-
-    def setUp(self, *args, **kwargs):
-        """
-        Additional setup for SymbolicProblemTypeTest
-        """
-        super(SymbolicProblemTypeTest, self).setUp(*args, **kwargs)
-        self.problem_page.a11y_audit.config.set_rules({
-            'ignore': [
-                'section',  # TODO: AC-491
-                'label',  # TODO: AC-294
-            ]
-        })
 
     def answer_problem(self, correctness):
         """

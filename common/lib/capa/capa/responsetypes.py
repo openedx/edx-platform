@@ -253,8 +253,10 @@ class LoncapaResponse(object):
         """
         _ = self.capa_system.i18n.ugettext
 
-        # get responsetype index to make responsetype label
-        response_index = self.xml.attrib['id'].split('_')[-1]
+        # response_id = problem_id + response index
+        response_id = self.xml.attrib['id']
+        problem_id = response_id.split('_')[0]
+        response_index = response_id.split('_')[-1]
         # Translators: index here could be 1,2,3 and so on
         response_label = _(u'Question {index}').format(index=response_index)
 
@@ -262,11 +264,14 @@ class LoncapaResponse(object):
         tree = etree.Element('section')
         tree.set('class', 'wrapper-problem-response')
         tree.set('tabindex', '-1')
-        # tree.set('aria-labelledby', '{id}-problem-title question-title'.format(id=self.xml.get('id')))
+        tree.set('aria-labelledby', u'{problem_id}-problem-title {response_id}-question-index'.format(
+            problem_id=problem_id,
+            response_id=response_id
+        ))
 
         # question index for screen readers
         section_heading = etree.SubElement(tree, 'h4')
-        section_heading.set('id', u'{id}-question-title'.format(id=self.xml.get('id')))
+        section_heading.set('id', u'{response_id}-question-index'.format(response_id=response_id))
         section_heading.set('class', 'sr')
         section_heading.text = response_label
 
@@ -275,7 +280,7 @@ class LoncapaResponse(object):
             content = etree.SubElement(tree, 'div')
             content.set('class', 'multi-inputs-group')
             content.set('role', 'group')
-            content.set('aria-labelledby', self.xml.get('id'))
+            content.set('aria-labelledby', response_id)
         else:
             content = tree
 
