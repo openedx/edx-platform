@@ -121,7 +121,7 @@ ipaddr==2.1.11
 django-cors-headers==1.1.0
 
 # Debug toolbar
-django_debug_toolbar==1.3.2
+django_debug_toolbar==1.5
 
 # Used for testing
 astroid==1.3.8
