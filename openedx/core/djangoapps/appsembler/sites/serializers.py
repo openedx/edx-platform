@@ -23,6 +23,12 @@ class SiteConfigurationSerializer(serializers.ModelSerializer):
         model = SiteConfiguration
         fields = ('id', 'name', 'domain', 'values', 'sass_variables', 'page_elements')
 
+    def update(self, instance, validated_data):
+        object = super(SiteConfigurationSerializer, self).update(instance, validated_data)
+        # TODO: make this per-site, not scalable in production
+        Site.objects.clear_cache()
+        return object
+
 
 class SiteConfigurationListSerializer(SiteConfigurationSerializer):
     class Meta(SiteConfigurationSerializer.Meta):
