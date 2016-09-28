@@ -274,7 +274,6 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         response_discussion_url = response.data[0]['course']['discussion_url']  # pylint: disable=E1101
         self.assertIn('/api/discussion/v1/courses/{}'.format(self.course.id), response_discussion_url)
 
-
     def test_org_query(self):
         self.login()
 
@@ -289,11 +288,13 @@ class TestUserEnrollmentApi(UrlResetMixin, MobileAPITestCase, MobileAuthUserTest
         ]
 
         # Enroll in all the courses
-        self.assertEqual(len(response.data), 3)
         for course in courses:
             self.enroll(course.id)
 
-        response = self.api_response(data={'org':'edX'})
+        response = self.api_response(data={'org': 'edX'})
+
+        # Test for 3 expected courses
+        self.assertEqual(len(response.data), 3)
 
         # Verify only edX courses are returned
         for entry in response.data:

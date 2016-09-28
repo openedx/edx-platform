@@ -271,6 +271,9 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
     pagination_class = None
 
     def is_org(self, check_org, course_org):
+        """
+        Check course org matches request org param or no param provided
+        """
         return check_org is None or (check_org.lower() == course_org.lower())
 
     def get_queryset(self):
