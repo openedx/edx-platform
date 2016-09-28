@@ -2950,6 +2950,9 @@ SITE_ID = 1
 # dir containing all themes
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes"]
 
+# Theme directory locale paths
+COMPREHENSIVE_THEME_LOCALE_PATHS = []
+
 # Theme to use when no site or site theme is defined,
 # set to None if you want to use openedx theme
 DEFAULT_SITE_THEME = None

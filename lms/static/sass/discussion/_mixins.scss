@@ -35,7 +35,6 @@
   width: 100%;
   height: 125px;
   background: $forum-color-background;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
   font-size: $forum-base-font-size;
   font-family: $sans-serif;
   line-height: 1.6;
@@ -61,7 +60,7 @@
   @include padding-left($baseline/4);
   padding-top: 3px;
   width: 100%;
-  color: $gray-l2;
+  color: $forum-color-editor-preview-label;
   font-size: $forum-small-font-size;
 }
 

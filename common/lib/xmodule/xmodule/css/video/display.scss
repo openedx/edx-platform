@@ -21,7 +21,7 @@
 
 .video {
   @include clearfix();
-  background: rgb(240, 243, 245); // UXPL grayscale-cool xx-light;
+  background: rgb(245, 245, 245); // UXPL grayscale x-back
   display: block;
   margin: 0 -12px;
   padding: 12px;
@@ -74,70 +74,68 @@
     width: 0px;
     height: 0px;
   }
-
-  .wrapper-downloads {
-    margin: 0;
-    padding: 0;
-
-    .video-download-button {
-      display: inline-block;
-      vertical-align: top;
-      margin: ($baseline*0.75) ($baseline/2) 0 0;
-
-      > a {
-        @include transition(all $tmg-f2 ease-in-out 0s);
-        @include font-size(14);
-        line-height : 14px;
-        float: left;
-        border-radius: 3px;
-        background-color: $very-light-text;
-        padding: ($baseline*0.75);
-        color: $lighter-base-font-color;
-
-        &:hover,
-        &:focus {
-          background-color: $action-primary-active-bg;
-          color: $very-light-text;
+  
+    .downloads-heading {
+        margin: 1em 0 0 0;
+    }
+  
+    .wrapper-downloads {
+        display: flex;
+        
+        .hd {
+            margin: 0;
         }
-      }
+        
+        .wrapper-download-video,
+        .wrapper-download-transcripts,
+        .wrapper-handouts,
+        .branding {
+            flex: 1;
+            margin-top: $baseline;
+            @include padding-right($baseline);
+            vertical-align: top;
+        }
+        
+        .wrapper-download-video {
+            
+            .video-sources {
+                margin: 0;
+            }
+        }
+        
+        .wrapper-download-transcripts {
+            
+            .list-download-transcripts {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+                
+                .transcript-option {
+                    margin: 0;
+                }
+            }
+        }
+        
+        .branding {
+            @include padding-right(0);
+
+            .host-tag {
+                position: absolute;
+                left: -9999em;
+                display: inline-block;
+                vertical-align: middle;
+                color: $base-font-color;
+            }
+
+            .brand-logo {
+                display: inline-block;
+                max-width: 100%;
+                max-height: ($baseline*2);
+                padding: ($baseline/4) 0;
+                vertical-align: middle;
+            }
+        }
     }
-
-    .video-tracks {
-
-      > a {
-        border-radius: 3px 0 0 3px;
-      }
-
-      > a.external-track {
-        border-radius: 3px;
-      }
-    }
-
-    .branding {
-      display: inline-block;
-      float: right;
-      margin: 15px 0 0 10px;
-      vertical-align: top;
-
-      .host-tag {
-        @include margin-right($baseline/2);
-        position: absolute;
-        left: -9999em;
-        display: inline-block;
-        vertical-align: middle;
-        font-size: 70%;
-        color: #777;
-      }
-
-      .brand-logo {
-        display: inline-block;
-        max-width: 100%;
-        max-height: ($baseline*2);
-        padding: ($baseline/4) 0;
-        vertical-align: middle;
-      }
-    }
-  }
 
   .video-wrapper {
     @include float(left);

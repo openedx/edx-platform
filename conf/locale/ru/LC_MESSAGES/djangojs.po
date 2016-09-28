@@ -124,9 +124,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-01 11:26+0000\n"
-"PO-Revision-Date: 2016-09-13 21:04+0000\n"
-"Last-Translator: Weyedide <weyedide@gmail.com>\n"
+"POT-Creation-Date: 2016-09-15 13:39+0000\n"
+"PO-Revision-Date: 2016-09-19 12:11+0000\n"
+"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1548,14 +1548,9 @@ msgstr ""
 "Адрес URL, введённый вами, похож на внешнюю ссылку.  Добавить обязательный "
 "префикс «http://»?"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "Заголовок"
 
@@ -2036,7 +2031,6 @@ msgstr ""
 "страницу."
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/common/js/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 "Возникла проблема при обработке вашего запроса.  Пожалуйста, попробуйте ещё "
@@ -6306,6 +6300,12 @@ msgstr "Предыдущее"
 msgid "Status"
 msgstr "Состояние"
 
+#: cms/templates/js/publish-history.underscore
+#: cms/templates/js/staff-lock-editor.underscore
+#: common/static/common/templates/discussion/new-post-alert.underscore
+msgid "message"
+msgstr ""
+
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
 msgstr "Большой"
@@ -6445,6 +6445,10 @@ msgstr "Отозвать жалобу"
 msgid "Vote for this post,"
 msgstr "Голосовать за это сообщениие"
 
+#: common/static/common/templates/discussion/new-post-alert.underscore
+msgid "Error posting your message."
+msgstr ""
+
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible To:"
 msgstr "Видно:"
@@ -6463,18 +6467,20 @@ msgstr ""
 "определённой группы."
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title:"
 msgstr "Заголовок:"
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Add a clear and descriptive title to encourage participation."
 msgstr ""
 "Добавьте чётко сформулированный, содержательный заголовок, чтобы побудить "
 "других к участию."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Enter your question or comment"
-msgstr "Введите свой вопрос или комментарий"
+msgid "Enter your question or comment."
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6530,8 +6536,8 @@ msgid "Editing post"
 msgstr "Редактирование сообщения"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Edit post title"
-msgstr "Редактировать заголовок сообщения"
+msgid "Edit your post below."
+msgstr ""
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Update post"
@@ -8968,6 +8974,10 @@ msgid ""
 "release date has passed, published units in this subsection will become "
 "available to learners unless units are explicitly hidden."
 msgstr ""
+"Если Вы выберете какой-либо вариант кроме \"%(hide_label)s\", при "
+"наступлении даты выпуска подраздела опубликованные блоки из данного "
+"подраздела станут доступны обучающимся, за исключением блоков, намеренно "
+"скрытых авторами."
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -9474,11 +9484,6 @@ msgid "Last published %(last_published_date)s by %(publish_username)s"
 msgstr ""
 "Последний раз опубликовано %(last_published_date)s пользователем "
 "%(publish_username)s"
-
-#: cms/templates/js/publish-history.underscore
-#: cms/templates/js/staff-lock-editor.underscore
-msgid "message"
-msgstr "сообщение"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore

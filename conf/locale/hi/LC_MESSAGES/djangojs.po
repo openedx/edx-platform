@@ -48,8 +48,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-01 11:26+0000\n"
-"PO-Revision-Date: 2016-08-16 19:42+0000\n"
+"POT-Creation-Date: 2016-09-15 13:39+0000\n"
+"PO-Revision-Date: 2016-09-15 13:50+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
 "MIME-Version: 1.0\n"
@@ -1428,8 +1428,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
-#: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr ""
 
@@ -1877,7 +1875,6 @@ msgstr ""
 " लोड करें।"
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/common/js/discussion/utils.js
 msgid "We had some trouble processing your request. Please try again."
 msgstr ""
 "हमें आपके अनुरोध को लागू करने में कुछ मुश्किल हुई। कृपया फिर से कोशिश करें।"
@@ -5777,6 +5774,12 @@ msgstr "पिछला"
 msgid "Status"
 msgstr ""
 
+#: cms/templates/js/publish-history.underscore
+#: cms/templates/js/staff-lock-editor.underscore
+#: common/static/common/templates/discussion/new-post-alert.underscore
+msgid "message"
+msgstr ""
+
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
 msgstr ""
@@ -5914,6 +5917,10 @@ msgstr ""
 msgid "Vote for this post,"
 msgstr ""
 
+#: common/static/common/templates/discussion/new-post-alert.underscore
+msgid "Error posting your message."
+msgstr ""
+
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible To:"
 msgstr ""
@@ -5929,15 +5936,17 @@ msgid ""
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title:"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Add a clear and descriptive title to encourage participation."
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Enter your question or comment"
+msgid "Enter your question or comment."
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
@@ -5994,7 +6003,7 @@ msgid "Editing post"
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Edit post title"
+msgid "Edit your post below."
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -8717,11 +8726,6 @@ msgstr ""
 #: cms/templates/js/publish-xblock.underscore
 #, python-format
 msgid "Last published %(last_published_date)s by %(publish_username)s"
-msgstr ""
-
-#: cms/templates/js/publish-history.underscore
-#: cms/templates/js/staff-lock-editor.underscore
-msgid "message"
 msgstr ""
 
 #: cms/templates/js/publish-history.underscore

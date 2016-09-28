@@ -168,10 +168,8 @@
   @include box-sizing(border-box);
   @extend %t-strong;
   display: none;
-  border-bottom: 2px solid $yellow-d2;
   margin: 0 0 $baseline 0;
   padding: ($baseline/2) $baseline;
-  background: $yellow-d1;
   color: $white;
 
   .feedback-symbol {
