@@ -16,7 +16,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage, FakeSoftwareSecureVerificationPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
 from ...pages.lms.staff_view import StaffPage
@@ -233,6 +233,24 @@ class ProctoredExamTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
         self._login_as_a_verified_user()
+
+        # Immediately verify the user
+        self.immediate_verification_page.immediate_verification()
+
+        # Take face photo and proceed to the ID photo step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Take ID photo and proceed to the review photos step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Submit photos and proceed to the enrollment confirmation step
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Mark the verification as passing.
+        verification = FakeSoftwareSecureVerificationPage(self.browser).visit()
+        verification.mark_approved()
 
         self.courseware_page.visit()
         self.assertTrue(self.courseware_page.can_start_proctored_exam)
