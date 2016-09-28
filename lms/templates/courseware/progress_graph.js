@@ -123,12 +123,14 @@ $(function () {
     if (series[k]['data'].length > 1) {
         for (var m = 0; m < series[k]['data'].length; m++) {
             s = {};
+            s.data = m;
             s.tick = series[k]['data'][m][0];
             s.label = series[k]['label'];
             series_order_object.push(s);
         }
     } else {
         s = {};
+        s.data = m;
         s.tick = series[k]['data'][0][0];
         s.label = series[k]['label'];
         series_order_object.push(s);
@@ -139,41 +141,6 @@ $(function () {
   series_order_object.sort(function(a, b) {
       return a.tick-b.tick;
   });
-  
-  // add a new description property with the additional context
-  for (var n = 0; n < series_order_object.length; n++) {
-      if (detail_tooltips[series_order_object[n].label].length > 1) {
-          series_order_object[n].description = detail_tooltips[series_order_object[n].label][c];
-          if (droppedScores[0]) {
-              for (var m = 0; m < droppedScores[0].length; m++) {
-                  if (series_order_object[n].tick === droppedScores[0][m]) {
-                      series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
-                  }
-              }
-              c++;
-          }
-      } else {
-          series_order_object[n].description = detail_tooltips[series_order_object[n].label][0];
-          if (droppedScores[0]) {
-              for (var m = 0; m < droppedScores[0].length; m++) {
-                  if (series_order_object[n].tick === droppedScores[0][m]) {
-                      series_order_object[n].description = series_order_object[n].description + ' ' + detail_tooltips["Dropped Scores"][0];
-                  }
-              }
-          }
-      }
-  }
-  
-  // update the ticks output to include the additional context from series_order_object
-  for (var i = 0; i < ticks.length; i++) {
-      if (series_order_object[i]) {
-          ticks[i][1] = '<span aria-hidden="true">' + ticks[i][1] + '</span> ' + '<span class="sr">' + series_order_object[i].description + '</span>';
-      }
-  }
-  // console.log(series)
-  console.log(series_order_object);
-  // console.log(droppedScores);
-  // console.log(detail_tooltips);
   
   // hide the vertical axis since they are audibly lacking context
   for (var i = 0; i < grade_cutoff_ticks.length; i++) {
@@ -211,7 +178,14 @@ $(function () {
         tickLength: 0,
         min: 0.0,
         max: ${tickIndex - sectionSpacer},
-        ticks: ticks,
+        ticks: function() {
+            for (var i = 0; i < ticks.length; i++) {
+                if (series_order_object[i] && series_order_object[i].tick) {
+                    ticks[i][1] = '<span class="aria-hidden=true">' + ticks[i][1] + '</span><span class="sr">' + detail_tooltips[series_order_object[i].label][series_order_object[i].data] + '</span>';
+                }
+            }
+            return ticks;
+        },
         labelAngle: 90
     },
     yaxis: {
@@ -242,7 +216,7 @@ $(function () {
   }
   
       
-  var previousPoint = null;
+  var previousPoint = null;  
   $grade_detail_graph.bind("plothover", function (event, pos, item) {
     $("#x").text(pos.x.toFixed(2));
     $("#y").text(pos.y.toFixed(2));
@@ -256,7 +230,6 @@ $(function () {
           var series_tooltips = detail_tooltips[item.series.label];
           if (item.dataIndex < series_tooltips.length) {
             var x = item.datapoint[0].toFixed(2), y = item.datapoint[1].toFixed(2);
-                
             showTooltip(item.pageX, item.pageY, series_tooltips[item.dataIndex]);
           }
         }
