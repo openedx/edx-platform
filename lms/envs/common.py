@@ -2974,11 +2974,6 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
 REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 
-############## Settings for Neo4j ############################
-
-# This should be set in configuration
-NEO4J_CONFIG = None
-
 ############## Settings for LMS Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = None
