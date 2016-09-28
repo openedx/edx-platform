@@ -439,6 +439,7 @@ div.problem {
 
     p.answer {
       display: inline-block;
+      margin-top: ($baseline / 2);
       margin-bottom: 0;
 
       &:before {
