@@ -406,6 +406,7 @@ class CoursewareIndex(View):
                 courseware_context['entrance_exam_passed'] = user_has_passed_entrance_exam(self.request, self.course)
 
         # staff masquerading data
+        courseware_context['real_user'] = self.real_user
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(self.effective_user, self.course, self.course_key)
         if not in_preview_mode() and self.is_staff and now < effective_start:
