@@ -107,8 +107,10 @@ var edx = edx || {};
           self.hidden, chapter, sequential, vertical_location);
           // When a unit (aka vertical) is selected, all date fields are disabled because units
           // inherit dates from subsection
-          self.disableFields($('.ccx_due_date_time_fields'));
-          self.disableFields($('.ccx_start_date_time_fields'));
+          // Start: Changed By Labster
+          // self.disableFields($('.ccx_due_date_time_fields'));
+          // self.disableFields($('.ccx_start_date_time_fields'));
+          // End: Changed By Labster
         } else {
           // When "All units" is selected, all date fields are enabled,
           // because units inherit dates from subsections and we
@@ -469,14 +471,18 @@ var edx = edx || {};
           }
           if (what === 'start') {
             unit.start = date + ' ' + time;
-            if (unit.category === "sequential") {
-              self.updateChildrenDates(unit, what, unit.start);
-            }
+            // Start: Changed By Labster
+            // if (unit.category === "sequential") {
+            //   self.updateChildrenDates(unit, what, unit.start);
+            // }
+            // End: Changed By Labster
           } else {
             unit.due = date + ' ' + time;
-            if (unit.category === "sequential") {
-              self.updateChildrenDates(unit, what, unit.due);
-            }
+            // Start: Changed By Labster
+            // if (unit.category === "sequential") {
+            //   self.updateChildrenDates(unit, what, unit.due);
+            // }
+            // End: Changed By Labster
           }
           modal.find('.close-modal').click();
           self.dirty = true;
