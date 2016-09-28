@@ -48,7 +48,10 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
 
         self.assertEqual(kwargs['api']._store['base_url'], self.catalog_integration.internal_api_url)  # pylint: disable=protected-access
 
-        querystring = {'marketable': 1}
+        querystring = {
+            'marketable': 1,
+            'exclude_utm': 1,
+        }
         if type:
             querystring['type'] = type
         self.assertEqual(kwargs['querystring'], querystring)
@@ -214,7 +217,6 @@ class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
 
 
 @mock.patch(UTILS_MODULE + '.get_course_run')
-@mock.patch(UTILS_MODULE + '.strip_querystring')
 class TestGetRunMarketingUrl(TestCase):
     """Tests covering retrieval of course run marketing URLs."""
     def setUp(self):
@@ -223,43 +225,17 @@ class TestGetRunMarketingUrl(TestCase):
         self.course_key = CourseKey.from_string('foo/bar/baz')
         self.user = UserFactory()
 
-    def test_get_run_marketing_url(self, mock_strip, mock_get_course_run):
+    def test_get_run_marketing_url(self, mock_get_course_run):
         course_run = factories.CourseRun()
         mock_get_course_run.return_value = course_run
-        mock_strip.return_value = course_run['marketing_url']
 
         url = utils.get_run_marketing_url(self.course_key, self.user)
 
-        self.assertTrue(mock_strip.called)
         self.assertEqual(url, course_run['marketing_url'])
 
-    def test_marketing_url_empty(self, mock_strip, mock_get_course_run):
-        course_run = factories.CourseRun()
-        course_run['marketing_url'] = ''
-        mock_get_course_run.return_value = course_run
-
-        url = utils.get_run_marketing_url(self.course_key, self.user)
-
-        self.assertFalse(mock_strip.called)
-        self.assertEqual(url, None)
-
-    def test_marketing_url_missing(self, mock_strip, mock_get_course_run):
+    def test_marketing_url_missing(self, mock_get_course_run):
         mock_get_course_run.return_value = {}
 
         url = utils.get_run_marketing_url(self.course_key, self.user)
 
-        self.assertFalse(mock_strip.called)
         self.assertEqual(url, None)
-
-
-@ddt.ddt
-class TestStripQuerystring(TestCase):
-    """Tests covering querystring stripping."""
-    bare_url = 'https://www.example.com/path'
-
-    @ddt.data(
-        bare_url,
-        bare_url + '?foo=bar&baz=qux',
-    )
-    def test_strip_querystring(self, url):
-        self.assertEqual(utils.strip_querystring(url), self.bare_url)
