@@ -67,8 +67,10 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCreditService
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 
 from milestones.tests.utils import MilestonesTestCaseMixin
+
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -740,6 +742,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory.create()
         self.user = UserFactory.create()
+        SoftwareSecurePhotoVerificationFactory.create(user=self.request.user)
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access
         with self.modulestore.bulk_operations(self.course_key):
             self.toy_course = self.store.get_course(self.course_key, depth=2)
@@ -1020,6 +1023,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         if attempt_status:
             create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
             update_attempt_status(exam_id, self.request.user.id, attempt_status)
+
         return usage_key
 
     def _find_url_name(self, toc, url_name):
