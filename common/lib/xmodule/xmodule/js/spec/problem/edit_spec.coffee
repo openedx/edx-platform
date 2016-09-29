@@ -197,6 +197,7 @@ describe 'MarkdownEditingDescriptor', ->
         <numericalresponse answer="1">
           <p>Enter 1 with a tolerance:</p>
         <responseparam type="tolerance" default=".02"/>
+        <additional_answer answer="2 +- 5%"/>
           <formulaequationinput/>
         </numericalresponse>
 
