@@ -1476,6 +1476,9 @@ class CapaMixin(CapaFields):
         # Pull in the new problem seed
         self.set_state_from_lcp()
 
+        # Grade may have changed, so publish new value
+        self.publish_grade()
+
         event_info['new_state'] = self.lcp.get_state()
         self.track_function_unmask('reset_problem', event_info)
 

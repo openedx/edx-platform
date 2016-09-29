@@ -108,6 +108,15 @@ class ProblemSubmissionTestMixin(TestCase):
         resp = self.client.post(modx_url)
         return resp
 
+    def rescore_question(self, problem_url_name):
+        """
+        Reset specified problem for current user.
+        """
+        problem_location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(problem_location, 'problem_reset')
+        resp = self.client.post(modx_url)
+        return resp
+
     def show_question_answer(self, problem_url_name):
         """
         Shows the answer to the current student.
@@ -301,6 +310,18 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         """
         return [s.earned for s in self.get_grade_summary()['totaled_scores']['Homework']]
 
+    def hw_grade(self, hw_url_name):
+        """
+        Returns SubsectionGrade for given url.
+        """
+        # list of grade summaries for each section
+        sections_list = []
+        for chapter in self.get_progress_summary():
+            sections_list.extend(chapter['sections'])
+
+        # get the first section that matches the url (there should only be one)
+        return next(section for section in sections_list if section.url_name == hw_url_name)
+
     def score_for_hw(self, hw_url_name):
         """
         Returns list of scores for a given url.
@@ -308,15 +329,42 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         Returns list of scores for the given homework:
             [<points on problem_1>, <points on problem_2>, ..., <points on problem_n>]
         """
+        return [s.earned for s in self.hw_grade(hw_url_name).scores]
 
-        # list of grade summaries for each section
-        sections_list = []
-        for chapter in self.get_progress_summary():
-            sections_list.extend(chapter['sections'])
 
-        # get the first section that matches the url (there should only be one)
-        hw_section = next(section for section in sections_list if section.url_name == hw_url_name)
-        return [s.earned for s in hw_section.scores]
+class TestCourseGrades(TestSubmittingProblems):
+    """
+    Tests grades are updated correctly when manipulating problems.
+    """
+    def setUp(self):
+        super(TestCourseGrades, self).setUp()
+        self.homework = self.add_graded_section_to_course('homework')
+        self.problem = self.add_dropdown_to_section(self.homework.location, 'p1', 1)
+
+    def _submit_correct_answer(self):
+        """
+        Submits correct answer to the problem.
+        """
+        resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.assertEqual(resp.status_code, 200)
+
+    def _verify_grade(self, expected_problem_score, expected_hw_grade):
+        """
+        Verifies the problem score and the homework grade are as expected.
+        """
+        hw_grade = self.hw_grade('homework')
+        problem_score = hw_grade.scores[0]
+        self.assertEquals((problem_score.earned, problem_score.possible), expected_problem_score)
+        self.assertEquals((hw_grade.graded_total.earned, hw_grade.graded_total.possible), expected_hw_grade)
+
+    def test_basic(self):
+        self._submit_correct_answer()
+        self._verify_grade(expected_problem_score=(1.0, 1.0), expected_hw_grade=(1.0, 1.0))
+
+    def test_problem_reset(self):
+        self._submit_correct_answer()
+        self.reset_question_answer('p1')
+        self._verify_grade(expected_problem_score=(0.0, 1.0), expected_hw_grade=(0.0, 1.0))
 
 
 @attr(shard=3)
