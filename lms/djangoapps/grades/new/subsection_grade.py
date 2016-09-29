@@ -73,7 +73,7 @@ class SubsectionGrade(object):
             self._compute_block_score(descendant_key, course_structure, submissions_scores, csm_scores)
 
         self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
-        self._log_event(log.info, u"init_from_structure", student)
+        self._log_event(log.debug, u"init_from_structure", student)
 
     def init_from_model(self, student, model, course_structure, submissions_scores, csm_scores):
         """
@@ -96,7 +96,7 @@ class SubsectionGrade(object):
             display_name=self.display_name,
             module_id=self.location,
         )
-        self._log_event(log.info, u"init_from_model", student)
+        self._log_event(log.debug, u"init_from_model", student)
 
     @classmethod
     def bulk_create_models(cls, student, subsection_grades, course_key):
@@ -218,7 +218,7 @@ class SubsectionGradeFactory(object):
         If read_only is True, doesn't save any updates to the grades.
         """
         self._log_event(
-            log.info, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location)
+            log.debug, u"create, read_only: {0}, subsection: {1}".format(read_only, subsection.location)
         )
 
         block_structure = self._get_block_structure(block_structure)
@@ -241,7 +241,7 @@ class SubsectionGradeFactory(object):
         """
         Bulk creates all the unsaved subsection_grades to this point.
         """
-        self._log_event(log.info, u"bulk_create_unsaved")
+        self._log_event(log.debug, u"bulk_create_unsaved")
 
         with persistence_safe_fallback():
             SubsectionGrade.bulk_create_models(self.student, self._unsaved_subsection_grades, self.course.id)
