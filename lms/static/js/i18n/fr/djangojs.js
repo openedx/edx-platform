@@ -41,18 +41,6 @@
       "%(memberCount)s / %(maxMemberCount)s membre", 
       "%(memberCount)s / %(maxMemberCount)s membres"
     ], 
-    "%(numResponses)s other response": [
-      "%(numResponses)s autre r\u00e9ponse", 
-      "%(numResponses)s autres r\u00e9ponses"
-    ], 
-    "%(numResponses)s response": [
-      "%(numResponses)s r\u00e9ponse", 
-      "%(numResponses)s r\u00e9ponses"
-    ], 
-    "%(numVotes)s Vote": [
-      "%(numVotes)s Vote", 
-      "%(numVotes)s votes"
-    ], 
     "%(num_questions)s question": [
       "%(num_questions)s question", 
       "%(num_questions)s questions"
@@ -69,10 +57,6 @@
     "%(team_count)s Team": [
       "%(team_count)s Equipe", 
       "%(team_count)s \u00c9quipes"
-    ], 
-    "%(unread_count)s new comment": [
-      "%(unread_count)s nouveau commentaire", 
-      "%(unread_count)s nouveaux commentaires"
     ], 
     "%(value)s hour": [
       "%(value)s heure", 
@@ -470,7 +454,6 @@
     "Discussion": "Discussion", 
     "Discussion Home": "Page d'accueil de Discussion", 
     "Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.": "Les administrateurs, mod\u00e9rateurs du forum, et les Assistants P\u00e9dagogiques peuvent rendre leurs messages visibles par tous les \u00e9tudiants ou sp\u00e9cifier uniquement une cohorte.", 
-    "Discussion topics; currently listing: ": "Sujets de discussion:", 
     "Div": "Div", 
     "Do not show again": "Ne pas montrer de nouveau", 
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "Voulez-vous dispenser l'\u00e9tudiant ('{student_id}') d'examen d'entr\u00e9e?", 
@@ -610,7 +593,6 @@
     "Files must be in JPEG or PNG format.": "Les fichiers doivent \u00eatre au format JPEG ou PNG.", 
     "Fill browser": "Remplir le navigateur", 
     "Filter and sort topics": "Filtrer et trier les sujets", 
-    "Filter topics": "Filtrer les sujets", 
     "Financial Assistance": "Soutien Financier", 
     "Find": "Trouver", 
     "Find and replace": "Trouver et remplacer", 
@@ -773,7 +755,6 @@
     "Load Another File": "Envoyer un autre fichier", 
     "Load all responses": "Charger toutes les r\u00e9ponses", 
     "Load more": "Charger plus", 
-    "Load next %(numResponses)s responses": "Charger les %(numResponses)s prochaines r\u00e9ponses", 
     "Load next %(num_items)s result": [
       "Charger le %(num_items)s prochain resultat", 
       "Charger les %(num_items)s prochains resultats"
@@ -848,7 +829,6 @@
     "No receipt available": "Pas de re\u00e7u disponible", 
     "No results": "Aucun r\u00e9sultat", 
     "No results found for \"%(query_string)s\". Please try searching again.": "Aucun r\u00e9sultat pour \"%(query_string)s\". Veuillez renouveler votre recherche.", 
-    "No results found for %(original_query)s. Showing results for %(suggested_query)s.": "Pas de r\u00e9sultat trouv\u00e9 pour %(original_query)s. Affichage des r\u00e9sultats pour %(suggested_query)s.", 
     "No results found for {original_query}. ": "Aucun r\u00e9sultat trouv\u00e9 pour {original_query}.", 
     "No sources": "Aucune source", 
     "No tasks currently running.": "Aucune t\u00e2che active en ce moment", 
@@ -1101,13 +1081,8 @@
     "Show invisible characters": "Afficher les caract\u00e8res invisibles", 
     "Show me other ways to sign in or register": "Montrez-moi d'autres m\u00e9thodes pour me connecter ou m'inscrire", 
     "Show notes": "Afficher les notes", 
-    "Show posts by %(username)s.": "Voir les messages de %(username)s.", 
     "Show posts by {username}.": "Voir les messages de {username}.", 
     "Showing all responses": "Afficher toutes les r\u00e9ponses", 
-    "Showing first response": [
-      "Afficher la premi\u00e8re r\u00e9ponse", 
-      "Afficher les %(numResponses)s premi\u00e8res r\u00e9ponses"
-    ], 
     "Showing results for \"{searchString}\"": "Affichage des r\u00e9sultats pour \"{searchString}\"", 
     "Showing {firstIndex} out of {numItems} total": "Affiche {firstIndex} sur {numItems} au total", 
     "Showing {firstIndex}-{lastIndex} out of {numItems} total": "Affiche {firstIndex}-{lastIndex} sur {numItems} au total", 
@@ -1314,7 +1289,6 @@
     "Time Sent": "Heure d'envoi", 
     "Time Sent:": "Heure d'envoi :", 
     "Time Zone": "Fuseau Horaire", 
-    "Timed Exam": "Examen minut\u00e9", 
     "Timed Transcript Conflict": "Conflit de transcription synchronis\u00e9e", 
     "Timed Transcript Found": "Transcription synchronis\u00e9e trouv\u00e9e", 
     "Timed Transcript Uploaded Successfully": "Transcription synchronis\u00e9e import\u00e9e avec succ\u00e8s", 
@@ -1473,8 +1447,6 @@
     "We had some trouble marking this response endorsed.  Please try again.": "Nous avons eu quelques probl\u00e8mes pour approuver cette r\u00e9ponse. Veuillez essayer \u00e0 nouveau.", 
     "We had some trouble pinning this thread. Please try again.": "Nous avons eu quelques probl\u00e8mes pour \u00e9pingler ce fil. Veuillez essayer \u00e0 nouveau.", 
     "We had some trouble processing your request. Please ensure you have copied any ": "Nous avons eu des probl\u00e8mes pour traiter votre requ\u00eate. Soyez certain que vous avez copi\u00e9 tout ", 
-    "We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.": "Des probl\u00e8mes sont survenus lors du traitement de votre requ\u00eate. Veuillez v\u00e9rifier que vous avez copi\u00e9 tout travail non sauvegard\u00e9 et, ensuite, rechargez la page.", 
-    "We had some trouble processing your request. Please try again.": "Nous ne parvenons pas \u00e0 r\u00e9aliser votre requ\u00eate. Merci de r\u00e9essayer plus tard. ", 
     "We had some trouble removing this endorsement.  Please try again.": "Nous avons eu quelques probl\u00e8mes pour supprimer cette approbation. Veuillez essayer \u00e0 nouveau.", 
     "We had some trouble removing this response as an answer.  Please try again.": "Nous avons eu quelques probl\u00e8mes pour supprimer cette contribution en tant que r\u00e9ponse. Veuillez essayer \u00e0 nouveau.", 
     "We had some trouble removing your flag on this post.  Please try again.": "Nous avons eu quelques probl\u00e8mes pour enlever votre drapeau sur ce message. Veuillez essayer \u00e0 nouveau.", 
@@ -1659,10 +1631,6 @@
     "team count": "total \u00e9quipe", 
     "text_word_{uniqueId}": "text_word_{uniqueId}", 
     "text_word_{uniqueId} title_word_{uniqueId}": "text_word_{uniqueId} title_word_{uniqueId}", 
-    "there is currently %(numVotes)s vote": [
-      "il y a actuellement %(numVotes)s vote", 
-      "il y a actuellement %(numVotes)s votes"
-    ], 
     "there is currently {numVotes} vote": [
       "il y a actuellement {numVotes} vote", 
       "il y a actuellement {numVotes} votes"

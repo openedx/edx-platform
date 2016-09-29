@@ -45,18 +45,6 @@
       "%(memberCount)s / %(maxMemberCount)s Miembros"
     ], 
     "%(new_item_message)s": "%(new_item_message)s", 
-    "%(numResponses)s other response": [
-      "%(numResponses)s otra respuesta", 
-      "%(numResponses)s otras respuestas"
-    ], 
-    "%(numResponses)s response": [
-      "%(numResponses)s respuesta", 
-      "%(numResponses)s respuestas"
-    ], 
-    "%(numVotes)s Vote": [
-      "%(numVotes)s voto", 
-      "%(numVotes)s votos"
-    ], 
     "%(num_questions)s question": [
       "%(num_questions)s pregunta", 
       "%(num_questions)s preguntas"
@@ -75,10 +63,6 @@
       "%(team_count)s Equipos"
     ], 
     "%(type)s Component Template Menu": "Plantilla de men\u00fa de componentes %(type)s", 
-    "%(unread_count)s new comment": [
-      "%(unread_count)s nuevo comentario", 
-      "%(unread_count)s nuevos comentarios"
-    ], 
     "%(value)s hour": [
       "%(value)s hora", 
       "%(value)s horas"
@@ -528,7 +512,6 @@
     "Discussion": "Discusi\u00f3n", 
     "Discussion Home": "Inicio de la discusi\u00f3n", 
     "Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.": "Admins de discusiones, moderadores y TA pueden hacer sus publicaciones visibles a todos los estudiantes o para un grupo com\u00fan espec\u00edfico.", 
-    "Discussion topics; currently listing: ": "Temas de discusi\u00f3n, actualmente:", 
     "Display Name": "Nombre para mostrar:", 
     "Div": "Div", 
     "Do not show again": "No mostrar nuevamente", 
@@ -688,7 +671,6 @@
     "Files must be in JPEG or PNG format.": "Los archivos deben estar en formato JPEG o PNG.", 
     "Fill browser": "Expandir el navegador", 
     "Filter and sort topics": "Filtrar y ordenar los temas", 
-    "Filter topics": "Filtrar temas", 
     "Financial Assistance": "Asistencia financiera", 
     "Financial Assistance Application": "Solicitud de asistencia financiera", 
     "Find": "Buscar", 
@@ -890,7 +872,6 @@
     "Load Another File": "Cargar otro archivo", 
     "Load all responses": "Cargando todas las respuestas", 
     "Load more": "Cargar m\u00e1s", 
-    "Load next %(numResponses)s responses": "Cargar las siguientes %(numResponses)s respuestas", 
     "Load next %(num_items)s result": [
       "Cargar el siguiente %(num_items)s resultado", 
       "Cargar los siguientes %(num_items)s resultados"
@@ -976,7 +957,6 @@
     "No receipt available": "No hay recibo disponible", 
     "No results": "Sin resultados", 
     "No results found for \"%(query_string)s\". Please try searching again.": "No se encontraron resultados para \"%(query_string)s\". Por favor intente nuevamente.", 
-    "No results found for %(original_query)s. Showing results for %(suggested_query)s.": "No se encontraron resultados para %(original_query)s. Mostrando resultados para %(suggested_query)s.", 
     "No results found for {original_query}. ": "No se encontraron resultados para {original_query}.", 
     "No sources": "No hay fuentes", 
     "No tasks currently running.": "No hay tareas corriendo en el momento.", 
@@ -1282,13 +1262,8 @@
     "Show invisible characters": "Mostrar caracteres invisibles", 
     "Show me other ways to sign in or register": "Mostrar otras formas de iniciar sesi\u00f3n o registrarme", 
     "Show notes": "Mostrar notas", 
-    "Show posts by %(username)s.": "Mostrar las publicaciones de %(username)s.", 
     "Show posts by {username}.": "Mostrar las publicaciones por {username}.", 
     "Showing all responses": "Mostrando todas las respuestas", 
-    "Showing first response": [
-      "Mostrando la primera respuesta", 
-      "Mostrando las %(numResponses)s primeras respuestas"
-    ], 
     "Showing results for \"{searchString}\"": "Mostrando resultados para \"{searchString}\"", 
     "Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} ascending": "Mostrando {currentItemRange} de {totalItemsCount}, filtrado por {assetType}, ordenado por {sortName} asc", 
     "Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} descending": "Mostrando {currentItemRange} de {totalItemsCount}, filtrado por {assetType}, ordenado por {sortName} desc", 
@@ -1547,7 +1522,6 @@
     "Time Sent:": "Hora de env\u00edo:", 
     "Time Zone": "Zona horaria", 
     "Timed": "Cronometrado", 
-    "Timed Exam": "Examen cronometrado", 
     "Timed Transcript Conflict": "Conflicto en la transcripci\u00f3n", 
     "Timed Transcript Found": "Se encontr\u00f3 una transcripci\u00f3n", 
     "Timed Transcript Uploaded Successfully": "Transcripci\u00f3n cargada exitosamente", 
@@ -1736,8 +1710,6 @@
     "We had some trouble marking this response endorsed.  Please try again.": "Tenemos problemas para marcar tu respuesta como aprobada. Por favor intenta de nuevo.", 
     "We had some trouble pinning this thread. Please try again.": "Tenemos problemas fijando este hilo. Por favor intenta de nuevo.", 
     "We had some trouble processing your request. Please ensure you have copied any ": "Ocurri\u00f3 un problema al procesar su solicitud. Asegurese de haber copiado cualquier", 
-    "We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.": "Tuvimos problemas al procesar su solicitud. Por favor aseg\u00farese de guardar su trabajo y luego recargue la p\u00e1gina.", 
-    "We had some trouble processing your request. Please try again.": "Ocurri\u00f3 un problema al procesar su solicitud. Por favor intente nuevamente.", 
     "We had some trouble removing this endorsement.  Please try again.": "Tenemos problemas borrando tu respuesta. Por favor intenta de nuevo.", 
     "We had some trouble removing this response as an answer.  Please try again.": "Tenemos algunos problemas borrando tu mensaje como respuesta. Por favor int\u00e9ntalo de nuevo.", 
     "We had some trouble removing your flag on this post.  Please try again.": "Tenemos problemas borrando tu marca para esta publicaci\u00f3n. Por favor intenta de nuevo.", 
@@ -1953,10 +1925,6 @@
     "team count": "Cantidad de equipos", 
     "text_word_{uniqueId}": "text_word_{uniqueId}", 
     "text_word_{uniqueId} title_word_{uniqueId}": "text_word_{uniqueId} title_word_{uniqueId}", 
-    "there is currently %(numVotes)s vote": [
-      "actualmente tiene %(numVotes)s voto", 
-      "actualmente tiene %(numVotes)s votos"
-    ], 
     "there is currently {numVotes} vote": [
       "actualmente hay {numVotes} voto", 
       "actualmente hay {numVotes} votos"

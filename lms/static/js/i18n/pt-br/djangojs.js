@@ -40,18 +40,6 @@
       "%(memberCount)s / %(maxMemberCount)s membros"
     ], 
     "%(new_item_message)s": "%(new_item_message)s", 
-    "%(numResponses)s other response": [
-      "outra %(numResponses)s resposta", 
-      "outras %(numResponses)s respostas"
-    ], 
-    "%(numResponses)s response": [
-      "%(numResponses)s resposta", 
-      "%(numResponses)s respostas"
-    ], 
-    "%(numVotes)s Vote": [
-      "%(numVotes)s Votos", 
-      "%(numVotes)s Votos"
-    ], 
     "%(num_questions)s question": [
       "%(num_questions)s quest\u00e3o", 
       "%(num_questions)s quest\u00f5es"
@@ -70,10 +58,6 @@
       "%(team_count)s equipes"
     ], 
     "%(type)s Component Template Menu": "%(type)s Menu de Modelos de Componentes", 
-    "%(unread_count)s new comment": [
-      "%(unread_count)s novo coment\u00e1rio", 
-      "%(unread_count)s novos coment\u00e1rios"
-    ], 
     "%(value)s hour": [
       "%(value)s hora", 
       "%(value)s horas"
@@ -606,7 +590,6 @@
     "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB": "O arquivo {filename} excede o tamanho m\u00e1ximo de {maxFileSizeInMBs} MB", 
     "Files must be in JPEG or PNG format.": "Os arquivos devem estar nos formatos JPEG ou PNG.", 
     "Fill browser": "Tela cheia", 
-    "Filter topics": "Filtrar t\u00f3picos", 
     "Financial Assistance": "Assist\u00eancia Financeira", 
     "Financial Assistance Application": "Aplica\u00e7\u00e3o de assist\u00eancia financeira", 
     "Find": "Encontrar", 
@@ -776,8 +759,6 @@
     "Live view of webcam": "Visualizar webcam ao vivo", 
     "Load Another File": "Carregar outro arquivo", 
     "Load all responses": "Carregar todas as respostas", 
-    "Load more": "Carregar mais", 
-    "Load next %(numResponses)s responses": "Carregar as pr\u00f3ximas %(numResponses)s respostas", 
     "Load next %(num_items)s result": [
       "Carregar pr\u00f3ximo %(num_items)s resultado", 
       "Carregar pr\u00f3ximos %(num_items)s resultados"
@@ -854,7 +835,6 @@
     "No receipt available": "Recibo n\u00e3o dispon\u00edvel", 
     "No results": "Sem resultados", 
     "No results found for \"%(query_string)s\". Please try searching again.": "Nenhum resultado foi encontrado para \"%(query_string)s\". Tente novamente.", 
-    "No results found for %(original_query)s. Showing results for %(suggested_query)s.": "N\u00e3o h\u00e1 resultados para %(original_query)s. Exibindo resultados para %(suggested_query)s.", 
     "No sources": "Sem fontes", 
     "No tasks currently running.": "N\u00e3o h\u00e1 nenhuma tarefa em andamento", 
     "No threads matched your query.": "N\u00e3o houveram t\u00f3picos correspondentes \u00e0 sua sele\u00e7\u00e3o", 
@@ -1096,12 +1076,7 @@
     "Show invisible characters": "Exibir caracteres invis\u00edveis", 
     "Show me other ways to sign in or register": "Mostrar outras formas de entrada ou cadastro", 
     "Show notes": "Exibir anota\u00e7\u00f5es", 
-    "Show posts by %(username)s.": "Exibir publica\u00e7\u00f5es de %(username)s.", 
     "Showing all responses": "Exibindo todas as respostas", 
-    "Showing first response": [
-      "Exibindo a primeira resposta", 
-      "Exibindo as primeiras %(numResponses)s respostas"
-    ], 
     "Sign in": "Entrar", 
     "Sign in here using your email address and password, or use one of the providers listed below.": "Entre utilizando o seu endere\u00e7o de e-mail e senha, ou utilize um dos provedores listados abaixo.", 
     "Sign in here using your email address and password.": "Entre usando o seu endere\u00e7o de e-mail ou senha.", 
@@ -1463,8 +1438,6 @@
     "We had some trouble marking this response as an answer.  Please try again.": "Houve um problema ao marcar a sua mensagem como resposta. Por favor tente novamente.", 
     "We had some trouble marking this response endorsed.  Please try again.": "Houve um problema ao marcar esta mensagem como endossada. Por favor tente novamente.", 
     "We had some trouble pinning this thread. Please try again.": "Houve um problema ao marcar este seguimento. Por favor tente novamente.", 
-    "We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.": "Houve um problema ao processar seu pedido. Por favor, certifique-se de ter copiado qualquer trabalho n\u00e3o salvo e, em seguida, recarregue a p\u00e1gina.", 
-    "We had some trouble processing your request. Please try again.": "Houve algum problema ao processar a sua solicita\u00e7\u00e3o. Por favor, tente novamente.", 
     "We had some trouble removing this endorsement.  Please try again.": "Houve um problema ao remover este aval. Por favor tente novamente.", 
     "We had some trouble removing this response as an answer.  Please try again.": "Houve um problema ao desmarcar esta mensagem como resposta. Por favor tente novamente.", 
     "We had some trouble removing your flag on this post.  Please try again.": "Ocorreu um problema ao remover sua identifica\u00e7\u00e3o desta publica\u00e7\u00e3o. Tente novamente.", 
@@ -1643,10 +1616,6 @@
     "strong text": "texto forte", 
     "subsection": "subse\u00e7\u00e3o", 
     "team count": "Contagem de equipes", 
-    "there is currently %(numVotes)s vote": [
-      "atualmente %(numVotes)s vote", 
-      "existem atualmente %(numVotes)s votos"
-    ], 
     "timed": "Cronometrado.", 
     "title": "t\u00edtulo", 
     "unanswered question": "quest\u00e3o n\u00e3o respondida", 
