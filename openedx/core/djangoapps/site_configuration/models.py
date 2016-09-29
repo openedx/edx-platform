@@ -137,12 +137,13 @@ class SiteConfiguration(models.Model):
         domain_without_port_number = self.site.domain.split(':')[0]
         output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(
             domain_without_port_number))
-        # collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(site_domain))
+        collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(
+            domain_without_port_number))
         sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
         with open(output_path, 'w') as f:
             f.write(sass_output)
-        # with open(collected_output_path, 'w') as f:
-        #     f.write(sass_output)
+        with open(collected_output_path, 'w') as f:
+            f.write(sass_output)
 
     def collect_css_file(self):
         path = self.values.get('css_overrides_file')
