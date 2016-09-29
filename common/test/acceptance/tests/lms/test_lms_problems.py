@@ -130,11 +130,15 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
 
-        # The single visible Hint button should be enabled.
-        self.assertEqual([None], problem_page.get_hint_button_disabled_attr())
+        # The hint notification should not be visible on load
+        self.assertFalse(problem_page.is_hint_notification_visible())
+
+        # The two Hint button should be enabled. One visible, one present, but not visible in the DOM
+        self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
 
         # The hint button rotates through multiple hints
         problem_page.click_hint()
+        self.assertTrue(problem_page.is_hint_notification_visible())
         self.assertEqual(problem_page.hint_text, first_hint)
         # Now there are two "hint" buttons, as there is also one in the hint notification.
         self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
