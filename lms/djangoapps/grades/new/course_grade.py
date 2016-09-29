@@ -220,7 +220,7 @@ class CourseGrade(object):
         )
 
         for receiver, response in responses:
-            log.info(
+            log.debug(
                 'Signal fired when student grade is calculated. Receiver: %s. Response: %s',
                 receiver, response
             )
