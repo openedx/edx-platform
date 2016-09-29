@@ -154,11 +154,14 @@ $(function () {
       return a.tick-b.tick;
   });
   
-  // console.log(series_order_object);
-  
   // hide the vertical axis since they are audibly lacking context
   for (var i = 0; i < grade_cutoff_ticks.length; i++) {
-      grade_cutoff_ticks[i][1] = '<span aria-hidden="true">' + grade_cutoff_ticks[i][1] + '</span>';
+      grade_cutoff_ticks[i][1] = edx.HtmlUtils.interpolateHtml(
+          edx.HtmlUtils.HTML('<span aria-hidden="true">{cutoff}</span>'),
+          {
+              cutoff: grade_cutoff_ticks[i][1]
+          }
+      );
   }
     
   //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
@@ -194,7 +197,15 @@ $(function () {
         max: ${tickIndex - sectionSpacer},
         ticks: function() {
             for (var i = 0; i < ticks.length; i++) {
-                ticks[i][1] = '<span class="aria-hidden=true">' + ticks[i][1] + '</span><span class="sr">' + detail_tooltips[series_order_object[i].label][series_order_object[i].data] + '</span>';
+                if (detail_tooltips[series_order_object[i]]) {
+                    ticks[i][1] = edx.HtmlUtils.interpolateHtml(
+                        edx.HtmlUtils.HTML('<span aria-hidden="true">{original}</span><span class="sr">{additional}</span>'),
+                        {
+                            original: ticks[i][1],
+                            additional: detail_tooltips[series_order_object[i].label][series_order_object[i].data]
+                        }
+                    );
+                }
             }
             return ticks;
         },
