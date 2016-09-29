@@ -6,17 +6,29 @@ import math
 
 $(function () {
   function showTooltip(x, y, contents) {
-    $('<div id="tooltip">' + contents + '</div>').css( {
-      position: 'absolute',
-      display: 'none',
-      top: y + 5,
-      left: x + 15,
-      border: '1px solid #000',
-      padding: '4px 6px',
-      color: '#fff',
-      'background-color': '#333',
-      opacity: 0.90
-    }).appendTo("body").fadeIn(200);
+      var $tooltip_div = $('<div id="tooltip"></div>').css({
+              position: 'absolute',
+              display: 'none',
+              top: y + 5,
+              left: x + 15,
+              border: '1px solid #000',
+              padding: '4px 6px',
+              color: '#fff',
+              'background-color': '#222',
+              opacity: 0.90
+          });
+          
+      edx.HtmlUtils.setHtml(
+          $tooltip_div,
+          edx.HtmlUtils.HTML(contents)
+      );
+      
+      edx.HtmlUtils.append(
+          $('body'),
+          edx.HtmlUtils.HTML($tooltip_div)
+      );
+      
+      $('#tooltip').fadeIn(200);
   }
 
   /* -------------------------------- Grade detail bars -------------------------------- */
