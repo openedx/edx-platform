@@ -539,7 +539,6 @@ class LoncapaProblem(object):
                     screenreadertext.set('class', 'sr')
                     screenreadertext.text = choice_correctness_for_student_answer
                     targetedfeedback.set('role', 'group')
-                    targetedfeedback.set('aria-live', 'polite')
                     targetedfeedback.set('aria-describedby', problem_legend_id)
                     # Don't show targeted feedback if the student hasn't answer the problem
                     # or if the target feedback doesn't match the student's (incorrect) answer
