@@ -27,10 +27,10 @@ data: |
       brackets = [1, 0.5, 0.25, 0]   # Scores for various range brackets
 
       # Only for interval-guessing:
-      correct_interval = [416,660]               # Please put the lower value on the left.
-      interval_type = ['closed', 'closed']     # Are endpoints 'open' or 'closed'?
+      correct_interval = [416,660]           # Please put the lower value on the left.
+      interval_type = ['closed', 'closed']   # Are endpoints 'open' or 'closed'?
       interval_tolerance = 'linear'          # Options: 'linear', 'strict', or 'generous'
-      type_penalty = 0.1                       # Points off if open/closed incorrect
+      type_penalty = 0.1                     # Points off if open/closed incorrect
 
       # Only for estimation
       max_time = 1000                # Large number of people beyond actual high
@@ -161,7 +161,7 @@ data: |
       }
       </script>
         <p>What is the range of passengers that can fit on a 747 aircraft? Set the low and high bounds. (416 and 660 persons)</p>
-        <p class="sr" aria-hidden="true">
+        <p class="is-hidden" aria-hidden="true">
           <span id="lowerlimit">$lowerlimit</span>
           <span id="upperlimit">$upperlimit</span>
           <span id="openclose">$show_open_close</span>
