@@ -1,26 +1,21 @@
 """
 Run these tests @ Devstack:
     paver test_system -s lms --fasttest --verbose --test-id=lms/djangoapps/course_structure_api
+
+TODO: delete me once grading policy is implemented in course_api.
 """
 # pylint: disable=missing-docstring,invalid-name,maybe-no-member,attribute-defined-outside-init
 from datetime import datetime
-from mock import patch, Mock
 
 from django.core.urlresolvers import reverse
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
-from opaque_keys.edx.locator import CourseLocator
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.xml import CourseLocationManager
-from xmodule.tests import get_test_system
 
 from courseware.tests.factories import GlobalStaffFactory, StaffFactory
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
 
 
 TEST_SERVER_HOST = 'http://testserver'
@@ -204,175 +199,6 @@ class CourseDetailTestMixin(object):
         # Access should be denied if the user is not course staff.
         response = self.http_get_for_course(course_id=unicode(self.empty_course.id), HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(response.status_code, 404)
-
-
-class CourseListTests(CourseViewTestsMixin, SharedModuleStoreTestCase):
-    view = 'course_structure_api:v0:list'
-
-    @classmethod
-    def setUpClass(cls):
-        super(CourseListTests, cls).setUpClass()
-        cls.create_course_data()
-
-    def test_get(self):
-        """
-        The view should return a list of all courses.
-        """
-        response = self.http_get(reverse(self.view))
-        self.assertEqual(response.status_code, 200)
-        data = response.data
-        courses = data['results']
-        self.assertEqual(len(courses), 2)
-        self.assertEqual(data['count'], 2)
-        self.assertEqual(data['num_pages'], 1)
-
-        self.assertValidResponseCourse(courses[0], self.empty_course)
-        self.assertValidResponseCourse(courses[1], self.course)
-
-    def test_get_with_pagination(self):
-        """
-        The view should return a paginated list of courses.
-        """
-        url = "{}?page_size=1".format(reverse(self.view))
-        response = self.http_get(url)
-        self.assertEqual(response.status_code, 200)
-
-        courses = response.data['results']
-        self.assertEqual(len(courses), 1)
-        self.assertValidResponseCourse(courses[0], self.empty_course)
-
-    def test_get_filtering(self):
-        """
-        The view should return a list of details for the specified courses.
-        """
-        url = "{}?course_id={}".format(reverse(self.view), self.course_id)
-        response = self.http_get(url)
-        self.assertEqual(response.status_code, 200)
-
-        courses = response.data['results']
-        self.assertEqual(len(courses), 1)
-        self.assertValidResponseCourse(courses[0], self.course)
-
-    def test_not_authenticated(self):
-        response = self.http_get(reverse(self.view), HTTP_AUTHORIZATION=None)
-        self.assertEqual(response.status_code, 401)
-
-    def test_not_authorized(self):
-        """
-        Unauthorized users should get an empty list.
-        """
-        user = StaffFactory(course_key=self.course.id)
-        access_token = AccessTokenFactory.create(user=user, client=self.oauth_client).token
-        auth_header = 'Bearer ' + access_token
-
-        # Data should be returned if the user is authorized.
-        response = self.http_get(reverse(self.view), HTTP_AUTHORIZATION=auth_header)
-        self.assertEqual(response.status_code, 200)
-
-        url = "{}?course_id={}".format(reverse(self.view), self.course_id)
-        response = self.http_get(url, HTTP_AUTHORIZATION=auth_header)
-        self.assertEqual(response.status_code, 200)
-        data = response.data['results']
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]['name'], self.course.display_name)
-
-        # The view should return an empty list if the user cannot access any courses.
-        url = "{}?course_id={}".format(reverse(self.view), unicode(self.empty_course.id))
-        response = self.http_get(url, HTTP_AUTHORIZATION=auth_header)
-        self.assertEqual(response.status_code, 200)
-        self.assertDictContainsSubset({'count': 0, u'results': []}, response.data)
-
-    def test_course_error(self):
-        """
-        Ensure the view still returns results even if get_courses() returns an ErrorDescriptor. The ErrorDescriptor
-        should be filtered out.
-        """
-
-        error_descriptor = ErrorDescriptor.from_xml(
-            '<course></course>',
-            get_test_system(),
-            CourseLocationManager(CourseLocator(org='org', course='course', run='run')),
-            None
-        )
-
-        descriptors = [error_descriptor, self.empty_course, self.course]
-
-        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_courses', Mock(return_value=descriptors)):
-            self.test_get()
-
-
-class CourseDetailTests(CourseDetailTestMixin, CourseViewTestsMixin, SharedModuleStoreTestCase):
-    view = 'course_structure_api:v0:detail'
-
-    @classmethod
-    def setUpClass(cls):
-        super(CourseDetailTests, cls).setUpClass()
-        cls.create_course_data()
-
-    def test_get(self):
-        response = super(CourseDetailTests, self).test_get()
-        self.assertValidResponseCourse(response.data, self.course)
-
-
-class CourseStructureTests(CourseDetailTestMixin, CourseViewTestsMixin, SharedModuleStoreTestCase):
-    view = 'course_structure_api:v0:structure'
-
-    @classmethod
-    def setUpClass(cls):
-        super(CourseStructureTests, cls).setUpClass()
-        cls.create_course_data()
-
-    def setUp(self):
-        super(CourseStructureTests, self).setUp()
-
-        # Ensure course structure exists for the course
-        update_course_structure(unicode(self.course.id))
-
-    def test_get(self):
-        """
-        If the course structure exists in the database, the view should return the data. Otherwise, the view should
-        initiate an asynchronous course structure generation and return a 503.
-        """
-
-        # Attempt to retrieve data for a course without stored structure
-        CourseStructure.objects.all().delete()
-        self.assertFalse(CourseStructure.objects.filter(course_id=self.course.id).exists())
-        response = self.http_get_for_course()
-        self.assertEqual(response.status_code, 503)
-        self.assertEqual(response['Retry-After'], '120')
-
-        # Course structure generation shouldn't take long. Generate the data and try again.
-        self.assertTrue(CourseStructure.objects.filter(course_id=self.course.id).exists())
-        response = self.http_get_for_course()
-        self.assertEqual(response.status_code, 200)
-
-        blocks = {}
-
-        def add_block(xblock):
-            children = xblock.get_children()
-            blocks[unicode(xblock.location)] = {
-                u'id': unicode(xblock.location),
-                u'type': xblock.category,
-                u'parent': None,
-                u'display_name': xblock.display_name,
-                u'format': xblock.format,
-                u'graded': xblock.graded,
-                u'children': [unicode(child.location) for child in children]
-            }
-
-            for child in children:
-                add_block(child)
-
-        course = self.store.get_course(self.course.id, depth=None)
-        add_block(course)
-
-        expected = {
-            u'root': unicode(self.course.location),
-            u'blocks': blocks
-        }
-
-        self.maxDiff = None
-        self.assertDictEqual(response.data, expected)
 
 
 class CourseGradingPolicyTests(CourseDetailTestMixin, CourseViewTestsMixin, SharedModuleStoreTestCase):

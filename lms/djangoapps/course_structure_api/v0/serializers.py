@@ -1,4 +1,7 @@
-""" Django REST Framework Serializers """
+""" Django REST Framework Serializers
+
+TODO: delete me once grading policy is implemented in course_api.
+"""
 
 from django.core.urlresolvers import reverse
 from rest_framework import serializers
