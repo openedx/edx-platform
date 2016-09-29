@@ -38,7 +38,7 @@
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Larissa Queiroz Pontes <lariqbiotec@gmail.com>, 2015
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014-2016
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014-2016
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # lukassem <lucas_sem@hotmail.com>, 2014
@@ -88,7 +88,7 @@
 # Felipe Nogueira de Souza <felipensouza@live.com>, 2015
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Marcelo Soares Souza <marcelo@libertais.org>, 2014
@@ -141,7 +141,7 @@
 # Kelly Parada <kellcparada@gmail.com>, 2016
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # lukassem <lucas_sem@hotmail.com>, 2014
@@ -208,7 +208,7 @@
 # Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Luiz Mituiti <luizmituiti@gmail.com>, 2014
@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-15 13:40+0000\n"
+"POT-Creation-Date: 2016-09-29 14:23+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -1193,6 +1193,10 @@ msgid "Password reset unsuccessful"
 msgstr "A redefinição de senha não foi realizada"
 
 #: common/djangoapps/student/views.py
+msgid "Error in resetting your password. Please try again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
 msgstr "Não existe nenhum usuário inativo com este endereço de e-mail"
 
@@ -1231,6 +1235,10 @@ msgstr ""
 "separada de \"Instituições\" para acesso de fornecedores."
 
 #: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this provider configuration belongs to."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is enabled, users will not be asked to confirm their details "
 "(name, email, etc.) during the registration process. Only select this option"
@@ -1254,6 +1262,10 @@ msgid ""
 "If this option is not selected, users will not be presented with the "
 "provider as an option to authenticate with on the login screen, but manual "
 "authentication using the correct link is still possible."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this SAML configuration belongs to."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
@@ -5457,6 +5469,10 @@ msgstr ""
 "Especificado em segundos. Ativar armazenamento em cache, definindo este como"
 " um valor maior que 0."
 
+#: lms/djangoapps/commerce/models.py
+msgid "Path to order receipt page."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5705,6 +5721,57 @@ msgstr "{currency_symbol}{price}"
 #: lms/djangoapps/courseware/views/views.py
 msgid "Free"
 msgstr "Gratuito"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate has been invalidated"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Please contact your course team if you have any questions."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
@@ -9780,10 +9847,6 @@ msgstr ""
 msgid "Enable course home page improvements."
 msgstr "Ativar Melhorias na Home Page do curso"
 
-#: openedx/core/djangoapps/site_configuration/models.py
-msgid "Path to order receipt page."
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
 msgstr "O campo '{field_name}' não pôde ser editado."
@@ -10575,8 +10638,7 @@ msgstr ""
 #: cms/templates/container.html cms/templates/course_outline.html
 #: cms/templates/group_configurations.html cms/templates/library.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/problem_ajax.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/student_profile/learner_profile.html
@@ -11215,10 +11277,7 @@ msgid "Tell us the details"
 msgstr "Descreva os detalhes"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
+msgid "Include error messages, steps which lead to the issue, etc"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11251,7 +11310,9 @@ msgid "Brief description of the problem"
 msgstr "Descrição sucinta do problema"
 
 #: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
+msgid ""
+"Details of the problem you are encountering{asterisk}{begin_span}Include "
+"error messages, steps which lead to the issue, etc.{end_span}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -12328,12 +12389,28 @@ msgid "No playable video sources found."
 msgstr "Não foram encontradas fontes de vídeos reproduzíveis!"
 
 #: lms/templates/video.html
-msgid "Download video"
-msgstr "Baixar vídeo"
+msgid "Downloads and transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download {file}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download transcript"
 msgstr "Baixar transcrição"
+
+#: lms/templates/video.html
+msgid "Handouts"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -14548,6 +14625,10 @@ msgstr ""
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "Identificação da Discussão: {discussion_id}"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Discussion topics list"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
