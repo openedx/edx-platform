@@ -1,0 +1,87 @@
+<openassessment url_name="0e2bbf6cc89e45d98b028fa4e2d46314" allow_file_upload="False">
+  <title></title>
+  <assessments>
+    <assessment name="peer-assessment" must_grade="1" must_be_graded_by="1"/>
+    <assessment name="self-assessment"/>
+  </assessments>
+  <rubric>
+    <prompt>
+      Censorship in the Libraries
+
+      'All of us can think of a book that we hope none of our children or any
+      other children have taken off the shelf. But if I have the right to remove
+      that book from the shelf -- that work I abhor -- then you also have exactly
+      the same right and so does everyone else. And then we have no books left on
+      the shelf for any of us.' --Katherine Paterson, Author
+
+      Write a persuasive essay to a newspaper reflecting your views on censorship
+      in libraries. Do you believe that certain materials, such as books, music,
+      movies, magazines, etc., should be removed from the shelves if they are
+      found offensive? Support your position with convincing arguments from your
+      own experience, observations, and/or reading.
+
+      Read for conciseness, clarity of thought, and form.
+    </prompt>
+    <criterion>
+      <name>Ideas</name>
+      <prompt>Determine if there is a unifying theme or main idea.</prompt>
+      <option points="0">
+	<name>Poor</name>
+	<explanation>
+	  Difficult for the reader to discern the main idea.
+	  Too brief or too repetitive to establish or maintain a focus.
+	</explanation>
+      </option>
+      <option points="3">
+	<name>Fair</name>
+	<explanation>
+	  Presents a unifying theme or main idea, but may
+	  include minor tangents.  Stays somewhat focused on topic and
+	  task.
+	</explanation>
+      </option>
+      <option points="5">
+	<name>Good</name>
+	<explanation>
+	  Presents a unifying theme or main idea without going
+	  off on tangents.  Stays completely focused on topic and task.
+	</explanation>
+      </option>
+    </criterion>
+    <criterion>
+      <name>Content</name>
+      <prompt>Assess the content of the submission</prompt>
+      <option points="0">
+	<name>Poor</name>
+	<explanation>
+	  Includes little information with few or no details or
+	  unrelated details.  Unsuccessful in attempts to explore any
+	  facets of the topic.
+	</explanation>
+      </option>
+      <option points="1">
+	<name>Fair</name>
+	<explanation>
+	  Includes little information and few or no details.
+	  Explores only one or two facets of the topic.
+	</explanation>
+      </option>
+      <option points="3">
+	<name>Good</name>
+	<explanation>
+	  Includes sufficient information and supporting
+	  details. (Details may not be fully developed; ideas may be
+	  listed.)  Explores some facets of the topic.
+	</explanation>
+      </option>
+      <option points="3">
+	<name>Excellent</name>
+	<explanation>
+	  Includes in-depth information and exceptional
+	  supporting details that are fully developed.  Explores all
+	  facets of the topic.
+	</explanation>
+      </option>
+    </criterion>
+  </rubric>
+</openassessment>
