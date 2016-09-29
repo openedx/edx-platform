@@ -22,7 +22,6 @@ import sass
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
 from simple_history.models import HistoricalRecords
-from .utils import get_initial_sass_variables, get_initial_page_elements
 
 
 class Microsite(models.Model):
@@ -41,8 +40,6 @@ class Microsite(models.Model):
     site = models.OneToOneField(Site, related_name='microsite')
     key = models.CharField(max_length=63, db_index=True, unique=True)
     values = JSONField(null=False, blank=True, load_kwargs={'object_pairs_hook': collections.OrderedDict})
-    sass_variables = models.TextField(blank=True, default=get_initial_sass_variables)
-    page_elements = JSONField(blank=True, default=get_initial_page_elements)
 
     def __unicode__(self):
         return self.key
@@ -66,47 +63,6 @@ class Microsite(models.Model):
         Helper method to return a list of organizations associated with our particular Microsite
         """
         return MicrositeOrganizationMapping.get_organizations_for_microsite_by_pk(self.id)  # pylint: disable=no-member
-
-    def compile_microsite_sass(self):
-        theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME, 'src', 'main.scss')
-        output_path = os.path.join(settings.MICROSITE_ROOT_DIR, 'customer_themes', '{}.css'.format(self.key))
-        collected_ouput_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(self.key))
-        sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
-        with open(output_path, 'w') as f:
-            f.write(sass_output)
-        with open(collected_ouput_path, 'w') as f:
-            f.write(sass_output)
-
-    def collect_css_file(self):
-        path = self.values.get('css_overrides_file')
-        storage = staticfiles_storage
-        file_storage = FileSystemStorage(settings.MICROSITE_ROOT_DIR)
-        if getattr(file_storage, 'prefix', None):
-            prefixed_path = os.path.join(file_storage.prefix, path)
-        else:
-            prefixed_path = path
-        found_files = collections.OrderedDict()
-        found_files[prefixed_path] = (file_storage, path)
-
-        with file_storage.open(path) as source_file:
-            storage.save(prefixed_path, source_file)
-        if hasattr(storage, 'post_process'):
-            processor = storage.post_process(found_files)
-            for original_path, processed_path, processed in processor:
-                if isinstance(processed, Exception):
-                    raise processed
-
-    def _sass_var_override(self, path):
-        if 'branding-basics' in path:
-            return [(path, self.sass_variables)]
-        return None
-
-    def _get_initial_microsite_values(self):
-        return {
-            'platform_name': self.site.name,
-            'css_overrides_file': "customer_themes/{}.css".format(self.key),
-            'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
-        }
 
     @classmethod
     def get_microsite_for_domain(cls, domain):
