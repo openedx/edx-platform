@@ -1469,6 +1469,7 @@ class TestComponentTemplates(CourseTestCase):
         XBlockStudioConfiguration.objects.create(name='video', enabled=True, support_level="us")
         # XBlock masquerading as a problem
         XBlockStudioConfiguration.objects.create(name='openassessment', enabled=True, support_level="us")
+        XBlockStudioConfiguration.objects.create(name='drag-and-drop-v2', enabled=True, support_level="fs")
 
         self.templates = get_component_templates(self.course)
 
@@ -1508,7 +1509,17 @@ class TestComponentTemplates(CourseTestCase):
         self.templates = get_component_templates(self.course)
         self._verify_basic_component("discussion", "Discussion", "ps")
         self.assertEqual([], self.get_templates_of_type("video"))
-        self.assertEqual([], self.get_templates_of_type("problem"))
+        supported_problem_templates = [
+            {
+                'boilerplate_name': None,
+                'category': 'drag-and-drop-v2',
+                'display_name': u'Drag and Drop',
+                'hinted': False,
+                'support_level': u'fs',
+                'tab': 'advanced'
+            }
+        ]
+        self.assertEqual(supported_problem_templates, self.get_templates_of_type("problem"))
 
         self.course.allow_unsupported_xblocks = True
         self.templates = get_component_templates(self.course)
@@ -1607,33 +1618,49 @@ class TestComponentTemplates(CourseTestCase):
         """
         Test the integration of xblocks masquerading as problems.
         """
-        def get_openassessment():
-            """ Helper method to return the openassessment template from problem list """
+        def get_xblock_problem(label):
+            """
+            Helper method to get the template of any XBlock in the problems list
+            """
             self.templates = get_component_templates(self.course)
             problem_templates = self.get_templates_of_type('problem')
-            return self.get_template(problem_templates, u'Peer Assessment')
+            return self.get_template(problem_templates, label)
 
         def verify_openassessment_present(support_level):
             """ Helper method to verify that openassessment template is present """
-            openassessment = get_openassessment()
+            openassessment = get_xblock_problem('Peer Assessment')
             self.assertIsNotNone(openassessment)
             self.assertEqual(openassessment.get('category'), 'openassessment')
             self.assertEqual(openassessment.get('support_level'), support_level)
 
+        def verify_dndv2_present(support_level):
+            """
+            Helper method to verify that DnDv2 template is present
+            """
+            dndv2 = get_xblock_problem('Drag and Drop')
+            self.assertIsNotNone(dndv2)
+            self.assertEqual(dndv2.get('category'), 'drag-and-drop-v2')
+            self.assertEqual(dndv2.get('support_level'), support_level)
+
         verify_openassessment_present(True)
+        verify_dndv2_present(True)
 
         # Now enable XBlockStudioConfigurationFlag. The openassessment block is marked
-        # unsupported, so will no longer show up.
+        # unsupported, so will no longer show up, but DnDv2 will continue to appear.
         XBlockStudioConfigurationFlag.objects.create(enabled=True)
-        self.assertIsNone(get_openassessment())
+        self.assertIsNone(get_xblock_problem('Peer Assessment'))
+        self.assertIsNotNone(get_xblock_problem('Drag and Drop'))
 
         # Now allow unsupported components.
         self.course.allow_unsupported_xblocks = True
         verify_openassessment_present('us')
+        verify_dndv2_present('fs')
 
-        # Now disable openassessment completely through XBlockConfiguration
+        # Now disable the blocks completely through XBlockConfiguration
         XBlockConfiguration.objects.create(name='openassessment', enabled=False)
-        self.assertIsNone(get_openassessment())
+        XBlockConfiguration.objects.create(name='drag-and-drop-v2', enabled=False)
+        self.assertIsNone(get_xblock_problem('Peer Assessment'))
+        self.assertIsNone(get_xblock_problem('Drag and Drop'))
 
     def _verify_advanced_xblocks(self, expected_xblocks, expected_support_levels):
         """
