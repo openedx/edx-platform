@@ -130,17 +130,19 @@ $(function () {
         }
     } else {
         s = {};
-        s.data = m;
+        s.data = 0;
         s.tick = series[k]['data'][0][0];
         s.label = series[k]['label'];
         series_order_object.push(s);
     }
   }
-  
+
   // reorder the series_order_object object to match the ticks, which is the correct order
   series_order_object.sort(function(a, b) {
       return a.tick-b.tick;
   });
+  
+  // console.log(series_order_object);
   
   // hide the vertical axis since they are audibly lacking context
   for (var i = 0; i < grade_cutoff_ticks.length; i++) {
@@ -180,9 +182,7 @@ $(function () {
         max: ${tickIndex - sectionSpacer},
         ticks: function() {
             for (var i = 0; i < ticks.length; i++) {
-                if (series_order_object[i] && series_order_object[i].tick) {
-                    ticks[i][1] = '<span class="aria-hidden=true">' + ticks[i][1] + '</span><span class="sr">' + detail_tooltips[series_order_object[i].label][series_order_object[i].data] + '</span>';
-                }
+                ticks[i][1] = '<span class="aria-hidden=true">' + ticks[i][1] + '</span><span class="sr">' + detail_tooltips[series_order_object[i].label][series_order_object[i].data] + '</span>';
             }
             return ticks;
         },
