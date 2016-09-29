@@ -23,6 +23,9 @@ paver a11y_coverage
 
 if [ "$RUN_PA11YCRAWLER" = "1" ]
 then
+    # The settings that we use are installed with the pa11ycrawler module
+    export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
+
     echo "Running pa11ycrawler against test course..."
     paver pa11ycrawler --fasttest --skip-clean --fetch-course --with-html
 
