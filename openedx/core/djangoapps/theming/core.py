@@ -32,3 +32,8 @@ def enable_theming():
         customer_themes_dir = os.path.join(theme.themes_base_dir, 'customer_themes')
         if os.path.isdir(customer_themes_dir):
             settings.STATICFILES_DIRS.insert(0, ('customer_themes', customer_themes_dir))
+
+        theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
+        settings.STATICFILES_DIRS.append(
+            (u'', theme_root / 'lms' / 'static')
+        )
