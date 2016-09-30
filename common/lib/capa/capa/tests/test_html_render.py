@@ -1,3 +1,7 @@
+"""
+CAPA HTML rendering tests.
+"""
+import ddt
 import unittest
 from lxml import etree
 import os
@@ -9,7 +13,11 @@ from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFac
 from capa.tests.helpers import test_capa_system, new_loncapa_problem
 
 
+@ddt.ddt
 class CapaHtmlRenderTest(unittest.TestCase):
+    """
+    CAPA HTML rendering tests class.
+    """
 
     def setUp(self):
         super(CapaHtmlRenderTest, self).setUp()
@@ -204,6 +212,32 @@ class CapaHtmlRenderTest(unittest.TestCase):
         self.assertEqual(
             the_system.render_template.call_args_list,
             expected_calls
+        )
+
+    @ddt.unpack
+    @ddt.data(
+        {'problem_id': '94e85aba088b44b89fdc79cd59a02290'},
+        {'problem_id': 'python_grader'},
+    )
+    def test_problem_id_extracted_correctly(self, problem_id):
+        """
+        Verify that `problem_id` is extracted correctly.
+        """
+        kwargs = {
+            'question_text': "Test question",
+            'explanation_text': "Test explanation",
+            'answer': 'Test answer',
+            'hints': [('test prompt', 'test_hint', 'test hint text')]
+        }
+        xml_str = StringResponseXMLFactory().build_xml(**kwargs)
+
+        # Create the problem and render the HTML
+        problem = new_loncapa_problem(xml_str, problem_id=problem_id, use_capa_render_template=True)
+        rendered_html = etree.XML(problem.get_html())
+        section = rendered_html.xpath('//section[@class="wrapper-problem-response"]')[0]
+        self.assertEqual(
+            '{problem_id}-problem-title'.format(problem_id=problem_id) in section.attrib.get('aria-labelledby'),
+            True
         )
 
     def test_correct_question_index_for_sr(self):

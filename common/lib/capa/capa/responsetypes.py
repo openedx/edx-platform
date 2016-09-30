@@ -255,8 +255,7 @@ class LoncapaResponse(object):
 
         # response_id = problem_id + response index
         response_id = self.xml.attrib['id']
-        problem_id = response_id.split('_')[0]
-        response_index = response_id.split('_')[-1]
+        problem_id, response_index = response_id.rsplit('_', 1)
         # Translators: index here could be 1,2,3 and so on
         response_label = _(u'Question {index}').format(index=response_index)
 
