@@ -61,7 +61,7 @@ class MatlabProblemTest(ProblemsTest):
         self.assertEqual(matlab_problem_page.problem_name, 'Test Matlab Problem')
         return matlab_problem_page
 
-    @flaky  # TNL-4132
+    @flaky
     def test_run_code(self):
         """
         Test "Run Code" button functionality.

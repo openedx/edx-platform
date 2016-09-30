@@ -263,7 +263,7 @@ class ProctoredExamTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
 
-    @flaky  # TNL-5643
+    @flaky
     @ddt.data(True, False)
     def test_timed_exam_flow(self, hide_after_due):
         """

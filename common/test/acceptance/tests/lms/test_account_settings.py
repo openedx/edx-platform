@@ -256,7 +256,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         self._test_readonly_field('username', 'Username', self.username)
 
-    @flaky  # TNL-5691
+    @flaky
     def test_full_name_field(self):
         """
         Test behaviour of "Full Name" field.
