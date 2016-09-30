@@ -490,44 +490,16 @@ def generate_commit_table(start_ref, end_ref):
     return "\n".join(rows)
 
 
-def generate_email(start_ref, end_ref, release_date=None):
+def generate_email_recipients(start_ref, end_ref, release_date=None):
     """
-    Returns a string roughly approximating an email.
+    Returns a comma-separate string of email addresses associated with
+    merged pull requests.
     """
     if release_date is None:
         release_date = default_release_date()
     prbe = prs_by_email(start_ref, end_ref)
-
-    email = """
-        To: {emails}
-
-        You merged at least one pull request for edx-platform that is going out
-        in this upcoming release, and you are responsible for verifying those
-        changes on the staging servers before the code is released. Please go
-        to the release page to do so:
-
-        https://openedx.atlassian.net/wiki/display/ENG/{date}+Release
-
-        The staging server is: https://stage.edx.org
-
-        Note that you are responsible for verifying any pull requests that you
-        merged, whether you wrote the code or not. (If you didn't write the code,
-        you can and should try to get the person who wrote the code to help
-        verify the changes -- but even if you can't, you're still responsible!)
-        If you find any bugs, please notify me and record the bugs on the
-        release page. Thanks!
-
-        By the way, if you have an @edx.org email address and are having trouble logging
-        into stage, you may need to reset your password.
-
-        If you would prefer this email be sent to a different email address of yours,
-        send a request to oscm@edx.org with the details.
-
-    """.format(
-        emails=", ".join(prbe.keys()),
-        date=release_date.isoformat(),
-    )
-    return textwrap.dedent(email).strip()
+    emails = ", ".join(prbe.keys())
+    return emails
 
 
 def main():
@@ -543,8 +515,8 @@ def main():
         print(generate_pr_table(args.previous, args.current))
         return
 
-    print("Generating stage verification email and its list of recipients. This may take around a minute...")
-    print(generate_email(args.previous, args.current, release_date=args.date).encode('UTF-8'))
+    print("Generating list of email recipients. This may take around a minute...")
+    print(generate_email_recipients(args.previous, args.current, release_date=args.date).encode('UTF-8'))
     print("\n")
     print("Wiki Table:")
     print(
