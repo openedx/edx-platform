@@ -384,6 +384,7 @@ class CoursewareIndex(View):
             'staff_access': self.is_staff,
             'studio_url': get_studio_url(self.course, 'course'),
             'masquerade': self.masquerade,
+            'real_user': self.real_user,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
@@ -406,7 +407,6 @@ class CoursewareIndex(View):
                 courseware_context['entrance_exam_passed'] = user_has_passed_entrance_exam(self.request, self.course)
 
         # staff masquerading data
-        courseware_context['real_user'] = self.real_user
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(self.effective_user, self.course, self.course_key)
         if not in_preview_mode() and self.is_staff and now < effective_start:
