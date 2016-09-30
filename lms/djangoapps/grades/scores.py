@@ -108,8 +108,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
         _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
     )
 
-    assert weighted_possible is not None
-    has_valid_denominator = weighted_possible > 0.0
+    has_valid_denominator = weighted_possible is not None and weighted_possible > 0.0
     graded = _get_graded_from_block(persisted_block, block) if has_valid_denominator else False
 
     return ProblemScore(
