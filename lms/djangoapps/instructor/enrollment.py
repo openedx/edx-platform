@@ -18,8 +18,8 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
-from grades.scores import weighted_score
-from grades.signals.signals import SCORE_CHANGED
+from lms.djangoapps.grades.scores import weighted_score
+from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
 from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -325,8 +325,8 @@ def _fire_score_changed_for_block(course_id, student, block, module_state_key):
         points_possible=points_possible,
         points_earned=points_earned,
         user=student,
-        course_id=course_id,
-        usage_id=module_state_key
+        course_id=unicode(course_id),
+        usage_id=unicode(module_state_key)
     )
 
 
