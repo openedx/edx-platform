@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from mock import patch
 from courseware.module_render import get_module
 from courseware.model_data import FieldDataCache
-from xmodule.graders import ProblemScore
 
 
 @contextmanager
@@ -24,7 +23,7 @@ def mock_get_score(earned=0, possible=1):
     Mocks the get_score function to return a valid grade.
     """
     with patch('lms.djangoapps.grades.new.subsection_grade.get_score') as mock_score:
-        mock_score.return_value = ProblemScore(earned, possible, earned, possible, 1, True, None, None)
+        mock_score.return_value = (earned, possible)
         yield mock_score
 
 
