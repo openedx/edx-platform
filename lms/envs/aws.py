@@ -133,7 +133,7 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 # collected
 STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
 if STATIC_ROOT_BASE:
-    STATIC_ROOT = path(STATIC_ROOT_BASE)
+    STATIC_ROOT = path(STATIC_ROOT_BASE) / EDX_PLATFORM_REVISION
 
 
 # STATIC_URL_BASE specifies the base url to use for static files
@@ -143,6 +143,7 @@ if STATIC_URL_BASE:
     STATIC_URL = STATIC_URL_BASE.encode('ascii')
     if not STATIC_URL.endswith("/"):
         STATIC_URL += "/"
+    STATIC_URL += EDX_PLATFORM_REVISION + "/"
 
 # DEFAULT_COURSE_ABOUT_IMAGE_URL specifies the default image to show for courses that don't provide one
 DEFAULT_COURSE_ABOUT_IMAGE_URL = ENV_TOKENS.get('DEFAULT_COURSE_ABOUT_IMAGE_URL', DEFAULT_COURSE_ABOUT_IMAGE_URL)
