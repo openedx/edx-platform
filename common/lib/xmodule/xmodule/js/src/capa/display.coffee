@@ -406,10 +406,13 @@ class @Problem
   reset_internal: =>
     Logger.log 'problem_reset', @answers
     $.postWithPrefix "#{@url}/problem_reset", id: @id, (response) =>
-      @el.trigger('contentChanged', [@id, response.html])
-      @render(response.html)
-      @updateProgress response
-      @scroll_to_problem_meta()
+      if response.success
+        @el.trigger('contentChanged', [@id, response.html])
+        @render(response.html, @scroll_to_problem_meta)
+        @updateProgress response
+        window.SR.readText(gettext('This problem has been reset.'))
+      else
+        @gentle_alert response.msg
 
   # TODO this needs modification to deal with javascript responses; perhaps we
   # need something where responsetypes can define their own behavior when show

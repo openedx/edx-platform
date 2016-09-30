@@ -108,7 +108,7 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
             'problem',
             self.problem_name,
             data=self.factory.build_xml(**self.factory_kwargs),
-            metadata={'rerandomize': 'always'}
+            metadata={'rerandomize': 'always', 'show_reset_button': True}
         )
 
     def wait_for_status(self, status):
@@ -315,6 +315,24 @@ class ProblemTypeTestMixin(object):
         self.assertTrue(self.problem_page.is_focus_on_problem_meta())
         # Answer should be reset
         self.wait_for_status('unanswered')
+
+    @attr(shard=7)
+    def test_reset_shows_errors(self):
+        """
+        Scenario: Reset will show server errors
+        If I reset a problem without first answering it
+        Then a "gentle notification" is shown
+        And the focus moves to the "gentle notification"
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+        self.wait_for_status('unanswered')
+        self.assertFalse(self.problem_page.is_gentle_alert_notification_visible())
+        # Click reset without first answering the problem (possible because show_reset_button is set to True)
+        self.problem_page.click_reset()
+        self.problem_page.wait_for_gentle_alert_notification()
 
     @attr(shard=7)
     def test_partially_complete_notifications(self):

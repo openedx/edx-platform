@@ -90,7 +90,6 @@ describe 'Problem', ->
   describe 'renderProgressState', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
-      #@renderProgressState = @problem.renderProgressState
 
     testProgessData = (problem, status, detail, graded, expected_progress_after_render) ->
       problem.el.data('progress_status', status)
@@ -396,11 +395,27 @@ describe 'Problem', ->
 
     it 'render the returned content', ->
       spyOn($, 'postWithPrefix').and.callFake (url, answers, callback) ->
-        callback html: "Reset"
+        callback html: "Reset", success: true
         promise =
             always: (callable) -> callable()
       @problem.reset()
       expect(@problem.el.html()).toEqual 'Reset'
+
+    it 'sends a message to the window SR element', ->
+      spyOn($, 'postWithPrefix').and.callFake (url, answers, callback) ->
+        callback html: "Reset", success: true
+        promise =
+          always: (callable) -> callable()
+       @problem.reset()
+       expect(window.SR.readText).toHaveBeenCalledWith 'This problem has been reset.'
+
+    it 'shows a notification on error', ->
+      spyOn($, 'postWithPrefix').and.callFake (url, answers, callback) ->
+        callback msg: "Error on reset.", success: false
+        promise =
+          always: (callable) -> callable()
+      @problem.reset()
+      expect($('.notification-gentle-alert .notification-message').text()).toEqual("Error on reset.")
 
     it 'tests if all the buttons are disabled and the text of submit button remains same while resetting', (done) ->
       deferred = $.Deferred()
