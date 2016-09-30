@@ -79,7 +79,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.assertFalse(self.course_updates_page.is_first_update_message('Hello'))
         self.assertTrue(self.course_updates_page.is_first_update_message('Goodbye'))
 
-    @flaky
+    @flaky  # TNL-5582
     def test_delete_course_update(self):
         """
         Scenario: Users can delete updates
