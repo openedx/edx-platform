@@ -446,7 +446,6 @@ describe 'Problem', ->
 
     describe 'when the answer has not yet shown', ->
       beforeEach ->
-        @problem.el.removeClass 'showed'
         expect(@problem.el.find('.show').attr('disabled')).not.toEqual('disabled')
 
       it 'log the problem_show event', ->
@@ -472,10 +471,9 @@ describe 'Problem', ->
         @problem.show()
         expect(window.SR.readText).toHaveBeenCalledWith 'Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'
 
-      it 'add the showed class to element', ->
+      it 'disables the show answer button', ->
         spyOn($, 'postWithPrefix').and.callFake (url, callback) -> callback(answers: {})
         @problem.show()
-        expect(@problem.el).toHaveClass 'showed'
         expect(@problem.el.find('.show').attr('disabled')).toEqual('disabled')
 
       it 'sends a SR message when answer is present', (done) ->
@@ -697,18 +695,6 @@ describe 'Problem', ->
           el = $('#inputtype_12345')
           expect(el.find('canvas')).not.toExist()
           expect(console.log).toHaveBeenCalledWith('Answer is absent for image input with id=12345')
-
-    describe 'when the answers are already shown', ->
-      beforeEach ->
-        @problem.el.addClass 'showed'
-        @problem.el.prepend '''
-          <label for="input_1_1_1" correct_answer="true">
-            <input type="checkbox" name="input_1_1" id="input_1_1_1" value="1" />
-            One
-          </label>
-        '''
-        $('#answer_1_1').html('One')
-        $('#answer_1_2').html('Two')
 
   describe 'save', ->
     beforeEach ->

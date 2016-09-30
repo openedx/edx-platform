@@ -370,8 +370,6 @@ class @Problem
           @el.trigger('contentChanged', [@id, response.contents])
           @render(response.contents, @focus_on_submit_notification)
           @updateProgress response
-          if @el.hasClass 'showed'
-            @el.removeClass 'showed'
         else
           @saveNotification.hide()
           @gentle_alert response.success
@@ -418,50 +416,48 @@ class @Problem
   # need something where responsetypes can define their own behavior when show
   # is called.
   show: =>
-    if !@el.hasClass 'showed'
-      Logger.log 'problem_show', problem: @id
-      $.postWithPrefix "#{@url}/problem_show", (response) =>
-        answers = response.answers
-        $.each answers, (key, value) =>
-          if $.isArray(value)
-            for choice in value
-              @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
-          else
-            answer = @$("#answer_#{key}, #solution_#{key}")
-            edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value))
-            Collapsible.setCollapsibles(answer)
+    Logger.log 'problem_show', problem: @id
+    $.postWithPrefix "#{@url}/problem_show", (response) =>
+      answers = response.answers
+      $.each answers, (key, value) =>
+        if $.isArray(value)
+          for choice in value
+            @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
+        else
+          answer = @$("#answer_#{key}, #solution_#{key}")
+          edx.HtmlUtils.setHtml(answer, edx.HtmlUtils.HTML(value))
+          Collapsible.setCollapsibles(answer)
 
-            # Sometimes, `value` is just a string containing a MathJax formula.
-            # If this is the case, jQuery will throw an error in some corner cases
-            # because of an incorrect selector. We setup a try..catch so that
-            # the script doesn't break in such cases.
-            #
-            # We will fallback to the second `if statement` below, if an
-            # error is thrown by jQuery.
-            try
-                solution = $(value).find('.detailed-solution')
-            catch e
-                solution = {}
+          # Sometimes, `value` is just a string containing a MathJax formula.
+          # If this is the case, jQuery will throw an error in some corner cases
+          # because of an incorrect selector. We setup a try..catch so that
+          # the script doesn't break in such cases.
+          #
+          # We will fallback to the second `if statement` below, if an
+          # error is thrown by jQuery.
+          try
+              solution = $(value).find('.detailed-solution')
+          catch e
+              solution = {}
 
-        # TODO remove the above once everything is extracted into its own
-        # inputtype functions.
+      # TODO remove the above once everything is extracted into its own
+      # inputtype functions.
 
-        @el.find(".capa_inputtype").each (index, inputtype) =>
-          classes = $(inputtype).attr('class').split(' ')
-          for cls in classes
-            display = @inputtypeDisplays[$(inputtype).attr('id')]
-            showMethod = @inputtypeShowAnswerMethods[cls]
-            showMethod(inputtype, display, answers) if showMethod?
+      @el.find(".capa_inputtype").each (index, inputtype) =>
+        classes = $(inputtype).attr('class').split(' ')
+        for cls in classes
+          display = @inputtypeDisplays[$(inputtype).attr('id')]
+          showMethod = @inputtypeShowAnswerMethods[cls]
+          showMethod(inputtype, display, answers) if showMethod?
 
-        if MathJax?
-          @el.find('.problem > div').each (index, element) =>
-            MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
+      if MathJax?
+        @el.find('.problem > div').each (index, element) =>
+          MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
-        @el.addClass 'showed'
-        @el.find('.show').attr('disabled', 'disabled')
-        @updateProgress response
-        window.SR.readText(gettext('Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'))
-        @scroll_to_problem_meta()
+      @el.find('.show').attr('disabled', 'disabled')
+      @updateProgress response
+      window.SR.readText(gettext('Answers to this problem are now shown. Navigate through the problem to review it with answers inline.'))
+      @scroll_to_problem_meta()
 
   clear_all_notifications: =>
     @submitNotification.remove()
