@@ -108,20 +108,23 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
         _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
     )
 
-    assert weighted_possible is not None
-    has_valid_denominator = weighted_possible > 0.0
-    graded = _get_graded_from_block(persisted_block, block) if has_valid_denominator else False
+    if weighted_possible is None or weighted_earned is None:
+        return None
 
-    return ProblemScore(
-        raw_earned,
-        raw_possible,
-        weighted_earned,
-        weighted_possible,
-        weight,
-        graded,
-        display_name=display_name_with_default_escaped(block),
-        module_id=block.location,
-    )
+    else:
+        has_valid_denominator = weighted_possible > 0.0
+        graded = _get_graded_from_block(persisted_block, block) if has_valid_denominator else False
+
+        return ProblemScore(
+            raw_earned,
+            raw_possible,
+            weighted_earned,
+            weighted_possible,
+            weight,
+            graded,
+            display_name=display_name_with_default_escaped(block),
+            module_id=block.location,
+        )
 
 
 def weighted_score(raw_earned, raw_possible, weight):
@@ -191,7 +194,10 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     else:
         raw_possible = block.transformer_data[GradesTransformer].max_score
 
-    return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight)
+    if raw_possible is None:
+        return (raw_earned, raw_possible) + (None, None)
+    else:
+        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight)
 
 
 def _get_weight_from_block(persisted_block, block):
