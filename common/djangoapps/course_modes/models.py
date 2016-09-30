@@ -188,7 +188,7 @@ class CourseMode(models.Model):
     @classmethod
     def get_default_course_mode(cls):
         default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY[0]
-        return Mode(AUDIT, _('Audit'), 0, '', default_currency, None, None, None, None)
+        return Mode(cls.AUDIT, _('Audit'), 0, '', default_currency, None, None, None, None)
 
     @classmethod
     def all_modes_for_courses(cls, course_id_list):
