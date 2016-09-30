@@ -1984,30 +1984,30 @@ class NumericalResponse(LoncapaResponse):
         """
         if self.answer_id in student_answers:
             if new_cmap.cmap[self.answer_id]['correctness'] == 'correct':  # if the grader liked the student's answer
-
-                # check additional or not
-
-                # Note: using self.id here, not the more typical self.answer_id
-                hints = self.xml.xpath('//numericalresponse[@id=$id]/correcthint', id=self.id)
-                if hints:
-                    hint_node = hints[0]
-                    new_cmap[self.answer_id]['msg'] += self.make_hint_div(
-                        hint_node,
-                        True,
-                        [student_answers[self.answer_id]],
-                        self.tags[0]
-                    )
-
-                # Then look for additional answer with an answer= attribute
-                additional_answer_hints = self.xml.xpath('//numericalresponse[@id=$id]/additional_answer', id=self.id)
-                for node in additional_answer_hints:
-                    hint_node = node.find('./correcthint')
-                    new_cmap[self.answer_id]['msg'] += self.make_hint_div(
-                        hint_node,
-                        True,
-                        [student_answers[self.answer_id]],
-                        self.tags[0]
-                    )
+                # student answer is the base correct answer.
+                if self.compare_answer(student_answers[self.answer_id], self.xml.get('answer')):
+                    # Note: using self.id here, not the more typical self.answer_id
+                    hints = self.xml.xpath('//numericalresponse[@id=$id]/correcthint', id=self.id)
+                    if hints:
+                        hint_node = hints[0]
+                        new_cmap[self.answer_id]['msg'] += self.make_hint_div(
+                            hint_node,
+                            True,
+                            [student_answers[self.answer_id]],
+                            self.tags[0]
+                        )
+                # student answer is among the additional answers.
+                else:
+                    # look for additional answer with an answer= attribute
+                    additional_answer_hints = self.xml.xpath('//numericalresponse[@id=$id]/additional_answer', id=self.id)
+                    for node in additional_answer_hints:
+                        hint_node = node.find('./correcthint')
+                        new_cmap[self.answer_id]['msg'] += self.make_hint_div(
+                            hint_node,
+                            True,
+                            [student_answers[self.answer_id]],
+                            self.tags[0]
+                        )
 
 #-----------------------------------------------------------------------------
 
