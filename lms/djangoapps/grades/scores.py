@@ -124,23 +124,6 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
     )
 
 
-def weighted_score(raw_earned, raw_possible, weight):
-    """
-    Returns a tuple that represents the weighted (earned, possible) score.
-    If weight is None or raw_possible is 0, returns the original values.
-
-    When weight is used, it defines the weighted_possible.  This allows
-    course authors to specify the exact maximum value for a problem when
-    they provide a weight.
-    """
-    assert raw_possible is not None
-    cannot_compute_with_weight = weight is None or raw_possible == 0
-    if cannot_compute_with_weight:
-        return raw_earned, raw_possible
-    else:
-        return float(raw_earned) * weight / raw_possible, float(weight)
-
-
 def _get_score_from_submissions(submissions_scores, block):
     """
     Returns the score values from the submissions API if found.
@@ -174,7 +157,7 @@ def _get_score_from_csm(csm_scores, block, weight):
     if has_valid_score:
         raw_earned = score.correct if score.correct is not None else 0.0
         raw_possible = score.total
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight)
+        return (raw_earned, raw_possible) + _weighted_score(raw_earned, raw_possible, weight)
 
 
 def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
@@ -191,7 +174,7 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     else:
         raw_possible = block.transformer_data[GradesTransformer].max_score
 
-    return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight)
+    return (raw_earned, raw_possible) + _weighted_score(raw_earned, raw_possible, weight)
 
 
 def _get_weight_from_block(persisted_block, block):
@@ -231,6 +214,23 @@ def _get_explicit_graded(block):
     # in the aggregated self.graded_total, regardless of the
     # inherited graded value from the subsection. (TNL-5560)
     return True if field_value is None else field_value
+
+
+def _weighted_score(raw_earned, raw_possible, weight):
+    """
+    Returns a tuple that represents the weighted (earned, possible) score.
+    If weight is None or raw_possible is 0, returns the original values.
+
+    When weight is used, it defines the weighted_possible.  This allows
+    course authors to specify the exact maximum value for a problem when
+    they provide a weight.
+    """
+    assert raw_possible is not None
+    cannot_compute_with_weight = weight is None or raw_possible == 0
+    if cannot_compute_with_weight:
+        return raw_earned, raw_possible
+    else:
+        return float(raw_earned) * weight / raw_possible, float(weight)
 
 
 @memoized
