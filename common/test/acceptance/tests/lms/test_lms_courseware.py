@@ -7,6 +7,7 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
+from flaky import flaky
 from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest, EventsTestMixin, auto_auth, create_multiple_choice_problem
@@ -262,6 +263,7 @@ class ProctoredExamTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
 
+    @flaky
     @ddt.data(True, False)
     def test_timed_exam_flow(self, hide_after_due):
         """

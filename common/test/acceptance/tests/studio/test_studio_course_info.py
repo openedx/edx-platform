@@ -1,6 +1,8 @@
 """
 Acceptance Tests for Course Information
 """
+from flaky import flaky
+
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
@@ -77,6 +79,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.assertFalse(self.course_updates_page.is_first_update_message('Hello'))
         self.assertTrue(self.course_updates_page.is_first_update_message('Goodbye'))
 
+    @flaky
     def test_delete_course_update(self):
         """
         Scenario: Users can delete updates

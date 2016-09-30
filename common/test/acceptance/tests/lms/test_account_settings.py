@@ -2,18 +2,18 @@
 """
 End-to-end tests for the Account Settings page.
 """
+from datetime import datetime
 from unittest import skip
-from nose.plugins.attrib import attr
 
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.page_object import XSS_INJECTION
-from datetime import datetime
+from flaky import flaky
+from nose.plugins.attrib import attr
 from pytz import timezone, utc
 
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
-
 from common.test.acceptance.tests.helpers import EventsTestMixin
 
 
@@ -216,8 +216,14 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
                 self.assertEqual(self.account_settings_page.value_for_text_field(field_id), new_value)
 
     def _test_dropdown_field(
-            self, field_id, title, initial_value, new_values, success_message=SUCCESS_MESSAGE, reloads_on_save=False
-    ):
+            self,
+            field_id,
+            title,
+            initial_value,
+            new_values,
+            success_message=SUCCESS_MESSAGE,  # pylint: disable=unused-argument
+            reloads_on_save=False
+        ):
         """
         Test behaviour of a dropdown field.
         """
@@ -250,6 +256,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
         """
         self._test_readonly_field('username', 'Username', self.username)
 
+    @flaky
     def test_full_name_field(self):
         """
         Test behaviour of "Full Name" field.
