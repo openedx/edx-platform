@@ -190,6 +190,13 @@ div.problem {
 
 }
 
+// CAPA gap spacing between problem parts
+// can not use the & + & since .problem is nested deeply in .xmodule_display.xmodule_CapaModule
+.wrapper-problem-response + .wrapper-problem-response,
+.wrapper-problem-response + p {
+  margin-top: ($baseline * 1.5);
+}
+
 // Choice Group - silent class
 %choicegroup-base {
   @include clearfix();
@@ -247,7 +254,6 @@ div.problem {
   }
 
   .indicator-container {
-    display: inline-block;
     min-height: 1px;
     width: 25px;
   }
