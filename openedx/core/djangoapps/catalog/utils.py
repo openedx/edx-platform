@@ -40,7 +40,10 @@ def get_programs(user, uuid=None, type=None):  # pylint: disable=redefined-built
             type='.' + type if type else ''
         )
 
-        querystring = {'marketable': 1}
+        querystring = {
+            'marketable': 1,
+            'exclude_utm': 1,
+        }
         if type:
             querystring['type'] = type
 
@@ -133,6 +136,7 @@ def get_course_run(course_key, user):
             resource_id=unicode(course_key),
             cache_key=catalog_integration.CACHE_KEY if catalog_integration.is_cache_enabled else None,
             api=api,
+            querystring={'exclude_utm': 1},
         )
 
         return data if data else {}
@@ -151,21 +155,4 @@ def get_run_marketing_url(course_key, user):
         string, the marketing URL, or None if no URL is available.
     """
     course_run = get_course_run(course_key, user)
-    marketing_url = course_run.get('marketing_url')
-
-    if marketing_url:
-        # This URL may include unwanted UTM parameters in the querystring.
-        # For more, see https://en.wikipedia.org/wiki/UTM_parameters.
-        return strip_querystring(marketing_url)
-    else:
-        return None
-
-
-def strip_querystring(url):
-    """Strip the querystring from the provided URL.
-
-    urlparse's ParseResult is a subclass of namedtuple. _replace is part of namedtuple's
-    public API: https://docs.python.org/2/library/collections.html#collections.somenamedtuple._replace.
-    The name starts with an underscore to prevent conflicts with field names.
-    """
-    return urlparse(url)._replace(query='').geturl()  # pylint: disable=no-member
+    return course_run.get('marketing_url')
