@@ -27,7 +27,7 @@ BLOCK_RECORD_LIST_VERSION = 1
 
 # Used to serialize information about a block at the time it was used in
 # grade calculation.
-BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'raw_possible', 'graded'])
+BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
 
 
 class BlockRecordList(tuple):
@@ -98,8 +98,7 @@ class BlockRecordList(tuple):
             BlockRecord(
                 locator=UsageKey.from_string(block["locator"]).replace(course_key=course_key),
                 weight=block["weight"],
-                raw_possible=block["raw_possible"],
-                graded=block["graded"],
+                max_score=block["max_score"],
             )
             for block in block_dicts
         )

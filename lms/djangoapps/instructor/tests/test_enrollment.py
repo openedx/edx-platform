@@ -8,7 +8,6 @@ import mock
 from mock import patch
 from abc import ABCMeta
 from courseware.models import StudentModule
-from courseware.tests.helpers import get_request_for_user
 from django.conf import settings
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
@@ -17,11 +16,7 @@ from ccx_keys.locator import CCXLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from grades.new.subsection_grade import SubsectionGradeFactory
-from grades.tests.utils import answer_problem
 from lms.djangoapps.ccx.tests.factories import CcxFactory
-from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from student.roles import CourseCcxCoachRole
@@ -497,80 +492,6 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         unrelated_state = json.loads(self.get_state(self.unrelated.location))
         self.assertEqual(unrelated_state['attempts'], 12)
         self.assertEqual(unrelated_state['brains'], 'zombie')
-
-
-class TestStudentModuleGrading(SharedModuleStoreTestCase):
-    """
-    Tests the effects of student module manipulations
-    on student grades.
-    """
-    @classmethod
-    def setUpClass(cls):
-        super(TestStudentModuleGrading, cls).setUpClass()
-        cls.course = CourseFactory.create()
-        cls.chapter = ItemFactory.create(
-            parent=cls.course,
-            category="chapter",
-            display_name="Test Chapter"
-        )
-        cls.sequence = ItemFactory.create(
-            parent=cls.chapter,
-            category='sequential',
-            display_name="Test Sequential 1",
-            graded=True
-        )
-        cls.vertical = ItemFactory.create(
-            parent=cls.sequence,
-            category='vertical',
-            display_name='Test Vertical 1'
-        )
-        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-            question_text='The correct answer is Choice 3',
-            choices=[False, False, True, False],
-            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-        )
-        cls.problem = ItemFactory.create(
-            parent=cls.vertical,
-            category="problem",
-            display_name="Test Problem",
-            data=problem_xml
-        )
-        cls.request = get_request_for_user(UserFactory())
-        cls.user = cls.request.user
-
-    def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):
-        """
-        Retrieves the subsection grade and verifies that
-        its scores match those expected.
-        """
-        subsection_grade_factory = SubsectionGradeFactory(
-            self.user,
-            self.course,
-            get_course_blocks(self.user, self.course.location)
-        )
-        grade = subsection_grade_factory.update(self.sequence)
-        self.assertEqual(grade.all_total.earned, all_earned)
-        self.assertEqual(grade.graded_total.earned, graded_earned)
-        self.assertEqual(grade.all_total.possible, all_possible)
-        self.assertEqual(grade.graded_total.possible, graded_possible)
-
-    @patch('crum.get_current_request')
-    def test_delete_student_state(self, _crum_mock):
-        problem_location = self.problem.location
-        self._get_subsection_grade_and_verify(0, 1, 0, 1)
-        answer_problem(course=self.course, request=self.request, problem=self.problem, score=1, max_value=1)
-        self._get_subsection_grade_and_verify(1, 1, 1, 1)
-
-        # Delete student state using the instructor dash
-        reset_student_attempts(
-            self.course.id,
-            self.user,
-            problem_location,
-            requesting_user=self.user,
-            delete_module=True,
-        )
-        # Verify that the student's grades are reset
-        self._get_subsection_grade_and_verify(0, 1, 0, 1)
 
 
 class EnrollmentObjects(object):

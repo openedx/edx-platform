@@ -948,7 +948,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
 
         final_grade = gradeset['percent']
         # Only consider graded problems
-        problem_scores = {unicode(score.module_id): score for score in gradeset['raw_scores'] if score.graded}
+        problem_scores = {unicode(score.module_id): score for score, _ in gradeset['raw_scores'] if score.graded}
         earned_possible_values = list()
         for problem_id in problems:
             try:
