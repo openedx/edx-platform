@@ -15,10 +15,10 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.block_metadata_utils import display_name_with_default_escaped
-from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.graders import ProblemScore
 
 from .utils import answer_problem
 from .. import course_grades
