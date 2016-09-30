@@ -1520,7 +1520,7 @@ class CapaMixin(CapaFields):
             return {
                 'success': False,
                 # Translators: 'closed' means the problem's due date has passed. You may no longer attempt to solve the problem.
-                'error': _("Problem is closed."),
+                'msg': _("You cannot select Reset for a problem that is closed."),
             }
 
         if not self.is_submitted():
@@ -1528,8 +1528,7 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('reset_problem_fail', event_info)
             return {
                 'success': False,
-                # Translators: A student must "make an attempt" to solve the problem on the page before they can reset it.
-                'error': _("Refresh the page and make an attempt before resetting."),
+                'msg': _("You must submit an answer before you can select Reset."),
             }
 
         if self.is_submitted() and self.rerandomize in [RANDOMIZATION.ALWAYS, RANDOMIZATION.ONRESET]:
