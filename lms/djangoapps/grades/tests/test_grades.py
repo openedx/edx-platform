@@ -7,10 +7,7 @@ from mock import patch
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from courseware.tests.helpers import (
-    LoginEnrollmentTestCase,
-    get_request_for_user
-)
+from courseware.tests.helpers import get_request_for_user
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
