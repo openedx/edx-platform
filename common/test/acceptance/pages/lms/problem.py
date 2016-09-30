@@ -141,7 +141,7 @@ class ProblemPage(PageObject):
         """
         Is the Hint Notification visible?
         """
-        return self.q(css='.notification.hint.notification-hint').visible
+        return self.q(css='.notification.notification-hint').visible
 
     def is_save_notification_visible(self):
         """
