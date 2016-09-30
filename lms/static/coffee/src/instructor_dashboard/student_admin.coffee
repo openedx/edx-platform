@@ -76,6 +76,7 @@ class @StudentAdmin
       full_error_message = _.template(error_message, {student_id: unique_student_identifier})
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$progress_link.data 'endpoint'
         data: unique_student_identifier: unique_student_identifier
@@ -101,6 +102,7 @@ class @StudentAdmin
       full_error_message = _.template(error_message, {problem_id: problem_to_reset, student_id: unique_student_identifier})
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_reset_attempts_single.data 'endpoint'
         data: send_data
@@ -127,6 +129,7 @@ class @StudentAdmin
         full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
         $.ajax
+          type: 'POST'
           dataType: 'json'
           url: @$btn_delete_state_single.data 'endpoint'
           data: send_data
@@ -153,6 +156,7 @@ class @StudentAdmin
       full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_rescore_problem_single.data 'endpoint'
         data: send_data
@@ -174,6 +178,7 @@ class @StudentAdmin
       full_error_message = _.template(error_message, {student_id: unique_student_identifier, problem_id: problem_to_reset})
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_task_history_single.data 'endpoint'
         data: send_data
@@ -191,6 +196,7 @@ class @StudentAdmin
         delete_module: false
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_reset_entrance_exam_attempts.data 'endpoint'
         data: send_data
@@ -212,6 +218,7 @@ class @StudentAdmin
         unique_student_identifier: unique_student_identifier
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_rescore_entrance_exam.data 'endpoint'
         data: send_data
@@ -256,6 +263,7 @@ class @StudentAdmin
         delete_module: true
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_delete_entrance_exam_state.data 'endpoint'
         data: send_data
@@ -277,6 +285,7 @@ class @StudentAdmin
         unique_student_identifier: unique_student_identifier
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_entrance_exam_task_history.data 'endpoint'
         data: send_data
@@ -304,6 +313,7 @@ class @StudentAdmin
         full_error_message = _.template(error_message, {problem_id: problem_to_reset})
 
         $.ajax
+          type: 'POST'
           dataType: 'json'
           url: @$btn_reset_attempts_all.data 'endpoint'
           data: send_data
@@ -330,6 +340,7 @@ class @StudentAdmin
         full_error_message = _.template(error_message, {problem_id: problem_to_reset})
 
         $.ajax
+          type: 'POST'
           dataType: 'json'
           url: @$btn_rescore_problem_all.data 'endpoint'
           data: send_data
@@ -348,6 +359,7 @@ class @StudentAdmin
         return @$request_response_error_all.text gettext("Please enter a problem location.")
 
       $.ajax
+        type: 'POST'
         dataType: 'json'
         url: @$btn_task_history_all.data 'endpoint'
         data: send_data

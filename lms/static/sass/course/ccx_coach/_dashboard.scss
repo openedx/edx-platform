@@ -18,6 +18,11 @@ table.ccx-schedule {
     th, td {
         padding: 10px;
     }
+    td.no-link {
+        font-size: 13px;
+        text-shadow: 0 1px 0 #fcfbfb;
+        text-decoration: none;
+    }
     .sequential .unit {
         padding-left: 25px;
     }
@@ -40,6 +45,7 @@ table.ccx-schedule {
     margin-left: 20px;
 }
 
+
 .ccx-sidebar-panel {
     border: 1px solid #cbcbcb;
     padding: 15px;
@@ -48,8 +54,46 @@ table.ccx-schedule {
 
 form.ccx-form {
     line-height: 1.5;
+    // inspiration was taken from https://github.com/edx/ux-pattern-library
     select {
+        @include font-size(16);
+        background: #fcfcfc;
+        border: 1px solid #e9e8e8;
+        box-sizing: padding-box;
+        color: #282c2e;
+        display: inline-block;
+        font-size: ($baseline*.9.5);
+        height: 40px;
+        line-height: 20px;
+        padding: 10px;
+        transition: all 125ms ease-in-out 0s;
         width: 100%;
+        &:disabled {
+            border-color: #cfd8dc;
+            background: #e7ecee;
+            cursor: not-allowed;
+        }
+    }
+    input {
+        @include font-size(15);
+        background: #FCFCFC none repeat scroll 0% 0%;
+        border: 1px solid #E7E6E6;
+        box-sizing: border-box;
+        color: #34383A;
+        display: inline-block;
+        line-height: normal;
+        transition: all 0.125s ease-in-out 0s;
+        padding: 5px 10px 5px 10px;
+        &:focus {
+            border-color: #0ea6ec;
+            color: #282c2e;
+            outline: 0;
+        }
+        &:disabled {
+            border-color: #cfd8dc;
+            background: #e7ecee;
+            cursor: not-allowed;
+        }
     }
     .field {
         margin: 5px 0 5px 0;
@@ -72,5 +116,13 @@ button.ccx-button-link {
     }
     &:hover {
         color: brown;
+        background: none;
     }
+    &:focus {
+        background: none;
+    }
+}
+
+.ccx-manage-student-form input#student-id {
+    width: 60%;
 }

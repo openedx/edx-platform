@@ -245,7 +245,7 @@ class CertificateManager(object):
         """
         for cert_index, cert in enumerate(course.certificates['certificates']):  # pylint: disable=unused-variable
             if int(cert['id']) == int(certificate_id):
-                for sig_index, signatory in enumerate(cert.get('signatories')):  # pylint: disable=unused-variable
+                for sig_index, signatory in enumerate(cert.get('signatories')):
                     if int(signatory_id) == int(signatory['id']):
                         _delete_asset(course.id, signatory['signature_image_path'])
                         del cert['signatories'][sig_index]
@@ -354,14 +354,19 @@ def certificates_list_handler(request, course_key_string):
                 handler_name='certificates.certificate_activation_handler',
                 course_key=course_key
             )
-            course_modes = [mode.slug for mode in CourseMode.modes_for_course(
-                course_id=course.id, include_expired=True
-            )]
-            certificate_web_view_url = get_lms_link_for_certificate_web_view(
-                user_id=request.user.id,
-                course_key=course_key,
-                mode=course_modes[0]  # CourseMode.modes_for_course returns default mode 'honor' if doesn't find anyone.
-            )
+            course_modes = [
+                mode.slug for mode in CourseMode.modes_for_course(
+                    course_id=course.id, include_expired=True
+                ) if mode.slug != 'audit'
+            ]
+            if len(course_modes) > 0:
+                certificate_web_view_url = get_lms_link_for_certificate_web_view(
+                    user_id=request.user.id,
+                    course_key=course_key,
+                    mode=course_modes[0]  # CourseMode.modes_for_course returns default mode if doesn't find anyone.
+                )
+            else:
+                certificate_web_view_url = None
             certificates = None
             is_active = False
             if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
@@ -376,7 +381,7 @@ def certificates_list_handler(request, course_key_string):
                 'certificate_url': certificate_url,
                 'course_outline_url': course_outline_url,
                 'upload_asset_url': upload_asset_url,
-                'certificates': json.dumps(certificates),
+                'certificates': certificates,
                 'course_modes': course_modes,
                 'certificate_web_view_url': certificate_web_view_url,
                 'is_active': is_active,

@@ -6,14 +6,13 @@ xModule implementation of a learning sequence
 
 import json
 import logging
+from pkg_resources import resource_string
 import warnings
 
 from lxml import etree
-
 from xblock.core import XBlock
 from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
-from pkg_resources import resource_string
 
 from .exceptions import NotFoundError
 from .fields import Date
@@ -28,7 +27,8 @@ log = logging.getLogger(__name__)
 # OBSOLETE: This obsoletes 'type'
 class_priority = ['video', 'problem']
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 
@@ -52,7 +52,7 @@ class SequenceFields(object):
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
         default=False,
-        scope=Scope.content,
+        scope=Scope.settings,
     )
 
 

@@ -2,8 +2,9 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from django.template.defaultfilters import escapejs
-import json
+from openedx.core.lib.js_utils import (
+    escape_json_dumps, escape_js_string
+)
 %>
 <!doctype html>
 <!--[if lte IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
@@ -41,7 +42,7 @@ import json
     <a class="nav-skip" href="#content">${_("Skip to main content")}</a>
 
     <script type="text/javascript">
-      window.baseUrl = ${json.dumps(settings.STATIC_URL)};
+      window.baseUrl = "${escape_js_string(settings.STATIC_URL) | n}";
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
@@ -79,14 +80,14 @@ import json
             % if context_course:
               require(['js/factories/course'], function(CourseFactory) {
                   CourseFactory({
-                      id: "${context_course.id | escapejs}",
+                      id: "${escape_js_string(context_course.id) | n}",
                       name: "${context_course.display_name_with_default | h}",
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
-                      display_course_number: "${_(context_course.display_coursenumber)}",
+                      display_course_number: "${_(context_course.display_number_with_default)}",
                       revision: "${context_course.location.revision | h}",
-                      self_paced: ${json.dumps(context_course.self_paced)}
+                      self_paced: ${escape_json_dumps(context_course.self_paced) | n}
                   });
               });
             % endif
@@ -97,6 +98,7 @@ import json
           });
       });
     </script>
+    <%include file="widgets/segment-io-footer.html" />
     <div class="modal-cover"></div>
   </body>
 </html>

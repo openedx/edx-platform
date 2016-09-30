@@ -173,8 +173,6 @@ def make_asset_md(amount):
         all_asset_md.append(generate_random_asset_md())
     return all_asset_md
 
-# pylint: disable=no-member
-
 
 def make_asset_xml(amount, xml_filename):
     """

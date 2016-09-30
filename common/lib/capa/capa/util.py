@@ -191,7 +191,7 @@ def get_inner_html_from_xpath(xpath_node):
 
     """
     # returns string from xpath node
-    html = etree.tostring(xpath_node).strip()  # pylint: disable=no-member
+    html = etree.tostring(xpath_node).strip()
     # strips outer tag from html string
     inner_html = re.sub('(?ms)<%s[^>]*>(.*)</%s>' % (xpath_node.tag, xpath_node.tag), '\\1', html)
     return inner_html.strip()

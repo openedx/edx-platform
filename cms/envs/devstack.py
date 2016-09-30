@@ -12,7 +12,7 @@ MEDIA_ROOT = "/edx/var/edxapp/uploads"
 
 DEBUG = True
 USE_I18N = True
-TEMPLATE_DEBUG = DEBUG
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['debug'] = DEBUG
 HTTPS = 'off'
 
 ################################ LOGGERS ######################################
@@ -37,7 +37,7 @@ FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 # Skip packaging and optimization in development
 PIPELINE_ENABLED = False
-STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
@@ -114,6 +114,9 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
+
+########################### OAUTH2 #################################
+OAUTH_OIDC_ISSUER = 'http://127.0.0.1:8000/oauth2'
 
 ###############################################################################
 # See if the developer has any local overrides.

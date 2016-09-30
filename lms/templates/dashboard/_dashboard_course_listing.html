@@ -7,8 +7,8 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from markupsafe import escape
-from courseware.courses import get_course_university_about_section
 from course_modes.models import CourseMode
+from course_modes.helpers import enrollment_mode_display
 from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
@@ -34,7 +34,13 @@ from student.helpers import (
 
 <li class="course-item">
   % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
-    <% course_verified_certs = CourseMode.enrollment_mode_display(enrollment.mode, verification_status.get('status')) %>
+    <%
+        course_verified_certs = enrollment_mode_display(
+            enrollment.mode,
+            verification_status.get('status'),
+            course_overview.id
+        )
+    %>
     <%
         mode_class = course_verified_certs.get('display_mode', '')
         if mode_class != '':
@@ -69,7 +75,7 @@ from student.helpers import (
           <img src="${course_overview.course_image_url}" class="course-image" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default) | h}" />
         </a>
       % endif
-      % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+      % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES') and course_verified_certs.get('display_mode') != 'audit':
         <span class="sts-enrollment" title="${course_verified_certs.get('enrollment_title')}">
           <span class="label">${_("Enrolled as: ")}</span>
           % if course_verified_certs.get('show_image'):
@@ -92,7 +98,7 @@ from student.helpers import (
           % endif
         </h3>
         <div class="course-info">
-          <span class="info-university">${get_course_university_about_section(course_overview)} - </span>
+          <span class="info-university">${course_overview.display_org_with_default | h} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default | h}</span>
           <span class="info-date-block" data-tooltip="Hi">
           % if course_overview.has_ended():
@@ -181,83 +187,70 @@ from student.helpers import (
                   % if can_unenroll:
                     <li class="actions-item" id="actions-item-unenroll-${dashboard_index}">
                     % if is_paid_course and show_refund_option:
-                      ## Translators: The course name will be added to the end of this sentence.
                       % if not is_course_blocked:
-                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course_overview-number="${course_overview.number | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from the purchased course %(course_name)s ($(course_number)s)?")}', '${_("You will be refunded the amount you paid.")}')">
+                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
+                         data-track-info="${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("You will be refunded the amount you paid.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % else:
                       <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?")}', '${_("You will be refunded the amount you paid.")}')">
+                         data-track-info="${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("You will be refunded the amount you paid.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % endif
                     % elif is_paid_course and not show_refund_option:
-                      ## Translators: The course's name will be added to the end of this sentence.
                       % if not is_course_blocked:
                       <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?")}', '${_("You will not be refunded the amount you paid.")}')">
+                         data-track-info="${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("You will not be refunded the amount you paid.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % else:
                       <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?")}', '${_("You will not be refunded the amount you paid.")}')">
+                         data-track-info="${_("Are you sure you want to unenroll from the purchased course %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("You will not be refunded the amount you paid.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % endif
                     % elif enrollment.mode != "verified":
-                      ## Translators: The course's name will be added to the end of this sentence.
                       % if not is_course_blocked:
                       <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?")}', '')">
+                         data-track-info="${_("Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?") | h}">
                         ${_('Unenroll')}
                       </a>
                       % else:
                       <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message('${_("Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?")}', '')">
+                         data-track-info="${_("Are you sure you want to unenroll from %(course_name)s (%(course_number)s)?") | h}">
                         ${_('Unenroll')}
                       </a>
                       % endif
                     % elif show_refund_option:
-                      ## Translators: The course's name will be added to the end of this sentence.
                       % if not is_course_blocked:
-                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
-                                      '${_("You will be refunded the amount you paid.")}'
-                                  )"
-                      >
+                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}" data-cert-name-long="${cert_name_long | h}"
+                         data-track-info="${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("You will be refunded the amount you paid.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % else:
-                      <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
-                                      '${_("You will be refunded the amount you paid.")}'
-                                  )"
-                      >
+                      <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}" data-cert-name-long="${cert_name_long | h}"
+                         data-track-info="${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("You will be refunded the amount you paid.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % endif
                     % else:
-                      ## Translators: The course's name will be added to the end of this sentence.
                       % if not is_course_blocked:
-                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
-                                      '${_("The refund deadline for this course has passed, so you will not receive a refund.")}'
-                                  )"
-                      >
+                      <a href="#unenroll-modal" class="action action-unenroll" rel="leanModal" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}" data-cert-name-long="${cert_name_long | h}"
+                         data-track-info="${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("The refund deadline for this course has passed, so you will not receive a refund.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % else:
-                      <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}"
-                         onclick="set_unenroll_message(
-                                      '${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?")}',
-                                      '${_("The refund deadline for this course has passed, so you will not receive a refund.")}'
-                                  )"
-                      >
+                      <a class="action action-unenroll is-disabled" data-course-id="${course_overview.id | h}" data-course-number="${course_overview.number | h}" data-course-name="${course_overview.display_name_with_default | h}" data-dashboard-index="${dashboard_index}" data-cert-name-long="${cert_name_long | h}"
+                         data-track-info="${_("Are you sure you want to unenroll from the verified %(cert_name_long)s track of %(course_name)s (%(course_number)s)?") | h}"
+                         data-refund-info="${_("The refund deadline for this course has passed, so you will not receive a refund.") | h}">
                         ${_('Unenroll')}
                       </a>
                       % endif
@@ -403,13 +396,4 @@ from student.helpers import (
                    });
                }
            });
-
-           function set_unenroll_message(track_info, refund_info) {
-               document.getElementById('track-info').innerHTML = interpolate(track_info, {
-                  course_number: "<span id='unenroll_course_number'></span>",
-                  course_name: "<span id='unenroll_course_name'></span>",
-                  cert_name_long: "${cert_name_long | h}"
-               }, true);
-               document.getElementById('refund-info').innerHTML = refund_info;
-           }
 </script>

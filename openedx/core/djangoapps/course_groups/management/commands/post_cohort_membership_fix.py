@@ -15,8 +15,21 @@ class Command(BaseCommand):
     help = '''
     Repairs any potential inconsistencies made in the window between running migrations 0005 and 0006, and deploying
     the code changes to enforce use of CohortMembership that go with said migrations.
-    |commit|: optional argument. If not provided, will dry-run and list number of operations that would be made.
+
+    commit: optional argument. If not provided, will dry-run and list number of operations that would be made.
     '''
+
+    def add_arguments(self, parser):
+        """
+        Add arguments to the command parser.
+        """
+        parser.add_argument(
+            '--commit',
+            action='store_true',
+            dest='commit',
+            default=False,
+            help='Really commit the changes, otherwise, just dry run',
+        )
 
     def handle(self, *args, **options):
         """
@@ -24,10 +37,7 @@ class Command(BaseCommand):
         with the database already migrated to post-CohortMembership state, we will use the pre-CohortMembership
         table CourseUserGroup as the canonical source of truth. This way, changes made in the window are persisted.
         """
-        commit = False
-        if len(args) == 1:
-            commit = args[0] == 'commit'
-
+        commit = options['commit']
         memberships_to_delete = 0
         memberships_to_add = 0
 

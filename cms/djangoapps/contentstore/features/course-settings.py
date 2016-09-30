@@ -6,7 +6,7 @@ from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror, upload_file
 from django.conf import settings
 
-from nose.tools import assert_true, assert_false  # pylint: disable=no-name-in-module
+from nose.tools import assert_true, assert_false
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 

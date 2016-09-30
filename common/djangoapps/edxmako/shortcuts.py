@@ -57,6 +57,30 @@ def marketing_link(name):
         return '#'
 
 
+def is_any_marketing_link_set(names):
+    """
+    Returns a boolean if any given named marketing links are configured.
+    """
+
+    return any(is_marketing_link_set(name) for name in names)
+
+
+def is_marketing_link_set(name):
+    """
+    Returns a boolean if a given named marketing link is configured.
+    """
+
+    enable_mktg_site = microsite.get_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    )
+
+    if enable_mktg_site:
+        return name in settings.MKTG_URLS
+    else:
+        return name in settings.MKTG_URL_LINK_MAP
+
+
 def marketing_link_context_processor(request):
     """
     A django context processor to give templates access to marketing URLs
@@ -123,6 +147,8 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance['settings'] = settings
     context_instance['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
     context_instance['marketing_link'] = marketing_link
+    context_instance['is_any_marketing_link_set'] = is_any_marketing_link_set
+    context_instance['is_marketing_link_set'] = is_marketing_link_set
 
     # In various testing contexts, there might not be a current request context.
     request_context = get_template_request_context()

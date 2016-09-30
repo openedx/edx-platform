@@ -145,12 +145,12 @@ class TestVideo(BaseTestXmodule):
     def test_handle_ajax(self):
 
         data = [
-            {'speed': 2.0},
-            {'saved_video_position': "00:00:10"},
-            {'transcript_language': 'uk'},
-            {'bumper_do_not_show_again': True},
-            {'bumper_last_view_date': True},
-            {'demoo�': 'sample'}
+            {u'speed': 2.0},
+            {u'saved_video_position': "00:00:10"},
+            {u'transcript_language': 'uk'},
+            {u'bumper_do_not_show_again': True},
+            {u'bumper_last_view_date': True},
+            {u'demoo�': 'sample'}
         ]
         for sample in data:
             response = self.clients[self.users[0].username].post(

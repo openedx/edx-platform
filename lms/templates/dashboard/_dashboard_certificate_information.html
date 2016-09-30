@@ -27,15 +27,18 @@ else:
     status_css_class = 'course-status-processing'
 %>
 <div class="message message-status ${status_css_class} is-shown">
-
 % if cert_status['status'] == 'processing':
   <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
-% elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
+% elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted', 'auditing'):
   <p class="message-copy">${_("Your final grade:")}
   <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-    % if cert_status['status'] == 'notpassing' and enrollment.mode != 'audit':
-       ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)} <span class="grade-value">
-         ${"{0:.0f}%".format(float(course_overview.lowest_passing_grade)*100)}</span>.
+    % if cert_status['status'] == 'notpassing':
+      % if enrollment.mode != 'audit':
+        ${_("Grade required for a {cert_name_short}:").format(cert_name_short=cert_name_short)} <span class="grade-value">
+      % else:
+        ${_("Grade required to pass this course:")} <span class="grade-value">
+      % endif
+      ${"{0:.0f}%".format(float(course_overview.lowest_passing_grade)*100)}</span>.
     % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
     <p class="message-copy">
       ${_("Your verified {cert_name_long} is being held pending confirmation that the issuance of your {cert_name_short} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your {cert_name_long}, please contact our billing address {billing_email}").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), billing_email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(email=settings.PAYMENT_SUPPORT_EMAIL), cert_name_short=cert_name_short, cert_name_long=cert_name_long)}

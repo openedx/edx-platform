@@ -13,15 +13,16 @@ from pavelib.utils.process import run_background_process
 try:
     from pygments.console import colorize
 except ImportError:
-    colorize = lambda color, text: text  # pylint: disable=invalid-name
+    colorize = lambda color, text: text
 
 __test__ = False  # do not collect
 
 
-def start_servers(default_store):
+def start_servers(default_store, coveragerc=None):
     """
     Start the servers we will run tests on, returns PIDs for servers.
     """
+    coveragerc = coveragerc or Env.BOK_CHOY_COVERAGERC
 
     def start_server(cmd, logfile, cwd=None):
         """
@@ -38,7 +39,7 @@ def start_servers(default_store):
             "manage {service} --settings bok_choy runserver "
             "{address} --traceback --noreload".format(
                 default_store=default_store,
-                coveragerc=Env.BOK_CHOY_COVERAGERC,
+                coveragerc=coveragerc,
                 service=service,
                 address=address,
             )

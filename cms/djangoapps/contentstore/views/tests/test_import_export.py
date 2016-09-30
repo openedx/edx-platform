@@ -26,12 +26,102 @@ from contentstore.tests.utils import CourseTestCase
 from openedx.core.lib.extract_tar import safetar_extractall
 from student import auth
 from student.roles import CourseInstructorRole, CourseStaffRole
+from util.milestones_helpers import seed_milestone_relationship_types
+from models.settings.course_metadata import CourseMetadata
+from util import milestones_helpers
+from xmodule.modulestore.django import modulestore
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 log = logging.getLogger(__name__)
+
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+class ImportEntranceExamTestCase(CourseTestCase):
+    """
+    Unit tests for importing a course with entrance exam
+    """
+    def setUp(self):
+        super(ImportEntranceExamTestCase, self).setUp()
+        self.url = reverse_course_url('import_handler', self.course.id)
+        self.content_dir = path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.content_dir)
+
+        # Create tar test file -----------------------------------------------
+        # OK course with entrance exam section:
+        seed_milestone_relationship_types()
+        entrance_exam_dir = tempfile.mkdtemp(dir=self.content_dir)
+        # test course being deeper down than top of tar file
+        embedded_exam_dir = os.path.join(entrance_exam_dir, "grandparent", "parent")
+        os.makedirs(os.path.join(embedded_exam_dir, "course"))
+        os.makedirs(os.path.join(embedded_exam_dir, "chapter"))
+        with open(os.path.join(embedded_exam_dir, "course.xml"), "w+") as f:
+            f.write('<course url_name="2013_Spring" org="EDx" course="0.00x"/>')
+
+        with open(os.path.join(embedded_exam_dir, "course", "2013_Spring.xml"), "w+") as f:
+            f.write(
+                '<course '
+                'entrance_exam_enabled="true" entrance_exam_id="xyz" entrance_exam_minimum_score_pct="0.7">'
+                '<chapter url_name="2015_chapter_entrance_exam"/></course>'
+            )
+
+        with open(os.path.join(embedded_exam_dir, "chapter", "2015_chapter_entrance_exam.xml"), "w+") as f:
+            f.write('<chapter display_name="Entrance Exam" in_entrance_exam="true" is_entrance_exam="true"></chapter>')
+
+        self.entrance_exam_tar = os.path.join(self.content_dir, "entrance_exam.tar.gz")
+        with tarfile.open(self.entrance_exam_tar, "w:gz") as gtar:
+            gtar.add(entrance_exam_dir)
+
+    def test_import_existing_entrance_exam_course(self):
+        """
+        Check that course is imported successfully as an entrance exam.
+        """
+        course = self.store.get_course(self.course.id)
+        self.assertIsNotNone(course)
+        self.assertEquals(course.entrance_exam_enabled, False)
+
+        with open(self.entrance_exam_tar) as gtar:
+            args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
+            resp = self.client.post(self.url, args)
+        self.assertEquals(resp.status_code, 200)
+        course = self.store.get_course(self.course.id)
+        self.assertIsNotNone(course)
+        self.assertEquals(course.entrance_exam_enabled, True)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, 0.7)
+
+    def test_import_delete_pre_exiting_entrance_exam(self):
+        """
+        Check that pre existed entrance exam content should be overwrite with the imported course.
+        """
+        exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
+        resp = self.client.post(exam_url, {'entrance_exam_minimum_score_pct': 0.5}, http_accept='application/json')
+        self.assertEqual(resp.status_code, 201)
+
+        # Reload the test course now that the exam module has been added
+        self.course = modulestore().get_course(self.course.id)
+        metadata = CourseMetadata.fetch_all(self.course)
+        self.assertTrue(metadata['entrance_exam_enabled'])
+        self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
+        self.assertEqual(metadata['entrance_exam_minimum_score_pct']['value'], 0.5)
+        self.assertTrue(len(milestones_helpers.get_course_milestones(unicode(self.course.id))))
+        content_milestones = milestones_helpers.get_course_content_milestones(
+            unicode(self.course.id),
+            metadata['entrance_exam_id']['value'],
+            milestones_helpers.get_milestone_relationship_types()['FULFILLS']
+        )
+        self.assertTrue(len(content_milestones))
+
+        # Now import entrance exam course
+        with open(self.entrance_exam_tar) as gtar:
+            args = {"name": self.entrance_exam_tar, "course-data": [gtar]}
+            resp = self.client.post(self.url, args)
+        self.assertEquals(resp.status_code, 200)
+        course = self.store.get_course(self.course.id)
+        self.assertIsNotNone(course)
+        self.assertEquals(course.entrance_exam_enabled, True)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, 0.7)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)

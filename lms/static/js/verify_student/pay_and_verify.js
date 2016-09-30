@@ -66,7 +66,8 @@ var edx = edx || {};
                 verificationDeadline: el.data('verification-deadline'),
                 courseModeSlug: el.data('course-mode-slug'),
                 alreadyVerified: el.data('already-verified'),
-                verificationGoodUntil: el.data('verification-good-until')
+                verificationGoodUntil: el.data('verification-good-until'),
+                isABTesting:  el.data('is-ab-testing')
             },
             'payment-confirmation-step': {
                 courseKey: el.data('course-key'),

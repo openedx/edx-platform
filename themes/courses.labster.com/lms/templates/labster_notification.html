@@ -1,0 +1,44 @@
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+% if settings.FEATURES.get('SHOW_LABSTER_NOTIFICATION'):
+<div id="labster-notification" class="wrapper-msg urgency-low warning">
+  <div class="msg">
+    <i class="msg-icon fa fa-warning"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("New Labster.com!")}</h3>
+      <div class="copy">
+        <p>
+          ${_('In order to optimize user experience, we have upgraded the platform.')}<br>
+          ${_('You can find the previous version of the platform {old_labster_link}.').format(
+            old_labster_link='<a href="http://temp.labster.com">{link_text}</a>'.format(link_text=_('here'))
+          )}<br>
+          ${_('If you have any questions, write us on {email_link}.').format(email_link='support@labster.com')}
+        </p>
+      </div>
+      <ul class="nav-actions">
+        <li class="action action-dismiss">
+          <a href="#" class="button dismiss-button">
+            <i class="icon fa fa-times-circle"></i>
+            <span class="button-copy">${_("Dismiss")}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+<%block name="js_extra">
+<script>
+  $(function() {
+    if (!$.cookie('labster_notification_popup')) {
+      $('#labster-notification').show();
+      $('#labster-notification .dismiss-button').on('click', function() {
+        $.cookie('labster_notification_popup', true);
+        $('#labster-notification').hide();
+      });
+    }
+  });
+</script>
+</%block>
+% endif

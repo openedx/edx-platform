@@ -9,10 +9,10 @@ For processing xml always prefer this over using lxml.etree directly.
 
 from lxml.etree import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from lxml.etree import XMLParser as _XMLParser
-from lxml.etree import _Element, _ElementTree  # pylint: disable=unused-import, no-name-in-module
+from lxml.etree import _Element, _ElementTree  # pylint: disable=unused-import
 
 # This should be imported after lxml.etree so that it overrides the following attributes.
-from defusedxml.lxml import parse, fromstring, XML  # pylint: disable=unused-import
+from defusedxml.lxml import parse, fromstring, XML
 
 
 class XMLParser(_XMLParser):  # pylint: disable=function-redefined

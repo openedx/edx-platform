@@ -58,7 +58,7 @@ class mock_ecommerce_api_endpoint(object):  # pylint: disable=invalid-name
             adding_headers={'Content-Type': 'application/json'},
         )
 
-    def __exit__(self, exc_type, exc_val, exc_tb):  # pylint: disable=unused-argument
+    def __exit__(self, exc_type, exc_val, exc_tb):
         assert self.expect_called == (httpretty.last_request().headers != {})
         httpretty.disable()
 

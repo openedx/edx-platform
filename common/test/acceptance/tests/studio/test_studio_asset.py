@@ -1,9 +1,6 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
-
-from flaky import flaky
-
 from ...pages.studio.asset_index import AssetIndexPage
 
 from .base_studio_test import StudioCourseTest
@@ -37,7 +34,6 @@ class AssetIndexTest(StudioCourseTest):
         """
         self.asset_page.visit()
 
-    @flaky  # TODO fix this, see SOL-1160
     def test_type_filter_exists(self):
         """
         Make sure type filter is on the page.

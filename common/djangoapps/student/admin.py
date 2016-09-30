@@ -19,6 +19,7 @@ class CourseAccessRoleForm(forms.ModelForm):
 
     class Meta(object):
         model = CourseAccessRole
+        fields = '__all__'
 
     email = forms.EmailField(required=True)
     COURSE_ACCESS_ROLES = [(role_name, role_name) for role_name in REGISTERED_ACCESS_ROLES.keys()]
@@ -136,13 +137,11 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
     """ Admin interface for the CourseEnrollment model. """
     list_display = ('id', 'course_id', 'mode', 'user', 'is_active',)
     list_filter = ('mode', 'is_active',)
+    raw_id_fields = ('user',)
     search_fields = ('course_id', 'mode', 'user__username',)
 
-    def get_readonly_fields(self, request, obj=None):
-        # The course_id, mode, and user fields should not be editable for an existing enrollment.
-        if obj:
-            return self.readonly_fields + ('course_id', 'mode', 'user',)
-        return self.readonly_fields
+    def queryset(self, request):
+        return super(CourseEnrollmentAdmin, self).queryset(request).select_related('user')
 
     class Meta(object):
         model = CourseEnrollment
@@ -151,6 +150,7 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
 class UserProfileAdmin(admin.ModelAdmin):
     """ Admin interface for UserProfile model. """
     list_display = ('user', 'name',)
+    raw_id_fields = ('user',)
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'user__email', 'name',)
 
     def get_readonly_fields(self, request, obj=None):

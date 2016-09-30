@@ -10,6 +10,7 @@ class ProblemPage(PageObject):
     """
 
     url = None
+    CSS_PROBLEM_HEADER = '.problem-header'
 
     def is_browser_on_page(self):
         return self.q(css='.xblock-student_view').present
@@ -70,17 +71,27 @@ class ProblemPage(PageObject):
             description="MathJax rendered in hint"
         )
 
-    def fill_answer(self, text):
+    def fill_answer(self, text, input_num=None):
         """
         Fill in the answer to the problem.
+
+        args:
+            text: String to fill the input with.
+
+        kwargs:
+            input_num: If provided, fills only the input_numth field. Else, all
+                input fields will be filled.
         """
-        self.q(css='div.problem div.capa_inputtype.textline input').fill(text)
+        fields = self.q(css='div.problem div.capa_inputtype.textline input')
+        fields = fields.nth(input_num) if input_num is not None else fields
+        fields.fill(text)
 
     def fill_answer_numerical(self, text):
         """
         Fill in the answer to a numerical problem.
         """
         self.q(css='div.problem section.inputtype input').fill(text)
+        self.wait_for_ajax()
 
     def click_check(self):
         """
@@ -88,6 +99,12 @@ class ProblemPage(PageObject):
         """
         self.q(css='div.problem button.check').click()
         self.wait_for_ajax()
+
+    def wait_for_status_icon(self):
+        """
+        wait for status icon
+        """
+        self.wait_for_element_visibility('div.problem section.inputtype div .status', 'wait for status icon')
 
     def click_hint(self):
         """

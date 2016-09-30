@@ -164,7 +164,7 @@ class ProfileImageView(DeveloperErrorViewMixin, APIView):
         # send client response.
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def delete(self, request, username):  # pylint: disable=unused-argument
+    def delete(self, request, username):
         """
         DELETE /api/user/v1/accounts/{username}/image
         """

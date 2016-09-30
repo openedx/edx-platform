@@ -1,0 +1,24 @@
+<%inherit file="../main.html"/>
+<%!
+import json
+
+from openedx.core.lib.js_utils import escape_json_dumps
+%>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="js_extra">
+<%static:require_module module_name="js/financial-assistance/financial_assistance_form_factory" class_name="FinancialAssistanceFactory">
+FinancialAssistanceFactory({
+    fields: ${escape_json_dumps(fields)},
+    user_details: ${escape_json_dumps(user_details)},
+    header_text: ${escape_json_dumps(header_text)},
+    student_faq_url: ${json.dumps(student_faq_url)},
+    dashboard_url: ${json.dumps(dashboard_url)},
+    account_settings_url: ${json.dumps(account_settings_url)},
+    platform_name: ${escape_json_dumps(platform_name)},
+    submit_url: ${json.dumps(submit_url)}
+});
+</%static:require_module>
+</%block>
+
+<div class="financial-assistance-wrapper"></div>

@@ -11,9 +11,9 @@ from django.utils.timezone import utc
 from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 
-from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from courseware.field_overrides import OverrideFieldData
 from lms.djangoapps.ccx.tests.test_overrides import inject_field_overrides
-from student.tests.factories import UserFactory  # pylint: disable=import-error
+from student.tests.factories import UserFactory
 from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -242,7 +242,7 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
 
     def test_set_due_date_extension_num_queries(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(5):
             tools.set_due_date_extension(self.course, self.week1, self.user, extended)
             self._clear_field_data_cache()
 

@@ -775,8 +775,8 @@ class SpecialExamsPageAttemptsSection(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present and\
-            self.q(css="#search_attempt_id").present
+        return (self.q(css="div.wrap #ui-accordion-proctoring-accordion-header-1[aria-selected=true]").present and
+                self.q(css="#search_attempt_id").present)
 
     @property
     def is_search_text_field_visible(self):
@@ -996,6 +996,23 @@ class CertificatesPage(PageObject):
     url = None
     PAGE_SELECTOR = 'section#certificates'
 
+    def wait_for_certificate_exceptions_section(self):
+        """
+        Wait for Certificate Exceptions to be rendered on page
+        """
+        self.wait_for_element_visibility(
+            'div.certificate-exception-container',
+            'Certificate Exception Section is visible'
+        )
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+
+    def refresh(self):
+        """
+        Refresh Certificates Page and wait for the page to load completely.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
+
     def is_browser_on_page(self):
         return self.q(css='a[data-section=certificates].active-section').present
 
@@ -1005,12 +1022,61 @@ class CertificatesPage(PageObject):
         """
         return self.q(css=' '.join([self.PAGE_SELECTOR, css_selector]))
 
+    def add_certificate_exception(self, student, free_text_note):
+        """
+        Add Certificate Exception for 'student'.
+        """
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+
+        self.get_selector('#certificate-exception').fill(student)
+        self.get_selector('#notes').fill(free_text_note)
+        self.get_selector('#add-exception').click()
+
+        self.wait_for_ajax()
+        self.wait_for(
+            lambda: student in self.get_selector('div.white-listed-students table tr:last-child td').text,
+            description='Certificate Exception added to list'
+        )
+
+    def remove_first_certificate_exception(self):
+        """
+        Remove Certificate Exception from the white list.
+        """
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+        self.get_selector('div.white-listed-students table tr td .delete-exception').first.click()
+        self.wait_for_ajax()
+
+    def click_generate_certificate_exceptions_button(self):  # pylint: disable=invalid-name
+        """
+        Click 'Generate Exception Certificates' button in 'Certificates Exceptions' section
+        """
+        self.get_selector('#generate-exception-certificates').click()
+
+    def fill_user_name_field(self, student):
+        """
+        Fill username/email field with given text
+        """
+        self.get_selector('#certificate-exception').fill(student)
+
+    def click_add_exception_button(self):
+        """
+        Click 'Add Exception' button in 'Certificates Exceptions' section
+        """
+        self.get_selector('#add-exception').click()
+
     @property
     def generate_certificates_button(self):
         """
         Returns the "Generate Certificates" button.
         """
         return self.get_selector('#btn-start-generating-certificates')
+
+    @property
+    def generate_certificates_disabled_button(self):  # pylint: disable=invalid-name
+        """
+        Returns the disabled state of button
+        """
+        return self.get_selector('#disabled-btn-start-generating-certificates')
 
     @property
     def certificate_generation_status(self):
@@ -1025,3 +1091,24 @@ class CertificatesPage(PageObject):
         Returns the "Pending Instructor Tasks" section.
         """
         return self.get_selector('div.running-tasks-container')
+
+    @property
+    def certificate_exceptions_section(self):
+        """
+        Returns the "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.certificate-exception-container')
+
+    @property
+    def last_certificate_exception(self):
+        """
+        Returns the Last Certificate Exception in Certificate Exceptions list in "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.white-listed-students table tr:last-child td')
+
+    @property
+    def message(self):
+        """
+        Returns the Message (error/success) in "Certificate Exceptions" section.
+        """
+        return self.get_selector('div.message')

@@ -4,11 +4,9 @@ Tests for celery tasks defined in tasks module
 
 from mock_django import mock_signal_receiver
 
-from ccx.tests.factories import (  # pylint: disable=import-error
-    CcxFactory,
-)
-from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
-from student.tests.factories import (  # pylint: disable=import-error
+from lms.djangoapps.ccx.tests.factories import CcxFactory
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import (
     AdminFactory,
 )
 from xmodule.modulestore.django import SignalHandler
@@ -21,7 +19,7 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 
 from ccx_keys.locator import CCXLocator
 
-from ..tasks import send_ccx_course_published
+from lms.djangoapps.ccx.tasks import send_ccx_course_published
 
 
 class TestSendCCXCoursePublished(ModuleStoreTestCase):

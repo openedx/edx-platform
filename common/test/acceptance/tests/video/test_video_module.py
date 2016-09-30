@@ -3,6 +3,9 @@
 """
 Acceptance tests for Video.
 """
+import os
+
+from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf, skip
 from ..helpers import UniqueCourseTest, is_youtube_available, YouTubeStubConfig
@@ -30,7 +33,6 @@ HTML5_SOURCES_INCORRECT = [
 ]
 
 
-@attr('shard_4')
 @skipIf(is_youtube_available() is False, 'YouTube is not available!')
 class VideoBaseTest(UniqueCourseTest):
     """
@@ -192,6 +194,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.video.wait_for_video_player_render()
 
 
+@attr('shard_4')
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
 
@@ -251,7 +254,7 @@ class YouTubeVideoTest(VideoBaseTest):
         Then the "CC" button is hidden
         """
         self.navigate_to_video()
-        self.assertFalse(self.video.is_button_shown('CC'))
+        self.assertFalse(self.video.is_button_shown('transcript_button'))
 
     def test_fullscreen_video_alignment_with_transcript_hidden(self):
         """
@@ -348,8 +351,8 @@ class YouTubeVideoTest(VideoBaseTest):
         # check if video aligned correctly with enabled transcript
         self.assertTrue(self.video.is_aligned(True))
 
-        # click video button "CC"
-        self.video.click_player_button('CC')
+        # click video button "transcript"
+        self.video.click_player_button('transcript_button')
 
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
@@ -456,7 +459,7 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.assertTrue(self.video.is_video_rendered('html5'))
         # check if caption button is visible
-        self.assertTrue(self.video.is_button_shown('CC'))
+        self.assertTrue(self.video.is_button_shown('transcript_button'))
         self._verify_caption_text('Welcome to edX.')
 
     def test_download_transcript_button_works_correctly(self):
@@ -588,7 +591,6 @@ class YouTubeVideoTest(VideoBaseTest):
         self.go_to_sequential_position(1)
         execute_video_steps(tab1_video_names)
 
-    @flaky  # TODO: fix this, ticket TNL-3725
     def test_video_component_stores_speed_correctly_for_multiple_videos(self):
         """
         Scenario: Video component stores speed correctly when each video is in separate sequential
@@ -614,13 +616,15 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "0.75"
-        self.assertEqual(self.video.speed, '0.75x')
+        # Since the playback speed was set to .5 in "B", this video will also be impacted
+        # because a playback speed has never explicitly been set for it. However, this video
+        # does not have a .5 playback option, so the closest possible (.75) should be selected.
+        self.video.verify_speed_changed('0.75x')
 
         # open video "A"
         self.course_nav.go_to_sequential('A')
 
-        # check if video "A" should start playing at speed "2.0"
+        # Video "A" should still play at speed 2.0 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '2.0x')
 
         # reload the page
@@ -638,14 +642,15 @@ class YouTubeVideoTest(VideoBaseTest):
         # open video "B"
         self.course_nav.go_to_sequential('B')
 
-        # check if video "B" should start playing at speed "0.50"
+        # Video "B" should still play at speed .5 because it was explicitly set to that.
         self.assertEqual(self.video.speed, '0.50x')
 
         # open video "C"
         self.course_nav.go_to_sequential('C')
 
-        # check if video "C" should start playing at speed "1.0"
-        self.assertEqual(self.video.speed, '1.0x')
+        # The change of speed for Video "A" should  impact Video "C" because it still has
+        # not been explicitly set to a speed.
+        self.video.verify_speed_changed('1.0x')
 
     def test_video_has_correct_transcript(self):
         """
@@ -847,6 +852,7 @@ class YouTubeVideoTest(VideoBaseTest):
         execute_video_steps(tab1_video_names)
 
 
+@attr('shard_4')
 class YouTubeHtml5VideoTest(VideoBaseTest):
     """ Test YouTube HTML5 Video Player """
 
@@ -868,6 +874,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
 
+@attr('shard_4')
 class Html5VideoTest(VideoBaseTest):
     """ Test HTML5 Video Player """
 
@@ -1053,6 +1060,7 @@ class Html5VideoTest(VideoBaseTest):
         self.assertTrue(all([source in HTML5_SOURCES for source in self.video.sources]))
 
 
+@attr('shard_4')
 class YouTubeQualityTest(VideoBaseTest):
     """ Test YouTube Video Quality Button """
 
@@ -1097,3 +1105,36 @@ class YouTubeQualityTest(VideoBaseTest):
         self.video.click_player_button('quality')
 
         self.assertTrue(self.video.is_quality_button_active)
+
+
+@attr('a11y')
+class LMSVideoModuleA11yTest(VideoBaseTest):
+    """
+    LMS Video Accessibility Test Class
+    """
+
+    def setUp(self):
+        browser = os.environ.get('SELENIUM_BROWSER', 'firefox')
+
+        # the a11y tests run in CI under phantomjs which doesn't
+        # support html5 video or flash player, so the video tests
+        # don't work in it. We still want to be able to run these
+        # tests in CI, so override the browser setting if it is
+        # phantomjs.
+        if browser == 'phantomjs':
+            browser = 'firefox'
+
+        with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
+            super(LMSVideoModuleA11yTest, self).setUp()
+
+    def test_video_player_a11y(self):
+        self.navigate_to_video()
+
+        # Limit the scope of the audit to the video player only.
+        self.video.a11y_audit.config.set_scope(include=["div.video"])
+        self.video.a11y_audit.config.set_rules({
+            "ignore": [
+                'link-href',  # TODO: AC-223
+            ],
+        })
+        self.video.a11y_audit.check_for_accessibility_errors()

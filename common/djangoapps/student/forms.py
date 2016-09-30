@@ -2,10 +2,11 @@
 Utility functions for validating forms
 """
 from django import forms
+from django.forms import widgets
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.hashers import UNUSABLE_PASSWORD
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.tokens import default_token_generator
 
 from django.utils.http import int_to_base36
@@ -22,6 +23,13 @@ from util.password_policy_validators import (
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
+    error_messages = {
+        'unknown': _("That e-mail address doesn't have an associated "
+                     "user account. Are you sure you've registered?"),
+        'unusable': _("The user account associated with this e-mail "
+                      "address cannot reset the password."),
+    }
+
     def clean_email(self):
         """
         This is a literal copy from Django 1.4.5's django.contrib.auth.forms.PasswordResetForm
@@ -33,7 +41,7 @@ class PasswordResetFormNoActive(PasswordResetForm):
         self.users_cache = User.objects.filter(email__iexact=email)
         if not len(self.users_cache):
             raise forms.ValidationError(self.error_messages['unknown'])
-        if any((user.password == UNUSABLE_PASSWORD)
+        if any((user.password.startswith(UNUSABLE_PASSWORD_PREFIX))
                for user in self.users_cache):
             raise forms.ValidationError(self.error_messages['unusable'])
         return email
@@ -79,16 +87,20 @@ class PasswordResetFormNoActive(PasswordResetForm):
             send_mail(subject, email, from_email, [user.email])
 
 
+class TrueCheckbox(widgets.CheckboxInput):
+    """
+    A checkbox widget that only accepts "true" (case-insensitive) as true.
+    """
+    def value_from_datadict(self, data, files, name):
+        value = data.get(name, '')
+        return value.lower() == 'true'
+
+
 class TrueField(forms.BooleanField):
     """
     A boolean field that only accepts "true" (case-insensitive) as true
     """
-    def to_python(self, value):
-        # CheckboxInput converts string to bool by case-insensitive match to "true" or "false"
-        if value is True:
-            return value
-        else:
-            return None
+    widget = TrueCheckbox
 
 
 _USERNAME_TOO_SHORT_MSG = _("Username must be minimum of two characters long")

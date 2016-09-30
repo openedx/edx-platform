@@ -377,7 +377,6 @@ def _payment_accepted(order_id, auth_amount, currency, decision):
                 )
             )
 
-            #pylint: disable=attribute-defined-outside-init
             ex.order = order
             raise ex
     else:

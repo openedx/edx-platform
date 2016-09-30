@@ -1,6 +1,6 @@
 <%!
 from django.utils.translation import ugettext as _
-from verify_student.views import PayAndVerifyView
+from lms.djangoapps.verify_student.views import PayAndVerifyView
 %>
 <%namespace name='static' file='../static_content.html'/>
 
@@ -22,7 +22,7 @@ from verify_student.views import PayAndVerifyView
   ${_(u"The verification deadline for {course_name} was {date}. Verification is no longer available.").format(
       course_name=course.display_name, date=deadline)}
   % elif deadline_name == PayAndVerifyView.UPGRADE_DEADLINE:
-  ${_(u"The deadline to upgrade to a verified certificate for this course has passed. You can still earn an honor code certificate.")}
+  ${_(u"The deadline to upgrade to a verified certificate for this course has passed.")}
   % endif
   </p>
 </section>

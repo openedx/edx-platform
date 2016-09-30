@@ -1,0 +1,12 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">${_("Checkout Error")}</%block>
+
+
+<section class="container">
+    <h1>${_("Checkout Error")}</h1>
+    ${ _(u"An error has occurred with your payment. <b>You have not been charged.</b> Please try to submit your payment again. If this problem persists, contact {email}.").format(
+    email="<a href=\"mailto:{email}\">{email}</a>".format(email=payment_support_email)) }
+</section>

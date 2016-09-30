@@ -18,10 +18,12 @@ from uuid import uuid4
 
 from lxml import etree
 from mock import ANY, Mock, patch
+import ddt
 
 from django.conf import settings
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -232,6 +234,7 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
         self.assertEqual(create_youtube_string(self.descriptor), expected)
 
 
+@ddt.ddt
 class VideoDescriptorImportTestCase(unittest.TestCase):
     """
     Make sure that VideoDescriptor can import an old XML-based video correctly.
@@ -306,6 +309,54 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
             'handout': 'http://www.example.com/handout',
+            'download_track': False,
+            'download_video': False,
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': '',
+            'transcripts': {'uk': 'ukrainian_translation.srt', 'de': 'german_translation.srt'},
+        })
+
+    @ddt.data(
+        ('course-v1:test_org+test_course+test_run',
+         '/asset-v1:test_org+test_course+test_run+type@asset+block@test.png'),
+        ('test_org/test_course/test_run', '/c4x/test_org/test_course/asset/test.png')
+    )
+    @ddt.unpack
+    def test_from_xml_when_handout_is_course_asset(self, course_id_string, expected_handout_link):
+        """
+        Test that if handout link is course_asset then it will contain targeted course_id in handout link.
+        """
+        module_system = DummySystem(load_error_modules=True)
+        course_id = CourseKey.from_string(course_id_string)
+        xml_data = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   start_time="00:00:01"
+                   download_video="false"
+                   end_time="00:01:00">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <handout src="/asset-v1:test_org_1+test_course_1+test_run_1+type@asset+block@test.png"/>
+              <transcript language="uk" src="ukrainian_translation.srt" />
+              <transcript language="de" src="german_translation.srt" />
+            </video>
+        '''
+        id_generator = Mock()
+        id_generator.target_course_id = course_id
+
+        output = VideoDescriptor.from_xml(xml_data, module_system, id_generator)
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': 'izygArpw-Qo',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': 'rABDYkeK0x8',
+            'show_captions': False,
+            'start_time': datetime.timedelta(seconds=1),
+            'end_time': datetime.timedelta(seconds=60),
+            'track': 'http://www.example.com/track',
+            'handout': expected_handout_link,
             'download_track': False,
             'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
@@ -603,7 +654,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         """
         def mock_val_export(edx_video_id):
             """Mock edxval.api.export_to_xml"""
-            return etree.Element(  # pylint:disable=no-member
+            return etree.Element(
                 'video_asset',
                 attrib={'export_edx_video_id': edx_video_id}
             )

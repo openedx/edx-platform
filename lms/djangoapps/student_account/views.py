@@ -116,6 +116,7 @@ def login_and_registration_form(request, initial_mode="login"):
         'responsive': True,
         'allow_iframing': True,
         'disable_courseware_js': True,
+        'disable_footer': True,
     }
 
     return render_to_response('student_account/login_and_register.html', context)
@@ -349,6 +350,7 @@ def finish_auth(request):  # pylint: disable=unused-argument
     """
     return render_to_response('student_account/finish_auth.html', {
         'disable_courseware_js': True,
+        'disable_footer': True,
     })
 
 

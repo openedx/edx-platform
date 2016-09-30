@@ -47,7 +47,7 @@ class LoginSessionView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, request):
         """Return a description of the login form.
 
         This decouples clients from the API definition:
@@ -73,9 +73,9 @@ class LoginSessionView(APIView):
 
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
-        email_instructions = _(
-            u"The email address you used to register with {platform_name}"
-        ).format(platform_name=settings.PLATFORM_NAME)
+        email_instructions = _("The email address you used to register with {platform_name}").format(
+            platform_name=settings.PLATFORM_NAME
+        )
 
         form_desc.add_field(
             "email",
@@ -267,15 +267,17 @@ class RegistrationView(APIView):
         conflicts = check_account_exists(email=email, username=username)
         if conflicts:
             conflict_messages = {
-                # Translators: This message is shown to users who attempt to create a new
-                # account using an email address associated with an existing account.
                 "email": _(
-                    u"It looks like {email_address} belongs to an existing account. Try again with a different email address."  # pylint: disable=line-too-long
+                    # Translators: This message is shown to users who attempt to create a new
+                    # account using an email address associated with an existing account.
+                    u"It looks like {email_address} belongs to an existing account. "
+                    u"Try again with a different email address."
                 ).format(email_address=email),
-                # Translators: This message is shown to users who attempt to create a new
-                # account using a username associated with an existing account.
                 "username": _(
-                    u"It looks like {username} belongs to an existing account. Try again with a different username."
+                    # Translators: This message is shown to users who attempt to create a new
+                    # account using a username associated with an existing account.
+                    u"It looks like {username} belongs to an existing account. "
+                    u"Try again with a different username."
                 ).format(username=username),
             }
             errors = {
@@ -360,7 +362,7 @@ class RegistrationView(APIView):
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"Needed for any certificates you may earn")
+        name_instructions = _(u"Your legal name, used for any certificates you earn.")
 
         form_desc.add_field(
             "name",
@@ -387,11 +389,11 @@ class RegistrationView(APIView):
         # meant to hold the user's public username.
         username_label = _(u"Public username")
 
-        # Translators: These instructions appear on the registration form, immediately
-        # below a field meant to hold the user's public username.
         username_instructions = _(
+            # Translators: These instructions appear on the registration form, immediately
+            # below a field meant to hold the user's public username.
             u"The name that will identify you in your courses - "
-            "{bold_start}(cannot be changed later){bold_end}"
+            u"{bold_start}(cannot be changed later){bold_end}"
         ).format(bold_start=u'<strong>', bold_end=u'</strong>')
 
         # Translators: This example username is used as a placeholder in
@@ -542,9 +544,9 @@ class RegistrationView(APIView):
         """
         # Translators: This phrase appears above a field on the registration form
         # meant to hold the user's reasons for registering with edX.
-        goals_label = _(
-            u"Tell us why you're interested in {platform_name}"
-        ).format(platform_name=settings.PLATFORM_NAME)
+        goals_label = _(u"Tell us why you're interested in {platform_name}").format(
+            platform_name=settings.PLATFORM_NAME
+        )
 
         form_desc.add_field(
             "goals",
@@ -627,18 +629,14 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(
-            u"I agree to the {platform_name} {terms_of_service}."
-        ).format(
+        label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
             platform_name=settings.PLATFORM_NAME,
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _(
-            u"You must agree to the {platform_name} {terms_of_service}."
-        ).format(
+        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
             platform_name=settings.PLATFORM_NAME,
             terms_of_service=terms_link
         )
@@ -674,18 +672,14 @@ class RegistrationView(APIView):
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        label = _(
-            u"I agree to the {platform_name} {terms_of_service}."
-        ).format(
+        label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
             platform_name=settings.PLATFORM_NAME,
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
-        error_msg = _(
-            u"You must agree to the {platform_name} {terms_of_service}."
-        ).format(
+        error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
             platform_name=settings.PLATFORM_NAME,
             terms_of_service=terms_link
         )
@@ -758,7 +752,7 @@ class PasswordResetView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
-    def get(self, request):  # pylint: disable=unused-argument
+    def get(self, request):
         """Return a description of the password reset form.
 
         This decouples clients from the API definition:
@@ -784,9 +778,9 @@ class PasswordResetView(APIView):
 
         # Translators: These instructions appear on the password reset form,
         # immediately below a field meant to hold the user's email address.
-        email_instructions = _(
-            u"The email address you used to register with {platform_name}"
-        ).format(platform_name=settings.PLATFORM_NAME)
+        email_instructions = _(u"The email address you used to register with {platform_name}").format(
+            platform_name=settings.PLATFORM_NAME
+        )
 
         form_desc.add_field(
             "email",

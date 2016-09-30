@@ -1,0 +1,123 @@
+## mako
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from microsite_configuration import microsite
+from microsite_configuration.templatetags.microsite import platform_name
+%>
+
+<div class="wrapper wrapper-footer">
+  <footer>
+    <!-- This is super-ugly, don't use it! -->
+    <div class="colophon">
+      <nav class="nav-colophon" aria-label="${_('About')}">
+      <ol>
+        % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+          <%
+            footer_links = (
+              ('TOS', _("Terms of Service")),
+              ('PRIVACY', _("Privacy Policy")),
+              ('TESTIMONIALS', _("Testimonial")),
+              ('SUPPORT', _("Contact")),
+              ('FAQ', _("FAQ")),
+              ('PRICING', _("Pricing")),
+              ('CAREERS', _("Careers")),
+              ('ABOUT', _("About")),
+              ('BLOG', _("Blog"))
+            )
+          %>
+          % for item_num, link in enumerate(footer_links, start=1):
+            %if marketing_link(link[0]) and marketing_link(link[0]) != '#':
+              <li class="nav-colophon-0${item_num}">
+                <a href="${marketing_link(link[0])}">${link[1]}</a>
+              </li>
+            %endif
+          % endfor
+        % else:
+          <%
+            footer_links = (
+              ("terms-and-conditions/", "Terms of Service"),
+              ("terms-and-conditions/#privacy", "Privacy Policy"),
+              ("testimonials/", "Testimonial"),
+              ("support/", "Support"),
+              ("faqs/", "FAQ"),
+              ("pricing/", "Pricing"),
+              ("career/", "Careers"),
+              ("about", "Contact"),
+              ("blog", "Blog"),
+            )
+          %>
+          % for item_num, link in enumerate(footer_links, start=1):
+            <li class="nav-colophon-0${item_num}">
+              <a href="https://labster.com/${link[0]}">${link[1]}</a>
+            </li>
+          % endfor
+        % endif
+      </ol>
+      </nav>
+<%doc>
+      <div class="wrapper-logo">
+        <p>
+          <a href="/">
+            ## this is just a placeholder logo
+            ## feel free to change this logo to your own by replacing "logo.png" with your own logo
+            <img alt="organization logo placeholder" src="${static.url("images/logo.png")}">
+          </a>
+        </p>
+      </div>
+      <p class="copyright">&copy; ${settings.COPYRIGHT_YEAR} ${settings.PLATFORM_NAME}.</p>
+
+      ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+      <p class="copyright">
+        ## Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+        ${_("EdX, Open edX, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+            link_start=u"<a href='https://www.edx.org/'>",
+            link_end=u"</a>"
+        )}
+      </p>
+      <nav class="nav-legal" aria-label="${_('Legal')}">
+        <ul>
+        % if marketing_link('HONOR') and marketing_link('HONOR') != '#':
+          <li class="nav-legal-01">
+            <%
+              tos_link = u"<a href='{}'>".format(marketing_link('TOS'))
+              honor_link = u"<a href='{}'>".format(marketing_link('HONOR'))
+            %>
+            ${
+              _("{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor Code{honor_link_end}").format(
+                tos_link_start=tos_link,
+                tos_link_end="</a>",
+                honor_link_start=honor_link,
+                honor_link_end="</a>",
+              )
+            }
+          </li>
+        % else:
+          <li class="nav-legal-01">
+            <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+          </li>
+        % endif
+          <li class="nav-legal-02">
+            <a href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+          </li>
+        </ul>
+      </nav>
+</%doc>
+    </div>
+    ## please leave this link and use one of the logos provided
+    <div class="footer-about-openedx">
+      <p>
+        <a href="http://openedx.org/">
+          ## standard powered-by logo
+          ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.
+          ## <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png" alt="${_('Powered by Open edX')}" width="140" />
+          ## greyscale logo for dark background
+          <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag-light.png" alt="${_('Powered by Open edX')}" width="140" />
+          ## greyscale logo for light background
+          ## <img src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag-dark.png" alt="${_('Powered by Open edX')}" width="140" />
+        </a>
+      </p>
+    </div>
+  </footer>
+</div>

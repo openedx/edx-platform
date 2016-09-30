@@ -20,7 +20,8 @@ class RateLimitConfiguration(ConfigurationModel):
     When enabled, it will disable rate limiting on any view decorated
     with the `can_disable_rate_limit` class decorator.
     """
-    pass
+    class Meta(ConfigurationModel.Meta):
+        app_label = "util"
 
 
 def decompress_string(value):
@@ -61,13 +62,3 @@ class CompressedTextField(models.TextField):
             value = decompress_string(value)
 
         return value
-
-    def south_field_triple(self):
-        """Returns a suitable description of this field for South."""
-        # We'll just introspect the _actual_ field.
-        from south.modelsinspector import introspector
-
-        field_class = "django.db.models.fields.TextField"
-        args, kwargs = introspector(self)
-        # That's our definition!
-        return field_class, args, kwargs

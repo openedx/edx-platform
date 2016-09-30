@@ -22,7 +22,3 @@ with the appropriate course key. The use cases for this app include things like
 a user enrollment dashboard, a course metadata API, or a course marketing
 page.
 """
-
-# importing signals is necessary to activate signal handler, which invalidates
-# the CourseOverview cache every time a course is published
-import openedx.core.djangoapps.content.course_overviews.signals  # pylint: disable=unused-import

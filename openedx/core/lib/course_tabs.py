@@ -3,8 +3,6 @@ Tabs for courseware.
 """
 from openedx.core.lib.api.plugins import PluginManager
 
-_ = lambda text: text
-
 
 # Stevedore extension point namespaces
 COURSE_TAB_NAMESPACE = 'openedx.course_tab'

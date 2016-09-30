@@ -23,6 +23,7 @@ class OrganizationsHelpersTestCase(ModuleStoreTestCase):
 
         self.organization = {
             'name': 'Test Organization',
+            'short_name': 'Orgx',
             'description': 'Testing Organization Helpers Library',
         }
 
@@ -48,4 +49,26 @@ class OrganizationsHelpersTestCase(ModuleStoreTestCase):
 
     def test_add_organization_course_returns_none_when_app_disabled(self):
         response = organizations_helpers.add_organization_course(self.organization, self.course.id)
+        self.assertIsNone(response)
+
+    def test_get_organization_by_short_name_when_app_disabled(self):
+        """
+        Tests get_organization_by_short_name api when app is disabled.
+        """
+        response = organizations_helpers.get_organization_by_short_name(self.organization['short_name'])
+        self.assertIsNone(response)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ORGANIZATIONS_APP': True})
+    def test_get_organization_by_short_name_when_app_enabled(self):
+        """
+        Tests get_organization_by_short_name api when app is enabled.
+        """
+        response = organizations_helpers.add_organization(organization_data=self.organization)
+        self.assertIsNotNone(response['id'])
+
+        response = organizations_helpers.get_organization_by_short_name(self.organization['short_name'])
+        self.assertIsNotNone(response['id'])
+
+        # fetch non existing org
+        response = organizations_helpers.get_organization_by_short_name('non_existing')
         self.assertIsNone(response)

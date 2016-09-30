@@ -14,7 +14,7 @@ from opaque_keys import InvalidKeyError
 
 from util.date_utils import get_time_display
 from xmodule.modulestore.django import modulestore
-from course_modes.models import CourseMode
+from course_modes.models import CourseMode, CourseModeExpirationConfig
 
 # Technically, we shouldn't be doing this, since verify_student is defined
 # in LMS, and course_modes is defined in common.
@@ -26,19 +26,22 @@ from course_modes.models import CourseMode
 # The admin page will work in both LMS and Studio,
 # but the test suite for Studio will fail because
 # the verification deadline table won't exist.
-from verify_student import models as verification_models  # pylint: disable=import-error
+from lms.djangoapps.verify_student import models as verification_models
 
 
 class CourseModeForm(forms.ModelForm):
 
     class Meta(object):
         model = CourseMode
+        fields = '__all__'
 
     COURSE_MODE_SLUG_CHOICES = (
         [(CourseMode.DEFAULT_MODE_SLUG, CourseMode.DEFAULT_MODE_SLUG)] +
         [(mode_slug, mode_slug) for mode_slug in CourseMode.VERIFIED_MODES] +
         [(CourseMode.NO_ID_PROFESSIONAL_MODE, CourseMode.NO_ID_PROFESSIONAL_MODE)] +
-        [(mode_slug, mode_slug) for mode_slug in CourseMode.CREDIT_MODES]
+        [(mode_slug, mode_slug) for mode_slug in CourseMode.CREDIT_MODES] +
+        # need to keep legacy modes around for awhile
+        [(CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)]
     )
 
     mode_slug = forms.ChoiceField(choices=COURSE_MODE_SLUG_CHOICES, label=_("Mode"))
@@ -63,12 +66,13 @@ class CourseModeForm(forms.ModelForm):
 
         default_tz = timezone(settings.TIME_ZONE)
 
-        if self.instance.expiration_datetime:
+        if self.instance._expiration_datetime:  # pylint: disable=protected-access
             # django admin is using default timezone. To avoid time conversion from db to form
             # convert the UTC object to naive and then localize with default timezone.
-            expiration_datetime = self.instance.expiration_datetime.replace(tzinfo=None)
-            self.initial["expiration_datetime"] = default_tz.localize(expiration_datetime)
-
+            _expiration_datetime = self.instance._expiration_datetime.replace(  # pylint: disable=protected-access
+                tzinfo=None
+            )
+            self.initial["_expiration_datetime"] = default_tz.localize(_expiration_datetime)
         # Load the verification deadline
         # Since this is stored on a model in verify student, we need to load it from there.
         # We need to munge the timezone a bit to get Django admin to display it without converting
@@ -96,14 +100,14 @@ class CourseModeForm(forms.ModelForm):
 
         return course_key
 
-    def clean_expiration_datetime(self):
+    def clean__expiration_datetime(self):
         """
         Ensure that the expiration datetime we save uses the UTC timezone.
         """
         # django admin saving the date with default timezone to avoid time conversion from form to db
         # changes its tzinfo to UTC
-        if self.cleaned_data.get("expiration_datetime"):
-            return self.cleaned_data.get("expiration_datetime").replace(tzinfo=UTC)
+        if self.cleaned_data.get("_expiration_datetime"):
+            return self.cleaned_data.get("_expiration_datetime").replace(tzinfo=UTC)
 
     def clean_verification_deadline(self):
         """
@@ -119,7 +123,7 @@ class CourseModeForm(forms.ModelForm):
         """
         cleaned_data = super(CourseModeForm, self).clean()
         mode_slug = cleaned_data.get("mode_slug")
-        upgrade_deadline = cleaned_data.get("expiration_datetime")
+        upgrade_deadline = cleaned_data.get("_expiration_datetime")
         verification_deadline = cleaned_data.get("verification_deadline")
 
         # Allow upgrade deadlines ONLY for the "verified" mode
@@ -178,7 +182,7 @@ class CourseModeAdmin(admin.ModelAdmin):
         'mode_display_name',
         'min_price',
         'currency',
-        'expiration_datetime',
+        '_expiration_datetime',
         'verification_deadline',
         'sku'
     )
@@ -203,4 +207,12 @@ class CourseModeAdmin(admin.ModelAdmin):
     # in the Django admin list view.
     expiration_datetime_custom.short_description = "Upgrade Deadline"
 
+
+class CourseModeExpirationConfigAdmin(admin.ModelAdmin):
+    """Admin interface for the course mode auto expiration configuration. """
+
+    class Meta(object):
+        model = CourseModeExpirationConfig
+
 admin.site.register(CourseMode, CourseModeAdmin)
+admin.site.register(CourseModeExpirationConfig, CourseModeExpirationConfigAdmin)

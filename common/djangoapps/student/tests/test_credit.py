@@ -116,9 +116,8 @@ class CreditCourseDashboardTest(ModuleStoreTestCase):
         self._make_eligible()
         self._purchase_credit()
 
-        # Expect that the user's status is "pending"
         response = self._load_dashboard()
-        self.assertContains(response, "credit-request-pending-msg")
+        self.assertContains(response, "credit-request-not-started-msg")
 
     def test_purchased_credit_and_request_pending(self):
         # Simulate that the user has purchased credit and initiated a request,

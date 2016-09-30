@@ -106,6 +106,7 @@ fixture_paths:
     - templates/components/header
     - templates/components/tabbed
     - templates/components/card
+    - templates/financial-assistance/
     - js/fixtures/edxnotes
     - js/fixtures/search
     - templates/search

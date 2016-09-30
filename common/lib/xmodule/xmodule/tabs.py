@@ -1,18 +1,17 @@
 """
 Implement CourseTab
 """
-
 from abc import ABCMeta
 import logging
 
 from xblock.fields import List
 from openedx.core.lib.api.plugins import PluginError
 
-# We should only scrape strings for i18n in this file, since the target language is known only when
-# they are rendered in the template.  So ugettext gets called in the template.
-_ = lambda text: text
-
 log = logging.getLogger("edx.courseware")
+
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
 
 
 class CourseTab(object):
@@ -74,7 +73,7 @@ class CourseTab(object):
         self.is_hidden = tab_dict.get('is_hidden', False)
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         """Returns true if this course tab is enabled in the course.
 
         Args:
@@ -250,7 +249,7 @@ class StaticTab(CourseTab):
         super(StaticTab, self).__init__(tab_dict)
 
     @classmethod
-    def is_enabled(cls, course, user=None):  # pylint: disable=unused-argument
+    def is_enabled(cls, course, user=None):
         """
         Static tabs are viewable to everyone, even anonymous users.
         """

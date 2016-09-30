@@ -64,7 +64,7 @@ class TestGenerateCourseOverview(ModuleStoreTestCase):
         self.command.handle('not/found', all=False)
         self.assertTrue(mock_log.fatal.called)
 
-    @patch('openedx.core.djangoapps.content.course_overviews.management.commands.generate_course_overview.log')
+    @patch('openedx.core.djangoapps.content.course_overviews.models.log')
     def test_not_found_key(self, mock_log):
         """
         Test keys not found are logged.

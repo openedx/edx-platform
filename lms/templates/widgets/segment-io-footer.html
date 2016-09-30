@@ -1,0 +1,14 @@
+% if settings.LMS_SEGMENT_KEY:
+    <!-- begin segment footer -->
+    <script type="text/javascript">
+    % if user.is_authenticated():
+        $(window).load(function() {
+            analytics.identify("${user.id}", {
+              email: "${user.email}",
+              username: "${user.username}"
+            });
+        });
+    % endif
+    </script>
+    <!-- end segment footer -->
+% endif

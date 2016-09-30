@@ -88,7 +88,6 @@ def _filter_entrance_exam_grader(graders):
     return graders
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("DELETE", "GET", "PUT", "POST", "PATCH"))
 @login_required
 @expect_json
@@ -196,7 +195,6 @@ def xblock_handler(request, usage_key_string):
         )
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("GET"))
 @login_required
 @expect_json
@@ -259,7 +257,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
                         'page_size': int(request.REQUEST.get('page_size', 0)),
                     }
             except ValueError:
-                # pylint: disable=too-many-format-args
                 return HttpResponse(
                     content="Couldn't parse paging parameters: enable_paging: "
                             "{0}, page_number: {1}, page_size: {2}".format(
@@ -301,7 +298,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         hashed_resources = OrderedDict()
         for resource in fragment.resources:
-            hashed_resources[hash_resource(resource)] = resource
+            hashed_resources[hash_resource(resource)] = resource._asdict()
 
         return JsonResponse({
             'html': fragment.content,
@@ -312,7 +309,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
         return HttpResponse(status=406)
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("GET"))
 @login_required
 @expect_json
@@ -663,7 +659,6 @@ def _delete_item(usage_key, user):
         store.delete_item(usage_key, user.id)
 
 
-# pylint: disable=unused-argument
 @login_required
 @require_http_methods(("GET", "DELETE"))
 def orphan_handler(request, course_key_string):
@@ -698,12 +693,13 @@ def _delete_orphans(course_usage_key, user_id, commit=False):
     items = store.get_orphans(course_usage_key)
     branch = course_usage_key.branch
     if commit:
-        for itemloc in items:
-            revision = ModuleStoreEnum.RevisionOption.all
-            # specify branches when deleting orphans
-            if branch == ModuleStoreEnum.BranchName.published:
-                revision = ModuleStoreEnum.RevisionOption.published_only
-            store.delete_item(itemloc, user_id, revision=revision)
+        with store.bulk_operations(course_usage_key):
+            for itemloc in items:
+                revision = ModuleStoreEnum.RevisionOption.all
+                # specify branches when deleting orphans
+                if branch == ModuleStoreEnum.BranchName.published:
+                    revision = ModuleStoreEnum.RevisionOption.published_only
+                store.delete_item(itemloc, user_id, revision=revision)
     return [unicode(item) for item in items]
 
 
@@ -853,7 +849,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "due_date": get_default_time_display(xblock.due),
         "due": xblock.fields['due'].to_json(xblock.due),
         "format": xblock.format,
-        "course_graders": json.dumps([grader.get('type') for grader in graders]),
+        "course_graders": [grader.get('type') for grader in graders],
         "has_changes": has_changes,
         "actions": xblock_actions,
         "explanatory_message": explanatory_message,

@@ -25,6 +25,15 @@ class CreditServiceTests(ModuleStoreTestCase):
         self.credit_course = CreditCourse.objects.create(course_key=self.course.id, enabled=True)
         self.profile = UserProfile.objects.create(user_id=self.user.id, name='Foo Bar')
 
+    def enroll(self, course_id=None):
+        """
+        Enroll the test user in the given course's honor mode, or the test
+        course if not provided.
+        """
+        if course_id is None:
+            course_id = self.course.id
+        return CourseEnrollment.enroll(self.user, course_id, mode='honor')
+
     def test_user_not_found(self):
         """
         Makes sure that get_credit_state returns None if user_id cannot be found
@@ -46,7 +55,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         inactive
         """
 
-        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        enrollment = self.enroll()
         enrollment.is_active = False
         enrollment.save()
 
@@ -58,7 +67,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         Credit eligible
         """
 
-        CourseEnrollment.enroll(self.user, self.course.id)
+        self.enroll()
 
         self.credit_course.enabled = False
         self.credit_course.save()
@@ -86,7 +95,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertTrue(self.service.is_credit_course(self.course.id))
 
-        CourseEnrollment.enroll(self.user, self.course.id)
+        self.enroll()
 
         # set course requirements
         set_credit_requirements(
@@ -127,7 +136,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         """
         self.assertTrue(self.service.is_credit_course(self.course.id))
 
-        CourseEnrollment.enroll(self.user, self.course.id)
+        self.enroll()
 
         # set course requirements
         set_credit_requirements(
@@ -216,7 +225,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertFalse(self.service.is_credit_course(no_credit_course.id))
 
-        CourseEnrollment.enroll(self.user, no_credit_course.id)
+        self.enroll(no_credit_course.id)
 
         # this should be a no-op
         self.service.remove_credit_requirement_status(
@@ -237,7 +246,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         Make sure we can get back the optional course name
         """
 
-        CourseEnrollment.enroll(self.user, self.course.id)
+        self.enroll()
 
         # make sure it is not returned by default
         credit_state = self.service.get_credit_state(self.user.id, self.course.id)
@@ -258,7 +267,7 @@ class CreditServiceTests(ModuleStoreTestCase):
 
         self.assertFalse(self.service.is_credit_course(no_credit_course.id))
 
-        CourseEnrollment.enroll(self.user, no_credit_course.id)
+        self.enroll(no_credit_course.id)
 
         # this should be a no-op
         self.service.set_credit_requirement_status(
@@ -308,7 +317,7 @@ class CreditServiceTests(ModuleStoreTestCase):
         Make sure we can pass a course_id (string) and get back correct results as well
         """
 
-        CourseEnrollment.enroll(self.user, self.course.id)
+        self.enroll()
 
         # set course requirements
         set_credit_requirements(

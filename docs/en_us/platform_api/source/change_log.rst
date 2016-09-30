@@ -15,7 +15,7 @@ Change Log
    * - 10 June 2015
      - Added the section :ref:`Profile Images API Version 1.0`.
    * - 11 May 2015
-     - Updated the :ref:`User API <edX Platform User API Version 1.0>` to
+     - Updated the :ref:`User API <edX Platform User API>` to
        Version 1.0.
    * -
      - Added the :ref:`User Preferences API`.
@@ -26,7 +26,6 @@ Change Log
        ``enrollment_start`` and ``enrollment_end fields``.
    * - 2 April 2015
      - Added the :ref:`EdX Platform Course Structure API Version 0`, :ref:`edX
-       Platform Enrollment API Version 1.0` and edX Platform User API
-       Version 0 sections.
+       Platform Enrollment API` and edX Platform User API Version 0 sections.
    * - 29 January 2015
      - Added the :ref:`Get or Change User Status in a Course` section.

@@ -5,10 +5,10 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  import json
   import urllib
   from django.utils.translation import ugettext as _
   from contentstore import utils
+  from openedx.core.lib.js_utils import escape_json_dumps
 %>
 
 <%block name="header_extras">
@@ -31,7 +31,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
 <%block name="requirejs">
     require(["js/factories/settings"], function(SettingsFactory) {
-        SettingsFactory("${details_url}", ${json.dumps(show_min_grade_warning)});
+        SettingsFactory("${details_url}", ${escape_json_dumps(show_min_grade_warning) | n});
     });
 </%block>
 
@@ -425,9 +425,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
               <ol class="list-input">
                 <li class="field">
-                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-instructor-led" value="false"/>
-                  <label class="course-pace-label" for="course-pace-instructor-led">Instructor-Led</label>
-                  <span class="tip">${_("Instructor-led courses progress at the pace that the course author sets. You can configure release dates for course content and due dates for assignments.")}</span>
+                  <input type="radio" class="field-radio" name="self-paced" id="course-pace-instructor-paced" value="false"/>
+                  <label class="course-pace-label" for="course-pace-instructor-paced">Instructor-Paced</label>
+                  <span class="tip">${_("Instructor-paced courses progress at the pace that the course author sets. You can configure release dates for course content and due dates for assignments.")}</span>
                 </li>
                 <li class="field">
                   <input type="radio" class="field-radio" name="self-paced" id="course-pace-self-paced" value="true"/>

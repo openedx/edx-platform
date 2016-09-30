@@ -11,6 +11,7 @@ from certificates.models import (
     BadgeImageConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
+    GeneratedCertificate,
 )
 
 
@@ -29,6 +30,7 @@ class CertificateTemplateForm(forms.ModelForm):
 
     class Meta(object):
         model = CertificateTemplate
+        fields = '__all__'
 
 
 class CertificateTemplateAdmin(admin.ModelAdmin):
@@ -46,8 +48,18 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
     list_display = ('description', '__unicode__')
 
 
+class GeneratedCertificateAdmin(admin.ModelAdmin):
+    """
+    Django admin customizations for GeneratedCertificate model
+    """
+    raw_id_fields = ('user',)
+    search_fields = ('course_id', 'user__username')
+    list_display = ('id', 'course_id', 'mode', 'user')
+
+
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
 admin.site.register(BadgeImageConfiguration)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)
+admin.site.register(GeneratedCertificate, GeneratedCertificateAdmin)

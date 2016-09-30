@@ -10,11 +10,18 @@ from certificates import views
 urlpatterns = patterns(
     '',
 
-    # Certificates HTML view
+    # Certificates HTML view end point to render web certs by user and course
     url(
         r'^user/(?P<user_id>[^/]*)/course/{course_id}'.format(course_id=settings.COURSE_ID_PATTERN),
         views.render_html_view,
         name='html_view'
+    ),
+
+    # Certificates HTML view end point to render web certs by certificate_uuid
+    url(
+        r'^(?P<certificate_uuid>[0-9a-f]{32})$',
+        views.render_cert_by_uuid,
+        name='render_cert_by_uuid'
     ),
 
     # End-points used by student support

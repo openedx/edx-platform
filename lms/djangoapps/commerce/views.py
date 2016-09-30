@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from edxmako.shortcuts import render_to_response
 from microsite_configuration import microsite
-from verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
 from django.utils.translation import ugettext as _
 
@@ -20,6 +20,13 @@ def checkout_cancel(_request):
     """ Checkout/payment cancellation view. """
     context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
     return render_to_response("commerce/checkout_cancel.html", context)
+
+
+@csrf_exempt
+def checkout_error(_request):
+    """ Checkout/payment error view. """
+    context = {'payment_support_email': microsite.get_value('payment_support_email', settings.PAYMENT_SUPPORT_EMAIL)}
+    return render_to_response("commerce/checkout_error.html", context)
 
 
 @csrf_exempt

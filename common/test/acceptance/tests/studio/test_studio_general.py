@@ -7,7 +7,6 @@ from bok_choy.web_app_test import WebAppTest
 
 from ...pages.studio.asset_index import AssetIndexPage
 from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.checklists import ChecklistsPage
 from ...pages.studio.course_info import CourseUpdatesPage
 from ...pages.studio.edit_tabs import PagesPage
 from ...pages.studio.import_export import ExportCoursePage, ImportCoursePage
@@ -81,7 +80,7 @@ class CoursePagesTest(StudioCourseTest):
         self.pages = [
             clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
             for clz in [
-                AssetIndexPage, ChecklistsPage, CourseUpdatesPage,
+                AssetIndexPage, CourseUpdatesPage,
                 PagesPage, ExportCoursePage, ImportCoursePage, CourseTeamPage, CourseOutlinePage, SettingsPage,
                 AdvancedSettingsPage, GradingPage, TextbooksPage
             ]

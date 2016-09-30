@@ -708,7 +708,6 @@ class PDFTextBooksTabTest(UniqueCourseTest):
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-    @skip('TODO: fix this, see TNL-2083')
     def test_verify_textbook_tabs(self):
         """
         Test multiple pdf textbooks loads correctly in lms.
@@ -718,77 +717,6 @@ class PDFTextBooksTabTest(UniqueCourseTest):
         # Verify each PDF textbook tab by visiting, it will fail if correct tab is not loaded.
         for i in range(1, 3):
             self.tab_nav.go_to_tab("PDF Book {}".format(i))
-
-
-@attr('shard_1')
-class VideoTest(UniqueCourseTest):
-    """
-    Navigate to a video in the courseware and play it.
-    """
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(VideoTest, self).setUp()
-
-        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
-        self.course_nav = CourseNavPage(self.browser)
-        self.tab_nav = TabNavPage(self.browser)
-        self.video = VideoPage(self.browser)
-
-        # Install a course fixture with a video component
-        course_fix = CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        )
-
-        course_fix.add_children(
-            XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('vertical', 'Test Unit').add_children(
-                        XBlockFixtureDesc('video', 'Video')
-                    )))).install()
-
-        # Auto-auth register for the course
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
-
-    @skip("BLD-563: Video Player Stuck on Pause")
-    def test_video_player(self):
-        """
-        Play a video in the courseware.
-        """
-
-        # Navigate to a video
-        self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
-
-        # The video should start off paused
-        # Since the video hasn't loaded yet, it's elapsed time is 0
-        self.assertFalse(self.video.is_playing)
-        self.assertEqual(self.video.elapsed_time, 0)
-
-        # Play the video
-        self.video.play()
-
-        # Now we should be playing
-        self.assertTrue(self.video.is_playing)
-
-        # Commented the below EmptyPromise, will move to its page once this test is working and stable
-        # Also there is should be no Promise check in any test as this should be done in Page Object
-        # Wait for the video to load the duration
-        # EmptyPromise(
-        #     lambda: self.video.duration > 0,
-        #     'video has duration', timeout=20
-        # ).fulfill()
-
-        # Pause the video
-        self.video.pause()
-
-        # Expect that the elapsed time and duration are reasonable
-        # Again, we can't expect the video to actually play because of
-        # latency through the ssh tunnel
-        self.assertGreaterEqual(self.video.elapsed_time, 0)
-        self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
 
 
 @attr('shard_1')

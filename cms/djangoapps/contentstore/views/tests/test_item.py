@@ -1388,28 +1388,28 @@ class TestComponentTemplates(CourseTestCase):
         Test the handling of advanced problem templates.
         """
         problem_templates = self.get_templates_of_type('problem')
-        ora_template = self.get_template(problem_templates, u'Peer Assessment')
-        self.assertIsNotNone(ora_template)
-        self.assertEqual(ora_template.get('category'), 'openassessment')
-        self.assertIsNone(ora_template.get('boilerplate_name', None))
+        circuit_template = self.get_template(problem_templates, u'Circuit Schematic Builder')
+        self.assertIsNotNone(circuit_template)
+        self.assertEqual(circuit_template.get('category'), 'problem')
+        self.assertEqual(circuit_template.get('boilerplate_name'), 'circuitschematic.yaml')
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
-    def test_ora1_no_advance_component_button(self):
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    def test_deprecated_no_advance_component_button(self):
         """
-        Test that there will be no `Advanced` button on unit page if `combinedopenended` and `peergrading` are
-        deprecated provided that there are only 'combinedopenended', 'peergrading' modules in `Advanced Module List`
+        Test that there will be no `Advanced` button on unit page if units are
+        deprecated provided that they are the only modules in `Advanced Module List`
         """
-        self.course.advanced_modules.extend(['combinedopenended', 'peergrading'])
+        self.course.advanced_modules.extend(['poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertNotIn('Advanced', button_names)
 
-    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["combinedopenended", "peergrading"])
-    def test_cannot_create_ora1_problems(self):
+    @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', ["poll", "survey"])
+    def test_cannot_create_deprecated_problems(self):
         """
-        Test that we can't create ORA1 problems if `combinedopenended` and `peergrading` are deprecated
+        Test that we can't create problems if they are deprecated
         """
-        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
@@ -1418,17 +1418,17 @@ class TestComponentTemplates(CourseTestCase):
         self.assertEqual(template_display_names, ['Annotation'])
 
     @patch('django.conf.settings.DEPRECATED_ADVANCED_COMPONENT_TYPES', [])
-    def test_create_ora1_problems(self):
+    def test_create_non_deprecated_problems(self):
         """
-        Test that we can create ORA1 problems if `combinedopenended` and `peergrading` are not deprecated
+        Test that we can create problems if they are not deprecated
         """
-        self.course.advanced_modules.extend(['annotatable', 'combinedopenended', 'peergrading'])
+        self.course.advanced_modules.extend(['annotatable', 'poll', 'survey'])
         templates = get_component_templates(self.course)
         button_names = [template['display_name'] for template in templates]
         self.assertIn('Advanced', button_names)
         self.assertEqual(len(templates[0]['templates']), 3)
         template_display_names = [template['display_name'] for template in templates[0]['templates']]
-        self.assertEqual(template_display_names, ['Annotation', 'Open Response Assessment', 'Peer Grading Interface'])
+        self.assertEqual(template_display_names, ['Annotation', 'Poll', 'Survey'])
 
 
 @ddt.ddt
@@ -1459,7 +1459,7 @@ class TestXBlockInfo(ItemTest):
         self.validate_course_xblock_info(json_response, course_outline=True)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.split, 5, 5),
+        (ModuleStoreEnum.Type.split, 4, 4),
         (ModuleStoreEnum.Type.mongo, 5, 7),
     )
     @ddt.unpack
@@ -1642,7 +1642,7 @@ class TestXBlockInfo(ItemTest):
         self.assertEqual(xblock_info['display_name'], 'Week 1')
         self.assertTrue(xblock_info['published'])
         self.assertIsNone(xblock_info.get('edited_by', None))
-        self.assertEqual(xblock_info['course_graders'], '["Homework", "Lab", "Midterm Exam", "Final Exam"]')
+        self.assertEqual(xblock_info['course_graders'], ['Homework', 'Lab', 'Midterm Exam', 'Final Exam'])
         self.assertEqual(xblock_info['start'], '2030-01-01T00:00:00Z')
         self.assertEqual(xblock_info['graded'], False)
         self.assertEqual(xblock_info['due'], None)

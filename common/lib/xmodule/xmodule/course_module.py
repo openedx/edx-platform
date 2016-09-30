@@ -3,12 +3,10 @@ Django module container for classes and operations related to the "Course Module
 """
 import logging
 from cStringIO import StringIO
-from math import exp
 from lxml import etree
 from path import Path as path
 import requests
 from datetime import datetime
-import dateutil.parser
 from lazy import lazy
 
 from xmodule import course_metadata_utils
@@ -28,7 +26,8 @@ from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
 
-# Make '_' a no-op so we can scrape strings
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
 _ = lambda text: text
 
 CATALOG_VISIBILITY_CATALOG_AND_ABOUT = "both"
@@ -270,12 +269,6 @@ class CourseFields(object):
         scope=Scope.settings,
         deprecated=True  # Deprecated because someone would not edit this value within Studio.
     )
-    show_chat = Boolean(
-        display_name=_("Show Chat Widget"),
-        help=_("Enter true or false. When true, students can see the chat widget in the course."),
-        default=False,
-        scope=Scope.settings
-    )
     tabs = CourseTabList(help="List of tabs to enable in this course", scope=Scope.settings, default=[])
     end_of_course_survey_url = String(
         display_name=_("Course Survey URL"),
@@ -392,10 +385,10 @@ class CourseFields(object):
         # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
         # his students.
         display_name=_("Enable CCX"),
-        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
-        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
-        # his students.
         help=_(
+            # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+            # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+            # his students.
             "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
             " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
         ),
@@ -421,209 +414,6 @@ class CourseFields(object):
         scope=Scope.settings
     )
     has_children = True
-    checklists = List(
-        scope=Scope.settings,
-        default=[
-            {
-                "short_description": _("Getting Started With Studio"),
-                "items": [
-                    {
-                        "short_description": _("Add Course Team Members"),
-                        "long_description": _(
-                            "Grant your collaborators permission to edit your course so you can work together."
-                        ),
-                        "is_checked": False,
-                        "action_url": "ManageUsers",
-                        "action_text": _("Edit Course Team"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Set Important Dates for Your Course"),
-                        "long_description": _(
-                            "Establish your course's student enrollment and launch dates on the Schedule and Details "
-                            "page."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Details &amp; Schedule"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Draft Your Course's Grading Policy"),
-                        "long_description": _(
-                            "Set up your assignment types and grading policy even if you haven't created all your "
-                            "assignments."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsGrading",
-                        "action_text": _("Edit Grading Settings"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Explore the Other Studio Checklists"),
-                        "long_description": _(
-                            "Discover other available course authoring tools, and find help when you need it."
-                        ),
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                ],
-            },
-            {
-                "short_description": _("Draft a Rough Course Outline"),
-                "items": [
-                    {
-                        "short_description": _("Create Your First Section and Subsection"),
-                        "long_description": _("Use your course outline to build your first Section and Subsection."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Set Section Release Dates"),
-                        "long_description": _(
-                            "Specify the release dates for each Section in your course. Sections become visible to "
-                            "students on their release dates."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Designate a Subsection as Graded"),
-                        "long_description": _(
-                            "Set a Subsection to be graded as a specific assignment type. Assignments within graded "
-                            "Subsections count toward a student's final grade."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Reordering Course Content"),
-                        "long_description": _("Use drag and drop to reorder the content in your course."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Renaming Sections"),
-                        "long_description": _("Rename Sections by clicking the Section name from the Course Outline."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Deleting Course Content"),
-                        "long_description": _(
-                            "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is "
-                            "no Undo function."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add an Instructor-Only Section to Your Outline"),
-                        "long_description": _(
-                            "Some course authors find using a section for unsorted, in-progress work useful. To do "
-                            "this, create a section and set the release date to the distant future."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                ],
-            },
-            {
-                "short_description": _("Explore edX's Support Tools"),
-                "items": [
-                    {
-                        "short_description": _("Explore the Studio Help Forum"),
-                        "long_description": _(
-                            "Access the Studio Help forum from the menu that appears when you click your user name "
-                            "in the top right corner of Studio."
-                        ),
-                        "is_checked": False,
-                        "action_url": "http://help.edge.edx.org/",
-                        "action_text": _("Visit Studio Help"),
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": _("Enroll in edX 101"),
-                        "long_description": _("Register for edX 101, edX's primer for course creation."),
-                        "is_checked": False,
-                        "action_url": "https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about",
-                        "action_text": _("Register for edX 101"),
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": _("Download the Studio Documentation"),
-                        "long_description": _("Download the searchable Studio reference documentation in PDF form."),
-                        "is_checked": False,
-                        "action_url": "http://files.edx.org/Getting_Started_with_Studio.pdf",
-                        "action_text": _("Download Documentation"),
-                        "action_external": True,
-                    },
-                ],
-            },
-            {
-                "short_description": _("Draft Your Course About Page"),
-                "items": [
-                    {
-                        "short_description": _("Draft a Course Description"),
-                        "long_description": _(
-                            "Courses on edX have an About page that includes a course video, description, and more. "
-                            "Draft the text students will read before deciding to enroll in your course."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add Staff Bios"),
-                        "long_description": _(
-                            "Showing prospective students who their instructor will be is helpful. "
-                            "Include staff bios on the course About page."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add Course FAQs"),
-                        "long_description": _("Include a short list of frequently asked questions about your course."),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Add Course Prerequisites"),
-                        "long_description": _(
-                            "Let students know what knowledge and/or skills they should have before "
-                            "they enroll in your course."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
-                        "action_external": False,
-                    },
-                ],
-            },
-        ],
-    )
     info_sidebar_name = String(
         display_name=_("Course Info Sidebar Name"),
         help=_(
@@ -792,7 +582,8 @@ class CourseFields(object):
             "number that you entered when you created the course. To use the course number that you entered when "
             "you created the course, enter null."
         ),
-        scope=Scope.settings
+        scope=Scope.settings,
+        default=""
     )
 
     max_student_enrollments_allowed = Integer(
@@ -980,7 +771,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
             # Then remove show_timezone so that if the user clears out the due_date_display_format,
             # they get the default date display.
             self.due_date_display_format = "DATE_TIME"
-            delattr(self, 'show_timezone')
+            del self.show_timezone
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
         # init.  (Modulestore is in charge of figuring out where to load the policy from)
@@ -1267,7 +1058,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         flag = self.is_new
         if flag is None:
             # Use a heuristic if the course has not been flagged
-            announcement, start, now = self._sorting_dates()
+            announcement, start, now = course_metadata_utils.sorting_dates(
+                self.start, self.advertised_start, self.announcement
+            )
             if announcement and (now - announcement).days < 30:
                 # The course has been announced for less that month
                 return True
@@ -1287,41 +1080,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns a tuple that can be used to sort the courses according
         the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
-        (advertized) start dates of the course if available.
+        (advertised) start dates of the course if available.
 
         The lower the number the "newer" the course.
         """
-        # Make courses that have an announcement date shave a lower
-        # score than courses than don't, older courses should have a
-        # higher score.
-        announcement, start, now = self._sorting_dates()
-        scale = 300.0  # about a year
-        if announcement:
-            days = (now - announcement).days
-            score = -exp(-days / scale)
-        else:
-            days = (now - start).days
-            score = exp(days / scale)
-        return score
-
-    def _sorting_dates(self):
-        # utility function to get datetime objects for dates used to
-        # compute the is_new flag and the sorting_score
-
-        announcement = self.announcement
-        if announcement is not None:
-            announcement = announcement
-
-        try:
-            start = dateutil.parser.parse(self.advertised_start)
-            if start.tzinfo is None:
-                start = start.replace(tzinfo=UTC())
-        except (ValueError, AttributeError):
-            start = self.start
-
-        now = datetime.now(UTC())
-
-        return announcement, start, now
+        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
 
     @lazy
     def grading_context(self):

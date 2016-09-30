@@ -2,10 +2,14 @@
 'use strict';
 define('video/04_video_full_screen.js', [], function () {
     var template = [
-        '<a href="#" class="add-fullscreen" title="',
-            gettext('Fill browser'), '" role="button" aria-disabled="false">',
-            gettext('Fill browser'),
-        '</a>'
+        '<button class="control add-fullscreen" aria-disabled="false">',
+            '<span class="icon-fallback-img">',
+                '<span class="icon fa fa-arrows-alt" aria-hidden="true"></span>',
+                '<span class="sr control-text">',
+                    gettext('Fill browser'),
+                '</span>',
+            '</span>',
+        '</button>'
     ].join('');
 
     // VideoControl() function - what this module "exports".
@@ -133,8 +137,12 @@ define('video/04_video_full_screen.js', [], function () {
         fullScreenClassNameEl.removeClass('video-fullscreen');
         $(window).scrollTop(this.scrollPos);
         this.videoFullScreen.fullScreenEl
-            .attr('title', gettext('Fill browser'))
-            .text(gettext('Fill browser'));
+            .find('.icon')
+                .removeClass('fa-compress')
+                .addClass('fa-arrows-alt')
+                .find('.control-text')
+                    .text(gettext('Fill browser'));
+
         this.el.trigger('fullscreen', [this.isFullScreen]);
     }
 
@@ -146,8 +154,12 @@ define('video/04_video_full_screen.js', [], function () {
         this.videoFullScreen.fullScreenState = this.isFullScreen = true;
         fullScreenClassNameEl.addClass('video-fullscreen');
         this.videoFullScreen.fullScreenEl
-            .attr('title', gettext('Exit full browser'))
-            .text(gettext('Exit full browser'));
+            .find('.icon')
+                .removeClass('fa-arrows-alt')
+                .addClass('fa-compress')
+                .find('.control-text')
+                    .text(gettext('Exit full browser'));
+
         this.el.trigger('fullscreen', [this.isFullScreen]);
     }
 

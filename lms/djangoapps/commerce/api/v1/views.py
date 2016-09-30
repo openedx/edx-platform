@@ -66,7 +66,7 @@ class OrderView(APIView):
     authentication_classes = (SessionAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, number):  # pylint:disable=unused-argument
+    def get(self, request, number):
         """ HTTP handler. """
         try:
             order = ecommerce_api_client(request.user).orders(number).get()
