@@ -19,6 +19,7 @@ from provider.oauth2.models import Client
 from social.backends.base import BaseAuth
 from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
+from social.apps.django_app.default.models import UserSocialAuth
 from .lti import LTIAuthBackend, LTI_PARAMS_KEY
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
@@ -74,6 +75,30 @@ class AuthNotConfigured(SocialAuthBaseException):
         return _('Authentication with {} is currently unavailable.').format(
             self.provider_name
         )
+
+
+class DataSharingConsentSetting(models.Model):
+
+    auth = models.OneToOneField(
+        UserSocialAuth,
+        on_delete=models.CASCADE,
+        related_name='consent_setting',
+        help_text=_(
+            "The UserSocialAuth database row to which this consent is attached."
+        ),
+    )
+    enabled = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If selected, this means that the user has chosen to share data with this SSO provider."
+        ),
+    )
+    date_set = models.DateTimeField(
+        auto_now=True,
+        help_text=_(
+            "This field indicates the timestamp at which the object was created."
+        ),
+    )
 
 
 class ProviderConfig(ConfigurationModel):
@@ -139,6 +164,36 @@ class ProviderConfig(ConfigurationModel):
             "authentication using the correct link is still possible."
         ),
     )
+    request_data_sharing_consent = models.BooleanField(
+        default=True,
+        help_text=_(
+            "If this option is selected, users will be presented with an option to share course "
+            "information with the SSO provider when registering."
+        ),
+    )
+    data_sharing_consent_prompt = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text=_(
+            "When data sharing consent is requested, this text will appear next to the relevant "
+            "form element to help users make an informed decision about whether to grant consent."
+        ),
+    )
+    require_data_sharing_consent = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is selected, users who sign in using this SSO provider will not be able "
+            "to proceed unless they affirmatively select the option to grant data sharing consent."
+        ),
+    )
+    data_sharing_consent_error = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text=_(
+            "If the SSO requires data sharing consent, but the user does not provide it at "
+            "registration, text from this field will be used to inform the user of the error."
+        ),
+    )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass
     accepts_logins = True  # Whether to display a sign-in button when the provider is enabled
@@ -191,6 +246,9 @@ class ProviderConfig(ConfigurationModel):
         This is default implementation. Subclass may override with a different one.
         """
         return remote_id
+
+    def show_data_sharing_consent_checkbox(self):
+        return self.require_data_sharing_consent or self.request_data_sharing_consent
 
     @classmethod
     def get_register_form_data(cls, pipeline_kwargs):

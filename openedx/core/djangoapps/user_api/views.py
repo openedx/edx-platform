@@ -837,6 +837,30 @@ class RegistrationView(APIView):
             supplementalText=terms_text
         )
 
+    def _add_request_data_sharing_consent_field(self, form_desc, provider):
+        default_label = _(u"I consent to share coursework data with {provider_name}").format(
+            provider_name=provider.name
+        )
+        label = provider.data_sharing_consent_prompt or default_label
+
+        default_error_msg = _(u"{provider_name} requires that you consent to sharing coursework data.").format(
+            provider_name=provider.name
+        )
+        error_msg = provider.data_sharing_consent_error or default_error_msg
+
+        required = provider.require_data_sharing_consent
+
+        form_desc.add_field(
+            "data_sharing_consent",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
+            error_messages={
+                "required": error_msg,
+            },
+        )
+
     def _apply_third_party_auth_overrides(self, request, form_desc):
         """Modify the registration form if the user has authenticated with a third-party provider.
 
@@ -873,6 +897,9 @@ class RegistrationView(APIView):
                             form_desc.override_field_properties(
                                 field_name, default=field_overrides[field_name]
                             )
+
+                    if current_provider.show_data_sharing_consent_checkbox():
+                        self._add_request_data_sharing_consent_field(form_desc, current_provider)
 
                     # Hide the password field
                     form_desc.override_field_properties(

@@ -83,6 +83,7 @@ import student
 from logging import getLogger
 
 from . import provider
+from .models import DataSharingConsentSetting
 
 
 # These are the query string params you can pass
@@ -176,6 +177,7 @@ class ProviderUserState(object):
     def __init__(self, enabled_provider, user, association):
         # Boolean. Whether the user has an account associated with the provider
         self.has_account = association is not None
+        self.association = association or None
         if self.has_account:
             # UserSocialAuth row ID
             self.association_id = association.id
@@ -284,7 +286,7 @@ def get_complete_url(backend_name):
     return _get_url('social:complete', backend_name)
 
 
-def get_disconnect_url(provider_id, association_id):
+def get_disconnect_url(provider_id, association_id=None):
     """Gets URL for the endpoint that starts the disconnect pipeline.
 
     Args:
@@ -300,7 +302,7 @@ def get_disconnect_url(provider_id, association_id):
         ValueError: if no provider is enabled with the given ID.
     """
     backend_name = _get_enabled_provider(provider_id).backend_name
-    if association_id:
+    if association_id is not None:
         return _get_url('social:disconnect_individual', backend_name, url_params={'association_id': association_id})
     else:
         return _get_url('social:disconnect', backend_name)
@@ -572,6 +574,11 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
                 'User "%s" is using third_party_auth to login but has not yet activated their account. ',
                 user.username
             )
+
+
+def create_data_sharing_consent(social, **kwargs):
+    logger.warning(kwargs)
+    DataSharingConsentSetting.objects.create(auth=social, enabled=kwargs.pop('create_data_sharing_consent', False))
 
 
 @partial.partial
