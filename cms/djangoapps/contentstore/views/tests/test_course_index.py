@@ -16,7 +16,7 @@ from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexin
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor, reverse_usage_url
 from contentstore.views.course import (
-    course_outline_initial_state, reindex_course_and_check_access, _deprecated_blocks_info
+    course_outline_initial_state, reindex_course_and_check_access
 )
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.managers import CourseRerunUIStateManager
@@ -442,119 +442,6 @@ class TestCourseOutline(CourseTestCase):
                 self.store.unpublish(self.vertical.location, self.user.id)
 
         course_module.advanced_modules.extend(block_types)
-
-    def _verify_deprecated_info(self, course_id, advanced_modules, info, deprecated_block_types):
-        """
-        Verify deprecated info.
-        """
-        expected_blocks = []
-        for block_type in deprecated_block_types:
-            expected_blocks.append(
-                [
-                    reverse_usage_url('container_handler', self.vertical.location),
-                    '{} Problem'.format(block_type)
-                ]
-            )
-
-        self.assertEqual(info['block_types'], deprecated_block_types)
-        self.assertEqual(
-            info['block_types_enabled'],
-            any(component in advanced_modules for component in deprecated_block_types)
-        )
-
-        self.assertItemsEqual(info['blocks'], expected_blocks)
-        self.assertEqual(
-            info['advance_settings_url'],
-            reverse_course_url('advanced_settings_handler', course_id)
-        )
-
-    @ddt.data(
-        [{'publish': True}, ['notes']],
-        [{'publish': False}, ['notes']],
-        [{'publish': True}, ['notes', 'lti']]
-    )
-    @ddt.unpack
-    def test_verify_deprecated_warning_message(self, publish, block_types):
-        """
-        Verify deprecated warning info.
-        """
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
-        info = _deprecated_blocks_info(course_module, block_types)
-        self._verify_deprecated_info(
-            course_module.id,
-            course_module.advanced_modules,
-            info,
-            block_types
-        )
-
-    @ddt.data(
-        {'delete_vertical': True},
-        {'delete_vertical': False},
-    )
-    @ddt.unpack
-    def test_deprecated_blocks_list_updated_correctly(self, delete_vertical):
-        """
-        Verify that deprecated blocks list shown on banner is updated correctly.
-
-        Here is the scenario:
-            This list of deprecated blocks shown on banner contains published
-            and un-published blocks. That list should be updated when we delete
-            un-published block(s). This behavior should be same if we delete
-            unpublished vertical or problem.
-        """
-        block_types = ['notes']
-        course_module = modulestore().get_item(self.course.location)
-
-        vertical1 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert1 Subsection1'
-        )
-        problem1 = ItemFactory.create(
-            parent_location=vertical1.location,
-            category='notes',
-            display_name='notes problem in vert1',
-            publish_item=False
-        )
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should be empty here because there is nothing
-        # published or un-published present
-        self.assertEqual(info['blocks'], [])
-
-        vertical2 = ItemFactory.create(
-            parent_location=self.sequential.location, category='vertical', display_name='Vert2 Subsection1'
-        )
-        ItemFactory.create(
-            parent_location=vertical2.location,
-            category='notes',
-            display_name='notes problem in vert2',
-            pubish_item=True
-        )
-        # At this point CourseStructure will contain both the above
-        # published and un-published verticals
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        self.assertItemsEqual(
-            info['blocks'],
-            [
-                [reverse_usage_url('container_handler', vertical1.location), 'notes problem in vert1'],
-                [reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']
-            ]
-        )
-
-        # Delete the un-published vertical or problem so that CourseStructure updates its data
-        if delete_vertical:
-            self.store.delete_item(vertical1.location, self.user.id)
-        else:
-            self.store.delete_item(problem1.location, self.user.id)
-
-        info = _deprecated_blocks_info(course_module, block_types)
-        # info['blocks'] should only contain the info about vertical2 which is published.
-        # There shouldn't be any info present about un-published vertical1
-        self.assertEqual(
-            info['blocks'],
-            [[reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']]
-        )
 
 
 class TestCourseReIndex(CourseTestCase):

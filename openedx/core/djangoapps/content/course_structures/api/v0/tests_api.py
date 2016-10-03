@@ -1,7 +1,6 @@
 """
 Course Structure api.py tests
 """
-from .api import course_structure
 from openedx.core.djangoapps.content.course_structures.signals import listen_for_course_publish
 from xmodule.modulestore.django import SignalHandler
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -96,56 +95,3 @@ class CourseStructureApiTests(ModuleStoreTestCase):
         add_block(course)
 
         return blocks
-
-    def test_course_structure_with_no_block_types(self):
-        """
-        Verify that course_structure returns info for entire course.
-        """
-        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
-            with self.assertNumQueries(3):
-                structure = course_structure(self.course.id)
-
-        expected = {
-            u'root': unicode(self.course.location),
-            u'blocks': self._expected_blocks()
-        }
-
-        self.assertDictEqual(structure, expected)
-
-        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
-            with self.assertNumQueries(2):
-                course_structure(self.course.id)
-
-    def test_course_structure_with_block_types(self):
-        """
-        Verify that course_structure returns info for required block_types only when specific block_types are requested.
-        """
-        block_types = ['html', 'video']
-
-        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
-            with self.assertNumQueries(3):
-                structure = course_structure(self.course.id, block_types=block_types)
-
-        expected = {
-            u'root': unicode(self.course.location),
-            u'blocks': self._expected_blocks(block_types=block_types, get_parent=True)
-        }
-
-        self.assertDictEqual(structure, expected)
-
-        with mock.patch(self.MOCK_CACHE, cache.caches['default']):
-            with self.assertNumQueries(2):
-                course_structure(self.course.id, block_types=block_types)
-
-    def test_course_structure_with_non_existed_block_types(self):
-        """
-        Verify that course_structure returns empty info for non-existed block_types.
-        """
-        block_types = ['phantom']
-        structure = course_structure(self.course.id, block_types=block_types)
-        expected = {
-            u'root': unicode(self.course.location),
-            u'blocks': {}
-        }
-
-        self.assertDictEqual(structure, expected)
