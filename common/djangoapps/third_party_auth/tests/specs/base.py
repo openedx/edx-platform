@@ -496,6 +496,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             'password': 'password',
             'mailing_address': '',
             'email': 'user@email.com',
+            'data_sharing_consent': 'true',
         }
 
         if overrides:

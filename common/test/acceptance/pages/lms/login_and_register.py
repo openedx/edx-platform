@@ -190,7 +190,7 @@ class CombinedLoginAndRegisterPage(PageObject):
 
     def register(
             self, email="", password="", username="", full_name="", country="", favorite_movie="",
-            terms_of_service=False
+            terms_of_service=False, data_sharing_consent=False
     ):
         """Fills in and submits the registration form.
 
@@ -224,6 +224,8 @@ class CombinedLoginAndRegisterPage(PageObject):
             self.q(css="#register-favorite_movie").fill(favorite_movie)
         if terms_of_service:
             self.q(css="#register-honor_code").click()
+        if data_sharing_consent and self.q(css="#register-data_sharing_consent"):
+            self.q(css="#register-data_sharing_consent").click()
 
         # Submit it
         self.q(css=".register-button").click()
