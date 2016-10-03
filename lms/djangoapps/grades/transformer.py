@@ -3,12 +3,16 @@ Grades Transformer
 """
 from django.test.client import RequestFactory
 from functools import reduce as functools_reduce
+from logging import getLogger
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from lms.djangoapps.course_blocks.transformers.utils import collect_unioned_set_field, get_field_on_block
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
+
+
+log = getLogger(__name__)
 
 
 class GradesTransformer(BlockStructureTransformer):
@@ -119,8 +123,10 @@ class GradesTransformer(BlockStructureTransformer):
         Collect the `max_score` from the given module, storing it as a
         `transformer_block_field` associated with the `GradesTransformer`.
         """
-        score = module.max_score()
-        block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)
+        max_score = module.max_score()
+        block_structure.set_transformer_block_field(module.location, cls, 'max_score', max_score)
+        if max_score is None:
+            log.warning("GradesTransformer: max_score is None for {}".format(module.location))
 
     @staticmethod
     def _iter_scorable_xmodules(block_structure):

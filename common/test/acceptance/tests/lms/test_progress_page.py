@@ -15,6 +15,7 @@ from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
+from ...pages.lms.staff_view import StaffPage, StaffDebugPage
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.utils import type_in_codemirror
 from ...pages.studio.overview import CourseOutlinePage
@@ -192,6 +193,22 @@ class PersistentGradesTest(ProgressPageBaseTest):
             type_in_codemirror(self, 0, modified_content)
             modal.q(css='.action-save').click()
 
+    def _delete_student_state_for_problem(self):
+        """
+        As staff, clicks the "delete student state" button,
+        deleting the student user's state for the problem.
+        """
+        with self._logged_in_session(staff=True):
+            self.courseware_page.visit()
+            staff_page = StaffPage(self.browser, self.course_id)
+            self.assertEqual(staff_page.staff_view_mode, "Staff")
+            staff_page.q(css='a.instructor-info-action').nth(1).click()
+            staff_debug_page = StaffDebugPage(self.browser)
+            staff_debug_page.wait_for_page()
+            staff_debug_page.delete_state(self.USERNAME)
+            msg = staff_debug_page.idash_msg[0]
+            self.assertEqual(u'Successfully deleted student state for user {0}'.format(self.USERNAME), msg)
+
     @ddt.data(
         _edit_problem_content,
         _change_subsection_structure,
@@ -222,6 +239,13 @@ class PersistentGradesTest(ProgressPageBaseTest):
         with self._logged_in_session():
             self.assertEqual(self._get_problem_scores(), [(1, 1), (0, 1)])
             self.assertEqual(self._get_section_score(), (1, 2))
+
+    def test_progress_page_updates_when_student_state_deleted(self):
+        self._check_progress_page_with_scored_problem()
+        self._delete_student_state_for_problem()
+        with self._logged_in_session():
+            self.assertEqual(self._get_problem_scores(), [(0, 1), (0, 1)])
+            self.assertEqual(self._get_section_score(), (0, 2))
 
 
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
