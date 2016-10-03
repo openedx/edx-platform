@@ -937,12 +937,26 @@ class LoncapaProblem(object):
         if len(inputfields) > 1:
             response.set('multiple_inputtypes', 'true')
             group_label_tag = response.find('label')
+            group_description_tags = response.findall('description')
+            group_label_tag_id = u'multiinput-group-label-{}'.format(responsetype_id)
             group_label_tag_text = ''
             if group_label_tag is not None:
                 group_label_tag.tag = 'p'
-                group_label_tag.set('id', responsetype_id)
+                group_label_tag.set('id', group_label_tag_id)
                 group_label_tag.set('class', 'multi-inputs-group-label')
                 group_label_tag_text = stringify_children(group_label_tag)
+                response.set('multiinput-group-label-id', group_label_tag_id)
+
+            group_description_ids = []
+            for index, group_description_tag in enumerate(group_description_tags):
+                group_description_tag_id = u'multiinput-group-description-{}-{}'.format(responsetype_id, index)
+                group_description_tag.tag = 'p'
+                group_description_tag.set('id', group_description_tag_id)
+                group_description_tag.set('class', 'multi-inputs-group-description question-description')
+                group_description_ids.append(group_description_tag_id)
+
+            if group_description_ids:
+                response.set('multiinput-group_description_ids', ' '.join(group_description_ids))
 
             for inputfield in inputfields:
                 problem_data[inputfield.get('id')] = {
