@@ -11,7 +11,7 @@ from openedx.core.djangolib.markup import HTML
 
 <div class="problem-progress" id="${ id }-problem-progress"></div>
 
-<div class="problem" aria-labelledby="${ short_id }-problem-title">
+<div class="problem">
   ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
