@@ -269,6 +269,13 @@ class RegistrationView(APIView):
                     options=getattr(field, 'choices', None), error_messages=field.error_messages,
                     include_default_option=field_options.get('include_default_option'),
                 )
+        if third_party_auth.is_enabled():
+            running_pipeline = third_party_auth.pipeline.get(request)
+            if running_pipeline:
+                current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+                    if current_provider:
+                        if current_provider.show_data_sharing_consent_checkbox():
+                            self._add_request_data_sharing_consent_field(form_desc, current_provider)
 
         # Extra fields configured in Django settings
         # may be required, optional, or hidden
@@ -900,9 +907,6 @@ class RegistrationView(APIView):
                             form_desc.override_field_properties(
                                 field_name, default=field_overrides[field_name]
                             )
-
-                    if current_provider.show_data_sharing_consent_checkbox():
-                        self._add_request_data_sharing_consent_field(form_desc, current_provider)
 
                     # Hide the password field
                     form_desc.override_field_properties(
