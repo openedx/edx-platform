@@ -57,56 +57,6 @@ from openedx.core.djangolib.markup import HTML, Text
   </div>
   %endif
 
-    %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('block_types_enabled'):
-      <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
-        <div class="alert announcement">
-          <span class="feedback-symbol fa fa-warning" aria-hidden="true"></span><span class="sr">${_("Warning")}</span>
-
-          <div class="copy">
-            <h2 class="title title-3 warning-heading-text">${_("This course uses features that are no longer supported.")}</h2>
-
-            %if deprecated_blocks_info.get('blocks'):
-              <div class="components-list">
-                <p class="components-list-heading-text">${_("You must delete or replace the following components.")}</p>
-                  <nav class="nav-related" aria-label="${_('Unsupported Components')}">
-                    <ul>
-                      % for component_parent_url, component_display_name in deprecated_blocks_info['blocks']:
-                          <li class="nav-item">
-                                % if component_display_name:
-                                    <a href="${component_parent_url}">${component_display_name}</a>
-                                % else:
-                                    <a href="${component_parent_url}">${_("Deprecated Component")}</a>
-                                % endif
-                          </li>
-                      % endfor
-                    </ul>
-                  </nav>
-              </div>
-            %endif
-
-            % if deprecated_blocks_info.get('block_types_enabled'):
-              <div class="advance-modules-list">
-                <p class="advance-modules-remove-text">
-                  ${Text(_("To avoid errors, {platform_name} strongly recommends that you remove unsupported features from the course advanced settings. To do this, go to the {link_start}Advanced Settings page{link_end}, locate the \"Advanced Module List\" setting, and then delete the following modules from the list.")).format(
-                    platform_name=static.get_platform_name(),
-                    link_start=HTML('<a href="{advance_settings_url}">').format(advance_settings_url=deprecated_blocks_info['advance_settings_url']),
-                    link_end=HTML("</a>")
-                  )}
-                </p>
-                <nav class="nav-related" aria-label="${_('Unsupported Advance Modules')}">
-                  <ul>
-                    % for block_type in deprecated_blocks_info['block_types']:
-                      <li class="nav-item">${block_type}</li>
-                    % endfor
-                  </ul>
-                </nav>
-              </div>
-            % endif
-          </div>
-        </div>
-      </div>
-    %endif
-
 </%block>
 
 <%block name="content">
