@@ -2,6 +2,11 @@
 <%page expression_filter="h"/>
 <%namespace name='static' file='static_content.html'/>
 
+## This template should not use the target student's details when masquerading, see TNL-4895
+<%
+self.real_user = real_user if real_user != UNDEFINED else user
+%>
+
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -14,8 +19,8 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
         <a href="${reverse('dashboard')}" class="menu-title">
             <span class="sr-only">${_("Dashboard for:")}</span>
             <%
-            username = user.username
-            profile_image_url = get_profile_image_urls_for_user(user)['medium']
+            username = self.real_user.username
+            profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
             %>
             <img class="menu-image" src="${profile_image_url}" alt="">
             ${username}
@@ -28,7 +33,7 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
                 <%block name="navigation_dropdown_menu_links" >
                     <li class="dropdown-item item has-block-link"><a href="${reverse('dashboard')}" class="action dropdown-menuitem">${_("Dashboard")}</a></li>
-                    <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': user.username})}" class="action dropdown-menuitem">${_("Profile")}</a></li>
+                    <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': self.real_user.username})}" class="action dropdown-menuitem">${_("Profile")}</a></li>
                     <li class="dropdown-item item has-block-link"><a href="${reverse('account_settings')}" class="action dropdown-menuitem">${_("Account")}</a></li>
                 </%block>
                 <li class="dropdown-item item has-block-link"><a href="${reverse('logout')}" role="menuitem" class="action dropdown-menuitem">${_("Sign Out")}</a></li>
@@ -41,8 +46,8 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             <a href="${reverse('dashboard')}" class="user-link">
                 <span class="sr">${_("Dashboard for:")}</span>
                 <%
-                username = user.username
-                profile_image_url = get_profile_image_urls_for_user(user)['medium']
+                username = self.real_user.username
+                profile_image_url = get_profile_image_urls_for_user(self.real_user)['medium']
                 %>
                 <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
                 <div class="label-username">${username}</div>
