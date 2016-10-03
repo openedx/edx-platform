@@ -40,7 +40,10 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-student-notes'/>
 % endif
 
-<%include file="../discussion/_js_head_dependencies.html" />
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
   ${HTML(fragment.head_html())}
 </%block>
 
@@ -53,7 +56,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
 
   <%static:js group='courseware'/>
 
-  <%include file="../discussion/_js_body_dependencies.html" />
+  <%include file="/mathjax_include.html" args="disable_fast_preview=disable_fast_preview"/>
   % if staff_access:
   	<%include file="xqa_interface.html"/>
   % endif
