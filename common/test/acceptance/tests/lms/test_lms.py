@@ -377,7 +377,12 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertIn("Galactica1", self.register_page.username_value)
 
         # Set country, accept the terms, and submit the form:
-        self.register_page.register(country="US", favorite_movie="Battlestar Galactica", terms_of_service=True)
+        self.register_page.register(
+            country="US",
+            favorite_movie="Battlestar Galactica",
+            terms_of_service=True,
+            data_sharing_consent=True,
+        )
 
         # Expect that we reach the dashboard and we're auto-enrolled in the course
         course_names = self.dashboard_page.wait_for_page().available_courses

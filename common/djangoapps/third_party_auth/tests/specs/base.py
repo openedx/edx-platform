@@ -84,6 +84,7 @@ class IntegrationTestMixin(object):
                 'name': 'My Customized Name',
                 'username': 'new_username',
                 'honor_code': True,
+                'data_sharing_consent': True,
             }
         )
         self.assertEqual(ajax_register_response.status_code, 200)
