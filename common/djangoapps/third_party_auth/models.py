@@ -255,6 +255,9 @@ class ProviderConfig(ConfigurationModel):
         return remote_id
 
     def show_data_sharing_consent_checkbox(self):
+        """
+        Determine whether a data sharing consent checkbox should be shown at registration
+        """
         return self.require_data_sharing_consent or self.request_data_sharing_consent
 
     @classmethod

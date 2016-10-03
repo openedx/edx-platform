@@ -576,18 +576,19 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             )
 
 
-def create_data_sharing_consent(social, create_data_sharing_consent=None, **kwargs):
+def create_data_sharing_consent(social, **kwargs):
     """
     If an earlier pipeline step adds the "create_data_sharing_consent" kwargs as a True value,
     create a DataSharingConsentSetting object and tie it to the pipeline's social object.
     """
-    if create_data_sharing_consent is not None:
+    consent = kwargs.pop('create_data_sharing_consent', None)
+    if consent is not None:
         try:
             existing_consent = social.consent_setting
             existing_consent.delete()
         except DataSharingConsentSetting.DoesNotExist:
             pass
-        DataSharingConsentSetting.objects.create(auth=social, enabled=create_data_sharing_consent)
+        DataSharingConsentSetting.objects.create(auth=social, enabled=consent)
 
 
 @partial.partial
