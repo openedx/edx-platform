@@ -199,18 +199,16 @@
                 };
             }
 
-            params.beforeSend = function() {
-                if ($elem) {
-                    $elem.prop('disabled', true);
+            if ($elem) {
+                $elem.prop('disabled', true);
+            }
+            if (params.$loading) {
+                if (params.loadingCallback) {
+                    params.loadingCallback.apply(params.$loading);
+                } else {
+                    self.showLoadingIndicator(params.$loading, params.takeFocus);
                 }
-                if (params.$loading) {
-                    if (params.loadingCallback) {
-                        params.loadingCallback.apply(params.$loading);
-                    } else {
-                        self.showLoadingIndicator(params.$loading, params.takeFocus);
-                    }
-                }
-            };
+            }
 
             request = $.ajax(params).always(function() {
                 if ($elem) {
