@@ -144,10 +144,8 @@ messages = xblock.validate().to_json()
         </article>
         <footer class="location-footer">
             <div class="location-container">
-                <label class="location-label">
-                    <span class="location-label-text">${_('Location:')}</span>
-                    <input class="location-value" type="text" value="${ xblock.location }" disabled />
-                </label>
+                <label class="location-label">${_('Location:')}</label>
+                <p class="location-value">${ xblock.location }</p>
             </div>
         </footer>
     % else:

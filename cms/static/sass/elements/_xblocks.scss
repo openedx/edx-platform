@@ -500,23 +500,20 @@
       border-top: 1px solid #ddd;
       border-bottom-left-radius: 3px;
       border-bottom-right-radius: 3px;
-      text-align: right;
 
       .location-label {
-        .location-label-text {
-          position: absolute;
-          padding: 10px;
-          border-right: 1px solid #ddd;
-          z-index: 11;
-        }
-        .location-value {
-          width: 100%;
-          padding: 10px 10px 10px 80px;
-          border: none;
-          background: none;
-          box-shadow: none;
-          z-index: 10;
-        }
+        position: absolute;
+        left: 0;
+        padding: 8px 10px;
+        border-right: 1px solid #ddd;
+        z-index: 11;
+      }
+      .location-value {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 5px 10px 5px 90px;
+        z-index: 10;
+        font-size: .75em;
       }
     }
   }
