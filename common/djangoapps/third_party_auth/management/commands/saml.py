@@ -4,7 +4,6 @@ Management commands for third_party_auth
 """
 from django.core.management.base import BaseCommand, CommandError
 import logging
-from third_party_auth.models import SAMLConfiguration
 from third_party_auth.tasks import fetch_saml_metadata
 
 
@@ -16,9 +15,6 @@ class Command(BaseCommand):
         parser.add_argument('--pull', action='store_true', help="Pull updated metadata from external IDPs")
 
     def handle(self, *args, **options):
-        if not SAMLConfiguration.is_enabled():
-            raise CommandError("SAML support is disabled via SAMLConfiguration.")
-
         if options['pull']:
             log_handler = logging.StreamHandler(self.stdout)
             log_handler.setLevel(logging.DEBUG)
