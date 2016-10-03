@@ -201,6 +201,11 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         suite = Pa11yCrawler(
             'pa11ycrawler', course_key="course-v1:edX+Test101+course",
         )
+        ignore = (
+            "pa11y_ignore_rules_url="
+            "https://raw.githubusercontent.com/singingwolfboy/"
+            "pa11ycrawler-ignore/master/ignore.yaml"
+        )
         expected_cmd = [
             "scrapy",
             "crawl",
@@ -209,6 +214,8 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
             "port=8003",
             "-a",
             "course_key=course-v1:edX+Test101+course",
+            "-a",
+            ignore,
             "-a",
             "data_dir=/edx/app/edxapp/edx-platform/reports/pa11ycrawler/data",
         ]

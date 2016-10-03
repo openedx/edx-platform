@@ -1,12 +1,16 @@
 <h1><%- gettext("Editing post") %></h1>
 <ul class="post-errors"></ul>
 <div class="forum-edit-post-form-wrapper"></div>
-<div class="form-row">
-  <label class="sr" for="edit-post-title"><%- gettext("Edit post title") %></label>
-  <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="<%-title %>" placeholder="<%- gettext('Title') %>">
+<div class="post-field">
+    <label class="field-label">
+        <span class="field-label-text"><%- gettext("Title:") %></span><input aria-describedby="field_help_title" type="text" class="edit-post-title field-input" name="title" value="<%- title %>">
+    </label><span class="field-help" id="field_help_title">
+        <%- gettext("Add a clear and descriptive title to encourage participation.") %>
+    </span>
 </div>
-<div class="form-row">
-  <div class="edit-post-body" name="body"><%- body %></div>
+<div class="form-row post-field">
+    <p class="sr-only field-help" id="edit-post-editor-description"><%- gettext('Edit your post below.') %></p>
+    <div class="edit-post-body" aria-describedby="edit-post-editor-description" name="body"><%- body %></div>
 </div>
 <button type="submit" id="edit-post-submit" class="btn-brand submit post-update"><%- gettext("Update post") %></button>
 <button class="btn post-cancel"><%- gettext("Cancel") %></button>

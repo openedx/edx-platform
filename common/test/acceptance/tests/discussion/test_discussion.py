@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from nose.plugins.attrib import attr
 from pytz import UTC
+from flaky import flaky
 
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest
@@ -783,6 +784,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
 
+    @flaky  # TODO fix this, see TNL-5453
     def test_vote_report_endorse_after_edit(self):
         """
         Scenario: Moderator should be able to vote, report or endorse after editing the response.
@@ -827,7 +829,6 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
                 'section',  # TODO: AC-491
                 'color-contrast',  # TNL-4644
                 'icon-aria-hidden',  # TNL-4645
-                'duplicate-id',  # TNL-4647
             ]
         })
         page.visit()

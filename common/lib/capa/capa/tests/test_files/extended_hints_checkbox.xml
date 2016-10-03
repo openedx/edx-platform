@@ -1,7 +1,8 @@
 <problem>
-    <p>Select all the fruits from the list. In retrospect, the wordiness of these tests increases the dizziness!</p>
+    <p>In retrospect, the wordiness of these tests increases the dizziness!</p>
     <choiceresponse>
-      <checkboxgroup label="Select all the fruits from the list">
+      <label>Select all the fruits from the list</label>
+      <checkboxgroup>
         <choice correct="true" id="alpha">Apple
                    <choicehint selected="TrUe">You are right that apple is a fruit.
                    </choicehint>
@@ -33,9 +34,10 @@
         </compoundhint>
       </checkboxgroup>
     </choiceresponse>
-    <p>Select all the vegetables from the list</p>
+
     <choiceresponse>
-      <checkboxgroup label="Select all the vegetables from the list">
+      <label>Select all the vegetables from the list</label>
+      <checkboxgroup>
         <choice correct="false">Banana
                    <choicehint selected="true">No, sorry, a banana is a fruit.
                    </choicehint>
@@ -52,11 +54,11 @@
         <choice correct="true">
         Brussel Sprout
                    <choicehint selected="true">
-                   
+
                    Brussel sprouts are vegetables.
                    </choicehint>
                    <choicehint selected="false">
-                   
+
                    Brussel sprout is the only vegetable in this list.
                    </choicehint>
         </choice>
@@ -66,6 +68,7 @@
         </compoundhint>
       </checkboxgroup>
     </choiceresponse>
+
     <p>Compoundhint vs. correctness</p>
     <choiceresponse>
       <checkboxgroup>
@@ -80,17 +83,17 @@
     <choiceresponse>
       <checkboxgroup>
         <choice correct="true">
-        
-              A      
+
+              A
           <choicehint selected="true" label="AA">
-        
+
         aa
-        
+
         </choicehint></choice>
         <choice correct="true">
         B <choicehint selected="false" label="BB">
            bb
-               
+
         </choicehint></choice>
       </checkboxgroup>
     </choiceresponse>
@@ -114,4 +117,3 @@
 
 
 </problem>
-

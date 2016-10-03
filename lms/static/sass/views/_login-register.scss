@@ -335,7 +335,7 @@
             @extend %t-copy-sub2;
             display: block;
             margin: 0 0 ($baseline/2) 0;
-            color: $m-gray-l1;
+            color: $base-font-color;
         }
         /** FROM _accounts.scss - end **/
     }

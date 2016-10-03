@@ -10,7 +10,9 @@
         <select id="<%= form %>-<%= name %>"
             name="<%= name %>"
             class="input-inline"
+            <% if ( instructions ) { %>
             aria-describedby="<%= form %>-<%= name %>-desc"
+            <% } %>
             <% if ( typeof errorMessages !== 'undefined' ) {
                 _.each(errorMessages, function( msg, type ) {%>
                     data-errormsg-<%= type %>="<%= msg %>"
@@ -27,7 +29,9 @@
             type="<%= type %>"
             name="<%= name %>"
             class="input-block"
+            <% if ( instructions ) { %>
             aria-describedby="<%= form %>-<%= name %>-desc"
+            <% } %>
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( typeof errorMessages !== 'undefined' ) {
@@ -42,7 +46,7 @@
            type="<%= type %>"
            name="<%= name %>"
            class="input-block <% if ( type === 'checkbox' ) { %>checkbox<% } %>"
-            <% if ( type !== 'password' ) { %> aria-describedby="<%= form %>-<%= name %>-desc" <% } %>
+            <% if ( instructions ) { %> aria-describedby="<%= form %>-<%= name %>-desc" <% } %>
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
             <% if ( required ) { %> aria-required="true" required<% } %>
