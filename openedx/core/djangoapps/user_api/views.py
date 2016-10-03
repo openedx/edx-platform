@@ -273,9 +273,8 @@ class RegistrationView(APIView):
             running_pipeline = third_party_auth.pipeline.get(request)
             if running_pipeline:
                 current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
-                    if current_provider:
-                        if current_provider.show_data_sharing_consent_checkbox():
-                            self._add_request_data_sharing_consent_field(form_desc, current_provider)
+                if current_provider and current_provider.show_data_sharing_consent_checkbox():
+                    self._add_request_data_sharing_consent_field(form_desc, current_provider)
 
         # Extra fields configured in Django settings
         # may be required, optional, or hidden
