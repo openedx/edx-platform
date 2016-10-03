@@ -272,7 +272,12 @@ class LoncapaResponse(object):
             content = etree.SubElement(tree, 'div')
             content.set('class', 'multi-inputs-group')
             content.set('role', 'group')
-            content.set('aria-labelledby', response_id)
+
+            if self.xml.get('multiinput-group-label-id'):
+                content.set('aria-labelledby', self.xml.get('multiinput-group-label-id'))
+
+            if self.xml.get('multiinput-group_description_ids'):
+                content.set('aria-describedby', self.xml.get('multiinput-group_description_ids'))
         else:
             content = tree
 
