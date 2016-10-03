@@ -43,7 +43,7 @@ edx-drf-extensions==0.5.1
 edx-lint==0.4.3
 edx-django-oauth2-provider==1.1.1
 edx-django-sites-extensions==2.1.1
-edx-oauth2-provider==1.1.3
+edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.3.4
 edx-organizations==0.4.1
 edx-rest-api-client==1.2.1
