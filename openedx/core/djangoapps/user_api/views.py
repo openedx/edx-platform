@@ -838,6 +838,9 @@ class RegistrationView(APIView):
         )
 
     def _add_request_data_sharing_consent_field(self, form_desc, provider):
+        """
+        Adds a field to the form that allows the user to enable data sharing
+        """
         default_label = _(u"I consent to share coursework data with {provider_name}").format(
             provider_name=provider.name
         )

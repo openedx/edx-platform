@@ -1532,10 +1532,9 @@ def _do_create_account(form, custom_form=None, request=None):
             raise
     # Add a pipeline flag to create a DataSharingConsentSettings object
     if request is not None and third_party_auth.is_enabled() and pipeline.running(request):
-        running_pipeline = third_party_auth.pipeline.get(request)
+        running_pipeline = pipeline.get(request)
         if running_pipeline:
             sharing_authorized = bool(form.cleaned_data.get('data_sharing_consent'))
-            log.warning(form.cleaned_data)
             running_pipeline['kwargs']['create_data_sharing_consent'] = sharing_authorized
 
     # add this account creation to password history
@@ -1611,9 +1610,9 @@ def create_account_with_params(request, params):
 
     if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
-        running_pipeline = third_party_auth.pipeline.get(request)
+        running_pipeline = pipeline.get(request)
         if running_pipeline:
-            current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+            current_provider = provider.Registry.get_from_pipeline(running_pipeline)
             consent_field = {
                 'data_sharing_consent': 'require' if current_provider.require_data_sharing_consent else 'optional'
             }

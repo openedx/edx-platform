@@ -173,6 +173,9 @@ admin.site.register(ProviderApiPermissions, ApiPermissionsAdmin)
 
 
 class DataSharingConsentSettingAdmin(admin.ModelAdmin):
+    """
+    Django admin form for DataSharingConsentSetting
+    """
 
     readonly_fields = ('date_set',)
 

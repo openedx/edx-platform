@@ -78,6 +78,10 @@ class AuthNotConfigured(SocialAuthBaseException):
 
 
 class DataSharingConsentSetting(models.Model):
+    """
+    Model is designed to store a particular user's preference in terms of whether
+    to share data with an SSO provider.
+    """
 
     auth = models.OneToOneField(
         UserSocialAuth,
@@ -99,6 +103,9 @@ class DataSharingConsentSetting(models.Model):
             "This field indicates the timestamp at which the object was created."
         ),
     )
+
+    def __unicode__(self):
+        return u'{} - {} - {}'.format(self.auth, self.enabled, self.date_set)
 
 
 class ProviderConfig(ConfigurationModel):
