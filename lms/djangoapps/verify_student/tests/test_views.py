@@ -193,6 +193,25 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         self.assertContains(response, "To receive a certificate, you must also verify your identity")
         self.assertContains(response, "You will use your webcam to take a picture of")
 
+    def test_default_paid_course_registration_currency(self):
+        course = self._create_course("verified")
+        self._enroll(course.id, "verified")
+        response = self._get_page("verify_student_begin_flow", course.id)
+        data = self._get_page_data(response)
+        self.assertEqual(data['default_currency_code'], 'usd')
+        self.assertEqual(data['default_currency_symbol'], '$')
+        self.assertEqual(data['course_mode_currency'], 'usd')
+
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['gbp', '&pound;'])
+    def test_variable_paid_course_registration_currency(self):
+        course = self._create_course("verified")
+        self._enroll(course.id, "verified")
+        response = self._get_page("verify_student_begin_flow", course.id)
+        data = self._get_page_data(response)
+        self.assertEqual(data['default_currency_code'], 'gbp')
+        self.assertEqual(data['default_currency_symbol'], '&pound;')
+        self.assertEqual(data['course_mode_currency'], 'gbp')
+
     @ddt.data(
         ("expired", "verify_student_start_flow"),
         ("denied", "verify_student_begin_flow")
@@ -858,6 +877,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
                 mode_slug=course_mode,
                 mode_display_name=course_mode,
                 min_price=min_price,
+                currency=settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
                 **mode_kwargs
             )
 
@@ -1005,6 +1025,9 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             'courseware_url': pay_and_verify_div['data-courseware-url'],
             'course_mode_name': pay_and_verify_div['data-course-mode-name'],
             'course_mode_slug': pay_and_verify_div['data-course-mode-slug'],
+            'course_mode_currency': pay_and_verify_div['data-course-mode-currency'],
+            'default_currency_code': pay_and_verify_div['data-default-currency-code'],
+            'default_currency_symbol': pay_and_verify_div['data-default-currency-symbol'],
             'display_steps': json.loads(pay_and_verify_div['data-display-steps']),
             'current_step': pay_and_verify_div['data-current-step'],
             'requirements': json.loads(pay_and_verify_div['data-requirements']),

@@ -7,6 +7,7 @@ import pytz
 from collections import namedtuple, defaultdict
 from config_models.models import ConfigurationModel
 from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -29,10 +30,7 @@ Mode = namedtuple('Mode',
 class CourseMode(models.Model):
     """
     We would like to offer a course in a variety of modes.
-
     """
-    class Meta(object):
-        app_label = "course_modes"
 
     # the course that this mode is attached to
     course_id = CourseKeyField(max_length=255, db_index=True, verbose_name=_("Course"))
@@ -116,7 +114,7 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None, None)
+    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', settings.PAID_COURSE_REGISTRATION_CURRENCY[0], None, None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
 
     # Modes that allow a student to pursue a verified certificate
@@ -143,6 +141,7 @@ class CourseMode(models.Model):
 
     class Meta(object):
         unique_together = ('course_id', 'mode_slug', 'currency')
+        app_label = "course_modes"
 
     def clean(self):
         """

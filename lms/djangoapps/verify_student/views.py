@@ -406,6 +406,8 @@ class PayAndVerifyView(View):
             # transaction will be conducted using legacy shopping cart
             processors = [settings.CC_PROCESSOR_NAME]
 
+        default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY
+
         # Render the top-level page
         context = {
             'contribution_amount': contribution_amount,
@@ -415,6 +417,7 @@ class PayAndVerifyView(View):
             'course_mode': relevant_course_mode,
             'courseware_url': courseware_url,
             'current_step': current_step,
+            'default_currency': default_currency,
             'disable_courseware_js': True,
             'display_steps': display_steps,
             'is_active': json.dumps(request.user.is_active),

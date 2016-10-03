@@ -55,6 +55,9 @@ var edx = edx || {};
                     function(isVisible) { return isVisible; }
                 ),
                 upgrade: el.data('msg-key') === 'upgrade',
+                currency: el.data('course-mode-currency'),
+                currencyCode: el.data('default-currency-code').toUpperCase(),
+                currencySymbol: el.data('default-currency-symbol'),
                 minPrice: el.data('course-mode-min-price'),
                 sku: el.data('course-mode-sku'),
                 contributionAmount: el.data('contribution-amount'),
@@ -62,7 +65,6 @@ var edx = edx || {};
                     (el.data('course-mode-suggested-prices').toString()).split(','),
                     function(price) { return Boolean(price); }
                 ),
-                currency: el.data('course-mode-currency'),
                 processors: el.data('processors'),
                 verificationDeadline: el.data('verification-deadline'),
                 courseModeSlug: el.data('course-mode-slug'),
