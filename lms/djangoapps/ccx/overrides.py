@@ -88,6 +88,12 @@ def get_override_for_ccx(ccx, block, name, default=None):
     clean_ccx_key = _clean_ccx_key(block.location)
 
     block_overrides = overrides.get(clean_ccx_key, {})
+
+    # Hardcode the course_edit_method to be None instead of 'Studio', so,
+    # the LMS never tries to link back to Studio. CCX courses
+    # can't be edited in Studio.
+    block_overrides['course_edit_method'] = None
+
     if name in block_overrides:
         try:
             return block.fields[name].from_json(block_overrides[name])

@@ -2,8 +2,16 @@
 from datetime import datetime
 import urllib
 
-from pytz import UTC
 from django.core.urlresolvers import reverse, NoReverseMatch
+from oauth2_provider.models import (
+    AccessToken as dot_access_token,
+    RefreshToken as dot_refresh_token
+)
+from provider.oauth2.models import (
+    AccessToken as dop_access_token,
+    RefreshToken as dop_refresh_token
+)
+from pytz import UTC
 
 import third_party_auth
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
@@ -194,7 +202,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
     return {
         provider.provider_id: third_party_auth.pipeline.get_login_url(
             provider.provider_id, auth_entry, redirect_url=redirect_url
-        ) for provider in third_party_auth.provider.Registry.accepting_logins()
+        ) for provider in third_party_auth.provider.Registry.displayed_for_login()
     }
 
 
@@ -230,3 +238,13 @@ def get_next_url_for_login_page(request):
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
     return redirect_to
+
+
+def destroy_oauth_tokens(user):
+    """
+    Destroys ALL OAuth access and refresh tokens for the given user.
+    """
+    dop_access_token.objects.filter(user=user).delete()
+    dop_refresh_token.objects.filter(user=user).delete()
+    dot_access_token.objects.filter(user=user).delete()
+    dot_refresh_token.objects.filter(user=user).delete()

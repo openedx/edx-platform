@@ -1,6 +1,9 @@
 """
 Third-party auth provider configuration API.
 """
+from django.contrib.sites.models import Site
+from openedx.core.djangoapps.theming.helpers import get_current_request
+
 from .models import (
     OAuth2ProviderConfig, SAMLConfiguration, SAMLProviderConfig, LTIProviderConfig,
     _PSA_OAUTH2_BACKENDS, _PSA_SAML_BACKENDS, _LTI_BACKENDS,
@@ -15,20 +18,23 @@ class Registry(object):
     """
     @classmethod
     def _enabled_providers(cls):
-        """ Helper method to iterate over all providers """
+        """
+        Helper method that returns a generator used to iterate over all providers
+        of the current site.
+        """
         for backend_name in _PSA_OAUTH2_BACKENDS:
             provider = OAuth2ProviderConfig.current(backend_name)
-            if provider.enabled:
+            if provider.enabled_for_current_site:
                 yield provider
-        if SAMLConfiguration.is_enabled():
+        if SAMLConfiguration.is_enabled(Site.objects.get_current(get_current_request())):
             idp_slugs = SAMLProviderConfig.key_values('idp_slug', flat=True)
             for idp_slug in idp_slugs:
                 provider = SAMLProviderConfig.current(idp_slug)
-                if provider.enabled and provider.backend_name in _PSA_SAML_BACKENDS:
+                if provider.enabled_for_current_site and provider.backend_name in _PSA_SAML_BACKENDS:
                     yield provider
         for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
             provider = LTIProviderConfig.current(consumer_key)
-            if provider.enabled and provider.backend_name in _LTI_BACKENDS:
+            if provider.enabled_for_current_site and provider.backend_name in _LTI_BACKENDS:
                 yield provider
 
     @classmethod
@@ -37,9 +43,9 @@ class Registry(object):
         return sorted(cls._enabled_providers(), key=lambda provider: provider.name)
 
     @classmethod
-    def accepting_logins(cls):
-        """Returns list of providers that can be used to initiate logins currently"""
-        return [provider for provider in cls.enabled() if provider.accepts_logins]
+    def displayed_for_login(cls):
+        """Returns list of providers that can be used to initiate logins in the UI"""
+        return [provider for provider in cls.enabled() if provider.display_for_login]
 
     @classmethod
     def get(cls, provider_id):
@@ -69,7 +75,7 @@ class Registry(object):
     @classmethod
     def get_enabled_by_backend_name(cls, backend_name):
         """Generator returning all enabled providers that use the specified
-        backend.
+        backend on the current site.
 
         Example:
             >>> list(get_enabled_by_backend_name("tpa-saml"))
@@ -84,16 +90,17 @@ class Registry(object):
         """
         if backend_name in _PSA_OAUTH2_BACKENDS:
             provider = OAuth2ProviderConfig.current(backend_name)
-            if provider.enabled:
+            if provider.enabled_for_current_site:
                 yield provider
-        elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled():
+        elif backend_name in _PSA_SAML_BACKENDS and SAMLConfiguration.is_enabled(
+                Site.objects.get_current(get_current_request())):
             idp_names = SAMLProviderConfig.key_values('idp_slug', flat=True)
             for idp_name in idp_names:
                 provider = SAMLProviderConfig.current(idp_name)
-                if provider.backend_name == backend_name and provider.enabled:
+                if provider.backend_name == backend_name and provider.enabled_for_current_site:
                     yield provider
         elif backend_name in _LTI_BACKENDS:
             for consumer_key in LTIProviderConfig.key_values('lti_consumer_key', flat=True):
                 provider = LTIProviderConfig.current(consumer_key)
-                if provider.backend_name == backend_name and provider.enabled:
+                if provider.backend_name == backend_name and provider.enabled_for_current_site:
                     yield provider

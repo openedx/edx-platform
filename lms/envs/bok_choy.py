@@ -90,6 +90,11 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'
 
+
+EDXNOTES_CONNECT_TIMEOUT = 10  # time in seconds
+EDXNOTES_READ_TIMEOUT = 10  # time in seconds
+
+
 NOTES_DISABLED_TABS = []
 
 # Silence noisy logs

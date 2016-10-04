@@ -7,6 +7,7 @@ Used by Django and non-Django tests; must not have Django deps.
 from contextlib import contextmanager
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.sites.models import Site
 from provider.oauth2.models import Client as OAuth2Client
 from provider import constants
 import django.test
@@ -76,13 +77,17 @@ class ThirdPartyAuthTestMixin(object):
     @staticmethod
     def configure_oauth_provider(**kwargs):
         """ Update the settings for an OAuth2-based third party auth provider """
+        kwargs.setdefault('provider_slug', kwargs['backend_name'])
         obj = OAuth2ProviderConfig(**kwargs)
         obj.save()
         return obj
 
     def configure_saml_provider(self, **kwargs):
         """ Update the settings for a SAML-based third party auth provider """
-        self.assertTrue(SAMLConfiguration.is_enabled(), "SAML Provider Configuration only works if SAML is enabled.")
+        self.assertTrue(
+            SAMLConfiguration.is_enabled(Site.objects.get_current()),
+            "SAML Provider Configuration only works if SAML is enabled."
+        )
         obj = SAMLProviderConfig(**kwargs)
         obj.save()
         return obj

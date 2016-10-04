@@ -1,9 +1,10 @@
+<%! from capa.util import remove_markup %>
 <div id="chemicalequationinput_${id}" class="chemicalequationinput">
     <div class="script_placeholder" data-src="${previewer}"/>
 
     <div class="${status.classname}" id="status_${id}">
 
-    <input type="text" name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}" data-input-id="${id}" value="${value|h}"
+    <input type="text" name="input_${id}" id="input_${id}" aria-label="${remove_markup(response_data['label'])}" aria-describedby="answer_${id}" data-input-id="${id}" value="${value|h}"
    % if size:
    size="${size}"
    % endif

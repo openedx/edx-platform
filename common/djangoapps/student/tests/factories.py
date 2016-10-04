@@ -1,31 +1,28 @@
 """Provides factories for student models."""
 import random
-from datetime import datetime
-from uuid import uuid4
 
-import factory
+from student.models import (User, UserProfile, Registration,
+                            CourseEnrollmentAllowed, CourseEnrollment,
+                            PendingEmailChange, UserStanding,
+                            CourseAccessRole)
+from course_modes.models import CourseMode
 from django.contrib.auth.models import Group, AnonymousUser
+from datetime import datetime
+import factory
 from factory import lazy_attribute
 from factory.django import DjangoModelFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from uuid import uuid4
 from pytz import UTC
-
-from course_modes.models import CourseMode
-from student.models import (
-    User, UserProfile, Registration, CourseEnrollmentAllowed, CourseEnrollment, PendingEmailChange, UserStanding,
-    CourseAccessRole
-)
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 # Factories are self documenting
 # pylint: disable=missing-docstring
-
-USER_PASSWORD = 'test'
 
 
 class GroupFactory(DjangoModelFactory):
     class Meta(object):
         model = Group
-        django_get_or_create = ('name',)
+        django_get_or_create = ('name', )
 
     name = factory.Sequence(u'group{0}'.format)
 
@@ -42,7 +39,7 @@ class UserStandingFactory(DjangoModelFactory):
 class UserProfileFactory(DjangoModelFactory):
     class Meta(object):
         model = UserProfile
-        django_get_or_create = ('user',)
+        django_get_or_create = ('user', )
 
     user = None
     name = factory.LazyAttribute(u'{0.user.first_name} {0.user.last_name}'.format)
@@ -86,7 +83,7 @@ class UserFactory(DjangoModelFactory):
 
     username = factory.Sequence(u'robot{0}'.format)
     email = factory.Sequence(u'robot+test+{0}@edx.org'.format)
-    password = factory.PostGenerationMethodCall('set_password', USER_PASSWORD)
+    password = factory.PostGenerationMethodCall('set_password', 'test')
     first_name = factory.Sequence(u'Robot{0}'.format)
     last_name = 'Test'
     is_staff = False
@@ -158,7 +155,6 @@ class PendingEmailChangeFactory(DjangoModelFactory):
     new_email: sequence of new+email+{}@edx.org
     activation_key: sequence of integers, padded to 30 characters
     """
-
     class Meta(object):
         model = PendingEmailChange
 

@@ -105,8 +105,9 @@ from student.helpers import (
     check_verify_status_by_course,
     auth_pipeline_urls, get_next_url_for_login_page,
     DISABLE_UNENROLL_CERT_STATES,
+    destroy_oauth_tokens
 )
-from student.cookies import set_logged_in_cookies, delete_logged_in_cookies, set_user_info_cookie
+from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
@@ -749,9 +750,7 @@ def dashboard(request):
             'ecommerce_payment_page': ecommerce_service.payment_page_url(),
         })
 
-    response = render_to_response('dashboard.html', context)
-    set_user_info_cookie(response, request, user)
-    return response
+    return render_to_response('dashboard.html', context)
 
 
 def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
@@ -2120,6 +2119,7 @@ def password_reset(request):
                 "user_id": request.user.id,
             }
         )
+        destroy_oauth_tokens(request.user)
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
@@ -2246,6 +2246,13 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
             request, uidb64=uidb64, token=token, extra_context=platform_name
         )
 
+        # If password reset was unsuccessful a template response is returned (status_code 200).
+        # Check if form is invalid then show an error to the user.
+        # Note if password reset was successful we get response redirect (status_code 302).
+        if response.status_code == 200 and not response.context_data['form'].is_valid():
+            response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
+            return response
+
         # get the updated user
         updated_user = User.objects.get(id=uid_int)
 
@@ -2284,16 +2291,15 @@ def reactivation_email_for_user(user):
     subject = render_to_string('emails/activation_email_subject.txt', context)
     subject = ''.join(subject.splitlines())
     message = render_to_string('emails/activation_email.txt', context)
+    from_address = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
     try:
-        user.email_user(subject, message, configuration_helpers.get_value(
-            'email_from_address',
-            settings.DEFAULT_FROM_EMAIL,
-        ))
+        user.email_user(subject, message, from_address)
     except Exception:  # pylint: disable=broad-except
         log.error(
-            u'Unable to send reactivation email from "%s"',
-            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
+            u'Unable to send reactivation email from "%s" to "%s"',
+            from_address,
+            user.email,
             exc_info=True
         )
         return JsonResponse({

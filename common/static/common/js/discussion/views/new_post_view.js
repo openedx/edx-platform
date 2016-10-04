@@ -55,7 +55,7 @@
                 });
                 this.$el.html(_.template($('#new-post-template').html())(context));
                 threadTypeTemplate = _.template($('#thread-type-template').html());
-                if ($('.js-group-select').is(':disabled')) {
+                if ($('.js-group-select').prop('disabled')) {
                     $('.group-selector-wrapper').addClass('disabled');
                 }
                 this.addField(threadTypeTemplate({
@@ -177,7 +177,7 @@
                 DiscussionUtil.clearFormErrors(this.$('.post-errors'));
                 this.$('.wmd-preview p').html('');
                 if (this.isTabMode()) {
-                    return this.topicView.setTopic(this.$('.topic-title').first());
+                    return this.topicView.setTopic(this.$('button.topic-title').first());
                 }
             };
 

@@ -30,6 +30,8 @@ from courseware.access import has_access
 from courseware.courses import get_course_by_id
 
 from courseware.field_overrides import disable_overrides
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
+from django_comment_common.utils import seed_permissions_roles
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.course_grades import iterate_grades_for
 from opaque_keys.edx.keys import CourseKey
@@ -219,6 +221,11 @@ def create_ccx(request, course, ccx=None):
                 override_field_for_ccx(ccx, vertical, hidden, True)
 
     ccx_id = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
+
+    # Create forum roles
+    seed_permissions_roles(ccx_id)
+    # Assign administrator forum role to CCX coach
+    assign_role(ccx_id, request.user, FORUM_ROLE_ADMINISTRATOR)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
 

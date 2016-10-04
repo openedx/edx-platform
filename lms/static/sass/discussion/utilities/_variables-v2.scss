@@ -19,6 +19,8 @@ $forum-color-hover-thread: palette(grayscale, x-back) !default;
 $forum-color-reading-thread: palette(primary, base) !default;
 $forum-color-read-post: palette(grayscale, base) !default;
 $forum-color-never-read-post: palette(primary, base) !default;
+$forum-color-editor-preview-label: palette(grayscale, base) !default;
+$forum-color-response-count: palette(grayscale, base) !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin

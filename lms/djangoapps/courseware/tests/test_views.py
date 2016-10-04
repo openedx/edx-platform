@@ -1136,25 +1136,38 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location)
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
 
+    def _get_progress_page(self, expected_status_code=200):
+        """
+        Gets the progress page for the user in the course.
+        """
+        resp = self.client.get(
+            reverse('progress', args=[unicode(self.course.id)])
+        )
+        self.assertEqual(resp.status_code, expected_status_code)
+        return resp
+
+    def _get_student_progress_page(self, expected_status_code=200):
+        """
+        Gets the progress page for the user in the course.
+        """
+        resp = self.client.get(
+            reverse('student_progress', args=[unicode(self.course.id), self.user.id])
+        )
+        self.assertEqual(resp.status_code, expected_status_code)
+        return resp
+
     @ddt.data('"><script>alert(1)</script>', '<script>alert(1)</script>', '</script><script>alert(1)</script>')
     def test_progress_page_xss_prevent(self, malicious_code):
         """
         Test that XSS attack is prevented
         """
-        resp = self.client.get(
-            reverse('student_progress', args=[unicode(self.course.id), self.user.id])
-        )
-        self.assertEqual(resp.status_code, 200)
+        resp = self._get_student_progress_page()
         # Test that malicious code does not appear in html
         self.assertNotIn(malicious_code, resp.content)
 
     def test_pure_ungraded_xblock(self):
         ItemFactory.create(category='acid', parent_location=self.vertical.location)
-
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
-        self.assertEqual(resp.status_code, 200)
+        self._get_progress_page()
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_student_progress_with_valid_and_invalid_id(self, default_store):
@@ -1180,11 +1193,8 @@ class ProgressPageTests(ModuleStoreTestCase):
             )
             self.assertEquals(resp.status_code, 404)
 
-        resp = self.client.get(
-            reverse('student_progress', args=[unicode(self.course.id), self.user.id])
-        )
         # Assert that valid 'student_id' returns 200 status
-        self.assertEqual(resp.status_code, 200)
+        self._get_student_progress_page()
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_unenrolled_student_progress_for_credit_course(self, default_store):
@@ -1219,38 +1229,26 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Add a single credit requirement (final grade)
         set_credit_requirements(course.id, requirements)
 
-        resp = self.client.get(
-            reverse('student_progress', args=[unicode(course.id), not_enrolled_user.id])
-        )
-        self.assertEqual(resp.status_code, 200)
+        self._get_student_progress_page()
 
     def test_non_ascii_grade_cutoffs(self):
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
-        self.assertEqual(resp.status_code, 200)
+        self._get_progress_page()
 
     def test_generate_cert_config(self):
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
         # Enable the feature, but do not enable it for this course
         CertificateGenerationConfiguration(enabled=True).save()
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertNotContains(resp, 'Request Certificate')
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
@@ -1295,9 +1293,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertContains(resp, u"View Certificate")
 
         self.assertContains(resp, u"You can keep working for a higher grade")
@@ -1308,9 +1304,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         certificates[0]['is_active'] = False
         self.store.update_item(self.course, self.user.id)
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertNotContains(resp, u"View Your Certificate")
         self.assertNotContains(resp, u"You can now view your certificate")
         self.assertContains(resp, "working on it...")
@@ -1340,24 +1334,29 @@ class ProgressPageTests(ModuleStoreTestCase):
         # Enable certificate generation for this course
         certs_api.set_cert_generation_enabled(self.course.id, True)
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertContains(resp, u"Download Your Certificate")
 
     @ddt.data(
-        *itertools.product(((39, 4, True), (39, 4, False)), (True, False))
+        *itertools.product((True, False), (True, False))
     )
     @ddt.unpack
-    def test_query_counts(self, (sql_calls, mongo_calls, self_paced), self_paced_enabled):
+    def test_progress_queries_paced_courses(self, self_paced, self_paced_enabled):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(sql_calls), check_mongo_calls(mongo_calls):
-            resp = self.client.get(
-                reverse('progress', args=[unicode(self.course.id)])
-            )
-        self.assertEqual(resp.status_code, 200)
+        with self.assertNumQueries(39), check_mongo_calls(4):
+            self._get_progress_page()
+
+    def test_progress_queries(self):
+        self.setup_course()
+        with self.assertNumQueries(39), check_mongo_calls(4):
+            self._get_progress_page()
+
+        # subsequent accesses to the progress page require fewer queries.
+        for _ in range(2):
+            with self.assertNumQueries(22), check_mongo_calls(4):
+                self._get_progress_page()
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
@@ -1395,7 +1394,8 @@ class ProgressPageTests(ModuleStoreTestCase):
 
             self.assertEqual(
                 cert_button_hidden,
-                'Request Certificate' not in resp.content)
+                'Request Certificate' not in resp.content
+            )
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
@@ -1428,9 +1428,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.course.save()
         self.store.update_item(self.course, self.user.id)
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertContains(resp, u"View Certificate")
         self.assert_invalidate_certificate(generated_certificate)
 
@@ -1447,9 +1445,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             "http://www.example.com/certificate.pdf", "honor"
         )
 
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
         self.assertContains(resp, u'Download Your Certificate')
         self.assert_invalidate_certificate(generated_certificate)
 
@@ -1464,9 +1460,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         user = UserFactory.create()
         self.assertTrue(self.client.login(username=user.username, password='test'))
         CourseEnrollmentFactory(user=user, course_id=self.course.id, mode=CourseMode.AUDIT)
-        response = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        response = self._get_progress_page()
 
         self.assertContains(
             response,
@@ -1555,9 +1549,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         )
         # Invalidate user certificate
         certificate.invalidate()
-        resp = self.client.get(
-            reverse('progress', args=[unicode(self.course.id)])
-        )
+        resp = self._get_progress_page()
 
         self.assertNotContains(resp, u'Request Certificate')
         self.assertContains(resp, u'Your certificate has been invalidated')
@@ -1781,9 +1773,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.client.logout()
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("You must be signed in to {platform_name} to create a certificate.".format(
+        self.assertIn(u"You must be signed in to {platform_name} to create a certificate.".format(
             platform_name=settings.PLATFORM_NAME
-        ), resp.content)
+        ), resp.content.decode('utf-8'))
 
 
 class ActivateIDCheckerBlock(XBlock):

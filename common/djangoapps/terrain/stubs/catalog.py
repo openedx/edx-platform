@@ -11,6 +11,7 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):  # pylint: disable=miss
 
     def do_GET(self):  # pylint: disable=invalid-name, missing-docstring
         pattern_handlers = {
+            r'/api/v1/programs/$': self.get_programs,
             r'/api/v1/course_runs/(?P<course_id>[^/+]+(/|\+)[^/+]+(/|\+)[^/?]+)/$': self.get_course_run,
         }
 
@@ -31,9 +32,16 @@ class StubCatalogServiceHandler(StubHttpRequestHandler):  # pylint: disable=miss
                 return True
         return None
 
+    def get_programs(self):
+        """
+        Stubs the catalog's programs endpoint.
+        """
+        programs = self.server.config.get('catalog.programs', [])
+        self.send_json_response(programs)
+
     def get_course_run(self, course_id):
         """
-        Stubs a catalog course run endpoint.
+        Stubs the catalog's course run endpoint.
         """
         course_run = self.server.config.get('course_run.{}'.format(course_id), [])
         self.send_json_response(course_run)

@@ -6,7 +6,6 @@ from collections import OrderedDict
 import ddt
 from hashlib import sha1
 import json
-from mock import patch
 
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -14,10 +13,41 @@ from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from lms.djangoapps.grades.models import (
     BlockRecord,
-    BlockRecordSet,
+    BlockRecordList,
+    BLOCK_RECORD_LIST_VERSION,
     PersistentSubsectionGrade,
     VisibleBlocks
 )
+
+
+class BlockRecordListTestCase(TestCase):
+    """
+    Verify the behavior of BlockRecordList, particularly around edge cases
+    """
+    def setUp(self):
+        super(BlockRecordListTestCase, self).setUp()
+        self.course_key = CourseLocator(
+            org='some_org',
+            course='some_course',
+            run='some_run'
+        )
+
+    def test_empty_block_record_set(self):
+        empty_json = u'{"blocks":[],"course_key":"%s","version":%s}' % (
+            unicode(self.course_key),
+            BLOCK_RECORD_LIST_VERSION,
+        )
+
+        brs = BlockRecordList((), self.course_key)
+        self.assertFalse(brs)
+        self.assertEqual(
+            brs.json_value,
+            empty_json
+        )
+        self.assertEqual(
+            BlockRecordList.from_json(empty_json),
+            brs
+        )
 
 
 class GradesModelTestCase(TestCase):
@@ -41,8 +71,8 @@ class GradesModelTestCase(TestCase):
             block_type='problem',
             block_id='block_id_b'
         )
-        self.record_a = BlockRecord(self.locator_a, 1, 10)
-        self.record_b = BlockRecord(self.locator_b, 1, 10)
+        self.record_a = BlockRecord(locator=self.locator_a, weight=1, max_score=10)
+        self.record_b = BlockRecord(locator=self.locator_b, weight=1, max_score=10)
 
 
 @ddt.ddt
@@ -74,7 +104,7 @@ class BlockRecordTest(GradesModelTestCase):
     @ddt.unpack
     def test_serialization(self, weight, max_score, block_key):
         """
-        Tests serialization of a BlockRecord using the to_dict() method.
+        Tests serialization of a BlockRecord using the _asdict() method.
         """
         record = BlockRecord(block_key, weight, max_score)
         expected = OrderedDict([
@@ -89,43 +119,59 @@ class VisibleBlocksTest(GradesModelTestCase):
     """
     Test the VisibleBlocks model.
     """
+    def _create_block_record_list(self, blocks):
+        """
+        Creates and returns a BlockRecordList for the given blocks.
+        """
+        return VisibleBlocks.objects.create_from_blockrecords(BlockRecordList.from_list(blocks, self.course_key))
+
     def test_creation(self):
         """
         Happy path test to ensure basic create functionality works as expected.
         """
-        vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a])
+        vblocks = self._create_block_record_list([self.record_a])
         list_of_block_dicts = [self.record_a._asdict()]
         for block_dict in list_of_block_dicts:
             block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
-        expected_json = json.dumps(list_of_block_dicts, separators=(',', ':'), sort_keys=True)
+        expected_data = {
+            'blocks': [{'locator': unicode(self.record_a.locator), 'max_score': 10, 'weight': 1}],
+            'course_key': unicode(self.record_a.locator.course_key),
+            'version': BLOCK_RECORD_LIST_VERSION,
+        }
+        expected_json = json.dumps(expected_data, separators=(',', ':'), sort_keys=True)
         expected_hash = b64encode(sha1(expected_json).digest())
+        self.assertEqual(expected_data, json.loads(vblocks.blocks_json))
         self.assertEqual(expected_json, vblocks.blocks_json)
         self.assertEqual(expected_hash, vblocks.hashed)
 
-    def test_ordering_does_not_matter(self):
+    def test_ordering_matters(self):
         """
-        When creating new vblocks, a different ordering of blocks produces the
-        same record in the database.
+        When creating new vblocks, different ordering of blocks produces
+        different records in the database.
         """
-        stored_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_a, self.record_b])
-        repeat_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b, self.record_a])
-        new_vblocks = VisibleBlocks.objects.create_from_blockrecords([self.record_b])
+        stored_vblocks = self._create_block_record_list([self.record_a, self.record_b])
+        repeat_vblocks = self._create_block_record_list([self.record_b, self.record_a])
+        same_order_vblocks = self._create_block_record_list([self.record_a, self.record_b])
+        new_vblocks = self._create_block_record_list([self.record_b])
 
-        self.assertEqual(stored_vblocks.pk, repeat_vblocks.pk)
-        self.assertEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
+        self.assertNotEqual(stored_vblocks.pk, repeat_vblocks.pk)
+        self.assertNotEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
+
+        self.assertEquals(stored_vblocks.pk, same_order_vblocks.pk)
+        self.assertEquals(stored_vblocks.hashed, same_order_vblocks.hashed)
 
         self.assertNotEqual(stored_vblocks.pk, new_vblocks.pk)
         self.assertNotEqual(stored_vblocks.hashed, new_vblocks.hashed)
 
     def test_blocks_property(self):
         """
-        Ensures that, given an array of BlockRecord, creating visible_blocks and accessing
-        visible_blocks.blocks yields a copy of the initial array. Also, trying to set the blocks property should raise
-        an exception.
+        Ensures that, given an array of BlockRecord, creating visible_blocks
+        and accessing visible_blocks.blocks yields a copy of the initial array.
+        Also, trying to set the blocks property should raise an exception.
         """
-        expected_blocks = [self.record_a, self.record_b]
-        visible_blocks = VisibleBlocks.objects.create_from_blockrecords(expected_blocks)
-        self.assertEqual(BlockRecordSet(expected_blocks), visible_blocks.blocks)
+        expected_blocks = BlockRecordList.from_list([self.record_a, self.record_b], self.course_key)
+        visible_blocks = self._create_block_record_list(expected_blocks)
+        self.assertEqual(expected_blocks, visible_blocks.blocks)
         with self.assertRaises(AttributeError):
             visible_blocks.blocks = expected_blocks
 
@@ -142,30 +188,33 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             block_type='subsection',
             block_id='subsection_12345',
         )
+        self.block_records = BlockRecordList([self.record_a, self.record_b], self.course_key)
         self.params = {
             "user_id": 12345,
             "usage_key": self.usage_key,
             "course_version": "deadbeef",
             "subtree_edited_timestamp": "2016-08-01 18:53:24.354741",
-            "earned_all": 6,
-            "possible_all": 12,
-            "earned_graded": 6,
-            "possible_graded": 8,
-            "visible_blocks": [self.record_a, self.record_b],
+            "earned_all": 6.0,
+            "possible_all": 12.0,
+            "earned_graded": 6.0,
+            "possible_graded": 8.0,
+            "visible_blocks": self.block_records,
         }
 
     def test_create(self):
         """
         Tests model creation, and confirms error when trying to recreate model.
         """
-        created_grade = PersistentSubsectionGrade.objects.create(**self.params)
-        read_grade = PersistentSubsectionGrade.read_grade(
-            user_id=self.params["user_id"],
-            usage_key=self.params["usage_key"],
-        )
-        self.assertEqual(created_grade, read_grade)
+        created_grade = PersistentSubsectionGrade.create_grade(**self.params)
+        with self.assertNumQueries(1):
+            read_grade = PersistentSubsectionGrade.read_grade(
+                user_id=self.params["user_id"],
+                usage_key=self.params["usage_key"],
+            )
+            self.assertEqual(created_grade, read_grade)
+            self.assertEquals(read_grade.visible_blocks.blocks, self.block_records)
         with self.assertRaises(IntegrityError):
-            created_grade = PersistentSubsectionGrade.objects.create(**self.params)
+            PersistentSubsectionGrade.create_grade(**self.params)
 
     def test_create_bad_params(self):
         """
@@ -173,39 +222,19 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         """
         del self.params["earned_graded"]
         with self.assertRaises(IntegrityError):
-            PersistentSubsectionGrade.objects.create(**self.params)
+            PersistentSubsectionGrade.create_grade(**self.params)
 
     def test_course_version_is_optional(self):
         del self.params["course_version"]
-        PersistentSubsectionGrade.objects.create(**self.params)
-
-    def test_update_grade(self):
-        """
-        Tests model update, and confirms error when updating a nonexistent model.
-        """
-        with self.assertRaises(PersistentSubsectionGrade.DoesNotExist):
-            PersistentSubsectionGrade.update_grade(**self.params)
-        PersistentSubsectionGrade.objects.create(**self.params)
-        self.params['earned_all'] = 12
-        self.params['earned_graded'] = 8
-        PersistentSubsectionGrade.update_grade(**self.params)
-        read_grade = PersistentSubsectionGrade.read_grade(
-            user_id=self.params["user_id"],
-            usage_key=self.params["usage_key"],
-        )
-        self.assertEqual(read_grade.earned_all, 12)
-        self.assertEqual(read_grade.earned_graded, 8)
+        PersistentSubsectionGrade.create_grade(**self.params)
 
     @ddt.data(True, False)
-    def test_save(self, already_created):
+    def test_update_or_create_grade(self, already_created):
+        created_grade = PersistentSubsectionGrade.create_grade(**self.params) if already_created else None
+
+        self.params["earned_all"] = 7
+        updated_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.assertEquals(updated_grade.earned_all, 7)
         if already_created:
-            PersistentSubsectionGrade.objects.create(**self.params)
-        module_prefix = "lms.djangoapps.grades.models.PersistentSubsectionGrade."
-        with patch(
-            module_prefix + "objects.get_or_create",
-            wraps=PersistentSubsectionGrade.objects.get_or_create
-        ) as mock_get_or_create:
-            with patch(module_prefix + "update") as mock_update:
-                PersistentSubsectionGrade.save_grade(**self.params)
-                self.assertTrue(mock_get_or_create.called)
-                self.assertEqual(mock_update.called, already_created)
+            self.assertEquals(created_grade.id, updated_grade.id)
+            self.assertEquals(created_grade.earned_all, 6)

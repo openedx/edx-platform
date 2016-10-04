@@ -14,7 +14,6 @@ import pystache_custom as pystache
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from lms.djangoapps.ccx.overrides import get_current_ccx
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
@@ -806,11 +805,8 @@ def is_commentable_cohorted(course_key, commentable_id):
 
 def is_discussion_enabled(course_id):
     """
-    Return True if Discussion is enabled for a course; else False
+    Return True if discussions are enabled; else False
     """
-    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-        if get_current_ccx(course_id):
-            return False
     return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
 
 

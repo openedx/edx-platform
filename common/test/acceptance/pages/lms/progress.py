@@ -22,13 +22,35 @@ class ProgressPage(CoursePage):
     def grading_formats(self):
         return [label.replace(' Scores:', '') for label in self.q(css="div.scores h3").text]
 
+    def section_score(self, chapter, section):
+        """
+        Return a list of (points, max_points) tuples representing the
+        aggregate score for the section.
+
+        Example:
+            page.section_score('Week 1', 'Lesson 1') --> (2, 5)
+
+        Returns `None` if no such chapter and section can be found.
+        """
+        # Find the index of the section in the chapter
+        chapter_index = self._chapter_index(chapter)
+        if chapter_index is None:
+            return None
+
+        section_index = self._section_index(chapter_index, section)
+        if section_index is None:
+            return None
+
+        # Retrieve the scores for the section
+        return self._aggregate_section_score(chapter_index, section_index)
+
     def scores(self, chapter, section):
         """
         Return a list of (points, max_points) tuples representing the scores
         for the section.
 
         Example:
-            scores('Week 1', 'Lesson 1') --> [(2, 4), (0, 1)]
+            page.scores('Week 1', 'Lesson 1') --> [(2, 4), (0, 1)]
 
         Returns `None` if no such chapter and section can be found.
         """
@@ -44,6 +66,13 @@ class ProgressPage(CoursePage):
 
         # Retrieve the scores for the section
         return self._section_scores(chapter_index, section_index)
+
+    def text_on_page(self, text):
+        """
+        Return whether the given text appears
+        on the page.
+        """
+        return text in self.q(css=".view-in-course").html[0]
 
     def _chapter_index(self, title):
         """
@@ -85,6 +114,28 @@ class ProgressPage(CoursePage):
         except ValueError:
             self.warning("Could not find section '{0}'".format(title))
             return None
+
+    def _aggregate_section_score(self, chapter_index, section_index):
+        """
+        Return a tuple of the form `(points, max_points)` representing
+        the aggregate score for the specified chapter and section.
+        """
+        score_css = "div.chapters>section:nth-of-type({0}) div.sections>div:nth-of-type({1}) h3>span".format(
+            chapter_index, section_index
+
+        )
+        text_scores = self.q(css=score_css).text
+        assert len(text_scores) == 1
+        text_score = text_scores[0]
+        text_score = text_score.split()[0]  # strip off percentage, if present
+
+        assert (text_score[0], text_score[-1]) == ('(', ')')
+        text_score = text_score.strip('()')
+
+        assert '/' in text_score
+        score = tuple(int(x) for x in text_score.split('/'))
+        assert len(score) == 2
+        return score
 
     def _section_scores(self, chapter_index, section_index):
         """

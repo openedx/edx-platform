@@ -4,7 +4,6 @@ Tests for student activation and login
 import json
 import unittest
 
-import urllib
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -170,10 +169,14 @@ class LoginTest(CacheIsolationTestCase):
 
         # Verify the format of the "user info" cookie set on login
         cookie = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME]
-        user_info = json.loads(urllib.unquote(cookie.value))
+        user_info = json.loads(cookie.value)
 
+        # Check that the version is set
         self.assertEqual(user_info["version"], settings.EDXMKTG_USER_INFO_COOKIE_VERSION)
+
+        # Check that the username and email are set
         self.assertEqual(user_info["username"], self.user.username)
+        self.assertEqual(user_info["email"], self.user.email)
 
         # Check that the URLs are absolute
         for url in user_info["header_urls"].values():
@@ -502,7 +505,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/login?next={url}'.format(url=TARGET_URL), 302))
-        self.assertContains(noshib_response, ("Sign in or Register | {platform_name}"
+        self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 

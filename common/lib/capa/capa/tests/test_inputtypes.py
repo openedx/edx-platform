@@ -16,7 +16,7 @@ TODO:
 - test funny xml chars -- should never get xml parse error if things are escaped properly.
 
 """
-
+from collections import OrderedDict
 import json
 from lxml import etree
 from lxml.html import fromstring
@@ -24,7 +24,7 @@ import unittest
 import textwrap
 import xml.sax.saxutils as saxutils
 
-from . import test_capa_system
+from capa.tests.helpers import test_capa_system
 from capa import inputtypes
 from capa.checker import DemoSystem
 from mock import ANY, patch
@@ -34,6 +34,14 @@ from capa.xqueue_interface import XQUEUE_TIMEOUT
 
 # just a handy shortcut
 lookup_tag = inputtypes.registry.get_class_for_tag
+
+
+DESCRIBEDBY = 'aria-describedby="desc-1 desc-2"'
+DESCRIPTIONS = OrderedDict([('desc-1', 'description text 1'), ('desc-2', 'description text 2')])
+RESPONSE_DATA = {
+    'label': 'question text 101',
+    'descriptions': DESCRIPTIONS
+}
 
 
 def quote_attr(s):
@@ -49,9 +57,13 @@ class OptionInputTest(unittest.TestCase):
         xml_str = """<optioninput options="('Up','Down','Don't know')" id="sky_input" correct="Up"/>"""
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'Down',
-                 'id': 'sky_input',
-                 'status': 'answered'}
+        state = {
+            'value': 'Down',
+            'id': 'sky_input',
+            'status': 'answered',
+            'default_option_text': 'Select an option',
+            'response_data': RESPONSE_DATA
+        }
         option_input = lookup_tag('optioninput')(test_capa_system(), element, state)
 
         context = option_input._get_render_context()  # pylint: disable=protected-access
@@ -61,10 +73,12 @@ class OptionInputTest(unittest.TestCase):
             'value': 'Down',
             'options': [('Up', 'Up'), ('Down', 'Down'), ('Don\'t know', 'Don\'t know')],
             'status': inputtypes.Status('answered'),
-            'label': '',
             'msg': '',
             'inline': False,
             'id': 'sky_input',
+            'default_option_text': 'Select an option',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -105,12 +119,14 @@ class ChoiceGroupTest(unittest.TestCase):
     <choice correct="false" name="foil4">This is <b>foil</b> Four.</choice>
   </{tag}>
         """.format(tag=tag)
-
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'foil3',
-                 'id': 'sky_input',
-                 'status': 'answered'}
+        state = {
+            'value': 'foil3',
+            'id': 'sky_input',
+            'status': 'answered',
+            'response_data': RESPONSE_DATA
+        }
 
         the_input = lookup_tag(tag)(test_capa_system(), element, state)
 
@@ -121,7 +137,6 @@ class ChoiceGroupTest(unittest.TestCase):
             'id': 'sky_input',
             'value': 'foil3',
             'status': inputtypes.Status('answered'),
-            'label': '',
             'msg': '',
             'input_type': expected_input_type,
             'choices': [('foil1', '<text>This is foil One.</text>'),
@@ -131,6 +146,8 @@ class ChoiceGroupTest(unittest.TestCase):
             'show_correctness': 'always',
             'submitted_message': 'Answer received.',
             'name_array_suffix': expected_suffix,   # what is this for??
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -165,7 +182,10 @@ class JavascriptInputTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': '3', }
+        state = {
+            'value': '3',
+            'response_data': RESPONSE_DATA
+        }
         the_input = lookup_tag('javascriptinput')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
@@ -174,13 +194,14 @@ class JavascriptInputTest(unittest.TestCase):
             'STATIC_URL': '/dummy-static/',
             'id': 'prob_1_2',
             'status': inputtypes.Status('unanswered'),
-            # 'label': '',
             'msg': '',
             'value': '3',
             'params': params,
             'display_file': display_file,
             'display_class': display_class,
             'problem_state': problem_state,
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -193,11 +214,14 @@ class TextLineTest(unittest.TestCase):
 
     def test_rendering(self):
         size = "42"
-        xml_str = """<textline id="prob_1_2" label="testing 123" size="{size}"/>""".format(size=size)
+        xml_str = """<textline id="prob_1_2" size="{size}"/>""".format(size=size)
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'BumbleBee', }
+        state = {
+            'value': 'BumbleBee',
+            'response_data': RESPONSE_DATA
+        }
         the_input = lookup_tag('textline')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
@@ -207,7 +231,6 @@ class TextLineTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'BumbleBee',
             'status': inputtypes.Status('unanswered'),
-            'label': 'testing 123',
             'size': size,
             'msg': '',
             'hidden': False,
@@ -215,6 +238,8 @@ class TextLineTest(unittest.TestCase):
             'do_math': False,
             'trailing_text': '',
             'preprocessor': None,
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -229,7 +254,10 @@ class TextLineTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'BumbleBee', }
+        state = {
+            'value': 'BumbleBee',
+            'response_data': RESPONSE_DATA
+        }
         the_input = lookup_tag('textline')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
@@ -239,7 +267,6 @@ class TextLineTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'BumbleBee',
             'status': inputtypes.Status('unanswered'),
-            'label': '',
             'size': size,
             'msg': '',
             'hidden': False,
@@ -250,6 +277,8 @@ class TextLineTest(unittest.TestCase):
                 'class_name': preprocessorClass,
                 'script_src': script,
             },
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -273,7 +302,10 @@ class TextLineTest(unittest.TestCase):
 
             element = etree.fromstring(xml_str)
 
-            state = {'value': 'BumbleBee', }
+            state = {
+                'value': 'BumbleBee',
+                'response_data': RESPONSE_DATA
+            }
             the_input = lookup_tag('textline')(test_capa_system(), element, state)
 
             context = the_input._get_render_context()  # pylint: disable=protected-access
@@ -283,7 +315,6 @@ class TextLineTest(unittest.TestCase):
                 'id': 'prob_1_2',
                 'value': 'BumbleBee',
                 'status': inputtypes.Status('unanswered'),
-                'label': '',
                 'size': size,
                 'msg': '',
                 'hidden': False,
@@ -291,6 +322,8 @@ class TextLineTest(unittest.TestCase):
                 'do_math': False,
                 'trailing_text': expected_text,
                 'preprocessor': None,
+                'response_data': RESPONSE_DATA,
+                'describedby_html': DESCRIBEDBY
             }
             self.assertEqual(context, expected)
 
@@ -312,9 +345,12 @@ class FileSubmissionTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'BumbleBee.py',
-                 'status': 'incomplete',
-                 'feedback': {'message': '3'}, }
+        state = {
+            'value': 'BumbleBee.py',
+            'status': 'incomplete',
+            'feedback': {'message': '3'},
+            'response_data': RESPONSE_DATA
+        }
         input_class = lookup_tag('filesubmission')
         the_input = input_class(test_capa_system(), element, state)
 
@@ -324,12 +360,13 @@ class FileSubmissionTest(unittest.TestCase):
             'STATIC_URL': '/dummy-static/',
             'id': 'prob_1_2',
             'status': inputtypes.Status('queued'),
-            'label': '',
             'msg': the_input.submitted_msg,
             'value': 'BumbleBee.py',
             'queue_len': '3',
             'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
             'required_files': '["cookies.py"]',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -359,9 +396,12 @@ class CodeInputTest(unittest.TestCase):
 
         escapedict = {'"': '&quot;'}
 
-        state = {'value': 'print "good evening"',
-                 'status': 'incomplete',
-                 'feedback': {'message': '3'}, }
+        state = {
+            'value': 'print "good evening"',
+            'status': 'incomplete',
+            'feedback': {'message': '3'},
+            'response_data': RESPONSE_DATA
+        }
 
         input_class = lookup_tag('codeinput')
         the_input = input_class(test_capa_system(), element, state)
@@ -373,7 +413,6 @@ class CodeInputTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': inputtypes.Status('queued'),
-            # 'label': '',
             'msg': the_input.submitted_msg,
             'mode': mode,
             'linenumbers': linenumbers,
@@ -382,6 +421,8 @@ class CodeInputTest(unittest.TestCase):
             'hidden': '',
             'tabsize': int(tabsize),
             'queue_len': '3',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -413,9 +454,12 @@ class MatlabTest(unittest.TestCase):
                                      payload=self.payload,
                                      ln=self.linenumbers)
         elt = etree.fromstring(self.xml)
-        state = {'value': 'print "good evening"',
-                 'status': 'incomplete',
-                 'feedback': {'message': '3'}, }
+        state = {
+            'value': 'print "good evening"',
+            'status': 'incomplete',
+            'feedback': {'message': '3'},
+            'response_data': {}
+        }
 
         self.input_class = lookup_tag('matlabinput')
         self.the_input = self.input_class(test_capa_system(), elt, state)
@@ -428,7 +472,6 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': inputtypes.Status('queued'),
-            # 'label': '',
             'msg': self.the_input.submitted_msg,
             'mode': self.mode,
             'rows': self.rows,
@@ -440,15 +483,20 @@ class MatlabTest(unittest.TestCase):
             'button_enabled': True,
             'queue_len': '3',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
+            'response_data': {},
+            'describedby_html': ''
         }
 
         self.assertEqual(context, expected)
 
     def test_rendering_with_state(self):
-        state = {'value': 'print "good evening"',
-                 'status': 'incomplete',
-                 'input_state': {'queue_msg': 'message'},
-                 'feedback': {'message': '3'}, }
+        state = {
+            'value': 'print "good evening"',
+            'status': 'incomplete',
+            'input_state': {'queue_msg': 'message'},
+            'feedback': {'message': '3'},
+            'response_data': RESPONSE_DATA
+        }
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
@@ -459,7 +507,6 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': inputtypes.Status('queued'),
-            # 'label': '',
             'msg': the_input.submitted_msg,
             'mode': self.mode,
             'rows': self.rows,
@@ -471,16 +518,20 @@ class MatlabTest(unittest.TestCase):
             'button_enabled': True,
             'queue_len': '3',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
 
     def test_rendering_when_completed(self):
         for status in ['correct', 'incorrect']:
-            state = {'value': 'print "good evening"',
-                     'status': status,
-                     'input_state': {},
-                     }
+            state = {
+                'value': 'print "good evening"',
+                'status': status,
+                'input_state': {},
+                'response_data': RESPONSE_DATA
+            }
             elt = etree.fromstring(self.xml)
 
             the_input = self.input_class(test_capa_system(), elt, state)
@@ -490,7 +541,6 @@ class MatlabTest(unittest.TestCase):
                 'id': 'prob_1_2',
                 'value': 'print "good evening"',
                 'status': inputtypes.Status(status),
-                # 'label': '',
                 'msg': '',
                 'mode': self.mode,
                 'rows': self.rows,
@@ -502,16 +552,20 @@ class MatlabTest(unittest.TestCase):
                 'button_enabled': False,
                 'queue_len': '0',
                 'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
+                'response_data': RESPONSE_DATA,
+                'describedby_html': DESCRIBEDBY
             }
 
             self.assertEqual(context, expected)
 
     @patch('capa.inputtypes.time.time', return_value=10)
     def test_rendering_while_queued(self, time):
-        state = {'value': 'print "good evening"',
-                 'status': 'incomplete',
-                 'input_state': {'queuestate': 'queued', 'queuetime': 5},
-                 }
+        state = {
+            'value': 'print "good evening"',
+            'status': 'incomplete',
+            'input_state': {'queuestate': 'queued', 'queuetime': 5},
+            'response_data': RESPONSE_DATA
+        }
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
@@ -521,7 +575,6 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': inputtypes.Status('queued'),
-            # 'label': '',
             'msg': the_input.submitted_msg,
             'mode': self.mode,
             'rows': self.rows,
@@ -533,6 +586,8 @@ class MatlabTest(unittest.TestCase):
             'button_enabled': True,
             'queue_len': '1',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -650,13 +705,14 @@ class MatlabTest(unittest.TestCase):
             textwrap.dedent("""
             <div>{\'status\': Status(\'queued\'), \'button_enabled\': True,
             \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\',
-            \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\',
-            \'linenumbers\': \'true\', \'queue_msg\': \'\',
+            \'tabsize\': 4, \'cols\': \'80\',
+            \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\', \'queue_msg\': \'\',
             \'value\': \'print "good evening"\',
             \'msg\': u\'Submitted. As soon as a response is returned,
             this message will be replaced by that feedback.\',
             \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
-            \'hidden\': \'\', \'id\': \'prob_1_2\', \'tabsize\': 4}</div>
+            \'hidden\': \'\', \'id\': \'prob_1_2\', \'describedby_html\': \'\',
+            \'response_data\': {}}</div>
             """).replace('\n', ' ').strip()
         )
 
@@ -724,10 +780,13 @@ class MatlabTest(unittest.TestCase):
     </div><ul></ul></div>
         """)
 
-        state = {'value': 'print "good evening"',
-                 'status': 'incomplete',
-                 'input_state': {'queue_msg': queue_msg},
-                 'feedback': {'message': '3'}, }
+        state = {
+            'value': 'print "good evening"',
+            'status': 'incomplete',
+            'input_state': {'queue_msg': queue_msg},
+            'feedback': {'message': '3'},
+            'response_data': RESPONSE_DATA
+        }
         elt = etree.fromstring(self.xml)
 
         the_input = self.input_class(test_capa_system(), elt, state)
@@ -759,6 +818,8 @@ class MatlabTest(unittest.TestCase):
             'button_enabled': True,
             'queue_len': '3',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
+            'response_data': {},
+            'describedby_html': ''
         }
 
         self.assertEqual(context, expected)
@@ -845,8 +906,11 @@ class SchematicTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         value = 'three resistors and an oscilating pendulum'
-        state = {'value': value,
-                 'status': 'unsubmitted'}
+        state = {
+            'value': value,
+            'status': 'unsubmitted',
+            'response_data': RESPONSE_DATA
+        }
 
         the_input = lookup_tag('schematic')(test_capa_system(), element, state)
 
@@ -857,7 +921,6 @@ class SchematicTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': inputtypes.Status('unsubmitted'),
-            'label': '',
             'msg': '',
             'initial_value': initial_value,
             'width': width,
@@ -866,6 +929,8 @@ class SchematicTest(unittest.TestCase):
             'setup_script': '/dummy-static/js/capa/schematicinput.js',
             'analyses': analyses,
             'submit_analyses': submit_analyses,
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -889,8 +954,11 @@ class ImageInputTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': value,
-                 'status': 'unsubmitted'}
+        state = {
+            'value': value,
+            'status': 'unsubmitted',
+            'response_data': RESPONSE_DATA
+        }
 
         the_input = lookup_tag('imageinput')(test_capa_system(), element, state)
 
@@ -901,13 +969,14 @@ class ImageInputTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': inputtypes.Status('unsubmitted'),
-            'label': '',
             'width': width,
             'height': height,
             'src': src,
             'gx': egx,
             'gy': egy,
             'msg': '',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -944,8 +1013,11 @@ class CrystallographyTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         value = 'abc'
-        state = {'value': value,
-                 'status': 'unsubmitted'}
+        state = {
+            'value': value,
+            'status': 'unsubmitted',
+            'response_data': RESPONSE_DATA
+        }
 
         the_input = lookup_tag('crystallography')(test_capa_system(), element, state)
 
@@ -956,10 +1028,11 @@ class CrystallographyTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': inputtypes.Status('unsubmitted'),
-            # 'label': '',
             'msg': '',
             'width': width,
             'height': height,
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -986,8 +1059,11 @@ class VseprTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         value = 'abc'
-        state = {'value': value,
-                 'status': 'unsubmitted'}
+        state = {
+            'value': value,
+            'status': 'unsubmitted',
+            'response_data': RESPONSE_DATA
+        }
 
         the_input = lookup_tag('vsepr_input')(test_capa_system(), element, state)
 
@@ -1003,6 +1079,8 @@ class VseprTest(unittest.TestCase):
             'height': height,
             'molecules': molecules,
             'geometries': geometries,
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -1019,7 +1097,10 @@ class ChemicalEquationTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'H2OYeah', }
+        state = {
+            'value': 'H2OYeah',
+            'response_data': RESPONSE_DATA
+        }
         self.the_input = lookup_tag('chemicalequationinput')(test_capa_system(), element, state)
 
     def test_rendering(self):
@@ -1031,10 +1112,11 @@ class ChemicalEquationTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'H2OYeah',
             'status': inputtypes.Status('unanswered'),
-            'label': '',
             'msg': '',
             'size': self.size,
             'previewer': '/dummy-static/js/capa/chemical_equation_preview.js',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -1106,7 +1188,10 @@ class FormulaEquationTest(unittest.TestCase):
 
         element = etree.fromstring(xml_str)
 
-        state = {'value': 'x^2+1/2'}
+        state = {
+            'value': 'x^2+1/2',
+            'response_data': RESPONSE_DATA
+        }
         self.the_input = lookup_tag('formulaequationinput')(test_capa_system(), element, state)
 
     def test_rendering(self):
@@ -1120,12 +1205,13 @@ class FormulaEquationTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'x^2+1/2',
             'status': inputtypes.Status('unanswered'),
-            'label': '',
             'msg': '',
             'size': self.size,
             'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
             'inline': False,
             'trailing_text': '',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -1152,7 +1238,10 @@ class FormulaEquationTest(unittest.TestCase):
 
             element = etree.fromstring(xml_str)
 
-            state = {'value': 'x^2+1/2', }
+            state = {
+                'value': 'x^2+1/2',
+                'response_data': RESPONSE_DATA
+            }
             the_input = lookup_tag('formulaequationinput')(test_capa_system(), element, state)
 
             context = the_input._get_render_context()  # pylint: disable=protected-access
@@ -1162,12 +1251,13 @@ class FormulaEquationTest(unittest.TestCase):
                 'id': 'prob_1_2',
                 'value': 'x^2+1/2',
                 'status': inputtypes.Status('unanswered'),
-                'label': '',
                 'msg': '',
                 'size': size,
                 'previewer': '/dummy-static/js/capa/src/formula_equation_preview.js',
                 'inline': False,
                 'trailing_text': expected_text,
+                'response_data': RESPONSE_DATA,
+                'describedby_html': DESCRIBEDBY
             }
 
             self.assertEqual(context, expected)
@@ -1263,8 +1353,11 @@ class DragAndDropTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         value = 'abc'
-        state = {'value': value,
-                 'status': 'unsubmitted'}
+        state = {
+            'value': value,
+            'status': 'unsubmitted',
+            'response_data': RESPONSE_DATA
+        }
 
         user_input = {  # order matters, for string comparison
                         "target_outline": "false",
@@ -1293,9 +1386,10 @@ class DragAndDropTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': value,
             'status': inputtypes.Status('unsubmitted'),
-            # 'label': '',
             'msg': '',
-            'drag_and_drop_json': json.dumps(user_input)
+            'drag_and_drop_json': json.dumps(user_input),
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         # as we are dumping 'draggables' dicts while dumping user_input, string
@@ -1332,7 +1426,8 @@ class AnnotationInputTest(unittest.TestCase):
         state = {
             'value': json_value,
             'id': 'annotation_input',
-            'status': 'answered'
+            'status': 'answered',
+            'response_data': RESPONSE_DATA
         }
 
         tag = 'annotationinput'
@@ -1345,7 +1440,6 @@ class AnnotationInputTest(unittest.TestCase):
             'STATIC_URL': '/dummy-static/',
             'id': 'annotation_input',
             'status': inputtypes.Status('answered'),
-            # 'label': '',
             'msg': '',
             'title': 'foo',
             'text': 'bar',
@@ -1362,7 +1456,9 @@ class AnnotationInputTest(unittest.TestCase):
             'has_options_value': len(value['options']) > 0,
             'comment_value': value['comment'],
             'debug': False,
-            'return_to_annotation': True
+            'return_to_annotation': True,
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
 
         self.maxDiff = None
@@ -1405,6 +1501,7 @@ class TestChoiceText(unittest.TestCase):
             'value': '{}',
             'id': 'choicetext_input',
             'status': inputtypes.Status('answered'),
+            'response_data': RESPONSE_DATA
         }
 
         first_input = self.build_choice_element('numtolerance_input', 'choiceinput_0_textinput_0', 'false', '')
@@ -1421,11 +1518,12 @@ class TestChoiceText(unittest.TestCase):
         expected = {
             'STATIC_URL': '/dummy-static/',
             'msg': '',
-            'label': '',
             'input_type': expected_input_type,
             'choices': choices,
             'show_correctness': 'always',
-            'submitted_message': 'Answer received.'
+            'submitted_message': 'Answer received.',
+            'response_data': RESPONSE_DATA,
+            'describedby_html': DESCRIBEDBY
         }
         expected.update(state)
         the_input = lookup_tag(tag)(test_capa_system(), element, state)

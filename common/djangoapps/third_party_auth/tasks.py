@@ -6,6 +6,7 @@ Code to manage fetching and storing the metadata of IdPs.
 from celery.task import task
 import datetime
 import dateutil.parser
+import pytz
 import logging
 from lxml import etree
 import requests
@@ -36,16 +37,13 @@ def fetch_saml_metadata():
         num_failed: Number of providers that could not be updated
         num_total: Total number of providers whose metadata was fetched
     """
-    if not SAMLConfiguration.is_enabled():
-        return (0, 0, 0)  # Nothing to do until SAML is enabled.
-
     num_changed, num_failed = 0, 0
 
     # First make a list of all the metadata XML URLs:
     url_map = {}
     for idp_slug in SAMLProviderConfig.key_values('idp_slug', flat=True):
         config = SAMLProviderConfig.current(idp_slug)
-        if not config.enabled:
+        if not config.enabled or not SAMLConfiguration.is_enabled(config.site):
             continue
         url = config.metadata_source
         if url not in url_map:
@@ -106,6 +104,7 @@ def _parse_metadata_xml(xml, entity_id):
         expires_at = dateutil.parser.parse(xml.attrib["validUntil"])
     if "cacheDuration" in xml.attrib:
         cache_expires = OneLogin_Saml2_Utils.parse_duration(xml.attrib["cacheDuration"])
+        cache_expires = datetime.datetime.fromtimestamp(cache_expires, tz=pytz.utc)
         if expires_at is None or cache_expires < expires_at:
             expires_at = cache_expires
 

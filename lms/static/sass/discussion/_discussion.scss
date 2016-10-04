@@ -8,6 +8,7 @@ body.discussion {
     @include clearfix();
     box-sizing: border-box;
     width: 100%;
+    padding-top: 0;
 
     h1 {
       font-size: $forum-x-large-font-size;
@@ -19,14 +20,12 @@ body.discussion {
 
     .post-cancel {
       @include float(left);
-      margin: ($baseline/2) 0 0 ($baseline*0.75);
+      @include margin($baseline/2, 0, 0, $baseline*0.75);
     }
 
     .post-update {
       @include float(left);
       margin-top: ($baseline/2);
-      padding-bottom: ($baseline/10);
-      height: 37px;
 
       &:hover, &:focus {
         border-color: #222;
@@ -124,14 +123,18 @@ body.discussion {
   }
 
   .wmd-spacer1 {
-    @include left(50px);
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+    left: 50px;
   }
+
   .wmd-spacer2 {
-    @include left(175px);
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+    left: 175px;
   }
 
   .wmd-spacer3 {
-    @include left(300px);
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+    left: 300px;
   }
 
   .wmd-prompt-background {
@@ -350,7 +353,6 @@ section.discussion {
 
 .new-post-article {
   display: none;
-  margin-top: $baseline;
 
   .inner-wrapper {
     max-width: 1180px;
@@ -406,9 +408,10 @@ section.discussion-pagination {
 
     ol {
       li {
+        @include padding-right($baseline/2);
         list-style: none;
         display: inline-block;
-        padding-right: 0.5em;
+
         &.current-page span {
           display: inline-block;
           height: 35px;
@@ -441,14 +444,14 @@ section.discussion-pagination {
   .response-display-count {
     display: block;
     padding: ($baseline/2) 0;
-    color: $gray;
+    color: $forum-color-response-count;
     font-size: $forum-base-font-size;
   }
 
   .load-response-button {
+    @include text-align(left);
     position: relative;
     margin: ($baseline/2) 0;
     width: 100%;
-    text-align: left;
   }
 }

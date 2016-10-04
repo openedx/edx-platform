@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import json
 import itertools
 from uuid import uuid4
+import httpretty
 
 import ddt
 from django.conf import settings
@@ -28,6 +29,7 @@ from student.models import CourseEnrollment
 from student.tests.factories import CourseModeFactory
 from student.tests.tests import EnrollmentEventTestMixin
 from xmodule.modulestore.django import modulestore
+from commerce.api.v0.views import SAILTHRU_CAMPAIGN_COOKIE
 
 
 @attr(shard=1)
@@ -51,6 +53,8 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
         }
         if marketing_email_opt_in:
             payload["email_opt_in"] = True
+
+        self.client.cookies[SAILTHRU_CAMPAIGN_COOKIE] = 'sailthru id'
         return self.client.post(self.url, payload)
 
     def assertResponseMessage(self, response, expected_msg):
@@ -172,6 +176,9 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             self.assertResponseMessage(response, msg)
         else:
             self.assertResponsePaymentData(response)
+
+        # make sure ecommerce API call forwards Sailthru cookie
+        self.assertIn('{}=sailthru id'.format(SAILTHRU_CAMPAIGN_COOKIE), httpretty.last_request().headers['cookie'])
 
     @ddt.data(True, False)
     def test_course_with_honor_seat_sku(self, user_is_active):

@@ -8,6 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, resolve
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpRequest
@@ -39,7 +40,7 @@ from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
-from student.helpers import get_next_url_for_login_page
+from student.helpers import get_next_url_for_login_page, destroy_oauth_tokens
 import third_party_auth
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
@@ -48,6 +49,7 @@ from util.date_utils import strftime_localized
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
+User = get_user_model()  # pylint:disable=invalid-name
 
 
 @require_http_methods(['GET'])
@@ -171,6 +173,8 @@ def password_change_request_handler(request):
     if email:
         try:
             request_password_change(email, request.get_host(), request.is_secure())
+            user = user if user.is_authenticated() else User.objects.get(email=email)
+            destroy_oauth_tokens(user)
         except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter
@@ -203,7 +207,7 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.accepting_logins():
+        for enabled in third_party_auth.provider.Registry.displayed_for_login():
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
@@ -487,6 +491,8 @@ def account_settings_context(request):
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
             'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
-        } for state in auth_states]
+            # We only want to include providers if they are either currently available to be logged
+            # in with, or if the user is already authenticated with them.
+        } for state in auth_states if state.provider.display_for_login or state.has_account]
 
     return context

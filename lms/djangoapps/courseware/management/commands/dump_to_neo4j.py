@@ -139,7 +139,22 @@ class ModuleStoreSerializer(object):
 class Command(BaseCommand):
     """
     Command to dump modulestore data to neo4j
+
+    Takes the following named arguments:
+      host: the host of the neo4j server
+      port: the port on the server that accepts https requests
+      user: the username for the neo4j user
+      password: the user's password
+
+    Example usage:
+      python manage.py lms dump_to_neo4j --host localhost --port 7473 \
+        --user user --password password --settings=aws
     """
+    def add_arguments(self, parser):
+        parser.add_argument('--host', type=unicode)
+        parser.add_argument('--port', type=int)
+        parser.add_argument('--user', type=unicode)
+        parser.add_argument('--password', type=unicode)
 
     @staticmethod
     def add_to_transaction(neo4j_entities, transaction):
@@ -156,16 +171,25 @@ class Command(BaseCommand):
         Iterates through each course, serializes them into graphs, and saves
         those graphs to neo4j.
         """
-        # first, make sure that there's a valid neo4j configuration
-        if settings.NEO4J_CONFIG is None:
-            raise CommandError(
-                "No neo4j configuration (NEO4J_CONFIG) defined in lms.auth.json."
-            )
+        host = options['host']
+        port = options['port']
+        neo4j_user = options['user']
+        neo4j_password = options['password']
 
-        auth_params = ["{host}:{https_port}", "{user}", "{password}"]
-        authenticate(*[param.format(**settings.NEO4J_CONFIG) for param in auth_params])
+        authenticate(
+            "{host}:{port}".format(host=host, port=port),
+            neo4j_user,
+            neo4j_password,
+        )
 
-        graph = Graph(**settings.NEO4J_CONFIG)
+        graph = Graph(
+            bolt=True,
+            password=neo4j_password,
+            user=neo4j_user,
+            https_port=port,
+            host=host,
+            secure=True
+        )
 
         mss = ModuleStoreSerializer()
 

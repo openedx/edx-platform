@@ -52,9 +52,9 @@
   }
 
   .wmd-input {
+    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
     width: 100%;
     height: 150px;
-    border-radius: $forum-border-radius $forum-border-radius 0 0;
     font-style: normal;
     font-size: $forum-base-font-size;
     font-family: Monaco, 'Lucida Console', monospace;
@@ -111,13 +111,17 @@
   }
 
   .wmd-spacer1 {
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
     left: 50px;
   }
+
   .wmd-spacer2 {
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
     left: 175px;
   }
 
   .wmd-spacer3 {
+    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
     left: 300px;
   }
 

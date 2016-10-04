@@ -13,6 +13,7 @@ Main module which shows problems (of "capa" type).
 This is used by capa_module.
 """
 
+from collections import OrderedDict
 from copy import deepcopy
 from datetime import datetime
 import logging
@@ -30,10 +31,22 @@ import capa.responsetypes as responsetypes
 from capa.util import contextualize_text, convert_files_to_filenames
 import capa.xqueue_interface as xqueue_interface
 from capa.safe_exec import safe_exec
+from openedx.core.djangolib.markup import HTML
+from xmodule.stringify import stringify_children
 
 
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
+
+# fully accessible capa input types
+ACCESSIBLE_CAPA_INPUT_TYPES = [
+    'checkboxgroup',
+    'radiogroup',
+    'choicegroup',
+    'optioninput',
+    'textline',
+    'formulaequationinput',
+]
 
 # these get captured as student responses
 response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
@@ -176,7 +189,7 @@ class LoncapaProblem(object):
         # transformations.  This also creates the dict (self.responders) of Response
         # instances for each question in the problem. The dict has keys = xml subtree of
         # Response, values = Response instance
-        self._preprocess_problem(self.tree)
+        self.problem_data = self._preprocess_problem(self.tree)
 
         if not self.student_answers:  # True when student_answers is an empty dict
             self.set_initial_display()
@@ -752,7 +765,9 @@ class LoncapaProblem(object):
 
         if problemtree.tag in inputtypes.registry.registered_tags():
             # If this is an inputtype subtree, let it render itself.
-            status = "unsubmitted"
+            response_data = self.problem_data[problemid]
+
+            status = 'unsubmitted'
             msg = ''
             hint = ''
             hintmode = None
@@ -766,7 +781,7 @@ class LoncapaProblem(object):
                 hintmode = self.correct_map.get_hintmode(pid)
                 answervariable = self.correct_map.get_property(pid, 'answervariable')
 
-            value = ""
+            value = ''
             if self.student_answers and problemid in self.student_answers:
                 value = self.student_answers[problemid]
 
@@ -780,6 +795,7 @@ class LoncapaProblem(object):
                 'id': input_id,
                 'input_state': self.input_state[input_id],
                 'answervariable': answervariable,
+                'response_data': response_data,
                 'feedback': {
                     'message': msg,
                     'hint': hint,
@@ -836,26 +852,29 @@ class LoncapaProblem(object):
         Obtain all responder answers and save as self.responder_answers dict (key = response)
         """
         response_id = 1
+        problem_data = {}
         self.responders = {}
         for response in tree.xpath('//' + "|//".join(responsetypes.registry.registered_tags())):
-            response_id_str = self.problem_id + "_" + str(response_id)
+            responsetype_id = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
-            response.set('id', response_id_str)
+            response.set('id', responsetype_id)
             response_id += 1
 
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
             inputfields = tree.xpath(
-                "|".join(['//' + response.tag + '[@id=$id]//' + x for x in input_tags + solution_tags]),
-                id=response_id_str
+                "|".join(['//' + response.tag + '[@id=$id]//' + x for x in input_tags]),
+                id=responsetype_id
             )
 
-            # assign one answer_id for each input type or solution type
+            # assign one answer_id for each input type
             for entry in inputfields:
                 entry.attrib['response_id'] = str(response_id)
                 entry.attrib['answer_id'] = str(answer_id)
                 entry.attrib['id'] = "%s_%i_%i" % (self.problem_id, response_id, answer_id)
                 answer_id = answer_id + 1
+
+            self.response_a11y_data(response, inputfields, responsetype_id, problem_data)
 
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
@@ -881,3 +900,85 @@ class LoncapaProblem(object):
         for solution in tree.findall('.//solution'):
             solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
             solution_id += 1
+
+        return problem_data
+
+    def response_a11y_data(self, response, inputfields, responsetype_id, problem_data):
+        """
+        Construct data to be used for a11y.
+
+        Arguments:
+            response (object): xml response object
+            inputfields (list): list of inputfields in a responsetype
+            responsetype_id (str): responsetype id
+            problem_data (dict): dict to be filled with response data
+        """
+        # if there are no inputtypes then don't do anything
+        if not inputfields:
+            return
+
+        element_to_be_deleted = None
+        label = ''
+
+        if len(inputfields) > 1:
+            response.set('multiple_inputtypes', 'true')
+            group_label_tag = response.find('label')
+            group_label_tag_text = ''
+            if group_label_tag is not None:
+                group_label_tag.tag = 'p'
+                group_label_tag.set('id', responsetype_id)
+                group_label_tag.set('class', 'multi-inputs-group-label')
+                group_label_tag_text = stringify_children(group_label_tag)
+
+            for inputfield in inputfields:
+                problem_data[inputfield.get('id')] = {
+                    'group_label': group_label_tag_text,
+                    'label': inputfield.attrib.get('label', ''),
+                    'descriptions': {}
+                }
+        else:
+            # Extract label value from <label> tag or label attribute from inside the responsetype
+            responsetype_label_tag = response.find('label')
+            if responsetype_label_tag is not None:
+                label = stringify_children(responsetype_label_tag)
+                # store <label> tag containing question text to delete
+                # it later otherwise question will be rendered twice
+                element_to_be_deleted = responsetype_label_tag
+            elif 'label' in inputfields[0].attrib:
+                # in this case we have old problems with label attribute and p tag having question in it
+                # we will pick the first sibling of responsetype if its a p tag and match the text with
+                # the label attribute text. if they are equal then we will use this text as question.
+                # Get first <p> tag before responsetype, this <p> may contains the question text.
+                p_tag = response.xpath('preceding-sibling::*[1][self::p]')
+
+                if p_tag and p_tag[0].text == inputfields[0].attrib['label']:
+                    label = stringify_children(p_tag[0])
+                    element_to_be_deleted = p_tag[0]
+            else:
+                # In this case the problems don't have tag or label attribute inside the responsetype
+                # so we will get the first preceding label tag w.r.t to this responsetype.
+                # This will take care of those multi-question problems that are not using --- in their markdown.
+                label_tag = response.xpath('preceding-sibling::*[1][self::label]')
+                if label_tag:
+                    label = stringify_children(label_tag[0])
+                    element_to_be_deleted = label_tag[0]
+
+            # delete label or p element only if inputtype is fully accessible
+            if inputfields[0].tag in ACCESSIBLE_CAPA_INPUT_TYPES and element_to_be_deleted is not None:
+                element_to_be_deleted.getparent().remove(element_to_be_deleted)
+
+            # Extract descriptions and set unique id on each description tag
+            description_tags = response.findall('description')
+            description_id = 1
+            descriptions = OrderedDict()
+            for description in description_tags:
+                descriptions[
+                    "description_%s_%i" % (responsetype_id, description_id)
+                ] = HTML(stringify_children(description))
+                response.remove(description)
+                description_id += 1
+
+            problem_data[inputfields[0].get('id')] = {
+                'label': HTML(label.strip()) if label else '',
+                'descriptions': descriptions
+            }
