@@ -148,6 +148,7 @@ def visit_scenario_item(item_key):
     ))
 
     world.browser.visit(url)
+    world.wait_for_xmodule()
 
 
 def get_courses():
