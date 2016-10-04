@@ -603,7 +603,7 @@ html.video-fullscreen {
     }
 
     @media print {
-      padding: 4mm 2mm 0;
+      padding: 6mm 2mm 0;
       background: transparent !important;
     }
   }
@@ -635,7 +635,9 @@ html.video-fullscreen {
       width: flex-grid(11.5) + flex-gutter();
     }
   }
+}
 
+div.course-wrapper {
   @media print {
     border: 0;
     background: transparent !important;
@@ -681,7 +683,7 @@ section.self-assessment {
  */
 
 .CodeMirror {
-    
+
     .CodeMirror-linenumber.CodeMirror-gutter-elt {
         color: $gray-d3 !important;
     }

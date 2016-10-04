@@ -2,6 +2,7 @@
     @include transition( all .2s $ease-in-out-quad 0s);
     @include border-right(1px solid $border-color-2);
     @include border-radius(3px, 0, 0, 3px);
+    @extend %ui-print-excluded;
     display: table-cell; // needed to extend the sidebar the full height of the area
 
     // provides sufficient contrast for all screen reader-only elements
