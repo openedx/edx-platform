@@ -2,42 +2,67 @@
 import unittest
 
 from xmodule import graders
-from xmodule.graders import Score, aggregate_scores
+from xmodule.graders import ProblemScore, AggregatedScore, aggregate_scores
 
 
 class GradesheetTest(unittest.TestCase):
-    '''Tests the aggregate_scores method'''
+    """
+    Tests the aggregate_scores method
+    """
 
     def test_weighted_grading(self):
         scores = []
-        Score.__sub__ = lambda me, other: (me.earned - other.earned) + (me.possible - other.possible)
+        agg_fields = dict(display_name="aggregated_score", module_id=None)
+        prob_fields = dict(display_name="problem_score", module_id=None, raw_earned=0, raw_possible=0, weight=0)
 
-        all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=0, graded=False, section="summary", module_id=None))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", module_id=None))
-
-        scores.append(Score(earned=0, possible=5, graded=False, section="summary", module_id=None))
-        all_total, graded_total = aggregate_scores(scores)
-        self.assertEqual(all_total, Score(earned=0, possible=5, graded=False, section="summary", module_id=None))
-        self.assertEqual(graded_total, Score(earned=0, possible=0, graded=True, section="summary", module_id=None))
-
-        scores.append(Score(earned=3, possible=5, graded=True, section="summary", module_id=None))
-        all_total, graded_total = aggregate_scores(scores)
-        self.assertAlmostEqual(all_total, Score(earned=3, possible=10, graded=False, section="summary", module_id=None))
-        self.assertAlmostEqual(
-            graded_total, Score(earned=3, possible=5, graded=True, section="summary", module_id=None)
+        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
+        self.assertEqual(
+            all_total,
+            AggregatedScore(tw_earned=0, tw_possible=0, graded=False, **agg_fields),
+        )
+        self.assertEqual(
+            graded_total,
+            AggregatedScore(tw_earned=0, tw_possible=0, graded=True, **agg_fields),
         )
 
-        scores.append(Score(earned=2, possible=5, graded=True, section="summary", module_id=None))
-        all_total, graded_total = aggregate_scores(scores)
-        self.assertAlmostEqual(all_total, Score(earned=5, possible=15, graded=False, section="summary", module_id=None))
+        scores.append(ProblemScore(weighted_earned=0, weighted_possible=5, graded=False, **prob_fields))
+        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
+        self.assertEqual(
+            all_total,
+            AggregatedScore(tw_earned=0, tw_possible=5, graded=False, **agg_fields),
+        )
+        self.assertEqual(
+            graded_total,
+            AggregatedScore(tw_earned=0, tw_possible=0, graded=True, **agg_fields),
+        )
+
+        scores.append(ProblemScore(weighted_earned=3, weighted_possible=5, graded=True, **prob_fields))
+        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
         self.assertAlmostEqual(
-            graded_total, Score(earned=5, possible=10, graded=True, section="summary", module_id=None)
+            all_total,
+            AggregatedScore(tw_earned=3, tw_possible=10, graded=False, **agg_fields),
+        )
+        self.assertAlmostEqual(
+            graded_total,
+            AggregatedScore(tw_earned=3, tw_possible=5, graded=True, **agg_fields),
+        )
+
+        scores.append(ProblemScore(weighted_earned=2, weighted_possible=5, graded=True, **prob_fields))
+        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
+        self.assertAlmostEqual(
+            all_total,
+            AggregatedScore(tw_earned=5, tw_possible=15, graded=False, **agg_fields),
+        )
+        self.assertAlmostEqual(
+            graded_total,
+            AggregatedScore(tw_earned=5, tw_possible=10, graded=True, **agg_fields),
         )
 
 
 class GraderTest(unittest.TestCase):
-    '''Tests grader implementations'''
+    """
+    Tests grader implementations
+    """
 
     empty_gradesheet = {
     }
@@ -49,19 +74,25 @@ class GraderTest(unittest.TestCase):
     }
 
     test_gradesheet = {
-        'Homework': [Score(earned=2, possible=20.0, graded=True, section='hw1', module_id=None),
-                     Score(earned=16, possible=16.0, graded=True, section='hw2', module_id=None)],
+        'Homework': [
+            AggregatedScore(tw_earned=2, tw_possible=20.0, graded=True, display_name='hw1', module_id=None),
+            AggregatedScore(tw_earned=16, tw_possible=16.0, graded=True, display_name='hw2', module_id=None)
+        ],
+
         # The dropped scores should be from the assignments that don't exist yet
+        'Lab': [
+            AggregatedScore(tw_earned=1, tw_possible=2.0, graded=True, display_name='lab1', module_id=None),  # Dropped
+            AggregatedScore(tw_earned=1, tw_possible=1.0, graded=True, display_name='lab2', module_id=None),
+            AggregatedScore(tw_earned=1, tw_possible=1.0, graded=True, display_name='lab3', module_id=None),
+            AggregatedScore(tw_earned=5, tw_possible=25.0, graded=True, display_name='lab4', module_id=None),  # Dropped
+            AggregatedScore(tw_earned=3, tw_possible=4.0, graded=True, display_name='lab5', module_id=None),  # Dropped
+            AggregatedScore(tw_earned=6, tw_possible=7.0, graded=True, display_name='lab6', module_id=None),
+            AggregatedScore(tw_earned=5, tw_possible=6.0, graded=True, display_name='lab7', module_id=None),
+        ],
 
-        'Lab': [Score(earned=1, possible=2.0, graded=True, section='lab1', module_id=None),  # Dropped
-                Score(earned=1, possible=1.0, graded=True, section='lab2', module_id=None),
-                Score(earned=1, possible=1.0, graded=True, section='lab3', module_id=None),
-                Score(earned=5, possible=25.0, graded=True, section='lab4', module_id=None),  # Dropped
-                Score(earned=3, possible=4.0, graded=True, section='lab5', module_id=None),  # Dropped
-                Score(earned=6, possible=7.0, graded=True, section='lab6', module_id=None),
-                Score(earned=5, possible=6.0, graded=True, section='lab7', module_id=None)],
-
-        'Midterm': [Score(earned=50.5, possible=100, graded=True, section="Midterm Exam", module_id=None), ],
+        'Midterm': [
+            AggregatedScore(tw_earned=50.5, tw_possible=100, graded=True, display_name="Midterm Exam", module_id=None),
+        ],
     }
 
     def test_single_section_grader(self):
@@ -69,9 +100,11 @@ class GraderTest(unittest.TestCase):
         lab4_grader = graders.SingleSectionGrader("Lab", "lab4")
         bad_lab_grader = graders.SingleSectionGrader("Lab", "lab42")
 
-        for graded in [midterm_grader.grade(self.empty_gradesheet),
-                       midterm_grader.grade(self.incomplete_gradesheet),
-                       bad_lab_grader.grade(self.test_gradesheet)]:
+        for graded in [
+                midterm_grader.grade(self.empty_gradesheet),
+                midterm_grader.grade(self.incomplete_gradesheet),
+                bad_lab_grader.grade(self.test_gradesheet),
+        ]:
             self.assertEqual(len(graded['section_breakdown']), 1)
             self.assertEqual(graded['percent'], 0.0)
 
@@ -91,10 +124,12 @@ class GraderTest(unittest.TestCase):
         lab_grader = graders.AssignmentFormatGrader("Lab", 7, 3)
 
         # Test the grading of an empty gradesheet
-        for graded in [homework_grader.grade(self.empty_gradesheet),
-                       no_drop_grader.grade(self.empty_gradesheet),
-                       homework_grader.grade(self.incomplete_gradesheet),
-                       no_drop_grader.grade(self.incomplete_gradesheet)]:
+        for graded in [
+                homework_grader.grade(self.empty_gradesheet),
+                no_drop_grader.grade(self.empty_gradesheet),
+                homework_grader.grade(self.incomplete_gradesheet),
+                no_drop_grader.grade(self.incomplete_gradesheet),
+        ]:
             self.assertAlmostEqual(graded['percent'], 0.0)
             # Make sure the breakdown includes 12 sections, plus one summary
             self.assertEqual(len(graded['section_breakdown']), 12 + 1)
@@ -118,8 +153,10 @@ class GraderTest(unittest.TestCase):
     def test_assignment_format_grader_on_single_section_entry(self):
         midterm_grader = graders.AssignmentFormatGrader("Midterm", 1, 0)
         # Test the grading on a section with one item:
-        for graded in [midterm_grader.grade(self.empty_gradesheet),
-                       midterm_grader.grade(self.incomplete_gradesheet)]:
+        for graded in [
+                midterm_grader.grade(self.empty_gradesheet),
+                midterm_grader.grade(self.incomplete_gradesheet),
+        ]:
             self.assertAlmostEqual(graded['percent'], 0.0)
             # Make sure the breakdown includes just the one summary
             self.assertEqual(len(graded['section_breakdown']), 0 + 1)
@@ -137,23 +174,31 @@ class GraderTest(unittest.TestCase):
         # will act like SingleSectionGraders on single sections.
         midterm_grader = graders.AssignmentFormatGrader("Midterm", 1, 0)
 
-        weighted_grader = graders.WeightedSubsectionsGrader([(homework_grader, homework_grader.category, 0.25),
-                                                             (lab_grader, lab_grader.category, 0.25),
-                                                             (midterm_grader, midterm_grader.category, 0.5)])
+        weighted_grader = graders.WeightedSubsectionsGrader([
+            (homework_grader, homework_grader.category, 0.25),
+            (lab_grader, lab_grader.category, 0.25),
+            (midterm_grader, midterm_grader.category, 0.5),
+        ])
 
-        over_one_weights_grader = graders.WeightedSubsectionsGrader([(homework_grader, homework_grader.category, 0.5),
-                                                                     (lab_grader, lab_grader.category, 0.5),
-                                                                     (midterm_grader, midterm_grader.category, 0.5)])
+        over_one_weights_grader = graders.WeightedSubsectionsGrader([
+            (homework_grader, homework_grader.category, 0.5),
+            (lab_grader, lab_grader.category, 0.5),
+            (midterm_grader, midterm_grader.category, 0.5),
+        ])
 
         # The midterm should have all weight on this one
-        zero_weights_grader = graders.WeightedSubsectionsGrader([(homework_grader, homework_grader.category, 0.0),
-                                                                 (lab_grader, lab_grader.category, 0.0),
-                                                                 (midterm_grader, midterm_grader.category, 0.5)])
+        zero_weights_grader = graders.WeightedSubsectionsGrader([
+            (homework_grader, homework_grader.category, 0.0),
+            (lab_grader, lab_grader.category, 0.0),
+            (midterm_grader, midterm_grader.category, 0.5),
+        ])
 
         # This should always have a final percent of zero
-        all_zero_weights_grader = graders.WeightedSubsectionsGrader([(homework_grader, homework_grader.category, 0.0),
-                                                                     (lab_grader, lab_grader.category, 0.0),
-                                                                     (midterm_grader, midterm_grader.category, 0.0)])
+        all_zero_weights_grader = graders.WeightedSubsectionsGrader([
+            (homework_grader, homework_grader.category, 0.0),
+            (lab_grader, lab_grader.category, 0.0),
+            (midterm_grader, midterm_grader.category, 0.0),
+        ])
 
         empty_grader = graders.WeightedSubsectionsGrader([])
 
@@ -177,10 +222,12 @@ class GraderTest(unittest.TestCase):
         self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
         self.assertEqual(len(graded['grade_breakdown']), 3)
 
-        for graded in [weighted_grader.grade(self.empty_gradesheet),
-                       weighted_grader.grade(self.incomplete_gradesheet),
-                       zero_weights_grader.grade(self.empty_gradesheet),
-                       all_zero_weights_grader.grade(self.empty_gradesheet)]:
+        for graded in [
+                weighted_grader.grade(self.empty_gradesheet),
+                weighted_grader.grade(self.incomplete_gradesheet),
+                zero_weights_grader.grade(self.empty_gradesheet),
+                all_zero_weights_grader.grade(self.empty_gradesheet),
+        ]:
             self.assertAlmostEqual(graded['percent'], 0.0)
             self.assertEqual(len(graded['section_breakdown']), (12 + 1) + (7 + 1) + 1)
             self.assertEqual(len(graded['grade_breakdown']), 3)

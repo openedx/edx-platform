@@ -166,8 +166,8 @@ class TestGatedContent(GatingTestCase, MilestonesTestCaseMixin):
         """
         course_grade = CourseGradeFactory(user).create(self.course)
         for prob in [self.gating_prob1, self.gated_prob2, self.prob3]:
-            self.assertIn(prob.location, course_grade.locations_to_weighted_scores)
-        self.assertNotIn(self.orphan.location, course_grade.locations_to_weighted_scores)
+            self.assertIn(prob.location, course_grade.locations_to_scores)
+        self.assertNotIn(self.orphan.location, course_grade.locations_to_scores)
 
         self.assertEquals(course_grade.percent, expected_percent)
 
