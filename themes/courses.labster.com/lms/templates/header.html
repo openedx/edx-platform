@@ -114,17 +114,21 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="left nav-global">
       <%block name="navigation_global_links">
         % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+          <%doc>
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
+          </%doc>
           % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
             <li class="nav-global-02">
               <a href="${marketing_link('COURSES')}">${_("Browse Labs")}</a>
             </li>
           % endif
+          <%doc>
           <li class="nav-global-03">
             <a href="${marketing_link('SCHOOLS')}">${_("Schools")}</a>
           </li>
+          </%doc>
         % endif
       </%block>
       % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
