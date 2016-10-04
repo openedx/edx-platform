@@ -161,14 +161,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that the response has been turned into a <div> with correct attributes
         response_element = rendered_html.find('div')
 
-        # question index for screen readers
-        self.assertEqual(response_element.find('h4').text, 'Question 1')
-
-        # verifies ids of problem title & question title
-        self.assertEqual(
-            response_element.attrib['aria-labelledby'],
-            '{problem_id}-problem-title {problem_id}_1-question-index'.format(problem_id=problem.problem_id)
-        )
+        self.assertEqual(response_element.tag, "div")
+        self.assertEqual(response_element.attrib["aria-label"], "Question 1")
 
         # Expect that the response div.wrapper-problem-response
         # that contains a <div> for the textline
@@ -213,34 +207,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             expected_calls
         )
 
-    @ddt.unpack
-    @ddt.data(
-        {'problem_id': '94e85aba088b44b89fdc79cd59a02290'},
-        {'problem_id': 'python_grader'},
-    )
-    def test_problem_id_extracted_correctly(self, problem_id):
-        """
-        Verify that `problem_id` is extracted correctly.
-        """
-        kwargs = {
-            'question_text': "Test question",
-            'explanation_text': "Test explanation",
-            'answer': 'Test answer',
-            'hints': [('test prompt', 'test_hint', 'test hint text')]
-        }
-        xml_str = StringResponseXMLFactory().build_xml(**kwargs)
-
-        # Create the problem and render the HTML
-        problem = new_loncapa_problem(xml_str, problem_id=problem_id, use_capa_render_template=True)
-        rendered_html = etree.XML(problem.get_html())
-        div_element = rendered_html.xpath('//div[@class="wrapper-problem-response"]')[0]
-        self.assertEqual(
-            '{problem_id}-problem-title'.format(problem_id=problem_id) in div_element.attrib.get('aria-labelledby'),
-            True
-        )
-
-    def test_correct_question_index_for_sr(self):
-        """Verify that question index for screen readers is being set correctly"""
+    def test_correct_aria_label(self):
         xml = """
                  <problem>
                      <choiceresponse>
@@ -260,8 +227,8 @@ class CapaHtmlRenderTest(unittest.TestCase):
         problem = new_loncapa_problem(xml)
         rendered_html = etree.XML(problem.get_html())
         response_elements = rendered_html.findall('div')
-        self.assertEqual(response_elements[0].find('h4').text, 'Question 1')
-        self.assertEqual(response_elements[1].find('h4').text, 'Question 2')
+        self.assertEqual(response_elements[0].attrib['aria-label'], 'Question 1')
+        self.assertEqual(response_elements[1].attrib['aria-label'], 'Question 2')
 
     def test_render_response_with_overall_msg(self):
         # CustomResponse script that sets an overall_message

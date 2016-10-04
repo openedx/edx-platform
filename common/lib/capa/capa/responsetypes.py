@@ -255,7 +255,8 @@ class LoncapaResponse(object):
 
         # response_id = problem_id + response index
         response_id = self.xml.attrib['id']
-        problem_id, response_index = response_id.rsplit('_', 1)
+
+        response_index = response_id.split('_')[-1]
         # Translators: index here could be 1,2,3 and so on
         response_label = _(u'Question {index}').format(index=response_index)
 
@@ -263,17 +264,8 @@ class LoncapaResponse(object):
         tree = etree.Element('div')
         tree.set('class', 'wrapper-problem-response')
         tree.set('tabindex', '-1')
+        tree.set('aria-label', response_label)
         tree.set('role', 'group')
-        tree.set('aria-labelledby', u'{problem_id}-problem-title {response_id}-question-index'.format(
-            problem_id=problem_id,
-            response_id=response_id
-        ))
-
-        # question index for screen readers
-        section_heading = etree.SubElement(tree, 'h4')
-        section_heading.set('id', u'{response_id}-question-index'.format(response_id=response_id))
-        section_heading.set('class', 'sr')
-        section_heading.text = response_label
 
         if self.xml.get('multiple_inputtypes'):
             # add <div> to wrap all inputtypes
