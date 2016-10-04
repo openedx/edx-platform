@@ -424,7 +424,8 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
-PLATFORM_NAME = "edX"
+# Include a non-ascii character in PLATFORM_NAME to uncover possible UnicodeEncodeErrors in tests.
+PLATFORM_NAME = u"édX"
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites
@@ -591,13 +592,3 @@ COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
 COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_ROOT_URL = "http://localhost:8000"
-
-# Test configuration for neo4j
-NEO4J_CONFIG = {
-    'bolt': True,
-    'password': 'password',
-    'user': 'neo4j',
-    'https_port': 7473,
-    'host': 'localhost',
-    'secure': True,
-}

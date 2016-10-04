@@ -5,13 +5,14 @@ Container page in Studio
 from bok_choy.page_object import PageObject
 from bok_choy.promise import Promise, EmptyPromise
 from common.test.acceptance.pages.studio import BASE_URL
+from common.test.acceptance.pages.studio.utils import HelpMixin
 
 from common.test.acceptance.pages.common.utils import click_css, confirm_prompt
 
 from common.test.acceptance.pages.studio.utils import type_in_codemirror
 
 
-class ContainerPage(PageObject):
+class ContainerPage(PageObject, HelpMixin):
     """
     Container page in Studio
     """

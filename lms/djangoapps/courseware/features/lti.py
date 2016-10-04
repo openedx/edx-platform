@@ -272,7 +272,13 @@ def check_lti_popup(parent_window):
     # For verification, iterate through the window titles and make sure that
     # both are there.
     tabs = []
-    expected_tabs = [u'LTI | Test Section | {0} Courseware | edX'.format(TEST_COURSE_NAME), u'TEST TITLE']
+    expected_tabs = [
+        u'LTI | Test Section | {course} Courseware | {platform}'.format(
+            course=TEST_COURSE_NAME,
+            platform=settings.PLATFORM_NAME
+        ),
+        u'TEST TITLE'
+    ]
 
     for window in windows:
         world.browser.switch_to_window(window)

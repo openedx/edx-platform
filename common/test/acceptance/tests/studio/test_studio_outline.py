@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Acceptance tests for studio related to the outline page.
 """
@@ -1604,10 +1605,12 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
     """
     HEADING_TEXT = 'This course uses features that are no longer supported.'
     COMPONENT_LIST_HEADING = 'You must delete or replace the following components.'
-    ADVANCE_MODULES_REMOVE_TEXT = ('To avoid errors, edX strongly recommends that you remove unsupported features '
-                                   'from the course advanced settings. To do this, go to the Advanced Settings '
-                                   'page, locate the "Advanced Module List" setting, and then delete the following '
-                                   'modules from the list.')
+    ADVANCE_MODULES_REMOVE_TEXT = (
+        u'To avoid errors, édX strongly recommends that you remove unsupported features '
+        u'from the course advanced settings. To do this, go to the Advanced Settings '
+        u'page, locate the "Advanced Module List" setting, and then delete the following '
+        u'modules from the list.'
+    )
     DEFAULT_DISPLAYNAME = "Deprecated Component"
 
     def _add_deprecated_advance_modules(self, block_types):

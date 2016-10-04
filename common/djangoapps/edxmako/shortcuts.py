@@ -13,6 +13,7 @@
 #   limitations under the License.
 
 import logging
+from urlparse import urljoin
 
 from django.http import HttpResponse
 from django.template import Context
@@ -42,12 +43,20 @@ def marketing_link(name):
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
+    marketing_urls = configuration_helpers.get_value(
+        'MKTG_URLS',
+        settings.MKTG_URLS
+    )
 
-    if enable_mktg_site and name in settings.MKTG_URLS:
+    if enable_mktg_site and name in marketing_urls:
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
-            return settings.MKTG_URLS.get('ROOT')
-        return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
+            return marketing_urls.get('ROOT')
+        # Using urljoin here allows us to enable a marketing site and set
+        # a site ROOT, but still specify absolute URLs for other marketing
+        # URLs in the MKTG_URLS setting
+        # e.g. urljoin('http://marketing.com', 'http://open-edx.org/about') >>> 'http://open-edx.org/about'
+        return urljoin(marketing_urls.get('ROOT'), marketing_urls.get(name))
     # only link to the old pages when the marketing site isn't on
     elif not enable_mktg_site and name in link_map:
         # don't try to reverse disabled marketing links
@@ -75,9 +84,13 @@ def is_marketing_link_set(name):
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
+    marketing_urls = configuration_helpers.get_value(
+        'MKTG_URLS',
+        settings.MKTG_URLS
+    )
 
     if enable_mktg_site:
-        return name in settings.MKTG_URLS
+        return name in marketing_urls
     else:
         return name in settings.MKTG_URL_LINK_MAP
 
@@ -91,12 +104,17 @@ def marketing_link_context_processor(request):
     'MKTG_URL_' and whose values are the corresponding URLs as computed by the
     marketing_link method.
     """
+    marketing_urls = configuration_helpers.get_value(
+        'MKTG_URLS',
+        settings.MKTG_URLS
+    )
+
     return dict(
         [
             ("MKTG_URL_" + k, marketing_link(k))
             for k in (
                 settings.MKTG_URL_LINK_MAP.viewkeys() |
-                settings.MKTG_URLS.viewkeys()
+                marketing_urls.viewkeys()
             )
         ]
     )

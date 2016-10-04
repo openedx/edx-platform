@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import json
 import logging
 import unittest
+from urllib import quote
 
 import ddt
 from django.conf import settings
@@ -440,12 +441,12 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertIn('Add Certificate to LinkedIn', response.content)
 
         expected_url = (
-            'http://www.linkedin.com/profile/add'
-            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            'pfCertificationName=edX+Honor+Code+Certificate+for+Omega&'
-            'pfCertificationUrl=www.edx.org&'
-            'source=o'
-        )
+            u'http://www.linkedin.com/profile/add'
+            u'?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
+            u'pfCertificationName={platform}+Honor+Code+Certificate+for+Omega&'
+            u'pfCertificationUrl=www.edx.org&'
+            u'source=o'
+        ).format(platform=quote(settings.PLATFORM_NAME.encode('utf-8')))
         self.assertContains(response, escape(expected_url))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

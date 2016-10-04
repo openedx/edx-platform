@@ -1,3 +1,4 @@
+/* eslint no-console:0 */
 /**
  * @file Initialize module works with the JSON config, and sets up various
  * settings, parameters, variables. After all setup actions are performed, it
@@ -13,8 +14,8 @@
 (function(requirejs, require, define) {
     define(
 'video/01_initialize.js',
-['video/03_video_player.js', 'video/00_i18n.js', 'moment'],
-function(VideoPlayer, i18n, moment) {
+['video/03_video_player.js', 'video/00_i18n.js', 'moment', 'underscore'],
+function(VideoPlayer, i18n, moment, _) {
     var moment = moment || window.moment;
     /**
      * @function
@@ -698,7 +699,14 @@ function(VideoPlayer, i18n, moment) {
             return $.ajax({
                 url: [this.config.ytMetadataUrl, '?id=', url, '&part=contentDetails&key=', this.config.ytKey].join(''),
                 timeout: this.config.ytTestTimeout,
-                success: _.isFunction(callback) ? callback : null
+                success: _.isFunction(callback) ? callback : null,
+                error: function() {
+                    console.warn(
+                        'YouTube API request failed - usually this means the YouTube API key is invalid. ' +
+                            'Some video metadata may be unavailable.'
+                    );
+                },
+                notifyOnError: false
             });
         } else {
             return $.Deferred().reject().promise();

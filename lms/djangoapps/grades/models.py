@@ -23,9 +23,11 @@ from xmodule_django.models import CourseKeyField, UsageKeyField
 log = logging.getLogger(__name__)
 
 
+BLOCK_RECORD_LIST_VERSION = 1
+
 # Used to serialize information about a block at the time it was used in
 # grade calculation.
-BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'max_score'])
+BlockRecord = namedtuple('BlockRecord', ['locator', 'weight', 'raw_possible', 'graded'])
 
 
 class BlockRecordList(tuple):
@@ -33,12 +35,13 @@ class BlockRecordList(tuple):
     An immutable ordered list of BlockRecord objects.
     """
 
-    def __new__(cls, blocks, course_key):  # pylint: disable=unused-argument
+    def __new__(cls, blocks, course_key, version=None):  # pylint: disable=unused-argument
         return super(BlockRecordList, cls).__new__(cls, blocks)
 
-    def __init__(self, blocks, course_key):
+    def __init__(self, blocks, course_key, version=None):
         super(BlockRecordList, self).__init__(blocks)
         self.course_key = course_key
+        self.version = version or BLOCK_RECORD_LIST_VERSION
 
     def __eq__(self, other):
         assert isinstance(other, BlockRecordList)
@@ -73,8 +76,9 @@ class BlockRecordList(tuple):
         for block_dict in list_of_block_dicts:
             block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         data = {
-            'course_key': unicode(self.course_key),
-            'blocks': list_of_block_dicts,
+            u'blocks': list_of_block_dicts,
+            u'course_key': unicode(self.course_key),
+            u'version': self.version,
         }
         return json.dumps(
             data,
@@ -94,11 +98,12 @@ class BlockRecordList(tuple):
             BlockRecord(
                 locator=UsageKey.from_string(block["locator"]).replace(course_key=course_key),
                 weight=block["weight"],
-                max_score=block["max_score"],
+                raw_possible=block["raw_possible"],
+                graded=block["graded"],
             )
             for block in block_dicts
         )
-        return cls(record_generator, course_key)
+        return cls(record_generator, course_key, version=data['version'])
 
     @classmethod
     def from_list(cls, blocks, course_key):
@@ -121,7 +126,7 @@ class VisibleBlocksQuerySet(models.QuerySet):
         """
         model, _ = self.get_or_create(
             hashed=blocks.hash_value,
-            defaults={'blocks_json': blocks.json_value, 'course_id': blocks.course_key},
+            defaults={u'blocks_json': blocks.json_value, u'course_id': blocks.course_key},
         )
         return model
 

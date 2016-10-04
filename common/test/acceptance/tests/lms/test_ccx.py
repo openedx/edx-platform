@@ -56,3 +56,7 @@ class CreateCCXCoachTest(EventsTestMixin, UniqueCourseTest):
 
         # Assert that new ccx is created and we are on ccx dashboard/enrollment tab.
         self.assertTrue(self.coach_dashboard_page.is_browser_on_enrollment_page())
+
+        # Assert that the user cannot click in the "View Unit in Studio" button,
+        # which means the user cannot edit the ccx course in studio
+        self.assertFalse(self.coach_dashboard_page.is_button_view_unit_in_studio_visible())

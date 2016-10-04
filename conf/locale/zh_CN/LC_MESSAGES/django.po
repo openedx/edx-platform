@@ -176,6 +176,7 @@
 # Junjie Weng <wengjunjie@gmail.com>, 2014
 # KaeChenn <cjh_0731@sina.com>, 2015
 # 匡冲 <kuangchong07@gmail.com>, 2013
+# lerfo zheng <zqs1111@163.com>, 2016
 # Lingming Kong <klm123698745@gmail.com>, 2016
 # daisybellamy <linmiaoqiqi@hotmail.com>, 2014
 # Junjie, 2014
@@ -229,6 +230,7 @@
 # 匡冲 <kuangchong07@gmail.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 李子豪 <178354170lizihao@gmail.com>, 2014
+# 李武军 <lwj7863439@gmail.com>, 2016
 # 李莉 <happylily0516@foxmail.com>, 2013
 # 汤和果 <hgtang93@163.com>, 2015
 # 沈世奇 <vicapple22@gmail.com>, 2013
@@ -343,7 +345,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-15 13:40+0000\n"
+"POT-Creation-Date: 2016-09-29 14:23+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -1220,6 +1222,10 @@ msgid "Password reset unsuccessful"
 msgstr "重新设置密码不成功"
 
 #: common/djangoapps/student/views.py
+msgid "Error in resetting your password. Please try again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
 msgstr "无非激活用户与本邮件地址关联。"
 
@@ -1254,6 +1260,10 @@ msgid ""
 msgstr "二级供应商不会突出显示，将出现在一个单独的登录供应商列表“机构”中。"
 
 #: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this provider configuration belongs to."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is enabled, users will not be asked to confirm their details "
 "(name, email, etc.) during the registration process. Only select this option"
@@ -1272,6 +1282,10 @@ msgid ""
 "If this option is not selected, users will not be presented with the "
 "provider as an option to authenticate with on the login screen, but manual "
 "authentication using the correct link is still possible."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this SAML configuration belongs to."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
@@ -5094,6 +5108,10 @@ msgid ""
 " 0."
 msgstr "指定为秒。借由设定这个大于0的值来启动快取。"
 
+#: lms/djangoapps/commerce/models.py
+msgid "Path to order receipt page."
+msgstr ""
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5321,6 +5339,57 @@ msgstr "{currency_symbol}{price}"
 #: lms/djangoapps/courseware/views/views.py
 msgid "Free"
 msgstr "免费"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate has been invalidated"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Please contact your course team if you have any questions."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
@@ -9093,10 +9162,6 @@ msgstr ""
 msgid "Enable course home page improvements."
 msgstr "启用改进版课程主页"
 
-#: openedx/core/djangoapps/site_configuration/models.py
-msgid "Path to order receipt page."
-msgstr ""
-
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
 msgstr "'{field_name}'字段无法编辑."
@@ -9843,8 +9908,7 @@ msgstr "内容"
 #: cms/templates/container.html cms/templates/course_outline.html
 #: cms/templates/group_configurations.html cms/templates/library.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/problem_ajax.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/student_profile/learner_profile.html
@@ -10479,10 +10543,7 @@ msgid "Tell us the details"
 msgstr "告诉我们细节"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
+msgid "Include error messages, steps which lead to the issue, etc"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -10512,7 +10573,9 @@ msgid "Brief description of the problem"
 msgstr "简述此问题"
 
 #: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
+msgid ""
+"Details of the problem you are encountering{asterisk}{begin_span}Include "
+"error messages, steps which lead to the issue, etc.{end_span}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11539,12 +11602,28 @@ msgid "No playable video sources found."
 msgstr "未找到可播放的视频源。"
 
 #: lms/templates/video.html
-msgid "Download video"
-msgstr "下载视频"
+msgid "Downloads and transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download {file}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download transcript"
 msgstr "下载字幕"
+
+#: lms/templates/video.html
+msgid "Handouts"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -13717,6 +13796,10 @@ msgstr "要查看现场讨论，请在单元设置中点击“预览”或“现
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "讨论区用户名：{discussion_id}"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Discussion topics list"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"

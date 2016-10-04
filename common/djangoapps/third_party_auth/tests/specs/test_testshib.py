@@ -16,6 +16,7 @@ from .base import IntegrationTestMixin
 
 TESTSHIB_ENTITY_ID = 'https://idp.testshib.org/idp/shibboleth'
 TESTSHIB_METADATA_URL = 'https://mock.testshib.org/metadata/testshib-providers.xml'
+TESTSHIB_METADATA_URL_WITH_CACHE_DURATION = 'https://mock.testshib.org/metadata/testshib-providers-cache.xml'
 TESTSHIB_SSO_URL = 'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO'
 
 
@@ -47,7 +48,19 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         def metadata_callback(_request, _uri, headers):
             """ Return a cached copy of TestShib's metadata by reading it from disk """
             return (200, headers, self.read_data_file('testshib_metadata.xml'))
+
         httpretty.register_uri(httpretty.GET, TESTSHIB_METADATA_URL, content_type='text/xml', body=metadata_callback)
+
+        def cache_duration_metadata_callback(_request, _uri, headers):
+            """Return a cached copy of TestShib's metadata with a cacheDuration attribute"""
+            return (200, headers, self.read_data_file('testshib_metadata_with_cache_duration.xml'))
+
+        httpretty.register_uri(
+            httpretty.GET,
+            TESTSHIB_METADATA_URL_WITH_CACHE_DURATION,
+            content_type='text/xml',
+            body=cache_duration_metadata_callback
+        )
         self.addCleanup(httpretty.disable)
         self.addCleanup(httpretty.reset)
 
@@ -122,6 +135,24 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
             self.assertIn('<saml2p:Response', xml)
         else:
             self.assertFalse(mock_log.called)
+
+    def test_configure_testshib_provider_with_cache_duration(self):
+        """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
+        kwargs = {}
+        kwargs.setdefault('name', self.PROVIDER_NAME)
+        kwargs.setdefault('enabled', True)
+        kwargs.setdefault('visible', True)
+        kwargs.setdefault('idp_slug', self.PROVIDER_IDP_SLUG)
+        kwargs.setdefault('entity_id', TESTSHIB_ENTITY_ID)
+        kwargs.setdefault('metadata_source', TESTSHIB_METADATA_URL_WITH_CACHE_DURATION)
+        kwargs.setdefault('icon_class', 'fa-university')
+        kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
+        self.configure_saml_provider(**kwargs)
+        self.assertTrue(httpretty.is_enabled())
+        num_changed, num_failed, num_total = fetch_saml_metadata()
+        self.assertEqual(num_failed, 0)
+        self.assertEqual(num_changed, 1)
+        self.assertEqual(num_total, 1)
 
     def _freeze_time(self, timestamp):
         """ Mock the current time for SAML, so we can replay canned requests/responses """

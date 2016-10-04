@@ -11,7 +11,7 @@
         % endfor
         <input type="text" name="input_${id}" id="input_${id}"
             data-input-id="${id}" value="${value}"
-            ${describedby | n, decode.utf8}
+            ${HTML(describedby_html)}
             % if size:
             size="${size}"
             % endif

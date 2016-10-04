@@ -159,8 +159,8 @@
 # madmarsu <madmarsu@gmail.com>, 2014
 # madmarsu <madmarsu@gmail.com>, 2014
 # Maghjina <Maghjina@gmail.com>, 2014
-# mamby <mamby@live.com>, 2014
-# mamby <mamby@live.com>, 2014
+# mamby, 2014
+# mamby, 2014
 # Manjari <mringuet@gmail.com>, 2014
 # Matthieu Falce <falce.matthieu@gmail.com>, 2016
 # Emmanuel Olégine <olegine@gmail.com>, 2015
@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-15 13:40+0000\n"
+"POT-Creation-Date: 2016-09-29 14:23+0000\n"
 "PO-Revision-Date: 2016-08-30 15:36+0000\n"
 "Last-Translator: Matthieu Falce <falce.matthieu@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -1218,6 +1218,10 @@ msgid "Password reset unsuccessful"
 msgstr "La réinitialisation du mot de passe a échoué."
 
 #: common/djangoapps/student/views.py
+msgid "Error in resetting your password. Please try again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
 msgstr "Pas d'utilisateur inactif avec cette adresse email"
 
@@ -1256,6 +1260,10 @@ msgstr ""
 "liste séparée des fournisseurs de connexion \"Institutionnel\"."
 
 #: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this provider configuration belongs to."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is enabled, users will not be asked to confirm their details "
 "(name, email, etc.) during the registration process. Only select this option"
@@ -1280,6 +1288,10 @@ msgid ""
 "If this option is not selected, users will not be presented with the "
 "provider as an option to authenticate with on the login screen, but manual "
 "authentication using the correct link is still possible."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this SAML configuration belongs to."
 msgstr ""
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
@@ -5402,6 +5414,10 @@ msgstr ""
 "Indiqués en secondes. Active la mise en cache en réglant à une valeur plus "
 "grande que 0."
 
+#: lms/djangoapps/commerce/models.py
+msgid "Path to order receipt page."
+msgstr "Chemin vers la page de reçu de la commande"
+
 #: lms/djangoapps/commerce/signals.py
 msgid ""
 "A refund request has been initiated for {username} ({email}). To process "
@@ -5646,6 +5662,57 @@ msgstr "{price}{currency_symbol}"
 #: lms/djangoapps/courseware/views/views.py
 msgid "Free"
 msgstr "Gratuit"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate has been invalidated"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Please contact your course team if you have any questions."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
@@ -9438,10 +9505,6 @@ msgstr ""
 msgid "Enable course home page improvements."
 msgstr ""
 
-#: openedx/core/djangoapps/site_configuration/models.py
-msgid "Path to order receipt page."
-msgstr "Chemin vers la page de reçu de la commande"
-
 #: openedx/core/djangoapps/user_api/accounts/api.py
 msgid "The '{field_name}' field cannot be edited."
 msgstr "Le champ '{field_name}' ne peut pas être modifié."
@@ -10234,8 +10297,7 @@ msgstr "Contenu"
 #: cms/templates/container.html cms/templates/course_outline.html
 #: cms/templates/group_configurations.html cms/templates/library.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/problem_ajax.html lms/templates/courseware/courses.html
-#: lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/student_profile/learner_profile.html
@@ -10878,10 +10940,7 @@ msgid "Tell us the details"
 msgstr "Indiquez-nous les détails"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
+msgid "Include error messages, steps which lead to the issue, etc"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -10914,7 +10973,9 @@ msgid "Brief description of the problem"
 msgstr "Brève description du problème"
 
 #: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
+msgid ""
+"Details of the problem you are encountering{asterisk}{begin_span}Include "
+"error messages, steps which lead to the issue, etc.{end_span}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11985,12 +12046,28 @@ msgid "No playable video sources found."
 msgstr "Aucune source vidéo jouable trouvée"
 
 #: lms/templates/video.html
-msgid "Download video"
-msgstr "Télécharger la vidéo"
+msgid "Downloads and transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download {file}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download transcript"
 msgstr "Télécharger la transcription"
+
+#: lms/templates/video.html
+msgid "Handouts"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -14099,6 +14176,10 @@ msgstr ""
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "ID de discussion : {discussion_id}"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Discussion topics list"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"

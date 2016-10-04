@@ -10,7 +10,9 @@ import mock
 import ddt
 from config_models.models import cache
 from branding.models import BrandingApiConfig
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
+from student.tests.factories import UserFactory
 
 
 @ddt.ddt
@@ -227,3 +229,42 @@ class TestFooter(TestCase):
             )
 
         return self.client.get(url, HTTP_ACCEPT=accepts)
+
+
+class TestIndex(SiteMixin, TestCase):
+    """ Test the index view """
+
+    def setUp(self):
+        """ Set up a user """
+        super(TestIndex, self).setUp()
+
+        patcher = mock.patch("student.models.tracker")
+        self.mock_tracker = patcher.start()
+        self.user = UserFactory.create()
+        self.user.set_password("password")
+        self.user.save()
+
+    def test_index_does_not_redirect_without_site_override(self):
+        """ Test index view does not redirect if MKTG_URLS['ROOT'] is not set """
+        response = self.client.get(reverse("root"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_index_redirects_to_marketing_site_with_site_override(self):
+        """ Test index view redirects if MKTG_URLS['ROOT'] is set in SiteConfiguration """
+        self.use_site(self.site_other)
+        response = self.client.get(reverse("root"))
+        self.assertRedirects(
+            response,
+            self.site_configuration_other.values["MKTG_URLS"]["ROOT"],
+            fetch_redirect_response=False
+        )
+
+    def test_header_logo_links_to_marketing_site_with_site_override(self):
+        """
+        Test marketing site root link is included on dashboard page
+        if MKTG_URLS['ROOT'] is set in SiteConfiguration
+        """
+        self.use_site(self.site_other)
+        self.client.login(username=self.user.username, password="password")
+        response = self.client.get(reverse("dashboard"))
+        self.assertIn(self.site_configuration_other.values["MKTG_URLS"]["ROOT"], response.content)

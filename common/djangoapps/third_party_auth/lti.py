@@ -198,9 +198,9 @@ class LTIAuthBackend(BaseAuth):
         """
         from .models import LTIProviderConfig
         provider_config = LTIProviderConfig.current(lti_consumer_key)
-        if provider_config and provider_config.enabled:
+        if provider_config and provider_config.enabled_for_current_site:
             return (
-                provider_config.enabled,
+                provider_config.enabled_for_current_site,
                 provider_config.get_lti_consumer_secret(),
                 provider_config.lti_max_timestamp_age,
             )

@@ -6,6 +6,7 @@ from bok_choy.promise import EmptyPromise
 
 from common.test.acceptance.pages.studio import BASE_URL
 from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.utils import HelpMixin
 
 
 class LoginMixin(object):
@@ -34,7 +35,7 @@ class LoginMixin(object):
             ).fulfill()
 
 
-class LoginPage(PageObject, LoginMixin):
+class LoginPage(PageObject, LoginMixin, HelpMixin):
     """
     Login page for Studio.
     """

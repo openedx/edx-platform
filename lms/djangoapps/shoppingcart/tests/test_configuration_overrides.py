@@ -2,8 +2,6 @@
 """
 Dashboard with Shopping Cart History tests with configuration overrides.
 """
-import mock
-
 from django.core.urlresolvers import reverse
 
 from mock import patch
@@ -15,24 +13,11 @@ from shoppingcart.models import (
 )
 from student.tests.factories import UserFactory
 from course_modes.models import CourseMode
-
-
-def fake_all_orgs(default=None):  # pylint: disable=unused-argument
-    """
-    Method to return fake orgs,
-    """
-    return set(['fakeX', 'fooX'])
-
-
-def fake_site(name, default=None):  # pylint: disable=unused-argument
-    """
-    Method to return a fake site name.
-    """
-    return 'fakeX'
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
-class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
+class TestOrderHistoryOnSiteDashboard(SiteMixin, ModuleStoreTestCase):
     """
     Test for dashboard order history site configuration overrides.
     """
@@ -76,7 +61,7 @@ class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
         self.foox_site_order_id = cart.id
 
         # Third Order with course not attributed to any site.
-        course3 = CourseFactory.create(org='otherorg', number='777', display_name='otherorg Course')
+        course3 = CourseFactory.create(org='fakeOtherX', number='777', display_name='fakeOtherX Course')
         course3_key = course3.id
         course3_mode = CourseMode(course_id=course3.id,
                                   mode_slug="honor",
@@ -90,7 +75,7 @@ class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
         self.order_id = cart.id
 
         # Fourth Order with course not attributed to any site but with a CertificateItem
-        course4 = CourseFactory.create(org='otherorg', number='888')
+        course4 = CourseFactory.create(org='fakeOtherX', number='888')
         course4_key = course4.id
         course4_mode = CourseMode(course_id=course4.id,
                                   mode_slug="verified",
@@ -104,7 +89,7 @@ class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
         self.certificate_order_id = cart.id
 
         # Fifth Order with course not attributed to any site but with a Donation
-        course5 = CourseFactory.create(org='otherorg', number='999')
+        course5 = CourseFactory.create(org='fakeOtherX', number='999')
         course5_key = course5.id
 
         cart = Order.get_cart_for_user(self.user)
@@ -117,8 +102,6 @@ class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         self.courseless_donation_order_id = cart.id
 
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_site)
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_all_orgs", fake_all_orgs)
     def test_shows_orders_with_current_site_courses_only(self):
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
@@ -136,9 +119,8 @@ class TestOrderHistoryOnSiteDashboard(ModuleStoreTestCase):
         self.assertNotIn(receipt_url_cert, content)
         self.assertNotIn(receipt_url_donation, content)
 
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", mock.Mock(return_value=None))
-    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_all_orgs", fake_all_orgs)
     def test_shows_orders_with_non_site_courses_only_when_no_configuration_override_exists(self):
+        self.use_site(self.site_other)
         self.client.login(username=self.user.username, password="password")
         response = self.client.get(reverse("dashboard"))
         receipt_url_course = reverse('shoppingcart.views.show_receipt', kwargs={'ordernum': self.fakex_site_order_id})

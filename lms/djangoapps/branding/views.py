@@ -76,7 +76,11 @@ def index(request):
     )
 
     if enable_mktg_site:
-        return redirect(settings.MKTG_URLS.get('ROOT'))
+        marketing_urls = configuration_helpers.get_value(
+            'MKTG_URLS',
+            settings.MKTG_URLS
+        )
+        return redirect(marketing_urls.get('ROOT'))
 
     domain = request.META.get('HTTP_HOST')
 

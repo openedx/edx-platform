@@ -1773,9 +1773,9 @@ class GenerateUserCertTests(ModuleStoreTestCase):
         self.client.logout()
         resp = self.client.post(self.url)
         self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
-        self.assertIn("You must be signed in to {platform_name} to create a certificate.".format(
+        self.assertIn(u"You must be signed in to {platform_name} to create a certificate.".format(
             platform_name=settings.PLATFORM_NAME
-        ), resp.content)
+        ), resp.content.decode('utf-8'))
 
 
 class ActivateIDCheckerBlock(XBlock):

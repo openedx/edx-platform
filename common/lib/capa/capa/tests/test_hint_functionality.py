@@ -14,7 +14,7 @@ from ddt import ddt, data, unpack
 # pylint: disable=line-too-long
 # For out many ddt data cases, prefer a compact form of { .. }
 
-from . import new_loncapa_problem, load_fixture
+from capa.tests.helpers import new_loncapa_problem, load_fixture
 
 
 class HintTest(unittest.TestCase):
