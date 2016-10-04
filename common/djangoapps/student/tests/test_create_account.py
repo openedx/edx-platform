@@ -472,7 +472,7 @@ class TestCreateAccountValidation(TestCase):
             self.assert_error(params, "password_copy", expected_error)
 
         # Missing
-        assert_password_copy_error("Please confirm password.")
+        assert_password_copy_error("Confirm password")
 
         # Doesn't match password
         params["password_copy"] = "test passwords don't match"

@@ -191,7 +191,7 @@ class AccountCreationForm(forms.Form):
                     if field_value == "required" and data.get("password"):
                         self.fields[field_name] = forms.CharField(
                             error_messages={
-                                "required": _("Please confirm password.")
+                                "required": _("Confirm password")
                             }
                         )
                 else:

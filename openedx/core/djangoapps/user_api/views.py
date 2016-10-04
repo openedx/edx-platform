@@ -500,7 +500,7 @@ class RegistrationView(APIView):
         # meant to hold the user's retyped password.
         password_copy_label = _(u"Confirm password")
 
-        error_msg = _(u"Please confirm password.")
+        error_msg = _(u"Confirm your password.")
 
         form_desc.add_field(
             "password_copy",
