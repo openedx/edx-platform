@@ -473,7 +473,7 @@ class CAPAMultiInputProblemTest(unittest.TestCase):
 
         # verify that only one multi input group div is present at correct path
         multi_inputs_group = html.xpath(
-            '//section[@class="wrapper-problem-response"]/div[@class="multi-inputs-group"]'
+            '//div[@class="wrapper-problem-response"]/div[@class="multi-inputs-group"]'
         )
         self.assertEqual(len(multi_inputs_group), 1)
 

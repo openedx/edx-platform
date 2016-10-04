@@ -260,9 +260,10 @@ class LoncapaResponse(object):
         response_label = _(u'Question {index}').format(index=response_index)
 
         # wrap the content inside a section
-        tree = etree.Element('section')
+        tree = etree.Element('div')
         tree.set('class', 'wrapper-problem-response')
         tree.set('tabindex', '-1')
+        tree.set('role', 'group')
         tree.set('aria-labelledby', u'{problem_id}-problem-title {response_id}-question-index'.format(
             problem_id=problem_id,
             response_id=response_id

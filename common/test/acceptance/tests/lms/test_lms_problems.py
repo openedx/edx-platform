@@ -561,7 +561,7 @@ class CAPAProblemA11yBaseTestMixin(object):
 
         # Set the scope to the problem question
         problem_page.a11y_audit.config.set_scope(
-            include=['section.wrapper-problem-response']
+            include=['.wrapper-problem-response']
         )
 
         # Run the accessibility audit.
