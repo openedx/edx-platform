@@ -84,7 +84,7 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
 
             it('initiates rescoring of the entrance exam when the button is clicked', function() {
                 var successMessage = gettext("Started entrance exam rescore task for student '{student_id}'." +
-                    " Click the 'Show Background Task History for Student' button to see the status of the task."); //  eslint-disable-line max-len
+                    " Click the 'Show Task Status' button to see the status of the task."); //  eslint-disable-line max-len
                 var fullSuccessMessage = interpolate_text(successMessage, {
                     student_id: uniqStudentIdentifier
                 });
@@ -94,7 +94,8 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
                 var params = $.param({
-                    unique_student_identifier: uniqStudentIdentifier
+                    unique_student_identifier: uniqStudentIdentifier,
+                    only_if_higher: false
                 });
 
                 studentadmin.$btn_rescore_entrance_exam.click();
@@ -121,7 +122,8 @@ define(['jquery', 'js/instructor_dashboard/student_admin', 'edx-ui-toolkit/js/ut
                 var requests = AjaxHelpers.requests(this);
                 // Verify that the client contacts the server to start instructor task
                 var params = $.param({
-                    unique_student_identifier: uniqStudentIdentifier
+                    unique_student_identifier: uniqStudentIdentifier,
+                    only_if_higher: false
                 });
                 var errorMessage = gettext(
                     "Error starting a task to rescore entrance exam for student '{student_id}'." +

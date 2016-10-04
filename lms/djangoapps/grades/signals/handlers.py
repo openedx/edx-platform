@@ -5,11 +5,14 @@ Grades related signals.
 from django.dispatch import receiver
 from logging import getLogger
 
+from courseware.model_data import get_score, set_score
+from openedx.core.lib.grade_utils import is_score_higher
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
-from .signals import SCORE_CHANGED
+from .signals import SCORE_CHANGED, SCORE_PUBLISHED
 from ..tasks import recalculate_subsection_grade
+
 
 log = getLogger(__name__)
 
@@ -40,8 +43,8 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
 
     SCORE_CHANGED.send(
         sender=None,
-        points_possible=points_possible,
         points_earned=points_earned,
+        points_possible=points_possible,
         user_id=user.id,
         course_id=course_id,
         usage_id=usage_id
@@ -70,17 +73,61 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
 
     SCORE_CHANGED.send(
         sender=None,
-        points_possible=0,
         points_earned=0,
+        points_possible=0,
         user_id=user.id,
         course_id=course_id,
         usage_id=usage_id
     )
 
 
+@receiver(SCORE_PUBLISHED)
+def score_published_handler(sender, block, user, raw_earned, raw_possible, only_if_higher, **kwargs):  # pylint: disable=unused-argument
+    """
+    Handles whenever a block's score is published.
+    Returns whether the score was actually updated.
+    """
+    update_score = True
+    if only_if_higher:
+        previous_score = get_score(user.id, block.location)
+
+        if previous_score:
+            prev_raw_earned, prev_raw_possible = previous_score  # pylint: disable=unpacking-non-sequence
+
+            if not is_score_higher(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
+                update_score = False
+                log.warning(
+                    u"Grades: Rescore is not higher than previous: "
+                    u"user: {}, block: {}, previous: {}/{}, new: {}/{} ".format(
+                        user, block.location, prev_raw_earned, prev_raw_possible, raw_earned, raw_possible,
+                    )
+                )
+
+    if update_score:
+        set_score(user.id, block.location, raw_earned, raw_possible)
+
+        SCORE_CHANGED.send(
+            sender=None,
+            points_earned=raw_earned,
+            points_possible=raw_possible,
+            user_id=user.id,
+            course_id=unicode(block.location.course_key),
+            usage_id=unicode(block.location),
+            only_if_higher=only_if_higher,
+        )
+    return update_score
+
+
 @receiver(SCORE_CHANGED)
-def enqueue_update(sender, **kwargs):  # pylint: disable=unused-argument
+def enqueue_grade_update(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Handles the SCORE_CHANGED signal by enqueueing an update operation to occur asynchronously.
     """
-    recalculate_subsection_grade.apply_async(args=(kwargs['user_id'], kwargs['course_id'], kwargs['usage_id']))
+    recalculate_subsection_grade.apply_async(
+        args=(
+            kwargs['user_id'],
+            kwargs['course_id'],
+            kwargs['usage_id'],
+            kwargs.get('only_if_higher'),
+        )
+    )

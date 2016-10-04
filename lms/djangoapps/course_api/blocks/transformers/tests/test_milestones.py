@@ -172,8 +172,9 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
             # block passed in, so we pass in a child of the gating block
             lms_gating_api.evaluate_prerequisite(
                 self.course,
-                UsageKey.from_string(unicode(self.blocks[gating_block_child].location)),
-                self.user.id)
+                self.blocks[gating_block_child],
+                self.user.id,
+            )
         with self.assertNumQueries(2):
             self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 

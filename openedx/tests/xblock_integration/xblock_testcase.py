@@ -204,8 +204,7 @@ class GradePublishTestMixin(object):
                                 'max_score': max_score})
 
         self.scores = []
-        patcher = mock.patch("courseware.module_render.set_score",
-                             capture_score)
+        patcher = mock.patch("lms.djangoapps.grades.signals.handlers.set_score", capture_score)
         patcher.start()
         self.addCleanup(patcher.stop)
 

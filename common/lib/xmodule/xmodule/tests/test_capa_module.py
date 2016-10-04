@@ -487,15 +487,14 @@ class CapaModuleTest(unittest.TestCase):
         # Simulate that all answers are marked correct, no matter
         # what the input is, by patching CorrectMap.is_correct()
         # Also simulate rendering the HTML
-        # TODO: pep8 thinks the following line has invalid syntax
-        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct, \
-                patch('xmodule.capa_module.CapaModule.get_problem_html') as mock_html:
-            mock_is_correct.return_value = True
-            mock_html.return_value = "Test HTML"
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct:
+            with patch('xmodule.capa_module.CapaModule.get_problem_html') as mock_html:
+                mock_is_correct.return_value = True
+                mock_html.return_value = "Test HTML"
 
-            # Check the problem
-            get_request_dict = {CapaFactory.input_key(): '3.14'}
-            result = module.submit_problem(get_request_dict)
+                # Check the problem
+                get_request_dict = {CapaFactory.input_key(): '3.14'}
+                result = module.submit_problem(get_request_dict)
 
         # Expect that the problem is marked correct
         self.assertEqual(result['success'], 'correct')
@@ -861,7 +860,7 @@ class CapaModuleTest(unittest.TestCase):
         # what the input is, by patching LoncapaResponse.evaluate_answers()
         with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
             mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'correct')
-            result = module.rescore_problem()
+            result = module.rescore_problem(only_if_higher=False)
 
         # Expect that the problem is marked correct
         self.assertEqual(result['success'], 'correct')
@@ -881,7 +880,7 @@ class CapaModuleTest(unittest.TestCase):
         # what the input is, by patching LoncapaResponse.evaluate_answers()
         with patch('capa.responsetypes.LoncapaResponse.evaluate_answers') as mock_evaluate_answers:
             mock_evaluate_answers.return_value = CorrectMap(CapaFactory.answer_key(), 'incorrect')
-            result = module.rescore_problem()
+            result = module.rescore_problem(only_if_higher=False)
 
         # Expect that the problem is marked incorrect
         self.assertEqual(result['success'], 'incorrect')
@@ -895,7 +894,7 @@ class CapaModuleTest(unittest.TestCase):
 
         # Try to rescore the problem, and get exception
         with self.assertRaises(xmodule.exceptions.NotFoundError):
-            module.rescore_problem()
+            module.rescore_problem(only_if_higher=False)
 
     def test_rescore_problem_not_supported(self):
         module = CapaFactory.create(done=True)
@@ -904,7 +903,7 @@ class CapaModuleTest(unittest.TestCase):
         with patch('capa.capa_problem.LoncapaProblem.supports_rescoring') as mock_supports_rescoring:
             mock_supports_rescoring.return_value = False
             with self.assertRaises(NotImplementedError):
-                module.rescore_problem()
+                module.rescore_problem(only_if_higher=False)
 
     def _rescore_problem_error_helper(self, exception_class):
         """Helper to allow testing all errors that rescoring might return."""
@@ -914,7 +913,7 @@ class CapaModuleTest(unittest.TestCase):
         # Simulate answering a problem that raises the exception
         with patch('capa.capa_problem.LoncapaProblem.rescore_existing_answers') as mock_rescore:
             mock_rescore.side_effect = exception_class(u'test error \u03a9')
-            result = module.rescore_problem()
+            result = module.rescore_problem(only_if_higher=False)
 
         # Expect an AJAX alert message in 'success'
         expected_msg = u'Error: test error \u03a9'
@@ -1656,7 +1655,7 @@ class CapaModuleTest(unittest.TestCase):
         module.submit_problem(get_request_dict)
         # On rescore, state/student_answers should use unmasked names
         with patch.object(module.runtime, 'track_function') as mock_track_function:
-            module.rescore_problem()
+            module.rescore_problem(only_if_higher=False)
             mock_call = mock_track_function.mock_calls[0]
             event_info = mock_call[1][1]
             self.assertEquals(mock_call[1][0], 'problem_rescore')

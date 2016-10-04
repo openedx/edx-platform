@@ -39,18 +39,25 @@
             this.$btn_reset_attempts_single = findAndAssert(this.$section, "input[name='reset-attempts-single']");
             this.$btn_delete_state_single = this.$section.find("input[name='delete-state-single']");
             this.$btn_rescore_problem_single = this.$section.find("input[name='rescore-problem-single']");
+            this.$btn_rescore_problem_if_higher_single = this.$section.find(
+                "input[name='rescore-problem-if-higher-single']"
+            );
             this.$btn_task_history_single = this.$section.find("input[name='task-history-single']");
             this.$table_task_history_single = this.$section.find('.task-history-single-table');
             this.$field_exam_grade = this.$section.find("input[name='entrance-exam-student-select-grade']");
             this.$btn_reset_entrance_exam_attempts = this.$section.find("input[name='reset-entrance-exam-attempts']");
             this.$btn_delete_entrance_exam_state = this.$section.find("input[name='delete-entrance-exam-state']");
             this.$btn_rescore_entrance_exam = this.$section.find("input[name='rescore-entrance-exam']");
+            this.$btn_rescore_entrance_exam_if_higher = this.$section.find(
+                "input[name='rescore-entrance-exam-if-higher']"
+            );
             this.$btn_skip_entrance_exam = this.$section.find("input[name='skip-entrance-exam']");
             this.$btn_entrance_exam_task_history = this.$section.find("input[name='entrance-exam-task-history']");
             this.$table_entrance_exam_task_history = this.$section.find('.entrance-exam-task-history-table');
             this.$field_problem_select_all = this.$section.find("input[name='problem-select-all']");
             this.$btn_reset_attempts_all = this.$section.find("input[name='reset-attempts-all']");
             this.$btn_rescore_problem_all = this.$section.find("input[name='rescore-problem-all']");
+            this.$btn_rescore_problem_if_higher_all = this.$section.find("input[name='rescore-problem-all-if-higher']");
             this.$btn_task_history_all = this.$section.find("input[name='task-history-all']");
             this.$table_task_history_all = this.$section.find('.task-history-all-table');
             this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
@@ -176,46 +183,10 @@
                 }
             });
             this.$btn_rescore_problem_single.click(function() {
-                var errorMessage, fullErrorMessage, fullSuccessMessage,
-                    problemToReset, sendData, successMessage, uniqStudentIdentifier;
-                uniqStudentIdentifier = studentadmin.$field_student_select_grade.val();
-                problemToReset = studentadmin.$field_problem_select_single.val();
-                if (!uniqStudentIdentifier) {
-                    return studentadmin.$request_err_grade.text(
-                        gettext('Please enter a student email address or username.')
-                    );
-                }
-                if (!problemToReset) {
-                    return studentadmin.$request_err_grade.text(
-                        gettext('Please enter a problem location.')
-                    );
-                }
-                sendData = {
-                    unique_student_identifier: uniqStudentIdentifier,
-                    problem_to_reset: problemToReset
-                };
-                successMessage = gettext("Started rescore problem task for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Background Task History for Student' button to see the status of the task.");  // eslint-disable-line max-len
-                fullSuccessMessage = _.template(successMessage)({
-                    student_id: uniqStudentIdentifier,
-                    problem_id: problemToReset
-                });
-                errorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
-                fullErrorMessage = _.template(errorMessage)({
-                    student_id: uniqStudentIdentifier,
-                    problem_id: problemToReset
-                });
-                return $.ajax({
-                    type: 'POST',
-                    dataType: 'json',
-                    url: studentadmin.$btn_rescore_problem_single.data('endpoint'),
-                    data: sendData,
-                    success: studentadmin.clear_errors_then(function() {
-                        return alert(fullSuccessMessage);  // eslint-disable-line no-alert
-                    }),
-                    error: statusAjaxError(function() {
-                        return studentadmin.$request_err_grade.text(fullErrorMessage);
-                    })
-                });
+                return studentadmin.rescore_problem_single(false);
+            });
+            this.$btn_rescore_problem_if_higher_single.click(function() {
+                return studentadmin.rescore_problem_single(true);
             });
             this.$btn_task_history_single.click(function() {
                 var errorMessage, fullErrorMessage, problemToReset, sendData, uniqStudentIdentifier;
@@ -289,38 +260,10 @@
                 });
             });
             this.$btn_rescore_entrance_exam.click(function() {
-                var sendData, uniqStudentIdentifier;
-                uniqStudentIdentifier = studentadmin.$field_exam_grade.val();
-                if (!uniqStudentIdentifier) {
-                    return studentadmin.$request_err_ee.text(gettext(
-                        'Please enter a student email address or username.')
-                    );
-                }
-                sendData = {
-                    unique_student_identifier: uniqStudentIdentifier
-                };
-                return $.ajax({
-                    type: 'POST',
-                    dataType: 'json',
-                    url: studentadmin.$btn_rescore_entrance_exam.data('endpoint'),
-                    data: sendData,
-                    success: studentadmin.clear_errors_then(function() {
-                        var fullSuccessMessage, successMessage;
-                        successMessage = gettext("Started entrance exam rescore task for student '{student_id}'. Click the 'Show Background Task History for Student' button to see the status of the task.");  // eslint-disable-line max-len
-                        fullSuccessMessage = interpolate_text(successMessage, {
-                            student_id: uniqStudentIdentifier
-                        });
-                        return alert(fullSuccessMessage);  // eslint-disable-line no-alert
-                    }),
-                    error: statusAjaxError(function() {
-                        var errorMessage, fullErrorMessage;
-                        errorMessage = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct.");  // eslint-disable-line max-len
-                        fullErrorMessage = interpolate_text(errorMessage, {
-                            student_id: uniqStudentIdentifier
-                        });
-                        return studentadmin.$request_err_ee.text(fullErrorMessage);
-                    })
-                });
+                return studentadmin.rescore_entrance_exam_all(false);
+            });
+            this.$btn_rescore_entrance_exam_if_higher.click(function() {
+                return studentadmin.rescore_entrance_exam_all(true);
             });
             this.$btn_skip_entrance_exam.click(function() {
                 var confirmMessage, fullConfirmMessage, sendData, uniqStudentIdentifier;
@@ -435,7 +378,7 @@
                         all_students: true,
                         problem_to_reset: problemToReset
                     };
-                    successMessage = gettext("Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Background Task History for Problem' button to see the status of the task.");  // eslint-disable-line max-len
+                    successMessage = gettext("Successfully started task to reset attempts for problem '<%- problem_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
                     fullSuccessMessage = _.template(successMessage)({
                         problem_id: problemToReset
                     });
@@ -460,46 +403,10 @@
                 }
             });
             this.$btn_rescore_problem_all.click(function() {
-                var confirmMessage, errorMessage, fullConfirmMessage,
-                    fullErrorMessage, fullSuccessMessage, problemToReset, sendData, successMessage;
-                problemToReset = studentadmin.$field_problem_select_all.val();
-                if (!problemToReset) {
-                    return studentadmin.$request_response_error_all.text(
-                        gettext('Please enter a problem location.')
-                    );
-                }
-                confirmMessage = gettext("Rescore problem '<%- problem_id %>' for all students?");
-                fullConfirmMessage = _.template(confirmMessage)({
-                    problem_id: problemToReset
-                });
-                if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
-                    sendData = {
-                        all_students: true,
-                        problem_to_reset: problemToReset
-                    };
-                    successMessage = gettext("Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Background Task History for Problem' button to see the status of the task.");  // eslint-disable-line max-len
-                    fullSuccessMessage = _.template(successMessage)({
-                        problem_id: problemToReset
-                    });
-                    errorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
-                    fullErrorMessage = _.template(errorMessage)({
-                        problem_id: problemToReset
-                    });
-                    return $.ajax({
-                        type: 'POST',
-                        dataType: 'json',
-                        url: studentadmin.$btn_rescore_problem_all.data('endpoint'),
-                        data: sendData,
-                        success: studentadmin.clear_errors_then(function() {
-                            return alert(fullSuccessMessage);  // eslint-disable-line no-alert
-                        }),
-                        error: statusAjaxError(function() {
-                            return studentadmin.$request_response_error_all.text(fullErrorMessage);
-                        })
-                    });
-                } else {
-                    return studentadmin.clear_errors();
-                }
+                return studentadmin.rescore_problem_all(false);
+            });
+            this.$btn_rescore_problem_if_higher_all.click(function() {
+                return studentadmin.rescore_problem_all(true);
             });
             this.$btn_task_history_all.click(function() {
                 var sendData;
@@ -527,6 +434,133 @@
                 });
             });
         }
+
+        StudentAdmin.prototype.rescore_problem_single = function(onlyIfHigher) {
+            var errorMessage, fullErrorMessage, fullSuccessMessage,
+                problemToReset, sendData, successMessage, uniqStudentIdentifier,
+                that = this;
+            uniqStudentIdentifier = this.$field_student_select_grade.val();
+            problemToReset = this.$field_problem_select_single.val();
+            if (!uniqStudentIdentifier) {
+                return this.$request_err_grade.text(
+                    gettext('Please enter a student email address or username.')
+                );
+            }
+            if (!problemToReset) {
+                return this.$request_err_grade.text(
+                    gettext('Please enter a problem location.')
+                );
+            }
+            sendData = {
+                unique_student_identifier: uniqStudentIdentifier,
+                problem_to_reset: problemToReset,
+                only_if_higher: onlyIfHigher
+            };
+            successMessage = gettext("Started rescore problem task for problem '<%- problem_id %>' and student '<%- student_id %>'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+            fullSuccessMessage = _.template(successMessage)({
+                student_id: uniqStudentIdentifier,
+                problem_id: problemToReset
+            });
+            errorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>' for student '<%- student_id %>'. Make sure that the the problem and student identifiers are complete and correct.");  // eslint-disable-line max-len
+            fullErrorMessage = _.template(errorMessage)({
+                student_id: uniqStudentIdentifier,
+                problem_id: problemToReset
+            });
+            return $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: this.$btn_rescore_problem_single.data('endpoint'),
+                data: sendData,
+                success: this.clear_errors_then(function() {
+                    return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                }),
+                error: statusAjaxError(function() {
+                    return that.$request_err_grade.text(fullErrorMessage);
+                })
+            });
+        };
+
+        StudentAdmin.prototype.rescore_entrance_exam_all = function(onlyIfHigher) {
+            var sendData, uniqStudentIdentifier,
+                that = this;
+            uniqStudentIdentifier = this.$field_exam_grade.val();
+            if (!uniqStudentIdentifier) {
+                return this.$request_err_ee.text(gettext(
+                    'Please enter a student email address or username.')
+                );
+            }
+            sendData = {
+                unique_student_identifier: uniqStudentIdentifier,
+                only_if_higher: onlyIfHigher
+            };
+            return $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: this.$btn_rescore_entrance_exam.data('endpoint'),
+                data: sendData,
+                success: this.clear_errors_then(function() {
+                    var fullSuccessMessage, successMessage;
+                    successMessage = gettext("Started entrance exam rescore task for student '{student_id}'. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+                    fullSuccessMessage = interpolate_text(successMessage, {
+                        student_id: uniqStudentIdentifier
+                    });
+                    return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                }),
+                error: statusAjaxError(function() {
+                    var errorMessage, fullErrorMessage;
+                    errorMessage = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct.");  // eslint-disable-line max-len
+                    fullErrorMessage = interpolate_text(errorMessage, {
+                        student_id: uniqStudentIdentifier
+                    });
+                    return that.$request_err_ee.text(fullErrorMessage);
+                })
+            });
+        };
+
+        StudentAdmin.prototype.rescore_problem_all = function(onlyIfHigher) {
+            var confirmMessage, errorMessage, fullConfirmMessage,
+                fullErrorMessage, fullSuccessMessage, problemToReset, sendData, successMessage,
+                that = this;
+            problemToReset = this.$field_problem_select_all.val();
+            if (!problemToReset) {
+                return this.$request_response_error_all.text(
+                    gettext('Please enter a problem location.')
+                );
+            }
+            confirmMessage = gettext("Rescore problem '<%- problem_id %>' for all students?");
+            fullConfirmMessage = _.template(confirmMessage)({
+                problem_id: problemToReset
+            });
+            if (window.confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
+                sendData = {
+                    all_students: true,
+                    problem_to_reset: problemToReset,
+                    only_if_higher: onlyIfHigher
+                };
+                successMessage = gettext("Successfully started task to rescore problem '<%- problem_id %>' for all students. Click the 'Show Task Status' button to see the status of the task.");  // eslint-disable-line max-len
+                fullSuccessMessage = _.template(successMessage)({
+                    problem_id: problemToReset
+                });
+                errorMessage = gettext("Error starting a task to rescore problem '<%- problem_id %>'. Make sure that the problem identifier is complete and correct.");  // eslint-disable-line max-len
+                fullErrorMessage = _.template(errorMessage)({
+                    problem_id: problemToReset
+                });
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: this.$btn_rescore_problem_all.data('endpoint'),
+                    data: sendData,
+                    success: this.clear_errors_then(function() {
+                        return alert(fullSuccessMessage);  // eslint-disable-line no-alert
+                    }),
+                    error: statusAjaxError(function() {
+                        return that.$request_response_error_all.text(fullErrorMessage);
+                    })
+                });
+            } else {
+                return this.clear_errors();
+            }
+        };
 
         StudentAdmin.prototype.clear_errors_then = function(cb) {
             this.$request_err.empty();

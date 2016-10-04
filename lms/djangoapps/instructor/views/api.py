@@ -602,8 +602,8 @@ def students_update_enrollment(request, course_id):
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
-    auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
-    email_students = request.POST.get('email_students') in ['true', 'True', True]
+    auto_enroll = _get_boolean_param(request, 'auto_enroll')
+    email_students = _get_boolean_param(request, 'email_students')
     is_white_label = CourseMode.is_white_label(course_id)
     reason = request.POST.get('reason')
     if is_white_label:
@@ -743,8 +743,8 @@ def bulk_beta_modify_access(request, course_id):
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
-    email_students = request.POST.get('email_students') in ['true', 'True', True]
-    auto_enroll = request.POST.get('auto_enroll') in ['true', 'True', True]
+    email_students = _get_boolean_param(request, 'email_students')
+    auto_enroll = _get_boolean_param(request, 'auto_enroll')
     results = []
     rolename = 'beta'
     course = get_course_by_id(course_id)
@@ -1939,8 +1939,8 @@ def reset_student_attempts(request, course_id):
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
+    delete_module = _get_boolean_param(request, 'delete_module')
 
     # parameter combinations
     if all_students and student:
@@ -2027,8 +2027,8 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
-    all_students = request.POST.get('all_students', False) in ['true', 'True', True]
-    delete_module = request.POST.get('delete_module', False) in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
+    delete_module = _get_boolean_param(request, 'delete_module')
 
     # parameter combinations
     if all_students and student:
@@ -2092,7 +2092,8 @@ def rescore_problem(request, course_id):
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.POST.get('all_students') in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
+    only_if_higher = _get_boolean_param(request, 'only_if_higher')
 
     if not (problem_to_reset and (all_students or student)):
         return HttpResponseBadRequest("Missing query parameters.")
@@ -2107,19 +2108,26 @@ def rescore_problem(request, course_id):
     except InvalidKeyError:
         return HttpResponseBadRequest("Unable to parse problem id")
 
-    response_payload = {}
-    response_payload['problem_to_reset'] = problem_to_reset
+    response_payload = {'problem_to_reset': problem_to_reset}
 
     if student:
         response_payload['student'] = student_identifier
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_student(request, module_state_key, student)
-        response_payload['task'] = 'created'
+        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_student(
+            request,
+            module_state_key,
+            student,
+            only_if_higher,
+        )
     elif all_students:
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_all_students(request, module_state_key)
-        response_payload['task'] = 'created'
+        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_all_students(
+            request,
+            module_state_key,
+            only_if_higher,
+        )
     else:
         return HttpResponseBadRequest()
 
+    response_payload['task'] = 'created'
     return JsonResponse(response_payload)
 
 
@@ -2146,11 +2154,12 @@ def rescore_entrance_exam(request, course_id):
     )
 
     student_identifier = request.POST.get('unique_student_identifier', None)
+    only_if_higher = request.POST.get('only_if_higher', None)
     student = None
     if student_identifier is not None:
         student = get_student_from_identifier(student_identifier)
 
-    all_students = request.POST.get('all_students') in ['true', 'True', True]
+    all_students = _get_boolean_param(request, 'all_students')
 
     if not course.entrance_exam_id:
         return HttpResponseBadRequest(
@@ -2172,7 +2181,10 @@ def rescore_entrance_exam(request, course_id):
         response_payload['student'] = student_identifier
     else:
         response_payload['student'] = _("All Students")
-    lms.djangoapps.instructor_task.api.submit_rescore_entrance_exam_for_student(request, entrance_exam_key, student)
+
+    lms.djangoapps.instructor_task.api.submit_rescore_entrance_exam_for_student(
+        request, entrance_exam_key, student, only_if_higher,
+    )
     response_payload['task'] = 'created'
     return JsonResponse(response_payload)
 
@@ -3318,3 +3330,12 @@ def validate_request_data_and_get_certificate(certificate_invalidation, course_k
             "username/email and the selected course are correct and try again."
         ).format(student=student.username, course=course_key.course))
     return certificate
+
+
+def _get_boolean_param(request, param_name):
+    """
+    Returns the value of the boolean parameter with the given
+    name in the POST request. Handles translation from string
+    values to boolean values.
+    """
+    return request.POST.get(param_name, False) in ['true', 'True', True]
