@@ -10,8 +10,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.module_render import get_module
-from courseware.model_data import FieldDataCache, set_score
+from courseware.model_data import set_score
 from courseware.tests.helpers import (
     LoginEnrollmentTestCase,
     get_request_for_user
@@ -25,6 +24,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
+from .utils import answer_problem
 from .. import course_grades
 from ..course_grades import summary as grades_summary
 from ..module_grades import get_module_score
@@ -533,31 +533,3 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
         score = get_module_score(self.request.user, self.course, self.seq3)
         self.assertEqual(score, 1.0)
-
-
-def answer_problem(course, request, problem, score=1, max_value=1):
-    """
-    Records a correct answer for the given problem.
-
-    Arguments:
-        course (Course): Course object, the course the required problem is in
-        request (Request): request Object
-        problem (xblock): xblock object, the problem to be answered
-    """
-
-    user = request.user
-    grade_dict = {'value': score, 'max_value': max_value, 'user_id': user.id}
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id,
-        user,
-        course,
-        depth=2
-    )
-    # pylint: disable=protected-access
-    module = get_module(
-        user,
-        request,
-        problem.scope_ids.usage_id,
-        field_data_cache,
-    )._xmodule
-    module.system.publish(problem, 'grade', grade_dict)
