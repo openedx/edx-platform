@@ -55,6 +55,7 @@ NPM_INSTALLED_LIBRARIES = [
     'backbone/backbone.js',
     'edx-ui-toolkit/node_modules/backbone.paginator/lib/backbone.paginator.js',
     'backbone-validation/dist/backbone-validation-min.js',
+    'edx-ui-toolkit/node_modules/moment-timezone/builds/moment-timezone-with-data.min.js'
 ]
 
 # Directory to install static vendor files
