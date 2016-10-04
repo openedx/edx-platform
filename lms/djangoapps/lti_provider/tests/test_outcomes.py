@@ -295,47 +295,6 @@ class XmlHandlingTest(TestCase):
         self.assertFalse(outcomes.check_replace_result_response(response))
 
 
-class TestBodyHashClient(unittest.TestCase):
-    """
-    Test our custom BodyHashClient
-
-    This Client should do everything a normal oauthlib.oauth1.Client would do,
-    except it also adds oauth_body_hash to the Authorization headers.
-    """
-    def test_simple_message(self):
-        oauth = requests_oauthlib.OAuth1(
-            '1000000000000000',  # fake consumer key
-            '2000000000000000',  # fake consumer secret
-            signature_method='HMAC-SHA1',
-            client_class=outcomes.BodyHashClient,
-            force_include_body=True
-        )
-        headers = {'content-type': 'application/xml'}
-        req = requests.Request(
-            'POST',
-            "http://example.edx.org/fake",
-            data="Hello world!",
-            auth=oauth,
-            headers=headers
-        )
-        prepped_req = req.prepare()
-
-        # Make sure that our body hash is now part of the test...
-        self.assertIn(
-            'oauth_body_hash="00hq6RNueFa8QiEjhep5cJRHWAI%3D"',
-            prepped_req.headers['Authorization']
-        )
-
-        # But make sure we haven't wiped out any of the other oauth values
-        # that we would expect to be in the Authorization header as well
-        expected_oauth_headers = [
-            "oauth_nonce", "oauth_timestamp", "oauth_version",
-            "oauth_signature_method", "oauth_consumer_key", "oauth_signature",
-        ]
-        for oauth_header in expected_oauth_headers:
-            self.assertIn(oauth_header, prepped_req.headers['Authorization'])
-
-
 class TestAssignmentsForProblem(ModuleStoreTestCase):
     """
     Test cases for the assignments_for_problem method in outcomes.py

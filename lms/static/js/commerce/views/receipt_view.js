@@ -102,7 +102,7 @@ var edx = edx || {};
         },
 
         trackPurchase: function(order) {
-            window.analytics.track('Completed Order', {
+            window.analytics.track('Completed Purchase', {
                 orderId: order.number,
                 total: order.total_excl_tax,
                 currency: order.currency

@@ -1,4 +1,9 @@
-from django_comment_common.models import Role
+"""
+Common comment client utility functions.
+"""
+
+from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, \
+    FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
 
 
 class ThreadContext(object):
@@ -7,14 +12,14 @@ class ThreadContext(object):
     COURSE = 'course'
 
 
-_STUDENT_ROLE_PERMISSIONS = ["vote", "update_thread", "follow_thread", "unfollow_thread",
-                             "update_comment", "create_sub_comment", "unvote", "create_thread",
-                             "follow_commentable", "unfollow_commentable", "create_comment", ]
+STUDENT_ROLE_PERMISSIONS = ["vote", "update_thread", "follow_thread", "unfollow_thread",
+                            "update_comment", "create_sub_comment", "unvote", "create_thread",
+                            "follow_commentable", "unfollow_commentable", "create_comment", ]
 
-_MODERATOR_ROLE_PERMISSIONS = ["edit_content", "delete_thread", "openclose_thread",
-                               "endorse_comment", "delete_comment", "see_all_cohorts"]
+MODERATOR_ROLE_PERMISSIONS = ["edit_content", "delete_thread", "openclose_thread",
+                              "endorse_comment", "delete_comment", "see_all_cohorts"]
 
-_ADMINISTRATOR_ROLE_PERMISSIONS = ["manage_moderator"]
+ADMINISTRATOR_ROLE_PERMISSIONS = ["manage_moderator"]
 
 
 def _save_forum_role(course_key, name):
@@ -34,18 +39,18 @@ def seed_permissions_roles(course_key):
     """
     Create and assign permissions for forum roles
     """
-    administrator_role = _save_forum_role(course_key, "Administrator")
-    moderator_role = _save_forum_role(course_key, "Moderator")
-    community_ta_role = _save_forum_role(course_key, "Community TA")
-    student_role = _save_forum_role(course_key, "Student")
+    administrator_role = _save_forum_role(course_key, FORUM_ROLE_ADMINISTRATOR)
+    moderator_role = _save_forum_role(course_key, FORUM_ROLE_MODERATOR)
+    community_ta_role = _save_forum_role(course_key, FORUM_ROLE_COMMUNITY_TA)
+    student_role = _save_forum_role(course_key, FORUM_ROLE_STUDENT)
 
-    for per in _STUDENT_ROLE_PERMISSIONS:
+    for per in STUDENT_ROLE_PERMISSIONS:
         student_role.add_permission(per)
 
-    for per in _MODERATOR_ROLE_PERMISSIONS:
+    for per in MODERATOR_ROLE_PERMISSIONS:
         moderator_role.add_permission(per)
 
-    for per in _ADMINISTRATOR_ROLE_PERMISSIONS:
+    for per in ADMINISTRATOR_ROLE_PERMISSIONS:
         administrator_role.add_permission(per)
 
     moderator_role.inherit_permissions(student_role)
@@ -62,21 +67,21 @@ def are_permissions_roles_seeded(course_id):
     the database
     """
     try:
-        administrator_role = Role.objects.get(name="Administrator", course_id=course_id)
-        moderator_role = Role.objects.get(name="Moderator", course_id=course_id)
-        student_role = Role.objects.get(name="Student", course_id=course_id)
+        administrator_role = Role.objects.get(name=FORUM_ROLE_ADMINISTRATOR, course_id=course_id)
+        moderator_role = Role.objects.get(name=FORUM_ROLE_MODERATOR, course_id=course_id)
+        student_role = Role.objects.get(name=FORUM_ROLE_STUDENT, course_id=course_id)
     except:
         return False
 
-    for per in _STUDENT_ROLE_PERMISSIONS:
+    for per in STUDENT_ROLE_PERMISSIONS:
         if not student_role.has_permission(per):
             return False
 
-    for per in _MODERATOR_ROLE_PERMISSIONS + _STUDENT_ROLE_PERMISSIONS:
+    for per in MODERATOR_ROLE_PERMISSIONS + STUDENT_ROLE_PERMISSIONS:
         if not moderator_role.has_permission(per):
             return False
 
-    for per in _ADMINISTRATOR_ROLE_PERMISSIONS + _MODERATOR_ROLE_PERMISSIONS + _STUDENT_ROLE_PERMISSIONS:
+    for per in ADMINISTRATOR_ROLE_PERMISSIONS + MODERATOR_ROLE_PERMISSIONS + STUDENT_ROLE_PERMISSIONS:
         if not administrator_role.has_permission(per):
             return False
 

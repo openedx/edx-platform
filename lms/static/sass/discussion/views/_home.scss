@@ -3,7 +3,7 @@
 
 // home - layout
 .container .view-discussion-home {
-  padding-left: $baseline;
+  @include padding-left($baseline);
 
   section {
     border-bottom: 1px solid $forum-color-border;

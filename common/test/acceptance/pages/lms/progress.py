@@ -67,6 +67,13 @@ class ProgressPage(CoursePage):
         # Retrieve the scores for the section
         return self._section_scores(chapter_index, section_index)
 
+    def text_on_page(self, text):
+        """
+        Return whether the given text appears
+        on the page.
+        """
+        return text in self.q(css=".view-in-course").html[0]
+
     def _chapter_index(self, title):
         """
         Return the CSS index of the chapter with `title`.

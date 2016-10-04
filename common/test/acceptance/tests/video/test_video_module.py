@@ -4,6 +4,7 @@
 Acceptance tests for Video.
 """
 import os
+from ddt import ddt, unpack, data
 
 from mock import patch
 from nose.plugins.attrib import attr
@@ -199,6 +200,7 @@ class VideoBaseTest(UniqueCourseTest):
 
 
 @attr(shard=4)
+@ddt
 class YouTubeVideoTest(VideoBaseTest):
     """ Test YouTube Video Player """
 
@@ -491,15 +493,16 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assertTrue(self.video.is_button_shown('transcript_button'))
         self._verify_caption_text('Welcome to edX.')
 
-    def test_download_transcript_button_works_correctly(self):
+    @data(('srt', '00:00:00,260'), ('txt', 'Welcome to edX.'))
+    @unpack
+    def test_download_transcript_links_work_correctly(self, file_type, search_text):
         """
-        Scenario: Download Transcript button works correctly
+        Scenario: Download 'srt' transcript link works correctly.
+        Download 'txt' transcript link works correctly.
         Given the course has Video components A and B in "Youtube" mode
         And Video component C in "HTML5" mode
         And I have defined downloadable transcripts for the videos
         Then I can download a transcript for Video A in "srt" format
-        And I can download a transcript for Video A in "txt" format
-        And I can download a transcript for Video B in "txt" format
         And the Download Transcript menu does not exist for Video C
         """
 
@@ -524,19 +527,7 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
 
         # check if we can download transcript in "srt" format that has text "00:00:00,260"
-        self.assertTrue(self.video.downloaded_transcript_contains_text('srt', '00:00:00,260'))
-
-        # select the transcript format "txt"
-        self.assertTrue(self.video.select_transcript_format('txt'))
-
-        # check if we can download transcript in "txt" format that has text "Welcome to edX."
-        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Welcome to edX.'))
-
-        # open vertical containing video "B"
-        self.course_nav.go_to_vertical('Test Vertical-1')
-
-        # check if we can download transcript in "txt" format that has text "Equal transcripts"
-        self.assertTrue(self.video.downloaded_transcript_contains_text('txt', 'Equal transcripts'))
+        self.assertTrue(self.video.downloaded_transcript_contains_text(file_type, search_text))
 
         # open vertical containing video "C"
         self.course_nav.go_to_vertical('Test Vertical-2')

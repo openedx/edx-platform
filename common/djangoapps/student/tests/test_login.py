@@ -513,7 +513,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         noshib_response = self.client.get(TARGET_URL, follow=True)
         self.assertEqual(noshib_response.redirect_chain[-1],
                          ('http://testserver/login?next={url}'.format(url=TARGET_URL), 302))
-        self.assertContains(noshib_response, ("Sign in or Register | {platform_name}"
+        self.assertContains(noshib_response, (u"Sign in or Register | {platform_name}"
                                               .format(platform_name=settings.PLATFORM_NAME)))
         self.assertEqual(noshib_response.status_code, 200)
 

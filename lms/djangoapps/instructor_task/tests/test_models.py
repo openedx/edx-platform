@@ -7,7 +7,7 @@ import time
 
 import boto
 from django.conf import settings
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, override_settings, TestCase
 from mock import patch
 
 from common.test.utils import MockS3Mixin
@@ -103,7 +103,7 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
         storage.
         """
         test_settings = copy.deepcopy(settings.GRADES_DOWNLOAD)
-        test_settings['STORAGE_CLASS'] = 'storages.backends.s3boto.S3BotoStorage'
+        test_settings['STORAGE_CLASS'] = 'openedx.core.storage.S3ReportStorage'
         test_settings['STORAGE_KWARGS'] = {
             'bucket': settings.GRADES_DOWNLOAD['BUCKET'],
             'location': settings.GRADES_DOWNLOAD['ROOT_PATH'],
@@ -112,3 +112,24 @@ class DjangoStorageReportStoreS3TestCase(MockS3Mixin, ReportStoreTestMixin, Test
             connection = boto.connect_s3()
             connection.create_bucket(settings.GRADES_DOWNLOAD['STORAGE_KWARGS']['bucket'])
             return ReportStore.from_config(config_name='GRADES_DOWNLOAD')
+
+
+class TestS3ReportStorage(MockS3Mixin, TestCase):
+    """
+    Test the S3ReportStorage to make sure that configuration overrides from settings.FINANCIAL_REPORTS
+    are used instead of default ones.
+    """
+    def test_financial_report_overrides(self):
+        """
+        Test that CUSTOM_DOMAIN from FINANCIAL_REPORTS is used to construct file url. instead of domain defined via
+        AWS_S3_CUSTOM_DOMAIN setting.
+        """
+        with override_settings(FINANCIAL_REPORTS={
+            'STORAGE_TYPE': 's3',
+            'BUCKET': 'edx-financial-reports',
+            'CUSTOM_DOMAIN': 'edx-financial-reports.s3.amazonaws.com',
+            'ROOT_PATH': 'production',
+        }):
+            report_store = ReportStore.from_config(config_name="FINANCIAL_REPORTS")
+            # Make sure CUSTOM_DOMAIN from FINANCIAL_REPORTS is used to construct file url
+            self.assertIn("edx-financial-reports.s3.amazonaws.com", report_store.storage.url(""))

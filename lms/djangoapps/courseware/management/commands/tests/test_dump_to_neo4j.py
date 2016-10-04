@@ -36,6 +36,7 @@ class TestDumpToNeo4jCommandBase(SharedModuleStoreTestCase):
         cls.course2 = CourseFactory.create()
 
 
+@ddt.ddt
 class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
     """
     Tests for the dump to neo4j management command
@@ -50,7 +51,13 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         mock_transaction = mock.Mock()
         mock_graph.begin.return_value = mock_transaction
 
-        call_command('dump_to_neo4j')
+        call_command(
+            'dump_to_neo4j',
+            host='mock_host',
+            port=7473,
+            user='mock_user',
+            password='mock_password',
+        )
 
         self.assertEqual(mock_graph.begin.call_count, 2)
         self.assertEqual(mock_transaction.commit.call_count, 2)
@@ -72,20 +79,17 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         mock_graph.begin.return_value = mock_transaction
         mock_transaction.run.side_effect = ValueError('Something went wrong!')
 
-        call_command('dump_to_neo4j')
+        call_command(
+            'dump_to_neo4j',
+            host='mock_host',
+            port=7473,
+            user='mock_user',
+            password='mock_password',
+        )
 
         self.assertEqual(mock_graph.begin.call_count, 2)
         self.assertEqual(mock_transaction.commit.call_count, 0)
         self.assertEqual(mock_transaction.rollback.call_count, 2)
-
-    @mock.patch('django.conf.settings.NEO4J_CONFIG', None)
-    def test_dump_to_neo4j_no_config(self):
-        """
-        Tests that the command errors out if there isn't a configuration
-        file found
-        """
-        with self.assertRaises(CommandError):
-            call_command('dump_to_neo4j')
 
 
 @ddt.ddt

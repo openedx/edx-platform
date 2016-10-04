@@ -13,7 +13,7 @@ from openedx.core.djangoapps.content.block_structure.api import get_course_in_ca
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
-from .signals import SCORE_CHANGED
+from .signals import SCORE_CHANGED, SUBSECTION_SCORE_UPDATED
 from ..config.models import PersistentGradesEnabledFlag
 from ..transformer import GradesTransformer
 from ..new.subsection_grade import SubsectionGradeFactory
@@ -43,8 +43,6 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     usage_id = kwargs['item_id']
     user = user_by_anonymous_id(kwargs['anonymous_user_id'])
 
-    # If any of the kwargs were missing, at least one of the following values
-    # will be None.
     SCORE_CHANGED.send(
         sender=None,
         points_possible=points_possible,
@@ -73,8 +71,6 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
     usage_id = kwargs['item_id']
     user = user_by_anonymous_id(kwargs['anonymous_user_id'])
 
-    # If any of the kwargs were missing, at least one of the following values
-    # will be None.
     SCORE_CHANGED.send(
         sender=None,
         points_possible=0,
@@ -99,8 +95,6 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
     """
     student = kwargs['user']
     course_key = CourseLocator.from_string(kwargs['course_id'])
-    if not PersistentGradesEnabledFlag.feature_enabled(course_key):
-        return
 
     scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
     collected_block_structure = get_course_in_cache(course_key)
@@ -112,10 +106,19 @@ def recalculate_subsection_grade_handler(sender, **kwargs):  # pylint: disable=u
         'subsections',
         set()
     )
+    subsection_grade_factory = SubsectionGradeFactory(student, course, collected_block_structure)
     for subsection_usage_key in subsections_to_update:
         transformed_subsection_structure = get_course_blocks(
             student,
             subsection_usage_key,
             collected_block_structure=collected_block_structure,
         )
-        SubsectionGradeFactory(student).update(subsection_usage_key, transformed_subsection_structure, course)
+        subsection_grade = subsection_grade_factory.update(
+            transformed_subsection_structure[subsection_usage_key], transformed_subsection_structure
+        )
+        SUBSECTION_SCORE_UPDATED.send(
+            sender=None,
+            course=course,
+            user=student,
+            subsection_grade=subsection_grade,
+        )

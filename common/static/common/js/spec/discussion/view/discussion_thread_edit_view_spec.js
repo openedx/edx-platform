@@ -47,10 +47,10 @@
                     }
                 };
             });
-
             view.$el.find('.topic-title').filter(function(idx, el) {
                 return $(el).data('discussionId') === newTopicId;
-            }).click(); // set new topic
+            }).prop('selected', true); // set new topic
+            view.$('.post-topic').trigger('change');
             view.$('.edit-post-title').val('changed thread title'); // set new title
             if (discussionMode !== 'inline') {
                 view.$("label[for$='post-type-discussion']").click(); // set new thread type

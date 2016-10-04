@@ -13,18 +13,29 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.messages.middleware import MessageMiddleware
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.http import HttpRequest
+from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
 from nose.plugins.attrib import attr
+from oauth2_provider.models import (
+    AccessToken as dot_access_token,
+    RefreshToken as dot_refresh_token
+)
+from provider.oauth2.models import (
+    AccessToken as dop_access_token,
+    RefreshToken as dop_refresh_token
+)
 from testfixtures import LogCapture
 
 from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_API_URL, TEST_API_SIGNING_KEY, factories
 from commerce.tests.mocks import mock_get_orders
 from course_modes.models import CourseMode
+from lms.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.user_api.accounts.api import activate_account, create_account
 from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
@@ -39,6 +50,7 @@ from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_t
 
 
 LOGGER_NAME = 'audit'
+User = get_user_model()  # pylint:disable=invalid-name
 
 
 @ddt.ddt
@@ -126,11 +138,8 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
         self.assertTrue(result)
 
         # Try reusing the activation link to change the password again
-        response = self.client.post(
-            activation_link,
-            {'new_password1': self.OLD_PASSWORD, 'new_password2': self.OLD_PASSWORD},
-            follow=True
-        )
+        # Visit the activation link again.
+        response = self.client.get(activation_link)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "This password reset link is invalid. It may have been used already.")
 
@@ -160,6 +169,23 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             # data sent from the login page
             response = self._change_password()
             self.assertEqual(response.status_code, 400)
+
+    def test_access_token_invalidation_logged_out(self):
+        self.client.logout()
+        user = User.objects.get(email=self.OLD_EMAIL)
+        self._create_dop_tokens(user)
+        self._create_dot_tokens(user)
+        response = self._change_password(email=self.OLD_EMAIL)
+        self.assertEqual(response.status_code, 200)
+        self.assert_access_token_destroyed(user)
+
+    def test_access_token_invalidation_logged_in(self):
+        user = User.objects.get(email=self.OLD_EMAIL)
+        self._create_dop_tokens(user)
+        self._create_dot_tokens(user)
+        response = self._change_password()
+        self.assertEqual(response.status_code, 200)
+        self.assert_access_token_destroyed(user)
 
     def test_password_change_inactive_user(self):
         # Log out the user created during test setup
@@ -219,6 +245,31 @@ class StudentAccountUpdateTest(CacheIsolationTestCase, UrlResetMixin):
             data['email'] = email
 
         return self.client.post(path=reverse('password_change_request'), data=data)
+
+    def _create_dop_tokens(self, user=None):
+        """Create dop access token for given user if user provided else for default user."""
+        if not user:
+            user = User.objects.get(email=self.OLD_EMAIL)
+
+        client = ClientFactory()
+        access_token = AccessTokenFactory(user=user, client=client)
+        RefreshTokenFactory(user=user, client=client, access_token=access_token)
+
+    def _create_dot_tokens(self, user=None):
+        """Create dop access token for given user if user provided else for default user."""
+        if not user:
+            user = User.objects.get(email=self.OLD_EMAIL)
+
+        application = dot_factories.ApplicationFactory(user=user)
+        access_token = dot_factories.AccessTokenFactory(user=user, application=application)
+        dot_factories.RefreshTokenFactory(user=user, application=application, access_token=access_token)
+
+    def assert_access_token_destroyed(self, user):
+        """Assert all access tokens are destroyed."""
+        self.assertFalse(dot_access_token.objects.filter(user=user).exists())
+        self.assertFalse(dot_refresh_token.objects.filter(user=user).exists())
+        self.assertFalse(dop_access_token.objects.filter(user=user).exists())
+        self.assertFalse(dop_refresh_token.objects.filter(user=user).exists())
 
 
 @attr(shard=3)

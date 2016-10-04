@@ -1285,6 +1285,7 @@ dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
 discussion_js = (
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/mathjax_include.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/customwmd.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_accessible.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_delay_renderer.js') +
@@ -1448,6 +1449,18 @@ PIPELINE_CSS = {
             'css/discussion/lms-discussion-main-rtl.css',
         ],
         'output_filename': 'css/discussion/lms-discussion-main-rtl.css',
+    },
+    'style-inline-discussion': {
+        'source_filenames': [
+            'css/discussion/inline-discussion.css',
+        ],
+        'output_filename': 'css/discussion/inline-discussion.css',
+    },
+    'style-inline-discussion-rtl': {
+        'source_filenames': [
+            'css/discussion/inline-discussion-rtl.css',
+        ],
+        'output_filename': 'css/discussion/inline-discussion-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
@@ -1689,7 +1702,6 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
     'moment': 'js/vendor/moment-with-locales.min.js',
-    'jquery.url': 'js/vendor/url.min.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
     'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events.js',
@@ -2373,6 +2385,7 @@ GRADES_DOWNLOAD = {
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': 'edx-financial-reports',
+    'CUSTOM_DOMAIN': 'edx-financial-reports.s3.amazonaws.com',
     'ROOT_PATH': '/tmp/edx-s3/financial_reports',
 }
 
@@ -2951,6 +2964,9 @@ SITE_ID = 1
 # dir containing all themes
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes"]
 
+# Theme directory locale paths
+COMPREHENSIVE_THEME_LOCALE_PATHS = []
+
 # Theme to use when no site or site theme is defined,
 # set to None if you want to use openedx theme
 DEFAULT_SITE_THEME = None
@@ -2972,11 +2988,6 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 # The cache is cleared when Redirect models are saved/deleted
 REDIRECT_CACHE_TIMEOUT = None  # The length of time we cache Redirect model data
 REDIRECT_CACHE_KEY_PREFIX = 'redirects'
-
-############## Settings for Neo4j ############################
-
-# This should be set in configuration
-NEO4J_CONFIG = None
 
 ############## Settings for LMS Context Sensitive Help ##############
 

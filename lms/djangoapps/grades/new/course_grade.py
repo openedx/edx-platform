@@ -60,10 +60,15 @@ class CourseGrade(object):
         """
         # Grading policy might be overriden by a CCX, need to reset it
         self.course.set_grading_policy(self.course.grading_policy)
-        return self.course.grader.grade(
+        grade_value = self.course.grader.grade(
             self.subsection_grade_totals_by_format,
             generate_random_scores=settings.GENERATE_PROFILE_SCORES
         )
+        # can't use the existing properties due to recursion issues caused by referencing self.grade_value
+        percent = self._calc_percent(grade_value)
+        letter_grade = self._compute_letter_grade(percent)
+        self._log_event(log.warning, u"grade_value, percent: {0}, grade: {1}".format(percent, letter_grade))
+        return grade_value
 
     @property
     def has_access_to_course(self):
@@ -78,7 +83,7 @@ class CourseGrade(object):
         """
         Returns a rounded percent from the overall grade.
         """
-        return round(self.grade_value['percent'] * 100 + 0.05) / 100
+        return self._calc_percent(self.grade_value)
 
     @property
     def letter_grade(self):
@@ -107,36 +112,49 @@ class CourseGrade(object):
         # doesn't get displayed differently than it gets grades
         grade_summary['percent'] = self.percent
         grade_summary['grade'] = self.letter_grade
-
         grade_summary['totaled_scores'] = self.subsection_grade_totals_by_format
         grade_summary['raw_scores'] = list(self.locations_to_weighted_scores.itervalues())
 
         return grade_summary
 
-    def compute(self):
+    def compute_and_update(self, read_only=False):
         """
         Computes the grade for the given student and course.
+
+        If read_only is True, doesn't save any updates to the grades.
         """
-        subsection_grade_factory = SubsectionGradeFactory(self.student)
+        subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, self.course_structure)
         for chapter_key in self.course_structure.get_children(self.course.location):
             chapter = self.course_structure[chapter_key]
-            subsection_grades = []
+            chapter_subsection_grades = []
             for subsection_key in self.course_structure.get_children(chapter_key):
-                subsection_grades.append(
-                    subsection_grade_factory.create(
-                        self.course_structure[subsection_key],
-                        self.course_structure,
-                        self.course,
-                    )
+                chapter_subsection_grades.append(
+                    subsection_grade_factory.create(self.course_structure[subsection_key], read_only=True)
                 )
 
             self.chapter_grades.append({
                 'display_name': block_metadata_utils.display_name_with_default_escaped(chapter),
                 'url_name': block_metadata_utils.url_name_for_block(chapter),
-                'sections': subsection_grades
+                'sections': chapter_subsection_grades
             })
 
+        subsections_total = sum(len(x) for x in self.subsection_grade_totals_by_format.itervalues())
+        subsections_read = len(subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
+        subsections_created = subsections_total - subsections_read
+        blocks_total = len(self.locations_to_weighted_scores)
+        if not read_only:
+            subsection_grade_factory.bulk_create_unsaved()
+
         self._signal_listeners_when_grade_computed()
+        self._log_event(
+            log.warning,
+            u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}".format(
+                read_only,
+                subsections_read,
+                subsections_created,
+                blocks_total,
+            )
+        )
 
     def score_for_module(self, location):
         """
@@ -149,7 +167,7 @@ class CourseGrade(object):
         all scored problems that are children of the chosen location.
         """
         if location in self.locations_to_weighted_scores:
-            score = self.locations_to_weighted_scores[location]
+            score, _ = self.locations_to_weighted_scores[location]
             return score.earned, score.possible
         children = self.course_structure.get_children(location)
         earned = 0.0
@@ -159,6 +177,13 @@ class CourseGrade(object):
             earned += child_earned
             possible += child_possible
         return earned, possible
+
+    @staticmethod
+    def _calc_percent(grade_value):
+        """
+        Helper for percent calculation.
+        """
+        return round(grade_value['percent'] * 100 + 0.05) / 100
 
     def _compute_letter_grade(self, percentage):
         """
@@ -195,10 +220,20 @@ class CourseGrade(object):
         )
 
         for receiver, response in responses:
-            log.info(
+            log.debug(
                 'Signal fired when student grade is calculated. Receiver: %s. Response: %s',
                 receiver, response
             )
+
+    def _log_event(self, log_func, log_statement):
+        """
+        Logs the given statement, for this instance.
+        """
+        log_func(u"Persistent Grades: CourseGrade.{0}, course: {1}, user: {2}".format(
+            log_statement,
+            self.course.id,
+            self.student.id
+        ))
 
 
 class CourseGradeFactory(object):
@@ -208,22 +243,26 @@ class CourseGradeFactory(object):
     def __init__(self, student):
         self.student = student
 
-    def create(self, course):
+    def create(self, course, read_only=False):
         """
         Returns the CourseGrade object for the given student and course.
+
+        If read_only is True, doesn't save any updates to the grades.
         """
         course_structure = get_course_blocks(self.student, course.location)
         return (
             self._get_saved_grade(course, course_structure) or
-            self._compute_and_update_grade(course, course_structure)
+            self._compute_and_update_grade(course, course_structure, read_only)
         )
 
-    def _compute_and_update_grade(self, course, course_structure):
+    def _compute_and_update_grade(self, course, course_structure, read_only):
         """
         Freshly computes and updates the grade for the student and course.
+
+        If read_only is True, doesn't save any updates to the grades.
         """
         course_grade = CourseGrade(self.student, course, course_structure)
-        course_grade.compute()
+        course_grade.compute_and_update(read_only)
         return course_grade
 
     def _get_saved_grade(self, course, course_structure):  # pylint: disable=unused-argument

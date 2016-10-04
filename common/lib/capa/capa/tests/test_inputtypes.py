@@ -24,7 +24,7 @@ import unittest
 import textwrap
 import xml.sax.saxutils as saxutils
 
-from . import test_capa_system
+from capa.tests.helpers import test_capa_system
 from capa import inputtypes
 from capa.checker import DemoSystem
 from mock import ANY, patch
@@ -78,7 +78,7 @@ class OptionInputTest(unittest.TestCase):
             'id': 'sky_input',
             'default_option_text': 'Select an option',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -147,7 +147,7 @@ class ChoiceGroupTest(unittest.TestCase):
             'submitted_message': 'Answer received.',
             'name_array_suffix': expected_suffix,   # what is this for??
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -201,7 +201,7 @@ class JavascriptInputTest(unittest.TestCase):
             'display_class': display_class,
             'problem_state': problem_state,
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -239,7 +239,7 @@ class TextLineTest(unittest.TestCase):
             'trailing_text': '',
             'preprocessor': None,
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -278,7 +278,7 @@ class TextLineTest(unittest.TestCase):
                 'script_src': script,
             },
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -323,7 +323,7 @@ class TextLineTest(unittest.TestCase):
                 'trailing_text': expected_text,
                 'preprocessor': None,
                 'response_data': RESPONSE_DATA,
-                'describedby': DESCRIBEDBY
+                'describedby_html': DESCRIBEDBY
             }
             self.assertEqual(context, expected)
 
@@ -366,7 +366,7 @@ class FileSubmissionTest(unittest.TestCase):
             'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
             'required_files': '["cookies.py"]',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -422,7 +422,7 @@ class CodeInputTest(unittest.TestCase):
             'tabsize': int(tabsize),
             'queue_len': '3',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -484,7 +484,7 @@ class MatlabTest(unittest.TestCase):
             'queue_len': '3',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
             'response_data': {},
-            'describedby': ''
+            'describedby_html': ''
         }
 
         self.assertEqual(context, expected)
@@ -519,7 +519,7 @@ class MatlabTest(unittest.TestCase):
             'queue_len': '3',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -553,7 +553,7 @@ class MatlabTest(unittest.TestCase):
                 'queue_len': '0',
                 'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
                 'response_data': RESPONSE_DATA,
-                'describedby': DESCRIBEDBY
+                'describedby_html': DESCRIBEDBY
             }
 
             self.assertEqual(context, expected)
@@ -587,7 +587,7 @@ class MatlabTest(unittest.TestCase):
             'queue_len': '1',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -705,13 +705,14 @@ class MatlabTest(unittest.TestCase):
             textwrap.dedent("""
             <div>{\'status\': Status(\'queued\'), \'button_enabled\': True,
             \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\',
-            \'tabsize\': 4, \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\',
-            \'describedby\': \'\', \'queue_msg\': \'\',
+            \'tabsize\': 4, \'cols\': \'80\',
+            \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\', \'queue_msg\': \'\',
             \'value\': \'print "good evening"\',
             \'msg\': u\'Submitted. As soon as a response is returned,
             this message will be replaced by that feedback.\',
             \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
-            \'hidden\': \'\', \'linenumbers\': \'true\', \'id\': \'prob_1_2\', \'response_data\': {}}</div>
+            \'hidden\': \'\', \'id\': \'prob_1_2\', \'describedby_html\': \'\',
+            \'response_data\': {}}</div>
             """).replace('\n', ' ').strip()
         )
 
@@ -818,7 +819,7 @@ class MatlabTest(unittest.TestCase):
             'queue_len': '3',
             'matlab_editor_js': '/dummy-static/js/vendor/CodeMirror/octave.js',
             'response_data': {},
-            'describedby': ''
+            'describedby_html': ''
         }
 
         self.assertEqual(context, expected)
@@ -929,7 +930,7 @@ class SchematicTest(unittest.TestCase):
             'analyses': analyses,
             'submit_analyses': submit_analyses,
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -975,7 +976,7 @@ class ImageInputTest(unittest.TestCase):
             'gy': egy,
             'msg': '',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -1031,7 +1032,7 @@ class CrystallographyTest(unittest.TestCase):
             'width': width,
             'height': height,
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -1079,7 +1080,7 @@ class VseprTest(unittest.TestCase):
             'molecules': molecules,
             'geometries': geometries,
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.assertEqual(context, expected)
@@ -1115,7 +1116,7 @@ class ChemicalEquationTest(unittest.TestCase):
             'size': self.size,
             'previewer': '/dummy-static/js/capa/chemical_equation_preview.js',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -1210,7 +1211,7 @@ class FormulaEquationTest(unittest.TestCase):
             'inline': False,
             'trailing_text': '',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
         self.assertEqual(context, expected)
 
@@ -1256,7 +1257,7 @@ class FormulaEquationTest(unittest.TestCase):
                 'inline': False,
                 'trailing_text': expected_text,
                 'response_data': RESPONSE_DATA,
-                'describedby': DESCRIBEDBY
+                'describedby_html': DESCRIBEDBY
             }
 
             self.assertEqual(context, expected)
@@ -1388,7 +1389,7 @@ class DragAndDropTest(unittest.TestCase):
             'msg': '',
             'drag_and_drop_json': json.dumps(user_input),
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         # as we are dumping 'draggables' dicts while dumping user_input, string
@@ -1457,7 +1458,7 @@ class AnnotationInputTest(unittest.TestCase):
             'debug': False,
             'return_to_annotation': True,
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
 
         self.maxDiff = None
@@ -1522,7 +1523,7 @@ class TestChoiceText(unittest.TestCase):
             'show_correctness': 'always',
             'submitted_message': 'Answer received.',
             'response_data': RESPONSE_DATA,
-            'describedby': DESCRIBEDBY
+            'describedby_html': DESCRIBEDBY
         }
         expected.update(state)
         the_input = lookup_tag(tag)(test_capa_system(), element, state)

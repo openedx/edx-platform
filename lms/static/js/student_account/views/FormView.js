@@ -85,7 +85,9 @@
 
                         html.push(_.template(fieldTpl)($.extend(data[i], {
                             form: this.formType,
-                            requiredStr: this.requiredStr
+                            requiredStr: this.requiredStr,
+                            supplementalText: data[i].supplementalText || '',
+                            supplementalLink: data[i].supplementalLink || ''
                         })));
                     }
 

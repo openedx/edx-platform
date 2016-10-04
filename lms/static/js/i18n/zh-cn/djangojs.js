@@ -42,15 +42,6 @@
     "%(memberCount)s / %(maxMemberCount)s Member": [
       "%(memberCount)s / %(maxMemberCount)s \u4e2a\u6210\u5458"
     ], 
-    "%(numResponses)s other response": [
-      "%(numResponses)s \u6761\u5176\u4ed6\u56de\u590d"
-    ], 
-    "%(numResponses)s response": [
-      "%(numResponses)s \u6761\u56de\u590d"
-    ], 
-    "%(numVotes)s Vote": [
-      "%(numVotes)s \u5f20\u9009\u7968"
-    ], 
     "%(num_questions)s question": [
       "%(num_questions)s \u4e2a\u95ee\u9898"
     ], 
@@ -63,9 +54,6 @@
     "%(post_type)s posted %(time_ago)s by %(author)s": "\u7531%(author)s\u53d1\u8868\u4e8e%(time_ago)s\u7684%(post_type)s", 
     "%(team_count)s Team": [
       "%(team_count)s \u4e2a\u56e2\u961f"
-    ], 
-    "%(unread_count)s new comment": [
-      "%(unread_count)s \u6761\u65b0\u8bc4\u8bba"
     ], 
     "%(value)s hour": [
       "%(value)s \u5c0f\u65f6"
@@ -403,7 +391,6 @@
     "Discussion": "\u8ba8\u8bba", 
     "Discussion Home": "\u8ba8\u8bba\u533a", 
     "Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.": "\u8ba8\u8bba\u533a\u7ba1\u7406\u5458\u3001\u7248\u4e3b\u4ee5\u53ca\u52a9\u6559\u53ef\u4ee5\u5c06\u5b83\u4eec\u7684\u5e16\u5b50\u8bbe\u7f6e\u4e3a\u5bf9\u6240\u6709\u5b66\u751f\u53ef\u89c1\u6216\u8005\u4ec5\u5bf9\u67d0\u4e2a\u7fa4\u7ec4\u53ef\u89c1\u3002", 
-    "Discussion topics; currently listing: ": "\u8ba8\u8bba\u8bdd\u9898\uff1b\u5f53\u524d\u5217\u51fa\uff1a", 
     "Div": "Div \u6807\u7b7e", 
     "Do not show again": "\u4e0d\u518d\u663e\u793a", 
     "Do you want to allow this student ('{student_id}') to skip the entrance exam?": "\u60a8\u662f\u5426\u5141\u8bb8\u8be5\u5b66\u751f('{student_id}')\u8df3\u8fc7\u5165\u5b66\u8003\u8bd5\uff1f", 
@@ -427,7 +414,6 @@
     "Edit Membership": "\u7f16\u8f91\u56e2\u961f\u6210\u5458\u4fe1\u606f", 
     "Edit Team": "\u7f16\u8f91\u56e2\u961f", 
     "Edit Your Name": "\u7f16\u8f91\u4f60\u7684\u540d\u5b57", 
-    "Edit post title": "\u7f16\u8f91\u8ba8\u8bba\u5e16\u6807\u9898", 
     "Editable": "\u53ef\u7f16\u8f91", 
     "Editing comment": "\u7f16\u8f91\u8bc4\u8bba", 
     "Editing post": "\u7f16\u8f91\u8ba8\u8bba\u5e16", 
@@ -467,7 +453,6 @@
     "Enter the page number you'd like to quickly navigate to.": "\u8f93\u5165\u60a8\u9700\u8981\u5feb\u901f\u524d\u5f80\u7684\u9875\u7801\u3002", 
     "Enter the username or email address of each learner that you want to add as an exception.": "\u8f93\u5165\u60a8\u8981\u6dfb\u52a0\u4e3a\u7279\u6b8a\u5904\u7406\u7684\u6bcf\u4e00\u4f4d\u5b66\u5458\u7684\u7528\u6237\u540d\u6216\u7535\u5b50\u90ae\u4ef6\u3002", 
     "Enter username or email": "\u8f93\u5165\u7528\u6237\u540d\u6216\u8005\u7535\u5b50\u90ae\u4ef6\u5730\u5740", 
-    "Enter your question or comment": "\u8bf7\u8f93\u5165\u60a8\u7684\u95ee\u9898\u6216\u8005\u8bc4\u8bba", 
     "Entrance exam attempts is being reset for student '{student_id}'.": "\u6b63\u5728\u91cd\u7f6e\u5b66\u751f\u201c{student_id}\u201d\u7684\u5165\u5b66\u8003\u8bd5\u5c1d\u8bd5\u6b21\u6570\u3002", 
     "Entrance exam state is being deleted for student '{student_id}'.": "\u5b66\u751f'{student_id}'\u7684\u5165\u5b66\u8003\u8bd5\u7684\u72b6\u6001\u5df2\u88ab\u5220\u9664\u3002", 
     "Error": "\u9519\u8bef", 
@@ -529,7 +514,6 @@
     "Files must be in JPEG or PNG format.": "\u6587\u4ef6\u5fc5\u987b\u662fJPEG\u6216\u8005PNG\u683c\u5f0f\u3002", 
     "Fill browser": "\u5168\u5c4f", 
     "Filter and sort topics": "\u8fc7\u6ee4\u548c\u6574\u7406\u8bdd\u9898", 
-    "Filter topics": "\u8fc7\u6ee4\u8bdd\u9898", 
     "Financial Assistance": "\u7ecf\u6d4e\u8865\u52a9", 
     "Financial Assistance Application": "\u7ecf\u6d4e\u63f4\u52a9\u7533\u8bf7", 
     "Find": "\u67e5\u627e", 
@@ -687,8 +671,6 @@
     "Live view of webcam": "\u6444\u50cf\u5934\u7684\u5b9e\u65f6\u753b\u9762", 
     "Load Another File": "\u52a0\u8f7d\u5176\u4ed6\u6587\u4ef6", 
     "Load all responses": "\u8f7d\u5165\u6240\u6709\u7684\u56de\u590d", 
-    "Load more": "\u8f7d\u5165\u66f4\u591a", 
-    "Load next %(numResponses)s responses": "\u52a0\u8f7d\u63a5\u4e0b\u6765\u7684%(numResponses)s\u6761\u56de\u590d", 
     "Load next %(num_items)s result": [
       "\u52a0\u8f7d\u540e %(num_items)s \u4e2a\u7ed3\u679c"
     ], 
@@ -750,7 +732,6 @@
     "No receipt available": "\u6ca1\u6709\u53ef\u63d0\u4f9b\u7684\u6536\u636e\u3002", 
     "No results": "\u6ca1\u6709\u7ed3\u679c", 
     "No results found for \"%(query_string)s\". Please try searching again.": "\u672a\u627e\u5230\u6709\u5173\"%(query_string)s\"\u7684\u4efb\u4f55\u7ed3\u679c\u3002\u8bf7\u91cd\u65b0\u641c\u7d22\u3002", 
-    "No results found for %(original_query)s. Showing results for %(suggested_query)s.": "\u672a\u627e\u5230\u4e0e %(original_query)s \u5339\u914d\u7684\u7ed3\u679c\u3002\u663e\u793a\u7684\u662f\u67e5\u627e %(suggested_query)s \u7684\u7ed3\u679c\u3002", 
     "No sources": "\u6ca1\u6709\u6e90", 
     "No tasks currently running.": "\u6ca1\u6709\u6b63\u5728\u6267\u884c\u7684\u4efb\u52a1", 
     "No threads matched your query.": "\u672a\u627e\u5230\u5339\u914d\u7684\u5e16\u5b50", 
@@ -972,11 +953,7 @@
     "Show invisible characters": "\u663e\u793a\u4e0d\u53ef\u89c1\u5b57\u7b26", 
     "Show me other ways to sign in or register": "\u4e3a\u6211\u663e\u793a\u5176\u4ed6\u767b\u5f55\u6216\u6ce8\u518c\u65b9\u5f0f", 
     "Show notes": "\u663e\u793a\u6ce8\u91ca", 
-    "Show posts by %(username)s.": "\u6309 %(username)s \u663e\u793a\u5e16\u5b50", 
     "Showing all responses": "\u663e\u793a\u6240\u6709\u7684\u56de\u590d", 
-    "Showing first response": [
-      "\u663e\u793a\u524d %(numResponses)s \u6761\u56de\u590d"
-    ], 
     "Sign in": "\u767b\u5f55", 
     "Sign in here using your email address and password, or use one of the providers listed below.": "\u4f7f\u7528\u60a8\u7684\u7535\u5b50\u90ae\u4ef6\u548c\u5bc6\u7801\u6216\u4f7f\u7528\u4ee5\u4e0b\u5217\u51fa\u7684\u4e00\u4e2a\u65b9\u5f0f\u5728\u6b64\u5904\u767b\u5f55\u3002", 
     "Sign in here using your email address and password.": "\u5728\u8fd9\u91cc\u4f7f\u7528\u4f60\u7684\u7535\u5b50\u90ae\u4ef6\u548c\u5bc6\u7801\u767b\u5f55\u3002", 
@@ -1306,8 +1283,6 @@
     "We had some trouble marking this response as an answer.  Please try again.": "\u6807\u8bb0\u8fd9\u4e2a\u56de\u590d\u4e3a\u7b54\u6848\u65f6\u51fa\u73b0\u4e86\u4e00\u4e9b\u95ee\u9898\uff0c\u8bf7\u91cd\u8bd5\u3002", 
     "We had some trouble marking this response endorsed.  Please try again.": "\u6807\u8bb0\u8fd9\u4e2a\u56de\u590d\u4e3a\u652f\u6301\u65f6\u51fa\u73b0\u4e86\u4e00\u4e9b\u95ee\u9898\uff0c\u8bf7\u91cd\u8bd5\u3002", 
     "We had some trouble pinning this thread. Please try again.": "\u7f6e\u9876\u8fd9\u4e2a\u5e16\u5b50\u65f6\u51fa\u73b0\u4e86\u4e00\u4e9b\u95ee\u9898\uff0c\u8bf7\u91cd\u8bd5\u3002", 
-    "We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.": "\u5728\u5904\u7406\u60a8\u7684\u8bf7\u6c42\u65f6\u53d1\u751f\u9519\u8bef\u3002\u8bf7\u60a8\u786e\u8ba4\u5df2\u5907\u4efd\u672a\u4fdd\u5b58\u7684\u5de5\u4f5c\uff0c\u7136\u540e\u91cd\u65b0\u8f7d\u5165\u9875\u9762\u3002", 
-    "We had some trouble processing your request. Please try again.": "\u5904\u7406\u8bf7\u6c42\u9047\u5230\u95ee\u9898\uff0c\u8bf7\u91cd\u8bd5\u3002", 
     "We had some trouble removing this endorsement.  Please try again.": "\u53d6\u6d88\u6807\u8bb0\u8fd9\u4e2a\u56de\u590d\u4e3a\u652f\u6301\u65f6\u51fa\u73b0\u4e86\u4e00\u4e9b\u95ee\u9898\uff0c\u8bf7\u91cd\u8bd5\u3002", 
     "We had some trouble removing this response as an answer.  Please try again.": "\u53d6\u6d88\u6807\u8bb0\u8fd9\u4e2a\u56de\u590d\u4e3a\u7b54\u6848\u65f6\u51fa\u73b0\u4e86\u4e00\u4e9b\u95ee\u9898\uff0c\u8bf7\u91cd\u8bd5\u3002", 
     "We had some trouble removing your flag on this post.  Please try again.": "\u79fb\u9664\u8fd9\u4e2a\u5e16\u5b50\u7684\u6807\u8bb0\u65f6\u51fa\u73b0\u4e86\u4e00\u4e9b\u95ee\u9898\uff0c\u8bf7\u91cd\u8bd5\u3002", 
@@ -1477,9 +1452,6 @@
     "strong text": "\u52a0\u7c97\u6587\u5b57", 
     "subsection": "\u8282", 
     "team count": "\u56e2\u961f\u8ba1\u6570", 
-    "there is currently %(numVotes)s vote": [
-      "\u5f53\u524d\u6709 %(numVotes)s \u5f20\u9009\u7968"
-    ], 
     "timed": "\u5b9a\u65f6", 
     "title": "\u6807\u9898", 
     "unanswered question": "\u5f85\u56de\u590d\u7684\u95ee\u9898", 

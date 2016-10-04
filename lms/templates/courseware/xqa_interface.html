@@ -30,9 +30,9 @@ function setup_debug(element_id, edit_link, staff_context){
         }
     );
 
-    DialogTabControls.setKeydownListner($(debugModalSelector), leanOverlaySelector);
-    DialogTabControls.setKeydownListner($(historyModalSelector), leanOverlaySelector);
-    DialogTabControls.setKeydownListner($(xqaModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListener($(debugModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListener($(historyModalSelector), leanOverlaySelector);
+    DialogTabControls.setKeydownListener($(xqaModalSelector), leanOverlaySelector);
 
     staffDebugTrigger.on('click', function() {
         DialogTabControls.initializeTabKeyValues(debugModalSelector);

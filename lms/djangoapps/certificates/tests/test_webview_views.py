@@ -190,7 +190,7 @@ class CertificatesViewsTests(CommonCertificatesTestCase):
         params = OrderedDict([
             ('_ed', '0_0dPSPyS070e0HsE9HNz_13_d11_',),
             ('pfCertificationName', '{platform_name} Honor Code Certificate for {course_name}'.format(
-                platform_name=settings.PLATFORM_NAME,
+                platform_name=settings.PLATFORM_NAME.encode('utf-8'),
                 course_name=self.course.display_name,
             ),),
             ('pfCertificationUrl', self.request.build_absolute_uri(test_url),),

@@ -1,9 +1,14 @@
 """
 Functionality for problem scores.
 """
+from logging import getLogger
+
 from openedx.core.lib.cache_utils import memoized
 from xblock.core import XBlock
 from .transformer import GradesTransformer
+
+
+log = getLogger(__name__)
 
 
 @memoized
@@ -30,15 +35,17 @@ def possibly_scored(usage_key):
     return usage_key.block_type in block_types_possibly_scored()
 
 
-def weighted_score(raw_earned, raw_possible, weight):
-    """Return a tuple that represents the weighted (correct, total) score."""
-    # If there is no weighting, or weighting can't be applied, return input.
+def weighted_score(raw_earned, raw_possible, weight=None):
+    """
+    Return a tuple that represents the weighted (earned, possible) score.
+    If weight is None or raw_possible is 0, returns the original values.
+    """
     if weight is None or raw_possible == 0:
         return (raw_earned, raw_possible)
     return float(raw_earned) * weight / raw_possible, float(weight)
 
 
-def get_score(user, block, scores_client, submissions_scores_cache):
+def get_score(user, block, scores_client, submissions_scores_cache, weight, possible=None):
     """
     Return the score for a user on a problem, as a tuple (earned, possible).
     e.g. (5,7) if you got 5 out of 7 points.
@@ -49,8 +56,13 @@ def get_score(user, block, scores_client, submissions_scores_cache):
     user: a Student object
     block: a BlockStructure's BlockData object
     scores_client: an initialized ScoresClient
-    submissions_scores_cache: A dict of location names to (earned, possible) point tuples.
-           If an entry is found in this cache, it takes precedence.
+    submissions_scores_cache: A dict of location names to (earned, possible)
+        point tuples.  If an entry is found in this cache, it takes precedence.
+    weight: The weight of the problem to use in the calculation.  A value of
+        None signifies that the weight should not be applied.
+    possible (optional): The possible maximum score of the problem to use in the
+        calculation.  If None, uses the value found either in scores_client or
+        from the block.
     """
     submissions_scores_cache = submissions_scores_cache or {}
 
@@ -74,16 +86,25 @@ def get_score(user, block, scores_client, submissions_scores_cache):
     if score and score.total is not None:
         # We have a valid score, just use it.
         earned = score.correct if score.correct is not None else 0.0
-        possible = score.total
+        if possible is None:
+            possible = score.total
+        elif possible != score.total:
+            log.error(
+                u"Persistent Grades: scores.get_score, possible value {} != score.total value {}".format(
+                    possible,
+                    score.total
+                )
+            )
     else:
         # This means we don't have a valid score entry and we don't have a
         # cached_max_score on hand. We know they've earned 0.0 points on this.
         earned = 0.0
-        possible = block.transformer_data[GradesTransformer].max_score
+        if possible is None:
+            possible = block.transformer_data[GradesTransformer].max_score
 
         # Problem may be an error module (if something in the problem builder failed)
         # In which case possible might be None
         if possible is None:
             return (None, None)
 
-    return weighted_score(earned, possible, block.weight)
+    return weighted_score(earned, possible, weight)

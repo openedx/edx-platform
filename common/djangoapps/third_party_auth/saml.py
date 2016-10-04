@@ -2,8 +2,10 @@
 Slightly customized python-social-auth backend for SAML 2.0 support
 """
 import logging
+from django.contrib.sites.models import Site
 from django.http import Http404
 from django.utils.functional import cached_property
+from openedx.core.djangoapps.theming.helpers import get_current_request
 from social.backends.saml import SAMLAuth, OID_EDU_PERSON_ENTITLEMENT
 from social.exceptions import AuthForbidden, AuthMissingParameter
 
@@ -41,10 +43,12 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
         if not self._config.enabled:
             log.error('SAML authentication is not enabled')
             raise Http404
+
         # TODO: remove this check once the fix is merged upstream:
         # https://github.com/omab/python-social-auth/pull/821
         if 'idp' not in self.strategy.request_data():
             raise AuthMissingParameter(self, 'idp')
+
         return super(SAMLAuthBackend, self).auth_url()
 
     def _check_entitlements(self, idp, attributes):
@@ -93,4 +97,4 @@ class SAMLAuthBackend(SAMLAuth):  # pylint: disable=abstract-method
     @cached_property
     def _config(self):
         from .models import SAMLConfiguration
-        return SAMLConfiguration.current()
+        return SAMLConfiguration.current(Site.objects.get_current(get_current_request()))

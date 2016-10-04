@@ -2,16 +2,5 @@
 // Version 1 styling (pre-Pattern Library)
 // ====================
 
-// libs and resets *do not edit*
-@import 'bourbon/bourbon'; // lib - bourbon
-@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
-
-// BASE  *default edX offerings*
-// ====================
-
-// base - utilities
-@import 'base/reset';
-@import 'base/variables';
-@import 'base/mixins';
-
+@import 'build-base-v1';
 @import 'build-lms-v1'; // shared app style assets/rendering

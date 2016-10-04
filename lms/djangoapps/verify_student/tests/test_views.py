@@ -2491,7 +2491,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
 
         self.assertIn("Thanks,", body)
         self.assertIn(
-            "The {platform_name} team".format(
+            u"The {platform_name} team".format(
                 platform_name=settings.PLATFORM_NAME
             ),
             body

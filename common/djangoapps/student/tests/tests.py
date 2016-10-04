@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import json
 import logging
 import unittest
-from urlparse import urljoin
+from urllib import quote
 
 import ddt
 from django.conf import settings
@@ -30,6 +30,7 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from config_models.models import cache
 from course_modes.models import CourseMode
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories as programs_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
@@ -440,12 +441,12 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertIn('Add Certificate to LinkedIn', response.content)
 
         expected_url = (
-            'http://www.linkedin.com/profile/add'
-            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            'pfCertificationName=edX+Honor+Code+Certificate+for+Omega&'
-            'pfCertificationUrl=www.edx.org&'
-            'source=o'
-        )
+            u'http://www.linkedin.com/profile/add'
+            u'?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
+            u'pfCertificationName={platform}+Honor+Code+Certificate+for+Omega&'
+            u'pfCertificationUrl=www.edx.org&'
+            u'source=o'
+        ).format(platform=quote(settings.PLATFORM_NAME.encode('utf-8')))
         self.assertContains(response, escape(expected_url))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -589,7 +590,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
         self.mock_tracker.reset_mock()
 
 
-class EnrollInCourseTest(EnrollmentEventTestMixin, TestCase):
+class EnrollInCourseTest(EnrollmentEventTestMixin, CacheIsolationTestCase):
     """Tests enrolling and unenrolling in courses."""
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

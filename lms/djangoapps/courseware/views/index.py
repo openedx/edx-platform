@@ -384,6 +384,7 @@ class CoursewareIndex(View):
             'staff_access': self.is_staff,
             'studio_url': get_studio_url(self.course, 'course'),
             'masquerade': self.masquerade,
+            'real_user': self.real_user,
             'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),

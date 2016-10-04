@@ -48,7 +48,7 @@ class ThreadListGetForm(_PaginationForm):
         required=False
     )
     order_direction = ChoiceField(
-        choices=[(choice, choice) for choice in ["asc", "desc"]],
+        choices=[(choice, choice) for choice in ["desc"]],
         required=False
     )
     requested_fields = MultiValueField(required=False)

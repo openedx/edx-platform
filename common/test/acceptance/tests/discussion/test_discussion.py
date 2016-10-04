@@ -211,8 +211,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4635
-                'icon-aria-hidden',  # TNL-4637
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -457,8 +456,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'icon-aria-hidden',  # TNL-4641
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
 
@@ -467,8 +465,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'icon-aria-hidden',  # TNL-4641
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
 
@@ -529,8 +526,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -539,8 +535,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -827,8 +822,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         page.visit()
@@ -926,8 +920,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1333,8 +1326,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'icon-aria-hidden',  # TNL-4641
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

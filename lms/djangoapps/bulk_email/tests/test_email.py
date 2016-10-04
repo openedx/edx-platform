@@ -9,6 +9,7 @@ from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
+from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
@@ -503,7 +504,7 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         """
         This test tests that the bulk email context uses http or https urls as appropriate.
         """
-        self.assertEquals(email_context['platform_name'], 'edX')
+        self.assertEquals(email_context['platform_name'], settings.PLATFORM_NAME)
         self.assertEquals(email_context['course_title'], self.course_title)
         self.assertEquals(email_context['course_url'],
                           '{}://edx.org/courses/{}/{}/{}/'.format(scheme,

@@ -498,8 +498,9 @@ def get_thread_list(
     order_by: The key in which to sort the threads by. The only values are
         "last_activity_at", "comment_count", and "vote_count". The default is
         "last_activity_at".
-    order_direction: The direction in which to sort the threads by. The only
-        values are "asc" or "desc". The default is "desc".
+    order_direction: The direction in which to sort the threads by. The default
+        and only value is "desc". This will be removed in a future major
+        version.
     requested_fields: Indicates which additional fields to return
         for each thread. (i.e. ['profile_image'])
 
@@ -528,9 +529,9 @@ def get_thread_list(
             "order_by":
                 ["Invalid value. '{}' must be 'last_activity_at', 'comment_count', or 'vote_count'".format(order_by)]
         })
-    if order_direction not in ["asc", "desc"]:
+    if order_direction != "desc":
         raise ValidationError({
-            "order_direction": ["Invalid value. '{}' must be 'asc' or 'desc'".format(order_direction)]
+            "order_direction": ["Invalid value. '{}' must be 'desc'".format(order_direction)]
         })
 
     course = _get_course(course_key, request.user)
@@ -546,7 +547,6 @@ def get_thread_list(
         "per_page": page_size,
         "text": text_search,
         "sort_key": cc_map.get(order_by),
-        "sort_order": order_direction,
     }
 
     if view:
@@ -916,6 +916,11 @@ def update_thread(request, thread_id, update_data):
         thread_edited.send(sender=None, user=request.user, post=cc_thread)
     api_thread = serializer.data
     _do_extra_actions(api_thread, cc_thread, update_data.keys(), actions_form, context, request)
+
+    # always return read as True (and therefore unread_comment_count=0) as reasonably
+    # accurate shortcut, rather than adding additional processing.
+    api_thread['read'] = True
+    api_thread['unread_comment_count'] = 0
     return api_thread
 
 

@@ -160,7 +160,7 @@ define([
             it('sends analytic event when verified receipt is rendered', function() {
                 mockRender(true, 'True');
                 expect(window.analytics.track).toHaveBeenCalledWith(
-                    'Completed Order',
+                    'Completed Purchase',
                     {
                         orderId: 'EDX-123456',
                         total: '10.00',
@@ -172,7 +172,7 @@ define([
             it('sends analytic event when non verified receipt is rendered', function() {
                 mockRender(true, 'False');
                 expect(window.analytics.track).toHaveBeenCalledWith(
-                    'Completed Order',
+                    'Completed Purchase',
                     {
                         orderId: 'EDX-123456',
                         total: '10.00',

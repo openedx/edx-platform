@@ -38,7 +38,7 @@
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Larissa Queiroz Pontes <lariqbiotec@gmail.com>, 2015
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014-2016
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014-2016
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # lukassem <lucas_sem@hotmail.com>, 2014
@@ -88,7 +88,7 @@
 # Felipe Nogueira de Souza <felipensouza@live.com>, 2015
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Marcelo Soares Souza <marcelo@libertais.org>, 2014
@@ -141,7 +141,7 @@
 # Kelly Parada <kellcparada@gmail.com>, 2016
 # Kevin Grist <kgrist@localconcept.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # lukassem <lucas_sem@hotmail.com>, 2014
@@ -150,7 +150,7 @@
 # Marcos João Alves <noidmvp@gmail.com>, 2014
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # marianemurakami <mhmurakami@gmail.com>, 2014
-# Mike Job Silva <mikejobrn@gmail.com>, 2015
+# Mike Job <mikejobrn@gmail.com>, 2015
 # Monica Farias <monifar.tp@gmail.com>, 2015-2016
 # Nayse Hillesheim <nayse.hillesheim@gmail.com>, 2015
 # Ned Batchelder <ned@edx.org>, 2016
@@ -208,7 +208,7 @@
 # Hudson Martins dos Santos <p4p4l3gu4x@gmail.com>, 2015
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
-# Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
+# Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
 # Luiz Mituiti <luizmituiti@gmail.com>, 2014
@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-25 15:05+0000\n"
+"POT-Creation-Date: 2016-09-29 14:23+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -1193,6 +1193,10 @@ msgid "Password reset unsuccessful"
 msgstr "A redefinição de senha não foi realizada"
 
 #: common/djangoapps/student/views.py
+msgid "Error in resetting your password. Please try again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
 msgstr "Não existe nenhum usuário inativo com este endereço de e-mail"
 
@@ -1231,6 +1235,10 @@ msgstr ""
 "separada de \"Instituições\" para acesso de fornecedores."
 
 #: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this provider configuration belongs to."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is enabled, users will not be asked to confirm their details "
 "(name, email, etc.) during the registration process. Only select this option"
@@ -1248,6 +1256,17 @@ msgid ""
 msgstr ""
 "Se esta opção estiver selecionada, usuários não serão obrigados a confirmar "
 "o e-mail e suas contas serão ativadas imediatamente após a inscrição."
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is not selected, users will not be presented with the "
+"provider as an option to authenticate with on the login screen, but manual "
+"authentication using the correct link is still possible."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this SAML configuration belongs to."
+msgstr ""
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
@@ -1758,12 +1777,16 @@ msgid "This answer is partially correct."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This answer is unanswered."
+msgid "This answer is being processed."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
+msgid "Not yet answered."
 msgstr ""
+
+#: wiki/forms.py
+msgid "Select an option"
+msgstr "Selecionar uma opção"
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -1843,6 +1866,11 @@ msgstr "{input_type}: marcação inesperada {tag_name}"
 #: common/lib/capa/capa/inputtypes.py
 msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr "Era esperada a marcação {expected_tag}, mas {given_tag} foi obtida."
+
+#. Translators: index here could be 1,2,3 and so on
+#: common/lib/capa/capa/responsetypes.py
+msgid "Question {index}"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Correct"
@@ -3347,16 +3375,6 @@ msgstr ""
 msgid ""
 "Enter true or false. If this value is true, you can hide a subsection until "
 "learners earn a minimum score in another, prerequisite subsection."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable Subsection Grades Saved"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, the robust grades feature of "
-"saving subsection grades is enabled for this course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -5703,6 +5721,57 @@ msgstr "{currency_symbol}{price}"
 #: lms/djangoapps/courseware/views/views.py
 msgid "Free"
 msgstr "Gratuito"
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate has been invalidated"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Please contact your course team if you have any questions."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Congratulations, you qualified for a certificate!"
+msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."
@@ -9302,7 +9371,9 @@ msgstr ""
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search"
@@ -9963,27 +10034,39 @@ msgstr ""
 msgid "Please select your Country."
 msgstr "Por favor, selecione seu País."
 
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Review the Honor Code"
+msgstr ""
+
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
 msgstr "Termos do Serviço e Código de Honra"
 
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "I agree to the {platform_name} {terms_of_service}."
-msgstr "Eu concordo com {terms_of_service} {platform_name}."
+msgid "Review the Terms of Service and Honor Code"
+msgstr ""
 
 #. Translators: "Terms of Service" is a legal document users must agree to
 #. in order to register a new account.
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "You must agree to the {platform_name} {terms_of_service}."
-msgstr "Você deve concordar com {terms_of_service} {platform_name}."
+msgid "I agree to the {platform_name} {terms_of_service}"
+msgstr ""
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "You must agree to the {platform_name} {terms_of_service}"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Review the Terms of Service"
+msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
 msgid "This value is invalid."
@@ -10747,8 +10830,9 @@ msgstr ""
 msgid "Account"
 msgstr "Conta"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
+#: cms/templates/widgets/header.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
+#: themes/edx.org/lms/templates/header.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Ajuda"
 
@@ -10880,6 +10964,10 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
 msgstr "Discussão - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "Discussions"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/templates/discussion/_discussion_inline.html
@@ -11131,6 +11219,10 @@ msgid "Email is incorrect."
 msgstr "O endereço de e-mail é incorreto. "
 
 #: lms/templates/help_modal.html
+msgid "Support"
+msgstr ""
+
+#: lms/templates/help_modal.html
 msgid "{platform_name} Help"
 msgstr "Ajuda do {platform_name}"
 
@@ -11185,10 +11277,7 @@ msgid "Tell us the details"
 msgstr "Descreva os detalhes"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Describe what you were doing when you encountered the issue. Include any "
-"details that will help us to troubleshoot, including error messages that you"
-" saw."
+msgid "Include error messages, steps which lead to the issue, etc"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11221,7 +11310,9 @@ msgid "Brief description of the problem"
 msgstr "Descrição sucinta do problema"
 
 #: lms/templates/help_modal.html
-msgid "Details of the problem you are encountering{asterisk}"
+msgid ""
+"Details of the problem you are encountering{asterisk}{begin_span}Include "
+"error messages, steps which lead to the issue, etc.{end_span}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -12298,12 +12389,28 @@ msgid "No playable video sources found."
 msgstr "Não foram encontradas fontes de vídeos reproduzíveis!"
 
 #: lms/templates/video.html
-msgid "Download video"
-msgstr "Baixar vídeo"
+msgid "Downloads and transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download {file}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download transcript"
 msgstr "Baixar transcrição"
+
+#: lms/templates/video.html
+msgid "Handouts"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -13781,10 +13888,6 @@ msgid "Course Search"
 msgstr "Busca de Cursos"
 
 #: lms/templates/courseware/courseware.html
-msgid "search"
-msgstr "procurar"
-
-#: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
 msgstr "Nenhum conteúdo foi adicionado a este curso"
 
@@ -14522,6 +14625,10 @@ msgstr ""
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "Identificação da Discussão: {discussion_id}"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Discussion topics list"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
@@ -18179,11 +18286,9 @@ msgstr "Com quem posso entrar em contato se tiver dúvidas?"
 
 #: lms/templates/survey/survey.html
 msgid ""
-"If you have any questions about this course or this form, you can contact <a"
-" href=\"{mail_to_link}\"\">{mail_to_link}</a>."
+"If you have any questions about this course or this form, you can contact "
+"{link_start}{mail_to_link}{link_end}."
 msgstr ""
-"Se você tiver alguma pergunta sobre este curso ou este formulário, você pode"
-" entrar em contato com <a href=\"{mail_to_link}\"\">{mail_to_link}</a>."
 
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
@@ -18326,8 +18431,9 @@ msgstr "Sobre o edX"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© edX Inc.  All rights reserved except where noted.  EdX, Open edX and the "
-"edX and Open EdX logos are registered trademarks or trademarks of edX Inc."
+"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
+"the edX and Open EdX logos are registered trademarks or trademarks of edX "
+"Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -22137,10 +22243,6 @@ msgstr ""
 #: wiki/forms.py
 msgid "No changes made. Nothing to save."
 msgstr "Nenhuma alteração realizada. Nada para salvar. "
-
-#: wiki/forms.py
-msgid "Select an option"
-msgstr "Selecionar uma opção"
 
 #: wiki/forms.py
 msgid "Slug"

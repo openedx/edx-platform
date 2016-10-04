@@ -4,6 +4,11 @@
             <%= label %>
             <% if ( required && requiredStr ) { %> <%= requiredStr %></label><% } %>
         </label>
+        <% if (supplementalLink && supplementalText) { %>
+            <div class="supplemental-link">
+                <a href="<%- supplementalLink %>"><%- supplementalText %></a>
+            </div>
+        <% } %>
     <% } %>
 
     <% if ( type === 'select' ) { %>
@@ -24,6 +29,11 @@
         <% }); %>
         </select>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-desc"><%= instructions %></span><% } %>
+        <% if (supplementalLink && supplementalText) { %>
+            <div class="supplemental-link">
+                <a href="<%- supplementalLink %>"><%- supplementalText %></a>
+            </div>
+        <% } %>
     <% } else if ( type === 'textarea' ) { %>
         <textarea id="<%= form %>-<%= name %>"
             type="<%= type %>"
@@ -41,6 +51,11 @@
             } %>
             <% if ( required ) { %> aria-required="true" required<% } %> ></textarea>
             <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-desc"><%= instructions %></span><% } %>
+            <% if (supplementalLink && supplementalText) { %>
+                <div class="supplemental-link">
+                    <a href="<%- supplementalLink %>"><%- supplementalText %></a>
+                </div>
+            <% } %>
     <% } else { %>
         <input id="<%= form %>-<%= name %>"
            type="<%= type %>"
@@ -49,7 +64,7 @@
             <% if ( instructions ) { %> aria-describedby="<%= form %>-<%= name %>-desc" <% } %>
             <% if ( restrictions.min_length ) { %> minlength="<%= restrictions.min_length %>"<% } %>
             <% if ( restrictions.max_length ) { %> maxlength="<%= restrictions.max_length %>"<% } %>
-            <% if ( required ) { %> aria-required="true" required<% } %>
+            <% if ( required ) { %> required<% } %>
             <% if ( typeof errorMessages !== 'undefined' ) {
                 _.each(errorMessages, function( msg, type ) {%>
                     data-errormsg-<%= type %>="<%= msg %>"
@@ -65,6 +80,11 @@
             </label>
         <% } %>
         <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-desc"><%= instructions %></span><% } %>
+        <% if (supplementalLink && supplementalText) { %>
+            <div class="supplemental-link">
+                <a href="<%- supplementalLink %>"><%- supplementalText %></a>
+            </div>
+        <% } %>
     <% } %>
 
     <% if( form === 'login' && name === 'password' ) { %>
