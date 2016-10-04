@@ -1063,6 +1063,7 @@ def get_course_lti_endpoints(request, course_id):
     anonymous_user = AnonymousUser()
     anonymous_user.known = False  # make these "noauth" requests like module_render.handle_xblock_callback_noauth
     lti_descriptors = modulestore().get_items(course.id, qualifiers={'category': 'lti'})
+    lti_descriptors.extend(modulestore().get_items(course.id, qualifiers={'category': 'lti_consumer'}))
 
     lti_noauth_modules = [
         get_module_for_descriptor(
