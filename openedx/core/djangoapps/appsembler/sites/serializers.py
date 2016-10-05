@@ -1,5 +1,7 @@
 from django.contrib.sites.models import Site
 from rest_framework import serializers
+from organizations import api as organizations_api
+from organizations.models import Organization
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 from .utils import sass_to_dict, dict_to_sass, bootstrap_site
 
@@ -46,3 +48,22 @@ class SiteSerializer(serializers.ModelSerializer):
         site = super(SiteSerializer, self).create(validated_data)
         site = bootstrap_site(site)
         return site
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = ('id', 'name', 'short_name')
+
+    def create(self, validated_data):
+        return organizations_api.add_organization(**validated_data)
+
+
+class RegistrationSerializer(serializers.Serializer):
+    site = SiteSerializer()
+    organization = OrganizationSerializer()
+
+    def create(self, validated_data):
+        site_data = validated_data.pop('site')
+        organization_data = validated_data.pop('organization')
+        return organization_data
