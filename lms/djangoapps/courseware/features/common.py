@@ -138,7 +138,6 @@ def visit_scenario_item(item_key):
     Go to the courseware page containing the item stored in `world.scenario_dict`
     under the key `item_key`
     """
-
     url = django_url(reverse(
         'jump_to',
         kwargs={
@@ -148,8 +147,10 @@ def visit_scenario_item(item_key):
     ))
 
     world.browser.visit(url)
-    world.wait_for_xmodule()
-
+    world.wait_for_visible('#course-content')
+    # xblock xblock-student_view xblock-student_view-problem xmodule_display xmodule_CapaModule xblock-initialized
+    world.wait_for_visible('#xblock-student_view-problem')
+    world.wait_for_visible('#xblock-initialized')
 
 def get_courses():
     '''
