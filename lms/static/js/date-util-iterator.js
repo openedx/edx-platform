@@ -28,39 +28,39 @@
         $,
         DateUtils,
         StringUtils
-        ) {
+    ) {
         return function() {
             var displayTime;
             var displayString;
+            var context;
+
             $('.localized-datetime').each(function() {
                 if ($(this).data('datetime') !== 'None' && $(this).data('datetime') !== undefined) {
-                    var context = {
+                    context = {
                         datetime: $(this).data('datetime'),
                         timezone: $(this).data('timezone'),
                         language: $(this).attr('lang'),
                         format: $(this).data('format')
-                    }
+                    };
                     displayTime = DateUtils.localize(context);
-                }
-            if ($(this).data('string') !== undefined && $(this).data('string').length > 0) {
-                displayString = StringUtils.interpolate(
-                    '{string} {date}',
-                    {
-                        string: $(this).data('string'),
-                        date: displayTime
+                    if ($(this).data('string') !== undefined && $(this).data('string').length > 0) {
+                        displayString = StringUtils.interpolate(
+                            '{string} {date}',
+                            {
+                                string: $(this).data('string'),
+                                date: displayTime
+                            }
+                        );
+                    } else {
+                        displayString = displayTime;
                     }
-                );
-            } else {
-                displayString = displayTime;
-            }
-            if (displayTime && displayString.length > 0) {
-
-                console.log(displayString);
-                /*
-                 uncomment out the following line once approved
-                 */
-                // $(this).text(displayString);
-            }
+                    console.log(displayString);
+                    /*
+                     uncomment out the following line once approved
+                     */
+                    // $(this).text(displayString);
+                    // }
+                }
             });
         };
     });
