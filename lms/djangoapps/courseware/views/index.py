@@ -398,7 +398,12 @@ class CoursewareIndex(View):
             self.section_url_name,
             self.field_data_cache,
         )
-        courseware_context['accordion'] = render_accordion(self.request, self.course, table_of_contents['chapters'])
+        courseware_context['accordion'] = render_accordion(
+            self.request,
+            self.course,
+            table_of_contents['chapters'],
+            courseware_context['language_preference']
+        )
 
         # entrance exam data
         if course_has_entrance_exam(self.course):
@@ -494,7 +499,7 @@ class CoursewareIndex(View):
             raise
 
 
-def render_accordion(request, course, table_of_contents):
+def render_accordion(request, course, table_of_contents, language_preference):
     """
     Returns the HTML that renders the navigation for the given course.
     Expects the table_of_contents to have data on each chapter and section,
@@ -506,7 +511,9 @@ def render_accordion(request, course, table_of_contents):
             ('course_id', unicode(course.id)),
             ('csrf', csrf(request)['csrf_token']),
             ('due_date_display_format', course.due_date_display_format),
-            ('time_zone', get_user_time_zone(request.user).zone),
+            ('time_zone', request.user.preferences.model.get_value(request.user, "time_zone", None)),
+            ('language', language_preference)
+
         ] + TEMPLATE_IMPORTS.items()
     )
     return render_to_string('courseware/accordion.html', context)

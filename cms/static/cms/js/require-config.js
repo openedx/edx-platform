@@ -52,6 +52,7 @@
             'date': 'js/vendor/date',
             'moment': 'js/vendor/moment.min',
             'moment-with-locales': 'js/vendor/moment-with-locales.min',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data.min',
             'text': 'js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',

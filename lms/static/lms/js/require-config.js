@@ -59,6 +59,7 @@
             'date': 'js/vendor/date',
             'moment': 'js/vendor/moment.min',
             'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data.min',
             'text': 'js/vendor/requirejs/text',
             'logger': 'js/src/logger',
             'backbone': 'common/js/vendor/backbone',
@@ -214,6 +215,10 @@
             },
             'moment-with-locales': {
                 exports: 'moment'
+            },
+            'moment-timezone': {
+                exports: 'moment',
+                deps: ['moment']
             },
             // Because Draggabilly is being used by video code, the namespaced version of
             // require is not being recognized. Therefore the library is being added to the

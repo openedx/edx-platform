@@ -32,6 +32,10 @@ else:
                         span_start=HTML('<span class="sr">'),
                         span_end=HTML('</span>'),
                     ) if 'active' in section and section['active'] else ''}</p>
+
+                ## TEMP COMMENT
+                ## The following is the legacy date approach, supplanted at end of template by the dateutil helper
+                ## which utilizes HTML5 data elements and the lang tag (per a11y feedback)
                 <%
                 if section.get('due') is None:
                     due_date = ''
@@ -57,12 +61,16 @@ else:
                         ## completed proctored exam statuses should not show the due date
                         ## since the exam has already been submitted by the user
                         % if not section['proctoring'].get('in_completed_state', False):
-                            <span class="subtitle-name">${due_date}</span>
+
+                            ## TEMP COMMENT
+                            ## Note the addition of data elements data-timezone, data-datetime, and data-lang
+                            <span class="subtitle-name localized-datetime" lang="${language}" data-timezone="${time_zone}" data-datetime="${section['due']}" data-string="due">${due_date}</span>
                         % endif
                     % else:
                         ## non-proctored section, we just show the exam format and the due date
                         ## this is the standard case in edx-platform
-                        <span class="subtitle-name">${section['format']} ${due_date}</span>
+                        <span class="subtitle-name localized-datetime" lang="${language}" data-timezone="${time_zone}" data-datetime="${section['due']}" data-string="due">${due_date}</span>
+                        ## <!-- data-string="${section.format}"-->
 
                         % if 'graded' in section and section['graded']:
                             <span class="menu-icon icon fa fa-pencil-square-o" aria-hidden="true"></span>
@@ -86,5 +94,11 @@ else:
 % if toc:
     <%static:require_module_async module_name="js/courseware/accordion_events" class_name="AccordionEvents">
         AccordionEvents();
+    </%static:require_module_async>
+% endif
+
+% if toc:
+    <%static:require_module_async module_name="js/date-util-iterator" class_name="DateUtilIterator">
+        DateUtilIterator();
     </%static:require_module_async>
 % endif
