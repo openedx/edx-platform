@@ -54,7 +54,14 @@
                     } else {
                         displayString = displayTime;
                     }
+
+                    /*
+                    to show the prototype in action, check the console
+                    */
+                    /* eslint-disable no-alert, no-console */
                     console.log(displayString);
+                    /* eslint-enable no-alert, no-console */
+
                     /*
                      uncomment out the following line once approved
                      */
