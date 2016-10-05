@@ -156,7 +156,9 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         content = self.get_courseware_page().content
         self.assertIn(
-            '<a href="/u/{}" class="action dropdown-menuitem">Profile</a>'.format(self.test_user.username),
+            '<a href="/u/{}" role="menuitem" class="action dropdown-menuitem">Profile</a>'.format(
+                self.test_user.username
+            ),
             content,
             "Profile link should point to real user",
         )
