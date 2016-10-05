@@ -3190,7 +3190,8 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
         })
         self.assertEqual(response.status_code, 400)
 
-    def test_reset_student_attempts_delete(self):
+    @patch('courseware.module_render.SCORE_CHANGED.send')
+    def test_reset_student_attempts_delete(self, _mock_signal):
         """ Test delete single student state. """
         url = reverse('reset_student_attempts', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {
