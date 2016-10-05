@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 
 from __future__ import absolute_import
-
+import os
 import time
 
 from lettuce import world, step, before
@@ -132,7 +132,6 @@ def course_location(course_num):
 def section_location(course_num):
     return world.scenario_dict['SECTION'].location.replace(course=course_num)
 
-
 def visit_scenario_item(item_key):
     """
     Go to the courseware page containing the item stored in `world.scenario_dict`
@@ -149,8 +148,25 @@ def visit_scenario_item(item_key):
     world.browser.visit(url)
     world.wait_for_visible('#course-content')
     # xblock xblock-student_view xblock-student_view-problem xmodule_display xmodule_CapaModule xblock-initialized
-    world.wait_for_visible('#xblock-student_view-problem')
-    world.wait_for_visible('#xblock-initialized')
+    print "DEBUG DEBUG DEBUG"
+    source = world.browser.driver.page_source
+    print source
+    file_name = os.path.join('test_root','log','{}.html'.format(item_key))
+    print "DEBUG DEBUG DEBUG"
+    print file_name
+    LOGGER.warning(file_name)
+    print "DEBUG DEBUG DEBUG"
+    try:
+        with open(file_name, 'w') as output_file:
+            output_file.write(source.encode('utf-8'))
+    except Exception:  # pylint: disable=broad-except
+        msg = "Could not save the browser page source to {}.".format(file_name)
+        LOGGER.warning(msg)
+
+    print "DEBUG DEBUG DEBUG"
+
+    # world.wait_for_visible('#xblock-student_view-problem')
+    # world.wait_for_visible('#xblock-initialized')
 
 def get_courses():
     '''
