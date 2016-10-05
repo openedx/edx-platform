@@ -16,6 +16,8 @@ from course_modes.models import CourseMode
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
+from lms.djangoapps.grades.scores import weighted_score
+from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
 from lang_pref import LANGUAGE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -285,6 +287,43 @@ def _reset_module_attempts(studentmodule):
     # save
     studentmodule.state = json.dumps(problem_state)
     studentmodule.save()
+
+
+def _fire_score_changed_for_block(course_id, student, block, module_state_key):
+    """
+    Fires a SCORE_CHANGED event for the given module. The earned points are
+    always zero. We must retrieve the possible points from the XModule, as
+    noted below.
+    """
+    if block and block.has_score:
+        cache = FieldDataCache.cache_for_descriptor_descendents(
+            course_id=course_id,
+            user=student,
+            descriptor=block,
+            depth=0
+        )
+        # For implementation reasons, we need to pull the max_score from the XModule,
+        # even though the data is not user-specific.  Here we bind the data to the
+        # current user.
+        request = crum.get_current_request()
+        module = get_module_for_descriptor(
+            user=student,
+            request=request,
+            descriptor=block,
+            field_data_cache=cache,
+            course_key=course_id
+        )
+        points_earned, points_possible = weighted_score(0, module.max_score(), getattr(module, 'weight', None))
+    else:
+        points_earned, points_possible = 0, 0
+    SCORE_CHANGED.send(
+        sender=None,
+        points_possible=points_possible,
+        points_earned=points_earned,
+        user=student,
+        course_id=unicode(course_id),
+        usage_id=unicode(module_state_key)
+    )
 
 
 def get_email_params(course, auto_enroll, secure=True, course_key=None, display_name=None):
