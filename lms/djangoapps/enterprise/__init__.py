@@ -1,0 +1,1 @@
+default_app_config = "enterprise.app_config.EnterpriseAppConfig"
