@@ -3,6 +3,8 @@ Test Help links in LMS
 """
 import json
 
+from flaky import flaky
+
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
 from common.test.acceptance.fixtures import LMS_BASE_URL
@@ -68,6 +70,7 @@ class TestCohortHelp(ContainerBase):
 
         self.verify_help_link(href)
 
+    @flaky  # TODO fix this, see TNL-5709
     def test_automatic_cohort_help(self):
         """
         Scenario: Help in 'What does it mean?' is correct when we create cohort automatically.
