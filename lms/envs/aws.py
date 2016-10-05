@@ -508,7 +508,6 @@ AZURE_ACCOUNT_NAME = AUTH_TOKENS.get('AZURE_ACCOUNT_NAME', None)
 AZURE_ACCOUNT_KEY = AUTH_TOKENS.get('AZURE_ACCOUNT_KEY', None)
 AZURE_CONTAINER = AUTH_TOKENS.get('AZURE_CONTAINER', None)
 
-
 # Disabling querystring auth instructs Boto to exclude the querystring parameters (e.g. signature, access key) it
 # normally appends to every returned URL.
 AWS_QUERYSTRING_AUTH = AUTH_TOKENS.get('AWS_QUERYSTRING_AUTH', True)
@@ -518,6 +517,8 @@ if AUTH_TOKENS.get('DEFAULT_FILE_STORAGE'):
     DEFAULT_FILE_STORAGE = AUTH_TOKENS.get('DEFAULT_FILE_STORAGE')
 elif AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+elif AZURE_ACCOUNT_NAME and AZURE_ACCOUNT_KEY and AZURE_CONTAINER:
+    DEFAULT_FILE_STORAGE = 'openedx.core.storage.AzureStorageExtended'
 else:
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 

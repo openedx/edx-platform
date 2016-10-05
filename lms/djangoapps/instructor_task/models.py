@@ -26,7 +26,6 @@ from django.db import models, transaction
 from openedx.core.storage import get_storage
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
-
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
@@ -202,6 +201,14 @@ class ReportStore(object):
                     'querystring_expire': 300,
                     'gzip': True,
                 },
+            )
+        if storage_type == 'azure':
+            return DjangoStorageReportStore(
+                storage_class='openedx.core.storage.AzureStorageExtended',
+                storage_kwargs={
+                    'container': config['CONTAINER'],
+                    'url_expiry_secs': config.get('URL_EXPIRY_SECS', 300)
+                }
             )
         elif storage_type == 'localfs':
             return DjangoStorageReportStore(
