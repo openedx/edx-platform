@@ -35,10 +35,8 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
         if not PersistentGradesEnabledFlag.is_enabled():
             return False
         elif not PersistentGradesEnabledFlag.current().enabled_for_all_courses and course_id:
-            try:
-                return CoursePersistentGradesFlag.objects.get(course_id=course_id).enabled
-            except CoursePersistentGradesFlag.DoesNotExist:
-                return False
+            effective = CoursePersistentGradesFlag.objects.filter(course_id=course_id).order_by('-change_date').first()
+            return effective.enabled if effective is not None else False
         return True
 
     class Meta(object):
@@ -63,7 +61,7 @@ class CoursePersistentGradesFlag(ConfigurationModel):
         app_label = "grades"
 
     # The course that these features are attached to.
-    course_id = CourseKeyField(max_length=255, db_index=True, unique=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
 
     def __unicode__(self):
         not_en = "Not "
