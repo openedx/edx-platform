@@ -4,9 +4,6 @@ Discussion XBlock
 """
 import logging
 
-from django.templatetags.static import static
-from django.utils.translation import get_language_bidi
-
 from xblockutils.resources import ResourceLoader
 from xblockutils.studio_editable import StudioEditableXBlockMixin
 from xmodule.raw_module import RawDescriptor
@@ -15,9 +12,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope, String, UNIQUE_ID
 from xblock.fragment import Fragment
 from xmodule.xml_module import XmlParserMixin
-
-from openedx.core.lib.xblock_builtin import get_css_dependencies, get_js_dependencies
-
 
 log = logging.getLogger(__name__)
 loader = ResourceLoader(__name__)  # pylint: disable=invalid-name
@@ -94,57 +88,6 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
             return None
         return user_service._django_user  # pylint: disable=protected-access
 
-    @staticmethod
-    def vendor_js_dependencies():
-        """
-        Returns list of vendor JS files that this XBlock depends on.
-
-        The helper function that it uses to obtain the list of vendor JS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        return get_js_dependencies('discussion_vendor')
-
-    @staticmethod
-    def js_dependencies():
-        """
-        Returns list of JS files that this XBlock depends on.
-
-        The helper function that it uses to obtain the list of JS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        return get_js_dependencies('discussion')
-
-    @staticmethod
-    def css_dependencies():
-        """
-        Returns list of CSS files that this XBlock depends on.
-
-        The helper function that it uses to obtain the list of CSS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        if get_language_bidi():
-            return get_css_dependencies('style-inline-discussion-rtl')
-        else:
-            return get_css_dependencies('style-inline-discussion')
-
-    def add_resource_urls(self, fragment):
-        """
-        Adds URLs for JS and CSS resources that this XBlock depends on to `fragment`.
-        """
-        # Head dependencies
-        for vendor_js_file in self.vendor_js_dependencies():
-            fragment.add_resource_url(static(vendor_js_file), "application/javascript", "head")
-
-        for css_file in self.css_dependencies():
-            fragment.add_css_url(static(css_file))
-
-        # Body dependencies
-        for js_file in self.js_dependencies():
-            fragment.add_javascript_url(static(js_file))
-
     def has_permission(self, permission):
         """
         Encapsulates lms specific functionality, as `has_permission` is not
@@ -165,11 +108,12 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin, XmlParserMixin):
         """
         fragment = Fragment()
 
-        self.add_resource_urls(fragment)
+        course = self.runtime.modulestore.get_course(self.course_key)
 
         context = {
             'discussion_id': self.discussion_id,
             'user': self.django_user,
+            'course': course,
             'course_id': self.course_key,
             'can_create_thread': self.has_permission("create_thread"),
             'can_create_comment': self.has_permission("create_comment"),
