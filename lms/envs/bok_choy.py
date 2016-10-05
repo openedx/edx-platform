@@ -132,6 +132,9 @@ FEATURES['LICENSING'] = True
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
+# Open up endpoint for faking Software Secure responses
+FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
+
 ########################### Entrance Exams #################################
 FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
@@ -175,6 +178,12 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 MOCK_SEARCH_BACKING_FILE = (
     TEST_ROOT / "index_file.dat"
 ).abspath()
+
+# Verify student settings
+VERIFY_STUDENT["SOFTWARE_SECURE"] = {
+    "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
+    "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+}
 
 # this secret key should be the same as cms/envs/bok_choy.py's
 SECRET_KEY = "very_secret_bok_choy_key"
