@@ -317,7 +317,11 @@ def _fire_score_changed_for_block(course_id, student, block, module_state_key):
             field_data_cache=cache,
             course_key=course_id
         )
-        points_earned, points_possible = weighted_score(0, module.max_score(), getattr(module, 'weight', None))
+        max_score = module.max_score()
+        if max_score is None:
+            return
+        else:
+            points_earned, points_possible = weighted_score(0, max_score, getattr(module, 'weight', None))
     else:
         points_earned, points_possible = 0, 0
     SCORE_CHANGED.send(
