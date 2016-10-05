@@ -6,7 +6,7 @@ from entitlements.models import EntitlementGroup
 
 class EnterpriseCustomer(models.Model):
     name = models.CharField(max_length=255)
-    entitlement_group = models.ForeignKey(EntitlementGroup)
+    entitlement_group = models.OneToOneField(EntitlementGroup, related_name="enterprise_customer")
     linked_third_party_providers = models.CharField(
         max_length=4000, blank=True, help_text=_("Comma-separated list of TPA IdP slugs")
     )
@@ -14,3 +14,4 @@ class EnterpriseCustomer(models.Model):
     @property
     def third_party_providers(self):
         return [slug.strip() for slug in self.linked_third_party_providers.split(",")]
+

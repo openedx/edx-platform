@@ -26,3 +26,6 @@ class BaseEntitlement(object):
     def _get_model_parameters(self):
         return {}
 
+    def applicable_to(self, target):
+        return self.scope == target
+

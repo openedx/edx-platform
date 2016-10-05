@@ -22,6 +22,9 @@ class EntitlementModel(models.Model):
         scope_strategy = ScopeFactory.make_scope_strategy(entitlement_class.SCOPE_TYPE)
         return entitlement_class(self.scope_id, scope_strategy, **self.parameters)
 
+    def __unicode__(self):
+        return u"Entitlement type: {type}, scope_id: {scope_id}".format(type=self.type, scope_id=self.scope_id)
+
 
 class EntitlementGroup(models.Model):
     ENTERPRISE_CUSTOMER = "enterprise_customer"
@@ -38,3 +41,11 @@ class EntitlementGroup(models.Model):
 
     class Meta(object):
         app_label = "entitlements"
+
+    def get_entitlement_models_of_type(self, entitlement_type):
+        for entitlement_model in self.entitlements.all():
+            if entitlement_model.type == entitlement_type:
+                yield entitlement_model
+
+    def __unicode__(self):
+        return u"EntitlementGroup {name} (id: {id})".format(name=self.name, id=self.pk)
