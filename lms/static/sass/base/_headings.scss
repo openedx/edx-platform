@@ -121,5 +121,12 @@ $headings-base-color:                       $gray-d2;
         font-weight: $headings-font-weight-normal;
         // override external modules and xblocks that use inline CSS
         text-transform: initial;
+
+        &.unit-title {
+            margin-bottom: 0;
+            font-size: 1.5em;
+        }
     }
 }
+
+

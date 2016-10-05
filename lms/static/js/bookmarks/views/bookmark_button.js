@@ -6,7 +6,9 @@
                 errorMessage: gettext('An error has occurred. Please try again.'),
 
                 srAddBookmarkText: gettext('Click to add'),
+                bookmarkText: gettext('Bookmark this page'),
                 srRemoveBookmarkText: gettext('Click to remove'),
+                bookmarkedText: gettext('Bookmarked'),
 
                 events: {
                     'click': 'toggleBookmark'
@@ -85,10 +87,12 @@
                     if (bookmarked) {
                         this.$el.addClass('bookmarked');
                         this.$el.attr('aria-pressed', 'true');
+                        this.$el.find('.bookmark-text').text(this.bookmarkedText);
                         this.$el.find('.bookmark-sr').text(this.srRemoveBookmarkText);
                     } else {
                         this.$el.removeClass('bookmarked');
                         this.$el.attr('aria-pressed', 'false');
+                        this.$el.find('.bookmark-text').text(this.bookmarkText);
                         this.$el.find('.bookmark-sr').text(this.srAddBookmarkText);
                     }
                 },

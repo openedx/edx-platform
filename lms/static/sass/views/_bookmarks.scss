@@ -1,3 +1,6 @@
+$bookmark-icon: "\f097"; // .fa-bookmark-o
+$bookmarked-icon: "\f02e"; // .fa-bookmark
+
 // Rules for placing bookmarks and search button side by side
 .wrapper-course-modes {
   border-bottom: 1px solid $gray-l3;
@@ -25,7 +28,7 @@
     padding: ($baseline/4) ($baseline/2);
 
     &:before {
-      content: "\f02e";
+      content: $bookmarked-icon;
       font-family: FontAwesome;
     }
 
@@ -80,7 +83,7 @@
   }
 
   .bookmarks-results-list-item:before {
-    content: "\f02e";
+    content: $bookmarked-icon;
     position: relative;
     top: -7px;
     font-family: FontAwesome;
@@ -133,42 +136,34 @@
 .course-content {
 
    .bookmark-icon.bookmarked {
+    @include left($baseline / 4);
     top: -3px;
     position: absolute;
-    left: ($baseline/4);
   }
 
 
   // Rules for bookmark button's different styles
   .bookmark-button-wrapper {
-    text-align: right;
-    margin-bottom: 10px;
+    margin-bottom: ($baseline * 1.5);
   }
 
   .bookmark-button {
-    @extend %ui-clear-button;
-    @extend %btn-pl-default-base;
-    @include font-size(13);
-    padding: ($baseline/4) ($baseline/2);
 
     &:before {
-      content: "\f02e";
+      content: $bookmark-icon;
       font-family: FontAwesome;
     }
 
-    &.is-active {
-      background-color: lighten($action-primary-bg,10%);
-      color: $white;
-    }
-
     &.bookmarked {
-      background-color: lighten($action-primary-bg,10%);
-      color: $white;
-
       &:before {
-        content: "\f097";
-        font-family: FontAwesome;
+        content: $bookmarked-icon;
       }
     }
+
   }
+
+  .bookmark-sr {
+    @include margin-right($baseline / 4);
+  }
+
 }
