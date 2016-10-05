@@ -251,6 +251,11 @@ class SubsectionGradeFactory(object):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
+        # Save ourselves the extra queries if the course does not persist
+        # subsection grades.
+        if not PersistentGradesEnabledFlag.feature_enabled(self.course.id):
+            return
+
         self._log_event(log.warning, u"update, subsection: {}".format(subsection.location))
 
         block_structure = self._get_block_structure(block_structure)
@@ -259,10 +264,8 @@ class SubsectionGradeFactory(object):
             self.student, block_structure, self._submissions_scores, self._csm_scores
         )
 
-        if PersistentGradesEnabledFlag.feature_enabled(self.course.id):
-            grade_model = subsection_grade.update_or_create_model(self.student)
-            self._update_saved_subsection_grade(subsection.location, grade_model)
-
+        grade_model = subsection_grade.update_or_create_model(self.student)
+        self._update_saved_subsection_grade(subsection.location, grade_model)
         return subsection_grade
 
     @lazy
