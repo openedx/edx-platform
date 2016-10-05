@@ -5,12 +5,15 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
+from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 import social
 from social.apps.django_app.views import complete
 from social.apps.django_app.utils import load_strategy, load_backend
 from social.utils import setting_name
-from .models import SAMLConfiguration
+from .models import SAMLConfiguration, UserDataSharingConsentAudit
+from pipeline import get as get_running_pipeline, get_complete_url
+from .provider import Registry
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 
@@ -82,3 +85,50 @@ def post_to_custom_auth_form(request):
         'hmac': pipeline_data['hmac'],
     }
     return render(request, 'third_party_auth/post_custom_auth_entry.html', data)
+
+
+class GrantDataSharingPermissions(View):
+    """
+    View handles the case in which we get to the "verify consent" step, but consent
+    hasn't yet been provided - this view contains a GET view that provides a form for
+    consent to be provided, and a POST view that consumes said form.
+    """
+    def get(self, request):
+        """
+        Render a form to collect user input about data sharing consent
+        """
+        running_pipeline = get_running_pipeline(request)
+        if running_pipeline:
+            current_provider = Registry.get_from_pipeline(running_pipeline)
+            if current_provider:
+                name = current_provider.name
+            else:
+                raise Http404
+        else:
+            raise Http404
+        data = {'sso_provider': name}
+        return render(request, 'third_party_auth/grant_data_sharing_permissions.html', data)
+
+    def post(self, request):
+        """
+        Process the above form
+        """
+        running_pipeline = get_running_pipeline(request)
+        if not running_pipeline:
+            raise Http404
+        consent_provided = request.POST.get('data_sharing_consent', False)
+        social = running_pipeline['kwargs']['social']
+        try:
+            consent = social.data_sharing_consent_audit
+        except UserDataSharingConsentAudit.DoesNotExist:
+            consent = UserDataSharingConsentAudit.create(user_social_auth=social)
+        if consent_provided:
+            consent.enable()
+            consent.save()
+            return redirect(get_complete_url())
+        else:
+            consent.disable()
+            consent.save()
+            request.session.flush()
+            # Flush the session to avoid the possibility of accidental login and to abort the pipeline
+            return redirect(reverse('dashboard'))

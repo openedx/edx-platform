@@ -20,8 +20,10 @@ from social.backends.base import BaseAuth
 from social.backends.oauth import OAuthAuth
 from social.backends.saml import SAMLAuth, SAMLIdentityProvider
 from .lti import LTIAuthBackend, LTI_PARAMS_KEY
+from social.apps.django_app.default.models import UserSocialAuth
 from social.exceptions import SocialAuthBaseException
 from social.utils import module_member
+from model_utils.models import TimeStampedModel
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming.helpers import get_current_request
 
@@ -74,6 +76,130 @@ class AuthNotConfigured(SocialAuthBaseException):
         return _('Authentication with {} is currently unavailable.').format(
             self.provider_name
         )
+
+class UserDataSharingConsentAudit(TimeStampedModel):
+    """
+    Object that exists to store the canonical state of whether a particular
+    user has given consent for their course data to be shared with a particular
+    single-sign-on identity provider
+    """
+    class Meta(object):
+        app_label = 'third_party_auth'
+        verbose_name = "Data Sharing Consent Audit State"
+        verbose_name_plural = "Data Sharing Consent Audit States"
+
+    NOT_SET = 'NS'
+    ENABLED = 'EN'
+    DISABLED = 'DS'
+    STATE_CHOICES = (
+        (NOT_SET, 'Not set'),
+        (ENABLED, 'Permitted'),
+        (DISABLED, 'Not permitted')
+    )
+
+    user_social_auth = models.OneToOneField(
+        UserSocialAuth,
+        on_delete=models.CASCADE,
+        related_name='data_sharing_consent_audit',
+        help_text=_(
+            "Links to a particular item in the UserSocialAuth table; each UserSocialAuth "
+            "object uniquely links a particular user with a particular SSO provider."
+        ),
+    )
+    state = models.CharField(
+        max_length=2,
+        blank=False,
+        choices=STATE_CHOICES,
+        default=NOT_SET,
+        help_text=_(
+            "Stores whether the user linked to the attached UserSocialAuth object has consented to have "
+            "their information shared with the SSO provider linked to the attached UserSocialAuth object."
+        )
+    )
+
+    @property
+    def enabled(self):
+        """
+        Determine whether the user has enabled data sharing
+        """
+        return self.state == self.ENABLED
+
+    def enable(self):
+        """
+        If data sharing is not already enabled, enable it and create a new
+        historical record indicating the change.
+        """
+        if self.enabled:
+            return
+        self.historical_changes.create(
+            previous_state=self.state,
+            new_state=self.ENABLED,
+        )
+        self.state = self.ENABLED
+
+    def disable(self):
+        """
+        If data sharing is not disabled, disable it and create a new
+        historical record indicating the change.
+        """
+        if self.state == self.DISABLED:
+            # Note we don't call self.enabled; we want to set to disabled state
+            # explicitly if state is not set yet, which shows up as disabled
+            return
+        self.historical_changes.create(
+            previous_state=self.state,
+            new_state=self.DISABLED,
+        )
+        self.state = self.DISABLED
+
+
+class UserDataSharingConsentAuditHistory(TimeStampedModel):
+    """
+    Class stores historical entries of the state a linked UserDataSharingConsentAudit
+    object was in and the transitions that state made at particular times
+    """
+    class Meta(object):
+        app_label = 'third_party_auth'
+        verbose_name = "Data Sharing Consent Historical Entry"
+        verbose_name_plural = "Data Sharing Consent Historical Entries"
+
+    NOT_SET = 'NS'
+    ENABLED = 'EN'
+    DISABLED = 'DS'
+    STATE_CHOICES = (
+        (NOT_SET, 'Not set'),
+        (ENABLED, 'Permitted'),
+        (DISABLED, 'Not permitted')
+    )
+    current_state = models.ForeignKey(
+        UserDataSharingConsentAudit,
+        related_name='historical_changes',
+        on_delete=models.CASCADE,
+        help_text=_(
+            "The UserDataSharingConsentAudit object that encodes the state at present "
+            "of whether this user has given consent for data sharing to take place."
+        ),
+    )
+    previous_state = models.CharField(
+        max_length=2,
+        blank=False,
+        choices=STATE_CHOICES,
+        default=NOT_SET,
+        help_text=_(
+            "The state of the linked UserDataSharingConsentAudit prior to the state "
+            "transition indicated by this record."
+        ),
+    )
+    new_state = models.CharField(
+        max_length=2,
+        blank=False,
+        choices=STATE_CHOICES,
+        default=DISABLED,
+        help_text=_(
+            "The state of the linked UserDataSharingConsentAudit after the "
+            "state transition indicated by this recordd."
+        )
+    )
 
 
 class ProviderConfig(ConfigurationModel):
@@ -138,6 +264,20 @@ class ProviderConfig(ConfigurationModel):
             "as an option to authenticate with on the login screen, but manual "
             "authentication using the correct link is still possible."
         ),
+    )
+    require_data_sharing_consent = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is selected, users who sign in using this SSO provider will not be able "
+            "to proceed unless they affirmatively select the option to grant data sharing consent."
+        )
+    )
+    request_data_sharing_consent = models.BooleanField(
+        default=False,
+        help_text=_(
+            "If this option is selected, users will be presented with an option to share course "
+            "information with the SSO provider when registering."
+        )
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
     backend_name = None  # Set to a field or fixed value in subclass

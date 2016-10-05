@@ -15,7 +15,8 @@ from .models import (
     LTIProviderConfig,
     ProviderApiPermissions,
     _PSA_OAUTH2_BACKENDS,
-    _PSA_SAML_BACKENDS
+    _PSA_SAML_BACKENDS,
+    UserDataSharingConsentAudit,
 )
 from .tasks import fetch_saml_metadata
 from third_party_auth.provider import Registry
@@ -169,3 +170,9 @@ class ApiPermissionsAdmin(admin.ModelAdmin):
     form = ApiPermissionsAdminForm
 
 admin.site.register(ProviderApiPermissions, ApiPermissionsAdmin)
+
+
+class UserDataSharingConsentAuditAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(UserDataSharingConsentAudit, UserDataSharingConsentAuditAdmin)
