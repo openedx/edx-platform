@@ -71,7 +71,7 @@ class LoginSessionView(APIView):
         # meant to hold the user's email address.
         email_label = _(u"Email")
         if email_or_username:
-            email_label += _(u" or username")
+            email_label = _(u"Email or username")
 
         # Translators: This example email address is used as a placeholder in
         # a field on the login form meant to hold the user's email address.
@@ -79,10 +79,10 @@ class LoginSessionView(APIView):
 
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
-        email_instructions = _("The email address")
+        message = _("The email address you used to register with {platform_name}")
         if email_or_username:
-            email_instructions += _(" or username")
-        email_instructions += _(" you used to register with {platform_name}").format(
+            message = _("The email address or username you used to register with {platform_name}")
+        email_instructions += temaplate.format(
             platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
