@@ -6,9 +6,9 @@ import json
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.models import StudentModule
-from instructor.access import allow_access
-from instructor.services import InstructorService
-from instructor.tests.test_tools import msk_from_problem_urlname
+from lms.djangoapps.instructor.access import allow_access
+from lms.djangoapps.instructor.services import InstructorService
+from lms.djangoapps.instructor.tests.test_tools import msk_from_problem_urlname
 from nose.plugins.attrib import attr
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -153,7 +153,7 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
         )
         tags = ["proctoring"]
 
-        with mock.patch("instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
+        with mock.patch("lms.djangoapps.instructor.services.create_zendesk_ticket") as mock_create_zendesk_ticket:
             self.service.send_support_notification(
                 course_id=unicode(self.course.id),
                 exam_name="test_exam",

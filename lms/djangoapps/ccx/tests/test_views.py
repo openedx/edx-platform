@@ -16,7 +16,7 @@ from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
 from courseware.testutils import FieldOverrideTestMixin
-from instructor.access import (
+from lms.djangoapps.instructor.access import (
     allow_access,
     list_with_level,
 )
@@ -1027,7 +1027,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.addCleanup(RequestCache.clear_request_cache)
 
     @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True
         RequestCache.clear_request_cache()
