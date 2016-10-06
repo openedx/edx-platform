@@ -2,7 +2,9 @@
 from __future__ import unicode_literals
 
 import json
+import unittest
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
@@ -15,6 +17,7 @@ from .constants import DUMMY_REDIRECT_URL
 from ..adapters import DOTAdapter
 
 
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class ClientCredentialsTest(mixins.AccessTokenMixin, TestCase):
     """ Tests validating the client credentials grant behavior. """
 

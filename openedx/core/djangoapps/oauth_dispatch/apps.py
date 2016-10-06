@@ -11,4 +11,4 @@ class OAuthDispatchAppConfig(AppConfig):
     """
     OAuthDispatch Configuration
     """
-    name = u'lms.djangoapps.oauth_dispatch'
+    name = u'openedx.core.djangoapps.oauth_dispatch'

@@ -70,7 +70,10 @@ class AccessTokenExchangeViewTest(AccessTokenExchangeTestMixin):
 
         self._setup_provider_response(success=True)
         for single_access_token in [True, False]:
-            with mock.patch("auth_exchange.views.constants.SINGLE_ACCESS_TOKEN", single_access_token):
+            with mock.patch(
+                "openedx.core.djangoapps.auth_exchange.views.constants.SINGLE_ACCESS_TOKEN",
+                single_access_token,
+            ):
                 first_response = self.client.post(self.url, self.data)
                 second_response = self.client.post(self.url, self.data)
             self.assertEqual(first_response.status_code, 200)

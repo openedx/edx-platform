@@ -26,8 +26,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 import social.apps.django_app.utils as social_utils
 
-from auth_exchange.forms import AccessTokenExchangeForm
-from lms.djangoapps.oauth_dispatch import adapters
+from openedx.core.djangoapps.auth_exchange.forms import AccessTokenExchangeForm
+from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
@@ -53,7 +53,7 @@ class AccessTokenExchangeBase(APIView):
         """
         form = AccessTokenExchangeForm(request=request, oauth2_adapter=self.oauth2_adapter, data=request.POST)  # pylint: disable=no-member
         if not form.is_valid():
-            return self.error_response(form.errors)
+            return self.error_response(form.errors)  # pylint: disable=no-member
 
         user = form.cleaned_data["user"]
         scope = form.cleaned_data["scope"]

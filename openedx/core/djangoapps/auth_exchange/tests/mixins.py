@@ -8,8 +8,8 @@ Django-OAuth2-Provider.
 from unittest import skip, expectedFailure
 from django.test.client import RequestFactory
 
-from lms.djangoapps.oauth_dispatch import adapters
-from lms.djangoapps.oauth_dispatch.tests.constants import DUMMY_REDIRECT_URL
+from openedx.core.djangoapps.oauth_dispatch import adapters
+from openedx.core.djangoapps.oauth_dispatch.tests.constants import DUMMY_REDIRECT_URL
 
 from ..views import DOTAccessTokenExchangeView
 
