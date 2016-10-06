@@ -8,6 +8,8 @@ import datetime
 import ddt
 from django.conf import settings
 from django.db.utils import DatabaseError
+import itertools
+
 from mock import patch
 import pytz
 
@@ -16,16 +18,17 @@ from courseware.tests.helpers import get_request_for_user
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
-from openedx.core.lib.xblock_utils.test_utils import add_xml_block_from_file
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.utils import TEST_DATA_DIR
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from ..models import PersistentSubsectionGrade
 from ..new.course_grade import CourseGradeFactory
 from ..new.subsection_grade import SubsectionGrade, SubsectionGradeFactory
-from .utils import mock_get_score
+from .utils import mock_get_score, mock_get_submissions_score
 
 
 class GradeTestBase(SharedModuleStoreTestCase):
@@ -239,20 +242,20 @@ class SubsectionGradeTest(GradeTestBase):
 
 
 @ddt.ddt
-class TestMultipleProblemTypesSubsectionScores(ModuleStoreTestCase, ProblemSubmissionTestMixin):
+class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
     Test grading of different problem types.
     """
 
-    default_problem_metadata = {
-        u'graded': True,
-        u'weight': 2.5,
-        u'max_score': 7.0,
-        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
-    }
+    SCORED_BLOCK_COUNT = 7
+    ACTUAL_TOTAL_POSSIBLE = 16.0
 
-    COURSE_NAME = u'Problem Type Test Course'
-    COURSE_NUM = u'probtype'
+    @classmethod
+    def setUpClass(cls):
+        super(TestMultipleProblemTypesSubsectionScores, cls).setUpClass()
+        cls.load_scoreable_course()
+        chapter1 = cls.course.get_children()[0]
+        cls.seq1 = chapter1.get_children()[0]
 
     def setUp(self):
         super(TestMultipleProblemTypesSubsectionScores, self).setUp()
@@ -260,39 +263,104 @@ class TestMultipleProblemTypesSubsectionScores(ModuleStoreTestCase, ProblemSubmi
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
         self.request = get_request_for_user(self.student)
-        self.course = CourseFactory.create(
-            display_name=self.COURSE_NAME,
-            number=self.COURSE_NUM
-        )
-        self.chapter = ItemFactory.create(
-            parent=self.course,
-            category=u'chapter',
-            display_name=u'Test Chapter'
-        )
-        self.seq1 = ItemFactory.create(
-            parent=self.chapter,
-            category=u'sequential',
-            display_name=u'Test Sequential 1',
-            graded=True
-        )
-        self.vert1 = ItemFactory.create(
-            parent=self.seq1,
-            category=u'vertical',
-            display_name=u'Test Vertical 1'
+        self.course_structure = get_course_blocks(self.student, self.course.location)
+
+    @classmethod
+    def load_scoreable_course(cls):
+        """
+        This test course lives at `common/test/data/scoreable`.
+
+        For details on the contents and structure of the file, see
+        `common/test/data/scoreable/README`.
+        """
+
+        course_items = import_course_from_xml(
+            cls.store,
+            'test_user',
+            TEST_DATA_DIR,
+            source_dirs=['scoreable'],
+            static_content_store=None,
+            target_id=cls.store.make_course_key('edX', 'scoreable', '3000'),
+            raise_on_failure=True,
+            create_if_not_present=True,
         )
 
-    def _get_fresh_subsection_score(self, course_structure, subsection):
-        """
-        Return a Score object for the specified subsection.
+        cls.course = course_items[0]
 
-        Ensures that a stale cached value is not returned.
-        """
+    def test_score_submission_for_all_problems(self):
         subsection_factory = SubsectionGradeFactory(
             self.student,
+            course_structure=self.course_structure,
+            course=self.course,
+        )
+        score = subsection_factory.create(self.seq1)
+
+        self.assertEqual(score.all_total.earned, 0.0)
+        self.assertEqual(score.all_total.possible, self.ACTUAL_TOTAL_POSSIBLE)
+
+        # Choose arbitrary, non-default values for earned and possible.
+        earned_per_block = 3.0
+        possible_per_block = 7.0
+        with mock_get_submissions_score(earned_per_block, possible_per_block) as mock_score:
+            # Configure one block to return no possible score, the rest to return 3.0 earned / 7.0 possible
+            block_count = self.SCORED_BLOCK_COUNT - 1
+            mock_score.side_effect = itertools.chain(
+                [(earned_per_block, None, earned_per_block, None)],
+                itertools.repeat(mock_score.return_value)
+            )
+            score = subsection_factory.update(self.seq1)
+        self.assertEqual(score.all_total.earned, earned_per_block * block_count)
+        self.assertEqual(score.all_total.possible, possible_per_block * block_count)
+
+
+@ddt.ddt
+class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
+    """
+    Test that changing the metadata on a block has the desired effect on the
+    persisted score.
+    """
+    default_problem_metadata = {
+        u'graded': True,
+        u'weight': 2.5,
+        u'due': datetime.datetime(2099, 3, 15, 12, 30, 0, tzinfo=pytz.utc),
+    }
+
+    def setUp(self):
+        super(TestVariedMetadata, self).setUp()
+        self.course = CourseFactory.create()
+        self.chapter = ItemFactory.create(
+            parent=self.course,
+            category="chapter",
+            display_name="Test Chapter"
+        )
+        self.sequence = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name="Test Sequential 1",
+            graded=True
+        )
+        self.vertical = ItemFactory.create(
+            parent=self.sequence,
+            category='vertical',
+            display_name='Test Vertical 1'
+        )
+        self.problem_xml = u'''
+            <problem url_name="capa-optionresponse">
+              <optionresponse>
+                <optioninput options="('Correct', 'Incorrect')" correct="Correct"></optioninput>
+                <optioninput options="('Correct', 'Incorrect')" correct="Correct"></optioninput>
+              </optionresponse>
+            </problem>
+        '''
+        self.request = get_request_for_user(UserFactory())
+        self.client.login(username=self.request.user.username, password="test")
+        CourseEnrollment.enroll(self.request.user, self.course.id)
+        course_structure = get_course_blocks(self.request.user, self.course.location)
+        self.subsection_factory = SubsectionGradeFactory(
+            self.request.user,
             course_structure=course_structure,
             course=self.course,
         )
-        return subsection_factory.update(subsection)
 
     def _get_altered_metadata(self, alterations):
         """
@@ -303,48 +371,28 @@ class TestMultipleProblemTypesSubsectionScores(ModuleStoreTestCase, ProblemSubmi
         metadata.update(alterations)
         return metadata
 
-    def _get_score_with_alterations(self, alterations):
+    def _add_problem_with_alterations(self, alterations):
         """
-        Given a dict of alterations to the default_problem_metadata, return
-        the score when one correct problem (out of two) is submitted.
+        Add a problem to the course with the specified metadata alterations.
         """
+
         metadata = self._get_altered_metadata(alterations)
+        ItemFactory.create(
+            parent=self.vertical,
+            category="problem",
+            display_name="problem",
+            data=self.problem_xml,
+            metadata=metadata,
+        )
 
-        add_xml_block_from_file(u'problem', u'capa.xml', parent=self.vert1, metadata=metadata)
-        course_structure = get_course_blocks(self.student, self.course.location)
+    def _get_score(self):
+        """
+        Return the score of the test problem when one correct problem (out of
+        two) is submitted.
+        """
 
         self.submit_question_answer(u'problem', {u'2_1': u'Correct'})
-        return self._get_fresh_subsection_score(course_structure, self.seq1)
-
-    def test_score_submission_for_capa_problems(self):
-        add_xml_block_from_file(u'problem', u'capa.xml', parent=self.vert1, metadata=self.default_problem_metadata)
-        course_structure = get_course_blocks(self.student, self.course.location)
-
-        score = self._get_fresh_subsection_score(course_structure, self.seq1)
-        self.assertEqual(score.all_total.earned, 0.0)
-        self.assertEqual(score.all_total.possible, 2.5)
-
-        self.submit_question_answer(u'problem', {u'2_1': u'Correct'})
-        score = self._get_fresh_subsection_score(course_structure, self.seq1)
-        self.assertEqual(score.all_total.earned, 1.25)
-        self.assertEqual(score.all_total.possible, 2.5)
-
-    @ddt.data(
-        (u'openassessment', u'openassessment.xml'),
-        (u'coderesponse', u'coderesponse.xml'),
-        (u'lti', u'lti.xml'),
-        (u'library_content', u'library_content.xml'),
-    )
-    @ddt.unpack
-    def test_loading_different_problem_types(self, block_type, filename):
-        """
-        Test that transformation works for various block types
-        """
-        metadata = self.default_problem_metadata.copy()
-        if block_type == u'library_content':
-            # Library content does not have a weight
-            del metadata[u'weight']
-        add_xml_block_from_file(block_type, filename, parent=self.vert1, metadata=metadata)
+        return self.subsection_factory.create(self.sequence)
 
     @ddt.data(
         ({}, 1.25, 2.5),
@@ -355,7 +403,8 @@ class TestMultipleProblemTypesSubsectionScores(ModuleStoreTestCase, ProblemSubmi
     )
     @ddt.unpack
     def test_weight_metadata_alterations(self, alterations, expected_earned, expected_possible):
-        score = self._get_score_with_alterations(alterations)
+        self._add_problem_with_alterations(alterations)
+        score = self._get_score()
         self.assertEqual(score.all_total.earned, expected_earned)
         self.assertEqual(score.all_total.possible, expected_possible)
 
@@ -365,22 +414,10 @@ class TestMultipleProblemTypesSubsectionScores(ModuleStoreTestCase, ProblemSubmi
     )
     @ddt.unpack
     def test_graded_metadata_alterations(self, alterations, expected_earned, expected_possible):
-        score = self._get_score_with_alterations(alterations)
+        self._add_problem_with_alterations(alterations)
+        score = self._get_score()
         self.assertEqual(score.graded_total.earned, expected_earned)
         self.assertEqual(score.graded_total.possible, expected_possible)
-
-    @ddt.data(
-        {u'max_score': 99.3},
-        {u'max_score': 1.0},
-        {u'max_score': 0.0},
-        {u'max_score': None},
-    )
-    def test_max_score_does_not_change_results(self, alterations):
-        expected_earned = 1.25
-        expected_possible = 2.5
-        score = self._get_score_with_alterations(alterations)
-        self.assertEqual(score.all_total.earned, expected_earned)
-        self.assertEqual(score.all_total.possible, expected_possible)
 
 
 class TestCourseGradeLogging(SharedModuleStoreTestCase):
