@@ -7,7 +7,7 @@ from django.conf import settings
 from django.test import TestCase
 from paver.easy import call_task
 
-from pipeline_mako import render_require_js_path_overrides, compressed_css, compressed_js
+from openedx.core.djangoapps.pipeline_mako import render_require_js_path_overrides, compressed_css, compressed_js
 
 
 class RequireJSPathOverridesTest(TestCase):

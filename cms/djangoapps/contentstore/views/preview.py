@@ -9,6 +9,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_string
 
+import openedx.core.djangoapps.static_replace
 from openedx.core.lib.xblock_utils import (
     replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
 )
@@ -34,7 +35,6 @@ from cms.lib.xblock.field_data import CmsFieldData
 
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
-import static_replace
 from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
 
@@ -204,7 +204,11 @@ def _preview_module_system(request, descriptor, field_data):
         get_module=partial(_load_preview_module, request),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
+        replace_urls=partial(
+            openedx.core.djangoapps.static_replace.replace_static_urls,
+            data_directory=None,
+            course_id=course_id,
+        ),
         user=request.user,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
         get_python_lib_zip=(lambda: get_python_lib_zip(contentstore, course_id)),

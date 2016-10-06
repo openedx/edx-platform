@@ -2,11 +2,13 @@
 Unit tests for the asset upload endpoint.
 """
 from datetime import datetime
+from ddt import ddt, data
 from io import BytesIO
-from pytz import UTC
-from PIL import Image
+import mock
 import json
-from mock import patch
+from PIL import Image
+from pytz import UTC
+
 from django.conf import settings
 
 from contentstore.tests.utils import CourseTestCase
@@ -20,10 +22,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_course_from_xml
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from static_replace import replace_static_urls
-import mock
-from ddt import ddt
-from ddt import data
+from openedx.core.djangoapps.static_replace import replace_static_urls
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -330,7 +329,7 @@ class DownloadTestCase(AssetsTestCase):
         resp = self.client.get(url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 404)
 
-    @patch('xmodule.modulestore.mixed.MixedModuleStore.find_asset_metadata')
+    @mock.patch('xmodule.modulestore.mixed.MixedModuleStore.find_asset_metadata')
     def test_pickling_calls(self, patched_find_asset_metadata):
         """ Tests if assets are not calling find_asset_metadata
         """

@@ -29,7 +29,6 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.reference.plugins import FSService
 
-import static_replace
 from courseware.access import has_access, get_user_role
 from courseware.entrance_exams import (
     user_must_complete_entrance_exam,
@@ -50,6 +49,7 @@ from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.credit.services import CreditService
+import openedx.core.djangoapps.static_replace
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.lib.xblock_utils import (
     replace_course_urls,
@@ -644,17 +644,17 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
         # a module is coming through get_html and is therefore covered
         # by the replace_static_urls code below
         replace_urls=partial(
-            static_replace.replace_static_urls,
+            openedx.core.djangoapps.static_replace.replace_static_urls,
             data_directory=getattr(descriptor, 'data_dir', None),
             course_id=course_id,
             static_asset_path=static_asset_path or descriptor.static_asset_path,
         ),
         replace_course_urls=partial(
-            static_replace.replace_course_urls,
+            openedx.core.djangoapps.static_replace.replace_course_urls,
             course_key=course_id
         ),
         replace_jump_to_id_urls=partial(
-            static_replace.replace_jump_to_id_urls,
+            openedx.core.djangoapps.static_replace.replace_jump_to_id_urls,
             course_id=course_id,
             jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id.to_deprecated_string(), 'module_id': ''})
         ),

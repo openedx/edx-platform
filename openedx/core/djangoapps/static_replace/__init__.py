@@ -5,12 +5,10 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.contrib.staticfiles import finders
 from django.conf import settings
 
-from static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
+from opaque_keys.edx.locator import AssetLocator
 from xmodule.contentstore.content import StaticContent
 
-from opaque_keys.edx.locator import AssetLocator
+from .models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
 
 log = logging.getLogger(__name__)
 XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
