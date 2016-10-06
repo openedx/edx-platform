@@ -117,6 +117,16 @@ class TestManageUserCommand(TestCase):
         self.assertIn('email addresses do not match', str(exc_context.exception).lower())
         self.assertEqual([(TEST_USERNAME, TEST_EMAIL)], [(u.username, u.email) for u in User.objects.all()])
 
+    def test_same_email_varied_case(self):
+        """
+        Ensure that the operation is continues if the username matches an
+        existing user account and the supplied email differs only in cases.
+        """
+        User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL.upper())
+        call_command('manage_user', TEST_USERNAME, TEST_EMAIL.lower())
+        user = User.objects.get(username=TEST_USERNAME)
+        self.assertEqual(user.email, TEST_EMAIL.upper())
+
     @ddt.data(*itertools.product([(True, True), (True, False), (False, True), (False, False)], repeat=2))
     @ddt.unpack
     def test_bits(self, initial_bits, expected_bits):
