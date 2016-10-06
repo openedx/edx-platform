@@ -1141,13 +1141,6 @@ div.problem {
       &:hover {
         background-color: $btn-brand-focus-background;
       }
-
-      &.check {
-        &.is-disabled {
-          background: $btn-brand-disabled-background;
-          color: $btn-brand-disabled-color;
-        }
-      }
     }
   }
 

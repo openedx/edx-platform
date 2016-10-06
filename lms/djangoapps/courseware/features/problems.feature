@@ -174,21 +174,6 @@ Feature: LMS.Answer problems
         | ProblemType       | Points Possible               |
         | image             | 1 point possible (ungraded)   |
 
-    Scenario: I can't submit a blank answer
-        Given I am viewing a "<ProblemType>" problem
-        Then I can't submit a problem
-
-        Examples:
-        | ProblemType       |
-        | drop down         |
-        | multiple choice   |
-        | checkbox          |
-        | radio             |
-        | string            |
-        | numerical         |
-        | formula           |
-        | script            |
-
     Scenario: I can reset the correctness of a problem after changing my answer
         Given I am viewing a "<ProblemType>" problem
         Then my "<ProblemType>" answer is marked "unanswered"

@@ -197,8 +197,14 @@ class ProblemPage(PageObject):
         """
         Checks if the submit button is disabled
         """
-        return (self.q(css='.problem .submit').attrs('disabled') and
-                'is-disabled' in self.q(css='.problem .submit').attrs('class')[0])
+        disabled_attr = self.q(css='.problem .submit').attrs('disabled')[0]
+        return disabled_attr == 'true'
+
+    def wait_for_submit_disabled(self):
+        """
+        Waits until the Submit button becomes disabled.
+        """
+        self.wait_for(self.is_submit_disabled, 'Waiting for submit to be enabled')
 
     def wait_for_focus_on_submit_notification(self):
         """

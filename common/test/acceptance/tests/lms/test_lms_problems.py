@@ -39,9 +39,10 @@ class ProblemsTest(UniqueCourseTest):
         )
 
         problem = self.get_problem()
+        sequential = self.get_sequential()
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(problem)
+                sequential.add_children(problem)
             )
         ).install()
 
@@ -58,6 +59,10 @@ class ProblemsTest(UniqueCourseTest):
     def get_problem(self):
         """ Subclasses should override this to complete the fixture """
         raise NotImplementedError()
+
+    def get_sequential(self):
+        """ Subclasses can override this to add a sequential with metadata """
+        return XBlockFixtureDesc('sequential', 'Test Subsection')
 
 
 class ProblemClarificationTest(ProblemsTest):
@@ -212,6 +217,98 @@ class ProblemNotificationTests(ProblemsTest):
         problem_page.click_submit()
         problem_page.wait_incorrect_notification()
         self.assertFalse(problem_page.is_save_notification_visible())
+
+
+class ProblemSubmitButtonMaxAttemptsTest(ProblemsTest):
+    """
+    Tests that the Submit button disables after the number of max attempts is reached.
+    """
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 2},
+                                 grader_type='Final Exam')
+
+    def test_max_attempts(self):
+        """
+        Verifies that the Submit button disables when the max number of attempts is reached.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # Submit first answer (correct)
+        problem_page.click_choice("choice_2")
+        self.assertFalse(problem_page.is_submit_disabled())
+        problem_page.click_submit()
+        problem_page.wait_success_notification()
+
+        # Submit second and final answer (incorrect)
+        problem_page.click_choice("choice_1")
+        problem_page.click_submit()
+        problem_page.wait_incorrect_notification()
+
+        # Make sure that the Submit button disables.
+        problem_page.wait_for_submit_disabled()
+
+
+class ProblemSubmitButtonPastDueTest(ProblemsTest):
+    """
+    Tests that the Submit button is disabled if it is past the due date.
+    """
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+                <problem>
+                    <label>Which of the following countries has the largest population?</label>
+                        <multiplechoiceresponse>
+                          <choicegroup type="MultipleChoice">
+                            <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                            <choice correct="false">Germany</choice>
+                            <choice correct="true">Indonesia</choice>
+                            <choice correct="false">Russia</choice>
+                          </choicegroup>
+                        </multiplechoiceresponse>
+                </problem>
+            """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 2},
+                                 grader_type='Final Exam')
+
+    def get_sequential(self):
+        """ Subclasses can override this to add a sequential with metadata """
+        return XBlockFixtureDesc('sequential', 'Test Subsection', metadata={'due': "2016-10-01T00"})
+
+    def test_past_due(self):
+        """
+        Verifies that the Submit button disables when the max number of attempts is reached.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        # Should have Submit button disabled on original rendering.
+        problem_page.wait_for_submit_disabled()
+
+        # Select a choice, and make sure that the Submit button remains disabled.
+        problem_page.click_choice("choice_2")
+        problem_page.wait_for_submit_disabled()
 
 
 class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):

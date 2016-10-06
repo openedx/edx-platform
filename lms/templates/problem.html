@@ -51,11 +51,7 @@ from openedx.core.djangolib.markup import HTML
     </span>
     % endif
     </div>
-    <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}
-        % if attempts_allowed:
-            data-attempts-remaining="${attempts_allowed - attempts_used}"
-        % endif
-    >
+    <button type="button" class="submit btn-brand" data-submitting="${ submit_button_submitting }" data-value="${ submit_button }" data-should-enable-submit-button="${ should_enable_submit_button }" aria-describedby="submission_feedback_${short_id}" ${'' if should_enable_submit_button else 'disabled'}>
         <span class="submit-label" aria-hidden="true">${ submit_button }</span><span class="sr">${_("Submit your answer")}</span>
     </button>
     <div class="submission_feedback" id="submission_feedback_${short_id}">
