@@ -28,7 +28,7 @@ solution), kindly follow these guidelines:
     - Add the following code where needed (typically cms/startup.py and
       lms/startup.py):
         ```
-        from monkey_patch import your_module
+        from openedx.core.djangoapps.monkey_patch import your_module
         your_module.patch()
         ```
     - Write tests! All code should be tested anyway, but with code that
