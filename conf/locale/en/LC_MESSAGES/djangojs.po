@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:52+0000\n"
-"PO-Revision-Date: 2016-09-29 14:53:54.430999\n"
+"POT-Creation-Date: 2016-10-06 14:27+0000\n"
+"PO-Revision-Date: 2016-10-06 14:28:37.493632\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1633,6 +1633,7 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr ""
 
@@ -3500,6 +3501,10 @@ msgstr ""
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to add"
+msgstr ""
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Bookmark this page"
 msgstr ""
 
 #: lms/static/js/bookmarks/views/bookmark_button.js

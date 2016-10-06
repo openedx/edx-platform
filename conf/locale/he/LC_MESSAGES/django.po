@@ -1009,7 +1009,7 @@ msgstr "איפוס סיסמה נכשל"
 
 #: common/djangoapps/student/views.py
 msgid "Error in resetting your password. Please try again."
-msgstr ""
+msgstr "שגיאה באתחול סיסמתך. נא נסה שוב."
 
 #: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
@@ -1049,7 +1049,7 @@ msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this provider configuration belongs to."
-msgstr ""
+msgstr "האתר שתצורת ספק זו שייכת אליו."
 
 #: common/djangoapps/third_party_auth/models.py
 msgid ""
@@ -1080,7 +1080,7 @@ msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
 msgid "The Site that this SAML configuration belongs to."
-msgstr ""
+msgstr "האתר שתצורת SAML זו שייכת אליו."
 
 #: common/djangoapps/third_party_auth/templates/third_party_auth/post_custom_auth_entry.html
 #: lms/templates/student_account/finish_auth.html
@@ -5403,54 +5403,57 @@ msgstr "חינם"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
-msgstr ""
+msgstr "הרשמתך: מסלול שומע חופשי"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "You are enrolled in the audit track for this course. The audit track does "
 "not include a certificate."
-msgstr ""
+msgstr "נרשמת למסלול שומע חופשי לקורס זה. מסלול זה אינו כולל תעודה."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate has been invalidated"
-msgstr ""
+msgstr "בוטלה זכאות תעודתך"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Please contact your course team if you have any questions."
-msgstr ""
+msgstr "לשאלות, נא צור קשר עם קבוצתך."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate is available"
-msgstr ""
+msgstr "התעודה שלך זמינה"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "You can keep working for a higher grade, or request your certificate now."
 msgstr ""
+"תוכל להמשיך לעבוד ולנסות לקבל ציון גבוה יותר או לבקש את התעודה שלך כעת."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "We're working on it..."
-msgstr ""
+msgstr "אנחנו עובדים על זה..."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "We're creating your certificate. You can keep working in your courses and a "
 "link to it will appear here and on your Dashboard when it is ready."
 msgstr ""
+"אנו יוצרים את התעודה שלך. תוכל להמשיך לעבוד על הקורסים שלך. קישור לתעודה "
+"יופיע כאן ובלוח הבקרה שלך כשהתעודה תהיה מוכנה."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Certificate unavailable"
-msgstr ""
+msgstr "התעודה אינה זמינה"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "You have not received a certificate because you do not have a current "
 "{platform_name} verified identity."
-msgstr ""
+msgstr "לא קיבלת תעודה כיוון שאין ברשותך זהות מאומתת של {platform_name} "
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Congratulations, you qualified for a certificate!"
-msgstr ""
+msgstr "מזל טוב, אתה זכאי לתעודה!"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Invalid location."

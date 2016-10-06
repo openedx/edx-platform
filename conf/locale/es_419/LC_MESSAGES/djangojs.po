@@ -118,8 +118,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2016-09-29 14:22+0000\n"
-"PO-Revision-Date: 2016-09-29 14:26+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"PO-Revision-Date: 2016-10-05 16:02+0000\n"
+"Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1566,9 +1566,12 @@ msgstr ""
 "La URL que introdujo parece ser un vínculo externo. ¿Desea agregarle el "
 "prefijo requerido http://?"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
 msgid "Title"
 msgstr "Título"
 
@@ -2238,8 +2241,8 @@ msgstr "Mostrando todas las respuestas"
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first {numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Mostrando la primera respuesta"
+msgstr[1] "Mostrando las primeras {numResponses} respuestas"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -3026,6 +3029,7 @@ msgid "Username"
 msgstr "Nombre de usuario"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "Correo electrónico"
 
@@ -6204,7 +6208,7 @@ msgstr "Acciones"
 #: cms/templates/js/course-outline.underscore
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "Examen cronometrado"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -6260,7 +6264,7 @@ msgstr "Estado"
 #: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
 msgid "message"
-msgstr ""
+msgstr "mensaje"
 
 #: common/static/common/templates/image-modal.underscore
 #: test_root/staticfiles/common/templates/image-modal.underscore
@@ -6360,7 +6364,7 @@ msgstr "Votar por las mejores publicaciones y respuestas"
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
 msgid "Report abuse, topics, and responses"
-msgstr "Reportar abusos, temas y respuestas"
+msgstr "Denunciar abusos, temas, y respuestas"
 
 #: common/static/common/templates/discussion/discussion-home.underscore
 #: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
@@ -6449,19 +6453,19 @@ msgstr "Desmarcar"
 #: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report abuse"
-msgstr "Reportar un abuso"
+msgstr "Denunciar un abuso"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report"
-msgstr "Reporte"
+msgstr "Denunciar"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Unreport"
-msgstr "No reportar"
+msgstr "No denunciar"
 
 #: common/static/common/templates/discussion/forum-action-vote.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-vote.underscore
@@ -6479,7 +6483,7 @@ msgstr "Cargar más"
 #: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
 msgid "Error posting your message."
-msgstr ""
+msgstr "Error al publicar su mensaje."
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6525,7 +6529,7 @@ msgstr "Añade un título claro y descriptivo para fomentar la participación."
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Enter your question or comment."
-msgstr ""
+msgstr "Ingrese su pregunta o comentario."
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6604,7 +6608,7 @@ msgstr "publicado %(time_ago)s por %(author)s"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Reported"
-msgstr "Reportado"
+msgstr "Denunciado"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
@@ -6616,7 +6620,7 @@ msgstr "Editando entrada"
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
-msgstr ""
+msgstr "Edite su publicación a continuación."
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
@@ -6989,7 +6993,7 @@ msgstr "Finalización del curso"
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Upgrade Deadline"
-msgstr "Actualizar la fecha límite"
+msgstr "Fecha límite para el upgrade"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: test_root/staticfiles/support/templates/enrollment.underscore
@@ -9221,65 +9225,65 @@ msgstr "Tomar foto"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Add a New Allowance"
-msgstr ""
+msgstr "Añadir nueva autorización"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Special Exam"
-msgstr ""
+msgstr "Examen especial"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Exam Type"
-msgstr ""
+msgstr "Tipo de exámen"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowance Type"
-msgstr ""
+msgstr "Tipo de autorización"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Additional Time (minutes)"
-msgstr ""
+msgstr "Tiempo adicional (minutos)"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "minutes"
-msgstr ""
+msgstr "minutos"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Username or Email"
-msgstr ""
+msgstr "Nombre de usuario o correo electrónico"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowances"
-msgstr ""
+msgstr "Autorizaciones"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Add Allowance"
-msgstr ""
+msgstr "Añadir autorización"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Exam Name"
-msgstr ""
+msgstr "Nombre del examen"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowance Value"
-msgstr ""
+msgstr "Valor de la autorización"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Time Limit"
-msgstr ""
+msgstr "Límite de tiempo"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Started At"
-msgstr ""
+msgstr "Iniciado a las"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
-msgstr ""
+msgstr "Finalizado a las"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -9850,11 +9854,11 @@ msgstr ""
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "Course Handouts"
-msgstr "Apuntes del curso"
+msgstr "Materiales del curso"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid "You have no handouts defined"
-msgstr "No tiene apuntes denifidos"
+msgstr "No tiene Materiales denifidos"
 
 #: cms/templates/js/course_info_handouts.underscore
 msgid ""
@@ -10095,7 +10099,7 @@ msgstr "Borrar"
 
 #: cms/templates/js/metadata-editor.underscore
 msgid "Component Location ID"
-msgstr ""
+msgstr "ID de la Ubicación del componente"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
