@@ -288,7 +288,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         problem to which user does not have access to.
         """
         input_state = json.dumps({'done': True})
-        num_students = 1
+        num_students = 10
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry()
         with patch('lms.djangoapps.instructor_task.tasks_helper.module_state.get_module_for_descriptor_internal', return_value=None):
@@ -331,6 +331,25 @@ class TestRescoreInstructorTask(TestInstructorTasks):
             failed=0,
             action_name='rescored'
         )
+    def test_rescoring_missing_result(self):
+        # Confirm that rescoring does not succeed if "success" key is not returned.
+        input_state = json.dumps({'done': True})
+        num_students = 10
+        self._create_students_with_state(num_students, input_state)
+        task_entry = self._create_input_entry()
+        mock_instance = Mock()
+        mock_instance.rescore_problem = Mock(return_value={'bogus': 'value'})
+        with patch('lms.djangoapps.instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
+            mock_get_module.return_value = mock_instance
+            self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
+        # check return value
+        entry = InstructorTask.objects.get(id=task_entry.id)
+        output = json.loads(entry.task_output)
+        self.assertEquals(output.get('attempted'), num_students)
+        self.assertEquals(output.get('succeeded'), 0)
+        self.assertEquals(output.get('total'), num_students)
+        self.assertEquals(output.get('action_name'), 'rescored')
+        self.assertGreater(output.get('duration_ms'), 0)
 
 
 @attr(shard=3)
