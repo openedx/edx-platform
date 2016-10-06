@@ -2095,7 +2095,7 @@ INSTALLED_APPS = (
     'learner_dashboard',
 
     # Needed whether or not enabled, due to migrations
-    'badges',
+    'badges.apps.BadgesConfig',
 
     # Enables default site and redirects
     'django_sites_extensions',
