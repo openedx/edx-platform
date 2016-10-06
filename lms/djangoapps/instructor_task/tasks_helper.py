@@ -24,7 +24,7 @@ import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 from StringIO import StringIO
 from edxmako.shortcuts import render_to_string
-from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
 from shoppingcart.models import (
     PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
     Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode

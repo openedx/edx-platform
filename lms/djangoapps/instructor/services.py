@@ -8,9 +8,9 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from commerce.signals import create_zendesk_ticket
 from courseware.models import StudentModule
-from instructor.views.tools import get_student_from_identifier
+from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from django.core.exceptions import ObjectDoesNotExist
-import instructor.enrollment as enrollment
+import lms.djangoapps.instructor.enrollment as enrollment
 from django.utils.translation import ugettext as _
 
 

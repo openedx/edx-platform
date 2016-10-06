@@ -19,7 +19,7 @@ from ccx_keys.locator import CCXLocator
 from courseware import courses
 from xmodule.modulestore.django import SignalHandler
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from instructor.enrollment import (
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
 )

@@ -32,8 +32,8 @@ from courseware import courses
 from ccx_keys.locator import CCXLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
-from instructor.access import allow_access, list_with_level
-from instructor.enrollment import (
+from lms.djangoapps.instructor.access import allow_access, list_with_level
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
 )

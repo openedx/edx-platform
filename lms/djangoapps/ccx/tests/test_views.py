@@ -20,7 +20,7 @@ from courseware.testutils import FieldOverrideTestMixin
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from django_comment_common.utils import are_permissions_roles_seeded
-from instructor.access import (
+from lms.djangoapps.instructor.access import (
     allow_access,
     list_with_level,
 )
@@ -1155,7 +1155,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         )
 
     @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True
         RequestCache.clear_request_cache()
