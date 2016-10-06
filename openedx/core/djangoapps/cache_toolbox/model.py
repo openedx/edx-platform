@@ -60,18 +60,28 @@ from .core import get_instance, delete_instance
 
 
 def cache_model(model, timeout=None):
+    """
+    Adds utility methods to the given model to obtain
+    ``ForeignKey`` instances via the cache.
+    """
     if hasattr(model, 'get_cached'):
         # Already patched
         return
 
-    def clear_cache(sender, instance, *args, **kwargs):
+    def clear_cache(sender, instance, *args, **kwargs):  # pylint: disable=unused-argument
+        """
+        Clears the cache for the given instance.
+        """
         delete_instance(sender, instance)
 
     post_save.connect(clear_cache, sender=model, weak=False)
     post_delete.connect(clear_cache, sender=model, weak=False)
 
     @classmethod
-    def get(cls, pk, using=None):
+    def get(cls, pk, using=None):  # pylint: disable=invalid-name
+        """
+        Returns the model for the given primary key (pk).
+        """
         if pk is None:
             return None
         return get_instance(cls, pk, timeout, using)
