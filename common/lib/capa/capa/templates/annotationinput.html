@@ -1,5 +1,5 @@
 <%! from openedx.core.djangolib.markup import HTML %>
-<div class="annotation-input">
+<form class="annotation-input">
 <div class="script_placeholder" data-src="${STATIC_URL}js/capa/annotationinput.js"/>
 
 <div class="annotation-header">
@@ -57,7 +57,7 @@
 
     <p id="answer_${id}" class="answer answer-annotation"></p>
 </div>
-</div>
+</form>
 
 % if msg:
 <span class="message">${HTML(msg)}</span>

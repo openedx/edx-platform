@@ -6,8 +6,7 @@
       not isinstance(value, basestring) and choice_id in value
     ))
 %>
-
-<div class="choicegroup capa_inputtype" id="inputtype_${id}">
+<form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <fieldset ${HTML(describedby_html)}>
       % if response_data['label']:
         <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
@@ -72,4 +71,4 @@
     % if msg:
     <span class="message">${HTML(msg)}</span>
     % endif
-</div>
+</form>
