@@ -1922,7 +1922,7 @@ INSTALLED_APPS = (
     'support',
 
     # External auth (OpenID, shib)
-    'external_auth',
+    'openedx.core.djangoapps.external_auth',
     'django_openid_auth',
 
     # django-oauth2-provider (deprecated)

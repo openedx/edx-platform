@@ -78,9 +78,9 @@ from courseware.access import has_access
 
 from django_comment_common.models import Role
 
-from external_auth.models import ExternalAuthMap
-import external_auth.views
-from external_auth.login_and_register import (
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+import openedx.core.djangoapps.external_auth.views
+from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
@@ -478,7 +478,9 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+    if context.get("extauth_domain", '').startswith(
+            openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
+    ):
         return render_to_response('register-shib.html', context)
 
     # If third-party auth is enabled, prepopulate the form with data from the
@@ -1202,7 +1204,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     if settings.FEATURES.get('AUTH_USE_SHIB') and user:
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
-            if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+            if eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
                 return JsonResponse({
                     "success": False,
                     "redirect": reverse('shib-login'),
@@ -1644,9 +1646,7 @@ def create_account_with_params(request, params):
         not settings.FEATURES.get("AUTH_USE_SHIB") or
         not settings.FEATURES.get("SHIB_DISABLE_TOS") or
         not do_external_auth or
-        not eamap.external_domain.startswith(
-            external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
-        )
+        not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
     form = AccountCreationForm(

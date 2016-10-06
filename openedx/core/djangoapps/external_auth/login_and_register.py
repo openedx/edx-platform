@@ -7,7 +7,7 @@ import re
 from django.conf import settings
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
-import external_auth.views
+import openedx.core.djangoapps.external_auth.views
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
@@ -56,11 +56,14 @@ def login(request):
     # is not handling the request.
     response = None
 
-    if settings.FEATURES['AUTH_USE_CERTIFICATES'] and external_auth.views.ssl_get_cert_from_request(request):
+    if (
+            settings.FEATURES['AUTH_USE_CERTIFICATES'] and
+            openedx.core.djangoapps.external_auth.views.ssl_get_cert_from_request(request)
+    ):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
         # is enabled and the header is in the request.
-        response = external_auth.views.redirect_with_get('root', request.GET)
+        response = openedx.core.djangoapps.external_auth.views.redirect_with_get('root', request.GET)
     elif settings.FEATURES.get('AUTH_USE_CAS'):
         # If CAS is enabled, redirect auth handling to there
         response = redirect(reverse('cas-login'))
@@ -69,7 +72,10 @@ def login(request):
         if redirect_to:
             course_id = _parse_course_id_from_string(redirect_to)
             if course_id and _get_course_enrollment_domain(course_id):
-                response = external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
+                response = openedx.core.djangoapps.external_auth.views.course_specific_login(
+                    request,
+                    course_id.to_deprecated_string(),
+                )
 
     return response
 
@@ -88,5 +94,5 @@ def register(request):
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
-        response = external_auth.views.redirect_with_get('root', request.GET)
+        response = openedx.core.djangoapps.external_auth.views.redirect_with_get('root', request.GET)
     return response
