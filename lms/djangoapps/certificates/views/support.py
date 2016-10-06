@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 from certificates import api
 from certificates.models import CertificateInvalidation
 from courseware.access import has_access
-from instructor_task.api import generate_certificates_for_students
+from lms.djangoapps.instructor_task.api import generate_certificates_for_students
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview

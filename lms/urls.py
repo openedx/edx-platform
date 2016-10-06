@@ -898,7 +898,7 @@ if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     urlpatterns += (
         url(
             r'^instructor_task_status/$',
-            'instructor_task.views.instructor_task_status',
+            'lms.djangoapps.instructor_task.views.instructor_task_status',
             name='instructor_task_status'
         ),
     )

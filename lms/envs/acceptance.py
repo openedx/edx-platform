@@ -35,7 +35,7 @@ LOG_OVERRIDES = [
     ('codejail.safe_exec', logging.ERROR),
     ('edx.courseware', logging.ERROR),
     ('audit', logging.ERROR),
-    ('instructor_task.api_helper', logging.ERROR),
+    ('lms.djangoapps.instructor_task.api_helper', logging.ERROR),
 ]
 
 for log_name, log_level in LOG_OVERRIDES:

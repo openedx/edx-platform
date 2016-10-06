@@ -25,13 +25,15 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from courseware.model_data import StudentModule
 
-from instructor_task.api import (submit_rescore_problem_for_all_students,
-                                 submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students,
-                                 submit_delete_problem_state_for_all_students)
-from instructor_task.models import InstructorTask
-from instructor_task.tasks_helper import upload_grades_csv
-from instructor_task.tests.test_base import (
+from lms.djangoapps.instructor_task.api import (
+    submit_rescore_problem_for_all_students,
+    submit_rescore_problem_for_student,
+    submit_reset_problem_attempts_for_all_students,
+    submit_delete_problem_state_for_all_students
+)
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.tasks_helper import upload_grades_csv
+from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskModuleTestCase,
     TestReportMixin,
     OPTION_1,
@@ -571,7 +573,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
         self.submit_student_answer(self.student_b.username, problem_b_url, [OPTION_1, OPTION_2])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
@@ -594,7 +596,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
