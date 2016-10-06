@@ -11,7 +11,7 @@ file and check it in at the same time as your model changes. To do that,
 """
 from django.contrib.auth.models import User
 from django.db import models
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from course_action_state.managers import CourseActionStateManager, CourseRerunUIStateManager
 
 

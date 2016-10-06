@@ -11,7 +11,7 @@ from util.db import outer_atomic
 from django.core.exceptions import ValidationError
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 log = logging.getLogger(__name__)
 

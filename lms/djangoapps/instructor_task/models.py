@@ -24,7 +24,7 @@ from django.core.files.base import ContentFile
 from django.db import models, transaction
 
 from openedx.core.storage import get_storage
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 # define custom states used by InstructorTask

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations, models
 from opaque_keys.edx.keys import CourseKey
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='visibleblocks',
             name='course_id',
-            field=xmodule_django.models.CourseKeyField(default=CourseKey.from_string('edX/BerylMonkeys/TNL-5458'), max_length=255, db_index=True),
+            field=CourseKeyField(default=CourseKey.from_string('edX/BerylMonkeys/TNL-5458'), max_length=255, db_index=True),
             preserve_default=False,
         ),
     ]

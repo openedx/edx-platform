@@ -4,12 +4,12 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import openedx.core.djangoapps.credit.models
 import model_utils.fields
-import xmodule_django.models
 import jsonfield.fields
 import django.db.models.deletion
 import django.utils.timezone
 from django.conf import settings
 import django.core.validators
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             name='CreditCourse',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_key', xmodule_django.models.CourseKeyField(unique=True, max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(unique=True, max_length=255, db_index=True)),
                 ('enabled', models.BooleanField(default=False)),
             ],
         ),
