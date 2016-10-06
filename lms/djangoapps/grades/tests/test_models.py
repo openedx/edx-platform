@@ -73,8 +73,8 @@ class GradesModelTestCase(TestCase):
             block_type='problem',
             block_id='block_id_b'
         )
-        self.record_a = BlockRecord(locator=self.locator_a, weight=1, max_score=10)
-        self.record_b = BlockRecord(locator=self.locator_b, weight=1, max_score=10)
+        self.record_a = BlockRecord(locator=self.locator_a, weight=1, raw_possible=10, graded=False)
+        self.record_b = BlockRecord(locator=self.locator_b, weight=1, raw_possible=10, graded=True)
 
 
 @ddt.ddt
@@ -90,29 +90,31 @@ class BlockRecordTest(GradesModelTestCase):
         Tests creation of a BlockRecord.
         """
         weight = 1
-        max_score = 10
+        raw_possible = 10
         record = BlockRecord(
             self.locator_a,
             weight,
-            max_score,
+            raw_possible,
+            graded=False,
         )
         self.assertEqual(record.locator, self.locator_a)
 
     @ddt.data(
-        (0, 0, "0123456789abcdef"),
-        (1, 10, 'totally_a_real_block_key'),
-        ("BlockRecord is", "a dumb data store", "with no validation"),
+        (0, 0, "0123456789abcdef", True),
+        (1, 10, 'totally_a_real_block_key', False),
+        ("BlockRecord is", "a dumb data store", "with no validation", None),
     )
     @ddt.unpack
-    def test_serialization(self, weight, max_score, block_key):
+    def test_serialization(self, weight, raw_possible, block_key, graded):
         """
         Tests serialization of a BlockRecord using the _asdict() method.
         """
-        record = BlockRecord(block_key, weight, max_score)
+        record = BlockRecord(block_key, weight, raw_possible, graded)
         expected = OrderedDict([
             ("locator", block_key),
             ("weight", weight),
-            ("max_score", max_score),
+            ("raw_possible", raw_possible),
+            ("graded", graded),
         ])
         self.assertEqual(expected, record._asdict())
 
@@ -136,7 +138,12 @@ class VisibleBlocksTest(GradesModelTestCase):
         for block_dict in list_of_block_dicts:
             block_dict['locator'] = unicode(block_dict['locator'])  # BlockUsageLocator is not json-serializable
         expected_data = {
-            'blocks': [{'locator': unicode(self.record_a.locator), 'max_score': 10, 'weight': 1}],
+            'blocks': [{
+                'locator': unicode(self.record_a.locator),
+                'raw_possible': 10,
+                'weight': 1,
+                'graded': self.record_a.graded,
+            }],
             'course_key': unicode(self.record_a.locator.course_key),
             'version': BLOCK_RECORD_LIST_VERSION,
         }

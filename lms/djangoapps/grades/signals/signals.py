@@ -14,20 +14,8 @@ SCORE_CHANGED = Signal(
     providing_args=[
         'points_possible',  # Maximum score available for the exercise
         'points_earned',   # Score obtained by the user
-        'user',  # User object
+        'user_id',  # Integer User ID
         'course_id',  # Unicode string representing the course
         'usage_id'  # Unicode string indicating the courseware instance
-    ]
-)
-
-
-# Signal that indicates that a user's score for a subsection has been updated.
-# This is a downstream signal of SCORE_CHANGED sent for each affected containing
-# subsection.
-SUBSECTION_SCORE_UPDATED = Signal(
-    providing_args=[
-        'course',  # Course object
-        'user',  # User object
-        'subsection_grade',  # SubsectionGrade object
     ]
 )
