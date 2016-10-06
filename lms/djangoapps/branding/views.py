@@ -61,7 +61,7 @@ def index(request):
             return redirect(reverse('dashboard'))
 
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
-        from external_auth.views import ssl_login
+        from openedx.core.djangoapps.external_auth.views import ssl_login
         # Set next URL to dashboard if it isn't set to avoid
         # caching a redirect to / that causes a redirect loop on logout
         if not request.GET.get('next'):

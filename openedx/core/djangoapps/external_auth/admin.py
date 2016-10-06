@@ -2,11 +2,14 @@
 django admin pages for courseware model
 '''
 
-from external_auth.models import *
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from ratelimitbackend import admin
 
 
 class ExternalAuthMapAdmin(admin.ModelAdmin):
+    """
+    Admin model for ExternalAuthMap
+    """
     search_fields = ['external_id', 'user__username']
     date_hierarchy = 'dtcreated'
 

@@ -817,7 +817,7 @@ INSTALLED_APPS = (
     'contentstore',
     'contentserver',
     'course_creators',
-    'external_auth',
+    'openedx.core.djangoapps.external_auth',
     'student',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run

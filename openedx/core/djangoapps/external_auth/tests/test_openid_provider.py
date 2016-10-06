@@ -17,7 +17,7 @@ from django.test.client import RequestFactory
 from unittest import skipUnless
 
 from student.tests.factories import UserFactory
-from external_auth.views import provider_login
+from openedx.core.djangoapps.external_auth.views import provider_login
 
 
 class MyFetcher(HTTPFetcher):
@@ -130,27 +130,53 @@ class OpenIdProviderTest(TestCase):
             self.assertEqual(resp.status_code, code,
                              "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
-            self.assertContains(resp, '<input name="openid.mode" type="hidden" value="checkid_setup" />', html=True)
-            self.assertContains(resp, '<input name="openid.ns" type="hidden" value="http://specs.openid.net/auth/2.0" />', html=True)
-            self.assertContains(resp, '<input name="openid.identity" type="hidden" value="http://specs.openid.net/auth/2.0/identifier_select" />', html=True)
-            self.assertContains(resp, '<input name="openid.claimed_id" type="hidden" value="http://specs.openid.net/auth/2.0/identifier_select" />', html=True)
-            self.assertContains(resp, '<input name="openid.ns.ax" type="hidden" value="http://openid.net/srv/ax/1.0" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.mode" type="hidden" value="fetch_request" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.required" type="hidden" value="email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.fullname" type="hidden" value="http://axschema.org/namePerson" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.lastname" type="hidden" value="http://axschema.org/namePerson/last" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.firstname" type="hidden" value="http://axschema.org/namePerson/first" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.nickname" type="hidden" value="http://axschema.org/namePerson/friendly" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.email" type="hidden" value="http://axschema.org/contact/email" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.old_email" type="hidden" value="http://schema.openid.net/contact/email" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.old_nickname" type="hidden" value="http://schema.openid.net/namePerson/friendly" />', html=True)
-            self.assertContains(resp, '<input name="openid.ax.type.old_fullname" type="hidden" value="http://schema.openid.net/namePerson" />', html=True)
-            self.assertContains(resp, '<input type="submit" value="Continue" />', html=True)
-            # this should work on the server:
-            self.assertContains(resp, '<input name="openid.realm" type="hidden" value="http://testserver/" />', html=True)
+            for expected_input in (
+                    '<input name="openid.ns" type="hidden" value="http://specs.openid.net/auth/2.0" />',
+
+                    '<input name="openid.ns.ax" type="hidden" value="http://openid.net/srv/ax/1.0" />',
+
+                    '<input name="openid.ax.type.fullname" type="hidden" value="http://axschema.org/namePerson" />',
+
+                    '<input type="submit" value="Continue" />',
+
+                    '<input name="openid.ax.type.email" type="hidden" value="http://axschema.org/contact/email" />',
+
+                    '<input name="openid.ax.type.lastname" '
+                    'type="hidden" value="http://axschema.org/namePerson/last" />',
+
+                    '<input name="openid.ax.type.firstname" '
+                    'type="hidden" value="http://axschema.org/namePerson/first" />',
+
+                    '<input name="openid.ax.required" type="hidden" '
+                    'value="email,fullname,old_email,firstname,old_nickname,lastname,old_fullname,nickname" />',
+
+                    '<input name="openid.ax.type.nickname" '
+                    'type="hidden" value="http://axschema.org/namePerson/friendly" />',
+
+                    '<input name="openid.ax.type.old_email" '
+                    'type="hidden" value="http://schema.openid.net/contact/email" />',
+
+                    '<input name="openid.ax.type.old_nickname" '
+                    'type="hidden" value="http://schema.openid.net/namePerson/friendly" />',
+
+                    '<input name="openid.ax.type.old_fullname" '
+                    'type="hidden" value="http://schema.openid.net/namePerson" />',
+
+                    '<input name="openid.identity" '
+                    'type="hidden" value="http://specs.openid.net/auth/2.0/identifier_select" />',
+
+                    '<input name="openid.claimed_id" '
+                    'type="hidden" value="http://specs.openid.net/auth/2.0/identifier_select" />',
+
+                    # should work on the test server as well
+                    '<input name="openid.realm" '
+                    'type="hidden" value="http://testserver/" />',
+            ):
+                self.assertContains(resp, expected_input, html=True)
 
             # not included here are elements that will vary from run to run:
-            # <input name="openid.return_to" type="hidden" value="http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H" />
+            # <input name="openid.return_to" type="hidden"
+            #   value="http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H" />
             # <input name="openid.assoc_handle" type="hidden" value="{HMAC-SHA1}{50ff8120}{rh87+Q==}" />
 
     def attempt_login(self, expected_code, login_method='POST', **kwargs):

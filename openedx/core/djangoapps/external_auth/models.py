@@ -6,7 +6,7 @@ file and check it in at the same time as your model changes. To do that,
 
 1. Go to the edx-platform dir
 2. ./manage.py lms schemamigration student --auto description_of_your_change
-3. Add the migration file created in edx-platform/common/djangoapps/external_auth/migrations/
+3. Add the migration file created in edx-platform/openedx/core/djangoapps/external_auth/migrations/
 """
 
 from django.db import models
@@ -14,6 +14,9 @@ from django.contrib.auth.models import User
 
 
 class ExternalAuthMap(models.Model):
+    """
+    Model class for external auth.
+    """
     class Meta(object):
         app_label = "external_auth"
         unique_together = (('external_id', 'external_domain'), )
@@ -29,5 +32,4 @@ class ExternalAuthMap(models.Model):
     dtsignup = models.DateTimeField('signup date', null=True)		# set after signup
 
     def __unicode__(self):
-        s = "[%s] = (%s / %s)" % (self.external_id, self.external_name, self.external_email)
-        return s
+        return "[%s] = (%s / %s)" % (self.external_id, self.external_name, self.external_email)

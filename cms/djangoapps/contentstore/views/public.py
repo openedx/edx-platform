@@ -10,8 +10,11 @@ from django.conf import settings
 
 from edxmako.shortcuts import render_to_response
 
-from external_auth.views import (ssl_login_shortcut, ssl_get_cert_from_request,
-                                 redirect_with_get)
+from openedx.core.djangoapps.external_auth.views import (
+    ssl_login_shortcut,
+    ssl_get_cert_from_request,
+    redirect_with_get,
+)
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 __all__ = ['signup', 'login_page', 'howitworks']
