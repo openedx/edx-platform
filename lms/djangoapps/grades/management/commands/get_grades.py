@@ -19,12 +19,15 @@ import csv
 
 
 class RequestMock(RequestFactory):
+    """
+    Class to create a mock request.
+    """
     def request(self, **request):
         "Construct a generic request object."
         request = RequestFactory.request(self, **request)
         handler = BaseHandler()
         handler.load_middleware()
-        for middleware_method in handler._request_middleware:
+        for middleware_method in handler._request_middleware:  # pylint: disable=protected-access
             if middleware_method(request):
                 raise Exception("Couldn't create request mock object - "
                                 "request middleware returned a response")
@@ -32,6 +35,9 @@ class RequestMock(RequestFactory):
 
 
 class Command(BaseCommand):
+    """
+    Management command for get_grades
+    """
 
     help = """
     Generate a list of grades for all students
@@ -69,7 +75,7 @@ class Command(BaseCommand):
             raise CommandError("File {0} already exists".format(
                 options['output']))
 
-        STATUS_INTERVAL = 100
+        status_interval = 100
 
         # parse out the course into a coursekey
         if options['course']:
@@ -106,26 +112,28 @@ class Command(BaseCommand):
         print "Grading students"
         for count, student in enumerate(enrolled_students):
             count += 1
-            if count % STATUS_INTERVAL == 0:
+            if count % status_interval == 0:
                 # Print a status update with an approximation of
                 # how much time is left based on how long the last
                 # interval took
                 diff = datetime.datetime.now() - start
-                timeleft = diff * (total - count) / STATUS_INTERVAL
+                timeleft = diff * (total - count) / status_interval
                 hours, remainder = divmod(timeleft.seconds, 3600)
                 minutes, __ = divmod(remainder, 60)
                 print "{0}/{1} completed ~{2:02}:{3:02}m remaining".format(
                     count, total, hours, minutes)
                 start = datetime.datetime.now()
             request.user = student
-            grade = course_grades.summary(student, request, course)
+            grade = course_grades.summary(student, course)
             if not header:
                 header = [section['label'] for section in grade[u'section_breakdown']]
                 rows.append(["email", "username", "certificate-grade", "grade"] + header)
             percents = {section['label']: section['percent'] for section in grade[u'section_breakdown']}
             row_percents = [percents[label] for label in header]
             if student.username in cert_grades:
-                rows.append([student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents)
+                rows.append(
+                    [student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents,
+                )
             else:
                 rows.append([student.email, student.username, "N/A", grade['percent']] + row_percents)
         with open(options['output'], 'wb') as f:
