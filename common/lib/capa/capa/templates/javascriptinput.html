@@ -1,9 +1,10 @@
-<div class="javascriptinput capa_inputtype" id="inputtype_${id}">
+<form class="javascriptinput capa_inputtype" id="inputtype_${id}">
   <input type="hidden" name="input_${id}" id="input_${id}" class="javascriptinput_input"/>
-    <div class="javascriptinput_data" data-display_class="${display_class}"
-        data-problem_state="${problem_state}" data-params="${params}"
+    <div class="javascriptinput_data" data-display_class="${display_class}" 
+        data-problem_state="${problem_state}" data-params="${params}" 
         data-submission="${value|h}" data-evaluation="${msg|h}">
     </div>
     <div class="script_placeholder" data-src="/static/js/${display_file}"></div>
     <div class="javascriptinput_container"></div>
-</div>
+</form>
+

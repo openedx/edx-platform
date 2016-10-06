@@ -8,7 +8,7 @@
     %endif
 % endfor
 <section id="choicetextinput_${id}" class="choicetextinput">
-<div class="choicetextgroup capa_inputtype" id="inputtype_${id}">
+<form class="choicetextgroup capa_inputtype" id="inputtype_${id}">
     <div class="script_placeholder" data-src="${STATIC_URL}js/capa/choicetextinput.js"/>
 
     <fieldset aria-label="${remove_markup(response_data['label'])}">
@@ -73,5 +73,5 @@
     % if msg:
     <span class="message">${msg|n}</span>
     % endif
-</div>
+</form>
 </section>

@@ -2,7 +2,7 @@
 <%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = "inline" if inline else "" %>
 
-<div class="inputtype option-input ${doinline}">
+<form class="inputtype option-input ${doinline}">
   % if response_data['label']:
       <label class="problem-group-label" for="input_${id}">${response_data['label']}</label>
   % endif
@@ -31,4 +31,4 @@
   % if msg:
       <span class="message">${HTML(msg)}</span>
   % endif
-</div>
+</form>
