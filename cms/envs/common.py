@@ -857,13 +857,11 @@ INSTALLED_APPS = (
     # Dark-launching languages
     'dark_lang',
 
-    # Student identity reverification
-    'reverification',
-
     # User preferences
     'openedx.core.djangoapps.user_api',
     'django_openid_auth',
 
+    # Country embargo support
     'embargo',
 
     # Monitoring signals

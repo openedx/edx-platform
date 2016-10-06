@@ -2004,9 +2004,7 @@ INSTALLED_APPS = (
     # RSS Proxy
     'rss_proxy',
 
-    # Student Identity Reverification
-    'reverification',
-
+    # Country embargo support
     'embargo',
 
     # Monitoring functionality
