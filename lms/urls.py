@@ -891,7 +891,7 @@ if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
-        url(r'^status/', include('service_status.urls')),
+        url(r'^status/', include('openedx.core.djangoapps.service_status.urls')),
     )
 
 if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):

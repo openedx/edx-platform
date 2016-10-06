@@ -148,7 +148,7 @@ if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns(
         '',
-        url(r'^status/', include('service_status.urls')),
+        url(r'^status/', include('openedx.core.djangoapps.service_status.urls')),
     )
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
