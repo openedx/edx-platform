@@ -1914,6 +1914,7 @@ INSTALLED_APPS = (
     'lms.djangoapps.grades.apps.GradesConfig',
 
     # Student support tools
+    'lms.djangoapps.student_account',
     'support',
 
     # External auth (OpenID, shib)
@@ -2105,6 +2106,7 @@ INSTALLED_APPS = (
 
     # additional release utilities to ease automation
     'release_util',
+
 )
 
 # Migrations which are not in the standard module "migrations"
