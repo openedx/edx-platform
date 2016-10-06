@@ -288,6 +288,7 @@
     "Body": "\u0243\u00f8d\u028e", 
     "Bold": "\u0243\u00f8ld", 
     "Bold (Ctrl+B)": "\u0243\u00f8ld (\u023b\u0287\u0279l+\u0243)", 
+    "Bookmark this page": "\u0243\u00f8\u00f8\u029e\u026f\u0250\u0279\u029e \u0287\u0265\u1d09s d\u0250\u0183\u01dd", 
     "Bookmarked": "\u0243\u00f8\u00f8\u029e\u026f\u0250\u0279\u029e\u01ddd", 
     "Bookmarked on": "\u0243\u00f8\u00f8\u029e\u026f\u0250\u0279\u029e\u01ddd \u00f8n", 
     "Border": "\u0243\u00f8\u0279d\u01dd\u0279", 

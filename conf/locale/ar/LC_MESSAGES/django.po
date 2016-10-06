@@ -10425,7 +10425,7 @@ msgstr "مستعدّ"
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
-msgstr "لم تنجح المعالجة"
+msgstr "خلل أثناء المعالجة"
 
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
@@ -10437,7 +10437,7 @@ msgstr "فشل التكرار"
 #. processing token was provided in the course settings
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Invalid Token"
-msgstr "إشارة غير صالحة"
+msgstr "غير مُصرَّح له"
 
 #. Translators: This is the status for a video that was included in a course
 #. import
@@ -21754,7 +21754,7 @@ msgstr "تحميلات الفيديو"
 
 #: cms/templates/videos_index.html
 msgid "Why upload video files?"
-msgstr "ما هو الهدف من تحميل ملفّات الفيديو؟"
+msgstr "ما الهدف من تحميل الفيديو هنا؟"
 
 #: cms/templates/videos_index.html
 msgid ""
