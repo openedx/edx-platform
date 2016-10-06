@@ -95,8 +95,8 @@ class StaffDebugPage(PageObject):
         This delete's a student's state for the problem
         """
         if user:
-            self.q(css='input[id^=sd_fu_]').fill(user)
-        self.q(css='.staff-modal .staff-debug-sdelete').click()
+            self.q(css='input[id^=sd_fu_]').first.fill(user)
+        self.q(css='.staff-modal .staff-debug-sdelete').first.click()
 
     def rescore(self, user=None):
         """

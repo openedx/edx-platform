@@ -30,14 +30,12 @@ def mock_get_score(earned=0, possible=1):
 
 def answer_problem(course, request, problem, score=1, max_value=1):
     """
-    Records an answer for the given problem.
+    Records a correct answer for the given problem.
 
     Arguments:
         course (Course): Course object, the course the required problem is in
         request (Request): request Object
         problem (xblock): xblock object, the problem to be answered
-        score (float): The new score for the problem
-        max_value (float): The new maximum score for the problem
     """
 
     user = request.user
@@ -48,10 +46,11 @@ def answer_problem(course, request, problem, score=1, max_value=1):
         course,
         depth=2
     )
+    # pylint: disable=protected-access
     module = get_module(
         user,
         request,
-        problem.location,
+        problem.scope_ids.usage_id,
         field_data_cache,
-    )
-    module.runtime.publish(problem, 'grade', grade_dict)
+    )._xmodule
+    module.system.publish(problem, 'grade', grade_dict)

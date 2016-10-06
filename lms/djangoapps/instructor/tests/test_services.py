@@ -49,7 +49,8 @@ class InstructorServiceTests(SharedModuleStoreTestCase):
             state=json.dumps({'attempts': 2}),
         )
 
-    def test_reset_student_attempts_delete(self):
+    @mock.patch('courseware.module_render.SCORE_CHANGED.send')
+    def test_reset_student_attempts_delete(self, _mock_signal):
         """
         Test delete student state.
         """
