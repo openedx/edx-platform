@@ -25,7 +25,7 @@ from django_countries.fields import CountryField
 from django_countries import countries
 
 from config_models.models import ConfigurationModel
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 from embargo.exceptions import InvalidAccessPoint
 from embargo.messages import ENROLL_MESSAGES, COURSEWARE_MESSAGES

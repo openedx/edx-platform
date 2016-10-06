@@ -11,7 +11,7 @@ from pytz import utc
 
 from lazy import lazy
 from openedx.core.lib.time_zone_utils import get_time_zone_abbr
-from xmodule_django.models import CourseKeyField, LocationKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 

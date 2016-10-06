@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.db import models
 import logging
 
-from xmodule_django.models import CourseKeyField, UsageKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
 from provider.utils import short_token
 

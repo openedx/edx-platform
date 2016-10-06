@@ -39,7 +39,7 @@ from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE, EnrollStatusChange
 from util.query import use_read_replica_if_available
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from .exceptions import (
     InvalidCartItem,
     PurchasedCallbackException,

@@ -68,7 +68,7 @@ from badges.events.course_meta import completion_check, course_group_check
 from config_models.models import ConfigurationModel
 from instructor_task.models import InstructorTask
 from util.milestones_helpers import fulfill_course_milestone, is_prerequisite_courses_enabled
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 LOGGER = logging.getLogger(__name__)
 

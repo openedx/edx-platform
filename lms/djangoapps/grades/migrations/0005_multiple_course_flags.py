@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='coursepersistentgradesflag',
             name='course_id',
-            field=xmodule_django.models.CourseKeyField(max_length=255, db_index=True),
+            field=CourseKeyField(max_length=255, db_index=True),
         ),
     ]

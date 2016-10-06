@@ -45,7 +45,7 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from simple_history.models import HistoricalRecords
 from track import contexts
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 from lms.djangoapps.badges.utils import badges_enabled
 from certificates.models import GeneratedCertificate

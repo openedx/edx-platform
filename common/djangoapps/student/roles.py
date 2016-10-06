@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 import logging
 
 from student.models import CourseAccessRole
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 log = logging.getLogger(__name__)

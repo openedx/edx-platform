@@ -5,7 +5,7 @@ controlling persistent grades.
 from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.db.models import BooleanField
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class PersistentGradesEnabledFlag(ConfigurationModel):

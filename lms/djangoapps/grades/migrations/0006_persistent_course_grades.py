@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.utils.timezone
 import model_utils.fields
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 import coursewarehistoryextended.fields
 
 
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, verbose_name='modified', editable=False)),
                 ('id', coursewarehistoryextended.fields.UnsignedBigIntAutoField(serialize=False, primary_key=True)),
                 ('user_id', models.IntegerField(db_index=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255)),
+                ('course_id', CourseKeyField(max_length=255)),
                 ('course_edited_timestamp', models.DateTimeField(verbose_name='Last content edit timestamp')),
                 ('course_version', models.CharField(max_length=255, verbose_name='Course content version identifier', blank=True)),
                 ('grading_policy_hash', models.CharField(max_length=255, verbose_name='Hash of grading policy')),
