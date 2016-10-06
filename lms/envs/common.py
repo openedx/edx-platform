@@ -3027,6 +3027,7 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 ############## Settings for LMS Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = None
+INSTRUCTOR_DOC_LINK_BASE_URL = 'http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course'
 
 ############## Settings for the Enterprise App ######################
 

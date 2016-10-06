@@ -12,6 +12,7 @@
 
 <%namespace name='static' file='static_content.html'/>
 <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
+<% doc_base_url = self.doc_base_url() if hasattr(self, 'doc_base_url') else None %>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
@@ -132,7 +133,10 @@ from pipeline_mako import render_require_js_path_overrides
     <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
 
     % if not disable_header:
-        <%include file="${static.get_template_path('header.html')}" args="online_help_token=online_help_token" />
+        <%include
+            file="${static.get_template_path('header.html')}"
+            args="online_help_token=online_help_token,doc_base_url=doc_base_url"
+        />
     % endif
 
     <div class="content-wrapper" id="content">

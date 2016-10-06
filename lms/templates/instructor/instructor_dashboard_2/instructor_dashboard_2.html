@@ -1,11 +1,13 @@
 <%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
-<%def name="online_help_token()"><% return "instructor" %></%def>
 <%!
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from django.conf import settings
 %>
+<%def name="online_help_token()"><% return "instructor" %></%def>
+<%def name="doc_base_url()"><% return settings.INSTRUCTOR_DOC_LINK_BASE_URL %></%def>
 <%block name="bodyclass">view-in-course view-instructordash</%block>
 
 ## ----- Tips on adding something to the new instructor dashboard -----
