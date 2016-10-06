@@ -21,11 +21,11 @@
                         'Basic Question Types': {
                             'subcategories': {},
                             'children': [
-                                'Selection From Options',
-                                'Numerical Input',
-                                'Very long category name',
-                                'Very very very very long category name',
-                                'Name with <em>HTML</em>'
+                                ['Selection From Options', 'entry'],
+                                ['Numerical Input', 'entry'],
+                                ['Very long category name', 'entry'],
+                                ['Very very very very long category name', 'entry'],
+                                ['Name with <em>HTML</em>', 'entry']
                             ],
                             'entries': {
                                 'Selection From Options': {
@@ -59,7 +59,7 @@
                         'Example Inline Discussion': {
                             'subcategories': {},
                             'children': [
-                                'What Are Your Goals for Creating a MOOC?'
+                                ['What Are Your Goals for Creating a MOOC?', 'entry']
                             ],
                             'entries': {
                                 'What Are Your Goals for Creating a MOOC?': {
@@ -70,7 +70,10 @@
                             }
                         }
                     },
-                    'children': ['Basic Question Types', 'Example Inline Discussion'],
+                    'children': [ // eslint-disable-line quote-props
+                        ['Basic Question Types', 'subcategory'],
+                        ['Example Inline Discussion', 'subcategory']
+                    ],
                     'entries': {}
                 },
                 'is_cohorted': true

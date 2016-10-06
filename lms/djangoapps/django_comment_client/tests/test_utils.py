@@ -14,6 +14,7 @@ from edxmako import add_lookup
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
+from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 import django_comment_client.utils as utils
 from lms.lib.comment_client.utils import perform_request, CommentClientMaintenanceError
 from django_comment_common.models import ForumsConfig
@@ -399,7 +400,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                         "Topic C": {"id": "Topic_C", "sort_key": "Topic C", "is_cohorted": "Topic_C" in expected_ids},
                     },
                     "subcategories": {},
-                    "children": ["Topic A", "Topic B", "Topic C"]
+                    "children": [("Topic A", TYPE_ENTRY), ("Topic B", TYPE_ENTRY), ("Topic C", TYPE_ENTRY)]
                 }
             )
 
@@ -451,10 +452,10 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion"]
+                        "children": [("Discussion", TYPE_ENTRY)]
                     }
                 },
-                "children": ["Chapter"]
+                "children": [("Chapter", TYPE_SUBCATEGORY)]
             }
         )
 
@@ -475,10 +476,10 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion"]
+                        "children": [("Discussion", TYPE_ENTRY)]
                     }
                 },
-                "children": ["Chapter"]
+                "children": [("Chapter", TYPE_SUBCATEGORY)]
             }
         )
 
@@ -499,10 +500,10 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion"]
+                        "children": [("Discussion", TYPE_ENTRY)]
                     }
                 },
-                "children": ["Chapter"]
+                "children": [("Chapter", TYPE_SUBCATEGORY)]
             },
             cohorted_if_in_list=True
         )
@@ -526,12 +527,12 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion 1"],
+                        "children": [("Discussion 1", TYPE_ENTRY)],
                         "start_date": later,
                         "sort_key": "Chapter 1"
                     }
                 },
-                "children": ["Chapter 1"]
+                "children": [("Chapter 1", TYPE_SUBCATEGORY)]
             },
             cohorted_if_in_list=True,
             exclude_unstarted=False
@@ -565,7 +566,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                 }
                             },
                             "subcategories": {},
-                            "children": ["Discussion 1", "Discussion 2"]
+                            "children": [("Discussion 1", TYPE_ENTRY), ("Discussion 2", TYPE_ENTRY)]
                         },
                         "Chapter 2": {
                             "entries": {
@@ -588,7 +589,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                                 }
                                             },
                                             "subcategories": {},
-                                            "children": ["Discussion"]
+                                            "children": [("Discussion", TYPE_ENTRY)]
                                         },
                                         "Subsection 2": {
                                             "entries": {
@@ -599,13 +600,13 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                                 }
                                             },
                                             "subcategories": {},
-                                            "children": ["Discussion"]
+                                            "children": [("Discussion", TYPE_ENTRY)]
                                         }
                                     },
-                                    "children": ["Subsection 1", "Subsection 2"]
+                                    "children": [("Subsection 1", TYPE_SUBCATEGORY), ("Subsection 2", TYPE_SUBCATEGORY)]
                                 }
                             },
-                            "children": ["Discussion", "Section 1"]
+                            "children": [("Discussion", TYPE_ENTRY), ("Section 1", TYPE_SUBCATEGORY)]
                         },
                         "Chapter 3": {
                             "entries": {},
@@ -619,13 +620,14 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                         }
                                     },
                                     "subcategories": {},
-                                    "children": ["Discussion"]
+                                    "children": [("Discussion", TYPE_ENTRY)]
                                 }
                             },
-                            "children": ["Section 1"]
+                            "children": [("Section 1", TYPE_SUBCATEGORY)]
                         }
                     },
-                    "children": ["Chapter 1", "Chapter 2", "Chapter 3"]
+                    "children": [("Chapter 1", TYPE_SUBCATEGORY), ("Chapter 2", TYPE_SUBCATEGORY),
+                                 ("Chapter 3", TYPE_SUBCATEGORY)]
                 }
             )
 
@@ -652,13 +654,16 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
         chapter1 = category_map["subcategories"]["Chapter 1"]
         chapter1_discussions = set(["Discussion A", "Discussion B", "Discussion A (1)", "Discussion A (2)"])
-        self.assertEqual(set(chapter1["children"]), chapter1_discussions)
+        chapter1_discussions_with_types = set([("Discussion A", TYPE_ENTRY), ("Discussion B", TYPE_ENTRY),
+                                               ("Discussion A (1)", TYPE_ENTRY), ("Discussion A (2)", TYPE_ENTRY)])
+        self.assertEqual(set(chapter1["children"]), chapter1_discussions_with_types)
         self.assertEqual(set(chapter1["entries"].keys()), chapter1_discussions)
 
         chapter2 = category_map["subcategories"]["Chapter 2"]
         subsection1 = chapter2["subcategories"]["Section 1"]["subcategories"]["Subsection 1"]
         subsection1_discussions = set(["Discussion", "Discussion (1)"])
-        self.assertEqual(set(subsection1["children"]), subsection1_discussions)
+        subsection1_discussions_with_types = set([("Discussion", TYPE_ENTRY), ("Discussion (1)", TYPE_ENTRY)])
+        self.assertEqual(set(subsection1["children"]), subsection1_discussions_with_types)
         self.assertEqual(set(subsection1["entries"].keys()), subsection1_discussions)
 
     def test_start_date_filter(self):
@@ -685,7 +690,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion 1"]
+                        "children": [("Discussion 1", TYPE_ENTRY)]
                     },
                     "Chapter 2": {
                         "entries": {
@@ -696,10 +701,10 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion"]
+                        "children": [("Discussion", TYPE_ENTRY)]
                     }
                 },
-                "children": ["Chapter 1", "Chapter 2"]
+                "children": [("Chapter 1", TYPE_SUBCATEGORY), ("Chapter 2", TYPE_SUBCATEGORY)]
             }
         )
 
@@ -735,7 +740,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion 1", "Discussion 2"]
+                        "children": [("Discussion 1", TYPE_ENTRY), ("Discussion 2", TYPE_ENTRY)]
                     },
                     "Chapter 2": {
                         "entries": {
@@ -758,7 +763,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                             }
                                         },
                                         "subcategories": {},
-                                        "children": ["Discussion"]
+                                        "children": [("Discussion", TYPE_ENTRY)]
                                     },
                                     "Subsection 2": {
                                         "entries": {
@@ -769,13 +774,13 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                             }
                                         },
                                         "subcategories": {},
-                                        "children": ["Discussion"]
+                                        "children": [("Discussion", TYPE_ENTRY)]
                                     }
                                 },
-                                "children": ["Subsection 1", "Subsection 2"]
+                                "children": [("Subsection 1", TYPE_SUBCATEGORY), ("Subsection 2", TYPE_SUBCATEGORY)]
                             }
                         },
-                        "children": ["Discussion", "Section 1"]
+                        "children": [("Discussion", TYPE_ENTRY), ("Section 1", TYPE_SUBCATEGORY)]
                     },
                     "Chapter 3": {
                         "entries": {},
@@ -789,13 +794,14 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                                     }
                                 },
                                 "subcategories": {},
-                                "children": ["Discussion"]
+                                "children": [("Discussion", TYPE_ENTRY)]
                             }
                         },
-                        "children": ["Section 1"]
+                        "children": [("Section 1", TYPE_SUBCATEGORY)]
                     }
                 },
-                "children": ["Chapter 1", "Chapter 2", "Chapter 3"]
+                "children": [("Chapter 1", TYPE_SUBCATEGORY), ("Chapter 2", TYPE_SUBCATEGORY),
+                             ("Chapter 3", TYPE_SUBCATEGORY)]
             }
         )
 
@@ -840,15 +846,15 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                         },
                         "subcategories": {},
                         "children": [
-                            "Discussion 2",
-                            "Discussion 5",
-                            "Discussion 4",
-                            "Discussion 1",
-                            "Discussion 3"
+                            ("Discussion 2", TYPE_ENTRY),
+                            ("Discussion 5", TYPE_ENTRY),
+                            ("Discussion 4", TYPE_ENTRY),
+                            ("Discussion 1", TYPE_ENTRY),
+                            ("Discussion 3", TYPE_ENTRY)
                         ]
                     }
                 },
-                "children": ["Chapter"]
+                "children": [("Chapter", TYPE_SUBCATEGORY)]
             }
         )
 
@@ -866,7 +872,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                     "Topic C": {"id": "Topic_C", "sort_key": "A", "is_cohorted": False},
                 },
                 "subcategories": {},
-                "children": ["Topic C", "Topic A", "Topic B"]
+                "children": [("Topic C", TYPE_ENTRY), ("Topic A", TYPE_ENTRY), ("Topic B", TYPE_ENTRY)]
             }
         )
 
@@ -913,15 +919,15 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                         },
                         "subcategories": {},
                         "children": [
-                            "Discussion A",
-                            "Discussion B",
-                            "Discussion C",
-                            "Discussion D",
-                            "Discussion E"
+                            ("Discussion A", TYPE_ENTRY),
+                            ("Discussion B", TYPE_ENTRY),
+                            ("Discussion C", TYPE_ENTRY),
+                            ("Discussion D", TYPE_ENTRY),
+                            ("Discussion E", TYPE_ENTRY)
                         ]
                     }
                 },
-                "children": ["Chapter"]
+                "children": [("Chapter", TYPE_SUBCATEGORY)]
             }
         )
 
@@ -950,7 +956,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion 1", "Discussion 2"]
+                        "children": [("Discussion 1", TYPE_ENTRY), ("Discussion 2", TYPE_ENTRY)]
                     },
                     "Chapter B": {
                         "entries": {
@@ -966,7 +972,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion 1", "Discussion 2"]
+                        "children": [("Discussion 1", TYPE_ENTRY), ("Discussion 2", TYPE_ENTRY)]
                     },
                     "Chapter C": {
                         "entries": {
@@ -977,10 +983,11 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                             }
                         },
                         "subcategories": {},
-                        "children": ["Discussion"]
+                        "children": [("Discussion", TYPE_ENTRY)]
                     }
                 },
-                "children": ["Chapter A", "Chapter B", "Chapter C"]
+                "children": [("Chapter A", TYPE_SUBCATEGORY), ("Chapter B", TYPE_SUBCATEGORY),
+                             ("Chapter C", TYPE_SUBCATEGORY)]
             }
         )
 
@@ -1042,9 +1049,9 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'Week 1': {
                         'subcategories': {},
                         'children': [
-                            'Visible to Alpha',
-                            'Visible to Beta',
-                            'Visible to Everyone'
+                            ('Visible to Alpha', 'entry'),
+                            ('Visible to Beta', 'entry'),
+                            ('Visible to Everyone', 'entry')
                         ],
                         'entries': {
                             'Visible to Alpha': {
@@ -1065,7 +1072,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         }
                     }
                 },
-                'children': ['General', 'Week 1'],
+                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
                 'entries': {
                     'General': {
                         'sort_key': 'General',
@@ -1088,8 +1095,8 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'Week 1': {
                         'subcategories': {},
                         'children': [
-                            'Visible to Alpha',
-                            'Visible to Everyone'
+                            ('Visible to Alpha', 'entry'),
+                            ('Visible to Everyone', 'entry')
                         ],
                         'entries': {
                             'Visible to Alpha': {
@@ -1105,7 +1112,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         }
                     }
                 },
-                'children': ['General', 'Week 1'],
+                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
                 'entries': {
                     'General': {
                         'sort_key': 'General',
@@ -1128,8 +1135,8 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'Week 1': {
                         'subcategories': {},
                         'children': [
-                            'Visible to Beta',
-                            'Visible to Everyone'
+                            ('Visible to Beta', 'entry'),
+                            ('Visible to Everyone', 'entry')
                         ],
                         'entries': {
                             'Visible to Beta': {
@@ -1145,7 +1152,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         }
                     }
                 },
-                'children': ['General', 'Week 1'],
+                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
                 'entries': {
                     'General': {
                         'sort_key': 'General',
@@ -1168,7 +1175,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                     'Week 1': {
                         'subcategories': {},
                         'children': [
-                            'Visible to Everyone'
+                            ('Visible to Everyone', 'entry')
                         ],
                         'entries': {
                             'Visible to Everyone': {
@@ -1179,7 +1186,7 @@ class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase
                         }
                     }
                 },
-                'children': ['General', 'Week 1'],
+                'children': [('General', 'entry'), ('Week 1', 'subcategory')],
                 'entries': {
                     'General': {
                         'sort_key': 'General',
