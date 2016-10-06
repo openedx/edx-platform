@@ -35,20 +35,10 @@ student_selected = selected(not staff_selected and not specific_student_selected
 include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
 %>
 
-% if course and user.is_authenticated() and not UserProfile.has_registered(user):
-  <p class="unauth-warning">
-  <%
-  if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
-    reg_url = reverse('course-specific-register', args=[course.id.to_deprecated_string()])
-  else:
-    reg_url = reverse('register_user')
-  %>
-   ${_("Non-registered mode.  {tag_start}Register{tag_end} to save your course progress.")\
-     .format(platform_name=settings.PLATFORM_NAME,
-             tag_start="<a href='{}'>".format(reg_url),
-             tag_end="</a>")}
-  </p>
-% endif
+<%include
+  file="course_navigation-sneak-peek-warning.html"
+  args="user=user, course=course"
+/>
 
 % if include_special_exams:
   <%static:js group='proctoring'/>
