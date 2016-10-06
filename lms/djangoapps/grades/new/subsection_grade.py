@@ -128,14 +128,14 @@ class SubsectionGrade(object):
         """
         Saves the subsection grade in a persisted model.
         """
-        self._log_event(log.info, u"create_model", student)
+        self._log_event(log.debug, u"create_model", student)
         return PersistentSubsectionGrade.create_grade(**self._persisted_model_params(student))
 
     def update_or_create_model(self, student):
         """
         Saves or updates the subsection grade in a persisted model.
         """
-        self._log_event(log.info, u"update_or_create_model", student)
+        self._log_event(log.debug, u"update_or_create_model", student)
         return PersistentSubsectionGrade.update_or_create_grade(**self._persisted_model_params(student))
 
     def _compute_block_score(
@@ -308,6 +308,11 @@ class SubsectionGradeFactory(object):
         """
         Updates the SubsectionGrade object for the student and subsection.
         """
+        # Save ourselves the extra queries if the course does not persist
+        # subsection grades.
+        if not PersistentGradesEnabledFlag.feature_enabled(self.course.id):
+            return
+
         self._log_event(log.warning, u"update, subsection: {}".format(subsection.location))
 
         block_structure = self._get_block_structure(block_structure)
@@ -316,10 +321,8 @@ class SubsectionGradeFactory(object):
             self.student, block_structure, self._scores_client, self._submissions_scores
         )
 
-        if PersistentGradesEnabledFlag.feature_enabled(self.course.id):
-            grade_model = subsection_grade.update_or_create_model(self.student)
-            self._update_saved_subsection_grade(subsection.location, grade_model)
-
+        grade_model = subsection_grade.update_or_create_model(self.student)
+        self._update_saved_subsection_grade(subsection.location, grade_model)
         return subsection_grade
 
     @lazy
