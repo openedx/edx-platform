@@ -1,197 +1,256 @@
-###
-Email Section
+/* globals _, SendEmail */
 
-imports from other modules.
-wrap in (-> ... apply) to defer evaluation
-such that the value can be defined later than this assignment (file load order).
-###
+(function() {
+    'use strict';
+    var KeywordValidator, PendingInstructorTasks,
+        createEmailContentTable, createEmailMessageViews, createTaskListTable,
+        plantTimeout, statusAjaxError;
 
-# Load utilities
-plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
-std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
-PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
-create_task_list_table = -> window.InstructorDashboard.util.create_task_list_table.apply this, arguments
-create_email_content_table = -> window.InstructorDashboard.util.create_email_content_table.apply this, arguments
-create_email_message_views = -> window.InstructorDashboard.util.create_email_message_views.apply this, arguments
-KeywordValidator = -> window.InstructorDashboard.util.KeywordValidator
+    plantTimeout = function() {
+        return window.InstructorDashboard.util.plantTimeout.apply(this, arguments);
+    };
 
-class @SendEmail
-    constructor: (@$container) ->
-        # gather elements
-        @$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
-        @$send_to = @$container.find("input[name='send_to']")
-        @$cohort_targets = @$send_to.filter('[value^="cohort:"]')
-        @$subject = @$container.find("input[name='subject']")
-        @$btn_send = @$container.find("input[name='send']")
-        @$task_response = @$container.find(".request-response")
-        @$request_response_error = @$container.find(".request-response-error")
-        @$content_request_response_error = @$container.find(".content-request-response-error")
-        @$history_request_response_error = @$container.find(".history-request-response-error")
-        @$btn_task_history_email = @$container.find("input[name='task-history-email']")
-        @$btn_task_history_email_content = @$container.find("input[name='task-history-email-content']")
-        @$table_task_history_email = @$container.find(".task-history-email-table")
-        @$table_email_content_history = @$container.find(".content-history-email-table")
-        @$email_content_table_inner = @$container.find(".content-history-table-inner")
-        @$email_messages_wrapper = @$container.find(".email-messages-wrapper")
+    statusAjaxError = function() {
+        return window.InstructorDashboard.util.statusAjaxError.apply(this, arguments);
+    };
 
-        # attach click handlers
+    PendingInstructorTasks = function() {
+        return window.InstructorDashboard.util.PendingInstructorTasks;
+    };
 
-        @$btn_send.click =>
-            subject = @$subject.val()
-            body = @$emailEditor.save()['data']
-            targets = []
-            @$send_to.filter(':checked').each ->
-                targets.push(this.value)
+    createTaskListTable = function() {
+        return window.InstructorDashboard.util.createTaskListTable.apply(this, arguments);
+    };
 
-            if subject == ""
-                alert gettext("Your message must have a subject.")
+    createEmailContentTable = function() {
+        return window.InstructorDashboard.util.createEmailContentTable.apply(this, arguments);
+    };
 
-            else if body == ""
-                alert gettext("Your message cannot be blank.")
+    createEmailMessageViews = function() {
+        return window.InstructorDashboard.util.createEmailMessageViews.apply(this, arguments);
+    };
 
-            else if targets.length == 0
-                alert gettext("Your message must have at least one target.")
+    KeywordValidator = function() {
+        return window.InstructorDashboard.util.KeywordValidator;
+    };
 
-            else
-                # Validation for keyword substitution
-                validation = KeywordValidator().validate_string body
-                if not validation.is_valid
-                    message = gettext("There are invalid keywords in your email. Check the following keywords and try again.")
-                    message += "\n" + validation.invalid_keywords.join('\n')
-                    alert message
-                    return
+    this.SendEmail = (function() {
+        function SendEmail($container) {
+            var sendemail = this;
+            this.$container = $container;
+            this.$emailEditor = XBlock.initializeBlock($('.xblock-studio_view'));
+            this.$send_to = this.$container.find("input[name='send_to']");
+            this.$cohort_targets = this.$send_to.filter('[value^="cohort:"]');
+            this.$subject = this.$container.find("input[name='subject']");
+            this.$btn_send = this.$container.find("input[name='send']");
+            this.$task_response = this.$container.find('.request-response');
+            this.$request_response_error = this.$container.find('.request-response-error');
+            this.$content_request_response_error = this.$container.find('.content-request-response-error');
+            this.$history_request_response_error = this.$container.find('.history-request-response-error');
+            this.$btn_task_history_email = this.$container.find("input[name='task-history-email']");
+            this.$btn_task_history_email_content = this.$container.find("input[name='task-history-email-content']");
+            this.$table_task_history_email = this.$container.find('.task-history-email-table');
+            this.$table_email_content_history = this.$container.find('.content-history-email-table');
+            this.$email_content_table_inner = this.$container.find('.content-history-table-inner');
+            this.$email_messages_wrapper = this.$container.find('.email-messages-wrapper');
+            this.$btn_send.click(function() {
+                var body, confirmMessage, displayTarget, fullConfirmMessage, message,
+                    sendData, subject, successMessage, target, targets, validation, i, len;
+                subject = sendemail.$subject.val();
+                body = sendemail.$emailEditor.save().data;
+                targets = [];
+                sendemail.$send_to.filter(':checked').each(function() {
+                    return targets.push(this.value);
+                });
+                if (subject === '') {
+                    return alert(gettext('Your message must have a subject.'));  // eslint-disable-line no-alert
+                } else if (body === '') {
+                    return alert(gettext('Your message cannot be blank.'));  // eslint-disable-line no-alert
+                } else if (targets.length === 0) {
+                    return alert(gettext( // eslint-disable-line no-alert
+                        'Your message must have at least one target.'));
+                } else {
+                    validation = KeywordValidator().validate_string(body);
+                    if (!validation.isValid) {
+                        message = gettext(
+                            'There are invalid keywords in your email. Check the following keywords and try again.');
+                        message += '\n' + validation.invalidKeywords.join('\n');
+                        alert(message);  // eslint-disable-line no-alert
+                        return false;
+                    }
+                    displayTarget = function(value) {
+                        if (value === 'myself') {
+                            return gettext('Yourself');
+                        } else if (value === 'staff') {
+                            return gettext('Everyone who has staff privileges in this course');
+                        } else if (value === 'learners') {
+                            return gettext('All learners who are enrolled in this course');
+                        } else {
+                            return gettext('All learners in the {cohort_name} cohort')
+                                .replace('{cohort_name}', value.slice(value.indexOf(':') + 1));
+                        }
+                    };
+                    successMessage = gettext('Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.');  // eslint-disable-line max-len
+                    confirmMessage = gettext(
+                        'You are sending an email message with the subject {subject} to the following recipients.');
+                    for (i = 0, len = targets.length; i < len; i++) {
+                        target = targets[i];
+                        confirmMessage += '\n-' + displayTarget(target);
+                    }
+                    confirmMessage += '\n\n' + gettext('Is this OK?');
+                    fullConfirmMessage = confirmMessage.replace('{subject}', subject);
+                    if (confirm(fullConfirmMessage)) {  // eslint-disable-line no-alert
+                        sendData = {
+                            action: 'send',
+                            send_to: JSON.stringify(targets),
+                            subject: subject,
+                            message: body
+                        };
+                        return $.ajax({
+                            type: 'POST',
+                            dataType: 'json',
+                            url: sendemail.$btn_send.data('endpoint'),
+                            data: sendData,
+                            success: function() {
+                                return sendemail.display_response(successMessage);
+                            },
+                            error: statusAjaxError(function() {
+                                return sendemail.fail_with_error(gettext('Error sending email.'));
+                            })
+                        });
+                    } else {
+                        sendemail.task_response.empty();
+                        return sendemail.$request_response_error.empty();
+                    }
+                }
+            });
+            this.$btn_task_history_email.click(function() {
+                var url = sendemail.$btn_task_history_email.data('endpoint');
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    success: function(data) {
+                        if (data.tasks.length) {
+                            return createTaskListTable(sendemail.$table_task_history_email, data.tasks);
+                        } else {
+                            sendemail.$history_request_response_error.text(
+                                gettext('There is no email history for this course.')
+                            );
+                            return sendemail.$history_request_response_error.css({
+                                display: 'block'
+                            });
+                        }
+                    },
+                    error: statusAjaxError(function() {
+                        return sendemail.$history_request_response_error.text(
+                            gettext('There was an error obtaining email task history for this course.')
+                        );
+                    })
+                });
+            });
+            this.$btn_task_history_email_content.click(function() {
+                var url = sendemail.$btn_task_history_email_content.data('endpoint');
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    success: function(data) {
+                        if (data.emails.length) {
+                            createEmailContentTable(sendemail.$table_email_content_history,
+                                sendemail.$email_content_table_inner, data.emails
+                            );
+                            return createEmailMessageViews(sendemail.$email_messages_wrapper, data.emails);
+                        } else {
+                            sendemail.$content_request_response_error.text(
+                                gettext('There is no email history for this course.')
+                            );
+                            return sendemail.$content_request_response_error.css({
+                                display: 'block'
+                            });
+                        }
+                    },
+                    error: statusAjaxError(function() {
+                        return sendemail.$content_request_response_error.text(
+                            gettext('There was an error obtaining email content history for this course.')
+                        );
+                    })
+                });
+            });
+            this.$send_to.change(function() {
+                var targets;
+                if ($('input#target_learners:checked').length) {
+                    sendemail.$cohort_targets.each(function() {
+                        this.checked = false;
+                        this.disabled = true;
+                        return true;
+                    });
+                } else {
+                    sendemail.$cohort_targets.each(function() {
+                        this.disabled = false;
+                        return true;
+                    });
+                }
+                targets = [];
+                $('input[name="send_to"]:checked+label').each(function() {
+                    return targets.push(this.innerText.replace(/\s*\n.*/g, ''));
+                });
+                return $('.send_to_list').text(gettext('Send to:') + ' ' + targets.join(', '));
+            });
+        }
 
-                display_target = (value) ->
-                    if value == "myself"
-                        gettext("Yourself")
-                    else if value == "staff"
-                        gettext("Everyone who has staff privileges in this course")
-                    else if value == "learners"
-                        gettext("All learners who are enrolled in this course")
-                    else
-                        gettext("All learners in the {cohort_name} cohort").replace('{cohort_name}', value.slice(value.indexOf(':')+1))
-                success_message = gettext("Your email message was successfully queued for sending. In courses with a large number of learners, email messages to learners might take up to an hour to be sent.")
-                confirm_message = gettext("You are sending an email message with the subject {subject} to the following recipients.")
-                for target in targets
-                    confirm_message += "\n-" + display_target(target)
-                confirm_message += "\n\n" + gettext("Is this OK?")
-                full_confirm_message = confirm_message.replace('{subject}', subject)
+        SendEmail.prototype.fail_with_error = function(msg) {
+            this.$task_response.empty();
+            this.$request_response_error.empty();
+            this.$request_response_error.text(msg);
+            return $('.msg-confirm').css({
+                display: 'none'
+            });
+        };
 
-                if confirm full_confirm_message
+        SendEmail.prototype.display_response = function(dataFromServer) {
+            this.$task_response.empty();
+            this.$request_response_error.empty();
+            this.$task_response.text(dataFromServer);
+            return $('.msg-confirm').css({
+                display: 'block'
+            });
+        };
 
-                    send_data =
-                        action: 'send'
-                        send_to: JSON.stringify(targets)
-                        subject: subject
-                        message: body
+        return SendEmail;
+    }());
 
-                    $.ajax
-                        type: 'POST'
-                        dataType: 'json'
-                        url: @$btn_send.data 'endpoint'
-                        data: send_data
-                        success: (data) =>
-                            @display_response success_message
+    this.Email = (function() {
+        function email($section) {
+            var eml = this;
+            this.$section = $section;
+            this.$section.data('wrapper', this);
+            plantTimeout(0, function() {
+                return new SendEmail(eml.$section.find('.send-email'));
+            });
+            this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
+        }
 
-                        error: std_ajax_err =>
-                            @fail_with_error gettext('Error sending email.')
+        email.prototype.onClickTitle = function() {
+            return this.instructor_tasks.task_poller.start();
+        };
 
-                else
-                    @task_response.empty()
-                    @$request_response_error.empty()
+        email.prototype.onExit = function() {
+            return this.instructor_tasks.task_poller.stop();
+        };
 
-        # list task history for email
-        @$btn_task_history_email.click =>
-            url = @$btn_task_history_email.data 'endpoint'
-            $.ajax
-                type: 'POST'
-                dataType: 'json'
-                url: url
-                success: (data) =>
-                    if data.tasks.length
-                        create_task_list_table @$table_task_history_email, data.tasks
-                    else
-                        @$history_request_response_error.text gettext("There is no email history for this course.")
-                        # Enable the msg-warning css display
-                        @$history_request_response_error.css({"display":"block"})
-                error: std_ajax_err =>
-                    @$history_request_response_error.text gettext("There was an error obtaining email task history for this course.")
+        return email;
+    }());
 
-        # List content history for emails sent
-        @$btn_task_history_email_content.click =>
-            url = @$btn_task_history_email_content.data 'endpoint'
-            $.ajax
-                type: 'POST'
-                dataType: 'json'
-                url : url
-                success: (data) =>
-                    if data.emails.length
-                        create_email_content_table @$table_email_content_history, @$email_content_table_inner, data.emails
-                        create_email_message_views @$email_messages_wrapper, data.emails
-                    else
-                        @$content_request_response_error.text gettext("There is no email history for this course.")
-                        @$content_request_response_error.css({"display":"block"})
-                error: std_ajax_err =>
-                    @$content_request_response_error.text gettext("There was an error obtaining email content history for this course.")
+    _.defaults(window, {
+        InstructorDashboard: {}
+    });
 
-        @$send_to.change =>
-            # Ensure invalid combinations are disabled
-            if $('input#target_learners:checked').length
-                # If all is selected, cohorts can't be
-                @$cohort_targets.each ->
-                    this.checked = false
-                    this.disabled = true
-                    true
-            else
-                @$cohort_targets.each ->
-                    this.disabled = false
-                    true
+    _.defaults(window.InstructorDashboard, {
+        sections: {}
+    });
 
-            # Also, keep the sent_to_list div updated
-            targets = []
-            $('input[name="send_to"]:checked+label').each ->
-                # Only use the first line, even if a subheading is present
-                targets.push(this.innerText.replace(/\s*\n.*/g,''))
-            $(".send_to_list").text(gettext("Send to:") + " " + targets.join(", "))
-
-
-    fail_with_error: (msg) ->
-        console.warn msg
-        @$task_response.empty()
-        @$request_response_error.empty()
-        @$request_response_error.text msg
-        $(".msg-confirm").css({"display":"none"})
-
-    display_response: (data_from_server) ->
-        @$task_response.empty()
-        @$request_response_error.empty()
-        @$task_response.text(data_from_server)
-        $(".msg-confirm").css({"display":"block"})
-
-
-# Email Section
-class Email
-    # enable subsections.
-    constructor: (@$section) ->
-        # attach self to html so that instructor_dashboard.coffee can find
-        #  this object to call event handlers like 'onClickTitle'
-        @$section.data 'wrapper', @
-
-        # isolate # initialize SendEmail subsection
-        plantTimeout 0, => new SendEmail @$section.find '.send-email'
-
-        @instructor_tasks = new (PendingInstructorTasks()) @$section
-
-    # handler for when the section title is clicked.
-    onClickTitle: -> @instructor_tasks.task_poller.start()
-
-    # handler for when the section is closed
-    onExit: -> @instructor_tasks.task_poller.stop()
-
-
-# export for use
-# create parent namespaces if they do not already exist.
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-    Email: Email
+    _.defaults(window.InstructorDashboard.sections, {
+        Email: this.Email
+    });
+}).call(this);

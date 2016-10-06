@@ -1,92 +1,96 @@
-###
-E-Commerce Section
-###
+/* globals _ */
 
-# Load utilities
-PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
-ReportDownloads = -> window.InstructorDashboard.util.ReportDownloads
+(function() {
+    'use strict';
+    var ECommerce, PendingInstructorTasks, ReportDownloads;
 
-class ECommerce
-# E-Commerce Section
-  constructor: (@$section) ->
-    # attach self to html so that instructor_dashboard.coffee can find
-    #  this object to call event handlers like 'onClickTitle'
-    @$section.data 'wrapper', @
-    # gather elements
-    @$list_sale_csv_btn = @$section.find("input[name='list-sale-csv']")
-    @$list_order_sale_csv_btn = @$section.find("input[name='list-order-sale-csv']")
-    @$download_company_name = @$section.find("input[name='download_company_name']")
-    @$active_company_name = @$section.find("input[name='active_company_name']")
-    @$spent_company_name = @$section.find('input[name="spent_company_name"]')
-    @$download_coupon_codes = @$section.find('input[name="download-coupon-codes-csv"]')
-    
-    @$download_registration_codes_form = @$section.find("form#download_registration_codes")
-    @$active_registration_codes_form = @$section.find("form#active_registration_codes")
-    @$spent_registration_codes_form = @$section.find("form#spent_registration_codes")
+    PendingInstructorTasks = function() {
+        return window.InstructorDashboard.util.PendingInstructorTasks;
+    };
 
-    @$reports                         = @$section.find '.reports-download-container'
-    @$reports_request_response        = @$reports.find '.request-response'
-    @$reports_request_response_error  = @$reports.find '.request-response-error'
+    ReportDownloads = function() {
+        return window.InstructorDashboard.util.ReportDownloads;
+    };
 
-    @report_downloads = new (ReportDownloads()) @$section
-    @instructor_tasks = new (PendingInstructorTasks()) @$section
+    ECommerce = (function() {
+        function eCommerce($section) {
+            var eCom = this;
+            this.$section = $section;
+            this.$section.data('wrapper', this);
+            this.$list_sale_csv_btn = this.$section.find("input[name='list-sale-csv']");
+            this.$list_order_sale_csv_btn = this.$section.find("input[name='list-order-sale-csv']");
+            this.$download_company_name = this.$section.find("input[name='download_company_name']");
+            this.$active_company_name = this.$section.find("input[name='active_company_name']");
+            this.$spent_company_name = this.$section.find('input[name="spent_company_name"]');
+            this.$download_coupon_codes = this.$section.find('input[name="download-coupon-codes-csv"]');
+            this.$download_registration_codes_form = this.$section.find('form#download_registration_codes');
+            this.$active_registration_codes_form = this.$section.find('form#active_registration_codes');
+            this.$spent_registration_codes_form = this.$section.find('form#spent_registration_codes');
+            this.$reports = this.$section.find('.reports-download-container');
+            this.$reports_request_response = this.$reports.find('.request-response');
+            this.$reports_request_response_error = this.$reports.find('.request-response-error');
+            this.report_downloads = new (ReportDownloads())(this.$section);
+            this.instructor_tasks = new (PendingInstructorTasks())(this.$section);
+            this.$error_msg = this.$section.find('#error-msg');
+            this.$list_sale_csv_btn.click(function() {
+                location.href = eCom.$list_sale_csv_btn.data('endpoint') + '/csv';
+                return location.href;
+            });
+            this.$list_order_sale_csv_btn.click(function() {
+                location.href = eCom.$list_order_sale_csv_btn.data('endpoint');
+                return location.href;
+            });
+            this.$download_coupon_codes.click(function() {
+                location.href = eCom.$download_coupon_codes.data('endpoint');
+                return location.href;
+            });
+            this.$download_registration_codes_form.submit(function() {
+                eCom.$error_msg.attr('style', 'display: none');
+                return true;
+            });
+            this.$active_registration_codes_form.submit(function() {
+                eCom.$error_msg.attr('style', 'display: none');
+                return true;
+            });
+            this.$spent_registration_codes_form.submit(function() {
+                eCom.$error_msg.attr('style', 'display: none');
+                return true;
+            });
+        }
 
-    @$error_msg = @$section.find('#error-msg')
-    
-    # attach click handlers
-    # this handler binds to both the download
-    # and the csv button
-    @$list_sale_csv_btn.click (e) =>
-      url = @$list_sale_csv_btn.data 'endpoint'
-      url += '/csv'
-      location.href = url
+        eCommerce.prototype.onClickTitle = function() {
+            this.clear_display();
+            this.instructor_tasks.task_poller.start();
+            return this.report_downloads.downloads_poller.start();
+        };
 
-    @$list_order_sale_csv_btn.click (e) =>
-      url = @$list_order_sale_csv_btn.data 'endpoint'
-      location.href = url
+        eCommerce.prototype.onExit = function() {
+            this.clear_display();
+            this.instructor_tasks.task_poller.stop();
+            return this.report_downloads.downloads_poller.stop();
+        };
 
-    @$download_coupon_codes.click (e) =>
-      url = @$download_coupon_codes.data 'endpoint'
-      location.href = url
+        eCommerce.prototype.clear_display = function() {
+            this.$error_msg.attr('style', 'display: none');
+            this.$download_company_name.val('');
+            this.$reports_request_response.empty();
+            this.$reports_request_response_error.empty();
+            this.$active_company_name.val('');
+            return this.$spent_company_name.val('');
+        };
 
-    @$download_registration_codes_form.submit (e) =>
-      @$error_msg.attr('style', 'display: none')
-      return true
+        return eCommerce;
+    }());
 
-    @$active_registration_codes_form.submit (e) =>
-      @$error_msg.attr('style', 'display: none')
-      return true
+    _.defaults(window, {
+        InstructorDashboard: {}
+    });
 
-    @$spent_registration_codes_form.submit (e) =>
-      @$error_msg.attr('style', 'display: none')
-      return true
+    _.defaults(window.InstructorDashboard, {
+        sections: {}
+    });
 
-  # handler for when the section title is clicked.
-  onClickTitle: ->
-    @clear_display()
-    @instructor_tasks.task_poller.start()
-    @report_downloads.downloads_poller.start()
-
-  # handler for when the section is closed
-  onExit: ->
-    @clear_display()
-    @instructor_tasks.task_poller.stop()
-    @report_downloads.downloads_poller.stop()
-
-  clear_display: ->
-    @$error_msg.attr('style', 'display: none')
-    @$download_company_name.val('')
-    @$reports_request_response.empty()
-    @$reports_request_response_error.empty()
-    @$active_company_name.val('')
-    @$spent_company_name.val('')
-
-  isInt = (n) -> return n % 1 == 0;
-    # Clear any generated tables, warning messages, etc.
-
-# export for use
-# create parent namespaces if they do not already exist.
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-   ECommerce:  ECommerce
+    _.defaults(window.InstructorDashboard.sections, {
+        ECommerce: ECommerce
+    });
+}).call(this);

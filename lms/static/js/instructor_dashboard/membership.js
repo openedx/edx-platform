@@ -1,740 +1,976 @@
-###
+/* globals _, AutoEnrollmentViaCsv, NotificationModel, NotificationView */
+
+/*
 Membership Section
 
 imports from other modules.
 wrap in (-> ... apply) to defer evaluation
 such that the value can be defined later than this assignment (file load order).
-###
-
-plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
-std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
-emailStudents = false
+*/
 
 
-class MemberListWidget
-  # create a MemberListWidget `$container` is a jquery object to embody.
-  # `params` holds template parameters. `params` should look like the defaults below.
-  constructor: (@$container, params={}) ->
-    params = _.defaults params,
-      title: "Member List"
-      info: """
-        Use this list to manage members.
-      """
-      labels: ["field1", "field2", "field3"]
-      add_placeholder: "Enter name"
-      add_btn_label: "Add Member"
-      add_handler: (input) ->
+(function() {
+    'use strict';
+    var AuthListWidget, BatchEnrollment, BetaTesterBulkAddition,
+        MemberListWidget, Membership, emailStudents, plantTimeout, statusAjaxError;
 
-    template_html = $("#member-list-widget-template").html()
-    @$container.html Mustache.render template_html, params
+    plantTimeout = function() {
+        return window.InstructorDashboard.util.plantTimeout.apply(this, arguments);
+    };
 
-    # bind add button
-    @$('input[type="button"].add').click =>
-      params.add_handler? @$('.add-field').val()
+    statusAjaxError = function() {
+        return window.InstructorDashboard.util.statusAjaxError.apply(this, arguments);
+    };
 
-  # clear the input text field
-  clear_input: -> @$('.add-field').val ''
+    emailStudents = false;
 
-  # clear all table rows
-  clear_rows: -> @$('table tbody').empty()
+    MemberListWidget = (function() {
+        function memberListWidget($container, params) {
+            var templateHtml, condition,
+                memberListParams = params || {},
+                memberlistwidget = this;
+            this.$container = $container;
+            memberListParams = _.defaults(memberListParams, {
+                title: 'Member List',
+                info: 'Use this list to manage members.',
+                labels: ['field1', 'field2', 'field3'],
+                add_placeholder: 'Enter name',
+                add_btn_label: 'Add Member',
+                add_handler: function() {}
+            });
+            templateHtml = $('#member-list-widget-template').html();
+            edx.HtmlUtils.setHtml(
+                this.$container, window.Mustache.render(templateHtml, edx.HtmlUtils.HTML(memberListParams))
+            );
+            this.$('input[type="button"].add').click(function() {
+                condition = typeof memberListParams.add_handler === 'function';
+                return condition ? memberListParams.add_handler(memberlistwidget.$('.add-field').val()) : undefined;
+            });
+        }
 
-  # takes a table row as an array items are inserted as text, unless detected
-  # as a jquery objects in which case they are inserted directly. if an
-  # element is a jquery object
-  add_row: (row_array) ->
-    $tbody = @$('table tbody')
-    $tr = $ '<tr>'
-    for item in row_array
-      $td = $ '<td>'
-      if item instanceof jQuery
-        $td.append item
-      else
-        $td.text item
-      $tr.append $td
-    $tbody.append $tr
+        memberListWidget.prototype.clear_input = function() {
+            return this.$('.add-field').val('');
+        };
 
-  # local selector
-  $: (selector) ->
-    if @debug?
-      s = @$container.find selector
-      if s?.length != 1
-        console.warn "local selector '#{selector}' found (#{s.length}) results"
-      s
-    else
-      @$container.find selector
+        memberListWidget.prototype.clear_rows = function() {
+            return this.$('table tbody').empty();
+        };
 
+        memberListWidget.prototype.add_row = function(rowArray) {
+            var $tbody, $td, $tr, item, i, len;
+            $tbody = this.$('table tbody');
+            $tr = $('<tr>');
+            for (i = 0, len = rowArray.length; i < len; i++) {
+                item = rowArray[i];
+                $td = $('<td>');
+                if (item instanceof jQuery) {
+                    edx.HtmlUtils.append($td, item);
+                } else {
+                    $td.text(item);
+                }
+                $tr.append($td);
+            }
+            return $tbody.append($tr);
+        };
 
-class AuthListWidget extends MemberListWidget
-  constructor: ($container, @rolename, @$error_section) ->
-    super $container,
-      title: $container.data 'display-name'
-      info: $container.data 'info-text'
-      labels: [gettext("Username"), gettext("Email"), gettext("Revoke access")]
-      add_placeholder: gettext("Enter username or email")
-      add_btn_label: $container.data 'add-button-label'
-      add_handler: (input) => @add_handler input
+        memberListWidget.prototype.$ = function(selector) {
+            var s;
+            if (this.debug != null) {
+                s = this.$container.find(selector);
+                return s;
+            } else {
+                return this.$container.find(selector);
+            }
+        };
 
-    @debug = true
-    @list_endpoint = $container.data 'list-endpoint'
-    @modify_endpoint = $container.data 'modify-endpoint'
-    unless @rolename?
-      throw "AuthListWidget missing @rolename"
+        return memberListWidget;
+    }());
 
-    @reload_list()
+    AuthListWidget = (function() {
+        function authListWidget($container, rolename, $errorSection) {
+            var msg,
+                authlistwidget = this;
+            this.rolename = rolename;
+            this.$errorSection = $errorSection;
+            authListWidget.super.constructor.call(this, $container, {
+                title: $container.data('display-name'),
+                info: $container.data('info-text'),
+                labels: [gettext('Username'), gettext('Email'), gettext('Revoke access')],
+                add_placeholder: gettext('Enter username or email'),
+                add_btn_label: $container.data('add-button-label'),
+                add_handler: function(input) {
+                    return authlistwidget.add_handler(input);
+                }
+            });
+            this.debug = true;
+            this.list_endpoint = $container.data('list-endpoint');
+            this.modify_endpoint = $container.data('modify-endpoint');
+            if (this.rolename == null) {
+                msg = 'AuthListWidget missing @rolename';
+                throw msg;
+            }
+            this.reload_list();
+        }
 
-  # action to do when is reintroduced into user's view
-  re_view: ->
-    @clear_errors()
-    @clear_input()
-    @reload_list()
+        authListWidget.prototype.re_view = function() {
+            this.clear_errors();
+            this.clear_input();
+            return this.reload_list();
+        };
 
-  # handle clicks on the add button
-  add_handler: (input) ->
-    if input? and input isnt ''
-      @modify_member_access input, 'allow', (error) =>
-        # abort on error
-        return @show_errors error unless error is null
-        @clear_errors()
-        @clear_input()
-        @reload_list()
-    else
-      @show_errors gettext "Please enter a username or email."
+        authListWidget.prototype.add_handler = function(input) {
+            var authlistwidgetaddhandler = this;
+            if ((input != null) && input !== '') {
+                return this.modify_member_access(input, 'allow', function(error) {
+                    if (error !== null) {
+                        return authlistwidgetaddhandler.show_errors(error);
+                    }
+                    authlistwidgetaddhandler.clear_errors();
+                    authlistwidgetaddhandler.clear_input();
+                    return authlistwidgetaddhandler.reload_list();
+                });
+            } else {
+                return this.show_errors(gettext('Please enter a username or email.'));
+            }
+        };
 
-  # reload the list of members
-  reload_list: ->
-    # @clear_rows()
-    @get_member_list (error, member_list) =>
-      # abort on error
-      return @show_errors error unless error is null
+        authListWidget.prototype.reload_list = function() {
+            var authlistwidgetreloadlist = this;
+            return this.get_member_list(function(error, memberList) {
+                if (error !== null) {
+                    return authlistwidgetreloadlist.show_errors(error);
+                }
+                authlistwidgetreloadlist.clear_rows();
+                return _.each(memberList, function(member) {
+                    var $revokeBtn, labelTrans;
+                    labelTrans = gettext('Revoke access');
+                    $revokeBtn = $(_.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%- label %></div>')({  // eslint-disable-line max-len
+                        label: labelTrans
+                    }), {
+                        class: 'revoke'
+                    });
+                    $revokeBtn.click(function() {
+                        return authlistwidgetreloadlist.modify_member_access(member.email, 'revoke', function(err) {
+                            if (err !== null) {
+                                return authlistwidgetreloadlist.show_errors(err);
+                            }
+                            authlistwidgetreloadlist.clear_errors();
+                            return authlistwidgetreloadlist.reload_list();
+                        });
+                    });
+                    return authlistwidgetreloadlist.add_row([member.username, member.email, $revokeBtn]);
+                });
+            });
+        };
 
-      # only show the list of there are members
-      @clear_rows()
+        authListWidget.prototype.clear_errors = function() {
+            var ref, result;
+            result = (this.$error_section) != null ? ref.text('') : undefined;
+            return result;
+        };
 
-      # use _.each instead of 'for' so that member
-      # is bound in the button callback.
-      _.each member_list, (member) =>
-        # if there are members, show the list
+        authListWidget.prototype.show_errors = function(msg) {
+            var ref, result;
+            result = (this.$error_section) != null ? ref.text(msg) : undefined;
+            return result;
+        };
 
-        # create revoke button and insert it into the row
-        label_trans = gettext("Revoke access")
-        $revoke_btn = $ _.template('<div class="revoke"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <%- label %></div>')({label: label_trans}),
-          class: 'revoke'
-        $revoke_btn.click =>
-            @modify_member_access member.email, 'revoke', (error) =>
-              # abort on error
-              return @show_errors error unless error is null
-              @clear_errors()
-              @reload_list()
-        @add_row [member.username, member.email, $revoke_btn]
+        authListWidget.prototype.get_member_list = function(cb) {
+            var authlistwidgetgetmemberlist = this;
+            return $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: this.list_endpoint,
+                data: {
+                    rolename: this.rolename
+                },
+                success: function(data) {
+                    return typeof cb === 'function' ? cb(null, data[authlistwidgetgetmemberlist.rolename]) : undefined;
+                }
+            });
+        };
 
-  # clear error display
-  clear_errors: -> @$error_section?.text ''
+        authListWidget.prototype.modify_member_access = function(uniqueStudentIdentifier, action, cb) {
+            var authlistwidgetmemberaccess = this;
+            return $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: this.modify_endpoint,
+                data: {
+                    unique_student_identifier: uniqueStudentIdentifier,
+                    rolename: this.rolename,
+                    action: action
+                },
+                success: function(data) {
+                    return authlistwidgetmemberaccess.member_response(data);
+                },
+                error: statusAjaxError(function() {
+                    return typeof cb === 'function' ? cb(gettext("Error changing user's permissions.")) : undefined;
+                })
+            });
+        };
 
-  # set error display
-  show_errors: (msg) -> @$error_section?.text msg
+        authListWidget.prototype.member_response = function(data) {
+            var msg;
+            this.clear_errors();
+            this.clear_input();
+            if (data.userDoesNotExist) {
+                msg = gettext("Could not find a user with username or email address '<%- identifier %>'.");
+                return this.show_errors(_.template(msg, {
+                    identifier: data.unique_student_identifier
+                }));
+            } else if (data.inactiveUser) {
+                msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.");  // eslint-disable-line max-len
+                return this.show_errors(_.template(msg, {
+                    username: data.unique_student_identifier
+                }));
+            } else if (data.removingSelfAsInstructor) {
+                return this.show_errors(
+                    gettext('Error: You cannot remove yourself from the Instructor group!')
+                );
+            } else {
+                return this.reload_list();
+            }
+        };
 
-  # send ajax request to list members
-  # `cb` is called with cb(error, member_list)
-  get_member_list: (cb) ->
-    $.ajax
-      type: 'POST'
-      dataType: 'json'
-      url: @list_endpoint
-      data: rolename: @rolename
-      success: (data) => cb? null, data[@rolename]
-      error: std_ajax_err =>
-        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
-        cb? gettext("Error fetching list for role") + " '#{@rolename}'"
+        return authListWidget;
+    }(MemberListWidget));
 
-  # send ajax request to modify access
-  # (add or remove them from the list)
-  # `action` can be 'allow' or 'revoke'
-  # `cb` is called with cb(error, data)
-  modify_member_access: (unique_student_identifier, action, cb) ->
-    $.ajax
-      type: 'POST'
-      dataType: 'json'
-      url: @modify_endpoint
-      data:
-        unique_student_identifier: unique_student_identifier
-        rolename: @rolename
-        action: action
-      success: (data) => @member_response data
-      error: std_ajax_err => cb? gettext "Error changing user's permissions."
+    this.AutoEnrollmentViaCsv = (function() {
+        function AutoEnrollmentViaCsv($container) {
+            var autoenrollviacsv = this;
+            this.$container = $container;
+            this.$student_enrollment_form = this.$container.find('#student-auto-enroll-form');
+            this.$enrollment_signup_button = this.$container.find('#submitBtn-auto_enroll_csv');
+            this.$students_list_file = this.$container.find("input[name='students_list']");
+            this.$csrf_token = this.$container.find("input[name='csrfmiddlewaretoken']");
+            this.$results = this.$container.find('div.results');
+            this.$browse_button = this.$container.find('#browseBtn-auto-enroll');
+            this.$browse_file = this.$container.find('#browseFile');
+            this.processing = false;
+            this.$browse_button.on('change', function(event) {
+                if (event.currentTarget.files.length === 1) {
+                    return autoenrollviacsv.$browse_file.val(
+                        event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf('\\') + 1)
+                    );
+                }
+                return false;
+            });
+            this.$enrollment_signup_button.click(function() {
+                return autoenrollviacsv.$student_enrollment_form.submit(function(event) {
+                    var data;
+                    if (autoenrollviacsv.processing) {
+                        return false;
+                    }
+                    autoenrollviacsv.processing = true;
+                    event.preventDefault();
+                    data = new FormData(event.currentTarget);
+                    $.ajax({
+                        dataType: 'json',
+                        type: 'POST',
+                        url: event.currentTarget.action,
+                        data: data,
+                        processData: false,
+                        contentType: false,
+                        success: function(responsedata) {
+                            autoenrollviacsv.processing = false;
+                            return autoenrollviacsv.display_response(responsedata);
+                        }
+                    });
+                    return false;
+                });
+            });
+        }
 
-  member_response: (data) ->
-    @clear_errors()
-    @clear_input()
-    if data.userDoesNotExist
-      msg = gettext("Could not find a user with username or email address '<%- identifier %>'.")
-      @show_errors _.template(msg, {identifier: data.unique_student_identifier})
-    else if data.inactiveUser
-      msg = gettext("Error: User '<%- username %>' has not yet activated their account. Users must create and activate their accounts before they can be assigned a role.")
-      @show_errors _.template(msg, {username: data.unique_student_identifier})
-    else if data.removingSelfAsInstructor
-      @show_errors gettext "Error: You cannot remove yourself from the Instructor group!"
-    else
-      @reload_list()
+        AutoEnrollmentViaCsv.prototype.display_response = function(dataFromServer) {
+            var error, errors, generalError, renderResponse,
+                resultFromServerIsSuccess, warning, warnings,
+                i, j, k, len, len1, len2, ref, ref1, ref2,
+                displayResponse = this;
+            this.$results.empty();
+            errors = [];
+            warnings = [];
+            resultFromServerIsSuccess = true;
+            if (dataFromServer.general_errors.length) {
+                resultFromServerIsSuccess = false;
+                ref = dataFromServer.general_errors;
+                for (i = 0, len = ref.length; i < len; i++) {
+                    generalError = ref[i];
+                    generalError.is_general_error = true;
+                    errors.push(generalError);
+                }
+            }
+            if (dataFromServer.row_errors.length) {
+                resultFromServerIsSuccess = false;
+                ref1 = dataFromServer.row_errors;
+                for (j = 0, len1 = ref1.length; j < len1; j++) {
+                    error = ref1[j];
+                    error.is_general_error = false;
+                    errors.push(error);
+                }
+            }
+            if (dataFromServer.warnings.length) {
+                resultFromServerIsSuccess = false;
+                ref2 = dataFromServer.warnings;
+                for (k = 0, len2 = ref2.length; k < len2; k++) {
+                    warning = ref2[k];
+                    warning.is_general_error = false;
+                    warnings.push(warning);
+                }
+            }
+            renderResponse = function(title, message, type, studentResults) {
+                var details, responseMessage, studentResult, l, len3;
+                details = [];
+                for (l = 0, len3 = studentResults.length; l < len3; l++) {
+                    studentResult = studentResults[l];
+                    if (studentResult.is_general_error) {
+                        details.push(studentResult.response);
+                    } else {
+                        responseMessage = studentResult.username + '  (' + studentResult.email + '):  ' + '   (' + studentResult.response + ')';   // eslint-disable-line max-len, no-useless-concat
+                        details.push(responseMessage);
+                    }
+                }
+                return edx.HtmlUtils.append(displayResponse.$results,
+                    edx.HtmlUtils.HTML(displayResponse.render_notification_view(type, title, message, details))
+                );
+            };
+            if (errors.length) {
+                renderResponse(gettext('Errors'),
+                    gettext('The following errors were generated:'), 'error', errors
+                );
+            }
+            if (warnings.length) {
+                renderResponse(gettext('Warnings'),
+                    gettext('The following warnings were generated:'), 'warning', warnings
+                );
+            }
+            if (resultFromServerIsSuccess) {
+                return renderResponse(gettext('Success'),
+                    gettext('All accounts were created successfully.'), 'confirmation', []
+                );
+            }
+            return renderResponse();
+        };
 
-class @AutoEnrollmentViaCsv
-  constructor: (@$container) ->
-    # Wrapper for the AutoEnrollmentViaCsv subsection.
-    # This object handles buttons, success and failure reporting,
-    # and server communication.
-    @$student_enrollment_form = @$container.find("#student-auto-enroll-form")
-    @$enrollment_signup_button = @$container.find("#submitBtn-auto_enroll_csv")
-    @$students_list_file = @$container.find("input[name='students_list']")
-    @$csrf_token = @$container.find("input[name='csrfmiddlewaretoken']")
-    @$results = @$container.find("div.results")
-    @$browse_button = @$container.find("#browseBtn-auto-enroll")
-    @$browse_file = @$container.find("#browseFile")
+        AutoEnrollmentViaCsv.prototype.render_notification_view = function(type, title, message, details) {
+            var notificationModel, view;
+            notificationModel = new NotificationModel();
+            notificationModel.set({
+                type: type,
+                title: title,
+                message: message,
+                details: details
+            });
+            view = new NotificationView({
+                model: notificationModel
+            });
+            view.render();
+            return view.$el.html();
+        };
 
-    @processing = false
+        return AutoEnrollmentViaCsv;
+    }());
 
-    @$browse_button.on "change", (event) =>
-      if event.currentTarget.files.length == 1
-        @$browse_file.val(event.currentTarget.value.substring(event.currentTarget.value.lastIndexOf("\\") + 1))
+    BetaTesterBulkAddition = (function() {
+        function betaTesterBulkAddition($container) {
+            var betatest = this;
+            this.$container = $container;
+            this.$identifier_input = this.$container.find("textarea[name='student-ids-for-beta']");
+            this.$btn_beta_testers = this.$container.find("input[name='beta-testers']");
+            this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
+            this.$checkbox_emailstudents = this.$container.find("input[name='email-students-beta']");
+            this.$task_response = this.$container.find('.request-response');
+            this.$request_response_error = this.$container.find('.request-response-error');
+            this.$btn_beta_testers.click(function(event) {
+                var autoEnroll, sendData;
+                emailStudents = betatest.$checkbox_emailstudents.is(':checked');
+                autoEnroll = betatest.$checkbox_autoenroll.is(':checked');
+                sendData = {
+                    action: $(event.target).data('action'),
+                    identifiers: betatest.$identifier_input.val(),
+                    email_students: emailStudents,
+                    auto_enroll: autoEnroll
+                };
+                return $.ajax({
+                    dataType: 'json',
+                    type: 'POST',
+                    url: betatest.$btn_beta_testers.data('endpoint'),
+                    data: sendData,
+                    success: function(data) {
+                        return betatest.display_response(data);
+                    },
+                    error: statusAjaxError(function() {
+                        return betatest.fail_with_error(gettext('Error adding/removing users as beta testers.'));
+                    })
+                });
+            });
+        }
 
-    # attach click handler for @$enrollment_signup_button
-    @$enrollment_signup_button.click =>
-      @$student_enrollment_form.submit (event) =>
-        if @processing
-          return false
+        betaTesterBulkAddition.prototype.clear_input = function() {
+            this.$identifier_input.val('');
+            this.$checkbox_emailstudents.attr('checked', true);
+            return this.$checkbox_autoenroll.attr('checked', true);
+        };
 
-        @processing = true
+        betaTesterBulkAddition.prototype.fail_with_error = function(msg) {
+            this.clear_input();
+            this.$task_response.empty();
+            this.$request_response_error.empty();
+            return this.$request_response_error.text(msg);
+        };
 
-        event.preventDefault()
-        data = new FormData(event.currentTarget)
-        $.ajax
-            dataType: 'json'
-            type: 'POST'
-            url: event.currentTarget.action
-            data: data
-            processData: false
-            contentType: false
-            success: (data) =>
-              @processing = false
-              @display_response data
+        betaTesterBulkAddition.prototype.display_response = function(dataFromServer) {
+            var errors, noUsers, renderList, sr, studentResults, successes, i, len, ref,
+                displayResponse = this;
+            this.clear_input();
+            this.$task_response.empty();
+            this.$request_response_error.empty();
+            errors = [];
+            successes = [];
+            noUsers = [];
+            ref = dataFromServer.results;
+            for (i = 0, len = ref.length; i < len; i++) {
+                studentResults = ref[i];
+                if (studentResults.userDoesNotExist) {
+                    noUsers.push(studentResults);
+                } else if (studentResults.error) {
+                    errors.push(studentResults);
+                } else {
+                    successes.push(studentResults);
+                }
+            }
+            renderList = function(label, ids) {
+                var identifier, $idsList, $taskResSection, j, len1;
+                $taskResSection = $('<div/>', {
+                    class: 'request-res-section'
+                });
+                $taskResSection.append($('<h3/>', {
+                    text: label
+                }));
+                $idsList = $('<ul/>');
+                $taskResSection.append($idsList);
+                for (j = 0, len1 = ids.length; j < len1; j++) {
+                    identifier = ids[j];
+                    $idsList.append($('<li/>', {
+                        text: identifier
+                    }));
+                }
+                return displayResponse.$task_response.append($taskResSection);
+            };
+            if (successes.length && dataFromServer.action === 'add') {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('These users were successfully added as beta testers:'), (function() {
+                    var j, len1, results;
+                    results = [];
+                    for (j = 0, len1 = successes.length; j < len1; j++) {
+                        sr = successes[j];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (successes.length && dataFromServer.action === 'remove') {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('These users were successfully removed as beta testers:'), (function() {
+                    var j, len1, results;
+                    results = [];
+                    for (j = 0, len1 = successes.length; j < len1; j++) {
+                        sr = successes[j];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (errors.length && dataFromServer.action === 'add') {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('These users were not added as beta testers:'), (function() {
+                    var j, len1, results;
+                    results = [];
+                    for (j = 0, len1 = errors.length; j < len1; j++) {
+                        sr = errors[j];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (errors.length && dataFromServer.action === 'remove') {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('These users were not removed as beta testers:'), (function() {
+                    var j, len1, results;
+                    results = [];
+                    for (j = 0, len1 = errors.length; j < len1; j++) {
+                        sr = errors[j];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (noUsers.length) {
+                noUsers.push($(
+                    gettext('Users must create and activate their account before they can be promoted to beta tester.'))
+                );
+                return renderList(gettext('Could not find users associated with the following identifiers:'), (function() { // eslint-disable-line max-len
+                    var j, len1, results;
+                    results = [];
+                    for (j = 0, len1 = noUsers.length; j < len1; j++) {
+                        sr = noUsers[j];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            return renderList();
+        };
 
-        return false
+        return betaTesterBulkAddition;
+    }());
 
-  display_response: (data_from_server) ->
-    @$results.empty()
-    errors = []
-    warnings = []
-    result_from_server_is_success = true
+    BatchEnrollment = (function() {
+        function batchEnrollment($container) {
+            var batchEnroll = this;
+            this.$container = $container;
+            this.$identifier_input = this.$container.find("textarea[name='student-ids']");
+            this.$enrollment_button = this.$container.find('.enrollment-button');
+            this.$is_course_white_label = this.$container.find('#is_course_white_label').val();
+            this.$reason_field = this.$container.find("textarea[name='reason-field']");
+            this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
+            this.$checkbox_emailstudents = this.$container.find("input[name='email-students']");
+            this.$task_response = this.$container.find('.request-response');
+            this.$request_response_error = this.$container.find('.request-response-error');
+            this.$enrollment_button.click(function(event) {
+                var sendData;
+                if (batchEnroll.$is_course_white_label === 'True') {
+                    if (!batchEnroll.$reason_field.val()) {
+                        batchEnroll.fail_with_error(gettext('Reason field should not be left blank.'));
+                        return false;
+                    }
+                }
+                emailStudents = batchEnroll.$checkbox_emailstudents.is(':checked');
+                sendData = {
+                    action: $(event.target).data('action'),
+                    identifiers: batchEnroll.$identifier_input.val(),
+                    auto_enroll: batchEnroll.$checkbox_autoenroll.is(':checked'),
+                    email_students: emailStudents,
+                    reason: batchEnroll.$reason_field.val()
+                };
+                return $.ajax({
+                    dataType: 'json',
+                    type: 'POST',
+                    url: $(event.target).data('endpoint'),
+                    data: sendData,
+                    success: function(data) {
+                        return batchEnroll.display_response(data);
+                    },
+                    error: statusAjaxError(function() {
+                        return batchEnroll.fail_with_error(gettext('Error enrolling/unenrolling users.'));
+                    })
+                });
+            });
+        }
 
-    if data_from_server.general_errors.length
-      result_from_server_is_success = false
-      for general_error in data_from_server.general_errors
-        general_error['is_general_error'] = true
-        errors.push general_error
+        batchEnrollment.prototype.clear_input = function() {
+            this.$identifier_input.val('');
+            this.$reason_field.val('');
+            this.$checkbox_emailstudents.attr('checked', true);
+            return this.$checkbox_autoenroll.attr('checked', true);
+        };
 
-    if data_from_server.row_errors.length
-      result_from_server_is_success = false
-      for error in data_from_server.row_errors
-        error['is_general_error'] = false
-        errors.push error
+        batchEnrollment.prototype.fail_with_error = function(msg) {
+            this.clear_input();
+            this.$task_response.empty();
+            this.$request_response_error.empty();
+            return this.$request_response_error.text(msg);
+        };
 
-    if data_from_server.warnings.length
-      result_from_server_is_success = false
-      for warning in data_from_server.warnings
-        warning['is_general_error'] = false
-        warnings.push warning
+        batchEnrollment.prototype.display_response = function(dataFromServer) {
+            var allowed, autoenrolled, enrolled, errors, errorsLabel,
+                invalidIdentifier, notenrolled, notunenrolled, renderList, sr, studentResults,
+                i, j, len, len1, ref, renderIdsLists,
+                displayResponse = this;
+            this.clear_input();
+            this.$task_response.empty();
+            this.$request_response_error.empty();
+            invalidIdentifier = [];
+            errors = [];
+            enrolled = [];
+            allowed = [];
+            autoenrolled = [];
+            notenrolled = [];
+            notunenrolled = [];
+            ref = dataFromServer.results;
+            for (i = 0, len = ref.length; i < len; i++) {
+                studentResults = ref[i];
+                if (studentResults.invalidIdentifier) {
+                    invalidIdentifier.push(studentResults);
+                } else if (studentResults.error) {
+                    errors.push(studentResults);
+                } else if (studentResults.after.enrollment) {
+                    enrolled.push(studentResults);
+                } else if (studentResults.after.allowed) {
+                    if (studentResults.after.auto_enroll) {
+                        autoenrolled.push(studentResults);
+                    } else {
+                        allowed.push(studentResults);
+                    }
+                } else if (dataFromServer.action === 'unenroll' &&
+                      !studentResults.before.enrollment &&
+                      !studentResults.before.allowed) {
+                    notunenrolled.push(studentResults);
+                } else if (!studentResults.after.enrollment) {
+                    notenrolled.push(studentResults);
+                } else {
+                    console.warn('student results not reported to user');  // eslint-disable-line no-console
+                }
+            }
+            renderList = function(label, ids) {
+                var identifier, $idsList, $taskResSection, h, len3;
+                $taskResSection = $('<div/>', {
+                    class: 'request-res-section'
+                });
+                $taskResSection.append($('<h3/>', {
+                    text: label
+                }));
+                $idsList = $('<ul/>');
+                $taskResSection.append($idsList);
+                for (h = 0, len3 = ids.length; h < len3; h++) {
+                    identifier = ids[h];
+                    $idsList.append($('<li/>', {
+                        text: identifier
+                    }));
+                }
+                return displayResponse.$task_response.append($taskResSection);
+            };
+            if (invalidIdentifier.length) {
+                renderList(gettext('The following email addresses and/or usernames are invalid:'), (function() {
+                    var m, len4, results;
+                    results = [];
+                    for (m = 0, len4 = invalidIdentifier.length; m < len4; m++) {
+                        sr = invalidIdentifier[m];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (errors.length) {
+                errorsLabel = (function() {
+                    if (dataFromServer.action === 'enroll') {
+                        return 'There was an error enrolling:';
+                    } else if (dataFromServer.action === 'unenroll') {
+                        return 'There was an error unenrolling:';
+                    } else {
+                        console.warn("unknown action from server '" + dataFromServer.action + "'");  // eslint-disable-line no-console, max-len
+                        return 'There was an error processing:';
+                    }
+                }());
+                renderIdsLists = function(errs) {
+                    var srItem,
+                        k = 0,
+                        results = [];
+                    for (k = 0, len = errs.length; k < len; k++) {
+                        srItem = errs[k];
+                        results.push(srItem.identifier);
+                    }
+                    return results;
+                };
+                for (j = 0, len1 = errors.length; j < len1; j++) {
+                    studentResults = errors[j];
+                    renderList(errorsLabel, renderIdsLists(errors));
+                }
+            }
+            if (enrolled.length && emailStudents) {
+                renderList(gettext('Successfully enrolled and sent email to the following users:'), (function() {
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = enrolled.length; k < len2; k++) {
+                        sr = enrolled[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (enrolled.length && !emailStudents) {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('Successfully enrolled the following users:'), (function() {
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = enrolled.length; k < len2; k++) {
+                        sr = enrolled[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (allowed.length && emailStudents) {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:'), (function() {  // eslint-disable-line max-len
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = allowed.length; k < len2; k++) {
+                        sr = allowed[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (allowed.length && !emailStudents) {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('These users will be allowed to enroll once they register:'), (function() {
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = allowed.length; k < len2; k++) {
+                        sr = allowed[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (autoenrolled.length && emailStudents) {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('Successfully sent enrollment emails to the following users. They will be enrolled once they register:'), (function() {  // eslint-disable-line max-len
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = autoenrolled.length; k < len2; k++) {
+                        sr = autoenrolled[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (autoenrolled.length && !emailStudents) {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('These users will be enrolled once they register:'), (function() {
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = autoenrolled.length; k < len2; k++) {
+                        sr = autoenrolled[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (notenrolled.length && emailStudents) {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('Emails successfully sent. The following users are no longer enrolled in the course:'), (function() {  // eslint-disable-line max-len
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = notenrolled.length; k < len2; k++) {
+                        sr = notenrolled[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (notenrolled.length && !emailStudents) {
+                // Translators: A list of users appears after this sentence;
+                renderList(gettext('The following users are no longer enrolled in the course:'), (function() {
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = notenrolled.length; k < len2; k++) {
+                        sr = notenrolled[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            if (notunenrolled.length) {
+                return renderList(gettext('These users were not affiliated with the course so could not be unenrolled:'), (function() {  // eslint-disable-line max-len
+                    var k, len2, results;
+                    results = [];
+                    for (k = 0, len2 = notunenrolled.length; k < len2; k++) {
+                        sr = notunenrolled[k];
+                        results.push(sr.identifier);
+                    }
+                    return results;
+                }()));
+            }
+            return renderList();
+        };
 
-    render_response = (title, message, type, student_results) =>
-      details = []
-      for student_result in student_results
-        if student_result.is_general_error
-          details.push student_result.response
-        else
-          response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ')'
-          details.push response_message
+        return batchEnrollment;
+    }());
 
-      @$results.append @render_notification_view type, title, message, details
+    this.AuthList = (function() {
+        function authList($container, rolename) {
+            var authlist = this;
+            this.$container = $container;
+            this.rolename = rolename;
+            this.$display_table = this.$container.find('.auth-list-table');
+            this.$request_response_error = this.$container.find('.request-response-error');
+            this.$add_section = this.$container.find('.auth-list-add');
+            this.$allow_field = this.$add_section.find("input[name='email']");
+            this.$allow_button = this.$add_section.find("input[name='allow']");
+            this.$allow_button.click(function() {
+                authlist.access_change(authlist.$allow_field.val(), 'allow', function() {
+                    return authlist.reload_auth_list();
+                });
+                return authlist.$allow_field.val('');
+            });
+            this.reload_auth_list();
+        }
 
-    if errors.length
-      render_response gettext('Errors'), gettext("The following errors were generated:"), 'error', errors
-    if warnings.length
-      render_response gettext('Warnings'), gettext("The following warnings were generated:"), 'warning', warnings
-    if result_from_server_is_success
-      render_response gettext('Success'), gettext("All accounts were created successfully."), 'confirmation', []
+        authList.prototype.reload_auth_list = function() {
+            var loadAuthList,
+                ths = this;
+            loadAuthList = function(data) {
+                var $tablePlaceholder, WHICH_CELL_IS_REVOKE, columns, grid, options, tableData;
+                ths.$request_response_error.empty();
+                ths.$display_table.empty();
+                options = {
+                    enableCellNavigation: true,
+                    enableColumnReorder: false,
+                    forceFitColumns: true
+                };
+                WHICH_CELL_IS_REVOKE = 3;
+                columns = [
+                    {
+                        id: 'username',
+                        field: 'username',
+                        name: 'Username'
+                    }, {
+                        id: 'email',
+                        field: 'email',
+                        name: 'Email'
+                    }, {
+                        id: 'first_name',
+                        field: 'first_name',
+                        name: 'First Name'
+                    }, {
+                        id: 'revoke',
+                        field: 'revoke',
+                        name: 'Revoke',
+                        formatter: function() {
+                            return "<span class='revoke-link'>Revoke Access</span>";
+                        }
+                    }
+                ];
+                tableData = data[ths.rolename];
+                $tablePlaceholder = $('<div/>', {
+                    class: 'slickgrid'
+                });
+                ths.$display_table.append($tablePlaceholder);
+                grid = new window.Slick.Grid($tablePlaceholder, tableData, columns, options);
+                return grid.onClick.subscribe(function(e, args) {
+                    var item;
+                    item = args.grid.getDataItem(args.row);
+                    if (args.cell === WHICH_CELL_IS_REVOKE) {
+                        return ths.access_change(item.email, 'revoke', function() {
+                            return ths.reload_auth_list();
+                        });
+                    }
+                    return false;
+                });
+            };
+            return $.ajax({
+                dataType: 'json',
+                type: 'POST',
+                url: this.$display_table.data('endpoint'),
+                data: {
+                    rolename: this.rolename
+                },
+                success: loadAuthList,
+                error: statusAjaxError(function() {
+                    return ths.$request_response_error.text("Error fetching list for '" + ths.rolename + "'");
+                })
+            });
+        };
 
-  render_notification_view: (type, title, message, details) ->
-    notification_model = new NotificationModel()
-    notification_model.set({
-          'type': type,
-          'title': title,
-          'message': message,
-          'details': details,
+        authList.prototype.refresh = function() {
+            this.$display_table.empty();
+            return this.reload_auth_list();
+        };
+
+        authList.prototype.access_change = function(email, action, cb) {
+            var ths = this;
+            return $.ajax({
+                dataType: 'json',
+                type: 'POST',
+                url: this.$add_section.data('endpoint'),
+                data: {
+                    email: email,
+                    rolename: this.rolename,
+                    action: action
+                },
+                success: function(data) {
+                    return typeof cb === 'function' ? cb(data) : undefined;
+                },
+                error: statusAjaxError(function() {
+                    return ths.$request_response_error.text(gettext("Error changing user's permissions."));
+                })
+            });
+        };
+
+        return authList;
+    }());
+
+    Membership = (function() {
+        function membership($section) {
+            var authList, i, len, ref,
+                thismembership = this;
+            this.$section = $section;
+            this.$section.data('wrapper', this);
+            plantTimeout(0, function() {
+                return new BatchEnrollment(thismembership.$section.find('.batch-enrollment'));
+            });
+            plantTimeout(0, function() {
+                return new AutoEnrollmentViaCsv(thismembership.$section.find('.auto_enroll_csv'));
+            });
+            plantTimeout(0, function() {
+                return new BetaTesterBulkAddition(thismembership.$section.find('.batch-beta-testers'));
+            });
+            this.$list_selector = this.$section.find('select#member-lists-selector');
+            this.$auth_list_containers = this.$section.find('.auth-list-container');
+            this.$auth_list_errors = this.$section.find('.member-lists-management .request-response-error');
+            this.auth_lists = _.map(this.$auth_list_containers, function(authListContainer) {
+                var rolename;
+                rolename = $(authListContainer).data('rolename');
+                return new AuthListWidget($(authListContainer), rolename, thismembership.$auth_list_errors);
+            });
+            this.$list_selector.empty();
+            ref = this.auth_lists;
+            for (i = 0, len = ref.length; i < len; i++) {
+                authList = ref[i];
+                this.$list_selector.append($('<option/>', {
+                    text: authList.$container.data('display-name'),
+                    data: {
+                        auth_list: authList
+                    }
+                }));
+            }
+            if (this.auth_lists.length === 0) {
+                this.$list_selector.hide();
+            }
+            this.$list_selector.change(function() {
+                var $opt, j, len1, ref1;
+                $opt = thismembership.$list_selector.children('option:selected');
+                if (!($opt.length > 0)) {
+                    return;
+                }
+                ref1 = thismembership.auth_lists;
+                for (j = 0, len1 = ref1.length; j < len1; j++) {
+                    authList = ref1[j];
+                    authList.$container.removeClass('active');
+                }
+                authList = $opt.data('auth_list');
+                authList.$container.addClass('active');
+                authList.re_view();
+            });
+            this.$list_selector.change();
+        }
+
+        membership.prototype.onClickTitle = function() {};
+
+        return membership;
+    }());
+
+    _.defaults(window, {
+        InstructorDashboard: {}
     });
-    view = new NotificationView(model:notification_model);
-    view.render()
-    return view.$el.html()
 
-class BetaTesterBulkAddition
-  constructor: (@$container) ->
-    # gather elements
-    @$identifier_input       = @$container.find("textarea[name='student-ids-for-beta']")
-    @$btn_beta_testers       = @$container.find("input[name='beta-testers']")
-    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
-    @$checkbox_emailstudents = @$container.find("input[name='email-students-beta']")
-    @$task_response          = @$container.find(".request-response")
-    @$request_response_error = @$container.find(".request-response-error")
-
-    # click handlers
-    @$btn_beta_testers.click (event) =>
-      emailStudents = @$checkbox_emailstudents.is(':checked')
-      autoEnroll = @$checkbox_autoenroll.is(':checked')
-      send_data =
-        action: $(event.target).data('action')  # 'add' or 'remove'
-        identifiers: @$identifier_input.val()
-        email_students: emailStudents
-        auto_enroll: autoEnroll
-
-      $.ajax
-        dataType: 'json'
-        type: 'POST'
-        url: @$btn_beta_testers.data 'endpoint'
-        data: send_data
-        success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error gettext "Error adding/removing users as beta testers."
-
-  # clear the input text field
-  clear_input: ->
-    @$identifier_input.val ''
-    # default for the checkboxes should be checked
-    @$checkbox_emailstudents.attr('checked', true)
-    @$checkbox_autoenroll.attr('checked', true)
-
-  fail_with_error: (msg) ->
-    console.warn msg
-    @clear_input()
-    @$task_response.empty()
-    @$request_response_error.empty()
-    @$request_response_error.text msg
-
-  display_response: (data_from_server) ->
-    @clear_input()
-    @$task_response.empty()
-    @$request_response_error.empty()
-    errors = []
-    successes = []
-    no_users = []
-    for student_results in data_from_server.results
-      if student_results.userDoesNotExist
-        no_users.push student_results
-      else if student_results.error
-        errors.push student_results
-      else
-        successes.push student_results
-
-    render_list = (label, ids) =>
-      task_res_section = $ '<div/>', class: 'request-res-section'
-      task_res_section.append $ '<h3/>', text: label
-      ids_list = $ '<ul/>'
-      task_res_section.append ids_list
-
-      for identifier in ids
-        ids_list.append $ '<li/>', text: identifier
-
-      @$task_response.append task_res_section
-
-    if successes.length and data_from_server.action is 'add'
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were successfully added as beta testers:"), (sr.identifier for sr in successes)
-
-    if successes.length and data_from_server.action is 'remove'
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were successfully removed as beta testers:"), (sr.identifier for sr in successes)
-
-    if errors.length and data_from_server.action is 'add'
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were not added as beta testers:"), (sr.identifier for sr in errors)
-
-    if errors.length and data_from_server.action is 'remove'
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were not removed as beta testers:"), (sr.identifier for sr in errors)
-
-    if no_users.length
-      no_users.push $ gettext("Users must create and activate their account before they can be promoted to beta tester.")
-      `// Translators: A list of identifiers (which are email addresses and/or usernames) appears after this sentence`
-      render_list gettext("Could not find users associated with the following identifiers:"), (sr.identifier for sr in no_users)
-
-# Wrapper for the batch enrollment subsection.
-# This object handles buttons, success and failure reporting,
-# and server communication.
-class BatchEnrollment
-  constructor: (@$container) ->
-    # gather elements
-    @$identifier_input       = @$container.find("textarea[name='student-ids']")
-    @$enrollment_button      = @$container.find(".enrollment-button")
-    @$is_course_white_label  = @$container.find("#is_course_white_label").val()
-    @$reason_field           = @$container.find("textarea[name='reason-field']")
-    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
-    @$checkbox_emailstudents = @$container.find("input[name='email-students']")
-    @$task_response          = @$container.find(".request-response")
-    @$request_response_error = @$container.find(".request-response-error")
-
-    # attach click handler for enrollment buttons
-    @$enrollment_button.click (event) =>
-      if @$is_course_white_label == 'True'
-        if not @$reason_field.val()
-          @fail_with_error gettext "Reason field should not be left blank."
-          return false
-
-      emailStudents = @$checkbox_emailstudents.is(':checked')
-      send_data =
-        action: $(event.target).data('action') # 'enroll' or 'unenroll'
-        identifiers: @$identifier_input.val()
-        auto_enroll: @$checkbox_autoenroll.is(':checked')
-        email_students: emailStudents
-        reason: @$reason_field.val()
-
-      $.ajax
-        dataType: 'json'
-        type: 'POST'
-        url: $(event.target).data 'endpoint'
-        data: send_data
-        success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error gettext "Error enrolling/unenrolling users."
-
-
-  # clear the input text field
-  clear_input: ->
-    @$identifier_input.val ''
-    @$reason_field.val ''
-    # default for the checkboxes should be checked
-    @$checkbox_emailstudents.attr('checked', true)
-    @$checkbox_autoenroll.attr('checked', true)
-
-  fail_with_error: (msg) ->
-    console.warn msg
-    @clear_input()
-    @$task_response.empty()
-    @$request_response_error.empty()
-    @$request_response_error.text msg
-
-  display_response: (data_from_server) ->
-    @clear_input()
-    @$task_response.empty()
-    @$request_response_error.empty()
-
-    # these results arrays contain student_results
-    # only populated arrays will be rendered
-    #
-    # invalid identifiers
-    invalid_identifier = []
-    # students for which there was an error during the action
-    errors = []
-    # students who are now enrolled in the course
-    enrolled = []
-    # students who are now allowed to enroll in the course
-    allowed = []
-    # students who will be autoenrolled on registration
-    autoenrolled = []
-    # students who are now not enrolled in the course
-    notenrolled = []
-    # students who were not enrolled or allowed prior to unenroll action
-    notunenrolled = []
-
-    # categorize student results into the above arrays.
-    for student_results in data_from_server.results
-      # for a successful action.
-      # student_results is of the form {
-      #   "identifier": "jd405@edx.org",
-      #   "before": {
-      #     "enrollment": true,
-      #     "auto_enroll": false,
-      #     "user": true,
-      #     "allowed": false
-      #   }
-      #   "after": {
-      #     "enrollment": true,
-      #     "auto_enroll": false,
-      #     "user": true,
-      #     "allowed": false
-      #   },
-      # }
-      #
-      # for an action error.
-      # student_results is of the form {
-      #   'identifier': identifier,
-      #   # then one of:
-      #   'error': True,
-      #   'invalidIdentifier': True  # if identifier can't find a valid User object and doesn't pass validate_email
-      # }
-
-      if student_results.invalidIdentifier
-        invalid_identifier.push student_results
-
-      else if student_results.error
-        errors.push student_results
-
-      else if student_results.after.enrollment
-        enrolled.push student_results
-
-      else if student_results.after.allowed
-        if student_results.after.auto_enroll
-          autoenrolled.push student_results
-        else
-          allowed.push student_results
-
-      # The instructor is trying to unenroll someone who is not enrolled or allowed to enroll; non-sensical action.
-      else if data_from_server.action is 'unenroll' and not (student_results.before.enrollment) and not (student_results.before.allowed)
-        notunenrolled.push student_results
-
-      else if not student_results.after.enrollment
-        notenrolled.push student_results
-
-      else
-        console.warn 'student results not reported to user'
-        console.warn student_results
-
-    # render populated result arrays
-    render_list = (label, ids) =>
-      task_res_section = $ '<div/>', class: 'request-res-section'
-      task_res_section.append $ '<h3/>', text: label
-      ids_list = $ '<ul/>'
-      task_res_section.append ids_list
-
-      for identifier in ids
-        ids_list.append $ '<li/>', text: identifier
-
-      @$task_response.append task_res_section
-
-    if invalid_identifier.length
-      render_list gettext("The following email addresses and/or usernames are invalid:"), (sr.identifier for sr in invalid_identifier)
-
-    if errors.length
-      errors_label = do ->
-        if data_from_server.action is 'enroll'
-          "There was an error enrolling:"
-        else if data_from_server.action is 'unenroll'
-          "There was an error unenrolling:"
-        else
-          console.warn "unknown action from server '#{data_from_server.action}'"
-          "There was an error processing:"
-
-      for student_results in errors
-        render_list errors_label, (sr.identifier for sr in errors)
-
-    if enrolled.length and emailStudents
-      render_list gettext("Successfully enrolled and sent email to the following users:"), (sr.identifier for sr in enrolled)
-
-    if enrolled.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("Successfully enrolled the following users:"), (sr.identifier for sr in enrolled)
-
-    # Student hasn't registered so we allow them to enroll
-    if allowed.length and emailStudents
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:"),
-        (sr.identifier for sr in allowed)
-
-    # Student hasn't registered so we allow them to enroll
-    if allowed.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users will be allowed to enroll once they register:"),
-        (sr.identifier for sr in allowed)
-
-    # Student hasn't registered so we allow them to enroll with autoenroll
-    if autoenrolled.length and emailStudents
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("Successfully sent enrollment emails to the following users. They will be enrolled once they register:"),
-        (sr.identifier for sr in autoenrolled)
-
-    # Student hasn't registered so we allow them to enroll with autoenroll
-    if autoenrolled.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users will be enrolled once they register:"),
-        (sr.identifier for sr in autoenrolled)
-
-    if notenrolled.length and emailStudents
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("Emails successfully sent. The following users are no longer enrolled in the course:"),
-        (sr.identifier for sr in notenrolled)
-
-    if notenrolled.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
-      render_list gettext("The following users are no longer enrolled in the course:"),
-        (sr.identifier for sr in notenrolled)
-
-    if notunenrolled.length
-      `// Translators: A list of users appears after this sentence. This situation arises when a staff member tries to unenroll a user who is not currently enrolled in this course.`
-      render_list gettext("These users were not affiliated with the course so could not be unenrolled:"),
-        (sr.identifier for sr in notunenrolled)
-
-# Wrapper for auth list subsection.
-# manages a list of users who have special access.
-# these could be instructors, staff, beta users, or forum roles.
-# uses slickgrid to display list.
-class AuthList
-  # rolename is one of ['instructor', 'staff'] for instructor_staff endpoints
-  # rolename is the name of Role for forums for the forum endpoints
-  constructor: (@$container, @rolename) ->
-    # gather elements
-    @$display_table          = @$container.find('.auth-list-table')
-    @$request_response_error = @$container.find('.request-response-error')
-    @$add_section            = @$container.find('.auth-list-add')
-    @$allow_field             = @$add_section.find("input[name='email']")
-    @$allow_button            = @$add_section.find("input[name='allow']")
-
-    # attach click handler
-    @$allow_button.click =>
-      @access_change @$allow_field.val(), 'allow', => @reload_auth_list()
-      @$allow_field.val ''
-
-    @reload_auth_list()
-
-  # fetch and display list of users who match criteria
-  reload_auth_list: ->
-    # helper function to display server data in the list
-    load_auth_list = (data) =>
-      # clear existing data
-      @$request_response_error.empty()
-      @$display_table.empty()
-
-      # setup slickgrid
-      options =
-        enableCellNavigation: true
-        enableColumnReorder: false
-        # autoHeight: true
-        forceFitColumns: true
-
-      # this is a hack to put a button/link in a slick grid cell
-      # if you change columns, then you must update
-      # WHICH_CELL_IS_REVOKE to have the index
-      # of the revoke column (left to right).
-      WHICH_CELL_IS_REVOKE = 3
-      columns = [
-        id: 'username'
-        field: 'username'
-        name: 'Username'
-      ,
-        id: 'email'
-        field: 'email'
-        name: 'Email'
-      ,
-        id: 'first_name'
-        field: 'first_name'
-        name: 'First Name'
-      ,
-      #   id: 'last_name'
-      #   field: 'last_name'
-      #   name: 'Last Name'
-      # ,
-        id: 'revoke'
-        field: 'revoke'
-        name: 'Revoke'
-        formatter: (row, cell, value, columnDef, dataContext) ->
-          "<span class='revoke-link'>Revoke Access</span>"
-      ]
-
-      table_data = data[@rolename]
-
-      $table_placeholder = $ '<div/>', class: 'slickgrid'
-      @$display_table.append $table_placeholder
-      grid = new Slick.Grid($table_placeholder, table_data, columns, options)
-
-      # click handler part of the revoke button/link hack.
-      grid.onClick.subscribe (e, args) =>
-        item = args.grid.getDataItem(args.row)
-        if args.cell is WHICH_CELL_IS_REVOKE
-          @access_change item.email, 'revoke', => @reload_auth_list()
-
-    # fetch data from the endpoint
-    # the endpoint comes from data-endpoint of the table
-    $.ajax
-      dataType: 'json'
-      type: 'POST'
-      url: @$display_table.data 'endpoint'
-      data: rolename: @rolename
-      success: load_auth_list
-      error: std_ajax_err => @$request_response_error.text "Error fetching list for '#{@rolename}'"
-
-
-  # slickgrid's layout collapses when rendered
-  # in an invisible div. use this method to reload
-  # the AuthList widget
-  refresh: ->
-    @$display_table.empty()
-    @reload_auth_list()
-
-  # update the access of a user.
-  # (add or remove them from the list)
-  # action should be one of ['allow', 'revoke']
-  access_change: (email, action, cb) ->
-    $.ajax
-      dataType: 'json'
-      type: 'POST'
-      url: @$add_section.data 'endpoint'
-      data:
-        email: email
-        rolename: @rolename
-        action: action
-      success: (data) -> cb?(data)
-      error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
-
-
-# Membership Section
-class Membership
-  # enable subsections.
-  constructor: (@$section) ->
-    # attach self to html
-    # so that instructor_dashboard.coffee can find this object
-    # to call event handlers like 'onClickTitle'
-    @$section.data 'wrapper', @
-
-    # isolate # initialize BatchEnrollment subsection
-    plantTimeout 0, => new BatchEnrollment @$section.find '.batch-enrollment'
-
-    # isolate # initialize AutoEnrollmentViaCsv subsection
-    plantTimeout 0, => new AutoEnrollmentViaCsv @$section.find '.auto_enroll_csv'
-
-    # initialize BetaTesterBulkAddition subsection
-    plantTimeout 0, => new BetaTesterBulkAddition @$section.find '.batch-beta-testers'
-
-    # gather elements
-    @$list_selector = @$section.find 'select#member-lists-selector'
-    @$auth_list_containers = @$section.find '.auth-list-container'
-    @$auth_list_errors = @$section.find '.member-lists-management .request-response-error'
-
-    # initialize & store AuthList subsections
-    # one for each .auth-list-container in the section.
-    @auth_lists = _.map (@$auth_list_containers), (auth_list_container) =>
-      rolename = $(auth_list_container).data 'rolename'
-      new AuthListWidget $(auth_list_container), rolename, @$auth_list_errors
-
-    # populate selector
-    @$list_selector.empty()
-    for auth_list in @auth_lists
-      @$list_selector.append $ '<option/>',
-        text: auth_list.$container.data 'display-name'
-        data:
-          auth_list: auth_list
-    if @auth_lists.length is 0
-      @$list_selector.hide()
-
-    @$list_selector.change =>
-      $opt = @$list_selector.children('option:selected')
-      return unless $opt.length > 0
-      for auth_list in @auth_lists
-        auth_list.$container.removeClass 'active'
-      auth_list = $opt.data('auth_list')
-      auth_list.$container.addClass 'active'
-      auth_list.re_view()
-
-    # one-time first selection of top list.
-    @$list_selector.change()
-
-  # handler for when the section title is clicked.
-  onClickTitle: ->
-
-
-# export for use
-# create parent namespaces if they do not already exist.
-_.defaults window, InstructorDashboard: {}
-_.defaults window.InstructorDashboard, sections: {}
-_.defaults window.InstructorDashboard.sections,
-  Membership: Membership
+    _.defaults(window.InstructorDashboard, {
+        sections: {}
+    });
+
+    _.defaults(window.InstructorDashboard.sections, {
+        Membership: Membership
+    });
+}).call(this);

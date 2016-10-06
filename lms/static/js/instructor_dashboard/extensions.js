@@ -1,155 +1,192 @@
-###
-Extensions Section
+/* globals _ */
 
-imports from other modules.
-wrap in (-> ... apply) to defer evaluation
-such that the value can be defined later than this assignment (file load order).
-###
+(function() {
+    'use strict';
+    var Extensions;
 
-plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
-std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
+    Extensions = (function() {
+        function extensions($section) {
+            var $gridDisplay,
+                ext = this;
+            this.$section = $section;
+            this.$section.data('wrapper', this);
+            this.$change_due_date = this.$section.find("input[name='change-due-date']");
+            this.$reset_due_date = this.$section.find("input[name='reset-due-date']");
+            this.$show_unit_ext = this.$section.find("input[name='show-unit-extensions']");
+            this.$show_student_ext = this.$section.find("input[name='show-student-extensions']");
+            this.$section.find('.request-response').hide();
+            this.$section.find('.request-response-error').hide();
+            $gridDisplay = this.$section.find('.data-display');
+            this.$grid_text = $gridDisplay.find('.data-display-text');
+            this.$grid_table = $gridDisplay.find('.data-display-table');
+            this.$change_due_date.click(function() {
+                var sendData;
+                ext.clear_display();
+                ext.$student_input = ext.$section.find("#set-extension input[name='student']");
+                ext.$url_input = ext.$section.find("#set-extension select[name='url']");
+                ext.$due_datetime_input = ext.$section.find("#set-extension input[name='due_datetime']");
+                sendData = {
+                    student: ext.$student_input.val(),
+                    url: ext.$url_input.val(),
+                    due_datetime: ext.$due_datetime_input.val()
+                };
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: ext.$change_due_date.data('endpoint'),
+                    data: sendData,
+                    success: function(data) {
+                        return ext.display_response('set-extension', data);
+                    },
+                    error: function(xhr) {
+                        return ext.fail_with_error('set-extension', 'Error changing due date', xhr);
+                    }
+                });
+            });
+            this.$reset_due_date.click(function() {
+                var sendData;
+                ext.clear_display();
+                ext.$student_input = ext.$section.find("#reset-extension input[name='student']");
+                ext.$url_input = ext.$section.find("#reset-extension select[name='url']");
+                sendData = {
+                    student: ext.$student_input.val(),
+                    url: ext.$url_input.val()
+                };
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: ext.$reset_due_date.data('endpoint'),
+                    data: sendData,
+                    success: function(data) {
+                        return ext.display_response('reset-extension', data);
+                    },
+                    error: function(xhr) {
+                        return ext.fail_with_error('reset-extension', 'Error reseting due date', xhr);
+                    }
+                });
+            });
+            this.$show_unit_ext.click(function() {
+                var sendData, url;
+                ext.clear_display();
+                ext.$grid_table.text('Loading');
+                ext.$url_input = ext.$section.find("#view-granted-extensions select[name='url']");
+                url = ext.$show_unit_ext.data('endpoint');
+                sendData = {
+                    url: ext.$url_input.val()
+                };
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    data: sendData,
+                    error: function(xhr) {
+                        return ext.fail_with_error('view-granted-extensions', 'Error getting due dates', xhr);
+                    },
+                    success: function(data) {
+                        return ext.display_grid(data);
+                    }
+                });
+            });
+            this.$show_student_ext.click(function() {
+                var sendData, url;
+                ext.clear_display();
+                ext.$grid_table.text('Loading');
+                url = ext.$show_student_ext.data('endpoint');
+                ext.$student_input = ext.$section.find("#view-granted-extensions input[name='student']");
+                sendData = {
+                    student: ext.$student_input.val()
+                };
+                return $.ajax({
+                    type: 'POST',
+                    dataType: 'json',
+                    url: url,
+                    data: sendData,
+                    error: function(xhr) {
+                        return ext.fail_with_error('view-granted-extensions', 'Error getting due dates', xhr);
+                    },
+                    success: function(data) {
+                        return ext.display_grid(data);
+                    }
+                });
+            });
+        }
 
-# Extensions Section
-class Extensions
+        extensions.prototype.onClickTitle = function() {};
 
-  constructor: (@$section) ->
-    # attach self to html
-    # so that instructor_dashboard.coffee can find this object
-    # to call event handlers like 'onClickTitle'
-    @$section.data 'wrapper', @
+        extensions.prototype.fail_with_error = function(id, msg, xhr) {
+            var $taskError, $taskResponse, data,
+                message = msg;
+            $taskError = this.$section.find('#' + id + ' .request-response-error');
+            $taskResponse = this.$section.find('#' + id + ' .request-response');
+            this.clear_display();
+            data = $.parseJSON(xhr.responseText);
+            message += ': ' + data.error;
+            $taskResponse.empty();
+            $taskError.empty();
+            $taskError.text(message);
+            return $taskError.show();
+        };
 
-    # Gather buttons
-    @$change_due_date = @$section.find("input[name='change-due-date']")
-    @$reset_due_date = @$section.find("input[name='reset-due-date']")
-    @$show_unit_extensions = @$section.find("input[name='show-unit-extensions']")
-    @$show_student_extensions = @$section.find("input[name='show-student-extensions']")
+        extensions.prototype.display_response = function(id, data) {
+            var $taskError, $taskResponse;
+            $taskError = this.$section.find('#' + id + ' .request-response-error');
+            $taskResponse = this.$section.find('#' + id + ' .request-response');
+            $taskError.empty().hide();
+            $taskResponse.empty().text(data);
+            return $taskResponse.show();
+        };
 
-    # Gather notification areas
-    @$section.find(".request-response").hide()
-    @$section.find(".request-response-error").hide()
+        extensions.prototype.display_grid = function(data) {
+            var $tablePlaceholder, col, columns, gridData, options;
+            this.clear_display();
+            this.$grid_text.text(data.title);
+            options = {
+                enableCellNavigation: true,
+                enableColumnReorder: false,
+                forceFitColumns: true
+            };
+            columns = (function() {
+                var i, len, ref, results;
+                ref = data.header;
+                results = [];
+                for (i = 0, len = ref.length; i < len; i++) {
+                    col = ref[i];
+                    results.push({
+                        id: col,
+                        field: col,
+                        name: col
+                    });
+                }
+                return results;
+            }());
+            gridData = data.data;
+            $tablePlaceholder = $('<div/>', {
+                class: 'slickgrid',
+                style: 'min-height: 400px'
+            });
+            this.$grid_table.append($tablePlaceholder);
+            return new window.Slick.Grid($tablePlaceholder, gridData, columns, options);
+        };
 
-    # Gather grid elements
-    $grid_display = @$section.find '.data-display'
-    @$grid_text = $grid_display.find '.data-display-text'
-    @$grid_table = $grid_display.find '.data-display-table'
+        extensions.prototype.clear_display = function() {
+            this.$grid_text.empty();
+            this.$grid_table.empty();
+            this.$section.find('.request-response-error').empty().hide();
+            return this.$section.find('.request-response').empty().hide();
+        };
 
-    # Click handlers
-    @$change_due_date.click =>
-      @clear_display()
-      @$student_input = @$section.find("#set-extension input[name='student']")
-      @$url_input = @$section.find("#set-extension select[name='url']")
-      @$due_datetime_input = @$section.find("#set-extension input[name='due_datetime']")
-      send_data =
-        student: @$student_input.val()
-        url: @$url_input.val()
-        due_datetime: @$due_datetime_input.val()
+        return extensions;
+    }());
 
-      $.ajax
-        type: 'POST'
-        dataType: 'json'
-        url: @$change_due_date.data 'endpoint'
-        data: send_data
-        success: (data) => @display_response "set-extension", data
-        error: (xhr) => @fail_with_error "set-extension", "Error changing due date", xhr
+    _.defaults(window, {
+        InstructorDashboard: {}
+    });
 
-    @$reset_due_date.click =>
-      @clear_display()
-      @$student_input = @$section.find("#reset-extension input[name='student']")
-      @$url_input = @$section.find("#reset-extension select[name='url']")
-      send_data =
-        student: @$student_input.val()
-        url: @$url_input.val()
+    _.defaults(window.InstructorDashboard, {
+        sections: {}
+    });
 
-      $.ajax
-        type: 'POST'
-        dataType: 'json'
-        url: @$reset_due_date.data 'endpoint'
-        data: send_data
-        success: (data) => @display_response "reset-extension", data
-        error: (xhr) => @fail_with_error "reset-extension", "Error reseting due date", xhr
-
-    @$show_unit_extensions.click =>
-      @clear_display()
-      @$grid_table.text 'Loading'
-
-      @$url_input = @$section.find("#view-granted-extensions select[name='url']")
-      url = @$show_unit_extensions.data 'endpoint'
-      send_data =
-        url: @$url_input.val()
-      $.ajax
-        type: 'POST'
-        dataType: 'json'
-        url: url
-        data: send_data
-        error: (xhr) => @fail_with_error "view-granted-extensions", "Error getting due dates", xhr
-        success: (data) => @display_grid data
-
-    @$show_student_extensions.click =>
-      @clear_display()
-      @$grid_table.text 'Loading'
-
-      url = @$show_student_extensions.data 'endpoint'
-      @$student_input = @$section.find("#view-granted-extensions input[name='student']")
-      send_data =
-        student: @$student_input.val()
-      $.ajax
-        type: 'POST'
-        dataType: 'json'
-        url: url
-        data: send_data
-        error: (xhr) => @fail_with_error "view-granted-extensions", "Error getting due dates", xhr
-        success: (data) => @display_grid data
-      
-  # handler for when the section title is clicked.
-  onClickTitle: ->
-
-  fail_with_error: (id, msg, xhr) ->
-    $task_error = @$section.find("#" + id + " .request-response-error")
-    $task_response = @$section.find("#" + id + " .request-response")
-    @clear_display()
-    data = $.parseJSON xhr.responseText
-    msg += ": " + data['error']
-    console.warn msg
-    $task_response.empty()
-    $task_error.empty()
-    $task_error.text msg
-    $task_error.show()
-
-  display_response: (id, data) ->
-    $task_error = @$section.find("#" + id + " .request-response-error")
-    $task_response = @$section.find("#" + id + " .request-response")
-    $task_error.empty().hide()
-    $task_response.empty().text data
-    $task_response.show()
-
-  display_grid: (data) ->
-    @clear_display()
-    @$grid_text.text data.title
-
-    # display on a SlickGrid
-    options =
-      enableCellNavigation: true
-      enableColumnReorder: false
-      forceFitColumns: true
-
-    columns = ({id: col, field: col, name: col} for col in data.header)
-    grid_data = data.data
-
-    $table_placeholder = $ '<div/>', class: 'slickgrid', style: 'min-height: 400px'
-    @$grid_table.append $table_placeholder
-    grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
-
-  clear_display: ->
-    @$grid_text.empty()
-    @$grid_table.empty()
-    @$section.find(".request-response-error").empty().hide()
-    @$section.find(".request-response").empty().hide()
-
-# export for use
-# create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    Extensions: Extensions
+    _.defaults(window.InstructorDashboard.sections, {
+        Extensions: Extensions
+    });
+}).call(this);
