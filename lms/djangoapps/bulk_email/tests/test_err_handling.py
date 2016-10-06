@@ -16,8 +16,8 @@ from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_MYSELF, BulkEmailFlag
 from bulk_email.tasks import perform_delegate_email_batches, send_course_email
-from instructor_task.models import InstructorTask
-from instructor_task.subtasks import (
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.subtasks import (
     initialize_subtask_info,
     SubtaskStatus,
     check_subtask_is_valid,
@@ -344,7 +344,7 @@ class TestEmailErrors(ModuleStoreTestCase):
         bogus_email_id = 1001
         to_list = ['test@test.com']
         global_email_context = {'course_title': 'dummy course'}
-        with patch('instructor_task.subtasks.InstructorTask.save') as mock_task_save:
+        with patch('lms.djangoapps.instructor_task.subtasks.InstructorTask.save') as mock_task_save:
             mock_task_save.side_effect = DatabaseError
             with self.assertRaises(DatabaseError):
                 send_course_email(entry_id, bogus_email_id, to_list, global_email_context, subtask_status.to_dict())

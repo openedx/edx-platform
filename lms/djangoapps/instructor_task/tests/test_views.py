@@ -9,11 +9,13 @@ from mock import Mock, patch
 
 from django.http import QueryDict
 
-from instructor_task.models import PROGRESS
-from instructor_task.tests.test_base import (InstructorTaskTestCase,
-                                             TEST_FAILURE_MESSAGE,
-                                             TEST_FAILURE_EXCEPTION)
-from instructor_task.views import instructor_task_status, get_task_completion_info
+from lms.djangoapps.instructor_task.models import PROGRESS
+from lms.djangoapps.instructor_task.tests.test_base import (
+    InstructorTaskTestCase,
+    TEST_FAILURE_MESSAGE,
+    TEST_FAILURE_EXCEPTION
+)
+from lms.djangoapps.instructor_task.views import instructor_task_status, get_task_completion_info
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):

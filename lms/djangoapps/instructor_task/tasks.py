@@ -27,7 +27,7 @@ from django.utils.translation import ugettext_noop
 
 from celery import task
 from bulk_email.tasks import perform_delegate_email_batches
-from instructor_task.tasks_helper import (
+from lms.djangoapps.instructor_task.tasks_helper import (
     run_main_task,
     BaseInstructorTask,
     perform_module_state_update,
