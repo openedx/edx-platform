@@ -16,17 +16,17 @@ from django.core.urlresolvers import reverse
 from smtplib import SMTPException
 
 from courseware.courses import get_course_by_id
-from instructor.enrollment import (
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
     unenroll_email,
 )
-from instructor.access import (
+from lms.djangoapps.instructor.access import (
     allow_access,
     list_with_level,
     revoke_access,
 )
-from instructor.views.tools import get_student_from_identifier
+from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.models import CourseEnrollment, CourseEnrollmentException

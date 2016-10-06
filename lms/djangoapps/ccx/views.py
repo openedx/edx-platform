@@ -40,9 +40,9 @@ from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import SignalHandler
 
-from instructor.views.api import _split_input_list
-from instructor.views.gradebook_api import get_grade_book_page
-from instructor.enrollment import (
+from lms.djangoapps.instructor.views.api import _split_input_list
+from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
 )

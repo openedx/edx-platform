@@ -36,7 +36,7 @@ from util.file import (
 )
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.views import require_global_staff
-from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
+from lms.djangoapps.instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -68,8 +68,8 @@ from student.models import (
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
-import instructor.enrollment as enrollment
-from instructor.enrollment import (
+import lms.djangoapps.instructor.enrollment as enrollment
+from lms.djangoapps.instructor.enrollment import (
     get_user_email_language,
     enroll_email,
     send_mail_to_student,
@@ -77,14 +77,14 @@ from instructor.enrollment import (
     send_beta_role_email,
     unenroll_email,
 )
-from instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
+from lms.djangoapps.instructor.access import list_with_level, allow_access, revoke_access, ROLES, update_forum_role
 import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangolib.markup import HTML, Text
-from instructor.views import INVOICE_KEY
+from lms.djangoapps.instructor.views import INVOICE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
