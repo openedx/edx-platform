@@ -27,15 +27,7 @@ class EntitlementModel(models.Model):
 
 
 class EntitlementGroup(models.Model):
-    ENTERPRISE_CUSTOMER = "enterprise_customer"
-
     name = models.CharField(max_length=255, help_text=_("Name of the group"))
-    kind = models.CharField(
-        max_length=50,
-        choices=(
-            (ENTERPRISE_CUSTOMER, _("Enterprise Customer")),
-        )
-    )
     entitlements = models.ManyToManyField(EntitlementModel)
     users = models.ManyToManyField(User, related_name='entitlement_groups', blank=True)
 
