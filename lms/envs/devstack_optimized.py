@@ -38,9 +38,12 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 #  Serve static files at /static directly from the staticfiles directory under test root.
 # Note: optimized files for testing are generated with settings from test_static_optimized
 STATIC_URL = "/static/"
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
+# Remove production pipeline finders
+STATICFILES_FINDERS.remove(
+    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder'
 )
+STATICFILES_FINDERS.remove('pipeline.finders.PipelineFinder')
+
 STATICFILES_DIRS = [
     (TEST_ROOT / "staticfiles" / "lms").abspath(),
 ]

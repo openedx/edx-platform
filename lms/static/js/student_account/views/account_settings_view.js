@@ -7,7 +7,7 @@
         'common/js/components/views/tabbed_view',
         'edx-ui-toolkit/js/utils/html-utils',
         'js/student_account/views/account_section_view',
-        'text!templates/student_account/account_settings.underscore'
+        'text!student_account/account_settings.underscore'
     ], function(gettext, $, _, TabbedView, HtmlUtils, AccountSectionView, accountSettingsTemplate) {
         var AccountSettingsView = TabbedView.extend({
 

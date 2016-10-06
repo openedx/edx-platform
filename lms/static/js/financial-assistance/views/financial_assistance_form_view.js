@@ -9,7 +9,7 @@
             'js/student_account/views/FormView',
             'text!../../../templates/financial-assistance/financial_assessment_form.underscore',
             'text!../../../templates/financial-assistance/financial_assessment_submitted.underscore',
-            'text!templates/student_account/form_field.underscore',
+            'text!student_account/form_field.underscore',
             'string_utils'
          ],
          function(

@@ -96,12 +96,11 @@ def should_show_debug_toolbar(_):
 PIPELINE_ENABLED = False
 STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
-# Revert to the default set of finders as we don't want the production pipeline
-STATICFILES_FINDERS = [
-    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-]
+# Remove production pipeline finders
+STATICFILES_FINDERS.remove(
+    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder'
+)
+STATICFILES_FINDERS.remove('pipeline.finders.PipelineFinder')
 
 # Disable JavaScript compression in development
 PIPELINE_JS_COMPRESSOR = None

@@ -6,20 +6,20 @@ import re
 from unittest import skipUnless
 from urllib import urlencode
 
-import mock
 import ddt
 from django.conf import settings
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
-from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 from django.contrib.messages.middleware import MessageMiddleware
+from django.http import HttpRequest
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.http import HttpRequest
 from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory, RefreshTokenFactory
 from edx_rest_api_client import exceptions
+import mock
 from nose.plugins.attrib import attr
 from oauth2_provider.models import (
     AccessToken as dot_access_token,
@@ -42,12 +42,12 @@ from openedx.core.djangoapps.user_api.accounts import EMAIL_MAX_LENGTH
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
-from student_account.views import account_settings_context, get_user_orders
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme_context
 
+from ..views import account_settings_context, get_user_orders
 
 LOGGER_NAME = 'audit'
 User = get_user_model()  # pylint:disable=invalid-name

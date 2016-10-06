@@ -81,8 +81,14 @@ except:
 from django.conf import settings
 from django.template.engine import Engine
 from django.template.loaders.filesystem import Loader
-engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+from edxmako.startup import iter_app_dirs
+template_dirs = []
+template_dirs.extend(settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
+template_dirs.extend(iter_app_dirs())
+engine = Engine(dirs=template_dirs)
 source, template_path = Loader(engine).load_template_source(path)
+#from django.template.loader import get_template
+#source = get_template(path)
 %>${source | n, decode.utf8}</%def>
 
 <%def name="require_module(module_name, class_name)">

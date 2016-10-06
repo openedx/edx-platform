@@ -121,7 +121,7 @@ define(['js/student_account/account'],
             };
 
             beforeEach(function() {
-                var fixture = readFixtures('templates/student_account/account.underscore');
+                var fixture = readFixtures('student_account/account.underscore');
                 setFixtures('<div id="account-tpl">' + fixture + '</div>');
 
                 view = new edx.student.account.AccountView().render();
