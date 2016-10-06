@@ -3,7 +3,7 @@
 from django.test import TestCase
 from oauth2_provider.models import Application, AccessToken, RefreshToken
 
-from lms.djangoapps.oauth_dispatch.tests import factories
+from openedx.core.djangoapps.oauth_dispatch.tests import factories
 from student.tests.factories import UserFactory
 
 

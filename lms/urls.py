@@ -8,10 +8,10 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-import auth_exchange.views
 from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
+from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -860,7 +860,7 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     urlpatterns += (
         # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
         # Developers should use these routes, to maintain compatibility for existing client code
-        url(r'^oauth2/', include('lms.djangoapps.oauth_dispatch.urls')),
+        url(r'^oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
         # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
         # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
         # also to maintain support for views that have not yet been wrapped in dispatch views.
@@ -938,7 +938,7 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     urlpatterns += (
         url(
             r'^oauth2/login/$',
-            auth_exchange.views.LoginWithAccessTokenView.as_view(),
+            LoginWithAccessTokenView.as_view(),
             name="login_with_access_token"
         ),
     )

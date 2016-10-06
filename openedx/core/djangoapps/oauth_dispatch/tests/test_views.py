@@ -5,29 +5,32 @@ Tests for Blocks Views
 import json
 
 import ddt
+from django.conf import settings
 from django.test import RequestFactory, TestCase
 from django.core.urlresolvers import reverse
 import httpretty
 from provider import constants
+import unittest
 
 from student.tests.factories import UserFactory
 from third_party_auth.tests.utils import ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinGoogle
 
 from .constants import DUMMY_REDIRECT_URL
 from .. import adapters
-from .. import views
+if settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"):
+    from .. import views
 from . import mixins
 
 
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class _DispatchingViewTestCase(TestCase):
     """
     Base class for tests that exercise DispatchingViews.
+
+    Subclasses need to define self.url.
     """
     dop_adapter = adapters.DOPAdapter()
     dot_adapter = adapters.DOTAdapter()
-
-    view_class = None
-    url = None
 
     def setUp(self):
         super(_DispatchingViewTestCase, self).setUp()
@@ -50,7 +53,7 @@ class _DispatchingViewTestCase(TestCase):
         Call the view with a POST request objectwith the appropriate format,
         returning the response object.
         """
-        return self.client.post(self.url, self._post_body(user, client, token_type))
+        return self.client.post(self.url, self._post_body(user, client, token_type))  # pylint: disable=no-member
 
     def _post_body(self, user, client, token_type=None):
         """
@@ -64,9 +67,10 @@ class TestAccessTokenView(mixins.AccessTokenMixin, _DispatchingViewTestCase):
     """
     Test class for AccessTokenView
     """
-
-    view_class = views.AccessTokenView
-    url = reverse('access_token')
+    def setUp(self):
+        self.url = reverse('access_token')
+        self.view_class = views.AccessTokenView
+        super(TestAccessTokenView, self).setUp()
 
     def _post_body(self, user, client, token_type=None):
         """
@@ -124,9 +128,10 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
     """
     Test class for AccessTokenExchangeView
     """
-
-    view_class = views.AccessTokenExchangeView
-    url = reverse('exchange_access_token', kwargs={'backend': 'google-oauth2'})
+    def setUp(self):
+        self.url = reverse('exchange_access_token', kwargs={'backend': 'google-oauth2'})
+        self.view_class = views.AccessTokenExchangeView
+        super(TestAccessTokenExchangeView, self).setUp()
 
     def _post_body(self, user, client, token_type=None):
         return {
@@ -143,6 +148,7 @@ class TestAccessTokenExchangeView(ThirdPartyOAuthTestMixinGoogle, ThirdPartyOAut
         self.assertEqual(response.status_code, 200)
 
 
+# pylint: disable=abstract-method
 @ddt.ddt
 class TestAuthorizationView(_DispatchingViewTestCase):
     """
@@ -231,6 +237,7 @@ class TestAuthorizationView(_DispatchingViewTestCase):
         return response.redirect_chain[-1][0]
 
 
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestViewDispatch(TestCase):
     """
     Test that the DispatchingView dispatches the right way.
@@ -324,12 +331,11 @@ class TestRevokeTokenView(_DispatchingViewTestCase):  # pylint: disable=abstract
     """
     Test class for RevokeTokenView
     """
-
-    login_with_access_token_url = reverse("login_with_access_token")
-    revoke_token_url = reverse('revoke_token')
-    access_token_url = reverse('access_token')
-
     def setUp(self):
+        self.login_with_access_token_url = reverse("login_with_access_token")
+        self.revoke_token_url = reverse('revoke_token')
+        self.access_token_url = reverse('access_token')
+
         super(TestRevokeTokenView, self).setUp()
         response = self.client.post(self.access_token_url, self.access_token_post_body_with_password())
         access_token_data = json.loads(response.content)
