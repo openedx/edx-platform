@@ -22,28 +22,26 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_GET
 
 import dogstats_wrapper as dog_stats_api
-from edxmako.shortcuts import render_to_response
-from xmodule.contentstore.django import contentstore
-from xmodule.exceptions import SerializationError
-from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.keys import CourseKey
-from opaque_keys.edx.locator import LibraryLocator
-from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
-from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
-from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
 
-from student.auth import has_course_author_access
-
-from openedx.core.lib.extract_tar import safetar_extractall
-from util.json_request import JsonResponse
-from util.views import ensure_valid_course_key
-from models.settings.course_metadata import CourseMetadata
 from contentstore.views.entrance_exam import (
     add_entrance_exam_milestone,
     remove_entrance_exam_milestone_reference
 )
-
 from contentstore.utils import reverse_course_url, reverse_usage_url, reverse_library_url
+from models.settings.course_metadata import CourseMetadata
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import LibraryLocator
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
+from openedx.core.lib.extract_tar import safetar_extractall
+from student.auth import has_course_author_access
+from util.json_request import JsonResponse
+from util.views import ensure_valid_course_key
+from xmodule.contentstore.django import contentstore
+from xmodule.exceptions import SerializationError
+from xmodule.modulestore import COURSE_ROOT, LIBRARY_ROOT
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.xml_exporter import export_course_to_xml, export_library_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, import_library_from_xml
 
 
 __all__ = [

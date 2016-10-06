@@ -12,8 +12,9 @@ from django.views.defaults import server_error
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError, HttpResponseForbidden)
 import dogstats_wrapper as dog_stats_api
-from edxmako.shortcuts import render_to_response
 import zendesk
+
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 import calc

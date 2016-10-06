@@ -12,11 +12,9 @@ import pytz
 from django.http import Http404
 from django.conf import settings
 
-from edxmako.shortcuts import render_to_string
+from static_replace import replace_static_urls
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from static_replace import replace_static_urls
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 
 from courseware.access import has_access
@@ -35,6 +33,7 @@ import branding
 
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

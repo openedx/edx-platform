@@ -8,12 +8,14 @@ from django.http import HttpResponse, Http404
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_GET
-from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
+
 from courseware.courses import get_course_with_access
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
+from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from util.json_request import JsonResponse, JsonResponseBadRequest
+
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from edxnotes.helpers import (
     get_edxnotes_id_token,

@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
+import third_party_auth
 
 from opaque_keys import InvalidKeyError
 from django.conf import settings
@@ -21,16 +22,16 @@ from rest_framework.exceptions import ParseError
 from django_countries import countries
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
-import third_party_auth
 from django_comment_common.models import Role
-from edxmako.shortcuts import marketing_link
-from student.forms import get_registration_extension_form
-from student.views import create_account_with_params
-from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
+from student.cookies import set_logged_in_cookies
+from student.forms import get_registration_extension_form
+from student.views import create_account_with_params
 from util.json_request import JsonResponse
+
 from .preferences.api import get_country_time_zones, update_email_opt_in
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile

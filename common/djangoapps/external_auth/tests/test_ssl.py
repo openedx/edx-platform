@@ -58,7 +58,7 @@ class SSLClientTest(ModuleStoreTestCase):
         middleware.process_request(request)
         request.session.save()
 
-        with patch('edxmako.request_context.get_current_request', return_value=request):
+        with patch('openedx.core.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             yield request
 
     @contextmanager
@@ -70,7 +70,7 @@ class SSLClientTest(ModuleStoreTestCase):
         middleware.process_request(request)
         request.session.save()
 
-        with patch('edxmako.request_context.get_current_request', return_value=request):
+        with patch('openedx.core.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             yield request
 
     def setUp(self):

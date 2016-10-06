@@ -44,7 +44,7 @@ from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
 from social.exceptions import AuthException, AuthAlreadyAssociated
 
-from edxmako.shortcuts import render_to_response, render_to_string
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history

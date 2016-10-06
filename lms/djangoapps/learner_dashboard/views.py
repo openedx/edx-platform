@@ -6,10 +6,10 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.views.decorators.http import require_GET
 
-from edxmako.shortcuts import render_to_response
 from lms.djangoapps.learner_dashboard.utils import strip_course_id, FAKE_COURSE_KEY
 from openedx.core.djangoapps.catalog.utils import get_programs as get_catalog_programs, munge_catalog_program
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs import utils
 

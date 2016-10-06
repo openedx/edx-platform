@@ -36,7 +36,6 @@ from eventtracking import tracker
 from courseware.courses import get_course_by_id
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE, EnrollStatusChange
 from util.query import use_read_replica_if_available
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
@@ -51,9 +50,10 @@ from .exceptions import (
     UnexpectedOrderItemStatus,
     ItemNotFoundInCartException
 )
-from shoppingcart.pdf import PDFInvoice
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
+from shoppingcart.pdf import PDFInvoice
 
 log = logging.getLogger("shoppingcart")
 

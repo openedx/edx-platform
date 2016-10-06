@@ -10,11 +10,11 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
 
-from student.auth import has_course_author_access
 import contentstore.git_export_utils as git_export_utils
-from edxmako.shortcuts import render_to_response
-from xmodule.modulestore.django import modulestore
+from student.auth import has_course_author_access
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger(__name__)
 

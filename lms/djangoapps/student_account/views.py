@@ -18,7 +18,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
-from edxmako.shortcuts import render_to_response
 import pytz
 
 from commerce.models import CommerceConfiguration
@@ -28,6 +27,7 @@ from external_auth.login_and_register import (
 )
 from lang_pref.api import released_languages, all_languages
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers

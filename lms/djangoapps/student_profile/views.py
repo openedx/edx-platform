@@ -10,7 +10,7 @@ from django_countries import countries
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from badges.utils import badges_enabled
-from edxmako.shortcuts import render_to_response, marketing_link
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response, marketing_link
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.user_api.errors import UserNotFound, UserNotAuthorized
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences

@@ -122,7 +122,7 @@ class DatabaseMicrositeBackendTests(DatabaseMicrositeTestCase):
             self.assertIn(settings.MICROSITE_ROOT_DIR, settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
             self.assertIn(settings.MICROSITE_ROOT_DIR, settings.MAKO_TEMPLATES['main'])
 
-    @patch('edxmako.paths.add_lookup')
+    @patch('openedx.core.djangoapps.edxmako.paths.add_lookup')
     def test_enable_microsites(self, add_lookup):
         """
         Tests microsite.enable_microsites works as expected.

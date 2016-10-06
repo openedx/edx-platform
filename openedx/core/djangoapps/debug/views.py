@@ -3,9 +3,10 @@ Views that are only activated when the project is running in development mode.
 These views will NOT be shown on production: trying to access them will result
 in a 404 error.
 """
-from edxmako.shortcuts import render_to_response
 from mako.exceptions import TopLevelLookupException
 from django.http import HttpResponseNotFound
+
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 
 
 def show_reference_template(request, template):

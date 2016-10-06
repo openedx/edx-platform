@@ -6,7 +6,7 @@ from mock import patch
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
-from edxmako import add_lookup, LOOKUP
+from openedx.core.djangoapps.edxmako import add_lookup, LOOKUP
 from lms import startup
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

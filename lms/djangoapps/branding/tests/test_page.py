@@ -3,27 +3,25 @@ Tests for branding page
 """
 
 import datetime
+from mock import patch, Mock
+from nose.plugins.attrib import attr
+from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
 
-from pytz import UTC
-from mock import patch, Mock
-from nose.plugins.attrib import attr
-from edxmako.shortcuts import render_to_response
-
 from branding.views import index
+
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from milestones.tests.utils import MilestonesTestCaseMixin
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from django.core.urlresolvers import reverse
-from courseware.tests.helpers import LoginEnrollmentTestCase
-
 from util.milestones_helpers import set_prerequisite_courses
-from milestones.tests.utils import MilestonesTestCaseMixin
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False

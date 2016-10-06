@@ -7,16 +7,14 @@ Contains:
     for testing Xmodules with mongo store.
 """
 
-from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
-from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE
 from xblock.field_data import DictFieldData
 from xmodule.tests import get_test_system, get_test_descriptor_system
-from opaque_keys.edx.locations import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

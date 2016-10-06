@@ -12,14 +12,14 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from edxmako.shortcuts import render_to_response
 import student.views
 from student.models import CourseEnrollment
 import courseware.views.views
-from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 import branding.api as branding_api
+
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response, marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)

@@ -18,7 +18,7 @@ from django.core.urlresolvers import reverse
 from django.utils.timezone import UTC
 from django.utils.html import escape
 from django.contrib.auth.models import User
-from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment

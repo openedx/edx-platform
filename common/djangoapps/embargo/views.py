@@ -3,7 +3,7 @@
 from django.http import Http404
 from django.views.generic.base import View
 
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 
 from embargo import messages
 

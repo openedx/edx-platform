@@ -31,7 +31,6 @@ from django.utils.translation import ugettext as _
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
 from django.test import RequestFactory
-from edxmako.shortcuts import render_to_response
 from request_cache.middleware import RequestCache
 from opaque_keys.edx.keys import CourseKey
 from student.roles import (
@@ -49,8 +48,9 @@ from student.tests.factories import (
     UserFactory,
 )
 
-from xmodule.x_module import XModuleMixin
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
     SharedModuleStoreTestCase,
@@ -60,6 +60,8 @@ from xmodule.modulestore.tests.factories import (
     ItemFactory,
     SampleCourseFactory,
 )
+from xmodule.x_module import XModuleMixin
+
 from ccx_keys.locator import CCXLocator
 
 from lms.djangoapps.ccx.models import CustomCourseForEdX
@@ -74,8 +76,6 @@ from lms.djangoapps.ccx.utils import (
     is_email,
 )
 from lms.djangoapps.ccx.views import get_date
-
-from xmodule.modulestore.django import modulestore
 
 
 def intercept_renderer(path, context):

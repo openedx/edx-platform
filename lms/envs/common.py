@@ -480,8 +480,8 @@ TEMPLATES = [
                 # We have to use mako-aware template loaders to be able to include
                 # mako templates inside django templates (such as main_django.html).
                 'openedx.core.djangoapps.theming.template_loaders.ThemeTemplateLoader',
-                'edxmako.makoloader.MakoFilesystemLoader',
-                'edxmako.makoloader.MakoAppDirectoriesLoader',
+                'openedx.core.djangoapps.edxmako.makoloader.MakoFilesystemLoader',
+                'openedx.core.djangoapps.edxmako.makoloader.MakoAppDirectoriesLoader',
             ],
             'context_processors': [
                 'django.template.context_processors.request',
@@ -498,13 +498,13 @@ TEMPLATES = [
                 'sekizai.context_processors.sekizai',
 
                 # Hack to get required link URLs to password reset templates
-                'edxmako.shortcuts.marketing_link_context_processor',
+                'openedx.core.djangoapps.edxmako.shortcuts.marketing_link_context_processor',
 
                 # Shoppingcart processor (detects if request.user has a cart)
                 'shoppingcart.context_processor.user_has_cart_context_processor',
 
                 # Allows the open edX footer to be leveraged in Django Templates.
-                'edxmako.shortcuts.footer_context_processor',
+                'openedx.core.djangoapps.edxmako.shortcuts.footer_context_processor',
 
                 # Online contextual help
                 'context_processors.doc_url',
@@ -720,7 +720,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'openedx.core.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
                 {
@@ -730,7 +730,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'openedx.core.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
             ]
@@ -1882,7 +1882,7 @@ INSTALLED_APPS = (
     'status',
 
     # For asset pipelining
-    'edxmako',
+    'openedx.core.djangoapps.edxmako',
     'pipeline',
     'static_replace',
 

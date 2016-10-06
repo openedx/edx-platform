@@ -7,8 +7,6 @@ from __future__ import absolute_import
 
 import logging
 
-from contentstore.views.item import create_xblock_info
-from contentstore.utils import reverse_library_url, add_instructor
 from django.http import HttpResponseNotAllowed, Http404
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -16,10 +14,13 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
+
+from contentstore.views.item import create_xblock_info
+from contentstore.utils import reverse_library_url, add_instructor
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator, LibraryUsageLocator
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

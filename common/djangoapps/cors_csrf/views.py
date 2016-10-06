@@ -1,12 +1,13 @@
 """Views for enabling cross-domain requests. """
 import logging
 import json
+
 from django.conf import settings
 from django.views.decorators.cache import cache_page
 from django.http import HttpResponseNotFound
-from edxmako.shortcuts import render_to_response
 from cors_csrf.models import XDomainProxyConfiguration
 
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 
 log = logging.getLogger(__name__)
 

@@ -15,10 +15,10 @@ from django.conf import settings
 from django.utils.html import escape
 
 from opaque_keys.edx.keys import CourseKey
-
-from edxmako.shortcuts import render_to_response
-from survey.models import SurveyForm
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+from survey.models import SurveyForm
 
 log = logging.getLogger("edx.survey")
 

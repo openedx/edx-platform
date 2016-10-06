@@ -3,15 +3,16 @@
 <%namespace name='static' file='../static_content.html'/>
 <%!
 from itertools import izip_longest
-from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
-from courseware.courses import get_course_about_section
+
 from django.conf import settings
-from edxmako.shortcuts import marketing_link
-from openedx.core.lib.courses import course_image_url
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
+from courseware.courses import get_course_about_section
+from openedx.core.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangolib.markup import HTML, Text
 from openedx.core.djangolib.js_utils import js_escaped_string
-
+from openedx.core.lib.courses import course_image_url
 %>
 
 <%inherit file="../main.html" />

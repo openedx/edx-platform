@@ -4,7 +4,7 @@ Index view for the support app.
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from support.decorators import require_support_permission
 
 

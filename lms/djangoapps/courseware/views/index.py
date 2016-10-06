@@ -17,7 +17,6 @@ from django.views.generic import View
 from django.shortcuts import redirect
 
 from courseware.url_helpers import get_redirect_url_for_global_staff
-from edxmako.shortcuts import render_to_response, render_to_string
 import logging
 import newrelic.agent
 import urllib
@@ -25,8 +24,9 @@ import urllib
 from lang_pref import LANGUAGE_KEY
 from xblock.fragment import Fragment
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.time_zone_utils import get_user_time_zone
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
+from openedx.core.lib.time_zone_utils import get_user_time_zone
 from shoppingcart.models import CourseRegistrationCode
 from student.models import CourseEnrollment
 from student.views import is_course_blocked

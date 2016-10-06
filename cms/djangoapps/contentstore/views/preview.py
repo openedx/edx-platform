@@ -7,8 +7,8 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from edxmako.shortcuts import render_to_string
 
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.lib.xblock_utils import (
     replace_static_urls, wrap_xblock, wrap_fragment, wrap_xblock_aside, request_token, xblock_local_resource_url,
 )

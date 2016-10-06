@@ -1,3 +1,7 @@
+"""
+Initialization for edxmako.
+"""
+
 #   Copyright (c) 2008 Mikeal Rogers
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
