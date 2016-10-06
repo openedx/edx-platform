@@ -1,12 +1,15 @@
 """
 Language Preference Views
 """
+
 import json
+
 from django.conf import settings
+from django.http import HttpResponse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from lang_pref import LANGUAGE_KEY
-from django.http import HttpResponse
+
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 
 
 @ensure_csrf_cookie

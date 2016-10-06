@@ -85,14 +85,20 @@ urlpatterns = (
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
     # Update session view
-    url(r'^lang_pref/session_language', 'lang_pref.views.update_session_language', name='session_language'),
+    url(
+        r'^lang_pref/session_language',
+        'openedx.core.djangoapps.lang_pref.views.update_session_language',
+        name='session_language'
+    ),
 
     # Multiple course modes and identity verification
     # TODO Namespace these!
     url(r'^course_modes/', include('course_modes.urls')),
     url(r'^verify_student/', include('verify_student.urls')),
 
-    url(r'^update_lang/', include('dark_lang.urls', namespace='darklang')),
+    # URLs for managing dark launches of languages
+    url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
+
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 )

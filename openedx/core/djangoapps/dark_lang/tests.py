@@ -4,15 +4,17 @@ Tests of DarkLangMiddleware
 import unittest
 
 import ddt
+from mock import Mock
+
 from django.http import HttpRequest
 from django.test import TestCase
 from django.test.client import Client
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from mock import Mock
 
-from dark_lang.middleware import DarkLangMiddleware
-from dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.dark_lang.middleware import DarkLangMiddleware
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from student.tests.factories import UserFactory
+
 UNSET = object()
 
 

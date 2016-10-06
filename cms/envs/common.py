@@ -226,6 +226,7 @@ SOCIAL_SHARING_SETTINGS = {
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+OPENEDX_ROOT = REPO_ROOT / "openedx"
 CMS_ROOT = REPO_ROOT / "cms"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
@@ -251,6 +252,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+    OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
     CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
 
@@ -360,10 +362,10 @@ MIDDLEWARE_CLASSES = (
     'track.middleware.TrackMiddleware',
 
     # This is used to set or update the user language preferences.
-    'lang_pref.middleware.LanguagePreferenceMiddleware',
+    'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Allows us to dark-launch particular languages
-    'dark_lang.middleware.DarkLangMiddleware',
+    'openedx.core.djangoapps.dark_lang.middleware.DarkLangMiddleware',
 
     'embargo.middleware.EmbargoMiddleware',
 
@@ -856,7 +858,7 @@ INSTALLED_APPS = (
     'course_modes',
 
     # Dark-launching languages
-    'dark_lang',
+    'openedx.core.djangoapps.dark_lang',
 
     # User preferences
     'openedx.core.djangoapps.user_api',

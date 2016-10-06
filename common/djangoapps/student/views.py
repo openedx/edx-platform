@@ -85,8 +85,6 @@ from openedx.core.djangoapps.external_auth.login_and_register import (
     register as external_auth_register
 )
 
-from lang_pref import LANGUAGE_KEY
-
 import track.views
 
 import dogstats_wrapper as dog_stats_api
@@ -120,11 +118,12 @@ from eventtracking import tracker
 from notification_prefs.views import enable_notifications
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
-from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs import utils as programs_utils
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 
 
 log = logging.getLogger("edx.student")
