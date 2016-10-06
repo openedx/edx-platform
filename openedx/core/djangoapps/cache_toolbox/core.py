@@ -34,40 +34,36 @@ def get_instance(model, instance_or_pk, timeout=None, using=None):
         True
 
     """
-    pk = getattr(instance_or_pk, 'pk', instance_or_pk)
+    primary_key = getattr(instance_or_pk, 'pk', instance_or_pk)
     key = instance_key(model, instance_or_pk)
     data = cache.get(key)
 
     if data is not None:
         try:
             # Try and construct instance from dictionary
-            instance = model(pk=pk, **data)
+            instance = model(pk=primary_key, **data)
 
             # Ensure instance knows that it already exists in the database,
             # otherwise we will fail any uniqueness checks when saving the
             # instance.
-            instance._state.adding = False
+            instance._state.adding = False  # pylint: disable=protected-access
 
             # Specify database so that instance is setup correctly. We don't
             # namespace cached objects by their origin database, however.
-            instance._state.db = using or DEFAULT_DB_ALIAS
+            instance._state.db = using or DEFAULT_DB_ALIAS  # pylint: disable=protected-access
 
             return instance
-        except:
+        except:  # pylint: disable=bare-except
             # Error when deserialising - remove from the cache; we will
             # fallback and return the underlying instance
             cache.delete(key)
 
     # Use the default manager so we are never filtered by a .get_queryset()
 
-#    import logging
-#    log = logging.getLogger("tracking")
-#    log.info( str(pk) )
-
-    instance = model._default_manager.using(using).get(pk=pk)
+    instance = model._default_manager.using(using).get(pk=primary_key)  # pylint: disable=protected-access
 
     data = {}
-    for field in instance._meta.fields:
+    for field in instance._meta.fields:  # pylint: disable=protected-access
         # Harmless to save, but saves space in the dictionary - we already know
         # the primary key when we lookup
         if field.primary_key:
@@ -76,8 +72,8 @@ def get_instance(model, instance_or_pk, timeout=None, using=None):
         if field.get_internal_type() == 'FileField':
             # Avoid problems with serializing FileFields
             # by only serializing the file name
-            file = getattr(instance, field.attname)
-            data[field.attname] = file.name
+            file_value = getattr(instance, field.attname)
+            data[field.attname] = file_value.name
         else:
             data[field.attname] = getattr(instance, field.attname)
 

@@ -67,7 +67,7 @@ with::
 
     MIDDLEWARE_CLASSES = [
         ...
-        'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+        'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
         ...
     ]
 
@@ -93,6 +93,9 @@ log = getLogger(__name__)
 
 
 class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
+    """
+    See documentation above.
+    """
     def __init__(self):
         cache_model(User)
 
@@ -110,7 +113,7 @@ class CacheBackedAuthenticationMiddleware(AuthenticationMiddleware):
                 # Raise an exception to fall through to the except clause below.
                 raise Exception
             self._verify_session_auth(request)
-        except:
+        except:  # pylint: disable=bare-except
             # Fallback to constructing the User from the database.
             super(CacheBackedAuthenticationMiddleware, self).process_request(request)
 

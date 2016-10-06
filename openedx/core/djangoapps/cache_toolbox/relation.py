@@ -69,18 +69,25 @@ Support
 ``cache_relation`` currently only works with ``OneToOneField`` fields. Support
 for regular ``ForeignKey`` fields is planned.
 """
-
 from django.db.models.signals import post_save, post_delete
 
 from .core import get_instance, delete_instance
 
 
 def cache_relation(descriptor, timeout=None):
+    """
+    Adds utility methods to a model to obtain related
+    model instances via a cache.
+    """
     rel = descriptor.related
     related_name = '%s_cache' % rel.field.related_query_name()
 
     @property
     def get(self):
+        """
+        Returns the cached value of the related model if found
+        in the cache. Otherwise gets and caches the related model.
+        """
         # Always use the cached "real" instance if available
         try:
             return getattr(self, descriptor.cache_name)
@@ -93,10 +100,6 @@ def cache_relation(descriptor, timeout=None):
         except AttributeError:
             pass
 
-#        import logging
-#        log = logging.getLogger("tracking")
-#        log.info( "DEBUG: "+str(str(rel.model)+"/"+str(self.pk) ))
-
         instance = get_instance(rel.model, self.pk, timeout)
 
         setattr(self, '_%s_cache' % related_name, instance)
@@ -107,13 +110,24 @@ def cache_relation(descriptor, timeout=None):
     # Clearing cache
 
     def clear(self):
+        """
+        Clears the cache of all related models of self.
+        """
         delete_instance(rel.model, self)
 
     @classmethod
-    def clear_pk(cls, *instances_or_pk):
+    def clear_pk(cls, *instances_or_pk):  # pylint: disable=unused-argument
+        """
+        Clears the cache of all related models of
+        the provided instances_or_pk.
+        """
         delete_instance(rel.model, *instances_or_pk)
 
-    def clear_cache(sender, instance, *args, **kwargs):
+    def clear_cache(sender, instance, *args, **kwargs):  # pylint: disable=unused-argument
+        """
+        Clears the cache of all related models of the
+        given instance.
+        """
         delete_instance(rel.model, instance)
 
     setattr(rel.parent_model, '%s_clear' % related_name, clear)

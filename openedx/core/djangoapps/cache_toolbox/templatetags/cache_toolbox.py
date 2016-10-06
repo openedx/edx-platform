@@ -1,12 +1,21 @@
+"""
+Implementation of custom django template tags for
+automatically caching template fragments.
+"""
 from django import template
 from django.core.cache import cache
 from django.template import Node, TemplateSyntaxError, Variable
 from django.template import resolve_variable
 
-register = template.Library()
+register = template.Library()  # pylint: disable=invalid-name
 
 
 class CacheNode(Node):
+    """
+    Subclass of django's template Node class that
+    caches the rendered value of a template fragment. This is a
+    simpler implementation of django.templatetags.cache.CacheNode.
+    """
     def __init__(self, nodelist, expire_time, key):
         self.nodelist = nodelist
         self.expire_time = Variable(expire_time)
@@ -46,6 +55,11 @@ def cachedeterministic(parser, token):
 
 
 class ShowIfCachedNode(Node):
+    """
+    Subclass of django's template Node class that
+    renders the cached value for the given key, only
+    if already cached.
+    """
     def __init__(self, key):
         self.key = key
 
@@ -55,7 +69,7 @@ class ShowIfCachedNode(Node):
 
 
 @register.tag
-def showifcached(parser, token):
+def showifcached(parser, token):  # pylint: disable=unused-argument
     """
     Show content if it exists in the cache, otherwise display nothing.
 
