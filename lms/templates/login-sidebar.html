@@ -17,8 +17,8 @@ from django.core.urlresolvers import reverse
 
 <div class="cta cta-help">
   % if not settings.DISABLE_REGISTER_BUTTON:
-    <h3>${_("Not Enrolled?")}</h3>
-    <p><a href="${reverse('register_user')}">${_("Sign up for {platform_name} today!").format(platform_name=platform_name)}</a></p>
+  <h3>${_("Not Enrolled?")}</h3>
+  <p><a href="${reverse('register_user')}">${_("Sign up for {platform_name} today!").format(platform_name=platform_name)}</a></p>
   % endif
 
   ## Disable help unless the FAQ marketing link is enabled
