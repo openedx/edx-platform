@@ -2600,6 +2600,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'response_type': 'optionresponse',
                 'input_type': 'optioninput',
                 'correct': True,
+                'group_label': '',
                 'variant': '',
             },
             factory.answer_key(3): {
@@ -2608,6 +2609,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'response_type': 'multiplechoiceresponse',
                 'input_type': 'choicegroup',
                 'correct': False,
+                'group_label': '',
                 'variant': '',
             },
             factory.answer_key(4): {
@@ -2616,6 +2618,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'response_type': 'choiceresponse',
                 'input_type': 'checkboxgroup',
                 'correct': False,
+                'group_label': '',
                 'variant': '',
             },
         })
@@ -2656,6 +2659,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',
                 'correct': True,
+                'group_label': '',
                 'variant': '',
             }
         })
@@ -2787,6 +2791,7 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'response_type': 'numericalresponse',
                 'input_type': 'textline',
                 'correct': True,
+                'group_label': '',
                 'variant': module.seed,
             }
         })
@@ -2819,11 +2824,13 @@ class TestProblemCheckTracking(unittest.TestCase):
                 'response_type': 'coderesponse',
                 'input_type': 'filesubmission',
                 'correct': False,
+                'group_label': '',
                 'variant': '',
             },
             factory.answer_key(3): {
                 'answer': 'None',
                 'correct': True,
+                'group_label': '',
                 'question': '',
                 'response_type': 'customresponse',
                 'input_type': 'textline',

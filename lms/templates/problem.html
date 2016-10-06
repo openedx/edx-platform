@@ -12,6 +12,8 @@ from openedx.core.djangolib.markup import HTML
 <div class="problem-progress"></div>
 
 <div class="problem">
+  ## onsubmit is required because click on any button inside form will submit it and reload page which we don't want
+  <form class='capa-problem-form' onsubmit='return false;'>
   ${ HTML(problem['html']) }
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
@@ -39,4 +41,5 @@ from openedx.core.djangolib.markup import HTML
     </div>
     % endif
   </div>
+  </form>
 </div>
