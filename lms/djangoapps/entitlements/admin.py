@@ -1,3 +1,6 @@
+"""
+This module contains classes controlling Django admin integration.
+"""
 from django.contrib import admin
 from .models import EntitlementModel, EntitlementGroup
 

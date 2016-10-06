@@ -1,3 +1,6 @@
+"""
+Models
+"""
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -5,6 +8,9 @@ from entitlements.models import EntitlementGroup
 
 
 class EnterpriseCustomer(models.Model):
+    """
+    This model represents Enterprise Customer.
+    """
     name = models.CharField(max_length=255)
     entitlement_group = models.OneToOneField(EntitlementGroup, related_name="enterprise_customer")
     linked_third_party_providers = models.CharField(

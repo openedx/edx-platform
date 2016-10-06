@@ -1,7 +1,15 @@
+"""
+This module contains generic Entitlement functionality.
+
+Metaentitlements (entitlements to manage entitlements) should probably be added here (when a need for the arise).
+"""
 from .models import EntitlementModel
 
 
 class BaseEntitlement(object):
+    """
+    This is an (abstract) base class for Entitlements.
+    """
     ENTITLEMENT_TYPE = None
     SCOPE_TYPE = None
 
@@ -12,9 +20,19 @@ class BaseEntitlement(object):
 
     @property
     def scope(self):
+        """
+        Returns scope of this entitlement
+        """
         return self._scope_strategy.get_scope(self._scope_id)
 
     def save(self):
+        """
+        Creates or updates EntitlementModel instance
+        :return:
+        """
+        # FIXME: different EntitlementGroups might contain different Entitlements of the same type and scope, but with
+        # different parameters - should probably keep track of actual entitlement model ID and use it insted type and
+        # scope_id as "primary key"
         entitlement_model, unused_created = EntitlementModel.objects.update_or_create(
             type=self.ENTITLEMENT_TYPE,
             scope_id=self._scope_id,
@@ -24,8 +42,17 @@ class BaseEntitlement(object):
         return entitlement_model
 
     def _get_model_parameters(self):
+        """
+        Returns Entitlement parameters to be stored in `parameters` field on entitlement model
+        :return: dictionary
+        """
         return {}
 
-    def applicable_to(self, target):
+    def is_applicable_to(self, target):
+        """
+        Checks if `target` matches the scope of this entitlement.
+        :param object target: an opbject to check entitlement scope.
+        :return: boolean
+        """
         return self.scope == target
 
