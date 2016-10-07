@@ -23,7 +23,7 @@ from branding import api as branding_api
 ## into non-inheriting templates via the %namespace tag.
 <%def name="theme_enabled()"><% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %></%def>
 <%def name="is_microsite()"><% return microsite.is_request_in_microsite() %></%def>
-<%def name="is_non_microsite_theme()"><% return theme_enabled() and not is_microsite() %></%def>
+<%def name="stanford_theme_enabled()"><% return theme_enabled() and not is_microsite() %></%def>
 
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
 <%def name="pagetitle()" />
