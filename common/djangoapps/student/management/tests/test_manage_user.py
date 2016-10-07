@@ -119,7 +119,7 @@ class TestManageUserCommand(TestCase):
 
     def test_same_email_varied_case(self):
         """
-        Ensure that the operation is continues if the username matches an
+        Ensure that the operation continues if the username matches an
         existing user account and the supplied email differs only in cases.
         """
         User.objects.create(username=TEST_USERNAME, email=TEST_EMAIL.upper())
