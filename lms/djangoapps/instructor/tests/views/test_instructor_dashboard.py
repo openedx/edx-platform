@@ -11,7 +11,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edxmako.shortcuts import render_to_response
 
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory, StudentModuleFactory
@@ -19,14 +18,15 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from instructor.views.gradebook_api import calculate_page_info
 
 from common.test.utils import XssTestMixin
+from course_modes.models import CourseMode
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
+from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
+from student.models import CourseEnrollment
+from student.roles import CourseFinanceAdminRole
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
-from shoppingcart.models import PaidCourseRegistration, Order, CourseRegCodeItem
-from course_modes.models import CourseMode
-from student.roles import CourseFinanceAdminRole
-from student.models import CourseEnrollment
 
 
 def intercept_renderer(path, context):

@@ -13,13 +13,13 @@ from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
 from enrollment.api import get_enrollments, update_enrollment
 from enrollment.errors import CourseModeNotFoundError
 from enrollment.serializers import ModeSerializer
 from lms.djangoapps.support.decorators import require_support_permission
 from lms.djangoapps.support.serializers import ManualEnrollmentSerializer
 from lms.djangoapps.verify_student.models import VerificationDeadline
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from student.models import CourseEnrollment, ManualEnrollmentAudit, ENROLLED_TO_ENROLLED
 from util.json_request import JsonResponse
 

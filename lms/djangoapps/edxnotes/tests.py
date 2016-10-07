@@ -11,28 +11,29 @@ from unittest import skipUnless
 from datetime import datetime
 import urlparse
 
-from edxmako.shortcuts import render_to_string
-from edxnotes import helpers
-from edxnotes.decorators import edxnotes
-from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
-from edxnotes.plugins import EdxNotesTab
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
+
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.tabs import get_course_tab_list
+from edx_oauth2_provider.tests.factories import ClientFactory
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.tabs import CourseTab
 
+from edxnotes import helpers
+from edxnotes.decorators import edxnotes
+from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
+from edxnotes.plugins import EdxNotesTab
 
 FEATURES = settings.FEATURES.copy()
 

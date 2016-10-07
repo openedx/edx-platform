@@ -101,7 +101,7 @@ NOTES_DISABLED_TABS = []
 import logging
 LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
-    ('edxmako.shortcuts', logging.ERROR),
+    ('openedx.core.djangoapps.edxmako.shortcuts', logging.ERROR),
     ('dd.dogapi', logging.ERROR),
     ('edx.discussion', logging.CRITICAL),
 ]

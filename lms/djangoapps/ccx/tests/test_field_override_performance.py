@@ -62,7 +62,10 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         self.request = self.request_factory.get("foo")
         self.request.user = self.student
 
-        patcher = mock.patch('edxmako.request_context.get_current_request', return_value=self.request)
+        patcher = mock.patch(
+            'openedx.core.djangoapps.edxmako.request_context.get_current_request',
+            return_value=self.request
+        )
         patcher.start()
         self.addCleanup(patcher.stop)
         self.course = None

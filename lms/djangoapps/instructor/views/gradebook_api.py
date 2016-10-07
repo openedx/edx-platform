@@ -11,10 +11,10 @@ from django.views.decorators.cache import cache_control
 
 from opaque_keys.edx.keys import CourseKey
 
-from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from instructor.views.api import require_level
 from lms.djangoapps.grades import course_grades
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
 
 

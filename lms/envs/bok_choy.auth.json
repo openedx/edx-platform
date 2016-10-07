@@ -101,7 +101,7 @@
                                 "localhost"
                             ],
                             "port": 27017,
-                            "render_template": "edxmako.shortcuts.render_to_string"
+                            "render_template": "openedx.core.djangoapps.edxmako.shortcuts.render_to_string"
                         }
                     },
                     {

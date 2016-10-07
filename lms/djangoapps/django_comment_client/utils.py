@@ -18,7 +18,6 @@ from xmodule.modulestore.django import modulestore
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from django_comment_client.settings import MAX_COMMENT_DEPTH
-from edxmako import lookup_template
 
 from courseware import courses
 from courseware.access import has_access
@@ -27,6 +26,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.edxmako import lookup_template
 
 
 log = logging.getLogger(__name__)

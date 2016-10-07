@@ -4,9 +4,9 @@ Views for serving static textbooks.
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from edxmako.shortcuts import render_to_response
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from xmodule.annotator_token import retrieve_token
 
 from courseware.access import has_access

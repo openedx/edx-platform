@@ -5,7 +5,9 @@ courses.
 import csv
 import json
 import logging
+import mongoengine
 import os
+from path import Path as path
 import subprocess
 import StringIO
 
@@ -25,21 +27,19 @@ from django.views.decorators.cache import cache_control
 from django.views.generic.base import TemplateView
 from django.views.decorators.http import condition
 from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
-import mongoengine
-from path import Path as path
+import track.views
 
 from courseware.courses import get_course_by_id
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
-from student.roles import CourseStaffRole, CourseInstructorRole
 from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
-from student.models import CourseEnrollment, UserProfile, Registration
-import track.views
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
+from student.models import CourseEnrollment, UserProfile, Registration
+from student.roles import CourseStaffRole, CourseInstructorRole
+from xmodule.modulestore.django import modulestore
 
 
 log = logging.getLogger(__name__)

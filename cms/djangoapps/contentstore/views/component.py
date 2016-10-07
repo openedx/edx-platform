@@ -2,34 +2,29 @@ from __future__ import absolute_import
 
 import logging
 
-from django.http import HttpResponseBadRequest, Http404
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_GET
-from django.core.exceptions import PermissionDenied
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseBadRequest, Http404
+from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_GET
+
+from contentstore.utils import get_lms_link_for_item
+from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
+from contentstore.views.item import create_xblock_info, add_container_page_publishing_info, StudioEditModuleRuntime
 from opaque_keys import InvalidKeyError
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from edxmako.shortcuts import render_to_response
-
-from xmodule.modulestore.django import modulestore
-
+from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
+from student.auth import has_course_author_access
 from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
-
-from contentstore.utils import get_lms_link_for_item
-from contentstore.views.helpers import get_parent_xblock, is_unit, xblock_type_display_name
-from contentstore.views.item import create_xblock_info, add_container_page_publishing_info, StudioEditModuleRuntime
-
-from opaque_keys.edx.keys import UsageKey
-
-from student.auth import has_course_author_access
-from django.utils.translation import ugettext as _
-
 from xblock_django.api import disabled_xblocks, authorable_xblocks
 from xblock_django.models import XBlockStudioConfigurationFlag
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 __all__ = [

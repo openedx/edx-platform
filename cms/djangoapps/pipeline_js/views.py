@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 
 
 def get_xmodule_urls():

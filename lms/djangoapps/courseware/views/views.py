@@ -66,7 +66,6 @@ from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient
-from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from instructor.enrollment import uses_shib
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -76,9 +75,10 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response, render_to_string, marketing_link
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.utils import is_shopping_cart_enabled
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from student.models import UserTestGroup, CourseEnrollment
 from student.roles import GlobalStaff
 from util.cache import cache, cache_if_anonymous

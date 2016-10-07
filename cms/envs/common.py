@@ -429,7 +429,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'openedx.core.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 },
                 {
@@ -439,7 +439,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'edxmako.shortcuts.render_to_string',
+                        'render_template': 'openedx.core.djangoapps.edxmako.shortcuts.render_to_string',
                     }
                 }
             ]
@@ -835,7 +835,7 @@ INSTALLED_APPS = (
     'datadog',
 
     # For asset pipelining
-    'edxmako',
+    'openedx.core.djangoapps.edxmako',
     'pipeline',
     'static_replace',
     'require',

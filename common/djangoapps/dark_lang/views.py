@@ -13,7 +13,7 @@ from openedx.core.lib.api.view_utils import view_auth_classes
 
 from dark_lang import DARK_LANGUAGE_KEY
 from dark_lang.models import DarkLangConfig
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from lang_pref import LANGUAGE_KEY
 
 LANGUAGE_INPUT_FIELD = 'preview_lang'

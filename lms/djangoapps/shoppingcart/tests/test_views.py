@@ -42,7 +42,7 @@ from student.tests.factories import UserFactory, AdminFactory, CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from embargo.test_utils import restrict_course
 from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.admin import SoftDeleteCouponAdmin

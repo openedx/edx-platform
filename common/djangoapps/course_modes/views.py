@@ -6,6 +6,8 @@ import decimal
 import urllib
 
 from babel.dates import format_datetime
+from ipware.ip import get_ip
+
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import transaction
@@ -14,18 +16,18 @@ from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, to_locale, ugettext as _
 from django.views.generic.base import View
-from ipware.ip import get_ip
+
+from courseware.access import has_access
+from embargo import api as embargo_api
+from lms.djangoapps.commerce.utils import EcommerceService
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.modulestore.django import modulestore
-
-from lms.djangoapps.commerce.utils import EcommerceService
-from course_modes.models import CourseMode
-from courseware.access import has_access
-from edxmako.shortcuts import render_to_response
-from embargo import api as embargo_api
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from student.models import CourseEnrollment
 from util.db import outer_atomic
+from xmodule.modulestore.django import modulestore
+
+from course_modes.models import CourseMode
 
 
 class ChooseModeView(View):

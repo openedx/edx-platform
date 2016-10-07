@@ -19,8 +19,9 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.contrib.staticfiles.storage import staticfiles_storage
 
-from edxmako.shortcuts import marketing_link
 from branding.models import BrandingApiConfig
+
+from openedx.core.djangoapps.edxmako.shortcuts import marketing_link
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 

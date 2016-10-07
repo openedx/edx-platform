@@ -3,14 +3,13 @@
 import pprint
 import traceback
 
+from codejail.safe_exec import safe_exec
 from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.html import escape
-
 from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
 
-from codejail.safe_exec import safe_exec
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 
 
 @login_required

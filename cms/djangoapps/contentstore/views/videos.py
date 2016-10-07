@@ -17,7 +17,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from util.json_request import expect_json, JsonResponse
 
 from .course import get_course_and_check_access

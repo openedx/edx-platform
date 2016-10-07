@@ -48,7 +48,7 @@ from django_comment_common.models import (
     FORUM_ROLE_MODERATOR,
     FORUM_ROLE_COMMUNITY_TA,
 )
-from edxmako.shortcuts import render_to_string
+
 from courseware.models import StudentModule
 from shoppingcart.models import (
     Coupon,
@@ -82,6 +82,7 @@ import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 from openedx.core.djangolib.markup import HTML, Text
 from instructor.views import INVOICE_KEY

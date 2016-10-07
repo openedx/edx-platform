@@ -1,3 +1,7 @@
+"""
+Django loader which can handle Mako templates if the first line is "## mako".
+"""
+
 import logging
 
 from django.conf import settings
@@ -7,8 +11,7 @@ from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 from django.template import Engine
 
-from edxmako.template import Template
-
+from openedx.core.djangoapps.edxmako.template import Template
 from openedx.core.lib.tempdir import mkdtemp_clean
 
 log = logging.getLogger(__name__)
@@ -40,6 +43,9 @@ class MakoLoader(object):
         return self.load_template(template_name, template_dirs)
 
     def load_template(self, template_name, template_dirs=None):
+        """
+        Loads either a Mako or Django template file.
+        """
         source, file_path = self.load_template_source(template_name, template_dirs)
 
         # In order to allow dynamic template overrides, we need to cache templates based on their absolute paths
@@ -73,14 +79,23 @@ class MakoLoader(object):
                 return source, file_path
 
     def load_template_source(self, template_name, template_dirs=None):
-        # Just having this makes the template load as an instance, instead of a class.
+        """
+        Allows the template to load as an instance, instead of a class.
+        """
         return self.base_loader.load_template_source(template_name, template_dirs)
 
     def reset(self):
+        """
+        Resets the base loader.
+        """
         self.base_loader.reset()
 
 
 class MakoFilesystemLoader(MakoLoader):
+    """
+    Mako loader which loads templates from a file system.
+    """
+
     is_usable = True
     _accepts_engine_in_init = True
 
@@ -89,6 +104,10 @@ class MakoFilesystemLoader(MakoLoader):
 
 
 class MakoAppDirectoriesLoader(MakoLoader):
+    """
+    Mako loader which loads templates from within Django app directories.
+    """
+
     is_usable = True
     _accepts_engine_in_init = True
 

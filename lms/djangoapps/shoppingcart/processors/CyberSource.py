@@ -29,11 +29,13 @@ from hashlib import sha1
 from textwrap import dedent
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from edxmako.shortcuts import render_to_string
+
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 def process_postpay_callback(params, **kwargs):

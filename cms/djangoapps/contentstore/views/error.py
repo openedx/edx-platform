@@ -1,9 +1,14 @@
 # pylint: disable=missing-docstring,unused-argument
 
-from django.http import (HttpResponse, HttpResponseServerError,
-                         HttpResponseNotFound)
-from edxmako.shortcuts import render_to_string, render_to_response
 import functools
+
+from django.http import (
+    HttpResponse,
+    HttpResponseServerError,
+    HttpResponseNotFound,
+)
+
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string, render_to_response
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 
 __all__ = ['not_found', 'server_error', 'render_404', 'render_500']

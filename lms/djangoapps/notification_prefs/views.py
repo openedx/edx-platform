@@ -10,8 +10,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 
-from edxmako.shortcuts import render_to_response
 from notification_prefs import NOTIFICATION_PREF_KEY
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.preferences.api import delete_user_preference
 

@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.conf import settings
 
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 
 from external_auth.views import (ssl_login_shortcut, ssl_get_cert_from_request,
                                  redirect_with_get)

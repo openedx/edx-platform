@@ -261,7 +261,7 @@ class TestPasswordPolicy(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        with patch('edxmako.request_context.get_current_request', return_value=request):
+        with patch('openedx.core.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             response = create_account(request)
         self.assertEqual(response.status_code, 200)
         obj = json.loads(response.content)

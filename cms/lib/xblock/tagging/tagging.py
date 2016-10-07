@@ -3,16 +3,17 @@
 Structured Tagging based on XBlockAsides
 """
 
+from django.conf import settings
+from webob import Response
+
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from xblock.core import XBlockAside, XBlock
 from xblock.fragment import Fragment
 from xblock.fields import Scope, Dict
 from xmodule.x_module import AUTHOR_VIEW
 from xmodule.capa_module import CapaModule
-from edxmako.shortcuts import render_to_string
-from django.conf import settings
-from webob import Response
-from .models import TagCategories
 
+from .models import TagCategories
 
 _ = lambda text: text
 

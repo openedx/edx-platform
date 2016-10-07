@@ -230,7 +230,7 @@ class TestCreateAccount(TestCase):
         request.session['ExternalAuthMap'] = extauth
         request.user = AnonymousUser()
 
-        with mock.patch('edxmako.request_context.get_current_request', return_value=request):
+        with mock.patch('openedx.core.djangoapps.edxmako.request_context.get_current_request', return_value=request):
             with mock.patch('django.contrib.auth.models.User.email_user') as mock_send_mail:
                 student.views.create_account(request)
 

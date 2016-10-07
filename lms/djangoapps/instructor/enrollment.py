@@ -17,13 +17,13 @@ from course_modes.models import CourseMode
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.models import StudentModule
-from edxmako.shortcuts import render_to_string
+from lang_pref import LANGUAGE_KEY
 from lms.djangoapps.grades.scores import weighted_score
 from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
-from lang_pref import LANGUAGE_KEY
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from submissions import api as sub_api  # installed from the edx-submissions repository
 from student.models import anonymous_id_for_user
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.user_api.models import UserPreference
 
 from xmodule.modulestore.django import modulestore

@@ -13,7 +13,7 @@ from mock import patch
 from django.conf import settings
 from django.contrib.sites.models import Site
 
-import edxmako
+import openedx.core.djangoapps.edxmako
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
@@ -64,7 +64,7 @@ def with_comprehensive_theme_context(theme=None):
 
 def dump_theming_info():
     """Dump a bunch of theming information, for debugging."""
-    for namespace, lookup in edxmako.LOOKUP.items():
+    for namespace, lookup in openedx.core.djangoapps.edxmako.LOOKUP.items():
         print "--- %s: %s" % (namespace, lookup.template_args['module_directory'])
         for directory in lookup.directories:
             print "  %s" % (directory,)

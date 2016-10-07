@@ -17,13 +17,13 @@ from django.utils.encoding import smart_str
 from badges.events.course_complete import get_completion_badge
 from badges.utils import badges_enabled
 from courseware.access import has_access
-from edxmako.shortcuts import render_to_response
-from edxmako.template import Template
 from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.lib.courses import course_image_url
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.template import Template
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.courses import course_image_url
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.views import handle_500

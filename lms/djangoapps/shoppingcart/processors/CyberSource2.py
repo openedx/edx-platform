@@ -33,11 +33,12 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from django.conf import settings
 from django.utils.translation import ugettext as _, ugettext_noop
-from edxmako.shortcuts import render_to_string
+
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.models import Order
 from shoppingcart.processors.exceptions import *
 from shoppingcart.processors.helpers import get_processor_config
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 

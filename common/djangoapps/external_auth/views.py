@@ -30,7 +30,6 @@ from django.utils.http import urlquote, is_safe_url
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from edxmako.shortcuts import render_to_response, render_to_string
 try:
     from django.views.decorators.csrf import csrf_exempt
 except ImportError:
@@ -47,8 +46,9 @@ from openid.extensions import ax, sreg
 from ratelimitbackend.exceptions import RateLimitException
 
 import student.views
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response, render_to_string
+from xmodule.modulestore.django import modulestore
 
 log = logging.getLogger("edx.external_auth")
 AUDIT_LOG = logging.getLogger("audit")

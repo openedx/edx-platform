@@ -17,13 +17,13 @@ from django.utils.translation import ugettext
 import logging
 import re
 
+from lms.djangoapps.courseware.courses import get_course_with_access
+from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.courses import get_course_with_access
-from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 
 from . import cohorts
-from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup, CohortMembership
 
 log = logging.getLogger(__name__)

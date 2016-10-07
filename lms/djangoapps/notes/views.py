@@ -5,15 +5,15 @@ Views to support the edX Notes feature.
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
+from django.utils.translation import ugettext_noop
 
-from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
 from courseware.tabs import EnrolledTab
 from notes.models import Note
 from notes.utils import notes_enabled_for_course
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from xmodule.annotator_token import retrieve_token
-from django.utils.translation import ugettext_noop
 
 
 @login_required

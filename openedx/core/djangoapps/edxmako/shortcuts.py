@@ -1,3 +1,7 @@
+"""
+Useful shortcuts for Mako templates.
+"""
+
 #   Copyright (c) 2008 Mikeal Rogers
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +19,13 @@
 import logging
 from urlparse import urljoin
 
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.template import Context
 
-from edxmako import lookup_template
-from edxmako.request_context import get_template_request_context
-from django.conf import settings
-from django.core.urlresolvers import reverse
+from openedx.core.djangoapps.edxmako import lookup_template
+from openedx.core.djangoapps.edxmako.request_context import get_template_request_context
 from openedx.core.djangoapps.theming.helpers import get_template_path, is_request_in_themed_site
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
@@ -95,7 +99,7 @@ def is_marketing_link_set(name):
         return name in settings.MKTG_URL_LINK_MAP
 
 
-def marketing_link_context_processor(request):
+def marketing_link_context_processor(request):  # pylint: disable=unused-argument
     """
     A django context processor to give templates access to marketing URLs
 
@@ -178,8 +182,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main', 
         context_dictionary.update(context)
 
     # "Fix" CSRF token by evaluating the lazy object
-    KEY_CSRF_TOKENS = ('csrf_token', 'csrf')
-    for key in KEY_CSRF_TOKENS:
+    for key in ('csrf_token', 'csrf'):
         if key in context_dictionary:
             context_dictionary[key] = unicode(context_dictionary[key])
 

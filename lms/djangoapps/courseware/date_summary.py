@@ -10,13 +10,13 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import to_locale, get_language
-from edxmako.shortcuts import render_to_string
 from lazy import lazy
 from pytz import utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.lib.time_zone_utils import get_time_zone_abbr, get_user_time_zone
 from student.models import CourseEnrollment
 

@@ -8,9 +8,9 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import View
 
-from edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError

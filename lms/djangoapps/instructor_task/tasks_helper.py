@@ -23,7 +23,6 @@ from django.db.models import Q
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 from StringIO import StringIO
-from edxmako.shortcuts import render_to_string
 from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
 from shoppingcart.models import (
     PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
@@ -57,17 +56,18 @@ from instructor_analytics.basic import (
     list_problem_responses
 )
 from instructor_analytics.csvs import format_dictlist
-from openassessment.data import OraAggregateData
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
+from lms.djangoapps.teams.models import CourseTeamMembership
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from opaque_keys.edx.keys import UsageKey
+from openassessment.data import OraAggregateData
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
-from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment, CourseAccessRole
-from lms.djangoapps.teams.models import CourseTeamMembership
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')

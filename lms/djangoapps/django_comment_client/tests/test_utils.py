@@ -9,7 +9,6 @@ from django.utils.timezone import UTC as django_utc
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory
-from edxmako import add_lookup
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
@@ -17,12 +16,13 @@ import django_comment_client.utils as utils
 
 from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.course_groups import cohorts
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from openedx.core.djangoapps.course_groups.tests.helpers import config_course_cohorts, topic_name_to_id
-from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.edxmako import add_lookup
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
+from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentFactory
 from student.roles import CourseStaffRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, ToyCourseFactory
@@ -1202,7 +1202,7 @@ class RenderMustacheTests(TestCase):
     Test the `render_mustache` utility function.
     """
 
-    @mock.patch('edxmako.LOOKUP', {})
+    @mock.patch('openedx.core.djangoapps.edxmako.LOOKUP', {})
     def test_it(self):
         """
         Basic test.

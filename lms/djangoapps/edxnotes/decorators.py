@@ -13,7 +13,7 @@ from edxnotes.helpers import (
     generate_uid,
     is_feature_enabled,
 )
-from edxmako.shortcuts import render_to_string
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_string
 
 
 def edxnotes(cls):

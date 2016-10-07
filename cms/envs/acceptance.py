@@ -32,7 +32,7 @@ LOG_OVERRIDES = [
     ('track.middleware', logging.CRITICAL),
     ('codejail.safe_exec', logging.ERROR),
     ('edx.courseware', logging.ERROR),
-    ('edxmako.shortcuts', logging.ERROR),
+    ('openedx.core.djangoapps.edxmako.shortcuts', logging.ERROR),
     ('audit', logging.ERROR),
     ('contentstore.views.import_export', logging.CRITICAL),
     ('xmodule.x_module', logging.CRITICAL),

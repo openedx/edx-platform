@@ -8,10 +8,10 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 
 from commerce.models import CommerceConfiguration
-from edxmako.shortcuts import render_to_response
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from shoppingcart.processors.CyberSource2 import is_user_payment_error
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment

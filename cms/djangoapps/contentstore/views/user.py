@@ -5,20 +5,18 @@ from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import ensure_csrf_cookie
-from edxmako.shortcuts import render_to_response
 
-from xmodule.modulestore.django import modulestore
+from course_creators.views import user_requested_access
+from django.http import HttpResponseNotFound
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryLocator
-from util.json_request import JsonResponse, expect_json
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
-from course_creators.views import user_requested_access
-
-from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
-
-from student.models import CourseEnrollment
-from django.http import HttpResponseNotFound
+from openedx.core.djangoapps.edxmako.shortcuts import render_to_response
 from student import auth
+from student.auth import STUDIO_EDIT_ROLES, STUDIO_VIEW_USERS, get_user_permissions
+from student.models import CourseEnrollment
+from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from util.json_request import JsonResponse, expect_json
+from xmodule.modulestore.django import modulestore
 
 
 __all__ = ['request_course_creator', 'course_team_handler']
