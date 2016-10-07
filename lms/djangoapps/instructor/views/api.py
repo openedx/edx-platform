@@ -2535,7 +2535,7 @@ def send_email(request, course_id):
         return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-        lms.djangoapps.instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
+    lms.djangoapps.instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
