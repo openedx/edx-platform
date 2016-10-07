@@ -39,7 +39,6 @@ from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 class StudioHelpTest(StudioCourseTest):
     """Tests for Studio help."""
 
-    @flaky  # TODO: TNL-4954
     def test_studio_help_links(self):
         """Test that the help links are present and have the correct content."""
         page = DashboardPage(self.browser)
