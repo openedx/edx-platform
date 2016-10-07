@@ -832,7 +832,7 @@ INSTALLED_APPS = (
     'eventtracking.django.apps.EventTrackingConfig',
 
     # Monitoring
-    'datadog',
+    'openedx.core.djangoapps.datadog',
 
     # For asset pipelining
     'edxmako',
