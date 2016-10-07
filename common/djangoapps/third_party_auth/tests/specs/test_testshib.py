@@ -120,12 +120,12 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self.assertEqual(provider_response.status_code, 302)
         self.assertEqual(provider_response['Location'], self.url_prefix + self.register_page_url)
         register_response = self.client.get(self.register_page_url)
-        tpa_context = register_response.context["data"]["third_party_auth"]
+        tpa_context = register_response.context["data"]["third_party_auth"]  #pylint: disable=no-member
         self.assertEqual(tpa_context["errorMessage"], None)
         # Check that the "You've successfully signed into [PROVIDER_NAME]" message is shown.
         self.assertEqual(tpa_context["currentProvider"], self.PROVIDER_NAME)
         # Check that the data (e.g. email) from the provider is displayed in the form:
-        form_data = register_response.context['data']['registration_form_desc']
+        form_data = register_response.context['data']['registration_form_desc']  #pylint: disable=no-member
         form_fields = {field['name']: field for field in form_data['fields']}
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
