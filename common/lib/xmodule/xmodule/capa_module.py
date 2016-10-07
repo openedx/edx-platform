@@ -31,9 +31,9 @@ class CapaModule(CapaMixin, XModule):
     js = {
         'coffee': [
             resource_string(__name__, 'js/src/capa/display.coffee'),
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/capa/imageinput.js'),
             resource_string(__name__, 'js/src/capa/schematic.js'),

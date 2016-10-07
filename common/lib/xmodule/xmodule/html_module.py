@@ -92,10 +92,10 @@ class HtmlModuleMixin(HtmlBlock, XModule):
     """
     js = {
         'coffee': [
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
             resource_string(__name__, 'js/src/html/display.coffee'),
         ],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/html/imageModal.js'),
             resource_string(__name__, 'js/common_static/js/vendor/draggabilly.js'),
