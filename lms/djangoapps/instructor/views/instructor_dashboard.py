@@ -22,8 +22,8 @@ from django.conf import settings
 from util.json_request import JsonResponse
 from mock import patch
 
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
+from openedx.core.lib.url_utils import quote_slashes
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab

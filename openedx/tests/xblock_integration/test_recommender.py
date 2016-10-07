@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from lms.djangoapps.courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.courseware.tests.factories import GlobalStaffFactory
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
+from openedx.core.lib.url_utils import quote_slashes
 
 
 class TestRecommender(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
