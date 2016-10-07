@@ -868,7 +868,7 @@ INSTALLED_APPS = (
     'embargo',
 
     # Monitoring signals
-    'monitoring',
+    'openedx.core.djangoapps.monitoring',
 
     # Course action state
     'course_action_state',

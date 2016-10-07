@@ -13,7 +13,7 @@ from django.dispatch import receiver
 import dogstats_wrapper as dog_stats_api
 
 
-def _database_tags(action, sender, kwargs):
+def _database_tags(action, sender, kwargs):  # pylint: disable=unused-argument
     """
     Return a tags for the sender and database used in django.db.models signals.
 
