@@ -384,10 +384,9 @@
                 } else if (RE_DISPLAYMATH.test(htmlString)) {
                     htmlString = htmlString.replace(RE_DISPLAYMATH, function($0, $1, $2, $3) {
                         /*
-                         bug fix, ordering is off
+                         corrected mathjax rendering in preview
                          */
-                        processedHtmlString = processor('$$' + $2 + '$$', 'display') + processedHtmlString;
-                        processedHtmlString = $1 + processedHtmlString;
+                        processedHtmlString += $1 + processor('$$' + $2 + '$$', 'display');
                         return $3;
                     });
                 } else {

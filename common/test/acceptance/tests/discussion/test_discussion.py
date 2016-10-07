@@ -959,6 +959,22 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             "</ul>"
         ))
 
+    def test_mathjax_rendering_in_order(self):
+        """
+        Tests that mathjax is rendered in proper order.
+
+        When user types mathjax expressions into discussion editor, it should render in the proper
+        order.
+        """
+        self.page.set_new_post_editor_value(
+            'Text line 1 \n'
+            '$$e[n]=d_1$$ \n'
+            'Text line 2 \n'
+            '$$e[n]=d_2$$'
+        )
+
+        self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
+
 
 @attr(shard=2)
 class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
