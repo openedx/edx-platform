@@ -9,8 +9,8 @@ from opaque_keys.edx.locator import CourseLocator
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
-from embargo.models import IPFilter
-from embargo.forms import RestrictedCourseForm, IPFilterForm
+from ..models import IPFilter
+from ..forms import RestrictedCourseForm, IPFilterForm
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -40,13 +40,17 @@ class RestrictedCourseFormTest(ModuleStoreTestCase):
         self._assert_course_field_error(form)
 
     def _assert_course_field_error(self, form):
-        # Validation shouldn't work
+        """
+        Validation shouldn't work.
+        """
         self.assertFalse(form.is_valid())
 
         msg = 'COURSE NOT FOUND'
         self.assertIn(msg, form._errors['course_key'][0])  # pylint: disable=protected-access
 
-        with self.assertRaisesRegexp(ValueError, "The RestrictedCourse could not be created because the data didn't validate."):
+        with self.assertRaisesRegexp(
+            ValueError, "The RestrictedCourse could not be created because the data didn't validate."
+        ):
             form.save()
 
 
@@ -111,9 +115,11 @@ class IPFilterFormTest(TestCase):
         form = IPFilterForm(data=form_data)
         self.assertFalse(form.is_valid())
 
-        wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55'] Please fix the error(s) and try again."
+        wmsg = "Invalid IP Address(es): [u'.0.0.1', u':dead:beef:::', u'1.0.0.0/55']" \
+               " Please fix the error(s) and try again."
         self.assertEquals(wmsg, form._errors['whitelist'][0])  # pylint: disable=protected-access
-        bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/'] Please fix the error(s) and try again."
+        bmsg = "Invalid IP Address(es): [u'18.244.*', u'999999:c0a8:101::42', u'1.0.0.0/']" \
+               " Please fix the error(s) and try again."
         self.assertEquals(bmsg, form._errors['blacklist'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(ValueError, "The IPFilter could not be created because the data didn't validate."):

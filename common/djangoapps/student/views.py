@@ -109,7 +109,7 @@ from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 
 import analytics
 from eventtracking import tracker

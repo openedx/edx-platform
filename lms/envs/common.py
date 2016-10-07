@@ -1137,9 +1137,8 @@ MIDDLEWARE_CLASSES = (
 
     'splash.middleware.SplashMiddleware',
 
-
     'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
-    'embargo.middleware.EmbargoMiddleware',
+    'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
@@ -2036,7 +2035,7 @@ INSTALLED_APPS = (
     'rss_proxy',
 
     # Country embargo support
-    'embargo',
+    'openedx.core.djangoapps.embargo',
 
     # Monitoring functionality
     'openedx.core.djangoapps.monitoring',
