@@ -489,10 +489,12 @@ def _section_membership(course, access, is_white_label):
 def _section_cohort_management(course, access):
     """ Provide data for the corresponding cohort management section """
     course_key = course.id
+    ccx_enabled = hasattr(course_key, 'ccx')
     section_data = {
         'section_key': 'cohort_management',
         'section_display_name': _('Cohorts'),
         'access': access,
+        'ccx_is_enabled': ccx_enabled,
         'course_cohort_settings_url': reverse(
             'course_cohort_settings',
             kwargs={'course_key_string': unicode(course_key)}
