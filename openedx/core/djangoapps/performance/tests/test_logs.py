@@ -1,4 +1,7 @@
-"""Tests that performance data is successfully logged."""
+# pylint: disable=no-member
+"""
+Tests that performance data is successfully logged.
+"""
 import datetime
 import dateutil
 import json
@@ -8,7 +11,7 @@ from StringIO import StringIO
 
 from django.test import TestCase
 from django.test.client import RequestFactory
-from performance.views import performance_log
+from openedx.core.djangoapps.performance.views import performance_log
 
 
 class PerformanceTrackingTest(TestCase):
