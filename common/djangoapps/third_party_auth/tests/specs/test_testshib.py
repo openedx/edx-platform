@@ -100,7 +100,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         Configure TestShib to require data sharing consent before running the registration test
         """
         self._configure_testshib_provider(require_data_sharing_consent=True)
-        super(TestShibIntegrationTest, self).test_register(data_sharing_consent=True))
+        super(TestShibIntegrationTest, self).test_register(data_sharing_consent=True)
 
     def test_registration_not_allowed_without_data_sharing_consent(self):
         """
