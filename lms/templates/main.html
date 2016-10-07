@@ -81,7 +81,6 @@ from branding import api as branding_api
   self.course_index_overlay_file = None
   self.course_info_extra_file = None
   self.dashboard_extra_file = None
-  self.register_extra_file = None
   self.register_honor_link = None
   self.register_sidebar_extra_file = None
 
@@ -100,7 +99,6 @@ from branding import api as branding_api
     self.course_index_overlay_file = 'theme-course_index_overlay.html'
     self.course_info_extra_file = 'theme-course_info_extra.html'
     self.dashboard_extra_file = 'theme-dashboard_extra.html'
-    self.register_extra_file = 'theme-register_extra.html'
     self.register_honor_link = marketing_link('TOS') + "#honor"
     self.register_sidebar_extra_file = 'theme-register_sidebar.html' # TODO: This is hardcoded in register_sidebar.html because it doesn't inherit this file right now.
   else:

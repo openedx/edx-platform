@@ -327,8 +327,8 @@ import calendar
           % endif
         </ol>
       </div>
-      % if self.register_extra_file:
-          <%include file='${self.register_extra_file}' />
+      % if self.theme_enabled() and not self.is_microsite():
+        <%include file='theme-register_extra.html' />
       % endif
       <div class="group group-form group-form-accountacknowledgements">
         <h2 class="sr">${_("Account Acknowledgements")}</h2>
