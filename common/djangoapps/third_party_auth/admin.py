@@ -173,6 +173,9 @@ admin.site.register(ProviderApiPermissions, ApiPermissionsAdmin)
 
 
 class UserDataSharingConsentAuditAdmin(admin.ModelAdmin):
-    pass
+    """
+    Django Admin class for UserDataSharingConsentAudit
+    """
+    list_display = ('user_social_auth', 'state')
 
 admin.site.register(UserDataSharingConsentAudit, UserDataSharingConsentAuditAdmin)

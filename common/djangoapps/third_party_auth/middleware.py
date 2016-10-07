@@ -32,7 +32,7 @@ class ResetSessionIfPipelineBrokenMiddleware(object):
     Middleware signs the user out if they need to provide data sharing consent,
     haven't, and left the TPA pipeline prematurely
     """
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request, view_func, view_args, view_kwargs): # pylint: disable=unused-argument
         """
         Conditionally sign out users who don't provide data sharing consent
         """

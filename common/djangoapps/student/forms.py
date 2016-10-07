@@ -191,7 +191,9 @@ class AccountCreationForm(forms.Form):
                     if field_value == "required":
                         self.fields[field_name] = TrueField(
                             error_messages={
-                                "required": _("Your SSO identity provider requires you to consent to course data sharing.")
+                                "required": _(
+                                    "Your SSO identity provider requires you to consent to course data sharing."
+                                )
                             }
                         )
                     else:

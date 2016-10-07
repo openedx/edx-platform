@@ -94,8 +94,8 @@ class UserDataSharingConsentAudit(TimeStampedModel):
     DISABLED = 'disabled'
     STATE_CHOICES = (
         (NOT_SET, 'Not set'),
-        (ENABLED, 'Permitted'),
-        (DISABLED, 'Not permitted')
+        (ENABLED, 'Enabled'),
+        (DISABLED, 'Disabled')
     )
 
     user_social_auth = models.OneToOneField(
@@ -153,6 +153,12 @@ class UserDataSharingConsentAudit(TimeStampedModel):
         )
         self.state = self.DISABLED
 
+    def __unicode__(self):
+        return 'UserDataSharingConsent: {} - {}'.format(
+            self.user_social_auth,
+            self.state
+        )
+
 
 class UserDataSharingConsentAuditHistory(TimeStampedModel):
     """
@@ -169,8 +175,8 @@ class UserDataSharingConsentAuditHistory(TimeStampedModel):
     DISABLED = 'disabled'
     STATE_CHOICES = (
         (NOT_SET, 'Not set'),
-        (ENABLED, 'Permitted'),
-        (DISABLED, 'Not permitted')
+        (ENABLED, 'Enabled'),
+        (DISABLED, 'Disabled')
     )
     current_state = models.ForeignKey(
         UserDataSharingConsentAudit,
@@ -201,6 +207,13 @@ class UserDataSharingConsentAuditHistory(TimeStampedModel):
             "state transition indicated by this recordd."
         )
     )
+
+    def __unicode__(self):
+        'Historical user data sharing consent record: {} - {} - {}'.format(
+            self.current_state.user_social_auth,
+            self.new_state,
+            self.created
+        )
 
 
 class ProviderConfig(ConfigurationModel):

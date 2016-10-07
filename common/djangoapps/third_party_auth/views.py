@@ -12,7 +12,7 @@ from social.apps.django_app.views import complete
 from social.apps.django_app.utils import load_strategy, load_backend
 from social.utils import setting_name
 from .models import SAMLConfiguration, UserDataSharingConsentAudit
-from pipeline import get as get_running_pipeline, get_complete_url
+from .pipeline import get as get_running_pipeline, get_complete_url
 from .provider import Registry
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
@@ -117,15 +117,16 @@ class GrantDataSharingPermissions(View):
         if not running_pipeline:
             raise Http404
         consent_provided = request.POST.get('data_sharing_consent', False)
-        social = running_pipeline['kwargs']['social']
+        social_auth = running_pipeline['kwargs']['social']
         try:
-            consent = social.data_sharing_consent_audit
+            consent = social_auth.data_sharing_consent_audit
         except UserDataSharingConsentAudit.DoesNotExist:
-            consent = UserDataSharingConsentAudit.create(user_social_auth=social)
+            consent = UserDataSharingConsentAudit.create(user_social_auth=social_auth)
         if consent_provided:
             consent.enable()
             consent.save()
-            return redirect(get_complete_url())
+            backend_name = running_pipeline['kwargs']['backend'].name
+            return redirect(get_complete_url(backend_name))
         else:
             consent.disable()
             consent.save()

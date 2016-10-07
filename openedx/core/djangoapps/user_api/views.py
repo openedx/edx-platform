@@ -852,14 +852,15 @@ class RegistrationView(APIView):
         the SSO provider with which they're authenticating.
         """
         label = _(
-            "I agree to allow my course data to be shared with {sso_name}".format(
-                sso_name=sso_name
-            )
+            "I agree to allow my course data to be shared with {sso_name}"
+        ).format(
+            sso_name=sso_name
         )
+
         error_msg = _(
-            "To link your account with {sso_name}, you are required to consent to data sharing.".format(
-                sso_name=sso_name
-            )
+            "To link your account with {sso_name}, you are required to consent to data sharing."
+        ).format(
+            sso_name=sso_name
         )
         form_desc.add_field(
             "data_sharing_consent",
