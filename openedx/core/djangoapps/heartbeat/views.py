@@ -1,3 +1,6 @@
+"""
+Views for verifying the health (heartbeat) of the app.
+"""
 from xmodule.modulestore.django import modulestore
 from dogapi import dog_stats_api
 from util.json_request import JsonResponse
@@ -7,7 +10,7 @@ from xmodule.exceptions import HeartbeatFailure
 
 
 @dog_stats_api.timed('edxapp.heartbeat')
-def heartbeat(request):
+def heartbeat(request):  # pylint: disable=unused-argument
     """
     Simple view that a loadbalancer can check to verify that the app is up. Returns a json doc
     of service id: status or message. If the status for any service is anything other than True,
