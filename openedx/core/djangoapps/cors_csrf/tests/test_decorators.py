@@ -3,7 +3,8 @@ import json
 import mock
 from django.http import HttpResponse
 from django.test import TestCase
-from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+
+from ..decorators import ensure_csrf_cookie_cross_domain
 
 
 def fake_view(request):

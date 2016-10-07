@@ -8,7 +8,7 @@ from django.conf import settings
 
 from rest_framework.exceptions import PermissionDenied
 
-from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from ..authentication import SessionAuthenticationCrossDomainCsrf
 
 
 class CrossDomainAuthTest(TestCase):

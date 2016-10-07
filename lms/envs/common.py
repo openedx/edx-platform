@@ -471,6 +471,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+    OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
 ]
 
@@ -1129,8 +1130,8 @@ MIDDLEWARE_CLASSES = (
 
     # CORS and CSRF
     'corsheaders.middleware.CorsMiddleware',
-    'cors_csrf.middleware.CorsCSRFMiddleware',
-    'cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'splash.middleware.SplashMiddleware',
@@ -2072,7 +2073,7 @@ INSTALLED_APPS = (
 
     # CORS and cross-domain CSRF
     'corsheaders',
-    'cors_csrf',
+    'openedx.core.djangoapps.cors_csrf',
 
     'commerce',
 

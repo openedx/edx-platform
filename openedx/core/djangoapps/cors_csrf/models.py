@@ -7,7 +7,7 @@ from config_models.models import ConfigurationModel
 class XDomainProxyConfiguration(ConfigurationModel):
     """Cross-domain proxy configuration.
 
-    See `cors_csrf.views.xdomain_proxy` for an explanation of how this works.
+    See `openedx.core.djangoapps.cors_csrf.views.xdomain_proxy` for an explanation of how this works.
 
     """
 
@@ -17,3 +17,6 @@ class XDomainProxyConfiguration(ConfigurationModel):
             u"requests to this site.  Please list each domain on its own line."
         )
     )
+
+    def __unicode__(self):
+        return "XDomainProxyConfiguration()"

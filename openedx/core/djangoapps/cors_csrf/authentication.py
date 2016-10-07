@@ -1,6 +1,10 @@
-"""Django Rest Framework Authentication classes for cross-domain end-points."""
+"""
+Django Rest Framework Authentication classes for cross-domain end-points.
+"""
+
 from rest_framework import authentication
-from cors_csrf.helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
+
+from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
 
 
 class SessionAuthenticationCrossDomainCsrf(authentication.SessionAuthentication):

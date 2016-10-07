@@ -1,13 +1,14 @@
 """Tests for cross-domain request views. """
+
+import ddt
 import json
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse, NoReverseMatch
 
-import ddt
-
 from config_models.models import cache
-from cors_csrf.models import XDomainProxyConfiguration
+
+from ..models import XDomainProxyConfiguration
 
 
 @ddt.ddt

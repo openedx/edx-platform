@@ -48,7 +48,7 @@ from django.conf import settings
 from django.middleware.csrf import CsrfViewMiddleware
 from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
 
-from cors_csrf.helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
+from .helpers import is_cross_domain_request_allowed, skip_cross_domain_referer_check
 
 log = logging.getLogger(__name__)
 
