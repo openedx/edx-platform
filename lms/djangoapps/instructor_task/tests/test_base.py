@@ -14,12 +14,12 @@ from celery.states import SUCCESS, FAILURE
 from django.core.urlresolvers import reverse
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
 from courseware.tests.tests import LoginEnrollmentTestCase
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from openedx.core.lib.url_utils import quote_slashes
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

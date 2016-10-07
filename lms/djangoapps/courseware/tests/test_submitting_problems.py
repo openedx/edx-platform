@@ -19,21 +19,21 @@ from capa.tests.response_xml_factory import (
     OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
     CodeResponseXMLFactory,
 )
-from lms.djangoapps.grades import course_grades, progress
 from course_modes.models import CourseMode
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from student.models import anonymous_id_for_user, CourseEnrollment
-from submissions import api as submissions_api
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.partitions.partitions import Group, UserPartition
+from lms.djangoapps.grades import course_grades, progress
 from openedx.core.djangoapps.credit.api import (
     set_credit_requirements, get_credit_requirement_status
 )
 from openedx.core.djangoapps.credit.models import CreditCourse, CreditProvider
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
+from openedx.core.lib.url_utils import quote_slashes
+from student.models import anonymous_id_for_user, CourseEnrollment
+from submissions import api as submissions_api
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 class ProblemSubmissionTestMixin(TestCase):
