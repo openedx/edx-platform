@@ -17,7 +17,6 @@
             var cohort_name = cohort.get('name');
             var cohort_name_value = isNewCohort ? '' : cohort_name;
             var placeholder_value = isNewCohort ? gettext('Enter the name of the cohort') : '';
-
             %>
             <div class="form-field">
                 <div class="cohort-management-settings-form-name field field-text">
@@ -126,7 +125,11 @@
                                             }
                                         )
                                         %>
-                                        <a class="link-to-group-settings" href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a>
+                                        <% if (isCcxEnabled) { %>
+                                            <%- gettext("Only the parent course staff of a CCX can create content groups.") %>
+                                        <% } else { %>
+                                            <a class="link-to-group-settings" href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a>
+                                        <% } %>
                                     </p>
                                 </div>
                             </div>
