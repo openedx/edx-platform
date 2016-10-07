@@ -95,6 +95,54 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self._configure_testshib_provider()
         super(TestShibIntegrationTest, self).test_register()
 
+    def test_register_with_data_sharing_consent(self):
+        """
+        Configure TestShib to require data sharing consent before running the registration test
+        """
+        self._configure_testshib_provider(require_data_sharing_consent=True)
+        super(TestShibIntegrationTest, self).test_register(data_sharing_consent=True))
+
+    def test_registration_not_allowed_without_data_sharing_consent(self):
+        """
+        Configure TestShib to require data sharing consent, but don't provide
+        consent when registering
+        """
+        self._configure_testshib_provider(require_data_sharing_consent=True)
+        # The user goes to the register page, and sees a button to register with the provider:
+        provider_register_url = self._check_register_page()
+        # The user clicks on the Dummy button:
+        try_login_response = self.client.get(provider_register_url)
+        # The user should be redirected to the provider's login page:
+        self.assertEqual(try_login_response.status_code, 302)
+        provider_response = self.do_provider_login(try_login_response['Location'])
+        # We should be redirected to the register screen since this account is not linked to an edX account:
+        self.assertEqual(provider_response.status_code, 302)
+        self.assertEqual(provider_response['Location'], self.url_prefix + self.register_page_url)
+        register_response = self.client.get(self.register_page_url)
+        tpa_context = register_response.context["data"]["third_party_auth"]
+        self.assertEqual(tpa_context["errorMessage"], None)
+        # Check that the "You've successfully signed into [PROVIDER_NAME]" message is shown.
+        self.assertEqual(tpa_context["currentProvider"], self.PROVIDER_NAME)
+        # Check that the data (e.g. email) from the provider is displayed in the form:
+        form_data = register_response.context['data']['registration_form_desc']
+        form_fields = {field['name']: field for field in form_data['fields']}
+        self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
+        self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
+        self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
+        registration_values = {
+            'email': 'email-edited@tpa-test.none',
+            'name': 'My Customized Name',
+            'username': 'new_username',
+            'honor_code': True,
+            'data_sharing_consent': False
+        }
+        # Now complete the form:
+        ajax_register_response = self.client.post(
+            reverse('user_api_registration'),
+            registration_values
+        )
+        self.assertEqual(ajax_register_response.status_code, 400)
+
     def test_login_records_attributes(self):
         """
         Test that attributes sent by a SAML provider are stored in the UserSocialAuth table.

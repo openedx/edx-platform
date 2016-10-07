@@ -227,7 +227,6 @@ def active_provider_requests_data_sharing(request):
     return False
 
 
-
 def get_authenticated_user(auth_provider, username, uid):
     """Gets a saved user authenticated by a particular backend.
 
