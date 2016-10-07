@@ -549,7 +549,7 @@ class JavascriptInput(InputTypeBase):
 
     TODO (arjun?): document this in detail.  Initial notes:
     - display_class is a subclass of XProblemClassDisplay (see
-        xmodule/xmodule/js/src/capa/display.coffee),
+        xmodule/xmodule/js/src/capa/display.js),
     - display_file is the js script to be in /static/js/ where display_class is defined.
     """
 

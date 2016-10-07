@@ -215,7 +215,7 @@ class @Sequence
         widget_placement: widget_placement
 
       # On Sequence change, destroy any existing polling thread
-      # for queued submissions, see ../capa/display.coffee
+      # for queued submissions, see ../capa/display.js
       if window.queuePollerID
         window.clearTimeout(window.queuePollerID)
         delete window.queuePollerID
