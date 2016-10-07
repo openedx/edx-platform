@@ -711,7 +711,7 @@ def set_data_sharing_consent_record(social, data_sharing_consent=None, **kwargs)
     if data_sharing_consent is None:
         return
 
-    consent = UserDataSharingConsentAudit.objects.get_or_create(user_social_auth=social)
+    consent, _ = UserDataSharingConsentAudit.objects.get_or_create(user_social_auth=social)
 
     if data_sharing_consent:
         consent.enable()

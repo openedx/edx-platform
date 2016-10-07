@@ -5,6 +5,7 @@ import ddt
 import unittest
 import httpretty
 from mock import patch
+from django.core.urlresolvers import reverse
 from social.apps.django_app.default.models import UserSocialAuth
 
 from third_party_auth.saml import log as saml_log

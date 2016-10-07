@@ -76,7 +76,6 @@ class IntegrationTestMixin(object):
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
         self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
-
         registration_values = {
             'email': 'email-edited@tpa-test.none',
             'name': 'My Customized Name',
