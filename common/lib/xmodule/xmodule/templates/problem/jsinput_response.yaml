@@ -5,67 +5,176 @@ metadata:
     showanswer: never
 data: |
       <problem>
-          <p>
-              In these problems (also called custom JavaScript problems or JS Input
-              problems), you add a problem or tool that uses JavaScript in Studio.
-              Studio embeds the problem in an IFrame so that your students can
-              interact with it in the LMS. You can grade your students' work using
-              JavaScript and some basic Python, and the grading is integrated into the
-              edX grading system.
-          </p>
-          <p>
-              The JS Input problem that you create must use HTML, JavaScript, and
-              cascading style sheets (CSS). You can use any application creation tool,
-              such as the Google Web Toolkit (GWT), to create your JS Input problem.
-          </p>
-          <p>
-              For more information, see
-              <a href="http://edx.readthedocs.io/projects/edx-partner-course-staff/en/latest/exercises_tools/custom_javascript.html" target="_blank">
-              Custom JavaScript Problem</a> in <i>Building and Running an edX Course</i>.
-          </p>
-          <p>
-              JavaScript developers can also see
-              <a href="http://edx.readthedocs.io/projects/edx-developer-guide/en/latest/extending_platform/javascript.html" target="_blank">
-              Custom JavaScript Applications</a> in the <i>EdX Developer's Guide</i>.
-          </p>
-          <p>
-              When you add the problem, be sure to select <strong>Settings</strong>
-              to specify a <strong>Display Name</strong> and other values that apply.
-          </p>
-          <p>You can use the following example problem as a model.</p>
+        <script type="loncapa/python">
 
-          <customresponse cfn="vglcfn">
-      <script type="loncapa/python">
-      <![CDATA[
+
       import json
-      def vglcfn(e, ans):
-        '''
-        par is a dictionary that contains two keys, "answer" and "state".
-        The value of "answer" is the JSON string that "getGrade" returns.
-        The value of "state" is the JSON string that "getState" returns.
-        Clicking either "Check" or "Save" registers the current state.
 
-        '''
-        par = json.loads(ans)
-        # You can use the value of the answer key to grade:
-        answer = json.loads(par["answer"])
-        return answer["cylinder"] and not answer["cube"]
-        '''
-        # Or you can use the value of the state key to grade:
-        state = json.loads(par["state"])
-        selectedObjects = state["selectedObjects"]
-        return selectedObjects["cylinder"] and not selectedObjects["cube"]
-        '''
-      ]]>
+      ########## Course Author Section #########
+      ## Change whatever you need to in here. ##
+      ##########################################
+
+      # These are REQUIRED for all problems.
+      problem_type = 'interval'  # Set to 'interval' or a 'number'
+      show_open_close = False    # Do we ask for open/closed interval?
+      feedback = True            # Do we tell people how close they were?
+      is_time_question = True    # Should we convert these numbers to times (min:sec)?
+                                 # If this is set True, course authors still use seconds.
+
+      # Only for number-guessing:
+      correct_number = 10            # The right answer
+      tolerance = [2, 4, 6]          # How close do they have to be? [correct, near, far]
+      brackets = [1, 0.5, 0.25, 0]   # Scores for various range brackets
+
+      # Only for interval-guessing:
+      correct_interval = [416,660]           # Please put the lower value on the left.
+      interval_type = ['closed', 'closed']   # Are endpoints 'open' or 'closed'?
+      interval_tolerance = 'linear'          # Options: 'linear', 'strict', or 'generous'
+      type_penalty = 0.1                     # Points off if open/closed incorrect
+
+      # Only for estimation
+      max_time = 1000                # Large number of people beyond actual high
+
+      ######## End Course Author Section #########
+      ## Don't change anything below this line. ##
+      ############################################
+
+
+      # Set the outer bounds for the slider
+      lowerlimit = 0
+      upperlimit = 1000
+
+
+      def answercheck(e, ans):
+          
+        # Get the student's answer.
+        parsed = json.loads(ans)
+        answer = json.loads(parsed['answer'])
+        guess_upper = answer['upperguess']
+        guess_lower = answer['lowerguess']
+        guess_upper_closed = answer['upperclosed']
+        guess_lower_closed = answer['lowerclosed']
+        
+        # Now begins the grading.
+        message = ''
+        final_grade = 0
+        
+        if problem_type == 'interval':
+          if guess_upper &lt; correct_interval[0]:
+            # No points if there's no overlap.
+            message = 'Answer not in selected range.'
+          elif guess_lower &gt; correct_interval[1]:
+            # Same here.
+            message = 'Answer not in selected range.'
+          else:
+            # Points based on percentage overlap.
+            endpoints = []
+            endpoints.append(correct_interval[0])
+            endpoints.append(correct_interval[1])
+            endpoints.append(guess_upper)
+            endpoints.append(guess_lower)
+            endpoints.sort()
+            
+            overlap = endpoints[2] - endpoints[1]
+            bigrange = max(correct_interval[1] - correct_interval[0], guess_upper - guess_lower)
+            final_grade = float(overlap) / float(bigrange)
+            
+            message = str(int(round(final_grade, 2) * 100)) + '% overlap with correct answer.'
+
+            if interval_tolerance == 'strict':
+              final_grade = final_grade * final_grade
+            elif interval_tolerance == 'generous':
+              final_grade = math.sqrt(final_grade)
+            
+            # Round up to the nearest tenth.
+            final_grade = math.ceil(final_grade*10.0) / 10.0
+            
+            if show_open_close:
+              if(guess_lower_closed != True and interval_type[0] == 'closed'):
+                final_grade = final_grade - type_penalty
+                message += ' Lower endpoint is wrong.'
+              if(guess_lower_closed == True and interval_type[0] != 'closed'):
+                final_grade = final_grade - type_penalty
+                message += ' Lower endpoint is wrong.'
+              if(guess_upper_closed != True and interval_type[1] == 'closed'):
+                final_grade = final_grade - type_penalty
+                message += ' Upper endpoint is wrong.'
+              if(guess_upper_closed == True and interval_type[1] != 'closed'):
+                final_grade = final_grade - type_penalty
+                message += ' Upper endpoint is wrong.'
+            
+        else:
+          
+          farthest = max(abs(correct_number - guess_upper), abs(correct_number - guess_lower))
+          
+          if farthest &lt; tolerance[0]:
+            final_grade = brackets[0]
+            message = 'Close enough! Actual answer: ' + str(correct_number)
+          elif farthest &lt; tolerance[1]:
+            final_grade = brackets[1]
+            message = 'Close. You are off by ' + str(farthest)
+          elif farthest &lt; tolerance[2]:
+            final_grade = brackets[2]
+            message = 'Not very close. You are off by ' + str(farthest)
+          else:
+            final_grade = brackets[3]
+            message = 'Your range is too large to get points.'
+          
+          if guess_upper &gt; correct_number and guess_lower &lt; correct_number:
+            message += ' The answer is within your range.'
+          else:
+            message += ' The answer is outside your range.'
+          
+        if not feedback:
+          message = ''
+
+        if final_grade &gt; 0.95:
+          isOK = True
+        elif final_grade &gt; 0.05:
+          isOK = "Partial"
+        else:
+          isOK = False
+        
+        return {
+          'input_list': [
+              { 'ok': isOK, 'msg': message, 'grade_decimal': final_grade},
+          ]
+        }
+
+
+
       </script>
-            <p>In the following image, click the objects until the cone is yellow and the cube is blue.</p>
-            <jsinput gradefn="WebGLDemo.getGrade"
-              get_statefn="WebGLDemo.getState"
-              set_statefn="WebGLDemo.setState"
-              initial_state='{"selectedObjects":{"cube":true,"cylinder":false}}'
-              width="400"
-              height="400"
-              html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"
-              sop="false"/>
-          </customresponse>
+        <script type="text/javascript">
+      $(document).ready(function(){
+      	console.log('Let\'s go!');
+      });
+
+      // Logs a javascript object.
+      function logThatThing(ThatThing){
+
+      	// Log it to the console just to verify it's working
+      	console.log(JSON.stringify(ThatThing));
+      	
+      	// Send it to the official edX logamajig!
+      	// Logger.log("harvardx.public_demo.range_guesser", ThatThing);
+
+      }
+      </script>
+        <p>What is the range of passengers that can fit on a 747 aircraft? Set the low and high bounds. (416 and 660 persons)</p>
+        <p class="is-hidden" aria-hidden="true">
+          <span id="lowerlimit">$lowerlimit</span>
+          <span id="upperlimit">$upperlimit</span>
+          <span id="openclose">$show_open_close</span>
+          <span id="istimequestion">$is_time_question</span>
+          <span id="maxtime">$max_time</span>
+        </p>
+        <customresponse cfn="answercheck">
+          <jsinput gradefn="guesser.getGrade" get_statefn="guesser.getState" set_statefn="guesser.setState" width="800" height="120" html_file="/static/guesser.html" sop="false"/>
+        </customresponse>
+        <solution>
+          <div class="detailed-solution">
+            <p>Explanation</p>
+            <p>Answer: The 747-400 passenger version can accommodate between 416 and 660 passengers depending on the layout and configuration.</p>
+          </div>
+        </solution>
       </problem>
