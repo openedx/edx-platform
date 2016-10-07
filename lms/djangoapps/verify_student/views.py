@@ -30,7 +30,7 @@ from eventtracking import tracker
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 
-from commerce.utils import audit_log, EcommerceService
+from commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.url_helpers import get_redirect_url
 from edx_rest_api_client.exceptions import SlumberBaseException
@@ -42,6 +42,7 @@ from openedx.core.djangoapps.user_api.accounts.api import update_account_setting
 from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
 from openedx.core.djangoapps.credit.api import set_credit_requirement_status
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment
 from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors import (
