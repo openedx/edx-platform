@@ -1,8 +1,9 @@
 """Tests for header_control middleware."""
 from django.http import HttpResponse, HttpRequest
 from django.test import TestCase
-from header_control import remove_headers_from_response, force_header_for_response
-from header_control.middleware import HeaderControlMiddleware
+
+from openedx.core.djangoapps.header_control import remove_headers_from_response, force_header_for_response
+from openedx.core.djangoapps.header_control.middleware import HeaderControlMiddleware
 
 
 class TestHeaderControlMiddlewareProcessResponse(TestCase):
