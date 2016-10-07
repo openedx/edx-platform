@@ -1972,7 +1972,7 @@ INSTALLED_APPS = (
     'splash',
 
     # Monitoring
-    'datadog',
+    'openedx.core.djangoapps.datadog',
 
     # User API
     'rest_framework',
