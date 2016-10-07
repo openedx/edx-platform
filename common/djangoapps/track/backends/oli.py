@@ -78,10 +78,14 @@ class OLIAnalyticsBackend(BaseBackend):
             LOG.info('event_data attribute missing from event for OLI service')
             return None
 
+        # Look where it should be for a capa prob.
         problem_id = event_data.get('problem_id')
         if not problem_id:
-            LOG.info('problem_id attribute missing from event for OLI service')
-            return None
+            # Look where it should be for an xblock.
+            problem_id = context.get('module').get('usage_key')
+            if not problem_id:
+                LOG.info('problem_id attribute missing from event for OLI service')
+                return None
 
         grade = event_data.get('grade')
         if grade is None:
