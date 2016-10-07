@@ -44,7 +44,7 @@ urlpatterns = patterns(
     url(r'^event$', 'contentstore.views.event', name='event'),
 
     url(r'^xmodule/', include('pipeline_js.urls')),
-    url(r'^heartbeat$', include('heartbeat.urls')),
+    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
 
