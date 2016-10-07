@@ -1,3 +1,6 @@
+"""
+Start up initialization of datadog.
+"""
 from django.conf import settings
 
 from dogapi import dog_stats_api, dog_http_api
