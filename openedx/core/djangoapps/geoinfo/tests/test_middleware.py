@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 """
 Tests for CountryMiddleware.
 """
@@ -7,8 +8,8 @@ import pygeoip
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
-from geoinfo.middleware import CountryMiddleware
 
+from openedx.core.djangoapps.geoinfo.middleware import CountryMiddleware
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
 

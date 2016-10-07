@@ -1122,7 +1122,7 @@ MIDDLEWARE_CLASSES = (
     'splash.middleware.SplashMiddleware',
 
 
-    'geoinfo.middleware.CountryMiddleware',
+    'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
     'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
