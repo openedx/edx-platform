@@ -354,7 +354,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
-    'contentserver.middleware.StaticContentServer',
+    'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -816,7 +816,7 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
-    'contentserver',
+    'openedx.core.djangoapps.contentserver',
     'course_creators',
     'openedx.core.djangoapps.external_auth',
     'student',  # misleading name due to sharing with lms

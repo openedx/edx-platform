@@ -13,12 +13,12 @@ from django.test.utils import override_settings
 from django.conf import settings
 
 from contentstore.tests.utils import CourseTestCase, mock_requests_get
-from contentserver.caching import del_cached_content
+from opaque_keys.edx.keys import UsageKey
+from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from opaque_keys.edx.keys import UsageKey
 from xmodule.video_module import transcripts_utils
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)

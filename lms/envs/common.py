@@ -1109,7 +1109,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
-    'contentserver.middleware.StaticContentServer',
+    'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
@@ -1892,7 +1892,7 @@ INSTALLED_APPS = (
     'static_replace',
 
     # For content serving
-    'contentserver',
+    'openedx.core.djangoapps.contentserver',
 
     # Theming
     'openedx.core.djangoapps.theming',

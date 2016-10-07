@@ -24,9 +24,10 @@ from xmodule.assetstore.assetmgr import AssetManager
 from opaque_keys import InvalidKeyError
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from contentserver.middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, AdminFactory
+
+from ..middleware import parse_range_header, HTTP_DATE_FORMAT, StaticContentServer
 
 log = logging.getLogger(__name__)
 
@@ -293,7 +294,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals('Origin', resp['Vary'])
 
-    @patch('contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
+    @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_unlocked(self, mock_get_cache_ttl):
         """
         Tests that when a cache TTL is set, an unlocked asset will be sent back with
@@ -306,7 +307,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.assertIn('Expires', resp)
         self.assertEquals('public, max-age=10, s-maxage=10', resp['Cache-Control'])
 
-    @patch('contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
+    @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_with_ttl_locked(self, mock_get_cache_ttl):
         """
         Tests that when a cache TTL is set, a locked asset will be sent back without
@@ -323,7 +324,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.assertNotIn('Expires', resp)
         self.assertEquals('private, no-cache, no-store', resp['Cache-Control'])
 
-    @patch('contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
+    @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_without_ttl_unlocked(self, mock_get_cache_ttl):
         """
         Tests that when a cache TTL is not set, an unlocked asset will be sent back without
@@ -336,7 +337,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         self.assertNotIn('Expires', resp)
         self.assertNotIn('Cache-Control', resp)
 
-    @patch('contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
+    @patch('openedx.core.djangoapps.contentserver.models.CourseAssetCacheTtlConfig.get_cache_ttl')
     def test_cache_headers_without_ttl_locked(self, mock_get_cache_ttl):
         """
         Tests that when a cache TTL is not set, a locked asset will be sent back with a
@@ -358,7 +359,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         near_expire_dt = StaticContentServer.get_expiration_value(start_dt, 55)
         self.assertEqual("Thu, 01 Dec 1983 20:00:55 GMT", near_expire_dt)
 
-    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
     def test_cache_is_cdn_with_normal_request(self, mock_get_cdn_user_agents):
         """
         Tests that when a normal request is made -- i.e. from an end user with their
@@ -372,7 +373,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
         self.assertEqual(is_from_cdn, False)
 
-    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
     def test_cache_is_cdn_with_cdn_request(self, mock_get_cdn_user_agents):
         """
         Tests that when a CDN request is made -- i.e. from an edge node back to the
@@ -386,7 +387,7 @@ class ContentStoreToyCourseTest(SharedModuleStoreTestCase):
         is_from_cdn = StaticContentServer.is_cdn_request(browser_request)
         self.assertEqual(is_from_cdn, True)
 
-    @patch('contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
+    @patch('openedx.core.djangoapps.contentserver.models.CdnUserAgentsConfig.get_cdn_user_agents')
     def test_cache_is_cdn_with_cdn_request_multiple_user_agents(self, mock_get_cdn_user_agents):
         """
         Tests that when a CDN request is made -- i.e. from an edge node back to the
