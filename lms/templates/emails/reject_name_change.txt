@@ -1,9 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%namespace file="../main.html" import="is_non_microsite_theme" />
+<%namespace file="../main.html" import="stanford_theme_enabled" />
 (Not currently used)
 
 ## TODO: fix this ugly hack
-% if is_non_microsite_theme():
+% if stanford_theme_enabled():
   ${_("We are sorry. Our course staff did not approve your request to change "
       "your name from {old_name} to {new_name}. If you need further "
       "assistance, please e-mail the tech support at {email}"

@@ -1,0 +1,24 @@
+<%page args="user, course" />
+<%!
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
+from student.models import UserProfile
+%>
+% if course and user.is_authenticated() and not UserProfile.has_registered(user):
+  <p class="unauth-warning">
+  <%
+  if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
+    reg_url = reverse('course-specific-register', args=[course.id.to_deprecated_string()])
+  else:
+    reg_url = reverse('register_user')
+  %>
+   ${_("Non-registered mode.  {tag_start}Register{tag_end} to save your course progress.")\
+     .format(platform_name=settings.PLATFORM_NAME,
+             tag_start="<a href='{}'>".format(reg_url),
+             tag_end="</a>"
+     )
+   }
+  </p>
+% endif
