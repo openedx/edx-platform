@@ -5,7 +5,7 @@ from time import sleep
 from urllib import urlencode
 from textwrap import dedent
 
-from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
+from openedx.tests.acceptance.fixtures.course import CourseFixture, FixtureError
 
 from path import Path as path
 from paver.easy import sh, BuildFailure, cmdopts, task, needs, might_call, call_task, dry

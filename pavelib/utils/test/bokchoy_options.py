@@ -33,7 +33,7 @@ BOKCHOY_OPTS = [
     make_option(
         '-d', '--test-dir',
         default='tests',
-        help='Directory for finding tests (relative to common/test/acceptance)'
+        help='Directory for finding tests (relative to openedx/tests/acceptance)'
     ),
     BOKCHOY_IMPORTS_DIR,
     make_option('-n', '--num-processes', type='int', help='Number of test threads (for multiprocessing)'),
