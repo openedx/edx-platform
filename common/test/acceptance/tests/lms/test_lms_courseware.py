@@ -714,12 +714,12 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         )
         self.assertEqual(self.problem_page.problem_name, problem_name)
 
-    def test_perform_problem_check_and_navigate(self):
+    def test_perform_problem_submit_and_navigate(self):
         """
         Scenario:
         I go to sequential position 1
         Facing problem1, I select 'choice_1'
-        Then I click check button
+        Then I click submit button
         Then I go to sequential position 2
         Then I came back to sequential position 1 again
         Facing problem1, I observe the problem1 content is not
@@ -730,7 +730,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         # Update problem 1's content state by clicking check button.
         self.problem_page.click_choice('choice_choice_1')
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
         self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
 
         # Save problem 1's content state as we're about to switch units in the sequence.
@@ -761,7 +761,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         # Update problem 1's content state by clicking save button.
         self.problem_page.click_choice('choice_choice_1')
         self.problem_page.click_save()
-        self.problem_page.wait_for_expected_status('div.capa_alert', 'saved')
+        self.problem_page.wait_for_save_notification()
 
         # Save problem 1's content state as we're about to switch units in the sequence.
         problem1_content_before_switch = self.problem_page.problem_content
@@ -790,7 +790,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         # Update problem 1's content state – by performing reset operation.
         self.problem_page.click_choice('choice_choice_1')
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
         self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
         self.problem_page.click_reset()
         self.problem_page.wait_for_expected_status('span.unanswered', 'unanswered')

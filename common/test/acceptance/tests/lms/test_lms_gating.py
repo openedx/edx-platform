@@ -114,7 +114,7 @@ class GatingTest(UniqueCourseTest):
         problem_page = ProblemPage(self.browser)
         self.assertEqual(problem_page.wait_for_page().problem_name, 'HEIGHT OF EIFFEL TOWER')
         problem_page.click_choice('choice_1')
-        problem_page.click_check()
+        problem_page.click_submit()
 
     def test_subsection_gating_in_studio(self):
         """

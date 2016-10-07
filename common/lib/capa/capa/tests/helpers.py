@@ -90,10 +90,10 @@ def mock_capa_module():
     return capa_module
 
 
-def new_loncapa_problem(xml, capa_system=None, seed=723, use_capa_render_template=False):
+def new_loncapa_problem(xml, problem_id='1', capa_system=None, seed=723, use_capa_render_template=False):
     """Construct a `LoncapaProblem` suitable for unit tests."""
     render_template = capa_render_template if use_capa_render_template else None
-    return LoncapaProblem(xml, id='1', seed=seed, capa_system=capa_system or test_capa_system(render_template),
+    return LoncapaProblem(xml, id=problem_id, seed=seed, capa_system=capa_system or test_capa_system(render_template),
                           capa_module=mock_capa_module())
 
 

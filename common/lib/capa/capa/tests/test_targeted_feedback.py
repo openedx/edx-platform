@@ -96,8 +96,8 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-
-        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback3\">.*3rd WRONG solution")
+        # pylint: disable=line-too-long
+        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback3\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Incorrect</span>.*3rd WRONG solution")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback2|feedbackC")
         # Check that calling it multiple times yields the same thing
         the_html2 = problem.get_html()
@@ -110,10 +110,23 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-
-        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\">.*1st WRONG solution")
+        # pylint: disable=line-too-long
+        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Incorrect</span>.*1st WRONG solution")
         self.assertRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback2|feedback3|feedbackC")
+
+    def test_targeted_feedback_correct_answer(self):
+        """ Test the case of targeted feedback for a correct answer. """
+        problem = new_loncapa_problem(load_fixture('targeted_feedback.xml'))
+        problem.done = True
+        problem.student_answers = {'1_2_1': 'choice_2'}
+
+        the_html = problem.get_html()
+        without_new_lines = the_html.replace("\n", "")
+        # pylint: disable=line-too-long
+        self.assertRegexpMatches(without_new_lines,
+                                 r"<targetedfeedback explanation-id=\"feedbackC\" role=\"group\" aria-describedby=\"1_2_1-legend\">\s*<span class=\"sr\">Correct</span>.*Feedback on your correct solution...")
+        self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback2|feedback3")
 
     def test_targeted_feedback_id_typos(self):
         """Cases where the explanation-id's don't match anything."""
@@ -280,8 +293,8 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-
-        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\">.*1st WRONG solution")
+        # pylint: disable=line-too-long
+        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">.*1st WRONG solution")
         self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
         self.assertNotRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback2|feedback3")
@@ -350,8 +363,8 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-
-        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\">.*1st WRONG solution")
+        # pylint: disable=line-too-long
+        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">.*1st WRONG solution")
         self.assertNotRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
         self.assertRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback2|feedback3|feedbackC")
@@ -427,8 +440,8 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         the_html = problem.get_html()
         without_new_lines = the_html.replace("\n", "")
-
-        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\">.*1st WRONG solution")
+        # pylint: disable=line-too-long
+        self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback1\" role=\"group\" aria-describedby=\"1_2_1-legend\">.*1st WRONG solution")
         self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC2\".*other solution explanation")
         self.assertNotRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback2|feedback3")

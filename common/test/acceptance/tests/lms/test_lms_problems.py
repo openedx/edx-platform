@@ -39,9 +39,10 @@ class ProblemsTest(UniqueCourseTest):
         )
 
         problem = self.get_problem()
+        sequential = self.get_sequential()
         course_fixture.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(problem)
+                sequential.add_children(problem)
             )
         ).install()
 
@@ -58,6 +59,10 @@ class ProblemsTest(UniqueCourseTest):
     def get_problem(self):
         """ Subclasses should override this to complete the fixture """
         raise NotImplementedError()
+
+    def get_sequential(self):
+        """ Subclasses can override this to add a sequential with metadata """
+        return XBlockFixtureDesc('sequential', 'Test Subsection')
 
 
 class ProblemClarificationTest(ProblemsTest):
@@ -102,7 +107,211 @@ class ProblemClarificationTest(ProblemsTest):
         self.assertNotIn('strong', tooltip_text)
 
 
-class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
+class ProblemHintTest(ProblemsTest, EventsTestMixin):
+    """
+    Base test class for problem hint tests.
+    """
+    def verify_check_hint(self, answer, answer_text, expected_events):
+        """
+        Verify clicking Check shows the extended hint in the problem message.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_text[0], u'question text')
+        problem_page.fill_answer(answer)
+        problem_page.click_submit()
+        self.assertEqual(problem_page.message_text, answer_text)
+        # Check for corresponding tracking event
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
+            number_of_matches=1
+        )
+        self.assert_events_match(expected_events, actual_events)
+
+    def verify_demand_hints(self, first_hint, second_hint, expected_events):
+        """
+        Test clicking through the demand hints and verify the events sent.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # The hint notification should not be visible on load
+        self.assertFalse(problem_page.is_hint_notification_visible())
+
+        # The two Hint button should be enabled. One visible, one present, but not visible in the DOM
+        self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
+
+        # The hint button rotates through multiple hints
+        problem_page.click_hint()
+        self.assertTrue(problem_page.is_hint_notification_visible())
+        self.assertEqual(problem_page.hint_text, first_hint)
+        # Now there are two "hint" buttons, as there is also one in the hint notification.
+        self.assertEqual([None, None], problem_page.get_hint_button_disabled_attr())
+
+        problem_page.click_hint()
+        self.assertEqual(problem_page.hint_text, second_hint)
+        # Now both "hint" buttons should be disabled, as there are no more hints.
+        self.assertEqual(['true', 'true'], problem_page.get_hint_button_disabled_attr())
+
+        # Now click on "Review" and make sure the focus goes to the correct place.
+        problem_page.click_review_in_notification()
+        self.assertTrue(problem_page.is_focus_on_problem_meta())
+
+        # Check corresponding tracking events
+        actual_events = self.wait_for_events(
+            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
+            number_of_matches=2
+        )
+        self.assert_events_match(expected_events, actual_events)
+
+    def get_problem(self):
+        """ Subclasses should override this to complete the fixture """
+        raise NotImplementedError()
+
+
+class ProblemNotificationTests(ProblemsTest):
+    """
+    Tests that the notifications are visible when expected.
+    """
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 10},
+                                 grader_type='Final Exam')
+
+    def test_notification_updates(self):
+        """
+        Verifies that the notification is removed and not visible when it should be
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        problem_page.click_choice("choice_2")
+        self.assertFalse(problem_page.is_success_notification_visible())
+        problem_page.click_submit()
+        problem_page.wait_success_notification()
+        # Clicking Save should clear the submit notification
+        problem_page.click_save()
+        self.assertFalse(problem_page.is_success_notification_visible())
+        problem_page.wait_for_save_notification()
+        # Changing the answer should clear the save notification
+        problem_page.click_choice("choice_1")
+        self.assertFalse(problem_page.is_save_notification_visible())
+        problem_page.click_save()
+        # Submitting the problem again should clear the save notification
+        problem_page.click_submit()
+        problem_page.wait_incorrect_notification()
+        self.assertFalse(problem_page.is_save_notification_visible())
+
+
+class ProblemSubmitButtonMaxAttemptsTest(ProblemsTest):
+    """
+    Tests that the Submit button disables after the number of max attempts is reached.
+    """
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 2},
+                                 grader_type='Final Exam')
+
+    def test_max_attempts(self):
+        """
+        Verifies that the Submit button disables when the max number of attempts is reached.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+
+        # Submit first answer (correct)
+        problem_page.click_choice("choice_2")
+        self.assertFalse(problem_page.is_submit_disabled())
+        problem_page.click_submit()
+        problem_page.wait_success_notification()
+
+        # Submit second and final answer (incorrect)
+        problem_page.click_choice("choice_1")
+        problem_page.click_submit()
+        problem_page.wait_incorrect_notification()
+
+        # Make sure that the Submit button disables.
+        problem_page.wait_for_submit_disabled()
+
+
+class ProblemSubmitButtonPastDueTest(ProblemsTest):
+    """
+    Tests that the Submit button is disabled if it is past the due date.
+    """
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+                <problem>
+                    <label>Which of the following countries has the largest population?</label>
+                        <multiplechoiceresponse>
+                          <choicegroup type="MultipleChoice">
+                            <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                            <choice correct="false">Germany</choice>
+                            <choice correct="true">Indonesia</choice>
+                            <choice correct="false">Russia</choice>
+                          </choicegroup>
+                        </multiplechoiceresponse>
+                </problem>
+            """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 2},
+                                 grader_type='Final Exam')
+
+    def get_sequential(self):
+        """ Subclasses can override this to add a sequential with metadata """
+        return XBlockFixtureDesc('sequential', 'Test Subsection', metadata={'due': "2016-10-01T00"})
+
+    def test_past_due(self):
+        """
+        Verifies that the Submit button disables when the max number of attempts is reached.
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        # Should have Submit button disabled on original rendering.
+        problem_page.wait_for_submit_disabled()
+
+        # Select a choice, and make sure that the Submit button remains disabled.
+        problem_page.click_choice("choice_2")
+        problem_page.wait_for_submit_disabled()
+
+
+class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.
     """
@@ -130,54 +339,39 @@ class ProblemExtendedHintTest(ProblemsTest, EventsTestMixin):
         """
         Test clicking Check shows the extended hint in the problem message.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_text[0], u'question text')
-        problem_page.fill_answer('B')
-        problem_page.click_check()
-        self.assertEqual(problem_page.message_text, u'Incorrect: hint')
-        # Check for corresponding tracking event
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
-            number_of_matches=1
+        self.verify_check_hint(
+            'B',
+            u'Answer\nIncorrect: hint',
+            [
+                {
+                    'event':
+                        {
+                            'hint_label': u'Incorrect:',
+                            'trigger_type': 'single',
+                            'student_answer': [u'B'],
+                            'correctness': False,
+                            'question_type': 'stringresponse',
+                            'hints': [{'text': 'hint'}]
+                        }
+                }
+            ]
         )
-        self.assert_events_match(
-            [{'event': {'hint_label': u'Incorrect',
-                        'trigger_type': 'single',
-                        'student_answer': [u'B'],
-                        'correctness': False,
-                        'question_type': 'stringresponse',
-                        'hints': [{'text': 'hint'}]}}],
-            actual_events)
 
     def test_demand_hint(self):
         """
         Test clicking hint button shows the demand hint in its div.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        # The hint button rotates through multiple hints
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): demand-hint1')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (2 of 2): demand-hint2')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): demand-hint1')
-        # Check corresponding tracking events
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
-            number_of_matches=3
-        )
-        self.assert_events_match(
+        self.verify_demand_hints(
+            u'Hint (1 of 2): demand-hint1',
+            u'Hint (1 of 2): demand-hint1\nHint (2 of 2): demand-hint2',
             [
                 {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}},
-                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'demand-hint2'}},
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'demand-hint1'}}
-            ],
-            actual_events)
+                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'demand-hint2'}}
+            ]
+        )
 
 
-class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
+class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
     """
     Tests that hints containing html get rendered properly
     """
@@ -205,51 +399,36 @@ class ProblemHintWithHtmlTest(ProblemsTest, EventsTestMixin):
         """
         Test clicking Check shows the extended hint in the problem message.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        self.assertEqual(problem_page.problem_text[0], u'question text')
-        problem_page.fill_answer('C')
-        problem_page.click_check()
-        self.assertEqual(problem_page.message_text, u'Incorrect: aa bb cc')
-        # Check for corresponding tracking event
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.feedback_displayed'},
-            number_of_matches=1
+        self.verify_check_hint(
+            'C',
+            u'Answer\nIncorrect: aa bb cc',
+            [
+                {
+                    'event':
+                        {
+                            'hint_label': u'Incorrect:',
+                            'trigger_type': 'single',
+                            'student_answer': [u'C'],
+                            'correctness': False,
+                            'question_type': 'stringresponse',
+                            'hints': [{'text': '<a href="#">aa bb</a> cc'}]
+                        }
+                }
+            ]
         )
-        self.assert_events_match(
-            [{'event': {'hint_label': u'Incorrect',
-                        'trigger_type': 'single',
-                        'student_answer': [u'C'],
-                        'correctness': False,
-                        'question_type': 'stringresponse',
-                        'hints': [{'text': '<a href="#">aa bb</a> cc'}]}}],
-            actual_events)
 
     def test_demand_hint(self):
         """
-        Test clicking hint button shows the demand hint in its div.
+        Test clicking hint button shows the demand hints in a notification area.
         """
-        self.courseware_page.visit()
-        problem_page = ProblemPage(self.browser)
-        # The hint button rotates through multiple hints
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (2 of 2): dd ee ff')
-        problem_page.click_hint()
-        self.assertEqual(problem_page.hint_text, u'Hint (1 of 2): aa bb cc')
-        # Check corresponding tracking events
-        actual_events = self.wait_for_events(
-            event_filter={'event_type': 'edx.problem.hint.demandhint_displayed'},
-            number_of_matches=3
-        )
-        self.assert_events_match(
+        self.verify_demand_hints(
+            u'Hint (1 of 2): aa bb cc',
+            u'Hint (1 of 2): aa bb cc\nHint (2 of 2): dd ee ff',
             [
                 {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}},
-                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'<a href="#">dd  ee</a> ff'}},
-                {'event': {u'hint_index': 0, u'hint_len': 2, u'hint_text': u'aa <a href="#">bb</a> cc'}}
-            ],
-            actual_events)
+                {'event': {u'hint_index': 1, u'hint_len': 2, u'hint_text': u'<a href="#">dd  ee</a> ff'}}
+            ]
+        )
 
 
 class ProblemWithMathjax(ProblemsTest):
@@ -291,13 +470,23 @@ class ProblemWithMathjax(ProblemsTest):
 
         # The hint button rotates through multiple hints
         problem_page.click_hint()
-        self.assertIn("Hint (1 of 2): mathjax should work1", problem_page.extract_hint_text_from_html)
+        self.assertEqual(
+            ["<strong>Hint (1 of 2): </strong>mathjax should work1"],
+            problem_page.extract_hint_text_from_html
+        )
         problem_page.verify_mathjax_rendered_in_hint()
 
         # Rotate the hint and check the problem hint
         problem_page.click_hint()
 
-        self.assertIn("Hint (2 of 2): mathjax should work2", problem_page.extract_hint_text_from_html)
+        self.assertEqual(
+            [
+                "<strong>Hint (1 of 2): </strong>mathjax should work1",
+                "<strong>Hint (2 of 2): </strong>mathjax should work2"
+            ],
+            problem_page.extract_hint_text_from_html
+        )
+
         problem_page.verify_mathjax_rendered_in_hint()
 
 
@@ -328,10 +517,9 @@ class ProblemPartialCredit(ProblemsTest):
         """
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
-        problem_page.wait_for_element_visibility(problem_page.CSS_PROBLEM_HEADER, 'wait for problem header')
         self.assertEqual(problem_page.problem_name, 'PARTIAL CREDIT TEST PROBLEM')
         problem_page.fill_answer_numerical('-1')
-        problem_page.click_check()
+        problem_page.click_submit()
         problem_page.wait_for_status_icon()
         self.assertTrue(problem_page.simpleprob_is_partially_correct())
 
@@ -382,7 +570,7 @@ class LogoutDuringAnswering(ProblemsTest):
 
         self.log_user_out()
         with problem_page.handle_alert(confirm=True):
-            problem_page.click_check()
+            problem_page.click_submit()
 
         login_page = CombinedLoginAndRegisterPage(self.browser)
         login_page.wait_for_page()
@@ -393,7 +581,7 @@ class LogoutDuringAnswering(ProblemsTest):
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
 
         problem_page.fill_answer_numerical('1')
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertTrue(problem_page.simpleprob_is_correct())
 
     def test_logout_cancel_no_redirect(self):
@@ -412,7 +600,7 @@ class LogoutDuringAnswering(ProblemsTest):
         problem_page.fill_answer_numerical('1')
         self.log_user_out()
         with problem_page.handle_alert(confirm=False):
-            problem_page.click_check()
+            problem_page.click_submit()
 
         self.assertTrue(problem_page.is_browser_on_page())
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
@@ -453,7 +641,6 @@ class ProblemQuestionDescriptionTest(ProblemsTest):
         """
         self.courseware_page.visit()
         problem_page = ProblemPage(self.browser)
-        problem_page.wait_for_element_visibility(problem_page.CSS_PROBLEM_HEADER, 'wait for problem header')
         self.assertEqual(problem_page.problem_name, 'Label with Description')
         self.assertEqual(problem_page.problem_question, 'Eggplant is a _____?')
         self.assertEqual(problem_page.problem_question_descriptions, self.descriptions)
@@ -471,7 +658,7 @@ class CAPAProblemA11yBaseTestMixin(object):
 
         # Set the scope to the problem question
         problem_page.a11y_audit.config.set_scope(
-            include=['section.wrapper-problem-response']
+            include=['.wrapper-problem-response']
         )
 
         # Run the accessibility audit.
@@ -600,3 +787,63 @@ class ProblemMathExpressionInputA11yTest(CAPAProblemA11yBaseTestMixin, ProblemsT
             </formularesponse>
         </problem>""")
         return XBlockFixtureDesc('problem', 'MATHEXPRESSIONINPUT PROBLEM', data=xml)
+
+
+class ProblemMetaGradedTest(ProblemsTest):
+    """
+    TestCase Class to verify that the graded variable is passed
+    """
+    def get_problem(self):
+        """
+        Problem structure
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml, grader_type='Final Exam')
+
+    def test_grader_type_displayed(self):
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+        self.assertEqual(problem_page.problem_progress_graded_value, "1 point possible (graded)")
+
+
+class ProblemMetaUngradedTest(ProblemsTest):
+    """
+    TestCase Class to verify that the ungraded variable is passed
+    """
+    def get_problem(self):
+        """
+        Problem structure
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml)
+
+    def test_grader_type_displayed(self):
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
+        self.assertEqual(problem_page.problem_progress_graded_value, "1 point possible (ungraded)")
