@@ -1606,7 +1606,6 @@ def create_account_with_params(request, params):
     if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
 
-
     if pipeline.active_provider_requests_data_sharing(request):
         extra_fields['data_sharing_consent'] = 'optional'
     if pipeline.active_provider_requires_data_sharing(request):

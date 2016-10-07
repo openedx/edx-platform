@@ -261,17 +261,12 @@ def set_data_sharing_consent_record(social, data_sharing_consent=None, **kwargs)
     if data_sharing_consent is None:
         return
 
-    try:
-        consent = social.data_sharing_consent_audit
-    except UserDataSharingConsentAudit.DoesNotExist:
-        consent = UserDataSharingConsentAudit.objects.create(user_social_auth=social)
+    consent = UserDataSharingConsentAudit.objects.get_or_create(user_social_auth=social)
 
     if data_sharing_consent:
         consent.enable()
-        consent.save()
-        return
-
-    consent.disable()
+    else:
+        consent.disable()
     consent.save()
 
 

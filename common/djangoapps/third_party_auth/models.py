@@ -77,6 +77,7 @@ class AuthNotConfigured(SocialAuthBaseException):
             self.provider_name
         )
 
+
 class UserDataSharingConsentAudit(TimeStampedModel):
     """
     Object that exists to store the canonical state of whether a particular
@@ -88,9 +89,9 @@ class UserDataSharingConsentAudit(TimeStampedModel):
         verbose_name = "Data Sharing Consent Audit State"
         verbose_name_plural = "Data Sharing Consent Audit States"
 
-    NOT_SET = 'NS'
-    ENABLED = 'EN'
-    DISABLED = 'DS'
+    NOT_SET = 'not_set'
+    ENABLED = 'enabled'
+    DISABLED = 'disabled'
     STATE_CHOICES = (
         (NOT_SET, 'Not set'),
         (ENABLED, 'Permitted'),
@@ -107,7 +108,7 @@ class UserDataSharingConsentAudit(TimeStampedModel):
         ),
     )
     state = models.CharField(
-        max_length=2,
+        max_length=8,
         blank=False,
         choices=STATE_CHOICES,
         default=NOT_SET,
@@ -163,9 +164,9 @@ class UserDataSharingConsentAuditHistory(TimeStampedModel):
         verbose_name = "Data Sharing Consent Historical Entry"
         verbose_name_plural = "Data Sharing Consent Historical Entries"
 
-    NOT_SET = 'NS'
-    ENABLED = 'EN'
-    DISABLED = 'DS'
+    NOT_SET = 'not_set'
+    ENABLED = 'enabled'
+    DISABLED = 'disabled'
     STATE_CHOICES = (
         (NOT_SET, 'Not set'),
         (ENABLED, 'Permitted'),
@@ -181,7 +182,7 @@ class UserDataSharingConsentAuditHistory(TimeStampedModel):
         ),
     )
     previous_state = models.CharField(
-        max_length=2,
+        max_length=8,
         blank=False,
         choices=STATE_CHOICES,
         default=NOT_SET,
@@ -191,7 +192,7 @@ class UserDataSharingConsentAuditHistory(TimeStampedModel):
         ),
     )
     new_state = models.CharField(
-        max_length=2,
+        max_length=8,
         blank=False,
         choices=STATE_CHOICES,
         default=DISABLED,

@@ -867,7 +867,7 @@ class RegistrationView(APIView):
             field_type="checkbox",
             default=False,
             required=required,
-            error_messages={"required":error_msg},
+            error_messages={"required": error_msg},
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):
