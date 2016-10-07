@@ -3,6 +3,8 @@ This module contains generic Entitlement functionality.
 
 Metaentitlements (entitlements to manage entitlements) should probably be added here (when a need for the arise).
 """
+from .scope import ScopeFactory
+from .registry import registry
 from .models import EntitlementModel
 
 
@@ -55,4 +57,25 @@ class BaseEntitlement(object):
         :return: boolean
         """
         return self.scope == target
+
+
+class EntitlementFactory(object):
+    def __init__(self, scope_factory):
+        self._scope_factory = scope_factory
+
+    def build_entitlement_from_model(self, entitlement_model):
+        """
+        This method performs instantiation of Entitlement represented by entitlement model
+        :return: instance of BaseEntitlement
+        """
+        entitlement_class = registry.get_entitlement_class(entitlement_model.type)
+        scope_strategy = self._scope_factory.make_scope_strategy(entitlement_class.SCOPE_TYPE)
+        return entitlement_class(entitlement_model.scope_id, scope_strategy, **entitlement_model.parameters)
+
+    def build_entitlement(self, type, scope_id, parameters):
+        entitlement_class = registry.get_entitlement_class(type)
+        entitlement_class(scope_id, **parameters)
+        return entitlement_class
+
+entitlement_factory = EntitlementFactory(ScopeFactory)
 

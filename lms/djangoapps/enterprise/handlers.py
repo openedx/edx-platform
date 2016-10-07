@@ -6,6 +6,7 @@ import logging
 from django.dispatch import receiver
 
 from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
+from entitlements.entitlements import entitlement_factory
 from .enterprise_entitlements import ShareResultsEntitlement
 
 
@@ -22,7 +23,7 @@ def _check_data_sharing_consent(user, entitlement_group):
     )
     return any(
         entitlement_model for entitlement_model in sharing_entitlement_models
-        if entitlement_model.get_entitlement().is_applicable_to(user)
+        if entitlement_factory.build_entitlement_from_model(entitlement_model).is_applicable_to(user)
     )
 
 

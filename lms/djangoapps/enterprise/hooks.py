@@ -5,7 +5,7 @@ from django.db import transaction
 from social.pipeline import partial
 from third_party_auth import provider
 
-from entitlements.scope import ScopeFactory
+from entitlements.entitlements import entitlement_factory
 from .enterprise_entitlements import ShareResultsEntitlement
 from .models import EnterpriseCustomer
 
@@ -48,9 +48,7 @@ def sso_login_hook(backend=None, user=None, **kwargs):
 
 @transaction.atomic
 def create_data_sharing_consent_entitlement(user, entitlement_group):
-    # TODO: EntitlementFactory to avoid creating strategy and passing it directly?
-    scope_strategy = ScopeFactory.make_scope_strategy(ShareResultsEntitlement.SCOPE_TYPE)
-    entitlement = ShareResultsEntitlement(user.id, scope_strategy)
+    entitlement = entitlement_factory.build_entitlement(ShareResultsEntitlement.ENTITLEMENT_TYPE, user.id)
 
     entitlement_model = entitlement.save()
     entitlement_group.entitlements.add(entitlement_model)
