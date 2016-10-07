@@ -9,9 +9,10 @@ from django.http import HttpResponse
 
 from dogapi import dog_stats_api
 
-from service_status import tasks
 from djcelery import celery
 from celery.exceptions import TimeoutError
+
+from openedx.core.djangoapps.service_status.tasks import delayed_ping
 
 
 def index(_):
@@ -37,7 +38,7 @@ def celery_ping(_):
     A Simple view that checks if Celery can process a simple task
     """
     start = time.time()
-    result = tasks.delayed_ping.apply_async(('ping', 0.1))
+    result = delayed_ping.apply_async(('ping', 0.1))
     task_id = result.id
 
     # Wait until we get the result

@@ -1876,7 +1876,7 @@ INSTALLED_APPS = (
     'config_models',
 
     # Monitor the status of services
-    'service_status',
+    'openedx.core.djangoapps.service_status',
 
     # Display status message to students
     'status',

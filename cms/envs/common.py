@@ -809,7 +809,7 @@ INSTALLED_APPS = (
     'config_models',
 
     # Monitor the status of services
-    'service_status',
+    'openedx.core.djangoapps.service_status',
 
     # Testing
     'django_nose',
