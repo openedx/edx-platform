@@ -1354,17 +1354,16 @@ class CapaMixin(CapaFields):
             if is_correct is None:
                 is_correct = ''
 
+            response_data = getattr(answer_input, 'response_data', {})
             input_metadata[input_id] = {
-                'question': answer_input.response_data.get('label', ''),
+                'question': response_data.get('label', ''),
                 'answer': user_visible_answer,
                 'response_type': getattr(getattr(answer_response, 'xml', None), 'tag', ''),
                 'input_type': getattr(answer_input, 'tag', ''),
                 'correct': is_correct,
                 'variant': variant,
+                'group_label': response_data.get('group_label', ''),
             }
-            # Add group_label in event data only if the responsetype contains multiple inputtypes
-            if answer_input.response_data.get('group_label'):
-                input_metadata[input_id]['group_label'] = answer_input.response_data.get('group_label')
 
         return input_metadata
 
