@@ -36,10 +36,10 @@ from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.url_utils import quote_slashes
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
