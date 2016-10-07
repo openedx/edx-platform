@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#pylint: disable=no-member
 """
 Tests for Shibboleth Authentication
 @jbau
@@ -14,8 +15,8 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import AnonymousUser, User
 from importlib import import_module
-from external_auth.models import ExternalAuthMap
-from external_auth.views import (
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.views import (
     shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
 )
 from mock import patch
@@ -125,6 +126,7 @@ class ShibSPTest(CacheIsolationTestCase):
             of an existing user that already has an ExternalAuthMap causes an error (403)
           * shib credentials that do not match an existing ExternalAuthMap causes the registration form to appear
         """
+        # pylint: disable=too-many-statements
 
         user_w_map = UserFactory.create(email='withmap@stanford.edu')
         extauth = ExternalAuthMap(external_id='withmap@stanford.edu',
@@ -155,7 +157,7 @@ class ShibSPTest(CacheIsolationTestCase):
             for remote_user in remote_users:
 
                 self.client.logout()
-                with patch('external_auth.views.AUDIT_LOG') as mock_audit_log:
+                with patch('openedx.core.djangoapps.external_auth.views.AUDIT_LOG') as mock_audit_log:
                     response = self.client.get(
                         reverse('shib-login'),
                         **{
@@ -214,7 +216,7 @@ class ShibSPTest(CacheIsolationTestCase):
                     # no audit logging calls
                     self.assertEquals(len(audit_log_calls), 0)
 
-    def _base_test_extauth_auto_activate_user_with_flag(self, log_user_string="inactive@stanford.edu"):
+    def _test_auto_activate_user_with_flag(self, log_user_string="inactive@stanford.edu"):
         """
         Tests that FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] means extauth automatically
         linked users, activates them, and logs them in
@@ -231,7 +233,7 @@ class ShibSPTest(CacheIsolationTestCase):
         })
 
         request.user = AnonymousUser()
-        with patch('external_auth.views.AUDIT_LOG') as mock_audit_log:
+        with patch('openedx.core.djangoapps.external_auth.views.AUDIT_LOG') as mock_audit_log:
             response = shib_login(request)
         audit_log_calls = mock_audit_log.method_calls
         # reload user from db, since the view function works via db side-effects
@@ -256,7 +258,7 @@ class ShibSPTest(CacheIsolationTestCase):
         """
         Wrapper to run base_test_extauth_auto_activate_user_with_flag with {'SQUELCH_PII_IN_LOGS': False}
         """
-        self._base_test_extauth_auto_activate_user_with_flag(log_user_string="inactive@stanford.edu")
+        self._test_auto_activate_user_with_flag(log_user_string="inactive@stanford.edu")
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @patch.dict(settings.FEATURES, {'BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH': True, 'SQUELCH_PII_IN_LOGS': True})
@@ -264,7 +266,7 @@ class ShibSPTest(CacheIsolationTestCase):
         """
         Wrapper to run base_test_extauth_auto_activate_user_with_flag with {'SQUELCH_PII_IN_LOGS': True}
         """
-        self._base_test_extauth_auto_activate_user_with_flag(log_user_string="user.id: 1")
+        self._test_auto_activate_user_with_flag(log_user_string="user.id: 1")
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     @data(*gen_all_identities())
@@ -279,11 +281,11 @@ class ShibSPTest(CacheIsolationTestCase):
         response = client.get(path='/shib-login/', data={}, follow=False, **identity)
 
         self.assertEquals(response.status_code, 200)
-        mail_input_HTML = '<input class="" id="email" type="email" name="email"'
+        mail_input_html = '<input class="" id="email" type="email" name="email"'
         if not identity.get('mail'):
-            self.assertContains(response, mail_input_HTML)
+            self.assertContains(response, mail_input_html)
         else:
-            self.assertNotContains(response, mail_input_HTML)
+            self.assertNotContains(response, mail_input_html)
         sn_empty = not identity.get('sn')
         given_name_empty = not identity.get('givenName')
         displayname_empty = not identity.get('displayName')

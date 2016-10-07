@@ -101,7 +101,7 @@ MOCK_MODULES = [
     'openid',
     'openid.store',
     'openid.store.interface',
-    'external_auth.views',
+    'openedx.core.djangoapps.external_auth.views',
     'mail_utils',
     'ratelimitbackend.backends',
     'social.apps.django_app.default',

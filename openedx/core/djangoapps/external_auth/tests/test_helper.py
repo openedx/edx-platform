@@ -2,7 +2,7 @@
 Tests for utility functions in external_auth module
 """
 from django.test import TestCase
-from external_auth.views import _safe_postlogin_redirect
+from openedx.core.djangoapps.external_auth.views import _safe_postlogin_redirect
 
 
 class ExternalAuthHelperFnTest(TestCase):
