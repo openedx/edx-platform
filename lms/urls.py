@@ -63,7 +63,7 @@ urlpatterns = (
     url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done',
         name='password_reset_done'),
 
-    url(r'^heartbeat$', include('heartbeat.urls')),
+    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed below.
