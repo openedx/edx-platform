@@ -289,6 +289,14 @@ div.problem {
       position: absolute;
       top: em(9);
     }
+
+    legend {
+      margin-bottom: $baseline;
+    }
+
+    legend + .question-description {
+      margin-top: -$baseline;
+    }
   }
 }
 
@@ -913,16 +921,16 @@ div.problem {
 // +Problem - Actions
 // ====================
 div.problem .action {
-  @include margin($baseline 0);
+  margin-top: $baseline;
   min-height: $baseline;
+  width: 100%;
+  display: inline-block;
 
   .problem-action-buttons-wrapper {
-    margin-bottom: $baseline / 2;
 
     @media (min-width: $bp-screen-lg) {
-      @include right($baseline * 1.5);
-      margin-top: -$baseline / 2;
-      position: absolute;
+      @include text-align(right);
+      @include float(right);
     }
 
   }
@@ -951,24 +959,26 @@ div.problem .action {
 
   }
 
-  .submission_feedback {
-    @include margin-left($baseline/2);
+  .submit-attempt-container {
+    display: table;
+
+    @media (max-width: $bp-screen-lg) {
+      max-width: 100%;
+      padding-top: $baseline;
+    }
+    .submit {
+      @include margin-right($baseline / 2);
+      float: left;
+    }
+  }
+
+  .submission-feedback {
     display: inline-block;
+    margin-top: $baseline / 2;
     color: $gray-d1;
     font-size: $medium-font-size;
     -webkit-font-smoothing: antialiased;
     vertical-align: middle;
-
-    @media (min-width: $bp-screen-lg) and (max-width: $bp-screen-xl) {
-      @include margin-left(0);
-      margin-top: $baseline / 2;
-      display: block;
-    }
-
-    @media (min-width: $bp-screen-xl) {
-      max-width: flex-grid(3, 10);
-    }
-
   }
 }
 
@@ -1084,7 +1094,7 @@ div.problem {
 
     .notification-message {
       display: inline-block;
-      width: flex-grid(8,10);
+      width: flex-grid(6,10);
       // Make notification tall enough that when the "Review" button is displayed,
       // the notification does not grow in height.
       margin-bottom: 8px;
