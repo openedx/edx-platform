@@ -64,7 +64,7 @@ LMS_ROOT_URL = "http://localhost:8000"
 
 # Features
 FEATURES = {
-    'EDX_SOLUTIONS_API': False,
+    'EDX_SOLUTIONS_API': True,
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
