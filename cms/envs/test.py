@@ -357,7 +357,6 @@ FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True
 ##### edx solutions apps for McKA #####
 EDX_API_KEY = 'test_api_key'
 TEST_MODE = True
-FEATURES['EDX_SOLUTIONS_API'] = True
 
 INSTALLED_APPS += (
     'course_metadata',
