@@ -341,8 +341,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sites.middleware.CurrentSiteMiddleware',
 
     # Instead of SessionMiddleware, we use a more secure version
-    # 'django.contrib.sessions.middleware.SessionMiddleware',
-    'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'openedx.core.djangoapps.safe_sessions.middleware.SafeSessionMiddleware',
 
     'method_override.middleware.MethodOverrideMiddleware',
 
