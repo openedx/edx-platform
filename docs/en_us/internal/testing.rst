@@ -96,9 +96,9 @@ Test Locations
       ``common/djangoapps/terrain``
    -  Lettuce Tests: located in ``features`` subpackage within a Django
       app. For example: ``lms/djangoapps/courseware/features``
-   -  Bok Choy Acceptance Tests: located under ``common/test/acceptance/tests``
-   -  Bok Choy Accessibility Tests: located under ``common/test/acceptance/tests`` and tagged with ``@attr("a11y")``
-   -  Bok Choy PageObjects: located under ``common/test/acceptance/pages``
+   -  Bok Choy Acceptance Tests: located under ``openedx/tests/acceptance/tests``
+   -  Bok Choy Accessibility Tests: located under ``openedx/tests/acceptance/tests`` and tagged with ``@attr("a11y")``
+   -  Bok Choy PageObjects: located under ``openedx/tests/acceptance/pages``
 
 Factories
 ---------
@@ -416,7 +416,7 @@ For example to run a single test, specify the name of the test file.
     paver test_bokchoy -t lms/test_lms.py
 
 Notice the test file location is relative to
-common/test/acceptance/tests. This is another example.
+openedx/tests/acceptance/tests. This is another example.
 
 ::
 
@@ -497,7 +497,7 @@ To run all the bok choy accessibility tests use this command.
     paver test_a11y
 
 To run specific tests, use the ``-t`` flag to specify a nose-style test spec
-relative to the ``common/test/acceptance/tests`` directory. This is an example for it.
+relative to the ``openedx/tests/acceptance/tests`` directory. This is an example for it.
 
 ::
 

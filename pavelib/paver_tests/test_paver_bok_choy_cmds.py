@@ -40,7 +40,7 @@ class TestPaverBokChoyCmd(unittest.TestCase):
             "SELENIUM_DRIVER_LOG_DIR='{}/test_root/log{}'".format(REPO_DIR, shard_str),
             "VERIFY_XSS='{}'".format(verify_xss),
             "nosetests",
-            "{}/common/test/acceptance/{}".format(REPO_DIR, name),
+            "{}/openedx/tests/acceptance/{}".format(REPO_DIR, name),
             "--xunit-file={}/reports/bok_choy{}/xunit.xml".format(REPO_DIR, shard_str),
             "--verbosity=2",
         ]

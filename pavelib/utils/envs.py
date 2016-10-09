@@ -26,7 +26,7 @@ class Env(object):
     PYTHON_COVERAGERC = REPO_ROOT / ".coveragerc"
 
     # Bok_choy dirs
-    BOK_CHOY_DIR = REPO_ROOT / "common" / "test" / "acceptance"
+    BOK_CHOY_DIR = REPO_ROOT / "openedx" / "tests" / "acceptance"
     BOK_CHOY_LOG_DIR = REPO_ROOT / "test_root" / "log"
     BOK_CHOY_REPORT_DIR = REPORT_DIR / "bok_choy"
     BOK_CHOY_A11Y_REPORT_DIR = REPORT_DIR / "a11y"
