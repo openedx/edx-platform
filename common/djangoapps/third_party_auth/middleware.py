@@ -44,7 +44,7 @@ class ResetSessionIfPipelineBrokenMiddleware(object):
         running_pipeline = pipeline.get(request)
         if running_pipeline:
             social = running_pipeline['kwargs'].get('social')
-            quarantined_module = running_pipeline['kwargs'].get('quarantined_module')
+            quarantined_module = request.session.get('quarantined_module')
             if social and quarantined_module and not view_module.startswith(quarantined_module):
                 try:
                     consent_provided = social.data_sharing_consent_audit.enabled
