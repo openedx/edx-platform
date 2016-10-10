@@ -64,7 +64,7 @@ class ThemeFilesFinder(BaseFinder):
         """
         List all files in all app storages.
         """
-        for storage in six.itervalues(self.customer_storagesstorages):
+        for storage in six.itervalues(self.customer_storages):
             if storage.exists(''):  # check if storage location exists
                 for path in utils.get_files(storage, ignore_patterns):
                     yield path, storage
