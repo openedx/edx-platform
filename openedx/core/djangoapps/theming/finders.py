@@ -41,14 +41,19 @@ class ThemeFilesFinder(BaseFinder):
         self.themes = []
         # Mapping of theme names to storage instances
         self.storages = OrderedDict()
+        self.customer_storages = OrderedDict()
 
         themes = get_themes()
         for theme in themes:
+            customer_theme_storage = self.storage_class(
+                os.path.join(theme.customer_specific_path, self.source_dir),
+                prefix=theme.theme_dir_name,
+            )
             theme_storage = self.storage_class(
                 os.path.join(theme.path, self.source_dir),
                 prefix=theme.theme_dir_name,
             )
-
+            self.customer_storages[theme.theme_dir_name] = customer_theme_storage
             self.storages[theme.theme_dir_name] = theme_storage
             if theme.theme_dir_name not in self.themes:
                 self.themes.append(theme.theme_dir_name)
@@ -59,6 +64,11 @@ class ThemeFilesFinder(BaseFinder):
         """
         List all files in all app storages.
         """
+        for storage in six.itervalues(self.customer_storagesstorages):
+            if storage.exists(''):  # check if storage location exists
+                for path in utils.get_files(storage, ignore_patterns):
+                    yield path, storage
+
         for storage in six.itervalues(self.storages):
             if storage.exists(''):  # check if storage location exists
                 for path in utils.get_files(storage, ignore_patterns):
@@ -87,6 +97,14 @@ class ThemeFilesFinder(BaseFinder):
         """
         Find a requested static file in an theme's static locations.
         """
+        customer_storage = self.customer_storages.get(theme, None)
+        if customer_storage:
+            # only try to find a file if the source dir actually exists
+            if customer_storage.exists(path):
+                matched_path = customer_storage.path(path)
+                if matched_path:
+                    return matched_path
+
         storage = self.storages.get(theme, None)
         if storage:
             # only try to find a file if the source dir actually exists
