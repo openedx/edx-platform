@@ -99,6 +99,7 @@ class GrantDataSharingPermissions(View):
         """
         running_pipeline = get_running_pipeline(request)
         if running_pipeline:
+            running_pipeline['kwargs']['quarantined_module'] = 'third_party_auth.views.'
             current_provider = Registry.get_from_pipeline(running_pipeline)
             if current_provider:
                 name = current_provider.name
@@ -126,6 +127,7 @@ class GrantDataSharingPermissions(View):
             consent.enable()
             consent.save()
             backend_name = running_pipeline['kwargs']['backend'].name
+            running_pipeline['kwargs']['quarantined_module'] = None
             return redirect(get_complete_url(backend_name))
         else:
             consent.disable()

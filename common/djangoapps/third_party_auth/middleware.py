@@ -36,23 +36,16 @@ class ResetSessionIfPipelineBrokenMiddleware(object):
         """
         Conditionally sign out users who don't provide data sharing consent
         """
-        allowed_module_prefixes = (
-            'third_party_auth.',
-            'social.',
-            'student.',
-            'student_account.',
-            'openedx.core.user_api.'
-        )
         view_module = view_func.__module__
-        if any(view_module.startswith(module_name) for module_name in allowed_module_prefixes):
-            return
+
         if not pipeline.active_provider_requires_data_sharing(request):
             return
 
         running_pipeline = pipeline.get(request)
         if running_pipeline:
             social = running_pipeline['kwargs'].get('social')
-            if social:
+            quarantined_module = running_pipeline['kwargs'].get('quarantined_module')
+            if social and quarantined_module and not view_module.startswith(quarantined_module):
                 try:
                     consent_provided = social.data_sharing_consent_audit.enabled
                 except UserDataSharingConsentAudit.DoesNotExist:
