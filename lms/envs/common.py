@@ -1290,6 +1290,7 @@ dashboard_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/dashboard/**/*.js'))
 )
 discussion_js = (
+    rooted_glob(COMMON_ROOT / 'static', 'common/js/discussion/mathjax_include.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/customwmd.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_accessible.js') +
     rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/mathjax_delay_renderer.js') +
@@ -1453,6 +1454,18 @@ PIPELINE_CSS = {
             'css/discussion/lms-discussion-main-rtl.css',
         ],
         'output_filename': 'css/discussion/lms-discussion-main-rtl.css',
+    },
+    'style-inline-discussion': {
+        'source_filenames': [
+            'css/discussion/inline-discussion.css',
+        ],
+        'output_filename': 'css/discussion/inline-discussion.css',
+    },
+    'style-inline-discussion-rtl': {
+        'source_filenames': [
+            'css/discussion/inline-discussion-rtl.css',
+        ],
+        'output_filename': 'css/discussion/inline-discussion-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
