@@ -57,7 +57,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
   <%static:js group='courseware'/>
   <%static:js group='discussion'/>
 
-  <%include file="/mathjax_include.html" args="disable_fast_preview=disable_fast_preview"/>
+  <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
   % if staff_access:
   	<%include file="xqa_interface.html"/>
   % endif
