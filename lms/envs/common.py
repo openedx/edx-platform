@@ -1567,7 +1567,7 @@ PIPELINE_JS = {
             [
                 'js/sticky_filter.js',
                 'js/query-params.js',
-                'js/vendor/moment-with-locales.min.js',
+                'common/js/vendor/moment-with-locales.js',
             ]
         ),
         'output_filename': 'js/lms-application.js',
@@ -1715,7 +1715,7 @@ REQUIRE_ENVIRONMENT = "node"
 REQUIRE_JS_PATH_OVERRIDES = {
     'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
-    'moment': 'js/vendor/moment-with-locales.min.js',
+    'moment': 'common/js/vendor/moment-with-locales.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
     'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events.js',
