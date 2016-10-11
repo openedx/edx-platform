@@ -256,9 +256,13 @@ def _load_preview_module(request, descriptor):
 
 def _is_xblock_reorderable(xblock, context):
     """
-    Returns true if the specified xblock is in the set of reorderable xblocks.
+    Returns true if the specified xblock is in the set of reorderable xblocks
+    otherwise returns false.
     """
-    return xblock.location in context['reorderable_items']
+    try:
+        return xblock.location in context['reorderable_items']
+    except KeyError:
+        return False
 
 
 # pylint: disable=unused-argument
