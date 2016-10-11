@@ -397,6 +397,7 @@ class CapaMixin(CapaFields):
             'progress_detail': Progress.to_js_detail_str(progress),
             'content': self.get_problem_html(encapsulate=False),
             'graded': self.graded,
+            'attempts_used': self.attempts,
         })
 
     def submit_button_name(self):
