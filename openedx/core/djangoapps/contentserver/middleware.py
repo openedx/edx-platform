@@ -9,7 +9,6 @@ from django.http import (
     HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
 from student.models import CourseEnrollment
-from contentserver.models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 
 from header_control import force_header_for_response
 from xmodule.assetstore.assetmgr import AssetManager
@@ -20,6 +19,8 @@ from opaque_keys.edx.locator import AssetLocator
 from .caching import get_cached_content, set_cached_content
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
+
+from .models import CourseAssetCacheTtlConfig, CdnUserAgentsConfig
 
 # TODO: Soon as we have a reasonable way to serialize/deserialize AssetKeys, we need
 # to change this file so instead of using course_id_partial, we're just using asset keys
@@ -42,6 +43,7 @@ class StaticContentServer(object):
             StaticContent.is_versioned_asset_path(request.path)
         )
 
+    # pylint: disable=too-many-statements
     def process_request(self, request):
         """Process the given request"""
         asset_path = request.path
@@ -117,7 +119,7 @@ class StaticContentServer(object):
             response = None
             if request.META.get('HTTP_RANGE'):
                 # If we have a StaticContent, get a StaticContentStream.  Can't manipulate the bytes otherwise.
-                if type(content) == StaticContent:
+                if isinstance(content, StaticContent):
                     content = AssetManager.find(loc, as_stream=True)
 
                 header_value = request.META['HTTP_RANGE']
