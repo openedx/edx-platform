@@ -104,6 +104,11 @@ def get_logger_config(log_dir,
                 'level': 'ERROR',
                 'propagate': True,
             },
+            'nose': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
         }
     }
     if syslog_addr:

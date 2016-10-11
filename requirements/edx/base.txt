@@ -144,8 +144,10 @@ django_debug_toolbar==1.5
 before_after==0.1.3
 bok-choy==0.5.3
 chrono==1.0.2
-coverage==4.2
-ddt==0.8.0
+git+https://github.com/nedbat/coveragepy.git@4e40f4dcfdf4f9eed0eb396f39228b1bab56b0f9#egg=coverage==0.0
+git+https://github.com/cpennington/blowyournose.git@0101090100198753898a9a1e822f65dfa9b2fee9#egg=blowyournose==0.0
+git+https://github.com/cpennington/dutch-boy.git@b9db9c5488b90371246fde3eb6d3fae6e6b73cb2#egg=dutch-boy==0.0
+ddt==1.1.1
 diff-cover==0.9.8
 django-crum==0.5
 django_nose==1.4.1
