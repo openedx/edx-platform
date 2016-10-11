@@ -565,12 +565,12 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def _should_enable_demand_hint(self, hint_index, demand_hints):
+    def _should_enable_demand_hint(self, demand_hints, hint_index=None):
         """
         Should the demand hint option be enabled?
 
         Arguments:
-            hint_index (int): The current hint index.
+            hint_index (int): The current hint index, or None (default value) if no hint is currently being shown.
             demand_hints (list): List of hints.
         Returns:
             bool: True is the demand hint is possible.
@@ -578,7 +578,11 @@ class CapaMixin(CapaFields):
         """
         # hint_index is the index of the last hint that will be displayed in this rendering,
         # so add 1 to check if others exist.
-        return len(demand_hints) > 0, len(demand_hints) > 0 and hint_index + 1 < len(demand_hints)
+        if hint_index is None:
+            should_enable = len(demand_hints) > 0
+        else:
+            should_enable = len(demand_hints) > 0 and hint_index + 1 < len(demand_hints)
+        return len(demand_hints) > 0, should_enable
 
     def get_demand_hint(self, hint_index):
         """
@@ -621,7 +625,7 @@ class CapaMixin(CapaFields):
         event_info['hint_text'] = get_inner_html_from_xpath(demand_hints[hint_index])
         self.runtime.publish(self, 'edx.problem.hint.demandhint_displayed', event_info)
 
-        _, should_enable_next_hint = self._should_enable_demand_hint(hint_index, demand_hints)
+        _, should_enable_next_hint = self._should_enable_demand_hint(demand_hints=demand_hints, hint_index=hint_index)
 
         # We report the index of this hint, the client works out what index to use to get the next hint
         return {
@@ -663,9 +667,8 @@ class CapaMixin(CapaFields):
         }
 
         # If demand hints are available, emit hint button and div.
-        hint_index = 0
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
-        demand_hint_possible, should_enable_next_hint = self._should_enable_demand_hint(hint_index, demand_hints)
+        demand_hint_possible, should_enable_next_hint = self._should_enable_demand_hint(demand_hints=demand_hints)
 
         answer_notification_type, answer_notification_message = self._get_answer_notification(
             render_notifications=submit_notification)

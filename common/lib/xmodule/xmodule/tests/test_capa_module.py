@@ -1238,7 +1238,8 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(xml=self.demand_xml)
         module.get_problem_html()  # ignoring html result
         context = module.system.render_template.call_args[0][1]
-        self.assertEqual(context['demand_hint_possible'], True)
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
 
         # Check the AJAX call that gets the hint by index
         result = module.get_demand_hint(0)
@@ -1252,6 +1253,35 @@ class CapaModuleTest(unittest.TestCase):
         result = module.get_demand_hint(2)  # here the server wraps around to index 0
         self.assertEqual(result['hint_index'], 0)
         self.assertTrue(result['should_enable_next_hint'])
+
+    def test_single_demand_hint(self):
+        """
+        Test the hint button enabled state when there is just a single hint.
+        """
+        test_xml = """
+            <problem>
+            <p>That is the question</p>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice">
+                <choice correct="false">Alpha <choicehint>A hint</choicehint>
+                </choice>
+                <choice correct="true">Beta</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            <demandhint>
+              <hint>Only demand hint</hint>
+            </demandhint>
+            </problem>"""
+        module = CapaFactory.create(xml=test_xml)
+        module.get_problem_html()  # ignoring html result
+        context = module.system.render_template.call_args[0][1]
+        self.assertTrue(context['demand_hint_possible'])
+        self.assertTrue(context['should_enable_next_hint'])
+
+        # Check the AJAX call that gets the hint by index
+        result = module.get_demand_hint(0)
+        self.assertEqual(result['hint_index'], 0)
+        self.assertFalse(result['should_enable_next_hint'])
 
     def test_demand_hint_logging(self):
         module = CapaFactory.create(xml=self.demand_xml)
