@@ -381,3 +381,142 @@ class TestMultipleProblemTypesSubsectionScores(ModuleStoreTestCase, ProblemSubmi
         score = self._get_score_with_alterations(alterations)
         self.assertEqual(score.all_total.earned, expected_earned)
         self.assertEqual(score.all_total.possible, expected_possible)
+
+
+class TestCourseGradeLogging(SharedModuleStoreTestCase):
+    """
+    Tests logging in the course grades module.
+    Uses a larger course structure than other
+    unit tests.
+    """
+    def setUp(self):
+        super(TestCourseGradeLogging, self).setUp()
+        self.course = CourseFactory.create()
+        self.chapter = ItemFactory.create(
+            parent=self.course,
+            category="chapter",
+            display_name="Test Chapter"
+        )
+        self.sequence = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name="Test Sequential 1",
+            graded=True
+        )
+        self.sequence_2 = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name="Test Sequential 2",
+            graded=True
+        )
+        self.sequence_3 = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            display_name="Test Sequential 3",
+            graded=False
+        )
+        self.vertical = ItemFactory.create(
+            parent=self.sequence,
+            category='vertical',
+            display_name='Test Vertical 1'
+        )
+        self.vertical_2 = ItemFactory.create(
+            parent=self.sequence_2,
+            category='vertical',
+            display_name='Test Vertical 2'
+        )
+        self.vertical_3 = ItemFactory.create(
+            parent=self.sequence_3,
+            category='vertical',
+            display_name='Test Vertical 3'
+        )
+        problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
+            question_text='The correct answer is Choice 3',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
+        self.problem = ItemFactory.create(
+            parent=self.vertical,
+            category="problem",
+            display_name="Test Problem 1",
+            data=problem_xml
+        )
+        self.problem_2 = ItemFactory.create(
+            parent=self.vertical_2,
+            category="problem",
+            display_name="Test Problem 2",
+            data=problem_xml
+        )
+        self.problem_3 = ItemFactory.create(
+            parent=self.vertical_3,
+            category="problem",
+            display_name="Test Problem 3",
+            data=problem_xml
+        )
+        self.request = get_request_for_user(UserFactory())
+        self.client.login(username=self.request.user.username, password="test")
+        self.course_structure = get_course_blocks(self.request.user, self.course.location)
+        self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
+        CourseEnrollment.enroll(self.request.user, self.course.id)
+
+    def _create_course_grade_and_check_logging(
+            self,
+            factory,
+            log_mock,
+            read_only,
+            subsections_read,
+            subsections_created,
+            blocks_accessed,
+            total_graded_subsections
+    ):
+        """
+        Creates a course grade and asserts that the associated logging
+        matches the expected totals passed in to the function.
+        """
+        factory.create(self.course)
+        log_statement = u''.join((
+            u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks ",
+            u"accessed: {3}, total graded subsections: {4}"
+        )).format(
+            read_only,
+            subsections_read,
+            subsections_created,
+            blocks_accessed,
+            total_graded_subsections,
+        )
+        log_mock.warning.assert_called_with(
+            u"Persistent Grades: CourseGrade.{0}, course: {1}, user: {2}".format(
+                log_statement,
+                unicode(self.course.id),
+                unicode(self.request.user.id),
+            )
+        )
+
+    def test_course_grade_logging(self):
+        grade_factory = CourseGradeFactory(self.request.user)
+        with persistent_grades_feature_flags(
+            global_flag=True,
+            enabled_for_all_courses=False,
+            course_id=self.course.id,
+            enabled_for_course=True
+        ):
+            with patch('lms.djangoapps.grades.new.course_grade.log') as log_mock:
+                # the course grade has not been created, so we expect each grade to be created
+                self._create_course_grade_and_check_logging(
+                    grade_factory,
+                    log_mock,
+                    read_only=False,
+                    subsections_read=0,
+                    subsections_created=3,
+                    blocks_accessed=3,
+                    total_graded_subsections=2)
+                # the course grade has been created, so we expect each grade to be read
+                self._create_course_grade_and_check_logging(
+                    grade_factory,
+                    log_mock,
+                    read_only=False,
+                    subsections_read=3,
+                    subsections_created=0,
+                    blocks_accessed=3,
+                    total_graded_subsections=2,
+                )
