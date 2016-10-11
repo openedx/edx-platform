@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from course_modes.models import CourseMode
-from lms.djangoapps.commerce.utils import audit_log
+from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from rest_framework import status

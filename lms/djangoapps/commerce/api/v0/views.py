@@ -13,7 +13,6 @@ from rest_framework.views import APIView
 from commerce.constants import Messages
 from commerce.exceptions import InvalidResponseError
 from commerce.http import DetailResponse, InternalRequestErrorResponse
-from commerce.utils import audit_log
 from course_modes.models import CourseMode
 from courseware import courses
 from embargo import api as embargo_api
@@ -22,6 +21,7 @@ from enrollment.views import EnrollmentCrossDomainSessionAuth
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.log_utils import audit_log
 from student.models import CourseEnrollment
 from util.json_request import JsonResponse
 
