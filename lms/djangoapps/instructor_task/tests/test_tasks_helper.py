@@ -2212,7 +2212,9 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
             shutil.rmtree(settings.GRADES_DOWNLOAD['ROOT_PATH'])
 
     def test_report_fails_if_error(self):
-        with patch('lms.djangoapps.instructor_task.tasks_helper.OraAggregateData.collect_ora2_data') as mock_collect_data:
+        with patch(
+            'lms.djangoapps.instructor_task.tasks_helper.OraAggregateData.collect_ora2_data'
+        ) as mock_collect_data:
             mock_collect_data.side_effect = KeyError
 
             with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
@@ -2229,10 +2231,14 @@ class TestInstructorOra2Report(SharedModuleStoreTestCase):
         with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_current_task:
             mock_current_task.return_value = self.current_task
 
-            with patch('lms.djangoapps.instructor_task.tasks_helper.OraAggregateData.collect_ora2_data') as mock_collect_data:
+            with patch(
+                'lms.djangoapps.instructor_task.tasks_helper.OraAggregateData.collect_ora2_data'
+            ) as mock_collect_data:
                 mock_collect_data.return_value = (test_header, test_rows)
 
-                with patch('lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows') as mock_store_rows:
+                with patch(
+                    'lms.djangoapps.instructor_task.models.DjangoStorageReportStore.store_rows'
+                ) as mock_store_rows:
                     return_val = upload_ora2_data(None, None, self.course.id, None, 'generated')
 
                     # pylint: disable=maybe-no-member
