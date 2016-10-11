@@ -8,7 +8,7 @@
 // ----------------------------
 // #GLOBALS
 // ----------------------------
-%btn {
+%btn-shims {
   display: inline-block;
   border-style: $btn-border-style;
   border-radius: $btn-border-radius;
@@ -50,7 +50,7 @@
 // #DEFAULT
 // ----------------------------
 .btn-default {
-  @extend %btn;
+  @extend %btn-shims;
   border-color: $btn-default-border-color;
   background: $btn-default-background;
   color: $btn-default-color;
@@ -85,7 +85,7 @@
 // #BRAND
 // ----------------------------
 .btn-brand {
-  @extend %btn;
+  @extend %btn-shims;
   border-color: $btn-brand-border-color;
   background: $btn-brand-background;
   color: $btn-brand-color;
