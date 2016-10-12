@@ -356,6 +356,11 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
+
+    # Display the 'Analytics' tab in the instructor dashboard for CCX courses.
+    # Note: This has no effect unless ANALYTICS_DASHBOARD_URL is already set,
+    #       because without that setting, the tab does not show up for any courses.
+    'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1917,7 +1922,7 @@ INSTALLED_APPS = (
     'support',
 
     # External auth (OpenID, shib)
-    'external_auth',
+    'openedx.core.djangoapps.external_auth',
     'django_openid_auth',
 
     # django-oauth2-provider (deprecated)
@@ -1972,7 +1977,7 @@ INSTALLED_APPS = (
     'splash',
 
     # Monitoring
-    'datadog',
+    'openedx.core.djangoapps.datadog',
 
     # User API
     'rest_framework',
@@ -2008,7 +2013,7 @@ INSTALLED_APPS = (
     'embargo',
 
     # Monitoring functionality
-    'monitoring',
+    'openedx.core.djangoapps.monitoring',
 
     # Course action state
     'course_action_state',
@@ -2093,7 +2098,7 @@ INSTALLED_APPS = (
     'learner_dashboard',
 
     # Needed whether or not enabled, due to migrations
-    'badges',
+    'badges.apps.BadgesConfig',
 
     # Enables default site and redirects
     'django_sites_extensions',

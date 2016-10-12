@@ -18,19 +18,28 @@ log = logging.getLogger('DjangoOpenIDStore')
 
 
 def get_url_key(server_url):
-    key = ASSOCIATIONS_KEY_PREFIX + server_url
-    return key
+    """
+    Returns the URL key for the given server_url.
+    """
+    return ASSOCIATIONS_KEY_PREFIX + server_url
 
 
 def get_nonce_key(server_url, timestamp, salt):
-    key = '{prefix}{url}.{ts}.{salt}'.format(prefix=NONCE_KEY_PREFIX,
-                                             url=server_url,
-                                             ts=timestamp,
-                                             salt=salt)
-    return key
+    """
+    Returns the nonce for the given parameters.
+    """
+    return '{prefix}{url}.{ts}.{salt}'.format(
+        prefix=NONCE_KEY_PREFIX,
+        url=server_url,
+        ts=timestamp,
+        salt=salt,
+    )
 
 
 class DjangoOpenIDStore(OpenIDStore):
+    """
+    django implementation of OpenIDStore.
+    """
     def __init__(self):
         log.info('DjangoStore cache:' + str(cache.__class__))
 

@@ -1,3 +1,6 @@
+"""
+External Auth Views
+"""
 import functools
 import json
 import logging
@@ -9,8 +12,8 @@ import unicodedata
 import urllib
 
 from textwrap import dedent
-from external_auth.models import ExternalAuthMap
-from external_auth.djangostore import DjangoOpenIDStore
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.djangostore import DjangoOpenIDStore
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, authenticate, login
@@ -31,11 +34,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
 from edxmako.shortcuts import render_to_response, render_to_string
-try:
-    from django.views.decorators.csrf import csrf_exempt
-except ImportError:
-    from django.contrib.csrf.middleware import csrf_exempt
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 
 import django_openid_auth.views as openid_views
 from django_openid_auth import auth as openid_auth
@@ -62,7 +61,7 @@ OPENID_DOMAIN_PREFIX = settings.OPENID_DOMAIN_PREFIX
 
 
 @csrf_exempt
-def default_render_failure(request,
+def default_render_failure(request,  # pylint: disable=unused-argument
                            message,
                            status=403,
                            template_name='extauth_failure.html',
@@ -90,7 +89,7 @@ def generate_password(length=12, chars=string.letters + string.digits):
 
 @csrf_exempt
 def openid_login_complete(request,
-                          redirect_field_name=REDIRECT_FIELD_NAME,
+                          redirect_field_name=REDIRECT_FIELD_NAME,  # pylint: disable=unused-argument
                           render_failure=None):
     """Complete the openid login process"""
 
@@ -104,7 +103,7 @@ def openid_login_complete(request,
     if openid_response.status == SUCCESS:
         external_id = openid_response.identity_url
         oid_backend = openid_auth.OpenIDBackend()
-        details = oid_backend._extract_user_details(openid_response)
+        details = oid_backend._extract_user_details(openid_response)  # pylint: disable=protected-access
 
         log.debug('openid success, details=%s', details)
 
@@ -134,6 +133,7 @@ def _external_login_or_signup(request,
                               fullname,
                               retfun=None):
     """Generic external auth login or signup"""
+    # pylint: disable=too-many-statements
     # see if we have a map from this external_id to an edX username
     try:
         eamap = ExternalAuthMap.objects.get(external_id=external_id,
@@ -300,15 +300,16 @@ def _signup(request, eamap, retfun=None):
     # but this only affects username, not fullname
     username = re.sub(r'\s', '', _flatten_to_ascii(eamap.external_name), flags=re.UNICODE)
 
-    context = {'has_extauth_info': True,
-               'show_signup_immediately': True,
-               'extauth_domain': eamap.external_domain,
-               'extauth_id': eamap.external_id,
-               'extauth_email': eamap.external_email,
-               'extauth_username': username,
-               'extauth_name': eamap.external_name,
-               'ask_for_tos': True,
-               }
+    context = {
+        'has_extauth_info': True,
+        'show_signup_immediately': True,
+        'extauth_domain': eamap.external_domain,
+        'extauth_id': eamap.external_id,
+        'extauth_email': eamap.external_email,
+        'extauth_username': username,
+        'extauth_name': eamap.external_name,
+        'ask_for_tos': True,
+    }
 
     # Some openEdX instances can't have terms of service for shib users, like
     # according to Stanford's Office of General Counsel
@@ -343,17 +344,17 @@ def _ssl_dn_extract_info(dn_string):
     full name from the SSL DN string.  Return (user,email,fullname) if
     successful, and None otherwise.
     """
-    ss = re.search('/emailAddress=(.*)@([^/]+)', dn_string)
-    if ss:
-        user = ss.group(1)
-        email = "%s@%s" % (user, ss.group(2))
+    search_string = re.search('/emailAddress=(.*)@([^/]+)', dn_string)
+    if search_string:
+        user = search_string.group(1)
+        email = "%s@%s" % (user, search_string.group(2))
     else:
-        return None
-    ss = re.search('/CN=([^/]+)/', dn_string)
-    if ss:
-        fullname = ss.group(1)
+        raise ValueError
+    search_string = re.search('/CN=([^/]+)/', dn_string)
+    if search_string:
+        fullname = search_string.group(1)
     else:
-        return None
+        raise ValueError
     return (user, email, fullname)
 
 
@@ -370,14 +371,14 @@ def ssl_get_cert_from_request(request):
     if not cert:
         try:
             # try the direct apache2 SSL key
-            cert = request._req.subprocess_env.get(certkey, '')
-        except Exception:
+            cert = request._req.subprocess_env.get(certkey, '')  # pylint: disable=protected-access
+        except Exception:  # pylint: disable=broad-except
             return ''
 
     return cert
 
 
-def ssl_login_shortcut(fn):
+def ssl_login_shortcut(func):
     """
     Python function decorator for login procedures, to allow direct login
     based on existing ExternalAuth record and MIT ssl certificate.
@@ -390,19 +391,19 @@ def ssl_login_shortcut(fn):
         """
 
         if not settings.FEATURES['AUTH_USE_CERTIFICATES']:
-            return fn(*args, **kwargs)
+            return func(*args, **kwargs)
         request = args[0]
 
         if request.user and request.user.is_authenticated():  # don't re-authenticate
-            return fn(*args, **kwargs)
+            return func(*args, **kwargs)
 
         cert = ssl_get_cert_from_request(request)
         if not cert:		# no certificate information - show normal login window
-            return fn(*args, **kwargs)
+            return func(*args, **kwargs)
 
         def retfun():
             """Wrap function again for call by _external_login_or_signup"""
-            return fn(*args, **kwargs)
+            return func(*args, **kwargs)
 
         (_user, email, fullname) = _ssl_dn_extract_info(cert)
         return _external_login_or_signup(
@@ -565,9 +566,9 @@ def course_specific_login(request, course_id):
 
     # now the dispatching conditionals.  Only shib for now
     if (
-        settings.FEATURES.get('AUTH_USE_SHIB') and
-        course.enrollment_domain and
-        course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+            settings.FEATURES.get('AUTH_USE_SHIB') and
+            course.enrollment_domain and
+            course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
     ):
         return redirect_with_get('shib-login', request.GET)
 
@@ -589,9 +590,9 @@ def course_specific_register(request, course_id):
 
     # now the dispatching conditionals.  Only shib for now
     if (
-        settings.FEATURES.get('AUTH_USE_SHIB') and
-        course.enrollment_domain and
-        course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+            settings.FEATURES.get('AUTH_USE_SHIB') and
+            course.enrollment_domain and
+            course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
     ):
         # shib-login takes care of both registration and login flows
         return redirect_with_get('shib-login', request.GET)
@@ -634,6 +635,9 @@ def get_xrds_url(resource, request):
 
 
 def add_openid_simple_registration(request, response, data):
+    """
+    Add simple registration fields to the response if requested.
+    """
     sreg_data = {}
     sreg_request = sreg.SRegRequest.fromOpenIDRequest(request)
     sreg_fields = sreg_request.allRequestedFields()
@@ -655,6 +659,9 @@ def add_openid_simple_registration(request, response, data):
 
 
 def add_openid_attribute_exchange(request, response, data):
+    """
+    Add attribute exchange fields to the response if requested.
+    """
     try:
         ax_request = ax.FetchRequest.fromOpenIDRequest(request)
     except ax.AXError:
@@ -691,8 +698,8 @@ def provider_respond(server, request, response, data):
     http_response.status_code = webresponse.code
 
     # add OpenID headers to response
-    for k, v in webresponse.headers.iteritems():
-        http_response[k] = v
+    for key, val in webresponse.headers.iteritems():
+        http_response[key] = val
 
     return http_response
 
@@ -744,7 +751,7 @@ def provider_login(request):
     """
     OpenID login endpoint
     """
-
+    # pylint: disable=too-many-statements
     # make and validate endpoint
     endpoint = get_xrds_url('login', request)
     if not endpoint:

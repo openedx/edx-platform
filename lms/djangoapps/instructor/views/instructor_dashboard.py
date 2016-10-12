@@ -22,8 +22,8 @@ from django.conf import settings
 from util.json_request import JsonResponse
 from mock import patch
 
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from openedx.core.lib.xblock_utils import wrap_xblock
+from openedx.core.lib.url_utils import quote_slashes
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.tabs import CourseTab
@@ -78,6 +78,20 @@ class InstructorDashboardTab(CourseTab):
         return bool(user and has_access(user, 'staff', course, course.id))
 
 
+def show_analytics_dashboard_message(course_key):
+    """
+    Defines whether or not the analytics dashboard URL should be displayed.
+
+    Arguments:
+        course_key (CourseLocator): The course locator to display the analytics dashboard message on.
+    """
+    if hasattr(course_key, 'ccx'):
+        ccx_analytics_enabled = settings.FEATURES.get('ENABLE_CCX_ANALYTICS_DASHBOARD_URL', False)
+        return settings.ANALYTICS_DASHBOARD_URL and ccx_analytics_enabled
+
+    return settings.ANALYTICS_DASHBOARD_URL
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
@@ -115,7 +129,7 @@ def instructor_dashboard_2(request, course_id):
     ]
 
     analytics_dashboard_message = None
-    if settings.ANALYTICS_DASHBOARD_URL:
+    if show_analytics_dashboard_message(course_key):
         # Construct a URL to the external analytics dashboard
         analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
         link_start = HTML("<a href=\"{}\" target=\"_blank\">").format(analytics_dashboard_url)
@@ -172,7 +186,8 @@ def instructor_dashboard_2(request, course_id):
     # Certificates panel
     # This is used to generate example certificates
     # and enable self-generated certificates for a course.
-    certs_enabled = CertificateGenerationConfiguration.current().enabled
+    # Note: This is hidden for all CCXs
+    certs_enabled = CertificateGenerationConfiguration.current().enabled and not hasattr(course_key, 'ccx')
     if certs_enabled and access['admin']:
         sections.append(_section_certificates(course))
 
@@ -424,7 +439,7 @@ def _section_course_info(course, access):
     if settings.FEATURES.get('DISPLAY_ANALYTICS_ENROLLMENTS'):
         section_data['enrollment_count'] = CourseEnrollment.objects.enrollment_counts(course_key)
 
-    if settings.ANALYTICS_DASHBOARD_URL:
+    if show_analytics_dashboard_message(course_key):
         #  dashboard_link is already made safe in _get_dashboard_link
         dashboard_link = _get_dashboard_link(course_key)
         #  so we can use Text() here so it's not double-escaped and rendering HTML on the front-end
@@ -474,10 +489,12 @@ def _section_membership(course, access, is_white_label):
 def _section_cohort_management(course, access):
     """ Provide data for the corresponding cohort management section """
     course_key = course.id
+    ccx_enabled = hasattr(course_key, 'ccx')
     section_data = {
         'section_key': 'cohort_management',
         'section_display_name': _('Cohorts'),
         'access': access,
+        'ccx_is_enabled': ccx_enabled,
         'course_cohort_settings_url': reverse(
             'course_cohort_settings',
             kwargs={'course_key_string': unicode(course_key)}

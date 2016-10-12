@@ -1,3 +1,6 @@
+"""
+Views for logging performance data.
+"""
 import datetime
 import json
 import logging
@@ -7,7 +10,7 @@ from django.http import HttpResponse
 from track.utils import DateTimeJSONEncoder
 
 
-perflog = logging.getLogger("perflog")
+log = logging.getLogger("perflog")
 
 
 def _get_request_header(request, header_name, default=''):
@@ -49,6 +52,6 @@ def performance_log(request):
         "host": _get_request_header(request, 'SERVER_NAME'),
     }
 
-    perflog.info(json.dumps(event, cls=DateTimeJSONEncoder))
+    log.info(json.dumps(event, cls=DateTimeJSONEncoder))
 
     return HttpResponse(status=204)

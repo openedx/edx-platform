@@ -33,7 +33,7 @@ urlpatterns = (
 
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^event$', 'track.views.user_track'),
-    url(r'^performance$', 'performance.views.performance_log'),
+    url(r'^performance$', 'openedx.core.djangoapps.performance.views.performance_log'),
     url(r'^segmentio/event$', 'track.views.segmentio.segmentio_event'),
 
     # TODO: Is this used anymore? What is STATIC_GRAB?
@@ -63,7 +63,7 @@ urlpatterns = (
     url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done',
         name='password_reset_done'),
 
-    url(r'^heartbeat$', include('heartbeat.urls')),
+    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed below.
@@ -803,27 +803,31 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 if settings.FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
-        url(r'^openid/complete/$', 'external_auth.views.openid_login_complete', name='openid-complete'),
+        url(
+            r'^openid/complete/$',
+            'openedx.core.djangoapps.external_auth.views.openid_login_complete',
+            name='openid-complete',
+        ),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
 if settings.FEATURES.get('AUTH_USE_SHIB'):
     urlpatterns += (
-        url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+        url(r'^shib-login/$', 'openedx.core.djangoapps.external_auth.views.shib_login', name='shib-login'),
     )
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
     urlpatterns += (
-        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/login/$', 'openedx.core.djangoapps.external_auth.views.cas_login', name="cas-login"),
         url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
 if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
     urlpatterns += (
         url(r'^course_specific_login/{}/$'.format(settings.COURSE_ID_PATTERN),
-            'external_auth.views.course_specific_login', name='course-specific-login'),
+            'openedx.core.djangoapps.external_auth.views.course_specific_login', name='course-specific-login'),
         url(r'^course_specific_register/{}/$'.format(settings.COURSE_ID_PATTERN),
-            'external_auth.views.course_specific_register', name='course-specific-register'),
+            'openedx.core.djangoapps.external_auth.views.course_specific_register', name='course-specific-register'),
 
     )
 
@@ -846,14 +850,26 @@ urlpatterns += (
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
-        url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
+        url(
+            r'^openid/provider/login/$',
+            'openedx.core.djangoapps.external_auth.views.provider_login',
+            name='openid-provider-login',
+        ),
         url(
             r'^openid/provider/login/(?:.+)$',
-            'external_auth.views.provider_identity',
+            'openedx.core.djangoapps.external_auth.views.provider_identity',
             name='openid-provider-login-identity'
         ),
-        url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
-        url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
+        url(
+            r'^openid/provider/identity/$',
+            'openedx.core.djangoapps.external_auth.views.provider_identity',
+            name='openid-provider-identity',
+        ),
+        url(
+            r'^openid/provider/xrds/$',
+            'openedx.core.djangoapps.external_auth.views.provider_xrds',
+            name='openid-provider-xrds',
+        ),
     )
 
 if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):

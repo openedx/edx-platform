@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 
 from courseware.tests import BaseTestXmodule
 from courseware.views.views import get_course_lti_endpoints
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
+from openedx.core.lib.url_utils import quote_slashes
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW

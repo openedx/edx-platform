@@ -38,8 +38,8 @@ from instructor_task.tests.test_base import (
     OPTION_2,
 )
 from capa.responsetypes import StudentInputError
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from openedx.core.lib.url_utils import quote_slashes
 
 
 log = logging.getLogger(__name__)

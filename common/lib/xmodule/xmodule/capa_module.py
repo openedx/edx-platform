@@ -94,6 +94,7 @@ class CapaModule(CapaMixin, XModule):
             return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
+        before_attempts = self.attempts
 
         try:
             result = handlers[dispatch](data)
@@ -119,11 +120,13 @@ class CapaModule(CapaMixin, XModule):
             raise ProcessingError(generic_error_message), None, traceback_obj
 
         after = self.get_progress()
-
+        after_attempts = self.attempts
+        progress_changed = (after != before) or (before_attempts != after_attempts)
         result.update({
-            'progress_changed': after != before,
+            'progress_changed': progress_changed,
             'progress_status': Progress.to_js_status_str(after),
             'progress_detail': Progress.to_js_detail_str(after),
+            'attempts_used': self.attempts,
         })
 
         return json.dumps(result, cls=ComplexEncoder)

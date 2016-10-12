@@ -135,8 +135,8 @@ $bookmarked-icon: "\f02e"; // .fa-bookmark
 // Rules for bookmark icon shown on each sequence nav item
 .course-content {
 
-   .bookmark-icon.bookmarked {
-    @include left($baseline / 4);
+  .bookmark-icon.bookmarked {
+    @include right($baseline / 4);
     top: -3px;
     position: absolute;
   }

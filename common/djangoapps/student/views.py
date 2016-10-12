@@ -54,7 +54,7 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
-    LogoutViewConfiguration)
+    LogoutViewConfiguration, RegistrationCookieConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
@@ -78,9 +78,9 @@ from courseware.access import has_access
 
 from django_comment_common.models import Role
 
-from external_auth.models import ExternalAuthMap
-import external_auth.views
-from external_auth.login_and_register import (
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+import openedx.core.djangoapps.external_auth.views
+from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
@@ -133,6 +133,14 @@ ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number d
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 # Used as the name of the user attribute for tracking affiliate registrations
 REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
+REGISTRATION_UTM_PARAMETERS = {
+    'utm_source': 'registration_utm_source',
+    'utm_medium': 'registration_utm_medium',
+    'utm_campaign': 'registration_utm_campaign',
+    'utm_term': 'registration_utm_term',
+    'utm_content': 'registration_utm_content',
+}
+REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "profile"])
 
@@ -470,7 +478,9 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+    if context.get("extauth_domain", '').startswith(
+            openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
+    ):
         return render_to_response('register-shib.html', context)
 
     # If third-party auth is enabled, prepopulate the form with data from the
@@ -1077,8 +1087,7 @@ def change_enrollment(request, check_access=True):
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
-                    enrollment = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
-                    enrollment.send_signal(EnrollStatusChange.enroll)
+                    CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -1195,7 +1204,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     if settings.FEATURES.get('AUTH_USE_SHIB') and user:
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
-            if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+            if eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
                 return JsonResponse({
                     "success": False,
                     "redirect": reverse('shib-login'),
@@ -1637,9 +1646,7 @@ def create_account_with_params(request, params):
         not settings.FEATURES.get("AUTH_USE_SHIB") or
         not settings.FEATURES.get("SHIB_DISABLE_TOS") or
         not do_external_auth or
-        not eamap.external_domain.startswith(
-            external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
-        )
+        not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
     form = AccountCreationForm(
@@ -1818,7 +1825,11 @@ def create_account_with_params(request, params):
     login(request, new_user)
     request.session.set_expiry(0)
 
-    _record_registration_attribution(request, new_user)
+    try:
+        record_registration_attributions(request, new_user)
+    # Don't prevent a user from registering due to attribution errors.
+    except Exception:   # pylint: disable=broad-except
+        log.exception('Error while attributing cookies to user registration.')
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
@@ -1860,14 +1871,52 @@ def _enroll_user_in_pending_courses(student):
                 )
 
 
-def _record_registration_attribution(request, user):
+def record_affiliate_registration_attribution(request, user):
     """
     Attribute this user's registration to the referring affiliate, if
     applicable.
     """
     affiliate_id = request.COOKIES.get(settings.AFFILIATE_COOKIE_NAME)
-    if user is not None and affiliate_id is not None:
+    if user and affiliate_id:
         UserAttribute.set_user_attribute(user, REGISTRATION_AFFILIATE_ID, affiliate_id)
+
+
+def record_utm_registration_attribution(request, user):
+    """
+    Attribute this user's registration to the latest UTM referrer, if
+    applicable.
+    """
+    utm_cookie_name = RegistrationCookieConfiguration.current().utm_cookie_name
+    utm_cookie = request.COOKIES.get(utm_cookie_name)
+    if user and utm_cookie:
+        utm = json.loads(utm_cookie)
+        for utm_parameter in REGISTRATION_UTM_PARAMETERS:
+            UserAttribute.set_user_attribute(
+                user,
+                REGISTRATION_UTM_PARAMETERS.get(utm_parameter),
+                utm.get(utm_parameter)
+            )
+        created_at_unixtime = utm.get('created_at')
+        if created_at_unixtime:
+            # We divide by 1000 here because the javascript timestamp generated is in milliseconds not seconds.
+            # PYTHON: time.time()      => 1475590280.823698
+            # JS: new Date().getTime() => 1475590280823
+            created_at_datetime = datetime.datetime.fromtimestamp(int(created_at_unixtime) / float(1000), tz=UTC)
+        else:
+            created_at_datetime = None
+        UserAttribute.set_user_attribute(
+            user,
+            REGISTRATION_UTM_CREATED_AT,
+            created_at_datetime
+        )
+
+
+def record_registration_attributions(request, user):
+    """
+    Attribute this user's registration based on referrer cookies.
+    """
+    record_affiliate_registration_attribution(request, user)
+    record_utm_registration_attribution(request, user)
 
 
 @csrf_exempt

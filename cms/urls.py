@@ -44,7 +44,7 @@ urlpatterns = patterns(
     url(r'^event$', 'contentstore.views.event', name='event'),
 
     url(r'^xmodule/', include('pipeline_js.urls')),
-    url(r'^heartbeat$', include('heartbeat.urls')),
+    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
 
@@ -153,7 +153,7 @@ if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
     urlpatterns += (
-        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/login/$', 'openedx.core.djangoapps.external_auth.views.cas_login', name="cas-login"),
         url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 

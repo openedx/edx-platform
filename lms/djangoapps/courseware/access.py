@@ -33,7 +33,7 @@ from xmodule.x_module import XModule
 from xmodule.split_test_module import get_split_user_partitions
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
-from external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student import auth
