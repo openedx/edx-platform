@@ -52,6 +52,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
 
         child_context['child_of_vertical'] = True
 
+        is_child_of_vertical = context.get('child_of_vertical', False)
+
         # pylint: disable=no-member
         for child in self.get_display_items():
             rendered_child = child.render(STUDENT_VIEW, child_context)
@@ -65,8 +67,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
-            'unit_title': self.display_name_with_default,
-            'show_bookmark_button': True,
+            'unit_title': self.display_name_with_default if not is_child_of_vertical else None,
+            'show_bookmark_button': not is_child_of_vertical,
             'bookmarked': child_context['bookmarked'],
             'bookmark_id': "{},{}".format(child_context['username'], unicode(self.location))
         }))
