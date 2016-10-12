@@ -328,7 +328,7 @@ def _fire_score_changed_for_block(course_id, student, block, module_state_key):
         sender=None,
         points_possible=points_possible,
         points_earned=points_earned,
-        user=student,
+        user_id=student.id,
         course_id=unicode(course_id),
         usage_id=unicode(module_state_key)
     )
