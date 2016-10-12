@@ -16,7 +16,7 @@ from edxmako.shortcuts import render_to_response
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory, StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from instructor.views.gradebook_api import calculate_page_info
+from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 
 from common.test.utils import XssTestMixin
 from student.tests.factories import AdminFactory, CourseEnrollmentFactory
@@ -275,7 +275,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         response = self.client.get(self.url)
         self.assertIn('D: 0.5, C: 0.57, B: 0.63, A: 0.75', response.content)
 
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 2)
     def test_calculate_page_info(self):
         page = calculate_page_info(offset=0, total_students=2)
         self.assertEqual(page["offset"], 0)
@@ -284,8 +284,8 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         self.assertEqual(page["previous_offset"], None)
         self.assertEqual(page["total_pages"], 1)
 
-    @patch('instructor.views.gradebook_api.render_to_response', intercept_renderer)
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.render_to_response', intercept_renderer)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_spoc_gradebook_pages(self):
         for i in xrange(2):
             username = "user_%d" % i

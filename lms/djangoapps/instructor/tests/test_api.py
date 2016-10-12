@@ -59,10 +59,10 @@ from xmodule.fields import Date
 from courseware.models import StudentFieldOverride
 
 import instructor_task.api
-import instructor.views.api
-from instructor.views.api import require_finance_admin
-from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
-from instructor.views.api import _split_input_list, common_exceptions_400, generate_unique_password
+import lms.djangoapps.instructor.views.api
+from lms.djangoapps.instructor.views.api import require_finance_admin
+from lms.djangoapps.instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
+from lms.djangoapps.instructor.views.api import _split_input_list, common_exceptions_400, generate_unique_password
 from instructor_task.api_helper import AlreadyRunningError
 from certificates.tests.factories import GeneratedCertificateFactory
 from certificates.models import CertificateStatuses
@@ -580,7 +580,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
             last_name='Student'
         )
 
-    @patch('instructor.views.api.log.info')
+    @patch('lms.djangoapps.instructor.views.api.log.info')
     def test_account_creation_and_enrollment_with_csv(self, info_log):
         """
         Happy path test to create a single new user
@@ -601,7 +601,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # test the log for email that's send to new created user.
         info_log.assert_called_with('email sent to new created user at %s', 'test_student@example.com')
 
-    @patch('instructor.views.api.log.info')
+    @patch('lms.djangoapps.instructor.views.api.log.info')
     def test_account_creation_and_enrollment_with_csv_with_blank_lines(self, info_log):
         """
         Happy path test to create a single new user
@@ -622,7 +622,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         # test the log for email that's send to new created user.
         info_log.assert_called_with('email sent to new created user at %s', 'test_student@example.com')
 
-    @patch('instructor.views.api.log.info')
+    @patch('lms.djangoapps.instructor.views.api.log.info')
     def test_email_and_username_already_exist(self, info_log):
         """
         If the email address and username already exists
@@ -712,7 +712,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
 
-    @patch('instructor.views.api.log.info')
+    @patch('lms.djangoapps.instructor.views.api.log.info')
     def test_csv_user_exist_and_not_enrolled(self, info_log):
         """
         If the email address and username already exists
@@ -797,7 +797,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
                       "test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        with patch('instructor.views.api.create_manual_course_enrollment') as mock:
+        with patch('lms.djangoapps.instructor.views.api.create_manual_course_enrollment') as mock:
             mock.side_effect = NonExistentCourseError()
             response = self.client.post(self.url, {'students_list': uploaded_file})
 
@@ -837,7 +837,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 2)
 
-    @patch.object(instructor.views.api, 'generate_random_string',
+    @patch.object(lms.djangoapps.instructor.views.api, 'generate_random_string',
                   Mock(side_effect=['first', 'first', 'second']))
     def test_generate_unique_password_no_reuse(self):
         """
@@ -1419,7 +1419,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
 
     @ddt.data('http', 'https')
-    @patch('instructor.enrollment.uses_shib')
+    @patch('lms.djangoapps.instructor.enrollment.uses_shib')
     def test_enroll_with_email_not_registered_with_shib(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
@@ -1446,7 +1446,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             )
         )
 
-    @patch('instructor.enrollment.uses_shib')
+    @patch('lms.djangoapps.instructor.enrollment.uses_shib')
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_enroll_email_not_registered_shib_mktgsite(self, mock_uses_shib):
         # Try with marketing site enabled and shib on
@@ -1468,7 +1468,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         )
 
     @ddt.data('http', 'https')
-    @patch('instructor.enrollment.uses_shib')
+    @patch('lms.djangoapps.instructor.enrollment.uses_shib')
     def test_enroll_with_email_not_registered_with_shib_autoenroll(self, protocol, mock_uses_shib):
         mock_uses_shib.return_value = True
 
@@ -2954,8 +2954,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         response = self.client.post(url, {})
         self.assertIn('The detailed enrollment report is being created.', response.content)
 
-    @patch.object(instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
-    @patch.object(instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
+    @patch.object(lms.djangoapps.instructor.views.api, 'anonymous_id_for_user', Mock(return_value='42'))
+    @patch.object(lms.djangoapps.instructor.views.api, 'unique_id_for_user', Mock(return_value='41'))
     def test_get_anon_ids(self):
         """
         Test the CSV output for the anonymized user ids.
@@ -3734,7 +3734,9 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
+        with patch(
+            'lms.djangoapps.instructor.views.instructor_task_helpers.get_task_completion_info'
+        ) as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
@@ -3753,7 +3755,9 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         act.return_value = self.tasks
         url = reverse('list_background_email_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
+        with patch(
+            'lms.djangoapps.instructor.views.instructor_task_helpers.get_task_completion_info'
+        ) as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
@@ -3772,7 +3776,9 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
+        with patch(
+            'lms.djangoapps.instructor.views.instructor_task_helpers.get_task_completion_info'
+        ) as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.post(url, {
                 'problem_location_str': self.problem_urlname,
@@ -3793,7 +3799,9 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id.to_deprecated_string()})
         mock_factory = MockCompletionInfo()
-        with patch('instructor.views.instructor_task_helpers.get_task_completion_info') as mock_completion_info:
+        with patch(
+            'lms.djangoapps.instructor.views.instructor_task_helpers.get_task_completion_info'
+        ) as mock_completion_info:
             mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
             response = self.client.post(url, {
                 'problem_location_str': self.problem_urlname,
@@ -3854,7 +3862,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         self.setup_fake_email_info(num_emails, with_failures)
         task_history_request.return_value = self.tasks.values()
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
+        with patch('lms.djangoapps.instructor.views.api.CourseEmail.objects.get') as mock_email_info:
             mock_email_info.side_effect = self.get_matching_mock_email
             response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
@@ -3931,7 +3939,7 @@ class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentT
         email_info = FakeEmailInfo(email, 0, 10)
         task_history_request.return_value = [task_info]
         url = reverse('list_email_content', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        with patch('instructor.views.api.CourseEmail.objects.get') as mock_email_info:
+        with patch('lms.djangoapps.instructor.views.api.CourseEmail.objects.get') as mock_email_info:
             mock_email_info.return_value = email
             response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
@@ -4556,7 +4564,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
                                 and row_data[1].endswith('/shoppingcart/register/redeem/{0}/"'.format(code)))
             index += 1
 
-    @patch.object(instructor.views.api, 'random_code_generator',
+    @patch.object(lms.djangoapps.instructor.views.api, 'random_code_generator',
                   Mock(side_effect=['first', 'second', 'third', 'fourth']))
     def test_generate_course_registration_codes_matching_existing_coupon_code(self):
         """
@@ -4582,7 +4590,7 @@ class TestCourseRegistrationCodes(SharedModuleStoreTestCase):
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 5)  # 1 for headers, 1 for new line at the end and 3 for the actual data
 
-    @patch.object(instructor.views.api, 'random_code_generator',
+    @patch.object(lms.djangoapps.instructor.views.api, 'random_code_generator',
                   Mock(side_effect=['first', 'first', 'second', 'third']))
     def test_generate_course_registration_codes_integrity_error(self):
         """
@@ -4946,8 +4954,8 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
         response = self.call_add_users_to_cohorts('')
         self.assertEqual(response.status_code, 403)
 
-    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
-    @patch('instructor.views.api.store_uploaded_file')
+    @patch('lms.djangoapps.instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('lms.djangoapps.instructor.views.api.store_uploaded_file')
     def test_success_username(self, mock_store_upload, mock_cohort_task):
         """
         Verify that we store the input CSV and call a background task when
@@ -4957,8 +4965,8 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
             'username,cohort\nfoo_username,bar_cohort', mock_store_upload, mock_cohort_task
         )
 
-    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
-    @patch('instructor.views.api.store_uploaded_file')
+    @patch('lms.djangoapps.instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('lms.djangoapps.instructor.views.api.store_uploaded_file')
     def test_success_email(self, mock_store_upload, mock_cohort_task):
         """
         Verify that we store the input CSV and call the cohorting background
@@ -4968,8 +4976,8 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
             'email,cohort\nfoo_email,bar_cohort', mock_store_upload, mock_cohort_task
         )
 
-    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
-    @patch('instructor.views.api.store_uploaded_file')
+    @patch('lms.djangoapps.instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('lms.djangoapps.instructor.views.api.store_uploaded_file')
     def test_success_username_and_email(self, mock_store_upload, mock_cohort_task):
         """
         Verify that we store the input CSV and call the cohorting background
@@ -4979,8 +4987,8 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
             'username,email,cohort\nfoo_username,bar_email,baz_cohort', mock_store_upload, mock_cohort_task
         )
 
-    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
-    @patch('instructor.views.api.store_uploaded_file')
+    @patch('lms.djangoapps.instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('lms.djangoapps.instructor.views.api.store_uploaded_file')
     def test_success_carriage_return(self, mock_store_upload, mock_cohort_task):
         """
         Verify that we store the input CSV and call the cohorting background
@@ -4990,8 +4998,8 @@ class TestBulkCohorting(SharedModuleStoreTestCase):
             'username,email,cohort\rfoo_username,bar_email,baz_cohort', mock_store_upload, mock_cohort_task
         )
 
-    @patch('instructor.views.api.instructor_task.api.submit_cohort_students')
-    @patch('instructor.views.api.store_uploaded_file')
+    @patch('lms.djangoapps.instructor.views.api.instructor_task.api.submit_cohort_students')
+    @patch('lms.djangoapps.instructor.views.api.store_uploaded_file')
     def test_success_carriage_return_line_feed(self, mock_store_upload, mock_cohort_task):
         """
         Verify that we store the input CSV and call the cohorting background
