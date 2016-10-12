@@ -5,7 +5,6 @@ from ratelimitbackend import admin
 
 from cms.djangoapps.contentstore.views.program import ProgramAuthoringView, ProgramsIdTokenView
 from cms.djangoapps.contentstore.views.organization import OrganizationListView
-from student.views import LogoutView
 
 admin.autodiscover()
 
@@ -18,6 +17,8 @@ LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
 urlpatterns = patterns(
     '',
+
+    url(r'', include('student.urls')),
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
@@ -58,18 +59,6 @@ urlpatterns = patterns(
 
     # Darklang View to change the preview language (or dark language)
     url(r'^update_lang/', include('dark_lang.urls', namespace='darklang')),
-)
-
-# User creation and updating views
-urlpatterns += patterns(
-    '',
-
-    url(r'^create_account$', 'student.views.create_account', name='create_account'),
-    url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name='activate'),
-
-    # ajax view that actually does the work
-    url(r'^login_post$', 'student.views.login_user', name='login_post'),
-    url(r'^logout$', LogoutView.as_view(), name='logout'),
 )
 
 # restful api
@@ -158,12 +147,6 @@ if settings.FEATURES.get('AUTH_USE_CAS'):
     )
 
 urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
-
-# enable automatic login
-if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
-    urlpatterns += (
-        url(r'^auto_auth$', 'student.views.auto_auth'),
-    )
 
 # enable entrance exams
 if settings.FEATURES.get('ENTRANCE_EXAMS'):

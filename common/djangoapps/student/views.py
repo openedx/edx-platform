@@ -556,6 +556,18 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
+    """
+    Provides the LMS dashboard view
+
+    TODO: This is lms specific and does not belong in common code.
+
+    Arguments:
+        request: The request object.
+
+    Returns:
+        The dashboard response.
+
+    """
     user = request.user
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
@@ -997,6 +1009,8 @@ def _credit_statuses(user, course_enrollments):
 def change_enrollment(request, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
+
+    TODO: This is lms specific and does not belong in common code.
 
     The request parameter must be a POST request (other methods return 405)
     that specifies course_id and enrollment_action parameters. If course_id or

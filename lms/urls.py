@@ -16,7 +16,6 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.views import LogoutView
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -27,41 +26,18 @@ urlpatterns = (
     '',
 
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
-    url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
-    url(r'^login_ajax$', 'student.views.login_user', name="login"),
-    url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
 
-    url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
+    url(r'', include('student.urls')),
+    # TODO: Move lms specific student views out of common code
+    url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^change_enrollment$', 'student.views.change_enrollment', name='change_enrollment'),
+
     url(r'^event$', 'track.views.user_track'),
     url(r'^performance$', 'openedx.core.djangoapps.performance.views.performance_log'),
     url(r'^segmentio/event$', 'track.views.segmentio.segmentio_event'),
 
     # TODO: Is this used anymore? What is STATIC_GRAB?
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
-
-    url(r'^accounts/manage_user_standing', 'student.views.manage_user_standing',
-        name='manage_user_standing'),
-    url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
-        name="disable_account_ajax"),
-
-    url(r'^logout$', LogoutView.as_view(), name='logout'),
-    url(r'^create_account$', 'student.views.create_account', name='create_account'),
-    url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
-
-    url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
-    ## Obsolete Django views for password resets
-    ## TODO: Replace with Mako-ized views
-    url(r'^password_change/$', 'django.contrib.auth.views.password_change',
-        name='password_change'),
-    url(r'^password_change_done/$', 'django.contrib.auth.views.password_change_done',
-        name='password_change_done'),
-    url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'student.views.password_reset_confirm_wrapper',
-        name='password_reset_confirm'),
-    url(r'^password_reset_complete/$', 'django.contrib.auth.views.password_reset_complete',
-        name='password_reset_complete'),
-    url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done',
-        name='password_reset_done'),
 
     url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
@@ -123,6 +99,8 @@ urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
 )
 
+# TODO: This needs to move to a separate urls.py once the student_account and
+# student views below find a home together
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
@@ -332,26 +310,11 @@ urlpatterns += (
         'courseware.module_render.xqueue_callback',
         name='xqueue_callback',
     ),
-    url(
-        r'^change_setting$',
-        'student.views.change_setting',
-        name='change_setting',
-    ),
 
     # TODO: These views need to be updated before they work
     url(r'^calculate$', 'util.views.calculate'),
 
     url(r'^courses/?$', 'branding.views.courses', name="courses"),
-    url(
-        r'^change_enrollment$',
-        'student.views.change_enrollment',
-        name='change_enrollment',
-    ),
-    url(
-        r'^change_email_settings$',
-        'student.views.change_email_settings',
-        name='change_email_settings',
-    ),
 
     #About the course
     url(
@@ -933,11 +896,6 @@ urlpatterns += (
     url(r'^debug/show_parameters$', 'debug.views.show_parameters'),
 )
 
-# enable automatic login
-if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
-    urlpatterns += (
-        url(r'^auto_auth$', 'student.views.auto_auth'),
-    )
 
 # Third-party auth.
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
