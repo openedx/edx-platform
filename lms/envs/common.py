@@ -440,7 +440,7 @@ OAUTH_EXPIRE_PUBLIC_CLIENT_DAYS = 30
 ################################## DJANGO OAUTH TOOLKIT #######################################
 
 OAUTH2_PROVIDER = {
-    'OAUTH2_VALIDATOR_CLASS': 'lms.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
+    'OAUTH2_VALIDATOR_CLASS': 'openedx.core.djangoapps.oauth_dispatch.dot_overrides.EdxOAuth2Validator',
     'SCOPES': {
         'read': 'Read scope',
         'write': 'Write scope',
@@ -1098,7 +1098,7 @@ MIDDLEWARE_CLASSES = (
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     # Enable SessionAuthenticationMiddleware in order to invalidate
     # user sessions after a password change.
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
@@ -1122,7 +1122,7 @@ MIDDLEWARE_CLASSES = (
     'splash.middleware.SplashMiddleware',
 
 
-    'geoinfo.middleware.CountryMiddleware',
+    'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
     'embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
@@ -1876,7 +1876,7 @@ INSTALLED_APPS = (
     'config_models',
 
     # Monitor the status of services
-    'service_status',
+    'openedx.core.djangoapps.service_status',
 
     # Display status message to students
     'status',
@@ -1917,7 +1917,7 @@ INSTALLED_APPS = (
     'support',
 
     # External auth (OpenID, shib)
-    'external_auth',
+    'openedx.core.djangoapps.external_auth',
     'django_openid_auth',
 
     # django-oauth2-provider (deprecated)
@@ -1927,7 +1927,7 @@ INSTALLED_APPS = (
 
     # django-oauth-toolkit
     'oauth2_provider',
-    'lms.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
+    'openedx.core.djangoapps.oauth_dispatch.apps.OAuthDispatchAppConfig',
 
     'third_party_auth',
 
@@ -1937,7 +1937,7 @@ INSTALLED_APPS = (
     # defined by oauth_provider.  If those tables don't exist, an error can occur.
     'oauth_provider',
 
-    'auth_exchange',
+    'openedx.core.djangoapps.auth_exchange',
 
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
@@ -2004,9 +2004,7 @@ INSTALLED_APPS = (
     # RSS Proxy
     'rss_proxy',
 
-    # Student Identity Reverification
-    'reverification',
-
+    # Country embargo support
     'embargo',
 
     # Monitoring functionality
@@ -2372,6 +2370,7 @@ GRADES_DOWNLOAD = {
 FINANCIAL_REPORTS = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': 'edx-financial-reports',
+    'CUSTOM_DOMAIN': 'edx-financial-reports.s3.amazonaws.com',
     'ROOT_PATH': '/tmp/edx-s3/financial_reports',
 }
 

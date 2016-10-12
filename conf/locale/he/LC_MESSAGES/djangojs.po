@@ -2908,6 +2908,7 @@ msgid "Username"
 msgstr "שם משתמש"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "דואר אלקטרוני"
 
@@ -5933,7 +5934,7 @@ msgstr "פעולות"
 #: cms/templates/js/course-outline.underscore
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "מבחן מתוזמן"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -8876,65 +8877,65 @@ msgstr "צלם תמונה"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Add a New Allowance"
-msgstr ""
+msgstr "הוסף הקצבה חדשה"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Special Exam"
-msgstr ""
+msgstr "מבחן מיוחד"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Exam Type"
-msgstr ""
+msgstr "סוג המבחן"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowance Type"
-msgstr ""
+msgstr "סוג ההקצבה"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Additional Time (minutes)"
-msgstr ""
+msgstr "תוספת זמן (דקות)"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Value"
-msgstr ""
+msgstr "ערך"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "minutes"
-msgstr ""
+msgstr "דקות"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Username or Email"
-msgstr ""
+msgstr "שם משתמש או דואר אלקטרוני"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowances"
-msgstr ""
+msgstr "הקצבות"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Add Allowance"
-msgstr ""
+msgstr "הוסף הקצבה"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Exam Name"
-msgstr ""
+msgstr "שם מבחן"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowance Value"
-msgstr ""
+msgstr "ערך ההקצבה"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Time Limit"
-msgstr ""
+msgstr "מגבלת זמן"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Started At"
-msgstr ""
+msgstr "התחיל ב"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
-msgstr ""
+msgstr "הושלם ב"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

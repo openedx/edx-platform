@@ -11,7 +11,7 @@ from openedx.core.lib.api.authentication import (
     OAuth2AuthenticationAllowInactiveUser,
     SessionAuthenticationAllowInactiveUser
 )
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 from badges.models import BadgeAssertion
 from .serializers import BadgeAssertionSerializer

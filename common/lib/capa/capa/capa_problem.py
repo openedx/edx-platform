@@ -46,6 +46,7 @@ ACCESSIBLE_CAPA_INPUT_TYPES = [
     'optioninput',
     'textline',
     'formulaequationinput',
+    'textbox',
 ]
 
 # these get captured as student responses
@@ -376,7 +377,7 @@ class LoncapaProblem(object):
 
     def grade_answers(self, answers):
         """
-        Grade student responses.  Called by capa_module.check_problem.
+        Grade student responses.  Called by capa_module.submit_problem.
 
         `answers` is a dict of all the entries from request.POST, but with the first part
         of each key removed (the string before the first "_").
@@ -496,6 +497,7 @@ class LoncapaProblem(object):
         choice-level explanations shown to a student after submission.
         Does nothing if there is no targeted-feedback attribute.
         """
+        _ = self.capa_system.i18n.ugettext
         # Note that the modifications has been done, avoiding problems if called twice.
         if hasattr(self, 'has_targeted'):
             return
@@ -515,9 +517,12 @@ class LoncapaProblem(object):
             # Keep track of the explanation-id that corresponds to the student's answer
             # Also, keep track of the solution-id
             solution_id = None
+            choice_correctness_for_student_answer = _('Incorrect')
             for choice in choices_list:
                 if choice.get('name') == student_answer:
                     expl_id_for_student_answer = choice.get('explanation-id')
+                    if choice.get('correct') == 'true':
+                        choice_correctness_for_student_answer = _('Correct')
                 if choice.get('correct') == 'true':
                     solution_id = choice.get('explanation-id')
 
@@ -527,7 +532,15 @@ class LoncapaProblem(object):
             if len(targetedfeedbackset) != 0:
                 targetedfeedbackset = targetedfeedbackset[0]
                 targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
+                # find the legend by id in choicegroup.html for aria-describedby
+                problem_legend_id = str(choicegroup.get('id')) + '-legend'
                 for targetedfeedback in targetedfeedbacks:
+                    screenreadertext = etree.Element("span")
+                    targetedfeedback.insert(0, screenreadertext)
+                    screenreadertext.set('class', 'sr')
+                    screenreadertext.text = choice_correctness_for_student_answer
+                    targetedfeedback.set('role', 'group')
+                    targetedfeedback.set('aria-describedby', problem_legend_id)
                     # Don't show targeted feedback if the student hasn't answer the problem
                     # or if the target feedback doesn't match the student's (incorrect) answer
                     if not self.done or targetedfeedback.get('explanation-id') != expl_id_for_student_answer:
@@ -561,6 +574,7 @@ class LoncapaProblem(object):
 
             # Add our solution instead to the targetedfeedbackset and change its tag name
             solution_element.tag = 'targetedfeedback'
+
             targetedfeedbackset.append(solution_element)
 
     def get_html(self):
@@ -923,12 +937,26 @@ class LoncapaProblem(object):
         if len(inputfields) > 1:
             response.set('multiple_inputtypes', 'true')
             group_label_tag = response.find('label')
+            group_description_tags = response.findall('description')
+            group_label_tag_id = u'multiinput-group-label-{}'.format(responsetype_id)
             group_label_tag_text = ''
             if group_label_tag is not None:
                 group_label_tag.tag = 'p'
-                group_label_tag.set('id', responsetype_id)
+                group_label_tag.set('id', group_label_tag_id)
                 group_label_tag.set('class', 'multi-inputs-group-label')
                 group_label_tag_text = stringify_children(group_label_tag)
+                response.set('multiinput-group-label-id', group_label_tag_id)
+
+            group_description_ids = []
+            for index, group_description_tag in enumerate(group_description_tags):
+                group_description_tag_id = u'multiinput-group-description-{}-{}'.format(responsetype_id, index)
+                group_description_tag.tag = 'p'
+                group_description_tag.set('id', group_description_tag_id)
+                group_description_tag.set('class', 'multi-inputs-group-description question-description')
+                group_description_ids.append(group_description_tag_id)
+
+            if group_description_ids:
+                response.set('multiinput-group_description_ids', ' '.join(group_description_ids))
 
             for inputfield in inputfields:
                 problem_data[inputfield.get('id')] = {

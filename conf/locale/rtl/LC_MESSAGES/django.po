@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:53+0000\n"
-"PO-Revision-Date: 2016-09-29 14:53:54.020729\n"
+"POT-Creation-Date: 2016-10-06 14:28+0000\n"
+"PO-Revision-Date: 2016-10-06 14:28:37.027976\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3404,19 +3404,6 @@ msgstr ""
 " رخ بهمفثقهرل هس شححمهثي."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "سذخقثي"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-"سثف فاهس دشمعث فخ فقعث هب فاهس وخيعمث هس ثهفاثق ش لقشيثي شسسهلروثرف خق ش "
-"حقشذفهذث حقخزمثو."
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr "فاهس ذخوحخرثرف هس خعف خب يشفث. فاث مهزقشقغ اشس رثص ذخرفثرف."
 
@@ -3565,6 +3552,10 @@ msgstr ""
 "ش رثص صهريخص. سثمثذف بشمسث هب غخع صشرف فاث مفه ذخرفثرف فخ خحثر هر شر هبقشوث "
 "هر فاث ذعققثرف حشلث. فاهس سثففهرل هس خرمغ عسثي صاثر اهيث ثطفثقرشم فخخم هس "
 "سثف فخ بشمسث.  "
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "سذخقثي"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -10820,9 +10811,13 @@ msgstr "ذمهذن فخ قثوخدث"
 msgid "Click to add"
 msgstr "ذمهذن فخ شيي"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "زخخنوشقنثي"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "زخخنوشقن"
+msgid "Bookmark this page"
+msgstr "زخخنوشقن فاهس حشلث"
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -11025,8 +11020,8 @@ msgid "Support"
 msgstr "سعححخقف"
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "{platform_name} اثمح"
+msgid "{platform_name} Support"
+msgstr "{platform_name} سعححخقف"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -11087,8 +11082,14 @@ msgid "Tell us the details"
 msgstr "فثمم عس فاث يثفشهمس"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
-msgstr "هرذمعيث ثققخق وثسسشلثس, سفثحس صاهذا مثشي فخ فاث هسسعث, ثفذ"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
+msgstr ""
+"يثسذقهزث صاشف غخع صثقث يخهرل صاثر غخع ثرذخعرفثقثي فاث هسسعث. هرذمعيث شرغ "
+"يثفشهمس فاشف صهمم اثمح عس فخ فقخعزمثساخخف, هرذمعيهرل ثققخق وثسسشلثس فاشف غخع"
+" سشص."
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -11119,12 +11120,8 @@ msgid "Brief description of the problem"
 msgstr "زقهثب يثسذقهحفهخر خب فاث حقخزمثو"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
-msgstr ""
-"يثفشهمس خب فاث حقخزمثو غخع شقث ثرذخعرفثقهرل{asterisk}{begin_span}هرذمعيث "
-"ثققخق وثسسشلثس, سفثحس صاهذا مثشي فخ فاث هسسعث, ثفذ.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
+msgstr "يثفشهمس خب فاث حقخزمثو غخع شقث ثرذخعرفثقهرل{asterisk}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -11793,10 +11790,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "حقثدهخعس"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "زخخنوشقنثي"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -21305,7 +21298,7 @@ msgid "Last day students can enroll."
 msgstr "مشسف يشغ سفعيثرفس ذشر ثرقخمم."
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
+msgid "Contact your edX partner manager to update these settings."
 msgstr "ذخرفشذف غخعق ثيط حشقفرثق وشرشلثق فخ عحيشفث فاثسث سثففهرلس."
 
 #: cms/templates/settings.html

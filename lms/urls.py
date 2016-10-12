@@ -8,10 +8,10 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-import auth_exchange.views
 from courseware.views.views import EnrollStaffView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
+from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -33,7 +33,7 @@ urlpatterns = (
 
     url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
     url(r'^event$', 'track.views.user_track'),
-    url(r'^performance$', 'performance.views.performance_log'),
+    url(r'^performance$', 'openedx.core.djangoapps.performance.views.performance_log'),
     url(r'^segmentio/event$', 'track.views.segmentio.segmentio_event'),
 
     # TODO: Is this used anymore? What is STATIC_GRAB?
@@ -803,27 +803,31 @@ if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
 if settings.FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
-        url(r'^openid/complete/$', 'external_auth.views.openid_login_complete', name='openid-complete'),
+        url(
+            r'^openid/complete/$',
+            'openedx.core.djangoapps.external_auth.views.openid_login_complete',
+            name='openid-complete',
+        ),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
 if settings.FEATURES.get('AUTH_USE_SHIB'):
     urlpatterns += (
-        url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
+        url(r'^shib-login/$', 'openedx.core.djangoapps.external_auth.views.shib_login', name='shib-login'),
     )
 
 if settings.FEATURES.get('AUTH_USE_CAS'):
     urlpatterns += (
-        url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
+        url(r'^cas-auth/login/$', 'openedx.core.djangoapps.external_auth.views.cas_login', name="cas-login"),
         url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
 if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
     urlpatterns += (
         url(r'^course_specific_login/{}/$'.format(settings.COURSE_ID_PATTERN),
-            'external_auth.views.course_specific_login', name='course-specific-login'),
+            'openedx.core.djangoapps.external_auth.views.course_specific_login', name='course-specific-login'),
         url(r'^course_specific_register/{}/$'.format(settings.COURSE_ID_PATTERN),
-            'external_auth.views.course_specific_register', name='course-specific-register'),
+            'openedx.core.djangoapps.external_auth.views.course_specific_register', name='course-specific-register'),
 
     )
 
@@ -846,21 +850,33 @@ urlpatterns += (
 
 if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
-        url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
+        url(
+            r'^openid/provider/login/$',
+            'openedx.core.djangoapps.external_auth.views.provider_login',
+            name='openid-provider-login',
+        ),
         url(
             r'^openid/provider/login/(?:.+)$',
-            'external_auth.views.provider_identity',
+            'openedx.core.djangoapps.external_auth.views.provider_identity',
             name='openid-provider-login-identity'
         ),
-        url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
-        url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
+        url(
+            r'^openid/provider/identity/$',
+            'openedx.core.djangoapps.external_auth.views.provider_identity',
+            name='openid-provider-identity',
+        ),
+        url(
+            r'^openid/provider/xrds/$',
+            'openedx.core.djangoapps.external_auth.views.provider_xrds',
+            name='openid-provider-xrds',
+        ),
     )
 
 if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     urlpatterns += (
         # These URLs dispatch to django-oauth-toolkit or django-oauth2-provider as appropriate.
         # Developers should use these routes, to maintain compatibility for existing client code
-        url(r'^oauth2/', include('lms.djangoapps.oauth_dispatch.urls')),
+        url(r'^oauth2/', include('openedx.core.djangoapps.oauth_dispatch.urls')),
         # These URLs contain the django-oauth2-provider default behavior.  It exists to provide
         # URLs for django-oauth2-provider to call using reverse() with the oauth2 namespace, and
         # also to maintain support for views that have not yet been wrapped in dispatch views.
@@ -891,7 +907,7 @@ if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
-        url(r'^status/', include('service_status.urls')),
+        url(r'^status/', include('openedx.core.djangoapps.service_status.urls')),
     )
 
 if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
@@ -938,7 +954,7 @@ if settings.FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     urlpatterns += (
         url(
             r'^oauth2/login/$',
-            auth_exchange.views.LoginWithAccessTokenView.as_view(),
+            LoginWithAccessTokenView.as_view(),
             name="login_with_access_token"
         ),
     )

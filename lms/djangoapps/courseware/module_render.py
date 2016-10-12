@@ -50,8 +50,8 @@ from edxmako.shortcuts import render_to_string
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
-from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
-from lms.djangoapps.verify_student.services import ReverificationService
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
+from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.lib.xblock_utils import (
@@ -62,6 +62,7 @@ from openedx.core.lib.xblock_utils import (
     wrap_xblock,
     request_token as xblock_request_token,
 )
+from openedx.core.lib.url_utils import unquote_slashes, quote_slashes
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
 from util import milestones_helpers
@@ -747,7 +748,8 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'fs': FSService(),
             'field-data': field_data,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
-            "reverification": ReverificationService(),
+            'verification': VerificationService(),
+            'reverification': ReverificationService(),
             'proctoring': ProctoringService(),
             'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),

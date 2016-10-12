@@ -4,9 +4,7 @@ var SequenceNav = function($element) {
 	var $wrapper = $element.find('.sequence-list-wrapper');
 	var $list = $element.find('#sequence-list');
 	var $arrows = $element.find('.sequence-nav-button');
-	var maxScroll = $list.width() - $wrapper.width() + 20;
-	var $leftShadow = $('<div class="left-shadow"></div>');
-	var $rightShadow = $('<div class="right-shadow"></div>');
+	var maxScroll = $list.width() - $wrapper.width();
 	var $body = $('body');
 	var listOrigin;
 	var mouseOrigin;
@@ -25,25 +23,12 @@ var SequenceNav = function($element) {
 		var targetLeft = clamp(listOrigin + offset, -maxScroll, 0);
 
 		updateHorizontalPosition(targetLeft);
-
-		setShadows(targetLeft);
 	};
 
 	var stopDrag = function(e) {
 		$body.css('-webkit-user-select', 'auto');
 		$body.unbind('mousemove', moveDrag);
 		$body.unbind('mouseup', stopDrag);
-	};
-
-	var setShadows = function(left) {
-		var left = left || $list.position().left;
-		var padding = 30;
-
-		var leftPercent = clamp(-left / padding, 0, 1);
-		$leftShadow.css('opacity', leftPercent);
-
-		var rightPercent = clamp((maxScroll + left) / padding, 0, 1);
-		$rightShadow.css('opacity', rightPercent);
 	};
 
 	var clamp = function(val, min, max) {
@@ -53,10 +38,9 @@ var SequenceNav = function($element) {
 	};
 
 	var updateWidths = function(e) {
-		maxScroll = $list.width() - $wrapper.width() + 20;
+		maxScroll = $list.width() - $wrapper.width();
 		var targetLeft = clamp($list.position().left, -maxScroll, 0);
 		updateHorizontalPosition(targetLeft);
-		setShadows(targetLeft);
 	};
 
 	var updateHorizontalPosition = function(left) {
@@ -73,20 +57,14 @@ var SequenceNav = function($element) {
 		if($active.position().left + $active.width() > $wrapper.width() - $list.position().left) {
 			$list.animate({
 				'left': (-$active.position().left + $wrapper.width() - $active.width() - 10) + 'px'
-			}, {
-				step: setShadows
-			});
+			}, {});
 		} else if($active.position().left < -$list.position().left) {
 			$list.animate({
 				'left': (-$active.position().left + 10) + 'px'
-			}, {
-				step: setShadows
-			});
+			}, {});
 		}
 	};
 
-	$wrapper.append($leftShadow).append($rightShadow);
-	setShadows(0);
 	$wrapper.bind('mousedown', startDrag);
 	$arrows.bind('click', checkPosition);
 	$(window).bind('resize', updateWidths);

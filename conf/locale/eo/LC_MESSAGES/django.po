@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:53+0000\n"
-"PO-Revision-Date: 2016-09-29 14:53:54.020729\n"
+"POT-Creation-Date: 2016-10-06 14:28+0000\n"
+"PO-Revision-Date: 2016-10-06 14:28:37.027976\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3941,19 +3941,6 @@ msgstr ""
 " nö fïltérïng ïs äpplïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "Sçöréd Ⱡ'σяєм ιρѕυ#"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-"Sét thïs välüé tö Trüé ïf thïs mödülé ïs éïthér ä grädéd ässïgnmént ör ä "
-"präçtïçé prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 "Thïs çömpönént ïs öüt öf däté. Thé lïßrärý häs néw çöntént. Ⱡ'σяєм ιρѕυм "
@@ -4139,6 +4126,10 @@ msgstr ""
 "α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "Sçöréd Ⱡ'σяєм ιρѕυ#"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -12507,9 +12498,13 @@ msgstr "Çlïçk tö rémövé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 msgid "Click to add"
 msgstr "Çlïçk tö ädd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "Böökmärkéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "Böökmärk Ⱡ'σяєм ιρѕυм ∂#"
+msgid "Bookmark this page"
+msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -12725,8 +12720,8 @@ msgid "Support"
 msgstr "Süppört Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "{platform_name} Hélp Ⱡ'σяєм ιρѕυм ∂#"
+msgid "{platform_name} Support"
+msgstr "{platform_name} Süppört Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -12793,10 +12788,19 @@ msgid "Tell us the details"
 msgstr "Téll üs thé détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
-"Ìnçlüdé érrör méssägés, stéps whïçh léäd tö thé ïssüé, étç Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Désçrïßé whät ýöü wéré döïng whén ýöü énçöüntéréd thé ïssüé. Ìnçlüdé äný "
+"détäïls thät wïll hélp üs tö tröüßléshööt, ïnçlüdïng érrör méssägés thät ýöü"
+" säw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłł#"
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -12832,13 +12836,10 @@ msgstr ""
 "Brïéf désçrïptïön öf thé prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
-"Détäïls öf thé prößlém ýöü äré énçöüntérïng{asterisk}{begin_span}Ìnçlüdé "
-"érrör méssägés, stéps whïçh léäd tö thé ïssüé, étç.{end_span} Ⱡ'σяєм ιρѕυм "
-"∂σłσя #"
+"Détäïls öf thé prößlém ýöü äré énçöüntérïng{asterisk} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -13630,10 +13631,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "Böökmärkéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -24588,9 +24585,9 @@ msgid "Last day students can enroll."
 msgstr "Läst däý stüdénts çän énröll. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
+msgid "Contact your edX partner manager to update these settings."
 msgstr ""
-"Çöntäçt ýöür édX Pärtnér Mänägér tö üpdäté thésé séttïngs. Ⱡ'σяєм ιρѕυм "
+"Çöntäçt ýöür édX pärtnér mänägér tö üpdäté thésé séttïngs. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/settings.html

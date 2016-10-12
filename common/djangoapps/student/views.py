@@ -78,9 +78,9 @@ from courseware.access import has_access
 
 from django_comment_common.models import Role
 
-from external_auth.models import ExternalAuthMap
-import external_auth.views
-from external_auth.login_and_register import (
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+import openedx.core.djangoapps.external_auth.views
+from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
@@ -105,6 +105,7 @@ from student.helpers import (
     check_verify_status_by_course,
     auth_pipeline_urls, get_next_url_for_login_page,
     DISABLE_UNENROLL_CERT_STATES,
+    destroy_oauth_tokens
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
@@ -469,7 +470,9 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+    if context.get("extauth_domain", '').startswith(
+            openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
+    ):
         return render_to_response('register-shib.html', context)
 
     # If third-party auth is enabled, prepopulate the form with data from the
@@ -1194,7 +1197,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     if settings.FEATURES.get('AUTH_USE_SHIB') and user:
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
-            if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+            if eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
                 return JsonResponse({
                     "success": False,
                     "redirect": reverse('shib-login'),
@@ -1636,9 +1639,7 @@ def create_account_with_params(request, params):
         not settings.FEATURES.get("AUTH_USE_SHIB") or
         not settings.FEATURES.get("SHIB_DISABLE_TOS") or
         not do_external_auth or
-        not eamap.external_domain.startswith(
-            external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
-        )
+        not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
     form = AccountCreationForm(
@@ -2116,6 +2117,7 @@ def password_reset(request):
                 "user_id": request.user.id,
             }
         )
+        destroy_oauth_tokens(request.user)
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")

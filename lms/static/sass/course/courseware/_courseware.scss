@@ -22,9 +22,8 @@ html.video-fullscreen {
   overflow: hidden;
 
   &.studio-view {
-    position: relative;
-    top: -($baseline/2);
     margin: 0;
+    display: inline;
   }
 
   .instructor-info-action {
@@ -412,7 +411,7 @@ html.video-fullscreen {
       }
     }
 
-    .sequence .path {
+    .path {
       @extend %t-copy-sub1;
       margin-top: -($baseline);
       margin-bottom: $baseline;
@@ -561,7 +560,7 @@ html.video-fullscreen {
       }
     }
 
-    section.xqa-modal, section.staff-modal, section.history-modal {
+    .xqa-modal, .staff-modal, .history-modal {
         width: 80%;
         height: 80%;
         left: left(20%);

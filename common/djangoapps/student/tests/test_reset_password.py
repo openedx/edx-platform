@@ -12,12 +12,16 @@ from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.tokens import default_token_generator
+from edx_oauth2_provider.tests.factories import ClientFactory, AccessTokenFactory, RefreshTokenFactory
+from oauth2_provider import models as dot_models
+from provider.oauth2 import models as dop_models
 
 from django.utils.http import int_to_base36
 
 from mock import Mock, patch
 import ddt
 
+from openedx.core.djangoapps.oauth_dispatch.tests import factories as dot_factories
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.views import password_reset, password_reset_confirm_wrapper, SETTING_CHANGE_INITIATED
 from student.tests.factories import UserFactory
@@ -113,8 +117,18 @@ class ResetPasswordTests(EventTestMixin, CacheIsolationTestCase):
 
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_req.user = self.user
+        dop_client = ClientFactory()
+        dop_access_token = AccessTokenFactory(user=self.user, client=dop_client)
+        RefreshTokenFactory(user=self.user, client=dop_client, access_token=dop_access_token)
+        dot_application = dot_factories.ApplicationFactory(user=self.user)
+        dot_access_token = dot_factories.AccessTokenFactory(user=self.user, application=dot_application)
+        dot_factories.RefreshTokenFactory(user=self.user, application=dot_application, access_token=dot_access_token)
         good_resp = password_reset(good_req)
         self.assertEquals(good_resp.status_code, 200)
+        self.assertFalse(dop_models.AccessToken.objects.filter(user=self.user).exists())
+        self.assertFalse(dop_models.RefreshToken.objects.filter(user=self.user).exists())
+        self.assertFalse(dot_models.AccessToken.objects.filter(user=self.user).exists())
+        self.assertFalse(dot_models.RefreshToken.objects.filter(user=self.user).exists())
         obj = json.loads(good_resp.content)
         self.assertEquals(obj, {
             'success': True,

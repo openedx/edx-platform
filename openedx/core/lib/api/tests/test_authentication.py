@@ -27,7 +27,7 @@ from rest_framework.views import APIView
 from rest_framework_oauth import permissions
 from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
 
-from lms.djangoapps.oauth_dispatch import adapters
+from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
 
 factory = APIRequestFactory()  # pylint: disable=invalid-name

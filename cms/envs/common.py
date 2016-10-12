@@ -226,6 +226,7 @@ SOCIAL_SHARING_SETTINGS = {
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+CMS_ROOT = REPO_ROOT / "cms"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 
@@ -249,8 +250,8 @@ MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-    COMMON_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
     COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+    CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
 
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
@@ -347,7 +348,7 @@ MIDDLEWARE_CLASSES = (
     'method_override.middleware.MethodOverrideMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
-    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     # Enable SessionAuthenticationMiddleware in order to invalidate
     # user sessions after a password change.
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
@@ -808,7 +809,7 @@ INSTALLED_APPS = (
     'config_models',
 
     # Monitor the status of services
-    'service_status',
+    'openedx.core.djangoapps.service_status',
 
     # Testing
     'django_nose',
@@ -817,7 +818,7 @@ INSTALLED_APPS = (
     'contentstore',
     'contentserver',
     'course_creators',
-    'external_auth',
+    'openedx.core.djangoapps.external_auth',
     'student',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run
@@ -857,13 +858,11 @@ INSTALLED_APPS = (
     # Dark-launching languages
     'dark_lang',
 
-    # Student identity reverification
-    'reverification',
-
     # User preferences
     'openedx.core.djangoapps.user_api',
     'django_openid_auth',
 
+    # Country embargo support
     'embargo',
 
     # Monitoring signals
@@ -1089,6 +1088,10 @@ ADVANCED_PROBLEM_TYPES = [
         'component': 'openassessment',
         'boilerplate_name': None,
     },
+    {
+        'component': 'drag-and-drop-v2',
+        'boilerplate_name': None
+    }
 ]
 
 

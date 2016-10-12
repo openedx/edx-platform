@@ -8,7 +8,7 @@ from collections import OrderedDict
 from model_utils.models import TimeStampedModel
 
 from util.models import CompressedTextField
-from xmodule_django.models import CourseKeyField, UsageKey
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKey
 
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name

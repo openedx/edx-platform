@@ -10,11 +10,10 @@ from urlparse import urlparse
 
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import BlockUsageLocator, CourseLocator, SlashSeparatedCourseKey
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from badges.tests.factories import BadgeClassFactory
 from badges.tests.test_models import get_image
-from lms.djangoapps.lms_xblock.runtime import quote_slashes, unquote_slashes, LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from xblock.fields import ScopeIds
 from xmodule.modulestore.django import ModuleI18nService
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -22,32 +21,6 @@ from xblock.exceptions import NoSuchServiceError
 
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
-
-TEST_STRINGS = [
-    '',
-    'foobar',
-    'foo/bar',
-    'foo/bar;',
-    'foo;;bar',
-    'foo;_bar',
-    'foo/',
-    '/bar',
-    'foo//bar',
-    'foo;;;bar',
-]
-
-
-@ddt
-class TestQuoteSlashes(TestCase):
-    """Test the quote_slashes and unquote_slashes functions"""
-
-    @data(*TEST_STRINGS)
-    def test_inverse(self, test_string):
-        self.assertEquals(test_string, unquote_slashes(quote_slashes(test_string)))
-
-    @data(*TEST_STRINGS)
-    def test_escaped(self, test_string):
-        self.assertNotIn('/', quote_slashes(test_string))
 
 
 class BlockMock(Mock):

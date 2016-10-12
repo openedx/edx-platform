@@ -29,6 +29,8 @@ from django.utils.timezone import UTC
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from django.conf import settings
 
+from openedx.core.djangolib.markup import HTML, Text
+
 log = logging.getLogger("edx.courseware")
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -179,12 +181,6 @@ class CapaFields(object):
     source_code = String(
         help=_("Source code for LaTeX and Word problems. This feature is not well-supported."),
         scope=Scope.settings
-    )
-    text_customization = Dict(
-        help=_("String customization substitutions for particular locations"),
-        scope=Scope.settings
-        # TODO: someday it should be possible to not duplicate this definition here
-        # and in inheritance.py
     )
     use_latex_compiler = Boolean(
         help=_("Enable LaTeX templates?"),
@@ -347,7 +343,7 @@ class CapaMixin(CapaFields):
 
     def set_last_submission_time(self):
         """
-        Set the module's last submission time (when the problem was checked)
+        Set the module's last submission time (when the problem was submitted)
         """
         self.last_submission_time = datetime.datetime.now(UTC())
 
@@ -400,62 +396,40 @@ class CapaMixin(CapaFields):
             'progress_status': Progress.to_js_status_str(progress),
             'progress_detail': Progress.to_js_detail_str(progress),
             'content': self.get_problem_html(encapsulate=False),
+            'graded': self.graded,
         })
 
-    def check_button_name(self):
+    def submit_button_name(self):
         """
-        Determine the name for the "check" button.
-
-        Usually it is just "Check", but if this is the student's
-        final attempt, change the name to "Final Check".
-        The text can be customized by the text_customization setting.
+        Determine the name for the "submit" button.
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
         _ = self.runtime.service(self, "i18n").ugettext
-        check = _('Check')
-        final_check = _('Final Check')
+        submit = _('Submit')
 
-        # Apply customizations if present
-        if 'custom_check' in self.text_customization:
-            check = _(self.text_customization.get('custom_check'))                # pylint: disable=translation-of-non-string
-        if 'custom_final_check' in self.text_customization:
-            final_check = _(self.text_customization.get('custom_final_check'))    # pylint: disable=translation-of-non-string
-        # TODO: need a way to get the customized words into the list of
-        # words to be translated
+        return submit
 
-        if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
-            return final_check
-        else:
-            return check
-
-    def check_button_checking_name(self):
+    def submit_button_submitting_name(self):
         """
-        Return the "checking..." text for the "check" button.
+        Return the "Submitting" text for the "submit" button.
 
-        After the user presses the "check" button, the button will briefly
+        After the user presses the "submit" button, the button will briefly
         display the value returned by this function until a response is
         received by the server.
-
-        The text can be customized by the text_customization setting.
-
         """
-        # Apply customizations if present
-        if 'custom_checking' in self.text_customization:
-            return self.text_customization.get('custom_checking')
-
         _ = self.runtime.service(self, "i18n").ugettext
-        return _('Checking...')
+        return _('Submitting')
 
-    def should_show_check_button(self):
+    def should_enable_submit_button(self):
         """
-        Return True/False to indicate whether to show the "Check" button.
+        Return True/False to indicate whether to enable the "Submit" button.
         """
         submitted_without_reset = (self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS)
 
         # If the problem is closed (past due / too many attempts)
-        # then we do NOT show the "check" button
-        # Also, do not show the "check" button if we're waiting
+        # then we disable the "submit" button
+        # Also, disable the "submit" button if we're waiting
         # for the user to reset a randomized problem
         if self.closed() or submitted_without_reset:
             return False
@@ -591,51 +565,85 @@ class CapaMixin(CapaFields):
 
         return html
 
+    def _should_enable_demand_hint(self, demand_hints, hint_index=None):
+        """
+        Should the demand hint option be enabled?
+
+        Arguments:
+            hint_index (int): The current hint index, or None (default value) if no hint is currently being shown.
+            demand_hints (list): List of hints.
+        Returns:
+            bool: True is the demand hint is possible.
+            bool: True is demand hint should be enabled.
+        """
+        # hint_index is the index of the last hint that will be displayed in this rendering,
+        # so add 1 to check if others exist.
+        if hint_index is None:
+            should_enable = len(demand_hints) > 0
+        else:
+            should_enable = len(demand_hints) > 0 and hint_index + 1 < len(demand_hints)
+        return len(demand_hints) > 0, should_enable
+
     def get_demand_hint(self, hint_index):
         """
-        Return html for the problem.
+        Return html for the problem, including demand hints.
 
-        Adds check, reset, save, and hint buttons as necessary based on the problem config
-        and state.
-        encapsulate: if True (the default) embed the html in a problem <div>
-        hint_index: (None is the default) if not None, this is the index of the next demand
-        hint to show.
+        hint_index (int): (None is the default) if not None, this is the index of the next demand
+            hint to show.
         """
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
         hint_index = hint_index % len(demand_hints)
 
         _ = self.runtime.service(self, "i18n").ugettext
-        hint_element = demand_hints[hint_index]
-        hint_text = get_inner_html_from_xpath(hint_element)
-        if len(demand_hints) == 1:
-            prefix = _('Hint: ')
-        else:
-            # Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three hints.
-            prefix = _('Hint ({hint_num} of {hints_count}): ').format(hint_num=hint_index + 1,
-                                                                      hints_count=len(demand_hints))
 
-        # Log this demand-hint request
+        counter = 0
+        total_text = ''
+        while counter <= hint_index:
+            # Translators: {previous_hints} is the HTML of hints that have already been generated, {hint_number_prefix}
+            # is a header for this hint, and {hint_text} is the text of the hint itself.
+            # This string is being passed to translation only for possible reordering of the placeholders.
+            total_text = HTML(_('{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>')).format(
+                previous_hints=HTML(total_text),
+                # Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three hints.
+                # This text is shown in bold before the accompanying hint text.
+                hint_number_prefix=Text(_("Hint ({hint_num} of {hints_count}): ")).format(
+                    hint_num=counter + 1, hints_count=len(demand_hints)
+                ),
+                # Course-authored HTML demand hints are supported.
+                hint_text=HTML(get_inner_html_from_xpath(demand_hints[counter]))
+            )
+            counter += 1
+
+        total_text = HTML('<ol>{hints}</ol>').format(hints=total_text)
+
+        # Log this demand-hint request. Note that this only logs the last hint requested (although now
+        # all previously shown hints are still displayed).
         event_info = dict()
         event_info['module_id'] = self.location.to_deprecated_string()
         event_info['hint_index'] = hint_index
         event_info['hint_len'] = len(demand_hints)
-        event_info['hint_text'] = hint_text
+        event_info['hint_text'] = get_inner_html_from_xpath(demand_hints[hint_index])
         self.runtime.publish(self, 'edx.problem.hint.demandhint_displayed', event_info)
+
+        _, should_enable_next_hint = self._should_enable_demand_hint(demand_hints=demand_hints, hint_index=hint_index)
 
         # We report the index of this hint, the client works out what index to use to get the next hint
         return {
             'success': True,
-            'contents': prefix + hint_text,
-            'hint_index': hint_index
+            'hint_index': hint_index,
+            'should_enable_next_hint': should_enable_next_hint,
+            'msg': total_text,
         }
 
-    def get_problem_html(self, encapsulate=True):
+    def get_problem_html(self, encapsulate=True, submit_notification=False):
         """
         Return html for the problem.
 
-        Adds check, reset, save, and hint buttons as necessary based on the problem config
+        Adds submit, reset, save, and hint buttons as necessary based on the problem config
         and state.
-        encapsulate: if True (the default) embed the html in a problem <div>
+
+        encapsulate (bool): if True (the default) embed the html in a problem <div>
+        submit_notification (bool): True if the submit notification should be added
         """
         try:
             html = self.lcp.get_html()
@@ -647,16 +655,10 @@ class CapaMixin(CapaFields):
 
         html = self.remove_tags_from_html(html)
 
-        # The convention is to pass the name of the check button if we want
-        # to show a check button, and False otherwise This works because
-        # non-empty strings evaluate to True.  We use the same convention
-        # for the "checking" state text.
-        if self.should_show_check_button():
-            check_button = self.check_button_name()
-            check_button_checking = self.check_button_checking_name()
-        else:
-            check_button = False
-            check_button_checking = False
+        # Enable/Disable Submit button if should_enable_submit_button returns True/False.
+        submit_button = self.submit_button_name()
+        submit_button_submitting = self.submit_button_submitting_name()
+        should_enable_submit_button = self.should_enable_submit_button()
 
         content = {
             'name': self.display_name_with_default,
@@ -666,19 +668,27 @@ class CapaMixin(CapaFields):
 
         # If demand hints are available, emit hint button and div.
         demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
-        demand_hint_possible = len(demand_hints) > 0
+        demand_hint_possible, should_enable_next_hint = self._should_enable_demand_hint(demand_hints=demand_hints)
+
+        answer_notification_type, answer_notification_message = self._get_answer_notification(
+            render_notifications=submit_notification)
 
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
-            'check_button': check_button,
-            'check_button_checking': check_button_checking,
+            'short_id': self.location.html_id(),
+            'submit_button': submit_button,
+            'submit_button_submitting': submit_button_submitting,
+            'should_enable_submit_button': should_enable_submit_button,
             'reset_button': self.should_show_reset_button(),
             'save_button': self.should_show_save_button(),
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
-            'demand_hint_possible': demand_hint_possible
+            'demand_hint_possible': demand_hint_possible,
+            'should_enable_next_hint': should_enable_next_hint,
+            'answer_notification_type': answer_notification_type,
+            'answer_notification_message': answer_notification_message,
         }
 
         html = self.runtime.render_template('problem.html', context)
@@ -698,6 +708,65 @@ class CapaMixin(CapaFields):
             html = self.runtime.replace_jump_to_id_urls(html)
 
         return html
+
+    def _get_answer_notification(self, render_notifications):
+        """
+        Generate the answer notification type and message from the current problem status.
+
+         Arguments:
+             render_notifications (bool): If false the method will return an None for type and message
+        """
+        answer_notification_message = None
+        answer_notification_type = None
+
+        if render_notifications:
+            progress = self.get_progress()
+            id_list = self.lcp.correct_map.keys()
+            if len(id_list) == 1:
+                # Only one answer available
+                answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+            elif len(id_list) > 1:
+                # Check the multiple answers that are available
+                answer_notification_type = self.lcp.correct_map.get_correctness(id_list[0])
+                for answer_id in id_list[1:]:
+                    if self.lcp.correct_map.get_correctness(answer_id) != answer_notification_type:
+                        # There is at least 1 of the following combinations of correctness states
+                        # Correct and incorrect, Correct and partially correct, or Incorrect and partially correct
+                        # which all should have a message type of Partially Correct
+                        answer_notification_type = 'partially-correct'
+                        break
+
+            # Build the notification message based on the notification type and translate it.
+            ungettext = self.runtime.service(self, "i18n").ungettext
+            if answer_notification_type == 'incorrect':
+                if progress is not None:
+                    answer_notification_message = ungettext(
+                        "Incorrect ({progress} point)",
+                        "Incorrect ({progress} points)",
+                        progress.frac()[1]
+                    ).format(progress=str(progress))
+                else:
+                    answer_notification_message = _('Incorrect')
+            elif answer_notification_type == 'correct':
+                if progress is not None:
+                    answer_notification_message = ungettext(
+                        "Correct ({progress} point)",
+                        "Correct ({progress} points)",
+                        progress.frac()[1]
+                    ).format(progress=str(progress))
+                else:
+                    answer_notification_message = _('Correct')
+            elif answer_notification_type == 'partially-correct':
+                if progress is not None:
+                    answer_notification_message = ungettext(
+                        "Partially correct ({progress} point)",
+                        "Partially correct ({progress} points)",
+                        progress.frac()[1]
+                    ).format(progress=str(progress))
+                else:
+                    answer_notification_message = _('Partially Correct')
+
+        return answer_notification_type, answer_notification_message
 
     def remove_tags_from_html(self, html):
         """
@@ -894,7 +963,7 @@ class CapaMixin(CapaFields):
         Used if we want to reconfirm we have the right thing e.g. after
         several AJAX calls.
         """
-        return {'html': self.get_problem_html(encapsulate=False)}
+        return {'html': self.get_problem_html(encapsulate=False, submit_notification=True)}
 
     @staticmethod
     def make_dict_of_responses(data):
@@ -996,7 +1065,7 @@ class CapaMixin(CapaFields):
         return {'grade': score['score'], 'max_grade': score['total']}
 
     # pylint: disable=too-many-statements
-    def check_problem(self, data, override_time=False):
+    def submit_problem(self, data, override_time=False):
         """
         Checks whether answers to a problem are correct
 
@@ -1034,7 +1103,7 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('problem_check_fail', event_info)
             if dog_stats_api:
                 dog_stats_api.increment(metric_name('checks'), tags=[u'result:failed', u'failure:unreset'])
-            raise NotFoundError(_("Problem must be reset before it can be checked again."))
+            raise NotFoundError(_("Problem must be reset before it can be submitted again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         # IDEA: consider stealing code from below: pretty-print of seconds, cueing of time remaining
@@ -1131,7 +1200,7 @@ class CapaMixin(CapaFields):
             )
 
         # render problem into HTML
-        html = self.get_problem_html(encapsulate=False)
+        html = self.get_problem_html(encapsulate=False, submit_notification=True)
 
         return {
             'success': success,
@@ -1288,17 +1357,16 @@ class CapaMixin(CapaFields):
             if is_correct is None:
                 is_correct = ''
 
+            response_data = getattr(answer_input, 'response_data', {})
             input_metadata[input_id] = {
-                'question': answer_input.response_data.get('label', ''),
+                'question': response_data.get('label', ''),
                 'answer': user_visible_answer,
                 'response_type': getattr(getattr(answer_response, 'xml', None), 'tag', ''),
                 'input_type': getattr(answer_input, 'tag', ''),
                 'correct': is_correct,
                 'variant': variant,
+                'group_label': response_data.get('group_label', ''),
             }
-            # Add group_label in event data only if the responsetype contains multiple inputtypes
-            if answer_input.response_data.get('group_label'):
-                input_metadata[input_id]['group_label'] = answer_input.response_data.get('group_label')
 
         return input_metadata
 
@@ -1424,11 +1492,11 @@ class CapaMixin(CapaFields):
         if not self.max_attempts == 0:
             msg = _(
                 "Your answers have been saved but not graded. Click '{button_name}' to grade them."
-            ).format(button_name=self.check_button_name())
+            ).format(button_name=self.submit_button_name())
         return {
             'success': True,
             'msg': msg,
-            'html': self.get_problem_html(encapsulate=False),
+            'html': self.get_problem_html(encapsulate=False)
         }
 
     def reset_problem(self, _data):
@@ -1454,7 +1522,7 @@ class CapaMixin(CapaFields):
             return {
                 'success': False,
                 # Translators: 'closed' means the problem's due date has passed. You may no longer attempt to solve the problem.
-                'error': _("Problem is closed."),
+                'msg': _("You cannot select Reset for a problem that is closed."),
             }
 
         if not self.is_submitted():
@@ -1462,8 +1530,7 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('reset_problem_fail', event_info)
             return {
                 'success': False,
-                # Translators: A student must "make an attempt" to solve the problem on the page before they can reset it.
-                'error': _("Refresh the page and make an attempt before resetting."),
+                'msg': _("You must submit an answer before you can select Reset."),
             }
 
         if self.is_submitted() and self.rerandomize in [RANDOMIZATION.ALWAYS, RANDOMIZATION.ONRESET]:

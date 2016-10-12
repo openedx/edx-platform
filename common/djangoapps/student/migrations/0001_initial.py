@@ -6,7 +6,7 @@ import django.utils.timezone
 import django_countries.fields
 import django.db.models.deletion
 from django.conf import settings
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('anonymous_user_id', models.CharField(unique=True, max_length=32)),
-                ('course_id', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, blank=True)),
+                ('course_id', CourseKeyField(db_index=True, max_length=255, blank=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('org', models.CharField(db_index=True, max_length=64, blank=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(db_index=True, max_length=255, blank=True)),
+                ('course_id', CourseKeyField(db_index=True, max_length=255, blank=True)),
                 ('role', models.CharField(max_length=64, db_index=True)),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
             name='CourseEnrollment',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('mode', models.CharField(default=b'honor', max_length=100)),
@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('email', models.CharField(max_length=255, db_index=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('auto_enroll', models.BooleanField(default=0)),
                 ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
             ],
@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
             name='EntranceExamConfiguration',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('created', models.DateTimeField(db_index=True, auto_now_add=True, null=True)),
                 ('updated', models.DateTimeField(auto_now=True, db_index=True)),
                 ('skip_entrance_exam', models.BooleanField(default=True)),
@@ -112,7 +112,7 @@ class Migration(migrations.Migration):
             name='HistoricalCourseEnrollment',
             fields=[
                 ('id', models.IntegerField(verbose_name='ID', db_index=True, auto_created=True, blank=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('created', models.DateTimeField(db_index=True, null=True, editable=False, blank=True)),
                 ('is_active', models.BooleanField(default=True)),
                 ('mode', models.CharField(default=b'honor', max_length=100)),

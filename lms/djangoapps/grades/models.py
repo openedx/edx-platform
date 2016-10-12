@@ -3,6 +3,9 @@ Models used for robust grading.
 
 Robust grading allows student scores to be saved per-subsection independent
 of any changes that may occur to the course after the score is achieved.
+We also persist students' course-level grades, and update them whenever
+a student's score or the course grading policy changes. As they are
+persisted, course grades are also immune to changes in course content.
 """
 
 from base64 import b64encode
@@ -17,7 +20,7 @@ from model_utils.models import TimeStampedModel
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from xmodule_django.models import CourseKeyField, UsageKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
 
 log = logging.getLogger(__name__)
@@ -213,7 +216,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
     # primary key will need to be large for this table
     id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
 
-    # uniquely identify this particular grade object
     user_id = models.IntegerField(blank=False)
     course_id = CourseKeyField(blank=False, max_length=255)
 
@@ -364,3 +366,75 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         params['visible_blocks_id'] = params['visible_blocks'].hash_value
         del params['visible_blocks']
+
+
+class PersistentCourseGrade(TimeStampedModel):
+    """
+    A django model tracking persistent course grades.
+    """
+
+    class Meta(object):
+        # Indices:
+        # (course_id, user_id) for individual grades
+        # (course_id) for instructors to see all course grades, implicitly created via the unique_together constraint
+        # (user_id) for course dashboard; explicitly declared as an index below
+        unique_together = [
+            ('course_id', 'user_id'),
+        ]
+
+    # primary key will need to be large for this table
+    id = UnsignedBigIntAutoField(primary_key=True)  # pylint: disable=invalid-name
+    user_id = models.IntegerField(blank=False, db_index=True)
+    course_id = CourseKeyField(blank=False, max_length=255)
+
+    # Information relating to the state of content when grade was calculated
+    course_edited_timestamp = models.DateTimeField(u'Last content edit timestamp', blank=False)
+    course_version = models.CharField(u'Course content version identifier', blank=True, max_length=255)
+    grading_policy_hash = models.CharField(u'Hash of grading policy', blank=False, max_length=255)
+
+    # Information about the course grade itself
+    percent_grade = models.FloatField(blank=False)
+    letter_grade = models.CharField(u'Letter grade for course', blank=False, max_length=255)
+
+    def __unicode__(self):
+        """
+        Returns a string representation of this model.
+        """
+        return u"{} user: {}, course version: {}, grading policy: {}, percent grade {}%, letter grade {}".format(
+            type(self).__name__,
+            self.user_id,
+            self.course_version,
+            self.grading_policy_hash,
+            self.percent_grade,
+            self.letter_grade,
+        )
+
+    @classmethod
+    def read_course_grade(cls, user_id, course_id):
+        """
+        Reads a grade from database
+
+        Arguments:
+            user_id: The user associated with the desired grade
+            course_id: The id of the course associated with the desired grade
+
+        Raises PersistentCourseGrade.DoesNotExist if applicable
+        """
+        return cls.objects.get(user_id=user_id, course_id=course_id)
+
+    @classmethod
+    def update_or_create_course_grade(cls, user_id, course_id, course_version=None, **kwargs):
+        """
+        Creates a course grade in the database.
+        Returns a PersistedCourseGrade object.
+        """
+        if course_version is None:
+            course_version = ""
+
+        grade, _ = cls.objects.update_or_create(
+            user_id=user_id,
+            course_id=course_id,
+            course_version=course_version,
+            defaults=kwargs
+        )
+        return grade

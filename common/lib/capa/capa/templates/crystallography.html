@@ -1,3 +1,4 @@
+<%! from openedx.core.djangolib.markup import HTML %>
 <section id="inputtype_${id}" class="capa_inputtype" >
     <div class="crystalography_problem" style="width:${width};height:${height}"></div>
 
@@ -16,13 +17,13 @@
     <input type="text" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}" style="display:none;"/>
 
     <p class="status" aria-describedby="input_${id}">
-        ${status.display_name}
+        <span class="sr">${status.display_name}</span>
     </p>
 
     <p id="answer_${id}" class="answer"></p>
 
     % if msg:
-        <span class="message">${msg|n}</span>
+        <span class="message" tabindex="-1">${HTML(msg)}</span>
     % endif
 
     % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:

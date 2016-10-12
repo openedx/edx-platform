@@ -3,6 +3,7 @@ Unit tests for grades models.
 """
 from base64 import b64encode
 from collections import OrderedDict
+from datetime import datetime
 import ddt
 from hashlib import sha1
 import json
@@ -15,6 +16,7 @@ from lms.djangoapps.grades.models import (
     BlockRecord,
     BlockRecordList,
     BLOCK_RECORD_LIST_VERSION,
+    PersistentCourseGrade,
     PersistentSubsectionGrade,
     VisibleBlocks
 )
@@ -164,8 +166,8 @@ class VisibleBlocksTest(GradesModelTestCase):
         self.assertNotEqual(stored_vblocks.pk, repeat_vblocks.pk)
         self.assertNotEqual(stored_vblocks.hashed, repeat_vblocks.hashed)
 
-        self.assertEquals(stored_vblocks.pk, same_order_vblocks.pk)
-        self.assertEquals(stored_vblocks.hashed, same_order_vblocks.hashed)
+        self.assertEqual(stored_vblocks.pk, same_order_vblocks.pk)
+        self.assertEqual(stored_vblocks.hashed, same_order_vblocks.hashed)
 
         self.assertNotEqual(stored_vblocks.pk, new_vblocks.pk)
         self.assertNotEqual(stored_vblocks.hashed, new_vblocks.hashed)
@@ -219,7 +221,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
                 usage_key=self.params["usage_key"],
             )
             self.assertEqual(created_grade, read_grade)
-            self.assertEquals(read_grade.visible_blocks.blocks, self.block_records)
+            self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
         with self.assertRaises(IntegrityError):
             PersistentSubsectionGrade.create_grade(**self.params)
 
@@ -241,7 +243,71 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
 
         self.params["earned_all"] = 7
         updated_grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        self.assertEquals(updated_grade.earned_all, 7)
+        self.assertEqual(updated_grade.earned_all, 7)
         if already_created:
-            self.assertEquals(created_grade.id, updated_grade.id)
-            self.assertEquals(created_grade.earned_all, 6)
+            self.assertEqual(created_grade.id, updated_grade.id)
+            self.assertEqual(created_grade.earned_all, 6)
+
+
+@ddt.ddt
+class PersistentCourseGradesTest(GradesModelTestCase):
+    """
+    Tests the PersistentCourseGrade model.
+    """
+    def setUp(self):
+        super(PersistentCourseGradesTest, self).setUp()
+        self.params = {
+            "user_id": 12345,
+            "course_id": self.course_key,
+            "course_version": "JoeMcEwing",
+            "course_edited_timestamp": datetime(
+                year=2016,
+                month=8,
+                day=1,
+                hour=18,
+                minute=53,
+                second=24,
+                microsecond=354741,
+            ),
+            "percent_grade": 77.7,
+            "letter_grade": "Great job",
+        }
+
+    def test_update(self):
+        created_grade = PersistentCourseGrade.objects.create(**self.params)
+        self.params["percent_grade"] = 88.8
+        self.params["letter_grade"] = "Better job"
+        updated_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        self.assertEqual(updated_grade.percent_grade, 88.8)
+        self.assertEqual(updated_grade.letter_grade, "Better job")
+        self.assertEqual(created_grade.id, updated_grade.id)
+
+    def test_create_and_read_grade(self):
+        created_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        read_grade = PersistentCourseGrade.read_course_grade(self.params["user_id"], self.params["course_id"])
+        for param in self.params:
+            self.assertEqual(self.params[param], getattr(created_grade, param))
+        self.assertEqual(created_grade, read_grade)
+
+    def test_course_version_optional(self):
+        del self.params["course_version"]
+        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        self.assertEqual("", grade.course_version)
+
+    @ddt.data(
+        ("percent_grade", "Not a float at all", ValueError),
+        ("percent_grade", None, IntegrityError),
+        ("letter_grade", None, IntegrityError),
+        ("course_id", "Not a course key at all", AssertionError),
+        ("user_id", None, IntegrityError),
+        ("grading_policy_hash", None, IntegrityError)
+    )
+    @ddt.unpack
+    def test_update_or_create_with_bad_params(self, param, val, error):
+        self.params[param] = val
+        with self.assertRaises(error):
+            PersistentCourseGrade.update_or_create_course_grade(**self.params)
+
+    def test_grade_does_not_exist(self):
+        with self.assertRaises(PersistentCourseGrade.DoesNotExist):
+            PersistentCourseGrade.read_course_grade(self.params["user_id"], self.params["course_id"])

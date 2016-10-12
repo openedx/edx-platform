@@ -7,6 +7,7 @@ import json
 from datetime import datetime, timedelta
 
 import ddt
+from flaky import flaky
 from nose.plugins.attrib import attr
 
 from ..helpers import UniqueCourseTest, EventsTestMixin, auto_auth, create_multiple_choice_problem
@@ -16,7 +17,7 @@ from ...pages.lms.course_nav import CourseNavPage
 from ...pages.lms.courseware import CoursewarePage, CoursewareSequentialTabPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.lms.dashboard import DashboardPage
-from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
+from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage, FakeSoftwareSecureVerificationPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.progress import ProgressPage
 from ...pages.lms.staff_view import StaffPage
@@ -200,6 +201,28 @@ class ProctoredExamTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
+    def _verify_user(self):
+        """
+        Takes user through the verification flow and then marks the verification as 'approved'.
+        """
+        # Immediately verify the user
+        self.immediate_verification_page.immediate_verification()
+
+        # Take face photo and proceed to the ID photo step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Take ID photo and proceed to the review photos step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Submit photos and proceed to the enrollment confirmation step
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Mark the verification as passing.
+        verification = FakeSoftwareSecureVerificationPage(self.browser).visit()
+        verification.mark_approved()
+
     def test_can_create_proctored_exam_in_studio(self):
         """
         Given that I am a staff member
@@ -220,6 +243,7 @@ class ProctoredExamTest(UniqueCourseTest):
         select advanced settings tab
         When I Make the exam proctored.
         And I login as a verified student.
+        And I verify the user's ID.
         And visit the courseware as a verified student.
         Then I can see an option to take the exam as a proctored exam.
         """
@@ -233,6 +257,8 @@ class ProctoredExamTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
         self._login_as_a_verified_user()
+
+        self._verify_user()
 
         self.courseware_page.visit()
         self.assertTrue(self.courseware_page.can_start_proctored_exam)
@@ -262,6 +288,7 @@ class ProctoredExamTest(UniqueCourseTest):
 
         LogoutPage(self.browser).visit()
 
+    @flaky  # TNL-5643
     @ddt.data(True, False)
     def test_timed_exam_flow(self, hide_after_due):
         """
@@ -687,12 +714,12 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         )
         self.assertEqual(self.problem_page.problem_name, problem_name)
 
-    def test_perform_problem_check_and_navigate(self):
+    def test_perform_problem_submit_and_navigate(self):
         """
         Scenario:
         I go to sequential position 1
         Facing problem1, I select 'choice_1'
-        Then I click check button
+        Then I click submit button
         Then I go to sequential position 2
         Then I came back to sequential position 1 again
         Facing problem1, I observe the problem1 content is not
@@ -703,7 +730,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         # Update problem 1's content state by clicking check button.
         self.problem_page.click_choice('choice_choice_1')
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
         self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
 
         # Save problem 1's content state as we're about to switch units in the sequence.
@@ -734,7 +761,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         # Update problem 1's content state by clicking save button.
         self.problem_page.click_choice('choice_choice_1')
         self.problem_page.click_save()
-        self.problem_page.wait_for_expected_status('div.capa_alert', 'saved')
+        self.problem_page.wait_for_save_notification()
 
         # Save problem 1's content state as we're about to switch units in the sequence.
         problem1_content_before_switch = self.problem_page.problem_content
@@ -763,7 +790,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         # Update problem 1's content state – by performing reset operation.
         self.problem_page.click_choice('choice_choice_1')
-        self.problem_page.click_check()
+        self.problem_page.click_submit()
         self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
         self.problem_page.click_reset()
         self.problem_page.wait_for_expected_status('span.unanswered', 'unanswered')

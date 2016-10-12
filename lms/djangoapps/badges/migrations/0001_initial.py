@@ -7,7 +7,7 @@ import badges.models
 from django.conf import settings
 import django.utils.timezone
 from model_utils import fields
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(max_length=255, validators=[badges.models.validate_lowercase])),
                 ('issuing_component', models.SlugField(default=b'', blank=True, validators=[badges.models.validate_lowercase])),
                 ('display_name', models.CharField(max_length=255)),
-                ('course_id', xmodule_django.models.CourseKeyField(default=None, max_length=255, blank=True)),
+                ('course_id', CourseKeyField(default=None, max_length=255, blank=True)),
                 ('description', models.TextField()),
                 ('criteria', models.TextField()),
                 ('mode', models.CharField(default=b'', max_length=100, blank=True)),

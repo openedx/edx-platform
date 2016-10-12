@@ -27,8 +27,8 @@ from openedx.core.lib.api.permissions import IsUserInUrl
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.lms_xblock.runtime import unquote_slashes
 from openedx.core.lib.api.paginators import DefaultPagination
+from openedx.core.lib.url_utils import unquote_slashes
 
 from . import DEFAULT_FIELDS, OPTIONAL_FIELDS, api
 from .serializers import BookmarkSerializer

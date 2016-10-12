@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='CourseMode',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, verbose_name='Course', db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, verbose_name='Course', db_index=True)),
                 ('mode_slug', models.CharField(max_length=100, verbose_name='Mode')),
                 ('mode_display_name', models.CharField(max_length=255, verbose_name='Display Name')),
                 ('min_price', models.IntegerField(default=0, verbose_name='Price')),
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
             name='CourseModesArchive',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(max_length=255, db_index=True)),
                 ('mode_slug', models.CharField(max_length=100)),
                 ('mode_display_name', models.CharField(max_length=255)),
                 ('min_price', models.IntegerField(default=0)),
