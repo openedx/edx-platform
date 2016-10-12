@@ -1907,7 +1907,7 @@ INSTALLED_APPS = (
     'certificates',
     'dashboard',
     'lms.djangoapps.instructor',
-    'lms.djangoapps.instructor_task',
+    'instructor_task',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
     'branding',

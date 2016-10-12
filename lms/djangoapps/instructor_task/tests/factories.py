@@ -3,7 +3,7 @@ import json
 import factory
 from factory.django import DjangoModelFactory
 from student.tests.factories import UserFactory as StudentUserFactory
-from lms.djangoapps.instructor_task.models import InstructorTask
+from instructor_task.models import InstructorTask
 from celery.states import PENDING
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 

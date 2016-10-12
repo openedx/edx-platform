@@ -13,8 +13,8 @@ from celery.states import READY_STATES
 
 from xmodule.modulestore.django import modulestore
 
-from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tasks import (
+from instructor_task.models import InstructorTask
+from instructor_task.tasks import (
     rescore_problem,
     reset_problem_attempts,
     delete_problem_state,
@@ -35,7 +35,7 @@ from lms.djangoapps.instructor_task.tasks import (
 
 from certificates.models import CertificateGenerationHistory
 
-from lms.djangoapps.instructor_task.api_helper import (
+from instructor_task.api_helper import (
     check_arguments_for_rescoring,
     encode_problem_and_student_input,
     encode_entrance_exam_and_student_input,

@@ -19,7 +19,7 @@ from courseware.courses import get_problems_in_section
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS
+from instructor_task.models import InstructorTask, PROGRESS
 
 
 log = logging.getLogger(__name__)

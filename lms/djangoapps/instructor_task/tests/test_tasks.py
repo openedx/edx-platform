@@ -22,17 +22,17 @@ from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 
-from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskModuleTestCase
-from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
-from lms.djangoapps.instructor_task.tasks import (
+from instructor_task.models import InstructorTask
+from instructor_task.tests.test_base import InstructorTaskModuleTestCase
+from instructor_task.tests.factories import InstructorTaskFactory
+from instructor_task.tasks import (
     rescore_problem,
     reset_problem_attempts,
     delete_problem_state,
     generate_certificates,
     export_ora2_data,
 )
-from lms.djangoapps.instructor_task.tasks_helper import (
+from instructor_task.tasks_helper import (
     UpdateProblemModuleStateError,
     upload_ora2_data,
 )
@@ -87,7 +87,7 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
             self.current_task.update_state.side_effect = TestTaskFailure(expected_failure_message)
         task_args = [entry_id, self._get_xmodule_instance_args()]
 
-        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task') as mock_get_task:
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_get_task:
             mock_get_task.return_value = self.current_task
             return task_class.apply(task_args, task_id=task_id).get()
 
@@ -246,7 +246,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         mock_instance = MagicMock()
         del mock_instance.rescore_problem
-        with patch('lms.djangoapps.instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             with self.assertRaises(UpdateProblemModuleStateError):
                 self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
@@ -264,7 +264,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         mock_instance = Mock()
         mock_instance.rescore_problem = Mock(return_value={'success': 'correct'})
-        with patch('lms.djangoapps.instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
         # check return value
@@ -284,7 +284,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         mock_instance = Mock()
         mock_instance.rescore_problem = Mock(return_value={'success': 'bogus'})
-        with patch('lms.djangoapps.instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
         # check return value
@@ -304,7 +304,7 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         mock_instance = Mock()
         mock_instance.rescore_problem = Mock(return_value={'bogus': 'value'})
-        with patch('lms.djangoapps.instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
+        with patch('instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
         # check return value
@@ -502,7 +502,7 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
         task_entry = self._create_input_entry()
         task_xmodule_args = self._get_xmodule_instance_args()
 
-        with patch('lms.djangoapps.instructor_task.tasks.run_main_task') as mock_main_task:
+        with patch('instructor_task.tasks.run_main_task') as mock_main_task:
             export_ora2_data(task_entry.id, task_xmodule_args)
 
             action_name = ugettext_noop('generated')

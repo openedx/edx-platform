@@ -21,7 +21,7 @@ from bulk_email.tasks import _get_source_address, _get_course_email_context
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.tests.factories import StaffFactory, InstructorFactory
-from lms.djangoapps.instructor_task.subtasks import update_subtask_status
+from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory

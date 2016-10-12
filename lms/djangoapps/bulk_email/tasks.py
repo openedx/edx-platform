@@ -39,8 +39,8 @@ from django.core.urlresolvers import reverse
 from bulk_email.models import CourseEmail, Optout
 from courseware.courses import get_course
 from openedx.core.lib.courses import course_image_url
-from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.subtasks import (
+from instructor_task.models import InstructorTask
+from instructor_task.subtasks import (
     SubtaskStatus,
     queue_subtasks_for_query,
     check_subtask_is_valid,

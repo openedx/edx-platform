@@ -14,7 +14,7 @@ import dogstats_wrapper as dog_stats_api
 from django.db import transaction, DatabaseError
 from django.core.cache import cache
 
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS, QUEUING
+from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 from util.db import outer_atomic
 
 TASK_LOG = logging.getLogger('edx.celery.task')

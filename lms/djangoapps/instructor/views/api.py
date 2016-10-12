@@ -65,9 +65,9 @@ from student.models import (
     ENROLLED_TO_ENROLLED, ENROLLED_TO_UNENROLLED, UNENROLLED_TO_ENROLLED,
     UNENROLLED_TO_UNENROLLED, ALLOWEDTOENROLL_TO_UNENROLLED, DEFAULT_TRANSITION_STATE
 )
-import lms.djangoapps.instructor_task.api
-from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
-from lms.djangoapps.instructor_task.models import ReportStore
+import instructor_task.api
+from instructor_task.api_helper import AlreadyRunningError
+from instructor_task.models import ReportStore
 import lms.djangoapps.instructor.enrollment as enrollment
 from lms.djangoapps.instructor.enrollment import (
     get_user_email_language,
@@ -967,7 +967,7 @@ def get_problem_responses(request, course_id):
         return JsonResponseBadRequest(_("Could not find problem with this location."))
 
     try:
-        lms.djangoapps.instructor_task.api.submit_calculate_problem_responses_csv(request, course_key, problem_location)
+        instructor_task.api.submit_calculate_problem_responses_csv(request, course_key, problem_location)
         success_status = _(
             "The problem responses report is being created."
             " To view the status of the report, see Pending Tasks below."
@@ -1261,11 +1261,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         return JsonResponse(response_payload)
     else:
         try:
-            lms.djangoapps.instructor_task.api.submit_calculate_students_features_csv(
-                request,
-                course_key,
-                query_features
-            )
+            instructor_task.api.submit_calculate_students_features_csv(request, course_key, query_features)
             success_status = _("The enrolled learner profile report is being created."
                                " To view the status of the report, see Pending Tasks below.")
             return JsonResponse({"status": success_status})
@@ -1294,7 +1290,7 @@ def get_students_who_may_enroll(request, course_id):
     course_key = CourseKey.from_string(course_id)
     query_features = ['email']
     try:
-        lms.djangoapps.instructor_task.api.submit_calculate_may_enroll_csv(request, course_key, query_features)
+        instructor_task.api.submit_calculate_may_enroll_csv(request, course_key, query_features)
         success_status = _(
             "The enrollment report is being created. This report contains"
             " information about learners who can enroll in the course."
@@ -1349,7 +1345,7 @@ def add_users_to_cohorts(request, course_id):
             validator=validator
         )
         # The task will assume the default file storage.
-        lms.djangoapps.instructor_task.api.submit_cohort_students(request, course_key, filename)
+        instructor_task.api.submit_cohort_students(request, course_key, filename)
     except (FileValidationException, PermissionDenied) as err:
         return JsonResponse({"error": unicode(err)}, status=400)
 
@@ -1397,7 +1393,7 @@ def get_enrollment_report(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        lms.djangoapps.instructor_task.api.submit_detailed_enrollment_features_csv(request, course_key)
+        instructor_task.api.submit_detailed_enrollment_features_csv(request, course_key)
         success_status = _("The detailed enrollment report is being created."
                            " To view the status of the report, see Pending Tasks below.")
         return JsonResponse({"status": success_status})
@@ -1422,7 +1418,7 @@ def get_exec_summary_report(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        lms.djangoapps.instructor_task.api.submit_executive_summary_report(request, course_key)
+        instructor_task.api.submit_executive_summary_report(request, course_key)
         status_response = _("The executive summary report is being created."
                             " To view the status of the report, see Pending Tasks below.")
     except AlreadyRunningError:
@@ -1447,7 +1443,7 @@ def get_course_survey_results(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        lms.djangoapps.instructor_task.api.submit_course_survey_report(request, course_key)
+        instructor_task.api.submit_course_survey_report(request, course_key)
         status_response = _("The survey report is being created."
                             " To view the status of the report, see Pending Tasks below.")
     except AlreadyRunningError:
@@ -1483,7 +1479,7 @@ def get_proctored_exam_results(request, course_id):
 
     course_key = CourseKey.from_string(course_id)
     try:
-        lms.djangoapps.instructor_task.api.submit_proctored_exam_results_report(request, course_key, query_features)
+        instructor_task.api.submit_proctored_exam_results_report(request, course_key, query_features)
         status_response = _("The proctored exam results report is being created."
                             " To view the status of the report, see Pending Tasks below.")
     except AlreadyRunningError:
@@ -1982,7 +1978,7 @@ def reset_student_attempts(request, course_id):
             return HttpResponse(error_msg, status=500)
         response_payload['student'] = student_identifier
     elif all_students:
-        lms.djangoapps.instructor_task.api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
+        instructor_task.api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
         response_payload['task'] = 'created'
         response_payload['student'] = 'All Students'
     else:
@@ -2048,17 +2044,9 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
     try:
         entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
         if delete_module:
-            lms.djangoapps.instructor_task.api.submit_delete_entrance_exam_state_for_student(
-                request,
-                entrance_exam_key,
-                student
-            )
+            instructor_task.api.submit_delete_entrance_exam_state_for_student(request, entrance_exam_key, student)
         else:
-            lms.djangoapps.instructor_task.api.submit_reset_problem_attempts_in_entrance_exam(
-                request,
-                entrance_exam_key,
-                student
-            )
+            instructor_task.api.submit_reset_problem_attempts_in_entrance_exam(request, entrance_exam_key, student)
     except InvalidKeyError:
         return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
 
@@ -2112,10 +2100,10 @@ def rescore_problem(request, course_id):
 
     if student:
         response_payload['student'] = student_identifier
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_student(request, module_state_key, student)
+        instructor_task.api.submit_rescore_problem_for_student(request, module_state_key, student)
         response_payload['task'] = 'created'
     elif all_students:
-        lms.djangoapps.instructor_task.api.submit_rescore_problem_for_all_students(request, module_state_key)
+        instructor_task.api.submit_rescore_problem_for_all_students(request, module_state_key)
         response_payload['task'] = 'created'
     else:
         return HttpResponseBadRequest()
@@ -2172,7 +2160,7 @@ def rescore_entrance_exam(request, course_id):
         response_payload['student'] = student_identifier
     else:
         response_payload['student'] = _("All Students")
-    lms.djangoapps.instructor_task.api.submit_rescore_entrance_exam_for_student(request, entrance_exam_key, student)
+    instructor_task.api.submit_rescore_entrance_exam_for_student(request, entrance_exam_key, student)
     response_payload['task'] = 'created'
     return JsonResponse(response_payload)
 
@@ -2188,10 +2176,7 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     task_type = 'bulk_course_email'
     # Specifying for the history of a single task type
-    tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(
-        course_id,
-        task_type=task_type
-    )
+    tasks = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
@@ -2210,7 +2195,7 @@ def list_email_content(request, course_id):  # pylint: disable=unused-argument
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     task_type = 'bulk_course_email'
     # First get tasks list of bulk emails sent
-    emails = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
+    emails = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
 
     response_payload = {
         'emails': map(extract_email_features, emails),
@@ -2250,13 +2235,13 @@ def list_instructor_tasks(request, course_id):
             return HttpResponseBadRequest()
         if student:
             # Specifying for a single student's history on this problem
-            tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
+            tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
         else:
             # Specifying for single problem's history
-            tasks = lms.djangoapps.instructor_task.api.get_instructor_task_history(course_id, module_state_key)
+            tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key)
     else:
         # If no problem or student, just get currently running tasks
-        tasks = lms.djangoapps.instructor_task.api.get_running_instructor_tasks(course_id)
+        tasks = instructor_task.api.get_running_instructor_tasks(course_id)
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
@@ -2288,17 +2273,10 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
         return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
     if student:
         # Specifying for a single student's entrance exam history
-        tasks = lms.djangoapps.instructor_task.api.get_entrance_exam_instructor_task_history(
-            course_id,
-            entrance_exam_key,
-            student
-        )
+        tasks = instructor_task.api.get_entrance_exam_instructor_task_history(course_id, entrance_exam_key, student)
     else:
         # Specifying for all student's entrance exam history
-        tasks = lms.djangoapps.instructor_task.api.get_entrance_exam_instructor_task_history(
-            course_id,
-            entrance_exam_key
-        )
+        tasks = instructor_task.api.get_entrance_exam_instructor_task_history(course_id, entrance_exam_key)
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
@@ -2358,7 +2336,7 @@ def export_ora2_data(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        lms.djangoapps.instructor_task.api.submit_export_ora2_data(request, course_key)
+        instructor_task.api.submit_export_ora2_data(request, course_key)
         success_status = _("The ORA data report is being generated.")
 
         return JsonResponse({"status": success_status})
@@ -2384,7 +2362,7 @@ def calculate_grades_csv(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        lms.djangoapps.instructor_task.api.submit_calculate_grades_csv(request, course_key)
+        instructor_task.api.submit_calculate_grades_csv(request, course_key)
         success_status = _("The grade report is being created."
                            " To view the status of the report, see Pending Tasks below.")
         return JsonResponse({"status": success_status})
@@ -2410,7 +2388,7 @@ def problem_grade_report(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        lms.djangoapps.instructor_task.api.submit_problem_grade_report(request, course_key)
+        instructor_task.api.submit_problem_grade_report(request, course_key)
         success_status = _("The problem grade report is being created."
                            " To view the status of the report, see Pending Tasks below.")
         return JsonResponse({"status": success_status})
@@ -2535,7 +2513,7 @@ def send_email(request, course_id):
         return HttpResponseBadRequest(repr(err))
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    lms.djangoapps.instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -2821,7 +2799,7 @@ def start_certificate_generation(request, course_id):
     Start generating certificates for all students enrolled in given course.
     """
     course_key = CourseKey.from_string(course_id)
-    task = lms.djangoapps.instructor_task.api.generate_certificates_for_students(request, course_key)
+    task = instructor_task.api.generate_certificates_for_students(request, course_key)
     message = _('Certificate generation task for all students of this course has been started. '
                 'You can view the status of the generation task in the "Pending Tasks" section.')
     response_payload = {
@@ -2857,7 +2835,7 @@ def start_certificate_regeneration(request, course_id):
             status=400
         )
     try:
-        lms.djangoapps.instructor_task.api.regenerate_certificates(request, course_key, certificates_statuses)
+        instructor_task.api.regenerate_certificates(request, course_key, certificates_statuses)
     except AlreadyRunningError as error:
         return JsonResponse({'message': error.message}, status=400)
 
@@ -3076,7 +3054,7 @@ def generate_certificate_exceptions(request, course_id, generate_for=None):
             status=400
         )
 
-    lms.djangoapps.instructor_task.api.generate_certificates_for_students(request, course_key, student_set=students)
+    instructor_task.api.generate_certificates_for_students(request, course_key, student_set=students)
 
     response_payload = {
         'success': True,
@@ -3285,7 +3263,7 @@ def re_validate_certificate(request, course_key, generated_certificate):
 
     # We need to generate certificate only for a single student here
     student = certificate_invalidation.generated_certificate.user
-    lms.djangoapps.instructor_task.api.generate_certificates_for_students(
+    instructor_task.api.generate_certificates_for_students(
         request, course_key, student_set="specific_student", specific_student_id=student.id
     )
 

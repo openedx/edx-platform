@@ -35,11 +35,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import CourseEmail, Optout, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
 from bulk_email.tasks import _get_course_email_context
 
-from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
-from lms.djangoapps.instructor_task.subtasks import update_subtask_status, SubtaskStatus
-from lms.djangoapps.instructor_task.models import InstructorTask
-from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
+from instructor_task.tasks import send_bulk_course_email
+from instructor_task.subtasks import update_subtask_status, SubtaskStatus
+from instructor_task.models import InstructorTask
+from instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from instructor_task.tests.factories import InstructorTaskFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 

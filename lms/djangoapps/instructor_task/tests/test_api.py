@@ -7,7 +7,7 @@ from bulk_email.models import CourseEmail, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_T
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-from lms.djangoapps.instructor_task.api import (
+from instructor_task.api import (
     get_running_instructor_tasks,
     get_instructor_task_history,
     submit_rescore_problem_for_all_students,
@@ -28,10 +28,10 @@ from lms.djangoapps.instructor_task.api import (
     SpecificStudentIdMissingError,
 )
 
-from lms.djangoapps.instructor_task.api_helper import AlreadyRunningError
-from lms.djangoapps.instructor_task.models import InstructorTask, PROGRESS
-from lms.djangoapps.instructor_task.tasks import export_ora2_data
-from lms.djangoapps.instructor_task.tests.test_base import (
+from instructor_task.api_helper import AlreadyRunningError
+from instructor_task.models import InstructorTask, PROGRESS
+from instructor_task.tasks import export_ora2_data
+from instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     InstructorTaskCourseTestCase,
     InstructorTaskModuleTestCase,
@@ -273,7 +273,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
     def test_submit_ora2_request_task(self):
         request = self.create_task_request(self.instructor)
 
-        with patch('lms.djangoapps.instructor_task.api.submit_task') as mock_submit_task:
+        with patch('instructor_task.api.submit_task') as mock_submit_task:
             mock_submit_task.return_value = MagicMock()
             submit_export_ora2_data(request, self.course.id)
 
