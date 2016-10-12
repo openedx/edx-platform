@@ -110,6 +110,7 @@ class SysadminBaseTestCase(SharedModuleStoreTestCase):
 
 
 @attr(shard=1)
+@unittest.skip("These tests are causing OutOfMemory on Jenkins.")
 @override_settings(
     MONGODB_LOG=TEST_MONGODB_LOG,
     GIT_REPO_DIR=settings.TEST_ROOT / "course_repos_{}".format(uuid4().hex)
