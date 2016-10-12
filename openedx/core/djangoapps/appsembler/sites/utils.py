@@ -2,8 +2,10 @@ import json
 import os
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from organizations.api import add_organization
+from organizations.models import UserOrganizationMapping
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
@@ -66,7 +68,7 @@ def json_to_sass(json_input):
     return dict_to_sass(sass_dict)
 
 
-def bootstrap_site(site, organization_id):
+def bootstrap_site(site, organization_id, user_email):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
@@ -77,11 +79,9 @@ def bootstrap_site(site, organization_id):
         'name': organization_id,
         'short_name': organization_id
     })
+    user = User.objects.get(email=user_email)
+    UserOrganizationMapping.objects.create(user=user, organization=organization)
     return organization, site
-
-
-def register_user_in_edx(request, email, password, first_name, last_name):
-    pass
 
 
 def delete_site(site_id):

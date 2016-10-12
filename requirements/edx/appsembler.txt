@@ -1,4 +1,4 @@
-git+https://github.com/appsembler/django-db-multitenant.git@0884b1504f1a9d6bba4f52bf9e7f31955c9aa8a8#egg=django-db-multitenant==0.1.1
+git+https://github.com/edx/edx-organizations.git@appsembler/amc
 django-mailgun==0.8.0
 libsass==0.11.1
 python-intercom==0.2.13
