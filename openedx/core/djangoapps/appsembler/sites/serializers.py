@@ -65,5 +65,10 @@ class RegistrationSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         site_data = validated_data.pop('site')
+        site = Site.objects.create(**site_data)
         organization_data = validated_data.pop('organization')
-        return organization_data
+        organization, _ = bootstrap_site(site, organization_data.get('name'))
+        return {
+            'site': site,
+            'organization': organization
+        }

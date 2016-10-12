@@ -41,4 +41,3 @@ class FileUploadView(views.APIView):
 
 class SiteCreateView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
-

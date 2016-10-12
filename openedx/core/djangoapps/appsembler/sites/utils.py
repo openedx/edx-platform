@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 from django.contrib.sites.models import Site
-
+from organizations.api import add_organization
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
@@ -66,15 +66,23 @@ def json_to_sass(json_input):
     return dict_to_sass(sass_dict)
 
 
-def bootstrap_site(site, organization):
+def bootstrap_site(site, organization_id):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
     SiteTheme.objects.create(site=site, theme_dir_name=settings.THEME_NAME)
     site.configuration_id = site_config.id
+    organization = add_organization({
+        'name': organization_id,
+        'short_name': organization_id
+    })
+    return organization, site
 
-    return site
+
+def register_user_in_edx(request, email, password, first_name, last_name):
+    pass
+
 
 def delete_site(site_id):
     site = Site.objects.get(id=site_id)
