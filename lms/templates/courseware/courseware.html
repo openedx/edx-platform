@@ -61,7 +61,10 @@ ${static.get_page_title_breadcrumbs(course_name())}
 <%static:css group='style-student-notes'/>
 % endif
 
-<%include file="../discussion/_js_head_dependencies.html" />
+<script type="text/javascript" src="${static.url('js/jquery.autocomplete.js')}"></script>
+<script type="text/javascript" src="${static.url('js/src/tooltip_manager.js')}"></script>
+
+<link href="${static.url('css/vendor/jquery.autocomplete.css')}" rel="stylesheet" type="text/css">
   ${HTML(fragment.head_html())}
 </%block>
 
@@ -73,7 +76,7 @@ ${static.get_page_title_breadcrumbs(course_name())}
   <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
 
   <%static:js group='courseware'/>
-  <%include file="../discussion/_js_body_dependencies.html" />
+  <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
