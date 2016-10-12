@@ -79,6 +79,8 @@ def bootstrap_site(site, organization_id, user_email):
         'name': organization_id,
         'short_name': organization_id
     })
+    site_config.values['course_org_filter'] = organization_id
+    site_config.save()
     user = User.objects.get(email=user_email)
     UserOrganizationMapping.objects.create(user=user, organization=organization)
     return organization, site
