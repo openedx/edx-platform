@@ -15,7 +15,6 @@ from openedx.core.djangoapps.theming.storage import (
 )
 from storages.backends.s3boto import S3BotoStorage
 
-
 class ProductionStorage(
         PipelineForgivingStorage,
         OptimizedFilesMixin,
