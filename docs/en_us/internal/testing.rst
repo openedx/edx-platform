@@ -173,12 +173,6 @@ To run these tests without ``collectstatic``, which is faster, append the follow
 
     paver test_system -s lms --fasttest
 
-For even more speed, use the ``--disable-migrations`` option to run tests without applying migrations and instead create tables directly from apps' models.
-
-::
-
-    paver test_system -s lms --disable-migrations
-
 To run cms python tests without ``collectstatic`` use this command.
 
 ::
