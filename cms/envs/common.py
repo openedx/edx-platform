@@ -376,7 +376,7 @@ MIDDLEWARE_CLASSES = (
     'ratelimitbackend.middleware.RateLimitMiddleware',
 
     # for expiring inactive sessions
-    'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+    'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
