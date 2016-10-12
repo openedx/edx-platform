@@ -1,7 +1,8 @@
 """Tests for remove_headers and force_header decorator. """
 from django.http import HttpResponse, HttpRequest
 from django.test import TestCase
-from header_control.decorators import remove_headers, force_header
+
+from openedx.core.djangoapps.header_control.decorators import remove_headers, force_header
 
 
 def fake_view(_request):

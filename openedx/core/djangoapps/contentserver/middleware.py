@@ -10,12 +10,12 @@ from django.http import (
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponsePermanentRedirect)
 from student.models import CourseEnrollment
 
-from header_control import force_header_for_response
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import AssetLocator
+from openedx.core.djangoapps.header_control import force_header_for_response
 from .caching import get_cached_content, set_cached_content
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.exceptions import NotFoundError
