@@ -1,6 +1,9 @@
 """
 Acceptance tests for Studio related to the textbooks.
 """
+
+from flaky import flaky
+
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
 from common.test.acceptance.pages.lms.textbook_view import TextbookViewPage
@@ -29,6 +32,7 @@ class TextbooksTest(StudioCourseTest):
 
         self.textbook_view_page = TextbookViewPage(self.browser, self.course_id)
 
+    @flaky  # TODO fix this flaky test
     def test_create_first_book_message(self):
         """
         Scenario: A message is displayed on the textbooks page when there are no uploaded textbooks

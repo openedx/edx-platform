@@ -2,10 +2,12 @@
 """
 Acceptance tests for studio related to the outline page.
 """
-import json
 from datetime import datetime, timedelta
+from flaky import flaky
 import itertools
+import json
 from pytz import UTC
+
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
 
@@ -1304,6 +1306,7 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
         self.verify_all_sections(collapsed=False)
 
+    @flaky  # TODO fix this, see TNL-5758
     def test_expand_all_when_some_collapsed(self):
         """
         Scenario: Expanding all sections when 1 or more sections are already expanded

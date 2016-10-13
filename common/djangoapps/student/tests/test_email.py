@@ -1,4 +1,8 @@
+"""
+Tests for email.
+"""
 
+from flaky import flaky
 import json
 import unittest
 
@@ -418,6 +422,7 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         self.assertEquals(0, PendingEmailChange.objects.count())
 
     @patch('student.views.PendingEmailChange.objects.get', Mock(side_effect=TestException))
+    @flaky  # TODO fix this flaky test
     def test_always_rollback(self, _email_user):
         connection = transaction.get_connection()
         with patch.object(connection, 'rollback', wraps=connection.rollback) as mock_rollback:
