@@ -32,12 +32,14 @@ urlpatterns = (
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
     url(r'^change_enrollment$', 'student.views.change_enrollment', name='change_enrollment'),
 
-    url(r'^event$', 'track.views.user_track'),
-    url(r'^performance$', 'openedx.core.djangoapps.performance.views.performance_log'),
-    url(r'^segmentio/event$', 'track.views.segmentio.segmentio_event'),
+    # Event tracking endpoints
+    url(r'', include('track.urls')),
 
-    # TODO: Is this used anymore? What is STATIC_GRAB?
-    url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
+    # Performance endpoints
+    url(r'', include('openedx.core.djangoapps.performance.urls')),
+
+    # Static template view endpoints like blog, faq, etc.
+    url(r'', include('static_template_view.urls')),
 
     url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
@@ -142,69 +144,12 @@ urlpatterns += (
     url(r'^support/', include('support.urls', app_name="support", namespace='support')),
 )
 
-# Semi-static views (these need to be rendered and have the login bar, but don't change)
-urlpatterns += (
-    url(r'^404$', 'static_template_view.views.render',
-        {'template': '404.html'}, name="404"),
-)
-
 # Favicon
 favicon_path = configuration_helpers.get_value('favicon_path', settings.FAVICON_PATH)  # pylint: disable=invalid-name
 urlpatterns += (url(
     r'^favicon\.ico$',
     RedirectView.as_view(url=settings.STATIC_URL + favicon_path, permanent=True)
 ),)
-
-urlpatterns += (
-    url(r'^blog$', 'static_template_view.views.render',
-        {'template': 'blog.html'}, name="blog"),
-    url(r'^contact$', 'static_template_view.views.render',
-        {'template': 'contact.html'}, name="contact"),
-    url(r'^donate$', 'static_template_view.views.render',
-        {'template': 'donate.html'}, name="donate"),
-    url(r'^faq$', 'static_template_view.views.render',
-        {'template': 'faq.html'}, name="faq"),
-    url(r'^help$', 'static_template_view.views.render',
-        {'template': 'help.html'}, name="help_edx"),
-    url(r'^jobs$', 'static_template_view.views.render',
-        {'template': 'jobs.html'}, name="jobs"),
-    url(r'^news$', 'static_template_view.views.render',
-        {'template': 'news.html'}, name="news"),
-    url(r'^press$', 'static_template_view.views.render',
-        {'template': 'press.html'}, name="press"),
-    url(r'^media-kit$', 'static_template_view.views.render',
-        {'template': 'media-kit.html'}, name="media-kit"),
-    url(r'^copyright$', 'static_template_view.views.render',
-        {'template': 'copyright.html'}, name="copyright"),
-
-    # Press releases
-    url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-)
-
-# Only enable URLs for those marketing links actually enabled in the
-# settings. Disable URLs by marking them as None.
-for key, value in settings.MKTG_URL_LINK_MAP.items():
-    # Skip disabled URLs
-    if value is None:
-        continue
-
-    # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES":
-        continue
-
-    # The MKTG_URL_LINK_MAP key specifies the template filename
-    template = key.lower()
-    if '.' not in template:
-        # Append STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION if
-        # no file extension was specified in the key
-        template = "%s.%s" % (template, settings.STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION)
-
-    # Make the assumption that the URL we want is the lowercased
-    # version of the map key
-    urlpatterns += (url(r'^%s$' % key.lower(),
-                        'static_template_view.views.render',
-                        {'template': template}, name=value),)
-
 
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
@@ -973,16 +918,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
     urlpatterns += (
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )
-
-# Custom error pages
-handler404 = 'static_template_view.views.render_404'
-handler500 = 'static_template_view.views.render_500'
-
-# display error page templates, for testing purposes
-urlpatterns += (
-    url(r'^404$', handler404),
-    url(r'^500$', handler500),
-)
 
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
 urlpatterns += (
