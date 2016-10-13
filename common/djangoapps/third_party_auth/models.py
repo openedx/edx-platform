@@ -313,10 +313,17 @@ class ProviderConfig(ConfigurationModel):
             raise ValidationError('Either an icon class or an icon image must be given (but not both)')
     @property
     def require_data_sharing_consent(self):
+        """
+        Does the provider require data sharing consent?
+        """
         return self.data_sharing_consent == self.DATA_CONSENT_REQUIRED
 
     @property
     def request_data_sharing_consent(self):
+        """
+        Does the provider request data sharing consent, regardless of whether
+        or not it's required?
+        """
         return self.data_sharing_consent != self.DATA_CONSENT_DISABLED
 
     @property
