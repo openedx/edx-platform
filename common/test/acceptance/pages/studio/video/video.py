@@ -124,6 +124,12 @@ class VideoComponentPage(VideoPage):
                            'Video Buffering Completed')
             self._wait_for(self.is_controls_visible, 'Player Controls are Visible')
 
+    def wait_for_message(self, message_type, expected_message):
+        """
+        Wait until the message of the requested type is as expected.
+        """
+        self._wait_for(lambda: self.message(message_type) == expected_message, "Waiting for message update.")
+
     @wait_for_js
     def is_controls_visible(self):
         """
