@@ -204,7 +204,7 @@ class UserDataSharingConsentAuditHistory(TimeStampedModel):
         default=DISABLED,
         help_text=_(
             "The state of the linked UserDataSharingConsentAudit after the "
-            "state transition indicated by this recordd."
+            "state transition indicated by this record."
         )
     )
 
