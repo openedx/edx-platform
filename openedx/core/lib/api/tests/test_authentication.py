@@ -11,6 +11,7 @@ from collections import namedtuple
 
 import ddt
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -26,6 +27,7 @@ from rest_framework.test import APIRequestFactory, APIClient
 from rest_framework.views import APIView
 from rest_framework_oauth import permissions
 from rest_framework_oauth.compat import oauth2_provider, oauth2_provider_scope
+import unittest
 
 from openedx.core.djangoapps.oauth_dispatch import adapters
 from openedx.core.lib.api import authentication
@@ -73,6 +75,7 @@ urlpatterns = patterns(
 
 @attr(shard=2)
 @ddt.ddt
+@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class OAuth2Tests(TestCase):
     """OAuth 2.0 authentication"""
     urls = 'openedx.core.lib.api.tests.test_authentication'
