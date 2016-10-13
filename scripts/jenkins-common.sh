@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 source $HOME/jenkins_env
 
 # Clear the mongo database
@@ -27,4 +29,5 @@ PATH=$PATH:node_modules/.bin
 
 # Manage the npm cache on Jenkins.
 # (In this case, remove it. That ensures from run-to-run, it is a clean npm environment)
+echo "--> Cleaning npm cache"
 npm cache clean
