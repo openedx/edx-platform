@@ -5,8 +5,6 @@ Override admin configuration for django-oauth-toolkit
 from django.contrib.admin import ModelAdmin, site
 from oauth2_provider import models
 
-from .models import RestrictedApplication
-
 
 def reregister(model_class):
     """
@@ -73,13 +71,3 @@ class DOTGrantAdmin(ModelAdmin):
     list_filter = [u'application']
     raw_id_fields = [u'user']
     search_fields = [u'code', u'user__username']
-
-
-class RestrictedApplicationAdmin(ModelAdmin):
-    """
-    ModelAdmin for the Restricted Application
-    """
-    list_display = [u'application']
-
-
-site.register(RestrictedApplication, RestrictedApplicationAdmin)
