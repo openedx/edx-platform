@@ -540,7 +540,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             sender=None,
             points_possible=event['max_value'],
             points_earned=event['value'],
-            user=user,
+            user_id=user.id,
             course_id=unicode(course_id),
             usage_id=unicode(descriptor.location)
         )

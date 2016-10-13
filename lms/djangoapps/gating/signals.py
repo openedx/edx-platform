@@ -26,5 +26,5 @@ def handle_score_changed(**kwargs):
         gating_api.evaluate_prerequisite(
             course,
             UsageKey.from_string(kwargs.get('usage_id')),
-            kwargs.get('user').id,
+            kwargs.get('user_id'),
         )

@@ -19,7 +19,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     def setUp(self):
         super(TestHandleScoreChanged, self).setUp()
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         self.test_usage_key = UsageKey.from_string('i4x://the/content/key/12345678')
 
     @patch('gating.signals.gating_api.evaluate_prerequisite')
@@ -31,7 +31,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             sender=None,
             points_possible=1,
             points_earned=1,
-            user=self.user,
+            user_id=self.user.id,
             course_id=unicode(self.course.id),
             usage_id=unicode(self.test_usage_key)
         )
@@ -44,7 +44,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             sender=None,
             points_possible=1,
             points_earned=1,
-            user=self.user,
+            user_id=self.user.id,
             course_id=unicode(self.course.id),
             usage_id=unicode(self.test_usage_key)
         )
