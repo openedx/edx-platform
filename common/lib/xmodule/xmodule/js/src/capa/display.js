@@ -134,8 +134,8 @@
             this.url = this.el.data('url');
             this.content = this.el.data('content');
 
-            // has_timed_out and has_response are used to ensure that are used to
-            // ensure that we wait a minimum of ~ 1s before transitioning the submit
+            // has_timed_out and has_response are used to ensure that
+            // we wait a minimum of ~ 1s before transitioning the submit
             // button from disabled to enabled
             this.has_timed_out = false;
             this.has_response = false;
@@ -308,26 +308,25 @@
                     });
                     JavascriptLoader.executeModuleScripts(that.el, function() {
                         that.setupInputTypes();
-                        return that.bind();
+                        that.bind();
                     });
                 }
                 that.num_queued_items = that.new_queued_items.length;
                 if (that.num_queued_items === 0) {
                     that.forceUpdate(response);
-                    return delete window.queuePollerID;
+                    delete window.queuePollerID;
                 } else {
                     newTimeout = previousTimeout * 2;
                     // if the timeout is greather than 1 minute
                     if (newTimeout >= 60000) {
                         delete window.queuePollerID;
-                        return that.gentle_alert(
+                        that.gentle_alert(
                             gettext('The grading process is still running. Refresh the page to see updates.')
                         );
                     } else {
                         window.queuePollerID = window.setTimeout(function() {
                             return that.poll(newTimeout, focusCallback);
                         }, newTimeout);
-                        return window.queuePollerID;
                     }
                 }
             });
@@ -340,11 +339,12 @@
              *
              * Input:
              *     url: the AJAX url of the problem
-             *     input_id: the input_id of the input you would like to make the call on
+             *     inputId: the inputId of the input you would like to make the call on
              *         NOTE: the id is the ${id} part of "input_${id}" during rendering
              *             If this function is passed the entire prefixed id, the backend may have trouble
              *             finding the correct input
              *     dispatch: string that indicates how this data should be handled by the inputtype
+             *     data: dictionary of data to send to the server
              *     callback: the function that will be called once the AJAX call has been completed.
              *          It will be passed a response object
              */
@@ -541,7 +541,7 @@
                     }
                     if (element.files.length === 0) {
                         fileNotSelected = true;
-                        fd.append(element.id, '');
+                        fd.append(element.id, ''); // In case we want to allow submissions with no file
                     }
                     if (requiredFiles.length !== 0) {
                         requiredFilesNotSubmitted = true;
@@ -569,27 +569,28 @@
             if (abortSubmission) {
                 window.clearTimeout(timeoutId);
                 this.enableSubmitButton(true);
-            }
-            settings = {
-                type: 'POST',
-                data: fd,
-                processData: false,
-                contentType: false,
-                complete: this.enableSubmitButtonAfterResponse,
-                success: function(response) {
-                    switch (response.success) {
-                    case 'incorrect':
-                    case 'correct':
-                        that.render(response.contents);
-                        that.updateProgress(response);
-                        break;
-                    default:
-                        that.gentle_alert(response.success);
+            } else {
+                settings = {
+                    type: 'POST',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    complete: this.enableSubmitButtonAfterResponse,
+                    success: function(response) {
+                        switch (response.success) {
+                        case 'incorrect':
+                        case 'correct':
+                            that.render(response.contents);
+                            that.updateProgress(response);
+                            break;
+                        default:
+                            that.gentle_alert(response.success);
+                        }
+                        return Logger.log('problem_graded', [that.answers, response.contents], that.id);
                     }
-                    return Logger.log('problem_graded', [that.answers, response.contents], that.id);
-                }
-            };
-            $.ajaxWithPrefix('' + this.url + '/problem_check', settings);
+                };
+                $.ajaxWithPrefix('' + this.url + '/problem_check', settings);
+            }
         };
 
         Problem.prototype.submit = function() {
@@ -780,9 +781,9 @@
                     );
                     that.clear_all_notifications();
                     that.saveNotification.show();
-                    return that.focus_on_save_notification();
+                    that.focus_on_save_notification();
                 } else {
-                    return that.gentle_alert(saveMessage);
+                    that.gentle_alert(saveMessage);
                 }
             });
         };
@@ -1306,9 +1307,9 @@
                         that.hintButton.attr({disabled: 'disabled'});
                     }
                     that.el.find('.notification-hint').show();
-                    return that.focus_on_hint_notification();
+                    that.focus_on_hint_notification();
                 } else {
-                    return that.gentle_alert(response.msg);
+                    that.gentle_alert(response.msg);
                 }
             });
         };
