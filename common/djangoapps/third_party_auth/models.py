@@ -311,6 +311,7 @@ class ProviderConfig(ConfigurationModel):
         super(ProviderConfig, self).clean()
         if bool(self.icon_class) == bool(self.icon_image):
             raise ValidationError('Either an icon class or an icon image must be given (but not both)')
+
     @property
     def require_data_sharing_consent(self):
         """
