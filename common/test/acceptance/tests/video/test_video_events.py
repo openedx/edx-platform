@@ -2,8 +2,10 @@
 
 import datetime
 import json
-from nose.plugins.attrib import attr
+
 import ddt
+from flaky import flaky
+from nose.plugins.attrib import attr
 
 from common.test.acceptance.tests.helpers import EventsTestMixin
 from common.test.acceptance.tests.video.test_video_module import VideoBaseTest
@@ -191,6 +193,7 @@ class VideoBumperEventsTest(VideoEventsTestMixin):
         }
         self.course_fixture.add_advanced_settings(additional_data)
 
+    @flaky  # TODO fix this TNL-5760
     @ddt.data(
         ('edx.video.bumper.skipped', watch_video_and_skip),
         ('edx.video.bumper.dismissed', watch_video_and_dismiss),
