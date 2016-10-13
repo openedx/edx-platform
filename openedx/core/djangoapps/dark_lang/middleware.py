@@ -8,14 +8,14 @@ This middleware must be placed before the LocaleMiddleware, but after
 the SessionMiddleware.
 """
 from django.conf import settings
+from django.utils.translation.trans_real import parse_accept_lang_header
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
-from dark_lang import DARK_LANGUAGE_KEY
-from dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 from openedx.core.djangoapps.user_api.preferences.api import (
     get_user_preference
 )
-from django.utils.translation.trans_real import parse_accept_lang_header
-from django.utils.translation import LANGUAGE_SESSION_KEY
 
 # If django 1.7 or higher is used, the right-side can be updated with new-style codes.
 CHINESE_LANGUAGE_CODE_MAP = {

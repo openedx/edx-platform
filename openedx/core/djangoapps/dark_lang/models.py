@@ -8,12 +8,15 @@ from config_models.models import ConfigurationModel
 
 class DarkLangConfig(ConfigurationModel):
     """
-    Configuration for the dark_lang django app
+    Configuration for the dark_lang django app.
     """
     released_languages = models.TextField(
         blank=True,
         help_text="A comma-separated list of language codes to release to the public."
     )
+
+    def __unicode__(self):
+        return u"DarkLangConfig()"
 
     @property
     def released_languages_list(self):

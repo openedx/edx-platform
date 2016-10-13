@@ -4,17 +4,26 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import translation
-from lang_pref import api as language_api
+
+from openedx.core.djangoapps.lang_pref import api as language_api
 
 
 class LanguageApiTest(TestCase):
-
+    """
+    Tests of the language APIs.
+    """
     def test_released_languages(self):
+        """
+        Tests for the released languages.
+        """
         released_languages = language_api.released_languages()
         self.assertGreaterEqual(len(released_languages), 1)
 
     @override_settings(ALL_LANGUAGES=[[u"cs", u"Czech"], [u"nl", u"Dutch"]])
     def test_all_languages(self):
+        """
+        Tests for the list of all languages.
+        """
         with translation.override('fr'):
             all_languages = language_api.all_languages()
 

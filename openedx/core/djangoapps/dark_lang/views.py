@@ -6,15 +6,14 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation import ugettext as _
 from django.views.generic.base import View
+from edxmako.shortcuts import render_to_response
+from openedx.core.djangoapps.dark_lang import DARK_LANGUAGE_KEY
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.preferences.api import (
     delete_user_preference, get_user_preference, set_user_preference
 )
 from openedx.core.lib.api.view_utils import view_auth_classes
-
-from dark_lang import DARK_LANGUAGE_KEY
-from dark_lang.models import DarkLangConfig
-from edxmako.shortcuts import render_to_response
-from lang_pref import LANGUAGE_KEY
 
 LANGUAGE_INPUT_FIELD = 'preview_lang'
 

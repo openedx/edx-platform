@@ -5,7 +5,7 @@ from collections import namedtuple
 
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from dark_lang.models import DarkLangConfig
+from openedx.core.djangoapps.dark_lang.models import DarkLangConfig
 
 
 # Named tuples can be referenced using object-like variable
@@ -38,14 +38,12 @@ def released_languages():
         released_language_codes.sort()
 
     # Intersect the list of valid language tuples with the list
-    # of release language codes
-    released_languages = [
-        Language(tuple[0], tuple[1])
-        for tuple in settings.LANGUAGES
-        if tuple[0] in released_language_codes
+    # of released language codes
+    return [
+        Language(language_info[0], language_info[1])
+        for language_info in settings.LANGUAGES
+        if language_info[0] in released_language_codes
     ]
-
-    return released_languages
 
 
 def all_languages():

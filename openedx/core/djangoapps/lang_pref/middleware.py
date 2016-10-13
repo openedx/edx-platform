@@ -2,11 +2,12 @@
 Middleware for Language Preferences
 """
 
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, delete_user_preference
-from lang_pref import LANGUAGE_KEY
 from django.utils.translation import LANGUAGE_SESSION_KEY
 from django.utils.translation.trans_real import parse_accept_lang_header
-from lang_pref.api import released_languages
+
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.lang_pref.api import released_languages
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, delete_user_preference
 
 
 class LanguagePreferenceMiddleware(object):
