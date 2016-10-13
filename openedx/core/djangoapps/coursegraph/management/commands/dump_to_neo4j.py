@@ -82,6 +82,7 @@ class ModuleStoreSerializer(object):
         fields['course'] = course_key.course
         fields['run'] = course_key.run
         fields['course_key'] = six.text_type(course_key)
+        fields['location'] = six.text_type(item.location)
 
         label = item.scope_ids.block_type
 

@@ -118,6 +118,7 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         self.assertIn("course", fields.keys())
         self.assertIn("run", fields.keys())
         self.assertIn("course_key", fields.keys())
+        self.assertIn("location", fields.keys())
         self.assertNotIn("checklist", fields.keys())
 
     def test_serialize_course(self):
