@@ -22,7 +22,6 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 INSTALLED_APPS += (
-    'appsembler_lms',
     'openedx.core.djangoapps.appsembler.sites',
 )
 
@@ -52,3 +51,5 @@ SITE_ID = None
 # MULTITENANT_MAPPER_CLASS = 'microsite_configuration.mapper.SimpleTenantMapper'
 
 #DATABASES['default']['ENGINE'] = 'db_multitenant.db.backends.mysql'
+
+AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS

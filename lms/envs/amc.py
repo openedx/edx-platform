@@ -14,8 +14,6 @@ EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
 MAILGUN_ACCESS_KEY = AUTH_TOKENS.get("MAILGUN_ACCESS_KEY")
 MAILGUN_SERVER_NAME = AUTH_TOKENS.get("MAILGUN_SERVER_NAME")
 
-INSTALLED_APPS += ('appsembler_lms',)
-
 # disable caching in dev environment
 for cache_key in CACHES.keys():
     CACHES[cache_key]['BACKEND'] = 'django.core.cache.backends.dummy.DummyCache'
@@ -37,3 +35,5 @@ CORS_ALLOW_HEADERS = (
     'x-csrftoken',
     'cache-control'
 )
+
+AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS
