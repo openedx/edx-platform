@@ -450,9 +450,14 @@ OAUTH2_PROVIDER = {
         'read': 'Read scope',
         'write': 'Write scope',
         'email': 'Email scope',
-        'profile': 'Profile scope',
-    }
+        # conform profile scope message that is presented to end-user
+        # to lms/templates/provider/authorize.html. This may be revised later.
+        'profile': 'Read your user profile',
+    },
 }
+# This is required for the migrations in oauth_dispatch.models
+# otherwise it fails saying this attribute is not present in Settings
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
 
 ################################## TEMPLATE CONFIGURATION #####################################
 # Mako templating
