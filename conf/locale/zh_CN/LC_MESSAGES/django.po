@@ -345,7 +345,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:23+0000\n"
+"POT-Creation-Date: 2016-10-06 15:01+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -3436,17 +3436,6 @@ msgid ""
 msgstr "选择一个要从知识库中获取的问题类型，如果选择了“任意类型”，则不应用任何筛选。"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "可评分"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr "若该模块是一个已打分的作业或一道练习题，则设该值为True。"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr "该组件已过时。知识库有新的内容。"
 
@@ -3581,6 +3570,10 @@ msgid ""
 msgstr ""
 "如果你想要学生通过点击一个链接在一个新窗口中打开LTI工具，选择True。如果你想要在当前页面的一个IFrame中打开LTI内容，选择False。这个设置只有在"
 " 隐藏外部工具 设置为False的时候才能使用。"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "可评分"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -10287,9 +10280,13 @@ msgstr "点击删除"
 msgid "Click to add"
 msgstr "点击添加"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "已收藏"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "收藏"
+msgid "Bookmark this page"
+msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -10489,8 +10486,8 @@ msgid "Support"
 msgstr ""
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "{platform_name} 帮助"
+msgid "{platform_name} Support"
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -10543,7 +10540,10 @@ msgid "Tell us the details"
 msgstr "告诉我们细节"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -10573,9 +10573,7 @@ msgid "Brief description of the problem"
 msgstr "简述此问题"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11209,10 +11207,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "上一个"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "已收藏"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -19721,7 +19715,7 @@ msgid "Last day students can enroll."
 msgstr "学生可以选课的最后一天。"
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
+msgid "Contact your edX partner manager to update these settings."
 msgstr ""
 
 #: cms/templates/settings.html

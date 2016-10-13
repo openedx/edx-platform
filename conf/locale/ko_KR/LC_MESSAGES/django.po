@@ -84,7 +84,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:23+0000\n"
+"POT-Creation-Date: 2016-10-06 15:01+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -3100,17 +3100,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 
@@ -3236,6 +3225,10 @@ msgid ""
 "a new window. Select False if you want the LTI content to open in an IFrame "
 "in the current page. This setting is only used when Hide External Tool is "
 "set to False.  "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -9662,8 +9655,12 @@ msgstr ""
 msgid "Click to add"
 msgstr ""
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr ""
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
+msgid "Bookmark this page"
 msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
@@ -9864,8 +9861,8 @@ msgid "Support"
 msgstr ""
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "{platform_name} 도움말"
+msgid "{platform_name} Support"
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -9917,7 +9914,10 @@ msgid "Tell us the details"
 msgstr "자세한 내용을 알려주세요"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -9948,9 +9948,7 @@ msgid "Brief description of the problem"
 msgstr "문제 기술"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -10587,10 +10585,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "이전"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -19127,7 +19121,7 @@ msgid "Last day students can enroll."
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
+msgid "Contact your edX partner manager to update these settings."
 msgstr ""
 
 #: cms/templates/settings.html

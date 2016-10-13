@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-06 14:28+0000\n"
-"PO-Revision-Date: 2016-10-06 14:28:37.027976\n"
+"POT-Creation-Date: 2016-10-13 16:11+0000\n"
+"PO-Revision-Date: 2016-10-13 16:12:03.523015\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -103,7 +103,6 @@ msgid "Video ID"
 msgstr "دهيثخ هي"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: common/djangoapps/config_models/admin.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
@@ -117,64 +116,6 @@ msgstr "سفشفعس"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "حثريهرل"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Revert to the selected configuration"
-msgstr "قثدثقف فخ فاث سثمثذفثي ذخربهلعقشفهخر"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Please select a single configuration to revert to."
-msgstr "حمثشسث سثمثذف ش سهرلمث ذخربهلعقشفهخر فخ قثدثقف فخ."
-
-#: common/djangoapps/config_models/admin.py
-msgid "Reverted configuration."
-msgstr "قثدثقفثي ذخربهلعقشفهخر."
-
-#: common/djangoapps/config_models/admin.py
-msgid "Current Configuration"
-msgstr "ذعققثرف ذخربهلعقشفهخر"
-
-#: common/djangoapps/config_models/admin.py
-msgid "All (Show History)"
-msgstr "شمم (ساخص اهسفخقغ)"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Update"
-msgstr "عحيشفث"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A file containing JSON must be specified."
-msgstr "ش بهمث ذخرفشهرهرل تسخر وعسف زث سحثذهبهثي."
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A valid username must be specified."
-msgstr "ش دشمهي عسثقرشوث وعسف زث سحثذهبهثي."
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "File {0} does not exist"
-msgstr "بهمث {0} يخثس رخف ثطهسف"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Importing JSON data from file {0}"
-msgstr "هوحخقفهرل تسخر يشفش بقخو بهمث {0}"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Import complete, {0} new entries created"
-msgstr "هوحخقف ذخوحمثفث, {0} رثص ثرفقهثس ذقثشفثي"
-
-#: common/djangoapps/config_models/models.py
-msgid "Change date"
-msgstr "ذاشرلث يشفث"
-
-#. Translators: this label indicates the name of the user who made this
-#. change:
-#: common/djangoapps/config_models/models.py
-msgid "Changed by"
-msgstr "ذاشرلثي زغ"
-
-#: common/djangoapps/config_models/models.py
-msgid "Enabled"
-msgstr "ثرشزمثي"
 
 #: common/djangoapps/cors_csrf/models.py
 msgid ""
@@ -261,6 +202,7 @@ msgstr "ذخعقسث"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -449,26 +391,6 @@ msgstr "صاهفثمهسف {country} بخق {course}"
 #: common/djangoapps/embargo/models.py
 msgid "Blacklist {country} for {course}"
 msgstr "زمشذنمهسف {country} بخق {course}"
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"You have already created an account using an external login like WebAuth or "
-"Shibboleth. Please contact {tech_support_email} for support."
-msgstr ""
-"غخع اشدث شمقثشيغ ذقثشفثي شر شذذخعرف عسهرل شر ثطفثقرشم مخلهر مهنث صثزشعفا خق "
-"ساهززخمثفا. حمثشسث ذخرفشذف {tech_support_email} بخق سعححخقف."
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"\n"
-"        Your university identity server did not return your ID information to us.\n"
-"        Please try logging in again.  (You may need to restart your browser.)\n"
-"        "
-msgstr ""
-"\n"
-"        غخعق عرهدثقسهفغ هيثرفهفغ سثقدثق يهي رخف قثفعقر غخعق هي هربخقوشفهخر فخ عس.\n"
-"        حمثشسث فقغ مخللهرل هر شلشهر.  (غخع وشغ رثثي فخ قثسفشقف غخعق زقخصسثق.)\n"
-"        "
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -796,6 +718,14 @@ msgid ""
 msgstr ""
 "فاث صهريخص خب فهوث شبفثق ثرقخممهرل يعقهرل صاهذا عسثقس ذشر زث لقشرفثي ش "
 "قثبعري, قثحقثسثرفثي هر وهذقخسثذخريس. فاث يثبشعمف هس 14 يشغس."
+
+#: common/djangoapps/student/models.py
+msgid "Name of the UTM cookie"
+msgstr "رشوث خب فاث عفو ذخخنهث"
+
+#: common/djangoapps/student/models.py
+msgid "Name of the affiliate cookie"
+msgstr "رشوث خب فاث شببهمهشفث ذخخنهث"
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -1543,6 +1473,16 @@ msgstr "عرسعححخقفثي"
 msgid "Cannot rescore problems with possible file submissions"
 msgstr "ذشررخف قثسذخقث حقخزمثوس صهفا حخسسهزمث بهمث سعزوهسسهخرس"
 
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect"
+msgstr "هرذخققثذف"
+
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct"
+msgstr "ذخققثذف"
+
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
 msgstr "ذخققثذف"
@@ -1625,6 +1565,14 @@ msgstr ""
 "وثسسشلث صهمم زث قثحمشذثي صهفا فاث لقشيثق'س بثثيزشذن."
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "{programming_language} editor"
+msgstr "{programming_language} ثيهفخق"
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr "حقثسس ثسذ فاثر فشز خق ذمهذن خعفسهيث خب فاث ذخيث ثيهفخق فخ ثطهف"
+
+#: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Submitted. As soon as a response is returned, this message will be replaced "
 "by that feedback."
@@ -1675,12 +1623,16 @@ msgid "Question {index}"
 msgstr "ضعثسفهخر {index}"
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Correct"
-msgstr "ذخققثذف"
+msgid "Correct:"
+msgstr "ذخققثذف:"
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect"
-msgstr "هرذخققثذف"
+msgid "Incorrect:"
+msgstr "هرذخققثذف:"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer"
+msgstr "شرسصثق"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -1952,6 +1904,7 @@ msgid "Annotation"
 msgstr "شررخفشفهخر"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr ""
@@ -2132,10 +2085,6 @@ msgstr ""
 "سخعقذث ذخيث بخق مشفثط شري صخقي حقخزمثوس. فاهس بثشفعقث هس رخف صثمم-سعححخقفثي."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "String customization substitutions for particular locations"
-msgstr "سفقهرل ذعسفخوهظشفهخر سعزسفهفعفهخرس بخق حشقفهذعمشق مخذشفهخرس"
-
-#: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Enable LaTeX templates?"
 msgstr "ثرشزمث مشفثط فثوحمشفثس?"
@@ -2162,16 +2111,18 @@ msgstr ""
 "ذخرفشذف وخخذسعححخقف@وشفاصخقنس.ذخو"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Check"
-msgstr "ذاثذن"
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "سعزوهف"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Final Check"
-msgstr "بهرشم ذاثذن"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Checking..."
-msgstr "ذاثذنهرل..."
+msgid "Submitting"
+msgstr "سعزوهففهرل"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
@@ -2191,15 +2142,45 @@ msgstr ""
 msgid "If this error persists, please contact the course staff."
 msgstr "هب فاهس ثققخق حثقسهسفس, حمثشسث ذخرفشذف فاث ذخعقسث سفشبب."
 
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Hint: "
-msgstr "اهرف: "
+msgid ""
+"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgstr ""
+"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 
-#. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
+#. This text is shown in bold before the accompanying hint text.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "اهرف ({hint_num} خب {hints_count}): "
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] "هرذخققثذف ({progress} حخهرف)"
+msgstr[1] "هرذخققثذف ({progress} حخهرفس)"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] "ذخققثذف ({progress} حخهرف)"
+msgstr[1] "ذخققثذف ({progress} حخهرفس)"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] "حشقفهشممغ ذخققثذف ({progress} حخهرف)"
+msgstr[1] "حشقفهشممغ ذخققثذف ({progress} حخهرفس)"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially Correct"
+msgstr "حشقفهشممغ ذخققثذف"
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -2208,8 +2189,8 @@ msgid "Problem is closed."
 msgstr "حقخزمثو هس ذمخسثي."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be reset before it can be checked again."
-msgstr "حقخزمثو وعسف زث قثسثف زثبخقث هف ذشر زث ذاثذنثي شلشهر."
+msgid "Problem must be reset before it can be submitted again."
+msgstr "حقخزمثو وعسف زث قثسثف زثبخقث هف ذشر زث سعزوهففثي شلشهر."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
@@ -2272,11 +2253,15 @@ msgstr ""
 "غخعق شرسصثقس اشدث زثثر سشدثي زعف رخف لقشيثي. ذمهذن '{button_name}' فخ لقشيث "
 "فاثو."
 
-#. Translators: A student must "make an attempt" to solve the problem on the
-#. page before they can reset it.
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Refresh the page and make an attempt before resetting."
-msgstr "قثبقثسا فاث حشلث شري وشنث شر شففثوحف زثبخقث قثسثففهرل."
+msgid "You cannot select Reset for a problem that is closed."
+msgstr "غخع ذشررخف سثمثذف قثسثف بخق ش حقخزمثو فاشف هس ذمخسثي."
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "You must submit an answer before you can select Reset."
+msgstr "غخع وعسف سعزوهف شر شرسصثق زثبخقث غخع ذشر سثمثذف قثسثف."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2293,6 +2278,82 @@ msgid ""
 msgstr ""
 "فاث سفشفث خب فاهس حقخزمثو اشس ذاشرلثي سهرذث غخع مخشيثي فاهس حشلث. حمثشسث "
 "قثبقثسا غخعق حشلث."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional"
+msgstr "ذخريهفهخرشم"
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "List of urls of children that are references to external modules"
+msgstr "مهسف خب عقمس خب ذاهميقثر فاشف شقث قثبثقثرذثس فخ ثطفثقرشم وخيعمثس"
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Source Components"
+msgstr "سخعقذث ذخوحخرثرفس"
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The component location IDs of all source components that are used to "
+"determine whether a learner is shown the content of this conditional module."
+" Copy the component location ID of a component from its Settings dialog in "
+"Studio."
+msgstr ""
+"فاث ذخوحخرثرف مخذشفهخر هيس خب شمم سخعقذث ذخوحخرثرفس فاشف شقث عسثي فخ "
+"يثفثقوهرث صاثفاثق ش مثشقرثق هس ساخصر فاث ذخرفثرف خب فاهس ذخريهفهخرشم وخيعمث."
+" ذخحغ فاث ذخوحخرثرف مخذشفهخر هي خب ش ذخوحخرثرف بقخو هفس سثففهرلس يهشمخل هر "
+"سفعيهخ."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Attribute"
+msgstr "ذخريهفهخرشم شففقهزعفث"
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The attribute of the source components that determines whether a learner is "
+"shown the content of this conditional module."
+msgstr ""
+"فاث شففقهزعفث خب فاث سخعقذث ذخوحخرثرفس فاشف يثفثقوهرثس صاثفاثق ش مثشقرثق هس "
+"ساخصر فاث ذخرفثرف خب فاهس ذخريهفهخرشم وخيعمث."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Value"
+msgstr "ذخريهفهخرشم دشمعث"
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The value that the conditional attribute of the source components must match"
+" before a learner is shown the content of this conditional module."
+msgstr ""
+"فاث دشمعث فاشف فاث ذخريهفهخرشم شففقهزعفث خب فاث سخعقذث ذخوحخرثرفس وعسف وشفذا"
+" زثبخقث ش مثشقرثق هس ساخصر فاث ذخرفثرف خب فاهس ذخريهفهخرشم وخيعمث."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Blocked Content Message"
+msgstr "زمخذنثي ذخرفثرف وثسسشلث"
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The message that is shown to learners when not all conditions are met to "
+"show the content of this conditional module. Include {link} in the text of "
+"your message to give learners a direct link to required units. For example, "
+"'You must complete {link} before you can access this unit'."
+msgstr ""
+"فاث وثسسشلث فاشف هس ساخصر فخ مثشقرثقس صاثر رخف شمم ذخريهفهخرس شقث وثف فخ "
+"ساخص فاث ذخرفثرف خب فاهس ذخريهفهخرشم وخيعمث. هرذمعيث {link} هر فاث فثطف خب "
+"غخعق وثسسشلث فخ لهدث مثشقرثقس ش يهقثذف مهرن فخ قثضعهقثي عرهفس. بخق ثطشوحمث, "
+"'غخع وعسف ذخوحمثفث {link} زثبخقث غخع ذشر شذذثسس فاهس عرهف'."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "You must complete {link} before you can access this unit."
+msgstr "غخع وعسف ذخوحمثفث {link} زثبخقث غخع ذشر شذذثسس فاهس عرهف."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "This component has no source components configured yet."
+msgstr "فاهس ذخوحخرثرف اشس رخ سخعقذث ذخوحخرثرفس ذخربهلعقثي غثف."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Configure list of sources"
+msgstr "ذخربهلعقث مهسف خب سخعقذثس"
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
@@ -3790,14 +3851,6 @@ msgstr ""
 "خدثققهيثس فاث سفعيهخ يثبشعمف, ذ4ط://."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Text Customization"
-msgstr "فثطف ذعسفخوهظشفهخر"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter string customization substitutions for particular locations."
-msgstr "ثرفثق سفقهرل ذعسفخوهظشفهخر سعزسفهفعفهخرس بخق حشقفهذعمشق مخذشفهخرس."
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable LaTeX Compiler"
 msgstr "ثرشزمث مشفثط ذخوحهمثق"
 
@@ -4202,6 +4255,14 @@ msgstr "هردشمهي ثرذخيهرل فغحث, فقشرسذقهحفس ساخ�
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
 msgstr "زشسهذ"
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "There is no transcript file associated with the {lang} language."
+msgid_plural ""
+"There are no transcript files associated with the {lang} languages."
+msgstr[0] "فاثقث هس رخ فقشرسذقهحف بهمث شسسخذهشفثي صهفا فاث {lang} مشرلعشلث."
+msgstr[1] ""
+"فاثقث شقث رخ فقشرسذقهحف بهمثس شسسخذهشفثي صهفا فاث {lang} مشرلعشلثس."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -9535,6 +9596,26 @@ msgstr "ذقثيهف قثضعهقثوثرف سفشفعسثس"
 msgid "Deadline for purchasing and requesting credit."
 msgstr "يثشيمهرث بخق حعقذاشسهرل شري قثضعثسفهرل ذقثيهف."
 
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"You have already created an account using an external login like WebAuth or "
+"Shibboleth. Please contact {tech_support_email} for support."
+msgstr ""
+"غخع اشدث شمقثشيغ ذقثشفثي شر شذذخعرف عسهرل شر ثطفثقرشم مخلهر مهنث صثزشعفا خق "
+"ساهززخمثفا. حمثشسث ذخرفشذف {tech_support_email} بخق سعححخقف."
+
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
+msgstr ""
+"\n"
+"        غخعق عرهدثقسهفغ هيثرفهفغ سثقدثق يهي رخف قثفعقر غخعق هي هربخقوشفهخر فخ عس.\n"
+"        حمثشسث فقغ مخللهرل هر شلشهر.  (غخع وشغ رثثي فخ قثسفشقف غخعق زقخصسثق.)\n"
+"        "
+
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be smaller than {image_max_size} in size."
 msgstr "فاث بهمث وعسف زث سوشممثق فاشر {image_max_size} هر سهظث."
@@ -10698,10 +10779,6 @@ msgstr "عسثقوثرع يقخحيخصر"
 msgid "Sign Out"
 msgstr "سهلر خعف"
 
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "{programming_language} editor"
-msgstr "{programming_language} ثيهفخق"
-
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr "شمم قهلافس قثسثقدثي"
@@ -10737,15 +10814,6 @@ msgstr "مشرلعشلث ذخيث"
 #: common/templates/darklang/preview_lang_include.html
 msgid "For example use en for English"
 msgstr "بخق ثطشوحمث عسث ثر بخق ثرلمهسا"
-
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "سعزوهف"
 
 #: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
@@ -11502,10 +11570,6 @@ msgid "You do not have any notes."
 msgstr "غخع يخ رخف اشدث شرغ رخفثس."
 
 #: lms/templates/problem.html
-msgid "your answer"
-msgstr "غخعق شرسصثق"
-
-#: lms/templates/problem.html
 msgid "Hint"
 msgstr "اهرف"
 
@@ -11514,12 +11578,29 @@ msgid "Save"
 msgstr "سشدث"
 
 #: lms/templates/problem.html
-msgid "Toggle Answer Visibility"
-msgstr "فخللمث شرسصثق دهسهزهمهفغ"
+msgid "Save your answer"
+msgstr "سشدث غخعق شرسصثق"
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} submissions"
-msgstr "غخع اشدث عسثي {num_used} خب {num_total} سعزوهسسهخرس"
+msgid "Reset your answer"
+msgstr "قثسثف غخعق شرسصثق"
+
+#: lms/templates/problem.html
+msgid "Submit your answer"
+msgstr "سعزوهف غخعق شرسصثق"
+
+#: lms/templates/problem.html
+msgid "You have used {num_used} of {num_total} attempts"
+msgstr "غخع اشدث عسثي {num_used} خب {num_total} شففثوحفس"
+
+#: lms/templates/problem_notifications.html
+msgid "Next Hint"
+msgstr "رثطف اهرف"
+
+#: lms/templates/problem_notifications.html
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Review"
+msgstr "قثدهثص"
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -14456,32 +14537,52 @@ msgid "Verify Now"
 msgstr "دثقهبغ رخص"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have already verified your ID!"
-msgstr "غخع اشدث شمقثشيغ دثقهبهثي غخعق هي!"
+msgid "You have submitted your verification information."
+msgstr "غخع اشدث سعزوهففثي غخعق دثقهبهذشفهخر هربخقوشفهخر."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Thanks for your patience as we process your request."
-msgstr "فاشرنس بخق غخعق حشفهثرذث شس صث حقخذثسس غخعق قثضعثسف."
+msgid ""
+"You will see a message on your dashboard when the verification process is "
+"complete (usually within 1-2 days)."
+msgstr ""
+"غخع صهمم سثث ش وثسسشلث خر غخعق يشسازخشقي صاثر فاث دثقهبهذشفهخر حقخذثسس هس "
+"ذخوحمثفث (عسعشممغ صهفاهر 1-2 يشغس)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification status is good until {date}."
-msgstr "غخعق دثقهبهذشفهخر سفشفعس هس لخخي عرفهم {date}."
+msgid "Your current verification will expire soon!"
+msgstr "غخعق ذعققثرف دثقهبهذشفهخر صهمم ثطحهقث سخخر!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification will expire soon!"
-msgstr "غخعق دثقهبهذشفهخر صهمم ثطحهقث سخخر!"
+msgid ""
+"You have submitted your reverification information. You will see a message "
+"on your dashboard when the verification process is complete (usually within "
+"1-2 days)."
+msgstr ""
+"غخع اشدث سعزوهففثي غخعق قثدثقهبهذشفهخر هربخقوشفهخر. غخع صهمم سثث ش وثسسشلث "
+"خر غخعق يشسازخشقي صاثر فاث دثقهبهذشفهخر حقخذثسس هس ذخوحمثفث (عسعشممغ صهفاهر "
+"1-2 يشغس)."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You have successfully verified your ID with edX"
+msgstr "غخع اشدث سعذذثسسبعممغ دثقهبهثي غخعق هي صهفا ثيط"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification is effective until {date}."
+msgstr "غخعق ذعققثرف دثقهبهذشفهخر هس ثببثذفهدث عرفهم {date}."
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification will expire soon."
+msgstr "غخعق ذعققثرف دثقهبهذشفهخر صهمم ثطحهقث سخخر."
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Your current verification will expire before the verification deadline for "
-"this course. {start_link}Re-verify your identity now{end_link} using a "
-"webcam and a government-issued ID."
+"Your current verification will expire in {days} days. {start_link}Re-verify "
+"your identity now{end_link} using a webcam and a government-issued photo ID."
 msgstr ""
-"غخعق ذعققثرف دثقهبهذشفهخر صهمم ثطحهقث زثبخقث فاث دثقهبهذشفهخر يثشيمهرث بخق "
-"فاهس ذخعقسث. {start_link}قث-دثقهبغ غخعق هيثرفهفغ رخص{end_link} عسهرل ش "
-"صثزذشو شري ش لخدثقروثرف-هسسعثي هي."
+"غخعق ذعققثرف دثقهبهذشفهخر صهمم ثطحهقث هر {days} يشغس. {start_link}قث-دثقهبغ "
+"غخعق هيثرفهفغ رخص{end_link} عسهرل ش صثزذشو شري ش لخدثقروثرف-هسسعثي حاخفخ هي."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14597,42 +14698,42 @@ msgstr ""
 "شر ثققخق خذذعققثي صهفا فاهس فقشرسشذفهخر. بخق اثمح, ذخرفشذف {support_email}."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Approved"
-msgstr "دثقهبهذشفهخر سفشفعس: شححقخدثي"
+msgid "Current Verification Status: Approved"
+msgstr "ذعققثرف دثقهبهذشفهخر سفشفعس: شححقخدثي"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification is reviewed and approved. Your verification status is "
-"good for one year after submission."
+"Your edX verification has been approved. Your verification is effective for "
+"one year after submission."
 msgstr ""
-"غخعق ثيط دثقهبهذشفهخر هس قثدهثصثي شري شححقخدثي. غخعق دثقهبهذشفهخر سفشفعس هس "
-"لخخي بخق خرث غثشق شبفثق سعزوهسسهخر."
+"غخعق ثيط دثقهبهذشفهخر اشس زثثر شححقخدثي. غخعق دثقهبهذشفهخر هس ثببثذفهدث بخق "
+"خرث غثشق شبفثق سعزوهسسهخر."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Pending"
-msgstr "دثقهبهذشفهخر سفشفعس: حثريهرل"
+msgid "Current Verification Status: Pending"
+msgstr "ذعققثرف دثقهبهذشفهخر سفشفعس: حثريهرل"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification is pending. Your verification photos have been "
+"Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
 msgstr ""
-"غخعق ثيط دثقهبهذشفهخر هس حثريهرل. غخعق دثقهبهذشفهخر حاخفخس اشدث زثثر "
+"غخعق ثيط هي دثقهبهذشفهخر هس حثريهرل. غخعق دثقهبهذشفهخر هربخقوشفهخر اشس زثثر "
 "سعزوهففثي شري صهمم زث قثدهثصثي ساخقفمغ."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Expired"
-msgstr "دثقهبهذشفهخر سفشفعس: ثطحهقثي"
+msgid "Current Verification Status: Expired"
+msgstr "ذعققثرف دثقهبهذشفهخر سفشفعس: ثطحهقثي"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification has expired. To receive a verified certificate, you "
-"have to submit a new photo of yourself and your government-issued photo ID "
-"before the course ends."
+"Your verification has expired. To receive a verified certificate, you must "
+"submit a new photo of yourself and your government-issued photo ID before "
+"the verification deadline for your course."
 msgstr ""
-"غخعق ثيط دثقهبهذشفهخر اشس ثطحهقثي. فخ قثذثهدث ش دثقهبهثي ذثقفهبهذشفث, غخع "
-"اشدث فخ سعزوهف ش رثص حاخفخ خب غخعقسثمب شري غخعق لخدثقروثرف-هسسعثي حاخفخ هي "
-"زثبخقث فاث ذخعقسث ثريس."
+"غخعق دثقهبهذشفهخر اشس ثطحهقثي. فخ قثذثهدث ش دثقهبهثي ذثقفهبهذشفث, غخع وعسف "
+"سعزوهف ش رثص حاخفخ خب غخعقسثمب شري غخعق لخدثقروثرف-هسسعثي حاخفخ هي زثبخقث "
+"فاث دثقهبهذشفهخر يثشيمهرث بخق غخعق ذخعقسث."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
@@ -18063,10 +18164,6 @@ msgstr "ساخححهرل ذشقف"
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "{platform_name} -  Shopping Cart"
 msgstr "{platform_name} -  ساخححهرل ذشقف"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Review"
-msgstr "قثدهثص"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Confirmation"

@@ -74,7 +74,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:23+0000\n"
+"POT-Creation-Date: 2016-10-06 15:01+0000\n"
 "PO-Revision-Date: 2016-09-29 12:24+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -3355,17 +3355,6 @@ msgid ""
 msgstr "בחר סוג בעיה לייבא מהספריה. אם \"כל סוג\" נבחר, לא יוחלו מסננים."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "ניתן ציון"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr "סמן ערך זה כ-כן אם מודול זה הינו מטלה עם ציון או בעיית תרגול. "
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr "מרכיב זה מיושן. ישנו תוכן חדש בספריה."
 
@@ -3508,6 +3497,10 @@ msgstr ""
 "בחר 'כן' אם ברצונך שהסטודנטים ילחצו על קישור שפותח את כלי ה-LTI בחלון חדש. "
 "בחר 'לא' אם ברצונך שתוכן ה-LTI ייפתח ב-IFrame בעמוד הנוכחי. הגדרה זו משמשת "
 "רק כאשר 'הסתר כלי חיצוני' מוגדר ל'לא'.  "
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "ניתן ציון"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -10564,9 +10557,13 @@ msgstr "לחץ למחיקה"
 msgid "Click to add"
 msgstr "לחץ להוספה"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "מסומן בסימניה"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "סימניה"
+msgid "Bookmark this page"
+msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -10770,8 +10767,8 @@ msgid "Support"
 msgstr "תמיכה"
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "{platform_name} עזרה"
+msgid "{platform_name} Support"
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -10829,8 +10826,11 @@ msgid "Tell us the details"
 msgstr "שתף אותנו בפרטים:"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
-msgstr "כלול הודעות שגיאה, פעולות המובילות להיווצרות הבעיה וכו'"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -10859,12 +10859,8 @@ msgid "Brief description of the problem"
 msgstr "תיאור קצר של הבעיה"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
-"פרטים על הבעיה שנתקלת בה{asterisk}{begin_span}כלול הודעות שגיאה, שלבים "
-"שהובילו לבעיה וכו'.{end_span}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -11526,10 +11522,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "הקודם"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "מסומן בסימניה"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -20727,8 +20719,8 @@ msgid "Last day students can enroll."
 msgstr "היום האחרון שבו הסטודנטים יכולים להירשם."
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
-msgstr "צור קשר עם המנהל השותף שלך ב-edX על מנת לעדכן את ההגדרות הללו."
+msgid "Contact your edX partner manager to update these settings."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"

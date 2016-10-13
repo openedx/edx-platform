@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-06 14:27+0000\n"
-"PO-Revision-Date: 2016-10-06 14:28:37.493632\n"
+"POT-Creation-Date: 2016-10-13 16:10+0000\n"
+"PO-Revision-Date: 2016-10-13 16:12:03.957210\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -294,48 +294,64 @@ msgstr "ذخووثرفشقغ"
 msgid "Reply to Annotation"
 msgstr "قثحمغ فخ شررخفشفهخر"
 
-#. Translators: %(earned)s is the number of points earned. %(total)s is the
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "(%(earned)s/%(possible)s point)"
-msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] "(%(earned)s/%(possible)s حخهرف)"
-msgstr[1] "(%(earned)s/%(possible)s حخهرفس)"
+msgid "%(earned)s/%(possible)s point (graded)"
+msgid_plural "%(earned)s/%(possible)s points (graded)"
+msgstr[0] "%(earned)s/%(possible)s حخهرف (لقشيثي)"
+msgstr[1] "%(earned)s/%(possible)s حخهرفس (لقشيثي)"
+
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(earned)s/%(possible)s point (ungraded)"
+msgid_plural "%(earned)s/%(possible)s points (ungraded)"
+msgstr[0] "%(earned)s/%(possible)s حخهرف (عرلقشيثي)"
+msgstr[1] "%(earned)s/%(possible)s حخهرفس (عرلقشيثي)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10). There will always be at least 1 point possible.;
+#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "(%(num_points)s point possible)"
-msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "(%(num_points)s حخهرف حخسسهزمث)"
-msgstr[1] "(%(num_points)s حخهرفس حخسسهزمث)"
+msgid "%(num_points)s point possible (graded)"
+msgid_plural "%(num_points)s points possible (graded)"
+msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي)"
+msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي)"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (ungraded)"
+msgid_plural "%(num_points)s points possible (ungraded)"
+msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي)"
+msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
 "فاث لقشيهرل حقخذثسس هس سفهمم قعررهرل. قثبقثسا فاث حشلث فخ سثث عحيشفثس."
 
+#. Translators: This is only translated to allow for reording of label and
+#. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Answer:"
-msgstr "شرسصثق:"
-
-#. Translators: the word Answer here refers to the answer to a problem the
-#. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Hide Answer"
-msgstr "اهيث شرسصثق"
-
-#. Translators: the word Answer here refers to the answer to a problem the
-#. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Show Answer"
-msgstr "ساخص شرسصثق"
+msgid "{label}: {status}"
+msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Answer hidden"
-msgstr "شرسصثق اهييثر"
+msgid "This problem has been reset."
+msgstr "فاهس حقخزمثو اشس زثثر قثسثف."
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid ""
+"Answers to this problem are now shown. Navigate through the problem to "
+"review it with answers inline."
+msgstr ""
+"شرسصثقس فخ فاهس حقخزمثو شقث رخص ساخصر. رشدهلشفث فاقخعلا فاث حقخزمثو فخ "
+"قثدهثص هف صهفا شرسصثقس هرمهرث."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
@@ -7202,13 +7218,12 @@ msgid "timed"
 msgstr "فهوثي"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid ""
-"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
-"on it before you select \"End My Exam\"."
+"To receive credit for problems, you must select \"Submit\" for each problem "
+"before you select \"End My Exam\"."
 msgstr ""
-"فخ قثذثهدث ذقثيهف خر ش حقخزمثو, غخع وعسف ذمهذن \"ذاثذن\" خق \"بهرشم ذاثذن\" "
-"خر هف زثبخقث غخع سثمثذف \"ثري وغ ثطشو\"."
+"فخ قثذثهدث ذقثيهف بخق حقخزمثوس, غخع وعسف سثمثذف \"سعزوهف\" بخق ثشذا حقخزمثو "
+"زثبخقث غخع سثمثذف \"ثري وغ ثطشو\"."
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
@@ -7676,6 +7691,10 @@ msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
 msgstr ""
 "{screen_reader_start}صشقرهرل:{screen_reader_end} رخ ذخرفثرف لقخعحس ثطهسف."
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+msgid "Only the parent course staff of a CCX can create content groups."
+msgstr "خرمغ فاث حشقثرف ذخعقسث سفشبب خب ش ذذط ذشر ذقثشفث ذخرفثرف لقخعحس."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -9033,6 +9052,14 @@ msgstr "سفشقفثي شف"
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
 msgstr "ذخوحمثفثي شف"
+
+#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
+msgid ""
+"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
+"on it before you select \"End My Exam\"."
+msgstr ""
+"فخ قثذثهدث ذقثيهف خر ش حقخزمثو, غخع وعسف ذمهذن \"ذاثذن\" خق \"بهرشم ذاثذن\" "
+"خر هف زثبخقث غخع سثمثذف \"ثري وغ ثطشو\"."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

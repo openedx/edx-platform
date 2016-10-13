@@ -193,7 +193,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:23+0000\n"
+"POT-Creation-Date: 2016-10-06 15:01+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -3622,19 +3622,6 @@ msgstr ""
 "«Любой», фильтры не применяются."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "Оценивается"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-"Установите значение \"Да\", если этот модуль является либо заданием на "
-"оценку, либо заданием для практики."
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr "Этот компонент устарел.  Содержимое библиотеки обновлено."
 
@@ -3791,6 +3778,10 @@ msgstr ""
 "открывался в новом окне. Выберите «Нет» для открытия LTI в том же окне. Эта "
 "настройка может быть использована только в случае, если для опции «Скрыть "
 "внешние инструменты» установлено значение «Нет»."
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "Оценивается"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -11121,9 +11112,13 @@ msgstr "Нажмите, чтобы удалить"
 msgid "Click to add"
 msgstr "Нажмите, чтобы добавить"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "Добавлено в закладки"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "Добавить в закладки"
+msgid "Bookmark this page"
+msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -11327,8 +11322,8 @@ msgid "Support"
 msgstr ""
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "Помощь {platform_name}"
+msgid "{platform_name} Support"
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -11389,7 +11384,10 @@ msgid "Tell us the details"
 msgstr "Сообщите нам детали "
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11421,9 +11419,7 @@ msgid "Brief description of the problem"
 msgstr "Краткое описание проблемы"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -12115,10 +12111,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "Предыдущее"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "Добавлено в закладки"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -21641,8 +21633,8 @@ msgid "Last day students can enroll."
 msgstr "Последний день регистрации слушателей"
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
-msgstr "Свяжитесь с вашим менеджером edX для обновления этих настроек."
+msgid "Contact your edX partner manager to update these settings."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"

@@ -34,6 +34,14 @@
     "%(comments_count)s %(span_sr_open)scomments %(span_close)s": "%(comments_count)s %(span_sr_open)s\u0254\u00f8\u026f\u026f\u01ddn\u0287s %(span_close)s", 
     "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s": "%(comments_count)s %(span_sr_open)s\u0254\u00f8\u026f\u026f\u01ddn\u0287s (%(unread_comments_count)s nn\u0279\u01dd\u0250d \u0254\u00f8\u026f\u026f\u01ddn\u0287s)%(span_close)s", 
     "%(download_link_start)sDownload this image (right-click or option-click, save as)%(link_end)s and then %(upload_link_start)supload%(link_end)s it to your backpack.</li>": "%(download_link_start)s\u0110\u00f8\u028dnl\u00f8\u0250d \u0287\u0265\u1d09s \u1d09\u026f\u0250\u0183\u01dd (\u0279\u1d09\u0183\u0265\u0287-\u0254l\u1d09\u0254\u029e \u00f8\u0279 \u00f8d\u0287\u1d09\u00f8n-\u0254l\u1d09\u0254\u029e, s\u0250\u028c\u01dd \u0250s)%(link_end)s \u0250nd \u0287\u0265\u01ddn %(upload_link_start)sndl\u00f8\u0250d%(link_end)s \u1d09\u0287 \u0287\u00f8 \u028e\u00f8n\u0279 b\u0250\u0254\u029ed\u0250\u0254\u029e.</li>", 
+    "%(earned)s/%(possible)s point (graded)": [
+      "%(earned)s/%(possible)s d\u00f8\u1d09n\u0287 (\u0183\u0279\u0250d\u01ddd)", 
+      "%(earned)s/%(possible)s d\u00f8\u1d09n\u0287s (\u0183\u0279\u0250d\u01ddd)"
+    ], 
+    "%(earned)s/%(possible)s point (ungraded)": [
+      "%(earned)s/%(possible)s d\u00f8\u1d09n\u0287 (nn\u0183\u0279\u0250d\u01ddd)", 
+      "%(earned)s/%(possible)s d\u00f8\u1d09n\u0287s (nn\u0183\u0279\u0250d\u01ddd)"
+    ], 
     "%(errorCount)s error found in form.": [
       "%(errorCount)s \u01dd\u0279\u0279\u00f8\u0279 \u025f\u00f8nnd \u1d09n \u025f\u00f8\u0279\u026f.", 
       "%(errorCount)s \u01dd\u0279\u0279\u00f8\u0279s \u025f\u00f8nnd \u1d09n \u025f\u00f8\u0279\u026f."
@@ -45,6 +53,14 @@
       "%(memberCount)s / %(maxMemberCount)s M\u01dd\u026fb\u01dd\u0279s"
     ], 
     "%(new_item_message)s": "%(new_item_message)s", 
+    "%(num_points)s point possible (graded)": [
+      "%(num_points)s d\u00f8\u1d09n\u0287 d\u00f8ss\u1d09bl\u01dd (\u0183\u0279\u0250d\u01ddd)", 
+      "%(num_points)s d\u00f8\u1d09n\u0287s d\u00f8ss\u1d09bl\u01dd (\u0183\u0279\u0250d\u01ddd)"
+    ], 
+    "%(num_points)s point possible (ungraded)": [
+      "%(num_points)s d\u00f8\u1d09n\u0287 d\u00f8ss\u1d09bl\u01dd (nn\u0183\u0279\u0250d\u01ddd)", 
+      "%(num_points)s d\u00f8\u1d09n\u0287s d\u00f8ss\u1d09bl\u01dd (nn\u0183\u0279\u0250d\u01ddd)"
+    ], 
     "%(num_questions)s question": [
       "%(num_questions)s bn\u01dds\u0287\u1d09\u00f8n", 
       "%(num_questions)s bn\u01dds\u0287\u1d09\u00f8ns"
@@ -96,14 +112,6 @@
     "%s result": [
       "%s \u0279\u01ddsnl\u0287", 
       "%s \u0279\u01ddsnl\u0287s"
-    ], 
-    "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s d\u00f8\u1d09n\u0287)", 
-      "(%(earned)s/%(possible)s d\u00f8\u1d09n\u0287s)"
-    ], 
-    "(%(num_points)s point possible)": [
-      "(%(num_points)s d\u00f8\u1d09n\u0287 d\u00f8ss\u1d09bl\u01dd)", 
-      "(%(num_points)s d\u00f8\u1d09n\u0287s d\u00f8ss\u1d09bl\u01dd)"
     ], 
     "(Add signatories for a certificate)": "(\u023add s\u1d09\u0183n\u0250\u0287\u00f8\u0279\u1d09\u01dds \u025f\u00f8\u0279 \u0250 \u0254\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd)", 
     "(Caption will be displayed when you start playing the video.)": "(\u023b\u0250d\u0287\u1d09\u00f8n \u028d\u1d09ll b\u01dd d\u1d09sdl\u0250\u028e\u01ddd \u028d\u0265\u01ddn \u028e\u00f8n s\u0287\u0250\u0279\u0287 dl\u0250\u028e\u1d09n\u0183 \u0287\u0265\u01dd \u028c\u1d09d\u01dd\u00f8.)", 
@@ -247,8 +255,7 @@
     "Anchors": "\u023an\u0254\u0265\u00f8\u0279s", 
     "Annotation": "\u023ann\u00f8\u0287\u0250\u0287\u1d09\u00f8n", 
     "Annotation Text": "\u023ann\u00f8\u0287\u0250\u0287\u1d09\u00f8n \u0166\u01ddx\u0287", 
-    "Answer hidden": "\u023ans\u028d\u01dd\u0279 \u0265\u1d09dd\u01ddn", 
-    "Answer:": "\u023ans\u028d\u01dd\u0279:", 
+    "Answers to this problem are now shown. Navigate through the problem to review it with answers inline.": "\u023ans\u028d\u01dd\u0279s \u0287\u00f8 \u0287\u0265\u1d09s d\u0279\u00f8bl\u01dd\u026f \u0250\u0279\u01dd n\u00f8\u028d s\u0265\u00f8\u028dn. N\u0250\u028c\u1d09\u0183\u0250\u0287\u01dd \u0287\u0265\u0279\u00f8n\u0183\u0265 \u0287\u0265\u01dd d\u0279\u00f8bl\u01dd\u026f \u0287\u00f8 \u0279\u01dd\u028c\u1d09\u01dd\u028d \u1d09\u0287 \u028d\u1d09\u0287\u0265 \u0250ns\u028d\u01dd\u0279s \u1d09nl\u1d09n\u01dd.", 
     "Any content that has listed this content as a prerequisite will also have access limitations removed.": "\u023an\u028e \u0254\u00f8n\u0287\u01ddn\u0287 \u0287\u0265\u0250\u0287 \u0265\u0250s l\u1d09s\u0287\u01ddd \u0287\u0265\u1d09s \u0254\u00f8n\u0287\u01ddn\u0287 \u0250s \u0250 d\u0279\u01dd\u0279\u01ddbn\u1d09s\u1d09\u0287\u01dd \u028d\u1d09ll \u0250ls\u00f8 \u0265\u0250\u028c\u01dd \u0250\u0254\u0254\u01ddss l\u1d09\u026f\u1d09\u0287\u0250\u0287\u1d09\u00f8ns \u0279\u01dd\u026f\u00f8\u028c\u01ddd.", 
     "Are you having trouble finding a team to join?": "\u023a\u0279\u01dd \u028e\u00f8n \u0265\u0250\u028c\u1d09n\u0183 \u0287\u0279\u00f8nbl\u01dd \u025f\u1d09nd\u1d09n\u0183 \u0250 \u0287\u01dd\u0250\u026f \u0287\u00f8 \u027e\u00f8\u1d09n?", 
     "Are you sure you want to delete this comment?": "\u023a\u0279\u01dd \u028e\u00f8n sn\u0279\u01dd \u028e\u00f8n \u028d\u0250n\u0287 \u0287\u00f8 d\u01ddl\u01dd\u0287\u01dd \u0287\u0265\u1d09s \u0254\u00f8\u026f\u026f\u01ddn\u0287?", 
@@ -758,7 +765,6 @@
     "Height": "\u0126\u01dd\u1d09\u0183\u0265\u0287", 
     "Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.": "\u0126\u01ddld \u00f8\u0287\u0265\u01dd\u0279 l\u01dd\u0250\u0279n\u01dd\u0279s d\u01dd\u0254\u1d09d\u01dd \u028d\u0265\u01dd\u0287\u0265\u01dd\u0279 \u0287\u00f8 \u027e\u00f8\u1d09n \u028e\u00f8n\u0279 \u0287\u01dd\u0250\u026f b\u028e sd\u01dd\u0254\u1d09\u025f\u028e\u1d09n\u0183 s\u00f8\u026f\u01dd \u0254\u0265\u0250\u0279\u0250\u0254\u0287\u01dd\u0279\u1d09s\u0287\u1d09\u0254s \u025f\u00f8\u0279 \u028e\u00f8n\u0279 \u0287\u01dd\u0250\u026f. \u023b\u0265\u00f8\u00f8s\u01dd \u0254\u0250\u0279\u01dd\u025fnll\u028e, b\u01dd\u0254\u0250ns\u01dd \u025f\u01dd\u028d\u01dd\u0279 d\u01dd\u00f8dl\u01dd \u026f\u1d09\u0183\u0265\u0287 b\u01dd \u1d09n\u0287\u01dd\u0279\u01dds\u0287\u01ddd \u1d09n \u027e\u00f8\u1d09n\u1d09n\u0183 \u028e\u00f8n\u0279 \u0287\u01dd\u0250\u026f \u1d09\u025f \u1d09\u0287 s\u01dd\u01dd\u026fs \u0287\u00f8\u00f8 \u0279\u01dds\u0287\u0279\u1d09\u0254\u0287\u1d09\u028c\u01dd.", 
     "Hide Annotations": "\u0126\u1d09d\u01dd \u023ann\u00f8\u0287\u0250\u0287\u1d09\u00f8ns", 
-    "Hide Answer": "\u0126\u1d09d\u01dd \u023ans\u028d\u01dd\u0279", 
     "Hide Deprecated Settings": "\u0126\u1d09d\u01dd \u0110\u01ddd\u0279\u01dd\u0254\u0250\u0287\u01ddd S\u01dd\u0287\u0287\u1d09n\u0183s", 
     "Hide Discussion": "\u0126\u1d09d\u01dd \u0110\u1d09s\u0254nss\u1d09\u00f8n", 
     "Hide Previews": "\u0126\u1d09d\u01dd \u2c63\u0279\u01dd\u028c\u1d09\u01dd\u028ds", 
@@ -1007,6 +1013,7 @@
     "Once in position, use the camera button {icon} to capture your photo": "\u00d8n\u0254\u01dd \u1d09n d\u00f8s\u1d09\u0287\u1d09\u00f8n, ns\u01dd \u0287\u0265\u01dd \u0254\u0250\u026f\u01dd\u0279\u0250 bn\u0287\u0287\u00f8n {icon} \u0287\u00f8 \u0254\u0250d\u0287n\u0279\u01dd \u028e\u00f8n\u0279 d\u0265\u00f8\u0287\u00f8", 
     "Only <%= fileTypes %> files can be uploaded. Please select a file ending in <%= fileExtensions %> to upload.": "\u00d8nl\u028e <%= fileTypes %> \u025f\u1d09l\u01dds \u0254\u0250n b\u01dd ndl\u00f8\u0250d\u01ddd. \u2c63l\u01dd\u0250s\u01dd s\u01ddl\u01dd\u0254\u0287 \u0250 \u025f\u1d09l\u01dd \u01ddnd\u1d09n\u0183 \u1d09n <%= fileExtensions %> \u0287\u00f8 ndl\u00f8\u0250d.", 
     "Only properly formatted .csv files will be accepted.": "\u00d8nl\u028e d\u0279\u00f8d\u01dd\u0279l\u028e \u025f\u00f8\u0279\u026f\u0250\u0287\u0287\u01ddd .\u0254s\u028c \u025f\u1d09l\u01dds \u028d\u1d09ll b\u01dd \u0250\u0254\u0254\u01ddd\u0287\u01ddd.", 
+    "Only the parent course staff of a CCX can create content groups.": "\u00d8nl\u028e \u0287\u0265\u01dd d\u0250\u0279\u01ddn\u0287 \u0254\u00f8n\u0279s\u01dd s\u0287\u0250\u025f\u025f \u00f8\u025f \u0250 \u023b\u023bX \u0254\u0250n \u0254\u0279\u01dd\u0250\u0287\u01dd \u0254\u00f8n\u0287\u01ddn\u0287 \u0183\u0279\u00f8nds.", 
     "Open": "\u00d8d\u01ddn", 
     "Open Calculator": "\u00d8d\u01ddn \u023b\u0250l\u0254nl\u0250\u0287\u00f8\u0279", 
     "Open language menu": "\u00d8d\u01ddn l\u0250n\u0183n\u0250\u0183\u01dd \u026f\u01ddnn", 
@@ -1263,7 +1270,6 @@
     "Short explanation": "S\u0265\u00f8\u0279\u0287 \u01ddxdl\u0250n\u0250\u0287\u1d09\u00f8n", 
     "Show All": "S\u0265\u00f8\u028d \u023all", 
     "Show Annotations": "S\u0265\u00f8\u028d \u023ann\u00f8\u0287\u0250\u0287\u1d09\u00f8ns", 
-    "Show Answer": "S\u0265\u00f8\u028d \u023ans\u028d\u01dd\u0279", 
     "Show Comment (%(num_comments)s)": [
       "S\u0265\u00f8\u028d \u023b\u00f8\u026f\u026f\u01ddn\u0287 (%(num_comments)s)", 
       "S\u0265\u00f8\u028d \u023b\u00f8\u026f\u026f\u01ddn\u0287s (%(num_comments)s)"
@@ -1533,6 +1539,7 @@
     "This page contains information about orders that you have placed with {platform_name}.": "\u0166\u0265\u1d09s d\u0250\u0183\u01dd \u0254\u00f8n\u0287\u0250\u1d09ns \u1d09n\u025f\u00f8\u0279\u026f\u0250\u0287\u1d09\u00f8n \u0250b\u00f8n\u0287 \u00f8\u0279d\u01dd\u0279s \u0287\u0265\u0250\u0287 \u028e\u00f8n \u0265\u0250\u028c\u01dd dl\u0250\u0254\u01ddd \u028d\u1d09\u0287\u0265 {platform_name}.", 
     "This post is visible only to %(group_name)s.": "\u0166\u0265\u1d09s d\u00f8s\u0287 \u1d09s \u028c\u1d09s\u1d09bl\u01dd \u00f8nl\u028e \u0287\u00f8 %(group_name)s.", 
     "This post is visible to everyone.": "\u0166\u0265\u1d09s d\u00f8s\u0287 \u1d09s \u028c\u1d09s\u1d09bl\u01dd \u0287\u00f8 \u01dd\u028c\u01dd\u0279\u028e\u00f8n\u01dd.", 
+    "This problem has been reset.": "\u0166\u0265\u1d09s d\u0279\u00f8bl\u01dd\u026f \u0265\u0250s b\u01dd\u01ddn \u0279\u01dds\u01dd\u0287.", 
     "This short name for the assignment type (for example, HW or Midterm) appears next to assignments on a learner's Progress page.": "\u0166\u0265\u1d09s s\u0265\u00f8\u0279\u0287 n\u0250\u026f\u01dd \u025f\u00f8\u0279 \u0287\u0265\u01dd \u0250ss\u1d09\u0183n\u026f\u01ddn\u0287 \u0287\u028ed\u01dd (\u025f\u00f8\u0279 \u01ddx\u0250\u026fdl\u01dd, \u0126W \u00f8\u0279 M\u1d09d\u0287\u01dd\u0279\u026f) \u0250dd\u01dd\u0250\u0279s n\u01ddx\u0287 \u0287\u00f8 \u0250ss\u1d09\u0183n\u026f\u01ddn\u0287s \u00f8n \u0250 l\u01dd\u0250\u0279n\u01dd\u0279's \u2c63\u0279\u00f8\u0183\u0279\u01ddss d\u0250\u0183\u01dd.", 
     "This team does not have any members.": "\u0166\u0265\u1d09s \u0287\u01dd\u0250\u026f d\u00f8\u01dds n\u00f8\u0287 \u0265\u0250\u028c\u01dd \u0250n\u028e \u026f\u01dd\u026fb\u01dd\u0279s.", 
     "This team is full.": "\u0166\u0265\u1d09s \u0287\u01dd\u0250\u026f \u1d09s \u025fnll.", 
@@ -1559,6 +1566,7 @@
     "To invalidate a certificate for a particular learner, add the username or email address below.": "\u0166\u00f8 \u1d09n\u028c\u0250l\u1d09d\u0250\u0287\u01dd \u0250 \u0254\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd \u025f\u00f8\u0279 \u0250 d\u0250\u0279\u0287\u1d09\u0254nl\u0250\u0279 l\u01dd\u0250\u0279n\u01dd\u0279, \u0250dd \u0287\u0265\u01dd ns\u01dd\u0279n\u0250\u026f\u01dd \u00f8\u0279 \u01dd\u026f\u0250\u1d09l \u0250dd\u0279\u01ddss b\u01ddl\u00f8\u028d.", 
     "To receive a certificate, you must also verify your identity before %(date)s.": "\u0166\u00f8 \u0279\u01dd\u0254\u01dd\u1d09\u028c\u01dd \u0250 \u0254\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd, \u028e\u00f8n \u026fns\u0287 \u0250ls\u00f8 \u028c\u01dd\u0279\u1d09\u025f\u028e \u028e\u00f8n\u0279 \u1d09d\u01ddn\u0287\u1d09\u0287\u028e b\u01dd\u025f\u00f8\u0279\u01dd %(date)s.", 
     "To receive a certificate, you must also verify your identity.": "\u0166\u00f8 \u0279\u01dd\u0254\u01dd\u1d09\u028c\u01dd \u0250 \u0254\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd, \u028e\u00f8n \u026fns\u0287 \u0250ls\u00f8 \u028c\u01dd\u0279\u1d09\u025f\u028e \u028e\u00f8n\u0279 \u1d09d\u01ddn\u0287\u1d09\u0287\u028e.", 
+    "To receive credit for problems, you must select \"Submit\" for each problem before you select \"End My Exam\".": "\u0166\u00f8 \u0279\u01dd\u0254\u01dd\u1d09\u028c\u01dd \u0254\u0279\u01ddd\u1d09\u0287 \u025f\u00f8\u0279 d\u0279\u00f8bl\u01dd\u026fs, \u028e\u00f8n \u026fns\u0287 s\u01ddl\u01dd\u0254\u0287 \"Snb\u026f\u1d09\u0287\" \u025f\u00f8\u0279 \u01dd\u0250\u0254\u0265 d\u0279\u00f8bl\u01dd\u026f b\u01dd\u025f\u00f8\u0279\u01dd \u028e\u00f8n s\u01ddl\u01dd\u0254\u0287 \"\u0246nd M\u028e \u0246x\u0250\u026f\".", 
     "To receive credit on a problem, you must click \"Check\" or \"Final Check\" on it before you select \"End My Exam\".": "\u0166\u00f8 \u0279\u01dd\u0254\u01dd\u1d09\u028c\u01dd \u0254\u0279\u01ddd\u1d09\u0287 \u00f8n \u0250 d\u0279\u00f8bl\u01dd\u026f, \u028e\u00f8n \u026fns\u0287 \u0254l\u1d09\u0254\u029e \"\u023b\u0265\u01dd\u0254\u029e\" \u00f8\u0279 \"F\u1d09n\u0250l \u023b\u0265\u01dd\u0254\u029e\" \u00f8n \u1d09\u0287 b\u01dd\u025f\u00f8\u0279\u01dd \u028e\u00f8n s\u01ddl\u01dd\u0254\u0287 \"\u0246nd M\u028e \u0246x\u0250\u026f\".", 
     "To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on the {link_start}Data Download{link_end} page.": "\u0166\u00f8 \u0279\u01dd\u028c\u1d09\u01dd\u028d s\u0287nd\u01ddn\u0287 \u0254\u00f8\u0265\u00f8\u0279\u0287 \u0250ss\u1d09\u0183n\u026f\u01ddn\u0287s \u00f8\u0279 s\u01dd\u01dd \u0287\u0265\u01dd \u0279\u01ddsnl\u0287s \u00f8\u025f ndl\u00f8\u0250d\u1d09n\u0183 \u0250 \u023bSV \u025f\u1d09l\u01dd, d\u00f8\u028dnl\u00f8\u0250d \u0254\u00f8n\u0279s\u01dd d\u0279\u00f8\u025f\u1d09l\u01dd \u1d09n\u025f\u00f8\u0279\u026f\u0250\u0287\u1d09\u00f8n \u00f8\u0279 \u0254\u00f8\u0265\u00f8\u0279\u0287 \u0279\u01ddsnl\u0287s \u00f8n \u0287\u0265\u01dd {link_start}\u0110\u0250\u0287\u0250 \u0110\u00f8\u028dnl\u00f8\u0250d{link_end} d\u0250\u0183\u01dd.", 
     "To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.": "\u0166\u00f8 s\u0265\u0250\u0279\u01dd \u028e\u00f8n\u0279 \u0254\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd \u00f8n M\u00f8z\u1d09ll\u0250 \u0243\u0250\u0254\u029ed\u0250\u0254\u029e, \u028e\u00f8n \u026fns\u0287 \u025f\u1d09\u0279s\u0287 \u0265\u0250\u028c\u01dd \u0250 \u0243\u0250\u0254\u029ed\u0250\u0254\u029e \u0250\u0254\u0254\u00f8nn\u0287. \u023b\u00f8\u026fdl\u01dd\u0287\u01dd \u0287\u0265\u01dd \u025f\u00f8ll\u00f8\u028d\u1d09n\u0183 s\u0287\u01ddds \u0287\u00f8 \u0250dd \u028e\u00f8n\u0279 \u0254\u01dd\u0279\u0287\u1d09\u025f\u1d09\u0254\u0250\u0287\u01dd \u0287\u00f8 \u0243\u0250\u0254\u029ed\u0250\u0254\u029e.", 
@@ -1984,6 +1992,7 @@
     "{display_name} Settings": "{display_name} S\u01dd\u0287\u0287\u1d09n\u0183s", 
     "{email} is already on the {container} team. Recheck the email address if you want to add a new member.": "{email} \u1d09s \u0250l\u0279\u01dd\u0250d\u028e \u00f8n \u0287\u0265\u01dd {container} \u0287\u01dd\u0250\u026f. \u024c\u01dd\u0254\u0265\u01dd\u0254\u029e \u0287\u0265\u01dd \u01dd\u026f\u0250\u1d09l \u0250dd\u0279\u01ddss \u1d09\u025f \u028e\u00f8n \u028d\u0250n\u0287 \u0287\u00f8 \u0250dd \u0250 n\u01dd\u028d \u026f\u01dd\u026fb\u01dd\u0279.", 
     "{hours}:{minutes} (current UTC time)": "{hours}:{minutes} (\u0254n\u0279\u0279\u01ddn\u0287 \u0244\u0166\u023b \u0287\u1d09\u026f\u01dd)", 
+    "{label}: {status}": "{label}: {status}", 
     "{numMoved} student was removed from {oldCohort}": [
       "{numMoved} s\u0287nd\u01ddn\u0287 \u028d\u0250s \u0279\u01dd\u026f\u00f8\u028c\u01ddd \u025f\u0279\u00f8\u026f {oldCohort}", 
       "{numMoved} s\u0287nd\u01ddn\u0287s \u028d\u01dd\u0279\u01dd \u0279\u01dd\u026f\u00f8\u028c\u01ddd \u025f\u0279\u00f8\u026f {oldCohort}"

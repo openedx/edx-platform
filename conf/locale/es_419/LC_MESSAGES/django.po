@@ -121,7 +121,7 @@
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # MarnyLopez, 2014
 # Natalia, 2013
-# Natalia, 2013-2014
+# Natalia, 2013-2014,2016
 # Ned Batchelder <ned@edx.org>, 2016
 # Nestor Alejandro Mendoza Espinoza <name1984@gmail.com>, 2015
 # Nicolas CS <nicolascs23@gmail.com>, 2016
@@ -165,6 +165,7 @@
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Matías Olivera <MatiasOlivera@outlook.com>, 2015
 # Natalia, 2013
+# Natalia, 2016
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
@@ -186,7 +187,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:23+0000\n"
+"POT-Creation-Date: 2016-10-06 15:01+0000\n"
 "PO-Revision-Date: 2016-10-05 15:00+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -3650,19 +3651,6 @@ msgstr ""
 "\"cualquiera\" no se aplicará ningún filtro."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "Puntuado"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-"Defina este valor en True si este módulo es una tarea calificable o un "
-"problema de práctica."
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 "Este componente está desactualizado. La librería ya tiene nuevo contenido."
@@ -3818,6 +3806,10 @@ msgstr ""
 "desea que el contenido de LTI se abra en un iframe en la página actual. Esta"
 " opción sólo se utiliza cuando herramienta externa Hide se establece en "
 "False."
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "Puntuado"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -11242,9 +11234,13 @@ msgstr "Haga clic para eliminar"
 msgid "Click to add"
 msgstr "Haga clic para añadir"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "Añadido a marcadores"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "Marcador"
+msgid "Bookmark this page"
+msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -11451,8 +11447,8 @@ msgid "Support"
 msgstr "Soporte"
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "Ayuda de {platform_name}"
+msgid "{platform_name} Support"
+msgstr "Soporte de {platform_name}"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -11513,10 +11509,11 @@ msgid "Tell us the details"
 msgstr "Indíquenos los detalles"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
-"Incluya los mensajes de error, los pasos realizados que llevaron al "
-"inconveniente, etc."
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -11548,13 +11545,8 @@ msgid "Brief description of the problem"
 msgstr "Breve descripción del problema"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
-"Detalles sobre el problema que está "
-"experimentando{asterisk}{begin_span}Incluya mensajes de error, pasos para "
-"reproducir el problema, etc.{end_span}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -12241,10 +12233,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "Previo"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "Añadido a marcadores"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -21889,7 +21877,7 @@ msgid "Last day students can enroll."
 msgstr "Último día en que los estudiantes se pueden inscribir"
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
+msgid "Contact your edX partner manager to update these settings."
 msgstr ""
 "Contacte a su administrador de edX para actualizar esta configuración."
 

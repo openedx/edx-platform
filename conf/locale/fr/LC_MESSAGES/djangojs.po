@@ -163,8 +163,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:22+0000\n"
-"PO-Revision-Date: 2016-09-29 14:26+0000\n"
+"POT-Creation-Date: 2016-10-06 15:00+0000\n"
+"PO-Revision-Date: 2016-10-12 23:16+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -1796,6 +1796,7 @@ msgstr ""
 "SequenceModule en cours. Veuillez contacter les responsables du cours."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "Ajouté aux favoris"
 
@@ -3868,6 +3869,10 @@ msgstr "Une erreur est survenue. Merci de réessayer de nouveau."
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to add"
 msgstr "Cliquer pour ajouter"
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Bookmark this page"
+msgstr ""
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
