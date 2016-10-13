@@ -38,7 +38,7 @@ CORS_ALLOW_HEADERS = (
 )
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
-SITE_ID = None
+SITE_ID = 1
 
 # MIDDLEWARE_CLASSES = (
 #     'db_multitenant.middleware.MultiTenantMiddleware',
