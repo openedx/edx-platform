@@ -30,6 +30,15 @@ urlpatterns = (
 
     url(r'^change_setting$', 'change_setting', name='change_setting'),
     url(r'^change_email_settings$', 'change_email_settings', name='change_email_settings'),
+
+    # password reset in student.views (see below for password reset django views)
+    url(r'^password_reset/$', 'password_reset', name='password_reset'),
+    url(
+        r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
+        'password_reset_confirm_wrapper',
+        name='password_reset_confirm',
+    ),
+
 )
 
 # enable automatic login
@@ -38,27 +47,18 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
         url(r'^auto_auth$', 'auto_auth'),
     )
 
+# add all student.views url patterns
 urlpatterns = patterns(*urlpatterns)
 
-# password reset mixes student.views with django views
-urlpatterns += (
-    url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
 
-    # Obsolete Django views for password resets
+# password reset django views (see above for password reset student.views)
+urlpatterns += patterns(
+    'django.contrib.auth.views',
 
     # TODO: Replace with Mako-ized views
-
-    url(r'^password_change/$', 'django.contrib.auth.views.password_change', name='password_change'),
-    url(r'^password_change_done/$', 'django.contrib.auth.views.password_change_done', name='password_change_done'),
     url(
         r'^password_reset_complete/$',
-        'django.contrib.auth.views.password_reset_complete',
+        'password_reset_complete',
         name='password_reset_complete',
     ),
-    url(
-        r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'student.views.password_reset_confirm_wrapper',
-        name='password_reset_confirm',
-    ),
-    url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done', name='password_reset_done'),
 )
