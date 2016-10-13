@@ -409,6 +409,9 @@ class CohortManagementSection(PageObject):
         if content_group:
             self._select_associated_content_group(content_group)
         self.save_cohort_settings()
+        EmptyPromise(
+            lambda: cohort_name == self.get_selected_cohort(), "Waiting for new cohort"
+        ).fulfill()
 
     def get_cohort_group_setup(self):
         """

@@ -360,10 +360,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
         def add_cohort_with_student(cohort_name, content_group, student):
             """ Create cohort and assign student to it. """
             cohort_management_page.add_cohort(cohort_name, content_group=content_group)
-            # After adding the cohort, it should automatically be selected
-            EmptyPromise(
-                lambda: cohort_name == cohort_management_page.get_selected_cohort(), "Waiting for new cohort"
-            ).fulfill()
             cohort_management_page.add_students_to_selected_cohort([student])
         add_cohort_with_student("Cohort Alpha", "alpha", student_a_username)
         add_cohort_with_student("Cohort Beta", "beta", student_b_username)
