@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .api import SiteConfigurationViewSet, FileUploadView
+from .api import SiteConfigurationViewSet, FileUploadView, SiteCreateView
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -10,5 +10,6 @@ router.register(r'sites', SiteConfigurationViewSet)
 # Additionally, we include the login URLs for the browsable API.
 urlpatterns = [
     url(r'^upload_file/', FileUploadView.as_view()),
+    url(r'^register/', SiteCreateView.as_view()),
     url(r'^', include(router.urls)),
 ]

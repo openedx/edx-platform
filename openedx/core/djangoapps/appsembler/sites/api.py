@@ -1,10 +1,10 @@
 from django.core.files.storage import DefaultStorage
-from rest_framework import views, viewsets
+from rest_framework import generics, views, viewsets
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer
+from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer, RegistrationSerializer
 from .utils import delete_site
 
 
@@ -37,3 +37,7 @@ class FileUploadView(views.APIView):
         storage = DefaultStorage()
         name = storage.save(filename, content)
         return storage.url(name)
+
+
+class SiteCreateView(generics.CreateAPIView):
+    serializer_class = RegistrationSerializer

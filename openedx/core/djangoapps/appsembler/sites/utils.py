@@ -2,7 +2,10 @@ import json
 import os
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
+from organizations.api import add_organization
+from organizations.models import UserOrganizationMapping, Organization
 from openedx.core.djangoapps.theming.models import SiteTheme
 
 
@@ -65,14 +68,24 @@ def json_to_sass(json_input):
     return dict_to_sass(sass_dict)
 
 
-def bootstrap_site(site):
+def bootstrap_site(site, organization_id, user_email):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
     SiteTheme.objects.create(site=site, theme_dir_name=settings.THEME_NAME)
     site.configuration_id = site_config.id
-    return site
+    organization_data = add_organization({
+        'name': organization_id,
+        'short_name': organization_id
+    })
+    organization = Organization.objects.get(id=organization_data.get('id'))
+    site_config.values['course_org_filter'] = organization_id
+    site_config.save()
+    user = User.objects.get(email=user_email)
+    UserOrganizationMapping.objects.create(user=user, organization=organization)
+    return organization, site, user
+
 
 def delete_site(site_id):
     site = Site.objects.get(id=site_id)
