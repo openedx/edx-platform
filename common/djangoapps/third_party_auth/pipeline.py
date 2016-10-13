@@ -223,9 +223,9 @@ def active_provider_requests_data_sharing(request):
     running_pipeline = get(request)
     if running_pipeline:
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        if current_provider and (
-            current_provider.request_data_sharing_consent or current_provider.require_data_sharing_consent
-        ):
+        if not current_provider:
+            return False
+        if current_provider.request_data_sharing_consent or current_provider.require_data_sharing_consent:
             return True
     return False
 
