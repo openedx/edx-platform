@@ -1,15 +1,12 @@
 # pylint: disable=missing-docstring
 
-from django.conf import settings
 from django.test import TestCase
 from oauth2_provider.models import Application, AccessToken, RefreshToken
-import unittest
 
 from openedx.core.djangoapps.oauth_dispatch.tests import factories
 from student.tests.factories import UserFactory
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestClientFactory(TestCase):
     def setUp(self):
         super(TestClientFactory, self).setUp()
@@ -21,7 +18,6 @@ class TestClientFactory(TestCase):
         self.assertEqual(actual_application, expected_application)
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestAccessTokenFactory(TestCase):
     def setUp(self):
         super(TestAccessTokenFactory, self).setUp()
@@ -34,7 +30,6 @@ class TestAccessTokenFactory(TestCase):
         self.assertEqual(actual_access_token, expected_access_token)
 
 
-@unittest.skipUnless(settings.FEATURES.get("ENABLE_OAUTH2_PROVIDER"), "OAuth2 not enabled")
 class TestRefreshTokenFactory(TestCase):
     def setUp(self):
         super(TestRefreshTokenFactory, self).setUp()
