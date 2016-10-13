@@ -1208,3 +1208,7 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = []
 # to generating test databases will discover and try to create all tables
 # and this setting needs to be present
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+# Used with Email sending
+RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
+RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
