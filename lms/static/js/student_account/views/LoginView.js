@@ -37,13 +37,6 @@
 
                 render: function(html) {
                     var fields = html || '';
-                    this.successMessage = HtmlUtils.interpolateHtml(
-                    // eslint-disable-next-line
-                    gettext('We have sent an email message with password reset instructions to the email address you provided.  If you do not receive this message, {anchorStart}contact technical support{anchorEnd}.'), {  // eslint-disable-line max-len
-                        anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
-                        anchorEnd: HtmlUtils.HTML('</a>')
-                    }
-                );
 
                     $(this.el).html(_.template(this.tpl)({
                     // We pass the context object to the template so that
@@ -93,16 +86,26 @@
                 },
 
                 resetEmail: function() {
+                    var email = $('#password-reset-email').val(),
+                        successMessage;
                     this.element.hide(this.$errors);
                     this.resetMessage = this.$resetSuccess.find('.message-copy');
+
+                    successMessage = HtmlUtils.interpolateHtml(
+                        gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with an edX account, we will send a message with password reset instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len
+                        '{paragraphStart}If you do not receive a password reset message, verify that you entered the correct email address, or check your spam folder.{paragraphEnd}' + // eslint-disable-line max-len
+                        '{paragraphStart}If you need further assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}'), { // eslint-disable-line max-len
+                            boldStart: HtmlUtils.HTML('<b>'),
+                            boldEnd: HtmlUtils.HTML('</b>'),
+                            paragraphStart: HtmlUtils.HTML('<p>'),
+                            paragraphEnd: HtmlUtils.HTML('</p>'),
+                            email: email,
+                            anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
+                            anchorEnd: HtmlUtils.HTML('</a>')
+                        });
+
                     if (this.resetMessage.find('p').length === 0) {
-                        this.resetMessage.append(
-                        HtmlUtils.joinHtml(
-                            HtmlUtils.HTML('<p>'),
-                            this.successMessage,
-                            HtmlUtils.HTML('</p>')
-                        ).toString()
-                    );
+                        this.resetMessage.append(HtmlUtils.joinHtml(successMessage).toString());
                     }
                     this.element.show(this.$resetSuccess);
                 },

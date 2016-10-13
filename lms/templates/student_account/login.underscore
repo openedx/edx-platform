@@ -8,7 +8,7 @@
 
 <div aria-live="polite">
     <div class="js-reset-success status submission-success hidden">
-        <h4 class="message-title"><%- gettext("Password Reset Email Sent") %></h4>
+        <h4 class="message-title"><%- gettext("Check Your Email") %></h4>
         <div class="message-copy">
         </div>
     </div>
