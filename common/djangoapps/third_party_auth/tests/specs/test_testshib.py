@@ -100,7 +100,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         """
         Configure TestShib to require data sharing consent before running the registration test
         """
-        self._configure_testshib_provider(require_data_sharing_consent=True)
+        self._configure_testshib_provider(data_sharing_consent='required')
         super(TestShibIntegrationTest, self).test_register(data_sharing_consent=True)
 
     def test_registration_form_has_data_sharing_consent_when_optional(self):
@@ -108,7 +108,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         Configure TestShib to request data sharing consent, and then check
         the form to make sure that the option to enable it is present.
         """
-        self._configure_testshib_provider(request_data_sharing_consent=True)
+        self._configure_testshib_provider(data_sharing_consent='optional')
         # The user goes to the register page, and sees a button to register with the provider:
         provider_register_url = self._check_register_page()
         # The user clicks on the Dummy button:
@@ -150,7 +150,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         Configure TestShib to require data sharing consent, but don't provide
         consent when registering
         """
-        self._configure_testshib_provider(require_data_sharing_consent=True)
+        self._configure_testshib_provider(data_sharing_consent='required')
         # The user goes to the register page, and sees a button to register with the provider:
         provider_register_url = self._check_register_page()
         # The user clicks on the Dummy button:

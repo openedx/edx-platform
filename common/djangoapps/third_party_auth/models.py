@@ -279,18 +279,21 @@ class ProviderConfig(ConfigurationModel):
             "authentication using the correct link is still possible."
         ),
     )
-    require_data_sharing_consent = models.BooleanField(
-        default=False,
-        help_text=_(
-            "If this option is selected, users who sign in using this SSO provider will not be able "
-            "to proceed unless they affirmatively select the option to grant data sharing consent."
-        )
+    DATA_CONSENT_DISABLED = 'disabled'
+    DATA_CONSENT_OPTIONAL = 'optional'
+    DATA_CONSENT_REQUIRED = 'required'
+    DATA_CONSENT_STATE_CHOICES = (
+        (DATA_CONSENT_DISABLED, 'Disabled'),
+        (DATA_CONSENT_OPTIONAL, 'Optional'),
+        (DATA_CONSENT_REQUIRED, 'Required')
     )
-    request_data_sharing_consent = models.BooleanField(
-        default=False,
+    data_sharing_consent = models.CharField(
+        max_length=8,
+        blank=False,
+        choices=DATA_CONSENT_STATE_CHOICES,
+        default=DATA_CONSENT_DISABLED,
         help_text=_(
-            "If this option is selected, users will be presented with an option to share course "
-            "information with the SSO provider when registering."
+            "Whether this SSO requires data sharing permissions from users"
         )
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
@@ -308,6 +311,13 @@ class ProviderConfig(ConfigurationModel):
         super(ProviderConfig, self).clean()
         if bool(self.icon_class) == bool(self.icon_image):
             raise ValidationError('Either an icon class or an icon image must be given (but not both)')
+    @property
+    def require_data_sharing_consent(self):
+        return self.data_sharing_consent == self.DATA_CONSENT_REQUIRED
+
+    @property
+    def request_data_sharing_consent(self):
+        return self.data_sharing_consent != self.DATA_CONSENT_DISABLED
 
     @property
     def provider_id(self):
