@@ -19,7 +19,7 @@ from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
-from common.test.acceptance.tests.helpers import load_data_str
+from common.test.acceptance.tests.helpers import load_data_str, disable_animations
 from common.test.acceptance.pages.lms.progress import ProgressPage
 
 
@@ -1315,8 +1315,12 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
+        # We have seen unexplainable sporadic failures in this test. Try disabling animations to see
+        # if that helps.
+        disable_animations(self.course_outline_page)
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.verify_all_sections(collapsed=True)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
