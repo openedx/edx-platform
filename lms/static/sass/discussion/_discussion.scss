@@ -299,7 +299,7 @@ body.discussion {
   position: relative;
   margin: $baseline 0;
   padding: $baseline;
-  background: #f6f6f6 !important;
+  border: 1px solid $forum-color-border !important;
   border-radius: $forum-border-radius;
 
   header {
@@ -308,9 +308,30 @@ body.discussion {
     }
   }
 
-  .new-post-btn {
-    @include float(right);
-    @include margin-right(4px);
+  .inline-discussion-topic {
+    width: flex-grid(12);
+    font-size: $forum-small-font-size;
+
+    .inline-discussion-topic-title {
+      font-weight: bold;
+    }
+  }
+
+  .discussion-module-header {
+    @include float(left);
+    width: flex-grid(7);
+  }
+
+  .add_post_btn_container {
+    @include text-align(right);
+    position: relative;
+    top: -45px;
+  }
+
+  .discussion {
+    &.inline-discussion {
+      padding-top: $baseline * 3;
+    }
   }
 
   div.add-response.post-extended-content {
@@ -324,27 +345,17 @@ body.discussion {
 }
 
 .discussion-show {
+  @include float(right);
   position: relative;
   top: 3px;
   font-size: $forum-base-font-size;
   text-align: center;
 
   &.shown {
-    .show-hide-discussion-icon {
-      background-position: 0 0;
-    }
+    background-color: $btn-default-background-color;
+    color: $uxpl-primary-blue;
   }
 
-  .show-hide-discussion-icon {
-    display: inline-block;
-    position: relative;
-    top: 5px;
-    @include margin-right(6px);
-    width: 21px;
-    height: 19px;
-    background: url('#{$static-path}/images/show-hide-discussion-icon.png') no-repeat;
-    background-position: -21px 0;
-  }
 }
 
 section.discussion {

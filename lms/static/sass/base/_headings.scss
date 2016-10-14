@@ -125,7 +125,11 @@ $headings-base-color:                       $gray-d2;
             margin-bottom: 0;
             font-size: 1.5em;
         }
+
+        &.discussion-module-title {
+            margin-bottom: 0;
+            display: inline-block;
+        }
     }
 }
-
 
