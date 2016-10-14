@@ -148,7 +148,7 @@ class AccountViewSet(ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
-    def me(self, request):
+    def get(self, request):
         """
         GET /api/user/v1/me
         """

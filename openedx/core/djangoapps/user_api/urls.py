@@ -10,7 +10,7 @@ from .accounts.views import AccountViewSet
 from .preferences.views import PreferencesView, PreferencesDetailView
 
 ME = AccountViewSet.as_view({
-    'get': 'me',
+    'get': 'get',
 })
 
 ACCOUNT_LIST = AccountViewSet.as_view({
