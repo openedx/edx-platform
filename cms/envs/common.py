@@ -1201,3 +1201,10 @@ DOC_LINK_BASE_URL = None
 
 # Theme directory locale paths
 COMPREHENSIVE_THEME_LOCALE_PATHS = []
+
+# This is required for the migrations in oauth_dispatch.models
+# otherwise it fails saying this attribute is not present in Settings
+# Although Studio does not exable OAuth2 Provider capability, the new approach
+# to generating test databases will discover and try to create all tables
+# and this setting needs to be present
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'

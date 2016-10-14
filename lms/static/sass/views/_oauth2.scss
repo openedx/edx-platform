@@ -15,3 +15,41 @@
 
   }
 }
+
+// For the django-oauth-toolkit Authorization view
+.wrapper-authorize {
+    background: $white;
+    width: 60%;
+    padding-right: 140px;
+    padding-left: 140px;
+
+    font-family: $sans-serif;
+
+    h1 {
+        @extend %t-title4;
+        margin-bottom: 0;
+        margin-left: 0;
+        padding: $baseline;
+        padding-left: 0px;
+        @include text-align(left);
+    }
+
+    p {
+      @extend %t-copy-base;
+      margin: $baseline/2 0;
+    }
+
+    .control-group {
+        float: right;
+    }
+
+    .btn-authorization-allow {
+        @extend %btn-primary-blue;
+        margin-left: 20px;
+        line-height: 0.7em;
+    }
+
+    .btn-authorization-cancel {
+        @extend %btn-secondary-blue-outline;
+    }
+}
