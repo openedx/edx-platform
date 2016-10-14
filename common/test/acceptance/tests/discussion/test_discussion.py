@@ -101,6 +101,7 @@ THREAD_CONTENT_WITH_LATEX = """Lorem ipsum dolor sit amet, consectetur adipiscin
                                """
 
 
+@flaky  # TODO fix this, see TNL-5583
 class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
     """
     A mixin containing tests for response pagination for use by both inline
@@ -181,6 +182,7 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
 
 
 @attr(shard=2)
+@flaky  # TODO fix this, see TNL-5583
 class DiscussionHomePageTest(UniqueCourseTest):
     """
     Tests for the discussion home page.
@@ -582,6 +584,7 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
 
 
 @attr(shard=2)
+@flaky  # TODO fix this, see TNL-5583
 class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.

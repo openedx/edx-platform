@@ -4,6 +4,7 @@ End-to-end tests for the LMS Instructor Dashboard.
 """
 
 import ddt
+from flaky import flaky
 
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
@@ -377,6 +378,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then, the added record should be visible
         self.assertTrue(allowance_section.is_allowance_record_visible)
 
+    @flaky  # TODO fix this flaky test
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -1195,6 +1197,7 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
             self.certificates_section.certificate_invalidation_message.text
         )
 
+    @flaky  # TODO fix this flaky test
     def test_error_on_invalid_user(self):
         """
         Scenario: On the Certificates tab of the Instructor Dashboard, Instructor should see error message if

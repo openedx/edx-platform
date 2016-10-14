@@ -18,6 +18,7 @@ front-end validation will not pass.
                   one stored on YouTube
     t_not_exist - this file does not exist on YouTube; it exists locally
 """
+from flaky import flaky
 from nose.plugins.attrib import attr
 from common.test.acceptance.tests.video.test_studio_video_module import CMSVideoBaseTest
 
@@ -159,6 +160,7 @@ class VideoTranscriptTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.assertTrue(self.video.verify_field_value('Default Timed Transcript', 't__eq_exist'))
 
+    @flaky  # TODO fix this flaky test
     def test_youtube_id_w_different_local_server_sub(self):
         """
         Scenario: Youtube id only: check "Found" state when user sets youtube_id with different local and server subs

@@ -2,9 +2,11 @@
 """
 End-to-end tests for the courseware unit bookmarks.
 """
+from flaky import flaky
 import json
 from nose.plugins.attrib import attr
 import requests
+
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage as LmsAutoAuthPage
 from common.test.acceptance.pages.lms.bookmarks import BookmarksPage
@@ -375,6 +377,7 @@ class BookmarksTest(BookmarksTestMixin):
         self._navigate_to_bookmarks_list()
         self._verify_breadcrumbs(num_units=1, modified_name=modified_name)
 
+    @flaky  # TODO fix this flaky test
     def test_unreachable_bookmark(self):
         """
         Scenario: We should get a HTTP 404 for an unreachable bookmark.
@@ -602,6 +605,7 @@ class BookmarksTest(BookmarksTestMixin):
             total_pages=2
         )
 
+    @flaky  # TODO fix this flaky test
     def test_bookmarked_unit_accessed_event(self):
         """
         Scenario: Bookmark events are emitted with correct data when we access/visit a bookmarked unit.

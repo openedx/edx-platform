@@ -5,6 +5,7 @@ Acceptance tests for CMS Video Module.
 """
 import os
 
+from flaky import flaky
 from mock import patch
 from nose.plugins.attrib import attr
 from unittest import skipIf
@@ -344,6 +345,7 @@ class CMSVideoA11yTest(CMSVideoBaseTest):
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
             super(CMSVideoA11yTest, self).setUp()
 
+    @flaky  # TODO fix this flaky test
     def test_video_player_a11y(self):
         # we're loading a shorter transcript to ensure both skip links are available
         self._create_course_unit(subtitles=True)

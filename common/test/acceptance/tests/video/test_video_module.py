@@ -1191,6 +1191,7 @@ class DragAndDropTest(VideoBaseTest):
     def setUp(self):
         super(DragAndDropTest, self).setUp()
 
+    @flaky  # TODO fix this flaky test
     def test_if_captions_are_draggable(self):
         """
         Loads transcripts so that closed-captioning is available.
@@ -1249,6 +1250,7 @@ class LMSVideoModuleA11yTest(VideoBaseTest):
         with patch.dict(os.environ, {'SELENIUM_BROWSER': browser}):
             super(LMSVideoModuleA11yTest, self).setUp()
 
+    @flaky  # TODO fix this flaky test
     def test_video_player_a11y(self):
         # load transcripts so we can test skipping to
         self.assets.extend(['english_single_transcript.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
