@@ -246,11 +246,18 @@ def verify_ordering(test_class, page, expected_orderings):
 
 
 def click_studio_help(page):
-    """Click the Studio help link in the page footer."""
-    page.q(css='.cta-show-sock').click()
+    """
+    Click the Studio help link in the page footer.
+    """
+    help_link_selector = '.cta-show-sock'
+    # check if help link is visible
+    EmptyPromise(lambda: page.q(css=help_link_selector).visible, "Help link visible").fulfill()
+
+    page.q(css=help_link_selector).click()
+
+    # check if extended support section is visible.
     EmptyPromise(
-        lambda: page.q(css='.support .list-actions a').results[0].text != '',
-        'Support section opened'
+        lambda: page.q(css='.support .list-actions a').results[0].text != '', 'Support section opened'
     ).fulfill()
 
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Note: this script is in a temporary state. In an effort to get the
 # platform off of coveralls and onto codecov, we will be temporarily

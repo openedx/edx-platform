@@ -47,8 +47,9 @@ class ConditionalTest(UniqueCourseTest):
         course_fixture.install()
 
         # Construct conditional block
-        conditional_metadata = {}
         source_block = None
+        conditional_attr = None
+        conditional_value = None
         if block_type == 'problem':
             problem_factory = StringResponseXMLFactory()
             problem_xml = problem_factory.build_xml(
@@ -57,12 +58,9 @@ class ConditionalTest(UniqueCourseTest):
                 answer='correct string',
             ),
             problem = XBlockFixtureDesc('problem', 'Test Problem', data=problem_xml[0])
-            conditional_metadata = {
-                'xml_attributes': {
-                    'attempted': 'True'
-                }
-            }
             source_block = problem
+            conditional_attr = 'attempted'
+            conditional_value = 'True'
         elif block_type == 'poll':
             poll = XBlockFixtureDesc(
                 'poll_question',
@@ -73,11 +71,8 @@ class ConditionalTest(UniqueCourseTest):
                     {'id': 'no', 'text': 'Of course not!'}
                 ],
             )
-            conditional_metadata = {
-                'xml_attributes': {
-                    'poll_answer': 'yes'
-                }
-            }
+            conditional_attr = 'poll_answer'
+            conditional_value = 'yes'
             source_block = poll
         else:
             raise NotImplementedError()
@@ -87,8 +82,9 @@ class ConditionalTest(UniqueCourseTest):
         conditional = XBlockFixtureDesc(
             'conditional',
             'Test Conditional',
-            metadata=conditional_metadata,
             sources_list=[source_block.locator],
+            conditional_attr=conditional_attr,
+            conditional_value=conditional_value
         )
         result_block = XBlockFixtureDesc(
             'html', 'Conditional Contents',

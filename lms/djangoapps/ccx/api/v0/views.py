@@ -19,7 +19,7 @@ from ccx_keys.locator import CCXLocator
 from courseware import courses
 from xmodule.modulestore.django import SignalHandler
 from edx_rest_framework_extensions.authentication import JwtAuthentication
-from instructor.enrollment import (
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
 )
@@ -37,7 +37,7 @@ from lms.djangoapps.ccx.overrides import (
 )
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
-    assign_coach_role_to_ccx,
+    assign_staff_role_to_ccx,
     is_email,
     get_course_chapters,
 )
@@ -507,8 +507,8 @@ class CCXListView(GenericAPIView):
                 email_students=True,
                 email_params=email_params,
             )
-            # assign coach role for the coach to the newly created ccx
-            assign_coach_role_to_ccx(ccx_course_key, coach, master_course_object.id)
+            # assign staff role for the coach to the newly created ccx
+            assign_staff_role_to_ccx(ccx_course_key, coach, master_course_object.id)
             # assign staff role for all the staff and instructor of the master course to the newly created ccx
             add_master_course_staff_to_ccx(
                 master_course_object,
@@ -766,8 +766,8 @@ class CCXDetailView(GenericAPIView):
                     email_students=True,
                     email_params=email_params,
                 )
-                # enroll the coach to the newly created ccx
-                assign_coach_role_to_ccx(ccx_course_key, coach, master_course_object.id)
+                # make the new coach staff on the CCX
+                assign_staff_role_to_ccx(ccx_course_key, coach, master_course_object.id)
 
         # using CCX object as sender here.
         responses = SignalHandler.course_published.send(

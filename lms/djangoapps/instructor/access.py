@@ -19,7 +19,7 @@ from student.roles import (
     CourseStaffRole,
 )
 
-from instructor.enrollment import (
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
 )

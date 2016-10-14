@@ -12,7 +12,10 @@ from student.tests.factories import (
     AdminFactory,
 )
 from util.tests.test_date_utils import fake_ugettext
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import (
+    ModuleStoreTestCase,
+    TEST_DATA_SPLIT_MODULESTORE
+)
 from xmodule.modulestore.tests.factories import (
     CourseFactory,
     check_mongo_calls
@@ -29,6 +32,8 @@ from ..overrides import override_field_for_ccx
 class TestCCX(ModuleStoreTestCase):
     """Unit tests for the CustomCourseForEdX model
     """
+
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     def setUp(self):
         """common setup for all tests"""
@@ -51,7 +56,7 @@ class TestCCX(ModuleStoreTestCase):
 
     def test_ccx_course_caching(self):
         """verify that caching the propery works to limit queries"""
-        with check_mongo_calls(1):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -77,7 +82,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that caching the start property works to limit queries"""
         now = datetime.now(utc)
         self.set_ccx_override('start', now)
-        with check_mongo_calls(1):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -102,7 +107,7 @@ class TestCCX(ModuleStoreTestCase):
         """verify that caching the due property works to limit queries"""
         expected = datetime.now(utc)
         self.set_ccx_override('due', expected)
-        with check_mongo_calls(1):
+        with check_mongo_calls(3):
             # these statements are used entirely to demonstrate the
             # instance-level caching of these values on CCX objects. The
             # check_mongo_calls context is the point here.
@@ -269,3 +274,10 @@ class TestCCX(ModuleStoreTestCase):
         )
         self.assertEqual(ccx.structure_json, json_struct)  # pylint: disable=no-member
         self.assertEqual(ccx.structure, dummy_struct)  # pylint: disable=no-member
+
+    def test_locator_property(self):
+        """
+        Verify that the locator helper property returns a correct CCXLocator
+        """
+        locator = self.ccx.locator  # pylint: disable=no-member
+        self.assertEqual(self.ccx.id, long(locator.ccx))

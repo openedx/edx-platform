@@ -69,7 +69,7 @@ def run():
         # Import these here to avoid circular dependencies of the form:
         # edx-platform app --> DRF --> django translation --> edx-platform app
         from edx_proctoring.runtime import set_runtime_service
-        from instructor.services import InstructorService
+        from lms.djangoapps.instructor.services import InstructorService
         from openedx.core.djangoapps.credit.services import CreditService
         set_runtime_service('credit', CreditService())
 

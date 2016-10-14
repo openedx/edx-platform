@@ -47,7 +47,6 @@ from simple_history.models import HistoricalRecords
 from track import contexts
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
-from lms.djangoapps.badges.utils import badges_enabled
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
@@ -1297,9 +1296,7 @@ class CourseEnrollment(models.Model):
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
-        if badges_enabled():
-            from lms.djangoapps.badges.events.course_meta import award_enrollment_badge
-            award_enrollment_badge(user)
+        enrollment.send_signal(EnrollStatusChange.enroll)
 
         return enrollment
 
@@ -2251,6 +2248,28 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
     def refund_window(self, refund_window):
         """Set the current refund window to the given timedelta."""
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
+
+
+class RegistrationCookieConfiguration(ConfigurationModel):
+    """
+    Configuration for registration cookies.
+    """
+    utm_cookie_name = models.CharField(
+        max_length=255,
+        help_text=_("Name of the UTM cookie")
+    )
+
+    affiliate_cookie_name = models.CharField(
+        max_length=255,
+        help_text=_("Name of the affiliate cookie")
+    )
+
+    def __unicode__(self):
+        """Unicode representation of this config. """
+        return u"UTM: {utm_name}; AFFILIATE: {affiliate_name}".format(
+            utm_name=self.utm_cookie_name,
+            affiliate_name=self.affiliate_cookie_name
+        )
 
 
 class UserAttribute(TimeStampedModel):

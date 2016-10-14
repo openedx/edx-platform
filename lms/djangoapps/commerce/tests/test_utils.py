@@ -1,11 +1,12 @@
 """Tests of commerce utilities."""
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
 
-from commerce.utils import audit_log, EcommerceService
 from commerce.models import CommerceConfiguration
-from django.test.client import RequestFactory
+from commerce.utils import EcommerceService
+from openedx.core.lib.log_utils import audit_log
 from student.tests.factories import UserFactory
 
 
@@ -19,7 +20,7 @@ def update_commerce_config(enabled=False, checkout_page='/test_basket/'):
 
 class AuditLogTests(TestCase):
     """Tests of the commerce audit logging helper."""
-    @patch('commerce.utils.log')
+    @patch('openedx.core.lib.log_utils.log')
     def test_log_message(self, mock_log):
         """Verify that log messages are constructed correctly."""
         audit_log('foo', qux='quux', bar='baz')

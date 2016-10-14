@@ -16,17 +16,17 @@ from django.core.urlresolvers import reverse
 from smtplib import SMTPException
 
 from courseware.courses import get_course_by_id
-from instructor.enrollment import (
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
     unenroll_email,
 )
-from instructor.access import (
+from lms.djangoapps.instructor.access import (
     allow_access,
     list_with_level,
     revoke_access,
 )
-from instructor.views.tools import get_student_from_identifier
+from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from student.models import CourseEnrollment, CourseEnrollmentException
@@ -292,9 +292,9 @@ def ccx_course(ccx_locator):
     yield course
 
 
-def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
+def assign_staff_role_to_ccx(ccx_locator, user, master_course_id):
     """
-    Check if user has ccx_coach role on master course then assign him coach role on ccx only
+    Check if user has ccx_coach role on master course then assign him staff role on ccx only
     if role is not already assigned. Because of this coach can open dashboard from master course
     as well as ccx.
     :param ccx_locator: CCX key
@@ -304,12 +304,12 @@ def assign_coach_role_to_ccx(ccx_locator, user, master_course_id):
     coach_role_on_master_course = CourseCcxCoachRole(master_course_id)
     # check if user has coach role on master course
     if coach_role_on_master_course.has_user(user):
-        # Check if user has coach role on ccx.
-        role = CourseCcxCoachRole(ccx_locator)
+        # Check if user has staff role on ccx.
+        role = CourseStaffRole(ccx_locator)
         if not role.has_user(user):
-            # assign user role coach on ccx
+            # assign user the staff role on ccx
             with ccx_course(ccx_locator) as course:
-                allow_access(course, user, "ccx_coach", send_email=False)
+                allow_access(course, user, "staff", send_email=False)
 
 
 def is_email(identifier):

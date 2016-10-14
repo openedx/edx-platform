@@ -14,6 +14,7 @@ from openedx.core.lib.time_zone_utils import get_user_time_zone
 from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
+  VERIFY_STATUS_RESUBMITTED,
   VERIFY_STATUS_APPROVED,
   VERIFY_STATUS_MISSED_DEADLINE,
   VERIFY_STATUS_NEED_TO_REVERIFY,
@@ -299,7 +300,7 @@ from student.helpers import (
         <%include file="_dashboard_credit_info.html" args="credit_status=credit_status"/>
       % endif
 
-        % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
+        % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_RESUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
         <div class="message message-status wrapper-message-primary is-shown">
           % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
             <div class="verification-reminder">
@@ -319,22 +320,24 @@ from student.helpers import (
               <a href="${reverse('verify_student_verify_now', kwargs={'course_id': unicode(course_overview.id)})}" class="btn" data-course-id="${course_overview.id}">${_('Verify Now')}</a>
             </div>
           % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
-            <h4 class="message-title">${_('You have already verified your ID!')}</h4>
-            <p class="message-copy">${_('Thanks for your patience as we process your request.')}</p>
+            <h4 class="message-title">${_('You have submitted your verification information.')}</h4>
+            <p class="message-copy">${_('You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
+          % elif verification_status['status'] == VERIFY_STATUS_RESUBMITTED:
+            <h4 class="message-title">${_('Your current verification will expire soon!')}</h4>
+            <p class="message-copy">${_('You have submitted your reverification information. You will see a message on your dashboard when the verification process is complete (usually within 1-2 days).')}</p>
           % elif verification_status['status'] == VERIFY_STATUS_APPROVED:
-            <h4 class="message-title">${_('You have already verified your ID!')}</h4>
+            <h4 class="message-title">${_('You have successfully verified your ID with edX')}</h4>
             % if verification_status.get('verification_good_until') is not None:
-              <p class="message-copy">${_('Your verification status is good until {date}.').format(date=verification_status['verification_good_until'])}
+              <p class="message-copy">${_('Your current verification is effective until {date}.').format(date=verification_status['verification_good_until'])}
             % endif
           % elif verification_status['status'] == VERIFY_STATUS_NEED_TO_REVERIFY:
-            <h4 class="message-title">${_('Your verification will expire soon!')}</h4>
+            <h4 class="message-title">${_('Your current verification will expire soon.')}</h4>
             ## Translators: start_link and end_link will be replaced with HTML tags;
             ## please do not translate these.
-            <p class="message-copy">${Text(_('Your current verification will expire before the verification deadline '
-              'for this course. {start_link}Re-verify your identity now{end_link} using a webcam and a '
-              'government-issued ID.')).format(
+            <p class="message-copy">${Text(_('Your current verification will expire in {days} days. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued photo ID.')).format(
                 start_link=HTML('<a href="{href}">').format(href=reverse('verify_student_reverify')),
-                end_link=HTML('</a>')
+                end_link=HTML('</a>'),
+                days=settings.VERIFY_STUDENT.get("EXPIRING_SOON_WINDOW")
               )}
             </p>
           % endif

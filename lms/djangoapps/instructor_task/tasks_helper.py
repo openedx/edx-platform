@@ -24,7 +24,7 @@ import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 from StringIO import StringIO
 from edxmako.shortcuts import render_to_string
-from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
 from shoppingcart.models import (
     PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
     Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
@@ -58,7 +58,7 @@ from instructor_analytics.basic import (
 )
 from instructor_analytics.csvs import format_dictlist
 from openassessment.data import OraAggregateData
-from instructor_task.models import ReportStore, InstructorTask, PROGRESS
+from lms.djangoapps.instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
