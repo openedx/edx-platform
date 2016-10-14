@@ -91,8 +91,8 @@ class WordCloudFields(object):
 class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Xmodule"""
     js = {
-        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
             resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
             resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
