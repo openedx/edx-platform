@@ -46,16 +46,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='ltiproviderconfig',
             name='data_sharing_consent',
-            field=models.CharField(default=b'disabled', help_text='Whether this SSO requires data sharing permissions from users', max_length=8, choices=[(b'disabled', b'Disabled'), (b'optional', b'Optional'), (b'required', b'Required')]),
+            field=models.CharField(default=b'disabled', help_text='This field is used to determine whether data sharing consent is requested or required of users signing in using this SSO provider. If disabled, consent will not be requested, and course data will not be shared.', max_length=8, choices=[(b'disabled', b'Disabled'), (b'optional', b'Optional'), (b'required', b'Required')]),
         ),
         migrations.AddField(
             model_name='oauth2providerconfig',
             name='data_sharing_consent',
-            field=models.CharField(default=b'disabled', help_text='Whether this SSO requires data sharing permissions from users', max_length=8, choices=[(b'disabled', b'Disabled'), (b'optional', b'Optional'), (b'required', b'Required')]),
+            field=models.CharField(default=b'disabled', help_text='This field is used to determine whether data sharing consent is requested or required of users signing in using this SSO provider. If disabled, consent will not be requested, and course data will not be shared.', max_length=8, choices=[(b'disabled', b'Disabled'), (b'optional', b'Optional'), (b'required', b'Required')]),
         ),
         migrations.AddField(
             model_name='samlproviderconfig',
             name='data_sharing_consent',
-            field=models.CharField(default=b'disabled', help_text='Whether this SSO requires data sharing permissions from users', max_length=8, choices=[(b'disabled', b'Disabled'), (b'optional', b'Optional'), (b'required', b'Required')]),
+            field=models.CharField(default=b'disabled', help_text='This field is used to determine whether data sharing consent is requested or required of users signing in using this SSO provider. If disabled, consent will not be requested, and course data will not be shared.', max_length=8, choices=[(b'disabled', b'Disabled'), (b'optional', b'Optional'), (b'required', b'Required')]),
         ),
     ]

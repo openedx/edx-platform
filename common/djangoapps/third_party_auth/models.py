@@ -293,7 +293,9 @@ class ProviderConfig(ConfigurationModel):
         choices=DATA_CONSENT_STATE_CHOICES,
         default=DATA_CONSENT_DISABLED,
         help_text=_(
-            "Whether this SSO requires data sharing permissions from users"
+            "This field is used to determine whether data sharing consent is requested "
+            "or required of users signing in using this SSO provider. If disabled, consent "
+            "will not be requested, and course data will not be shared."
         )
     )
     prefix = None  # used for provider_id. Set to a string value in subclass
