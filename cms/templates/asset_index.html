@@ -26,7 +26,8 @@
           assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
           uploadChunkSizeInMBs: ${chunk_size_in_mbs|n, dump_js_escaped_json},
           maxFileSizeInMBs: ${max_file_size_in_mbs|n, dump_js_escaped_json},
-          maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
+          maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}",
+          filterCriteria: "${filter_criteria|n, js_escaped_string}"
         });
     });
 </%block>
@@ -42,14 +43,27 @@
 
         <nav class="nav-actions" aria-label="${_('Page Actions')}">
             <h3 class="sr">${_("Page Actions")}</h3>
-            <ul>
-                <li class="nav-item">
-                    <a href="#" class="button upload-button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("Upload New File")}</a>
-                </li>
-            </ul>
+
+            <form class="filter-criteria-form" action="${asset_callback_url}" method="post">
+                <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+                <ul>
+                    <li class="nav-item">
+                        <input type="text" name="filter_criteria" class="filter-criteria-input filter-criteria-clearable" value="${filter_criteria}"/>
+                    </li>
+                    <li class="nav-item">
+                        <button type="submit" class="button new-button filter-criteria-button"><span aria-hidden="true"></span> Filter</button>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="button upload-button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("Upload New File")}</a>
+                    </li>
+                </ul>
+            </form>
+
         </nav>
     </header>
 </div>
+
+
 
 <div class="wrapper-content wrapper">
     <section class="content">
@@ -82,8 +96,8 @@
             <div class="bit external-help">
                 <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing files")}</a>
             </div>
-
         </aside>
+
     </section>
 </div>
 

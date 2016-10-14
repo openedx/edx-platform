@@ -184,10 +184,6 @@
       }
     }
 
-
-
-
-
     table {
       width: 100%;
       word-wrap: break-word;
@@ -552,5 +548,19 @@
       display: none;
       margin-bottom: ($baseline*5);
     }
+  }
+
+  .filter-criteria-clearable, .filter-criteria-clearable:focus{
+    background: #fff url(data:image/gif;base64,R0lGODlhBwAHAIAAAP///5KSkiH5BAAAAAAALAAAAAAHAAcAAAIMTICmsGrIXnLxuDMLADs=) no-repeat right -10px center;
+    padding-right: 18px; /* Use the same right padding (18) in jQ! */
+    transition: background 0.4s;
+  }
+
+  .filter-criteria-clearable.x  {
+    background-position: right 5px center;
+  }
+
+  .filter-criteria-clearable::-ms-clear {
+    display: none; width:0; height:0;
   }
 }

@@ -4,9 +4,14 @@ define([
     'use strict';
     return function(config) {
         var assets = new AssetCollection(),
-            assetsView;
+            assetsView,
+            urlConcatChar,
+            regex;
 
-        assets.url = config.assetCallbackUrl;
+        regex = /[?&]?([^=]+)=([^&]*)/g; // regex to test for query parameters in url
+        urlConcatChar = (regex.exec(config.assetCallbackUrl) != null) ? '&' : urlConcatChar = '?';
+
+        assets.url = config.assetCallbackUrl + urlConcatChar + 'filter_criteria=' + config.filterCriteria;
         assetsView = new AssetsView({
             collection: assets,
             el: $('.wrapper-assets'),
