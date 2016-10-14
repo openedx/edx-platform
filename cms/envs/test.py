@@ -335,14 +335,14 @@ INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)
 ##### edx solutions apps for McKA #####
 EDX_API_KEY = 'test_api_key'
 TEST_MODE = True
-
-INSTALLED_APPS += (
-    'course_metadata',
-    'edx_solutions_api_integration',
-    'social_engagement',
-    'gradebook',
-    'progress',
-    'edx_solutions_projects',
-    'edx_solutions_organizations',
-)
+if FEATURES.get('EDX_SOLUTIONS_API'):
+    INSTALLED_APPS += (
+        'course_metadata',
+        'edx_solutions_api_integration',
+        'social_engagement',
+        'gradebook',
+        'progress',
+        'edx_solutions_projects',
+        'edx_solutions_organizations',
+    )
 FEATURES['DISABLE_SOLUTIONS_APPS_SIGNALS'] = True
