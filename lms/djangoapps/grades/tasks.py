@@ -3,6 +3,7 @@ This module contains tasks for asynchronous execution of grade updates.
 """
 
 from celery import task
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
@@ -16,7 +17,7 @@ from .transformer import GradesTransformer
 from .new.subsection_grade import SubsectionGradeFactory
 
 
-@task()
+@task(routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
 def recalculate_subsection_grade(user_id, course_id, usage_id):
     """
     Updates a saved subsection grade.
