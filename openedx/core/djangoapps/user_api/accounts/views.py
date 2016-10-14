@@ -29,7 +29,7 @@ class AccountViewSet(ViewSet):
 
         **Example Requests**
 
-            GET /api/user/v1/account[?view=shared]
+            GET /api/user/v1/me[?view=shared]
             GET /api/user/v1/accounts?usernames={username1,username2}[?view=shared]
             GET /api/user/v1/accounts/{username}/[?view=shared]
 
@@ -148,9 +148,9 @@ class AccountViewSet(ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
-    def get(self, request):
+    def me(self, request):
         """
-        GET /api/user/v1/account
+        GET /api/user/v1/me
         """
         try:
             account_settings = get_account_settings(
