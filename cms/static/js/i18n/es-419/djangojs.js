@@ -288,6 +288,7 @@
     "Body": "Cuerpo", 
     "Bold": "Negrita", 
     "Bold (Ctrl+B)": "Negrita (Ctrl+B)", 
+    "Bookmark this page": "Marcar esta p\u00e1gina", 
     "Bookmarked": "A\u00f1adido a marcadores", 
     "Bookmarked on": "A\u00f1adido a marcadores en", 
     "Border": "Borde", 

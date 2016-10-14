@@ -27,6 +27,7 @@
 # Karim Mohamed <karim.mohamed.eg@gmail.com>, 2016
 # Khaled Jalajel <khaledjalajeldode@gmail.com>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
+# Lekaa Ahmed <leka2ahmed@yahoo.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2013-2015
@@ -93,6 +94,7 @@
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Karim Mohamed <karim.mohamed.eg@gmail.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
+# Lekaa Ahmed <leka2ahmed@yahoo.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2014-2015
 # mustafasadiq <mustafasadiq0@gmail.com>, 2014
@@ -150,7 +152,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:23+0000\n"
+"POT-Creation-Date: 2016-10-06 15:01+0000\n"
 "PO-Revision-Date: 2016-09-18 17:18+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -3566,19 +3568,6 @@ msgstr ""
 " اخترت ’أي نوع\"‘ أو ’Any Type‘."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "مُقيَّم "
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-"يُرجى ضبط هذه القيمة على القيمة ’true‘ إذا كانت هذه الوحدة إمّا واجبًا "
-"مقيَّمًا أو تمرينًا.   "
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr "انقضت مدّة هذا المكوِّن. حُدّثت المكتبة بمحتوى جديد الآن. "
 
@@ -3735,6 +3724,10 @@ msgstr ""
 "نافذة جديدة أو يمكنك اختيار ’false‘ لفتح محتوى ’LTI‘ داخل إطار ’IFrame‘ ضمن "
 "الصفحة الحاليّة. يقتصر استخدام هذا الإعداد على حالة ضبط خاصية \"إخفاء الأداة"
 " الخارجية\" على القيمة ’false‘. "
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "مُقيَّم "
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -10953,9 +10946,13 @@ msgstr "اضغط للإزالة"
 msgid "Click to add"
 msgstr "اضغط للإضافة"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "جرى وضع علامة"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "ضع علامة"
+msgid "Bookmark this page"
+msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -11159,8 +11156,8 @@ msgid "Support"
 msgstr ""
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "المساعدة الخاصة بمنصّة {platform_name}"
+msgid "{platform_name} Support"
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -11221,7 +11218,10 @@ msgid "Tell us the details"
 msgstr "أخبرنا عن التفاصيل"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11254,9 +11254,7 @@ msgid "Brief description of the problem"
 msgstr "شرح موجز للمشكلة "
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11941,10 +11939,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "السابق"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "جرى وضع علامة"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -21186,8 +21180,8 @@ msgid "Last day students can enroll."
 msgstr "اليوم الأخير المتاح للطلاب للتسجيل."
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
-msgstr "اتصل بمدير edX الشريك لتحديث إعدادات الضبط هذه."
+msgid "Contact your edX partner manager to update these settings."
+msgstr ""
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"

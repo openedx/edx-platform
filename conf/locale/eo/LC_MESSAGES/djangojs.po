@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-06 14:27+0000\n"
-"PO-Revision-Date: 2016-10-06 14:28:37.493632\n"
+"POT-Creation-Date: 2016-10-13 16:10+0000\n"
+"PO-Revision-Date: 2016-10-13 16:12:03.957210\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -296,23 +296,51 @@ msgstr "Çömméntärý Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Reply to Annotation"
 msgstr "Réplý tö Ànnötätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
-#. Translators: %(earned)s is the number of points earned. %(total)s is the
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "(%(earned)s/%(possible)s point)"
-msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] "(%(earned)s/%(possible)s pöïnt) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-msgstr[1] "(%(earned)s/%(possible)s pöïnts) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "%(earned)s/%(possible)s point (graded)"
+msgid_plural "%(earned)s/%(possible)s points (graded)"
+msgstr[0] ""
+"%(earned)s/%(possible)s pöïnt (grädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+msgstr[1] ""
+"%(earned)s/%(possible)s pöïnts (grädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(earned)s/%(possible)s point (ungraded)"
+msgid_plural "%(earned)s/%(possible)s points (ungraded)"
+msgstr[0] ""
+"%(earned)s/%(possible)s pöïnt (üngrädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgstr[1] ""
+"%(earned)s/%(possible)s pöïnts (üngrädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10). There will always be at least 1 point possible.;
+#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "(%(num_points)s point possible)"
-msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "(%(num_points)s pöïnt pössïßlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-msgstr[1] "(%(num_points)s pöïnts pössïßlé) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "%(num_points)s point possible (graded)"
+msgid_plural "%(num_points)s points possible (graded)"
+msgstr[0] ""
+"%(num_points)s pöïnt pössïßlé (grädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+msgstr[1] ""
+"%(num_points)s pöïnts pössïßlé (grädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (ungraded)"
+msgid_plural "%(num_points)s points possible (ungraded)"
+msgstr[0] ""
+"%(num_points)s pöïnt pössïßlé (üngrädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+msgstr[1] ""
+"%(num_points)s pöïnts pössïßlé (üngrädéd) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -320,25 +348,23 @@ msgstr ""
 "Thé grädïng pröçéss ïs stïll rünnïng. Réfrésh thé pägé tö séé üpdätés. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
+#. Translators: This is only translated to allow for reording of label and
+#. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Answer:"
-msgstr "Ànswér: Ⱡ'σяєм ιρѕυм #"
-
-#. Translators: the word Answer here refers to the answer to a problem the
-#. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Hide Answer"
-msgstr "Hïdé Ànswér Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#. Translators: the word Answer here refers to the answer to a problem the
-#. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Show Answer"
-msgstr "Shöw Ànswér Ⱡ'σяєм ιρѕυм ∂σłσя #"
+msgid "{label}: {status}"
+msgstr "{label}: {status} Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Answer hidden"
-msgstr "Ànswér hïddén Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+msgid "This problem has been reset."
+msgstr "Thïs prößlém häs ßéén rését. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid ""
+"Answers to this problem are now shown. Navigate through the problem to "
+"review it with answers inline."
+msgstr ""
+"Ànswérs tö thïs prößlém äré nöw shöwn. Nävïgäté thröügh thé prößlém tö "
+"révïéw ït wïth änswérs ïnlïné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
@@ -7958,13 +7984,12 @@ msgid "timed"
 msgstr "tïméd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid ""
-"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
-"on it before you select \"End My Exam\"."
+"To receive credit for problems, you must select \"Submit\" for each problem "
+"before you select \"End My Exam\"."
 msgstr ""
-"Tö réçéïvé çrédït ön ä prößlém, ýöü müst çlïçk \"Çhéçk\" ör \"Fïnäl Çhéçk\" "
-"ön ït ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+"Tö réçéïvé çrédït för prößléms, ýöü müst séléçt \"Süßmït\" för éäçh prößlém "
+"ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
@@ -8454,6 +8479,12 @@ msgid ""
 msgstr ""
 "{screen_reader_start}Wärnïng:{screen_reader_end} Nö çöntént gröüps éxïst. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+msgid "Only the parent course staff of a CCX can create content groups."
+msgstr ""
+"Önlý thé pärént çöürsé stäff öf ä ÇÇX çän çréäté çöntént gröüps. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -9977,6 +10008,14 @@ msgstr "Stärtéd Àt Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
 msgstr "Çömplétéd Àt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
+msgid ""
+"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
+"on it before you select \"End My Exam\"."
+msgstr ""
+"Tö réçéïvé çrédït ön ä prößlém, ýöü müst çlïçk \"Çhéçk\" ör \"Fïnäl Çhéçk\" "
+"ön ït ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

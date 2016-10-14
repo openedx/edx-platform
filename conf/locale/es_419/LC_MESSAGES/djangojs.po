@@ -29,7 +29,7 @@
 # Luis Ricardo Ruiz <luislicardo1307@gmail.com>, 2013
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
 # Natalia, 2013
-# Natalia, 2013-2014
+# Natalia, 2013-2014,2016
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015
@@ -117,7 +117,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:22+0000\n"
+"POT-Creation-Date: 2016-10-06 15:00+0000\n"
 "PO-Revision-Date: 2016-10-05 16:02+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -1752,6 +1752,7 @@ msgstr ""
 "SequenceModule. Por favor contacte al equipo del curso."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr "Añadido a marcadores"
 
@@ -3812,6 +3813,10 @@ msgstr "Ocurrió un error. Por favor intente nuevamente."
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to add"
 msgstr "Haga clic para añadir"
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Bookmark this page"
+msgstr "Marcar esta página"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
