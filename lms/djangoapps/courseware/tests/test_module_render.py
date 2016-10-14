@@ -1831,7 +1831,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @patch('lms.djangoapps.grades.signals.handlers.SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_SCORE_CHANGED.send')
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
         self.set_module_grade_using_publish(self.grade_dict)
