@@ -136,7 +136,6 @@ FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 FEATURES['ENABLE_SOFTWARE_SECURE_FAKE'] = True
 
 ########################### Entrance Exams #################################
-FEATURES['MILESTONES_APP'] = True
 FEATURES['ENTRANCE_EXAMS'] = True
 
 FEATURES['ENABLE_SPECIAL_EXAMS'] = True
