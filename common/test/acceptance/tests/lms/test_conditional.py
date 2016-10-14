@@ -1,6 +1,9 @@
 """
 Bok choy acceptance tests for conditionals in the LMS
 """
+
+from flaky import flaky
+
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -112,6 +115,7 @@ class ConditionalTest(UniqueCourseTest):
         conditional_page = ConditionalPage(self.browser)
         self.assertTrue(conditional_page.is_content_visible())
 
+    @flaky  # TNL-5770
     def test_conditional_handles_polls(self):
         self.install_course_fixture(block_type='poll')
         self.courseware_page.visit()
