@@ -169,6 +169,35 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstrin
         correct_map = problem.grade_answers({'1_2_1': 'choice_2'})
         self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0)
 
+    def test_contextualized_choices(self):
+        script = textwrap.dedent("""
+            a = 2
+            b = 9
+            c = a + b
+
+            ok0 = c % 2 == 0 # check remainder modulo 2
+            text0 = "$a + $b is even"
+
+            ok1 = c % 2 == 1 # check remainder modulo 2
+            text1 = "$a + $b is odd"
+
+            ok2 = "partial"
+            text2 = "infinity may be both"
+        """)
+        choices = ["$ok0", "$ok1", "$ok2"]
+        choice_names = ["$text0 ... (should be $ok0)",
+                        "$text1 ... (should be $ok1)",
+                        "$text2 ... (should be $ok2)"]
+        problem = self.build_problem(script=script,
+                                     choices=choices,
+                                     choice_names=choice_names,
+                                     credit_type='points')
+
+        # Ensure the expected correctness and choice names
+        self.assert_grade(problem, 'choice_2 + 9 is even ... (should be False)', 'incorrect')
+        self.assert_grade(problem, 'choice_2 + 9 is odd ... (should be True)', 'correct')
+        self.assert_grade(problem, 'choice_infinity may be both ... (should be partial)', 'partially-correct')
+
 
 class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = TrueFalseResponseXMLFactory
@@ -1291,6 +1320,26 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
 
         correct_map = problem.grade_answers({})
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
+
+    def test_contextualized_choices(self):
+        script = textwrap.dedent("""
+            a = 6
+            b = 4
+            c = a + b
+
+            ok0 = c % 2 == 0 # check remainder modulo 2
+            ok1 = c % 3 == 0 # check remainder modulo 3
+            ok2 = c % 5 == 0 # check remainder modulo 5
+            ok3 = not any([ok0, ok1, ok2])
+        """)
+        choices = ["$ok0", "$ok1", "$ok2", "$ok3"]
+        problem = self.build_problem(script=script,
+                                     choice_type='checkbox',
+                                     choices=choices)
+
+        # Ensure the expected correctness
+        self.assert_grade(problem, ['choice_0', 'choice_2'], 'correct')
+        self.assert_grade(problem, ['choice_1', 'choice_3'], 'incorrect')
 
 
 class JavascriptResponseTest(ResponseTest):  # pylint: disable=missing-docstring

@@ -873,31 +873,30 @@ class ChoiceResponse(LoncapaResponse):
     def setup_response(self):
         self.assign_choice_names()
 
-        correct_xml = self.xml.xpath(
-            '//*[@id=$id]//choice[@correct="true"]',
-            id=self.xml.get('id')
-        )
+        self.correct_choices = set()
+        self.incorrect_choices = set()
+        for choice in self.get_choices():
 
-        self.correct_choices = set([
-            choice.get('name') for choice in correct_xml
-        ])
+            # contextualize the name and correct attributes
+            name = contextualize_text(choice.get('name'), self.context)
+            correct = contextualize_text(choice.get('correct'), self.context).upper()
 
-        incorrect_xml = self.xml.xpath(
-            '//*[@id=$id]//choice[@correct="false"]',
-            id=self.xml.get('id')
-        )
+            # divide choices into correct and incorrect
+            if correct == 'TRUE':
+                self.correct_choices.add(name)
+            elif correct == 'FALSE':
+                self.incorrect_choices.add(name)
 
-        self.incorrect_choices = set([
-            choice.get('name') for choice in incorrect_xml
-        ])
+    def get_choices(self):
+        """Returns this response's XML choice elements."""
+        return self.xml.xpath('//*[@id=$id]//choice', id=self.xml.get('id'))
 
     def assign_choice_names(self):
         """
         Initialize name attributes in <choice> tags for this response.
         """
 
-        for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
-                                                      id=self.xml.get('id'))):
+        for index, choice in enumerate(self.get_choices()):
             choice.set("name", "choice_" + str(index))
             # If a choice does not have an id, assign 'A' 'B', .. used by CompoundHint
             if not choice.get('id'):
