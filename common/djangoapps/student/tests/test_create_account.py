@@ -360,6 +360,49 @@ class TestCreateAccount(TestCase):
             self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_content')))
             self.assertIsNone(UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT))
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_incomplete_utm_referral(self):
+        """Verify that no referral is recorded when a cookie is not present."""
+        utm_cookie_name = 'edx.test.utm'
+        with mock.patch('student.models.RegistrationCookieConfiguration.current') as config:
+            instance = config.return_value
+            instance.utm_cookie_name = utm_cookie_name
+
+            utm_cookie = {
+                'utm_source': 'test-source',
+                'utm_medium': 'test-medium',
+                # No campaign
+                'utm_term': 'test-term',
+                'utm_content': 'test-content',
+                # No created at
+            }
+
+            self.client.cookies[utm_cookie_name] = json.dumps(utm_cookie)
+            user = self.create_account_and_fetch_profile().user
+
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_source')),
+                utm_cookie.get('utm_source')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_medium')),
+                utm_cookie.get('utm_medium')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_term')),
+                utm_cookie.get('utm_term')
+            )
+            self.assertEqual(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_content')),
+                utm_cookie.get('utm_content')
+            )
+            self.assertIsNone(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_PARAMETERS.get('utm_campaign'))
+            )
+            self.assertIsNone(
+                UserAttribute.get_user_attribute(user, REGISTRATION_UTM_CREATED_AT)
+            )
+
 
 @ddt.ddt
 class TestCreateAccountValidation(TestCase):
