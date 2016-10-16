@@ -62,13 +62,14 @@ class OrganizationSerializer(serializers.ModelSerializer):
 class RegistrationSerializer(serializers.Serializer):
     site = SiteSerializer()
     organization = OrganizationSerializer()
-    user_email = serializers.EmailField()
+    user_email = serializers.EmailField(required=False)
 
     def create(self, validated_data):
         site_data = validated_data.pop('site')
         site = Site.objects.create(**site_data)
         organization_data = validated_data.pop('organization')
-        organization, _, user = bootstrap_site(site, organization_data.get('name'), validated_data.pop('user_email'))
+        user_email = validated_data.pop('user_email', None)
+        organization, _, user = bootstrap_site(site, organization_data.get('name'), user_email)
         return {
             'site': site,
             'organization': organization,
