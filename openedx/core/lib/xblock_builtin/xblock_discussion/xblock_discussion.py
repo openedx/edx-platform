@@ -177,6 +177,19 @@ class DiscussionXBlock(XBlock, StudioEditableXBlockMixin):
         """
         Renders author view for Studio.
         """
+        return self.studio_view_fragment()
+
+    def preview_view(self, context=None):  # pylint: disable=unused-argument
+        """
+        Renders preview inside Studio. This is used when DiscussionXBlock is embedded
+        by another XBlock.
+        """
+        return self.studio_view_fragment()
+
+    def studio_view_fragment(self):
+        """
+        Returns a fragment for rendering this block in Studio.
+        """
         fragment = Fragment()
         fragment.add_content(self.runtime.render_template(
             'discussion/_discussion_inline_studio.html',
