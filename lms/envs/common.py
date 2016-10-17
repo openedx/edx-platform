@@ -1174,7 +1174,7 @@ MIDDLEWARE_CLASSES = (
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
     # This must be last
-    'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
+    'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
