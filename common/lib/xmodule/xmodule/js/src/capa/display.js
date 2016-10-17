@@ -206,14 +206,15 @@
         };
 
         Problem.prototype.renderProgressState = function() {
-            var a, detail, earned, graded, possible, progress, progressTemplate, status;
+            var a, detail, earned, graded, possible, progress, progressTemplate, status, attempts;
             detail = this.el.data('progress_detail');
             status = this.el.data('progress_status');
             graded = this.el.data('graded');
-
+            attempts = this.el.data('attempts_used');
             // Render 'x/y point(s)' if student has attempted question
-            if (status !== 'none' && (detail !== null && detail !== undefined) && (jQuery.type(detail) === 'string') &&
-                detail.indexOf('/') > 0) {
+            if ((status !== 'none' || (status === 'none' && attempts > 0)) &&
+                    (detail !== null && detail !== undefined) &&
+                    (jQuery.type(detail) === 'string') && detail.indexOf('/') > 0) {
                 a = detail.split('/');
                 earned = parseFloat(a[0]);
                 possible = parseFloat(a[1]);
@@ -236,11 +237,9 @@
                     earned: earned,
                     possible: possible
                 }, true);
-            }
-
-            // Render 'x point(s) possible' if student has not yet attempted question
-            // Status is set to none when a user has a score of 0, and 0 when the problem has a weight of 0.
-            if (status === 'none' || status === 0) {
+            } else if (status === 'none' || status === 0 || status === '0') {
+                // Render 'x point(s) possible' if student has not yet attempted question
+                // Status is set to none when a user has a score of 0, and 0 when the problem has a weight of 0.
                 if ((detail !== null && detail !== undefined) && (jQuery.type(detail) === 'string') &&
                     detail.indexOf('/') > 0) {
                     a = detail.split('/');
@@ -270,6 +269,7 @@
             if (response.progress_changed) {
                 this.el.data('progress_status', response.progress_status);
                 this.el.data('progress_detail', response.progress_detail);
+                this.el.data('attempts_used', response.attempts_used);
                 this.el.trigger('progressChanged');
             }
             return this.renderProgressState();
@@ -278,6 +278,7 @@
         Problem.prototype.forceUpdate = function(response) {
             this.el.data('progress_status', response.progress_status);
             this.el.data('progress_detail', response.progress_detail);
+            this.el.data('attempts_used', response.attempts_used);
             this.el.trigger('progressChanged');
             return this.renderProgressState();
         };
