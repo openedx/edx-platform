@@ -11,7 +11,7 @@ from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
 from django.http import HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware
 
-from cors_csrf.middleware import CorsCSRFMiddleware, CsrfCrossDomainCookieMiddleware
+from ..middleware import CorsCSRFMiddleware, CsrfCrossDomainCookieMiddleware
 
 
 SENTINEL = object()

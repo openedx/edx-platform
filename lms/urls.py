@@ -884,7 +884,7 @@ urlpatterns += (
 
 # XDomain proxy
 urlpatterns += (
-    url(r'^xdomain_proxy.html$', 'cors_csrf.views.xdomain_proxy', name='xdomain_proxy'),
+    url(r'^xdomain_proxy.html$', 'openedx.core.djangoapps.cors_csrf.views.xdomain_proxy', name='xdomain_proxy'),
 )
 
 # Custom courses on edX (CCX) URLs
