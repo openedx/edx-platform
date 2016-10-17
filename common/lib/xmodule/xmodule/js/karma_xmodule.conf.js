@@ -32,7 +32,7 @@ var options = {
         {pattern: 'common_static/js/vendor/jquery-ui.min.js', included: true},
         {pattern: 'common_static/js/vendor/jquery.ui.draggable.js', included: true},
         {pattern: 'common_static/js/vendor/json2.js', included: true},
-        {pattern: 'common_static/js/vendor/moment.min.js', included: true},
+        {pattern: 'common_static/js/vendor/moment-with-locales.js', included: true},
         {pattern: 'common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', included: true},
         {pattern: 'common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js', included: true},
         {pattern: 'common_static/js/src/accessibility_tools.js', included: true},
