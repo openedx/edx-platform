@@ -132,7 +132,9 @@ def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylin
     Return a list of all valid discussion xblocks in this course that
     are accessible to the given user.
     """
-    all_xblocks = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, include_orphans=False)
+    all_xblocks = modulestore().get_items(course.id, qualifiers={
+        'category': ['discussion', 'discussion-forum']
+    }, include_orphans=False)
 
     return [
         xblock for xblock in all_xblocks
