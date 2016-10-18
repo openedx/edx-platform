@@ -48,7 +48,8 @@ class GradeTestBase(SharedModuleStoreTestCase):
             parent=cls.chapter,
             category='sequential',
             display_name="Test Sequential 1",
-            graded=True
+            graded=True,
+            format="Homework"
         )
         cls.vertical = ItemFactory.create(
             parent=cls.sequence,
@@ -100,13 +101,35 @@ class TestCourseGradeFactory(GradeTestBase):
             course_id=self.course.id,
             enabled_for_course=course_setting
         ):
-            with patch('lms.djangoapps.grades.new.course_grade._pretend_to_save_course_grades') as mock_save_grades:
+            with patch('lms.djangoapps.grades.new.course_grade.CourseGrade.load_persisted_grade') as mock_save_grades:
                 grade_factory.create(self.course)
         self.assertEqual(mock_save_grades.called, feature_flag and course_setting)
 
+    def test_course_grade_creation(self):
+        grading_policy = {
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": 1.0,
+                },
+            ],
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5,
+            },
+        }
+        self.course.set_grading_policy(grading_policy)
+        grade_factory = CourseGradeFactory(self.request.user)
+        with mock_get_score(1, 2):
+            course_grade = grade_factory.create(self.course)
+        self.assertEqual(course_grade.letter_grade, u'Pass')
+        self.assertEqual(course_grade.percent, 0.5)
+
 
 @ddt.ddt
-class TestSubsectionGradeFactory(GradeTestBase, ProblemSubmissionTestMixin):
+class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
     """
     Tests for SubsectionGradeFactory functionality.
 
@@ -456,7 +479,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         self.assertEqual(score.graded_total.possible, expected_possible)
 
 
-class TestCourseGradeLogging(SharedModuleStoreTestCase):
+class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCase):
     """
     Tests logging in the course grades module.
     Uses a larger course structure than other
@@ -504,26 +527,26 @@ class TestCourseGradeLogging(SharedModuleStoreTestCase):
             display_name='Test Vertical 3'
         )
         problem_xml = MultipleChoiceResponseXMLFactory().build_xml(
-            question_text='The correct answer is Choice 3',
+            question_text='The correct answer is Choice 2',
             choices=[False, False, True, False],
             choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
         )
         self.problem = ItemFactory.create(
             parent=self.vertical,
             category="problem",
-            display_name="Test Problem 1",
+            display_name="test_problem_1",
             data=problem_xml
         )
         self.problem_2 = ItemFactory.create(
             parent=self.vertical_2,
             category="problem",
-            display_name="Test Problem 2",
+            display_name="test_problem_2",
             data=problem_xml
         )
         self.problem_3 = ItemFactory.create(
             parent=self.vertical_3,
             category="problem",
-            display_name="Test Problem 3",
+            display_name="test_problem_3",
             data=problem_xml
         )
         self.request = get_request_for_user(UserFactory())
@@ -536,28 +559,14 @@ class TestCourseGradeLogging(SharedModuleStoreTestCase):
             self,
             factory,
             log_mock,
-            read_only,
-            subsections_read,
-            subsections_created,
-            blocks_accessed,
-            total_graded_subsections
+            log_statement
     ):
         """
         Creates a course grade and asserts that the associated logging
         matches the expected totals passed in to the function.
         """
         factory.create(self.course, read_only=False)
-        log_statement = u''.join((
-            u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks ",
-            u"accessed: {3}, total graded subsections: {4}"
-        )).format(
-            read_only,
-            subsections_read,
-            subsections_created,
-            blocks_accessed,
-            total_graded_subsections,
-        )
-        log_mock.warning.assert_called_with(
+        log_mock.assert_called_with(
             u"Persistent Grades: CourseGrade.{0}, course: {1}, user: {2}".format(
                 log_statement,
                 unicode(self.course.id),
@@ -574,24 +583,36 @@ class TestCourseGradeLogging(SharedModuleStoreTestCase):
             enabled_for_course=True
         ):
             with patch('lms.djangoapps.grades.new.course_grade.log') as log_mock:
-                # TODO: once merged with the "glue code" PR, update expected logging to include the relevant new info
-
                 # the course grade has not been created, so we expect each grade to be created
+                log_statement = u''.join((
+                    u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks ",
+                    u"accessed: {3}, total graded subsections: {4}"
+                )).format(False, 0, 3, 3, 2)
                 self._create_course_grade_and_check_logging(
                     grade_factory,
-                    log_mock,
-                    read_only=False,
-                    subsections_read=0,
-                    subsections_created=3,
-                    blocks_accessed=3,
-                    total_graded_subsections=2)
-                # the course grade has been created, so we expect each grade to be read
+                    log_mock.warning,
+                    log_statement
+                )
+                log_mock.reset_mock()
+
+                # the course grade has been created, so we expect to read it from the db
+                log_statement = u"load_persisted_grade"
                 self._create_course_grade_and_check_logging(
                     grade_factory,
-                    log_mock,
-                    read_only=False,
-                    subsections_read=3,
-                    subsections_created=0,
-                    blocks_accessed=3,
-                    total_graded_subsections=2,
+                    log_mock.info,
+                    log_statement
+                )
+                log_mock.reset_mock()
+
+                # only problem submission, a subsection grade update triggers
+                # a course grade update
+                self.submit_question_answer(u'test_problem_1', {u'2_1': u'choice_choice_2'})
+                log_statement = u''.join((
+                    u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks ",
+                    u"accessed: {3}, total graded subsections: {4}"
+                )).format(False, 3, 0, 3, 2)
+                self._create_course_grade_and_check_logging(
+                    grade_factory,
+                    log_mock.warning,
+                    log_statement
                 )

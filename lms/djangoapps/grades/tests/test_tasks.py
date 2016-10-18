@@ -146,7 +146,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course()
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(21 + added_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(25 + added_queries):
                 recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
 
     def test_single_call_to_create_block_structure(self):
@@ -170,7 +170,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(21 + added_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(25 + added_queries):
                 recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -179,7 +179,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.set_up_course(enable_subsection_grades=False)
             self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             additional_queries = 1 if default_store == ModuleStoreEnum.Type.mongo else 0
-            with check_mongo_calls(2) and self.assertNumQueries(12 + additional_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(16 + additional_queries):
                 recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
 
     @skip("Pending completion of TNL-5089")
