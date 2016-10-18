@@ -35,7 +35,7 @@ define(['../dateutil_factory.js'], function(DateUtilIterator) {
                     'data-string="Due {date}"></span>'
                 );
                 Object.keys(testLangs).forEach(function(key) {
-                    $form.attr('lang', String(key));
+                    $form.attr('data-language', String(key));
                     $(document.body).append($form);
 
                     DateUtilIterator.transform(iterationKey);
