@@ -1903,25 +1903,25 @@ def record_utm_registration_attribution(request, user):
     utm_cookie = request.COOKIES.get(utm_cookie_name)
     if user and utm_cookie:
         utm = json.loads(utm_cookie)
-        for utm_parameter in REGISTRATION_UTM_PARAMETERS:
-            UserAttribute.set_user_attribute(
-                user,
-                REGISTRATION_UTM_PARAMETERS.get(utm_parameter),
-                utm.get(utm_parameter)
-            )
+        for utm_parameter_name in REGISTRATION_UTM_PARAMETERS:
+            utm_parameter = utm.get(utm_parameter_name)
+            if utm_parameter:
+                UserAttribute.set_user_attribute(
+                    user,
+                    REGISTRATION_UTM_PARAMETERS.get(utm_parameter_name),
+                    utm_parameter
+                )
         created_at_unixtime = utm.get('created_at')
         if created_at_unixtime:
             # We divide by 1000 here because the javascript timestamp generated is in milliseconds not seconds.
             # PYTHON: time.time()      => 1475590280.823698
             # JS: new Date().getTime() => 1475590280823
             created_at_datetime = datetime.datetime.fromtimestamp(int(created_at_unixtime) / float(1000), tz=UTC)
-        else:
-            created_at_datetime = None
-        UserAttribute.set_user_attribute(
-            user,
-            REGISTRATION_UTM_CREATED_AT,
-            created_at_datetime
-        )
+            UserAttribute.set_user_attribute(
+                user,
+                REGISTRATION_UTM_CREATED_AT,
+                created_at_datetime
+            )
 
 
 def record_registration_attributions(request, user):
