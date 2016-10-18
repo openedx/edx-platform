@@ -640,7 +640,7 @@
             labeledStatus = [];
             for (i = 0, len = statusElement.length; i < len; i++) {
                 element = statusElement[i];
-                parentSection = $(element).closest('section');
+                parentSection = $(element).closest('.wrapper-problem-response');
                 addedStatus = false;
                 if (parentSection) {
                     ariaLabel = parentSection.attr('aria-label');

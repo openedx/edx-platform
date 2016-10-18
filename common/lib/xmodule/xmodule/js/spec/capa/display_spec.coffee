@@ -206,8 +206,8 @@ describe 'Problem', ->
 
     describe 'when the response is correct', ->
       it 'call render with returned content', ->
-        contents = '<section aria-label="Question 1"><p>Correct<span class="status">excellent</span></p></section>' +
-                   '<section aria-label="Question 2"><p>Yep<span class="status">correct</span></p></section>'
+        contents = '<div class="wrapper-problem-response" aria-label="Question 1"><p>Correct<span class="status">excellent</span></p></div>' +
+                   '<div class="wrapper-problem-response" aria-label="Question 2"><p>Yep<span class="status">correct</span></p></div>'
         spyOn($, 'postWithPrefix').and.callFake (url, answers, callback) ->
           callback(success: 'correct', contents: contents)
           promise =

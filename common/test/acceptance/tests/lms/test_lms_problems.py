@@ -205,17 +205,23 @@ class ProblemNotificationTests(ProblemsTest):
         self.assertFalse(problem_page.is_success_notification_visible())
         problem_page.click_submit()
         problem_page.wait_success_notification()
+        self.assertEqual('Question 1: correct', problem_page.status_sr_text)
+
         # Clicking Save should clear the submit notification
         problem_page.click_save()
         self.assertFalse(problem_page.is_success_notification_visible())
         problem_page.wait_for_save_notification()
+
         # Changing the answer should clear the save notification
         problem_page.click_choice("choice_1")
         self.assertFalse(problem_page.is_save_notification_visible())
         problem_page.click_save()
+        problem_page.wait_for_save_notification()
+
         # Submitting the problem again should clear the save notification
         problem_page.click_submit()
         problem_page.wait_incorrect_notification()
+        self.assertEqual('Question 1: incorrect', problem_page.status_sr_text)
         self.assertFalse(problem_page.is_save_notification_visible())
 
 
