@@ -75,7 +75,12 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         self.master_course_key_str = unicode(self.master_course_key)
         # OAUTH2 setup
         # create a specific user for the application
-        app_user = UserFactory(username='test_app_user', email='test_app_user@openedx.org', password=USER_PASSWORD)
+        self.app_user = app_user = UserFactory(
+            username='test_app_user',
+            email='test_app_user@openedx.org',
+            password=USER_PASSWORD
+        )
+
         # add staff role to the app user
         CourseStaffRole(self.master_course_key).add_users(app_user)
 
@@ -83,54 +88,22 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
         instructor = UserFactory()
         allow_access(self.course, instructor, 'instructor')
 
-        # create an oauth client app entry
-        self.app_client = Client.objects.create(
-            user=app_user,
-            name='test client',
-            url='http://localhost//',
-            redirect_uri='http://localhost//',
-            client_type=CONFIDENTIAL
-        )
-        # create an authorization code
-        self.app_grant = Grant.objects.create(
-            user=app_user,
-            client=self.app_client,
-            redirect_uri='http://localhost//'
-        )
-
-        # create an oauth2 provider client app entry
-        app_client_oauth2_provider = dot_models.Application.objects.create(
-            name='test client',
-            user=app_user,
-            client_type='confidential',
-            authorization_grant_type='authorization-code',
-            redirect_uris='http://localhost:8079/complete/edxorg/'
-        )
-        # create an authorization code
-        auth_oauth2_provider = dot_models.AccessToken.objects.create(
-            user=app_user,
-            application=app_client_oauth2_provider,
-            expires=datetime.utcnow() + timedelta(weeks=1),
-            scope='read write',
-            token='16MGyP3OaQYHmpT1lK7Q6MMNAZsjwF'
-        )
-        self.auth_header_oauth2_provider = "Bearer {0}".format(auth_oauth2_provider)
+        self.auth, self.auth_header_oauth2_provider = self.prepare_auth_token(app_user)
 
         self.course.enable_ccx = True
         self.mstore.update_item(self.course, self.coach.id)
-        self.auth = self.get_auth_token()
         # making the master course chapters easily available
         self.master_course_chapters = get_course_chapters(self.master_course_key)
 
-    def get_auth_token(self):
+    def get_auth_token(self, app_grant, app_client):
         """
         Helper method to get the oauth token
         """
         token_data = {
             'grant_type': 'authorization_code',
-            'code': self.app_grant.code,
-            'client_id': self.app_client.client_id,
-            'client_secret': self.app_client.client_secret
+            'code': app_grant.code,
+            'client_id': app_client.client_id,
+            'client_secret': app_client.client_secret
         }
         token_resp = self.client.post('/oauth2/access_token/', data=token_data)
         self.assertEqual(token_resp.status_code, status.HTTP_200_OK)
@@ -139,6 +112,47 @@ class CcxRestApiTest(CcxTestCase, APITestCase):
             token_type=token_resp_json['token_type'],
             token=token_resp_json['access_token']
         )
+
+    def prepare_auth_token(self, user):
+        """
+        creates auth token for users
+        """
+        # create an oauth client app entry
+        app_client = Client.objects.create(
+            user=user,
+            name='test client',
+            url='http://localhost//',
+            redirect_uri='http://localhost//',
+            client_type=CONFIDENTIAL
+        )
+        # create an authorization code
+        app_grant = Grant.objects.create(
+            user=user,
+            client=app_client,
+            redirect_uri='http://localhost//'
+        )
+
+        # create an oauth2 provider client app entry
+        app_client_oauth2_provider = dot_models.Application.objects.create(
+            name='test client 2',
+            user=user,
+            client_type='confidential',
+            authorization_grant_type='authorization-code',
+            redirect_uris='http://localhost:8079/complete/edxorg/'
+        )
+        # create an authorization code
+        auth_oauth2_provider = dot_models.AccessToken.objects.create(
+            user=user,
+            application=app_client_oauth2_provider,
+            expires=datetime.utcnow() + timedelta(weeks=1),
+            scope='read write',
+            token='16MGyP3OaQYHmpT1lK7Q6MMNAZsjwF'
+        )
+
+        auth_header_oauth2_provider = "Bearer {0}".format(auth_oauth2_provider)
+        auth = self.get_auth_token(app_grant, app_client)
+
+        return auth, auth_header_oauth2_provider
 
     def expect_error(self, http_code, error_code_str, resp_obj):
         """
@@ -203,7 +217,6 @@ class CcxListTest(CcxRestApiTest):
 
         resp = self.client.get(self.list_url_master_course, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
 
     def test_authorization_no_oauth_staff(self):
         """
@@ -788,6 +801,34 @@ class CcxListTest(CcxRestApiTest):
         self.assertEqual(len(outbox), 1)
         self.assertIn(self.coach.email, outbox[0].recipients())  # pylint: disable=no-member
 
+    @ddt.data(
+        ('auth', True),
+        ('auth', False),
+        ('auth_header_oauth2_provider', True),
+        ('auth_header_oauth2_provider', False)
+    )
+    @ddt.unpack
+    def test_post_list_on_active_state(self, auth_attr, user_is_active):
+        """
+        Test the creation of a CCX on user's active states.
+        """
+        self.app_user.is_active = user_is_active
+        self.app_user.save()  # pylint: disable=no-member
+
+        data = {
+            'master_course_id': self.master_course_key_str,
+            'max_students_allowed': 111,
+            'display_name': 'CCX Test Title',
+            'coach_email': self.coach.email,
+            'course_modules': self.master_course_chapters[0:1]
+        }
+        resp = self.client.post(self.list_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+
+        if not user_is_active:
+            self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        else:
+            self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
     @ddt.data(*AUTH_ATTRS)
     def test_post_list_duplicated_modules(self, auth_attr):
         """
@@ -1330,3 +1371,58 @@ class CcxDetailTest(CcxRestApiTest):
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
         self.assertItemsEqual(ccx_from_db.structure, chapters)
+
+    @ddt.data(
+        ('auth', True),
+        ('auth', False),
+        ('auth_header_oauth2_provider', True),
+        ('auth_header_oauth2_provider', False)
+    )
+    @ddt.unpack
+    def test_patch_user_on_active_state(self, auth_attr, user_is_active):
+        """
+        Test patch ccx course on user's active state.
+        """
+        self.app_user.is_active = user_is_active
+        self.app_user.save()  # pylint: disable=no-member
+
+        chapters = self.master_course_chapters[0:1]
+        data = {'course_modules': chapters * 3}
+        resp = self.client.patch(self.detail_url, data, format='json', HTTP_AUTHORIZATION=getattr(self, auth_attr))
+        if not user_is_active:
+            self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        else:
+            self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+            ccx_from_db = CustomCourseForEdX.objects.get(id=self.ccx.id)
+            self.assertItemsEqual(ccx_from_db.structure, chapters)
+
+    @ddt.data(
+        ('auth', True),
+        ('auth', False),
+        ('auth_header_oauth2_provider', True),
+        ('auth_header_oauth2_provider', False)
+    )
+    @ddt.unpack
+    def test_delete_detail_on_active_state(self, auth_attr, user_is_active):
+        """
+        Test for deleting a ccx course on user's active state.
+        """
+        self.app_user.is_active = user_is_active
+        self.app_user.save()  # pylint: disable=no-member
+
+        # check that there are overrides
+        self.assertGreater(CcxFieldOverride.objects.filter(ccx=self.ccx).count(), 0)
+        self.assertGreater(CourseEnrollment.objects.filter(course_id=self.ccx_key).count(), 0)
+        resp = self.client.delete(self.detail_url, {}, HTTP_AUTHORIZATION=getattr(self, auth_attr))
+
+        if not user_is_active:
+            self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+        else:
+            self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+            self.assertIsNone(resp.data)  # pylint: disable=no-member
+            # the CCX does not exist any more
+            with self.assertRaises(CustomCourseForEdX.DoesNotExist):
+                CustomCourseForEdX.objects.get(id=self.ccx.id)
+            # check that there are no overrides
+            self.assertEqual(CcxFieldOverride.objects.filter(ccx=self.ccx).count(), 0)
+            self.assertEqual(CourseEnrollment.objects.filter(course_id=self.ccx_key).count(), 0)
