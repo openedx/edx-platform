@@ -435,22 +435,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         view = MultipleThreadFixture(threads)
         view.push()
 
-    def test_page_scroll_on_thread_change_view(self):
-        """
-        Check switching between threads changes the page focus
-        """
-        # verify threads are rendered on the page
-        self.assertTrue(
-            self.thread_page_1.check_threads_rendered_successfully(thread_count=self.thread_count)
-        )
-
-        # From the thread_page_1 open & verify next thread
-        self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
-        self.assertTrue(self.thread_page_2.is_browser_on_page())
-
-        # Verify that the focus is changed
-        self.thread_page_2.check_focus_is_set(selector=".discussion-article")
-
     @attr('a11y')
     def test_page_accessibility(self):
         self.thread_page_1.a11y_audit.config.set_rules({

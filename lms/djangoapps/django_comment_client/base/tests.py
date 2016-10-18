@@ -370,8 +370,8 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 33),
-        (ModuleStoreEnum.Type.split, 3, 13, 33),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 31),
+        (ModuleStoreEnum.Type.split, 3, 13, 31),
     )
     @ddt.unpack
     @count_queries
