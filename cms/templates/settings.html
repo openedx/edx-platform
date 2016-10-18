@@ -87,7 +87,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
               <%
-                link_for_about_page = ("https:" if is_secure else "http:") + lms_link_for_about_page
+                link_for_about_page = lms_link_for_about_page
               %>
               <p><a class="link-courseURL" rel="external" href="${link_for_about_page}">${link_for_about_page}</a></p>
             </div>
