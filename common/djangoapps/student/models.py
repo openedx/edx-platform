@@ -123,7 +123,6 @@ class AnonymousUserId(models.Model):
     user = models.ForeignKey(User, db_index=True)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
-    unique_together = (user, course_id)
 
 
 def anonymous_id_for_user(user, course_id, save=True):
@@ -161,22 +160,11 @@ def anonymous_id_for_user(user, course_id, save=True):
         return digest
 
     try:
-        anonymous_user_id, __ = AnonymousUserId.objects.get_or_create(
-            defaults={'anonymous_user_id': digest},
+        AnonymousUserId.objects.get_or_create(
             user=user,
-            course_id=course_id
+            course_id=course_id,
+            anonymous_user_id=digest,
         )
-        if anonymous_user_id.anonymous_user_id != digest:
-            log.error(
-                u"Stored anonymous user id %(anonymous_user_id)r for "
-                u"user %(user)r in course %(course_id)r doesn't match "
-                u"computed id %(digest)r", {
-                    "anonymous_user_id": anonymous_user_id.anonymous_user_id,
-                    "user": user,
-                    "course_id": course_id,
-                    "digest": digest,
-                }
-            )
     except IntegrityError:
         # Another thread has already created this entry, so
         # continue
