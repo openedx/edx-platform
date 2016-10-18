@@ -337,15 +337,12 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             is_bookmarked = bookmarks_service.is_bookmarked(usage_key=item.scope_ids.usage_id)
             context["bookmarked"] = is_bookmarked
 
-            progress = item.get_progress()
             rendered_item = item.render(STUDENT_VIEW, context)
             fragment.add_frag_resources(rendered_item)
 
             iteminfo = {
                 'content': rendered_item.content,
                 'page_title': getattr(item, 'tooltip_title', ''),
-                'progress_status': Progress.to_js_status_str(progress),
-                'progress_detail': Progress.to_js_detail_str(progress),
                 'type': item.get_icon_class(),
                 'id': item.scope_ids.usage_id.to_deprecated_string(),
                 'bookmarked': is_bookmarked,

@@ -293,7 +293,9 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
 
         The return value is a string like u'1/2'.
         """
-        return json.loads(self.look_at_question(self.problem_display_name).content)['progress_detail']
+        json_data = json.loads(self.look_at_question(self.problem_display_name).content)
+        progress = '%s/%s' % (str(json_data['current_score']), str(json_data['total_possible']))
+        return progress
 
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_masquerade_as_specific_user_on_self_paced(self):

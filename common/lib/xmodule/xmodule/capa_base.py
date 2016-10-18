@@ -389,12 +389,14 @@ class CapaMixin(CapaFields):
         Return some html with data about the module
         """
         progress = self.get_progress()
+        curr_score, total_possible = (progress.frac() if progress else (0, 0))
         return self.runtime.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.location.to_deprecated_string(),
             'ajax_url': self.runtime.ajax_url,
-            'progress_status': Progress.to_js_status_str(progress),
-            'progress_detail': Progress.to_js_detail_str(progress),
+            'current_score': curr_score,
+            'total_possible': total_possible,
+            'attempts_used': self.attempts,
             'content': self.get_problem_html(encapsulate=False),
             'graded': self.graded,
         })
