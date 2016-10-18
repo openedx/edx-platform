@@ -32,9 +32,9 @@ from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_
             </button>
             <ul class="dropdown-menu list-divided is-hidden" id="${_("Usermenu")}" tabindex="-1">
                 <%block name="navigation_dropdown_menu_links" >
-                    <li class="dropdown-item item has-block-link"><a href="${reverse('dashboard')}" class="action dropdown-menuitem">${_("Dashboard")}</a></li>
-                    <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': self.real_user.username})}" class="action dropdown-menuitem">${_("Profile")}</a></li>
-                    <li class="dropdown-item item has-block-link"><a href="${reverse('account_settings')}" class="action dropdown-menuitem">${_("Account")}</a></li>
+                    <li class="dropdown-item item has-block-link"><a href="${reverse('dashboard')}" role="menuitem" class="action dropdown-menuitem">${_("Dashboard")}</a></li>
+                    <li class="dropdown-item item has-block-link"><a href="${reverse('learner_profile', kwargs={'username': self.real_user.username})}" role="menuitem" class="action dropdown-menuitem">${_("Profile")}</a></li>
+                    <li class="dropdown-item item has-block-link"><a href="${reverse('account_settings')}" role="menuitem" class="action dropdown-menuitem">${_("Account")}</a></li>
                 </%block>
                 <li class="dropdown-item item has-block-link"><a href="${reverse('logout')}" role="menuitem" class="action dropdown-menuitem">${_("Sign Out")}</a></li>
             </ul>

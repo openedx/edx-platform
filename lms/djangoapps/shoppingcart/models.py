@@ -1792,7 +1792,7 @@ class CourseRegCodeItem(OrderItem):
         # we should ultimately refactor code to have save_registration_code in this models.py
         # file, but there's also a shared dependency on a random string generator which
         # is in another PR (for another feature)
-        from instructor.views.api import save_registration_code
+        from lms.djangoapps.instructor.views.api import save_registration_code
         for i in range(total_registration_codes):  # pylint: disable=unused-variable
             save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 

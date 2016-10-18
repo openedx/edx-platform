@@ -14,21 +14,19 @@ from django.core.mail import send_mail
 from django.utils.translation import override as override_language
 
 from course_modes.models import CourseMode
+from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
-from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.grades.scores import weighted_score
 from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
-from lang_pref import LANGUAGE_KEY
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from submissions import api as sub_api  # installed from the edx-submissions repository
-from student.models import anonymous_id_for_user
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
-
+from submissions import api as sub_api  # installed from the edx-submissions repository
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
 log = logging.getLogger(__name__)
@@ -328,7 +326,7 @@ def _fire_score_changed_for_block(course_id, student, block, module_state_key):
         sender=None,
         points_possible=points_possible,
         points_earned=points_earned,
-        user=student,
+        user_id=student.id,
         course_id=unicode(course_id),
         usage_id=unicode(module_state_key)
     )

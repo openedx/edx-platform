@@ -70,7 +70,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404("Course not found.")
+        raise Http404("Course not found: {}.".format(unicode(course_key)))
 
 
 class UserNotEnrolled(Http404):

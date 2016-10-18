@@ -24,7 +24,7 @@ from certificates.tests.factories import (
     CertificateInvalidationFactory,
     GeneratedCertificateFactory
 )
-from instructor_task.tests.factories import InstructorTaskFactory
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import AdminFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase

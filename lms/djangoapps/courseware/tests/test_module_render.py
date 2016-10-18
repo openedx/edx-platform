@@ -1847,7 +1847,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             'sender': None,
             'points_possible': self.grade_dict['max_value'],
             'points_earned': self.grade_dict['value'],
-            'user': self.student_user,
+            'user_id': self.student_user.id,
             'course_id': unicode(self.course.id),
             'usage_id': unicode(self.problem.location)
         }

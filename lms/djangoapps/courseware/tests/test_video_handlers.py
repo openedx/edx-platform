@@ -8,26 +8,25 @@ import textwrap
 import json
 import ddt
 
-from nose.plugins.attrib import attr
 from datetime import timedelta, datetime
-from webob import Request
 from mock import MagicMock, Mock, patch
+from nose.plugins.attrib import attr
+from webob import Request
 
+from openedx.core.djangoapps.contentserver.caching import del_cached_content
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
-from . import BaseTestXmodule
-from .test_video_xml import SOURCE_XML
-from contentserver.caching import del_cached_content
 from xmodule.exceptions import NotFoundError
-
 from xmodule.video_module.transcripts_utils import (
     TranscriptException,
     TranscriptsGenerationException,
 )
 
+from . import BaseTestXmodule
+from .test_video_xml import SOURCE_XML
 
 TRANSCRIPT = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
 BUMPER_TRANSCRIPT = {"start": [1], "end": [10], "text": ["A bumper"]}

@@ -199,6 +199,8 @@ class XQueueCertInterface(object):
         Will change the certificate status to 'generating' or
         `downloadable` in case of web view certificates.
 
+        The course must not be a CCX.
+
         Certificate must be in the 'unavailable', 'error',
         'deleted' or 'generating' state.
 
@@ -213,6 +215,18 @@ class XQueueCertInterface(object):
 
         Returns the newly created certificate instance
         """
+
+        if hasattr(course_id, 'ccx'):
+            LOGGER.warning(
+                (
+                    u"Cannot create certificate generation task for user %s "
+                    u"in the course '%s'; "
+                    u"certificates are not allowed for CCX courses."
+                ),
+                student.id,
+                unicode(course_id)
+            )
+            return None
 
         valid_statuses = [
             status.generating,

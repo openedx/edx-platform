@@ -249,7 +249,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:23+0000\n"
+"POT-Creation-Date: 2016-10-06 15:01+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -3596,19 +3596,6 @@ msgstr ""
 "for selecionado, nenhuma filtragem é aplicada. "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr "Pontuado"
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-"Coloque este valor como Verdadeiro se esse módulo é um exercício para nota "
-"ou um problema prático."
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 "Este componente está desatualizado. A biblioteca possui novo conteúdo. "
@@ -3764,6 +3751,10 @@ msgstr ""
 "ferramenta LTI seja aberto em um iFrame na página atual. Esta configuração "
 "será utilizada apenas quando a opção \"Esconder Ferramenta Externa\" estiver"
 " definida como Falso."
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
+msgstr "Pontuado"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -11018,9 +11009,13 @@ msgstr "Clique para remover"
 msgid "Click to add"
 msgstr "Clique para adicionar"
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr "Adicionado a favoritos"
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
-msgstr "Adicionar a favoritos"
+msgid "Bookmark this page"
+msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -11223,8 +11218,8 @@ msgid "Support"
 msgstr ""
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "Ajuda do {platform_name}"
+msgid "{platform_name} Support"
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -11277,7 +11272,10 @@ msgid "Tell us the details"
 msgstr "Descreva os detalhes"
 
 #: lms/templates/help_modal.html
-msgid "Include error messages, steps which lead to the issue, etc"
+msgid ""
+"Describe what you were doing when you encountered the issue. Include any "
+"details that will help us to troubleshoot, including error messages that you"
+" saw."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11310,9 +11308,7 @@ msgid "Brief description of the problem"
 msgstr "Descrição sucinta do problema"
 
 #: lms/templates/help_modal.html
-msgid ""
-"Details of the problem you are encountering{asterisk}{begin_span}Include "
-"error messages, steps which lead to the issue, etc.{end_span}"
+msgid "Details of the problem you are encountering{asterisk}"
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -11981,10 +11977,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "Anterior"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr "Adicionado a favoritos"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -21260,9 +21252,8 @@ msgid "Last day students can enroll."
 msgstr "Último dia para inscrição de estudantes."
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
+msgid "Contact your edX partner manager to update these settings."
 msgstr ""
-"Contacte o seu Parceiro de Gestão edX para atualizar estas definições."
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"

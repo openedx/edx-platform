@@ -16,7 +16,6 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-from student.views import LogoutView
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -27,43 +26,22 @@ urlpatterns = (
     '',
 
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
+
+    url(r'', include('student.urls')),
+    # TODO: Move lms specific student views out of common code
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
-    url(r'^login_ajax$', 'student.views.login_user', name="login"),
-    url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
+    url(r'^change_enrollment$', 'student.views.change_enrollment', name='change_enrollment'),
 
-    url(r'^email_confirm/(?P<key>[^/]*)$', 'student.views.confirm_email_change'),
-    url(r'^event$', 'track.views.user_track'),
-    url(r'^performance$', 'openedx.core.djangoapps.performance.views.performance_log'),
-    url(r'^segmentio/event$', 'track.views.segmentio.segmentio_event'),
+    # Event tracking endpoints
+    url(r'', include('track.urls')),
 
-    # TODO: Is this used anymore? What is STATIC_GRAB?
-    url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),
+    # Performance endpoints
+    url(r'', include('openedx.core.djangoapps.performance.urls')),
 
-    url(r'^accounts/manage_user_standing', 'student.views.manage_user_standing',
-        name='manage_user_standing'),
-    url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
-        name="disable_account_ajax"),
+    # Static template view endpoints like blog, faq, etc.
+    url(r'', include('static_template_view.urls')),
 
-    url(r'^logout$', LogoutView.as_view(), name='logout'),
-    url(r'^create_account$', 'student.views.create_account', name='create_account'),
-    url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
-
-    url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
-    ## Obsolete Django views for password resets
-    ## TODO: Replace with Mako-ized views
-    url(r'^password_change/$', 'django.contrib.auth.views.password_change',
-        name='password_change'),
-    url(r'^password_change_done/$', 'django.contrib.auth.views.password_change_done',
-        name='password_change_done'),
-    url(r'^password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'student.views.password_reset_confirm_wrapper',
-        name='password_reset_confirm'),
-    url(r'^password_reset_complete/$', 'django.contrib.auth.views.password_reset_complete',
-        name='password_reset_complete'),
-    url(r'^password_reset_done/$', 'django.contrib.auth.views.password_reset_done',
-        name='password_reset_done'),
-
-    url(r'^heartbeat$', include('heartbeat.urls')),
+    url(r'^heartbeat$', include('openedx.core.djangoapps.heartbeat.urls')),
 
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed below.
@@ -107,14 +85,20 @@ urlpatterns = (
     url(r'^api/organizations/', include('organizations.urls', namespace='organizations')),
 
     # Update session view
-    url(r'^lang_pref/session_language', 'lang_pref.views.update_session_language', name='session_language'),
+    url(
+        r'^lang_pref/session_language',
+        'openedx.core.djangoapps.lang_pref.views.update_session_language',
+        name='session_language'
+    ),
 
     # Multiple course modes and identity verification
     # TODO Namespace these!
     url(r'^course_modes/', include('course_modes.urls')),
     url(r'^verify_student/', include('verify_student.urls')),
 
-    url(r'^update_lang/', include('dark_lang.urls', namespace='darklang')),
+    # URLs for managing dark launches of languages
+    url(r'^update_lang/', include('openedx.core.djangoapps.dark_lang.urls', namespace='dark_lang')),
+
     # URLs for API access management
     url(r'^api-admin/', include('openedx.core.djangoapps.api_admin.urls', namespace='api_admin')),
 )
@@ -123,6 +107,8 @@ urlpatterns += (
     url(r'^dashboard/', include('learner_dashboard.urls')),
 )
 
+# TODO: This needs to move to a separate urls.py once the student_account and
+# student views below find a home together
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
     urlpatterns += (
@@ -164,69 +150,12 @@ urlpatterns += (
     url(r'^support/', include('support.urls', app_name="support", namespace='support')),
 )
 
-# Semi-static views (these need to be rendered and have the login bar, but don't change)
-urlpatterns += (
-    url(r'^404$', 'static_template_view.views.render',
-        {'template': '404.html'}, name="404"),
-)
-
 # Favicon
 favicon_path = configuration_helpers.get_value('favicon_path', settings.FAVICON_PATH)  # pylint: disable=invalid-name
 urlpatterns += (url(
     r'^favicon\.ico$',
     RedirectView.as_view(url=settings.STATIC_URL + favicon_path, permanent=True)
 ),)
-
-urlpatterns += (
-    url(r'^blog$', 'static_template_view.views.render',
-        {'template': 'blog.html'}, name="blog"),
-    url(r'^contact$', 'static_template_view.views.render',
-        {'template': 'contact.html'}, name="contact"),
-    url(r'^donate$', 'static_template_view.views.render',
-        {'template': 'donate.html'}, name="donate"),
-    url(r'^faq$', 'static_template_view.views.render',
-        {'template': 'faq.html'}, name="faq"),
-    url(r'^help$', 'static_template_view.views.render',
-        {'template': 'help.html'}, name="help_edx"),
-    url(r'^jobs$', 'static_template_view.views.render',
-        {'template': 'jobs.html'}, name="jobs"),
-    url(r'^news$', 'static_template_view.views.render',
-        {'template': 'news.html'}, name="news"),
-    url(r'^press$', 'static_template_view.views.render',
-        {'template': 'press.html'}, name="press"),
-    url(r'^media-kit$', 'static_template_view.views.render',
-        {'template': 'media-kit.html'}, name="media-kit"),
-    url(r'^copyright$', 'static_template_view.views.render',
-        {'template': 'copyright.html'}, name="copyright"),
-
-    # Press releases
-    url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
-)
-
-# Only enable URLs for those marketing links actually enabled in the
-# settings. Disable URLs by marking them as None.
-for key, value in settings.MKTG_URL_LINK_MAP.items():
-    # Skip disabled URLs
-    if value is None:
-        continue
-
-    # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES":
-        continue
-
-    # The MKTG_URL_LINK_MAP key specifies the template filename
-    template = key.lower()
-    if '.' not in template:
-        # Append STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION if
-        # no file extension was specified in the key
-        template = "%s.%s" % (template, settings.STATIC_TEMPLATE_VIEW_DEFAULT_FILE_EXTENSION)
-
-    # Make the assumption that the URL we want is the lowercased
-    # version of the map key
-    urlpatterns += (url(r'^%s$' % key.lower(),
-                        'static_template_view.views.render',
-                        {'template': template}, name=value),)
-
 
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
@@ -252,12 +181,12 @@ COURSE_URLS = patterns(
     '',
     url(
         r'^look_up_registration_code$',
-        'instructor.views.registration_codes.look_up_registration_code',
+        'lms.djangoapps.instructor.views.registration_codes.look_up_registration_code',
         name='look_up_registration_code',
     ),
     url(
         r'^registration_code_details$',
-        'instructor.views.registration_codes.registration_code_details',
+        'lms.djangoapps.instructor.views.registration_codes.registration_code_details',
         name='registration_code_details',
     ),
 )
@@ -332,26 +261,11 @@ urlpatterns += (
         'courseware.module_render.xqueue_callback',
         name='xqueue_callback',
     ),
-    url(
-        r'^change_setting$',
-        'student.views.change_setting',
-        name='change_setting',
-    ),
 
     # TODO: These views need to be updated before they work
     url(r'^calculate$', 'util.views.calculate'),
 
     url(r'^courses/?$', 'branding.views.courses', name="courses"),
-    url(
-        r'^change_enrollment$',
-        'student.views.change_enrollment',
-        name='change_enrollment',
-    ),
-    url(
-        r'^change_email_settings$',
-        'student.views.change_email_settings',
-        name='change_email_settings',
-    ),
 
     #About the course
     url(
@@ -522,7 +436,7 @@ urlpatterns += (
         r'^courses/{}/instructor$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'instructor.views.instructor_dashboard.instructor_dashboard_2',
+        'lms.djangoapps.instructor.views.instructor_dashboard.instructor_dashboard_2',
         name='instructor_dashboard',
     ),
 
@@ -531,40 +445,40 @@ urlpatterns += (
         r'^courses/{}/set_course_mode_price$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'instructor.views.instructor_dashboard.set_course_mode_price',
+        'lms.djangoapps.instructor.views.instructor_dashboard.set_course_mode_price',
         name='set_course_mode_price',
     ),
     url(
         r'^courses/{}/instructor/api/'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        include('instructor.views.api_urls')),
+        include('lms.djangoapps.instructor.views.api_urls')),
     url(
         r'^courses/{}/remove_coupon$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'instructor.views.coupons.remove_coupon',
+        'lms.djangoapps.instructor.views.coupons.remove_coupon',
         name='remove_coupon',
     ),
     url(
         r'^courses/{}/add_coupon$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'instructor.views.coupons.add_coupon',
+        'lms.djangoapps.instructor.views.coupons.add_coupon',
         name='add_coupon',
     ),
     url(
         r'^courses/{}/update_coupon$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'instructor.views.coupons.update_coupon',
+        'lms.djangoapps.instructor.views.coupons.update_coupon',
         name='update_coupon',
     ),
     url(
         r'^courses/{}/get_coupon_info$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'instructor.views.coupons.get_coupon_info',
+        'lms.djangoapps.instructor.views.coupons.get_coupon_info',
         name='get_coupon_info',
     ),
 
@@ -914,7 +828,7 @@ if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     urlpatterns += (
         url(
             r'^instructor_task_status/$',
-            'instructor_task.views.instructor_task_status',
+            'lms.djangoapps.instructor_task.views.instructor_task_status',
             name='instructor_task_status'
         ),
     )
@@ -933,11 +847,6 @@ urlpatterns += (
     url(r'^debug/show_parameters$', 'debug.views.show_parameters'),
 )
 
-# enable automatic login
-if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
-    urlpatterns += (
-        url(r'^auto_auth$', 'student.views.auto_auth'),
-    )
 
 # Third-party auth.
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
@@ -1015,16 +924,6 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
     urlpatterns += (
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )
-
-# Custom error pages
-handler404 = 'static_template_view.views.render_404'
-handler500 = 'static_template_view.views.render_500'
-
-# display error page templates, for testing purposes
-urlpatterns += (
-    url(r'^404$', handler404),
-    url(r'^500$', handler500),
-)
 
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
 urlpatterns += (

@@ -12,10 +12,7 @@ from student.roles import CourseBetaTesterRole, CourseStaffRole, CourseCcxCoachR
 
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR)
-from instructor.access import (allow_access,
-                               revoke_access,
-                               list_with_level,
-                               update_forum_role)
+from lms.djangoapps.instructor.access import (allow_access, revoke_access, list_with_level, update_forum_role)
 
 
 @attr(shard=1)

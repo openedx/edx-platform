@@ -58,7 +58,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-09-29 14:22+0000\n"
+"POT-Creation-Date: 2016-10-06 15:00+0000\n"
 "PO-Revision-Date: 2016-09-29 14:26+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -1591,6 +1591,7 @@ msgstr ""
 "문의하세요."
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
+#: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmarked"
 msgstr ""
 
@@ -3428,6 +3429,10 @@ msgstr "오류가 발생했습니다. 다시 시도하세요."
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to add"
+msgstr ""
+
+#: lms/static/js/bookmarks/views/bookmark_button.js
+msgid "Bookmark this page"
 msgstr ""
 
 #: lms/static/js/bookmarks/views/bookmark_button.js

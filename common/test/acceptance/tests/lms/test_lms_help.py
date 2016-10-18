@@ -70,7 +70,6 @@ class TestCohortHelp(ContainerBase):
 
         self.verify_help_link(href)
 
-    @flaky  # TODO fix this, see TNL-5709
     def test_automatic_cohort_help(self):
         """
         Scenario: Help in 'What does it mean?' is correct when we create cohort automatically.

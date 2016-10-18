@@ -7,22 +7,22 @@ from django.core.urlresolvers import reverse
 
 %if verification_status == 'approved':
     <li class="status status-verification is-accepted">
-        <span class="title status-title">${_("Verification Status: Approved")}</span>
-        <p class="status-note">${_("Your edX Verification is reviewed and approved. Your verification status is good for one year after submission.")}</p>
+        <span class="title status-title">${_("Current Verification Status: Approved")}</span>
+        <p class="status-note">${_("Your edX verification has been approved. Your verification is effective for one year after submission.")}</p>
     </li>
 %endif
 
 %if verification_status == 'pending':
     <li class="status status-verification is-pending">
-        <span class="title status-title">${_("Verification Status: Pending")}</span>
-        <p class="status-note">${_("Your edX Verification is pending. Your verification photos have been submitted and will be reviewed shortly.")}</p>
+        <span class="title status-title">${_("Current Verification Status: Pending")}</span>
+        <p class="status-note">${_("Your edX ID verification is pending. Your verification information has been submitted and will be reviewed shortly.")}</p>
     </li>
 %endif
 
 %if verification_status in ['must_reverify', 'expired']:
     <li class="status status-verification is-denied">
-        <span class="title status-title">${_("Verification Status: Expired")}</span>
-        <p class="status-note">${_("Your edX Verification has expired. To receive a verified certificate, you have to submit a new photo of yourself and your government-issued photo ID before the course ends.")}</p>
+        <span class="title status-title">${_("Current Verification Status: Expired")}</span>
+        <p class="status-note">${_("Your verification has expired. To receive a verified certificate, you must submit a new photo of yourself and your government-issued photo ID before the verification deadline for your course.")}</p>
         <div class="btn-reverify">
             <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
         </div>

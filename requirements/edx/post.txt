@@ -16,4 +16,4 @@
 # incorporated into the main project.
 # https://github.com/onelogin/python-saml/pull/159
 # https://github.com/onelogin/python-saml/pull/164
-git+https://github.com/open-craft/python-saml.git@7f7dc389abeba44c1dac154d6aafcbe4187ae221#egg=python-saml==2.1.9
+git+https://github.com/open-craft/python-saml.git@d50f8d25419c2e981605e5c64e8528a125bcf303#egg=python-saml==2.2.0

@@ -7,7 +7,7 @@ from unittest import TestCase
 from django.core.management import call_command
 from mock import Mock
 
-from instructor.offline_gradecalc import offline_grade_calculation  # pylint: disable=unused-import
+from lms.djangoapps.instructor.offline_gradecalc import offline_grade_calculation  # pylint: disable=unused-import
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import CourseLocator
 
