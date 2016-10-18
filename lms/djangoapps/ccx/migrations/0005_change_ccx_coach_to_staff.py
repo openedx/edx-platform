@@ -4,10 +4,11 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import migrations
+from django.http import Http404
 
 from ccx_keys.locator import CCXLocator
+from courseware.courses import get_course_by_id
 from instructor.access import allow_access, revoke_access
-from lms.djangoapps.ccx.utils import ccx_course
 
 
 log = logging.getLogger("edx.ccx")
@@ -31,7 +32,11 @@ def change_existing_ccx_coaches_to_staff(apps, schema_editor):
     list_ccx = CustomCourseForEdX.objects.using(db_alias).all()
     for ccx in list_ccx:
         ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
-        with ccx_course(ccx_locator) as course:
+        try:
+            course = get_course_by_id(ccx_locator)
+        except Http404:
+            log.error('Could not migrate access for CCX course: %s', unicode(ccx_locator))
+        else:
             coach = User.objects.get(id=ccx.coach.id)
             allow_access(course, coach, 'staff', send_email=False)
             revoke_access(course, coach, 'ccx_coach', send_email=False)
@@ -57,7 +62,11 @@ def revert_ccx_staff_to_coaches(apps, schema_editor):
     list_ccx = CustomCourseForEdX.objects.using(db_alias).all()
     for ccx in list_ccx:
         ccx_locator = CCXLocator.from_course_locator(ccx.course_id, unicode(ccx.id))
-        with ccx_course(ccx_locator) as course:
+        try:
+            course = get_course_by_id(ccx_locator)
+        except Http404:
+            log.error('Could not migrate access for CCX course: %s', unicode(ccx_locator))
+        else:
             coach = User.objects.get(id=ccx.coach.id)
             allow_access(course, coach, 'ccx_coach', send_email=False)
             revoke_access(course, coach, 'staff', send_email=False)
