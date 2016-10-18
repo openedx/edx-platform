@@ -37,11 +37,11 @@ if [ "$CIRCLE_NODE_TOTAL" == "1" ] ; then
     echo "via the CircleCI UI and adjust scripts/circle-ci-tests.sh to match."
 
     echo "Running tests for common/lib/ and pavelib/"
-    paver test_lib --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
+    paver test_lib --with-flaky --cov-args="-p" --with-xunit || EXIT=1
     echo "Running python tests for Studio"
-    paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
+    paver test_system -s cms --with-flaky --cov-args="-p" --with-xunit --no-randomize || EXIT=1
     echo "Running python tests for lms"
-    paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp || EXIT=1
+    paver test_system -s lms --with-flaky --cov-args="-p" --with-xunit --no-randomize || EXIT=1
 
     exit $EXIT
 else
@@ -64,26 +64,28 @@ else
 
             echo "Finding ESLint violations and storing report..."
             paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
-
-            # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-            paver run_quality -p 100 || EXIT=1
-
             echo "Running code complexity report (python)."
             paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
-
+            echo "Running safe template linter report."
+            paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
+            echo "Running safe commit linter report."
+            paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
+            echo "Running diff quality."
+            # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+            paver run_quality -p 100 || EXIT=1
             exit $EXIT
             ;;
 
         1)  # run all of the lms unit tests
-            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s lms --with-flaky --cov-args="-p" --with-xunit --no-randomize
             ;;
 
         2)  # run all of the cms unit tests
-            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_system -s cms --with-flaky --cov-args="-p" --with-xunit --no-randomize
             ;;
 
         3)  # run the commonlib unit tests
-            paver test_lib --with-flaky --cov-args="-p" --with-xunitmp
+            paver test_lib --with-flaky --cov-args="-p" --with-xunit
             ;;
 
         *)

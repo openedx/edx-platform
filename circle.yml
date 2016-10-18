@@ -8,6 +8,9 @@ general:
     - "test_root/log"
 
 dependencies:
+  pre:
+    - DEBIAN_FRONTEND=noninteractive sudo apt-get install -q -y $(cat requirements/system/ubuntu/apt-packages.txt)
+
   override:
     - npm install
 
