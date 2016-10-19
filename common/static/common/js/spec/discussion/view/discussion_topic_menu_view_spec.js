@@ -2,6 +2,7 @@
 (function() {
     'use strict';
     describe('DiscussionTopicMenuView', function() {
+        var ExpectedDiscussionId;
         beforeEach(function() {
             this.createTopicView = function(options) {
                 options = _.extend({
@@ -87,12 +88,18 @@
             expect(this.view.$el.find('option.topic-title:selected').text()).toContain('<em>');
         });
 
-        it('appropriate topic is selected if `topicId` is passed', function() {
+        it('appropriate topic is selected if topicId is passed', function() {
             this.createTopicView({
                 topicId: 'c49f0dfb8fc94c9c8d9999cc95190c56'
             });
             this.view.render();
             expect(this.view.$el.find('option.topic-title:selected').text()).toEqual('Numerical Input');
+        });
+        it('if general topic is not present then topiId is set to first discussion topicId', function() {
+            this.createTopicView({});
+            this.view.render();
+            ExpectedDiscussionId = this.view.$('.post-topic option').first().data('discussion-id');
+            expect(this.view.getCurrentTopicId()).toEqual(ExpectedDiscussionId);
         });
     });
 }).call(this);
