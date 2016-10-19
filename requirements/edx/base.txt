@@ -140,6 +140,7 @@ django-cors-headers==1.1.0
 
 # Debug toolbar
 django_debug_toolbar==1.5
+sqlparse>=0.2.0,<0.3.0
 
 # Used for testing
 before_after==0.1.3
