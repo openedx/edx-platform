@@ -1,9 +1,12 @@
 """
 Grades Transformer
 """
+from base64 import b64encode
 from django.test.client import RequestFactory
 from functools import reduce as functools_reduce
+from hashlib import sha1
 from logging import getLogger
+import json
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -64,6 +67,7 @@ class GradesTransformer(BlockStructureTransformer):
             filter_by=lambda block_key: block_key.block_type == 'sequential',
         )
         cls._collect_explicit_graded(block_structure)
+        cls._collect_grading_policy_hash(block_structure)
 
     def transform(self, block_structure, usage_context):
         """
@@ -127,6 +131,35 @@ class GradesTransformer(BlockStructureTransformer):
         block_structure.set_transformer_block_field(module.location, cls, 'max_score', max_score)
         if max_score is None:
             log.warning("GradesTransformer: max_score is None for {}".format(module.location))
+
+    @classmethod
+    def _collect_grading_policy_hash(cls, block_structure):
+        """
+        Collect a hash of the course's grading policy, storing it as a
+        `transformer_block_field` associated with the `GradesTransformer`.
+        """
+        def _hash_grading_policy(policy):
+            """
+            Creates a hash from the course grading policy.
+            The keys are sorted in order to make the hash
+            agnostic to the ordering of the policy coming in.
+            """
+            ordered_policy = json.dumps(
+                policy,
+                separators=(',', ':'),  # Remove spaces from separators for more compact representation
+                sort_keys=True,
+            )
+            return b64encode(sha1(ordered_policy).digest())
+
+        course_location = block_structure.root_block_usage_key
+        course_block = block_structure.get_xblock(course_location)
+        grading_policy = course_block.grading_policy
+        block_structure.set_transformer_block_field(
+            course_block.location,
+            cls,
+            "grading_policy_hash",
+            _hash_grading_policy(grading_policy)
+        )
 
     @staticmethod
     def _iter_scorable_xmodules(block_structure):
