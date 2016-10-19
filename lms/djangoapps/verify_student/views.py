@@ -1104,7 +1104,12 @@ class SubmitPhotosView(View):
         to_address = user.email
 
         try:
-            send_mail(subject, message, from_address, [to_address], fail_silently=False)
+            html_message = render_to_string('emails/photo_submission_confirmation.html', context)
+        except:
+            html_message = None
+
+        try:
+            send_mail(subject, message, from_address, [to_address], fail_silently=False, html_message=html_message)
         except:  # pylint: disable=bare-except
             # We catch all exceptions and log them.
             # It would be much, much worse to roll back the transaction due to an uncaught
@@ -1196,19 +1201,24 @@ def _compose_message_reverification_email(
         context["reverify_link"] = request.build_absolute_uri(re_verification_link)
 
         message = render_to_string('emails/reverification_processed.txt', context)
+        try:
+            html_message = render_to_string('emails/reverification_processed.html', context)
+        except:
+            html_message = None
+
         log.info(
             "Sending email to User_Id=%s. Attempts left for this user are %s. "
             "Allowed attempts %s. "
             "Due Date %s",
             str(user_id), left_attempts, allowed_attempts, str(reverification_block.due)
         )
-        return subject, message
+        return subject, message, html_message
     # Catch all exception to avoid raising back to view
     except:  # pylint: disable=bare-except
         log.exception("The email for re-verification sending failed for user_id %s", user_id)
 
 
-def _send_email(user_id, subject, message):
+def _send_email(user_id, subject, message, html_message=None):
     """ Send email to given user
 
     Args:
@@ -1224,7 +1234,7 @@ def _send_email(user_id, subject, message):
         settings.DEFAULT_FROM_EMAIL
     )
     user = User.objects.get(id=user_id)
-    user.email_user(subject, message, from_address)
+    user.email_user(subject, message, from_address, html_message=html_message)
 
 
 def _set_user_requirement_status(attempt, namespace, status, reason=None):
@@ -1340,11 +1350,11 @@ def results_callback(request):
         course_key = checkpoints[0].course_id
         related_assessment_location = checkpoints[0].checkpoint_location
 
-        subject, message = _compose_message_reverification_email(
+        subject, message, html_message = _compose_message_reverification_email(
             course_key, user_id, related_assessment_location, status, request
         )
 
-        _send_email(user_id, subject, message)
+        _send_email(user_id, subject, message, html_message=html_message)
 
     return HttpResponse("OK!")
 

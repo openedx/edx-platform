@@ -15,7 +15,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.core.mail.message import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, transaction
 from django.core.urlresolvers import reverse
@@ -1743,6 +1743,11 @@ def generate_registration_codes(request, course_id):
     subject = u'Confirmation and Invoice for {course_name}'.format(course_name=course.display_name)
     message = render_to_string('emails/registration_codes_sale_email.txt', context)
 
+    try:
+        html_message = render_to_string('emails/registration_codes_sale_email.html', context)
+    except:
+        html_message = None
+
     invoice_attachment = render_to_string('emails/registration_codes_sale_invoice_attachment.txt', context)
 
     #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
@@ -1761,13 +1766,15 @@ def generate_registration_codes(request, course_id):
 
     # send a unique email for each recipient, don't put all email addresses in a single email
     for recipient in recipient_list:
-        email = EmailMessage()
+        email = EmailMultiAlternatives()
         email.subject = subject
         email.body = message
         email.from_email = from_address
         email.to = [recipient]
         email.attach(u'RegistrationCodes.csv', csv_file.getvalue(), 'text/csv')
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
+        if html_message:
+            email.attach_alternative(html_message, "text/html")
         if pdf_file is not None:
             email.attach(u'Invoice.pdf', pdf_file.getvalue(), 'application/pdf')
         else:

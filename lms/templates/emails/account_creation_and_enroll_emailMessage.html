@@ -1,0 +1,25 @@
+<%inherit file="main.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="message">
+<p>
+${_("Welcome to {course_name}").format(course_name=course.display_name_with_default_escaped)}
+</p>
+<p>
+${_("To get started, please visit https://{site_name}. The login information for your account follows.").format(site_name=site_name)}
+</p>
+<p>
+<pre>
+${_("email: {email}").format(email=email_address)}
+${_("password: {password}").format(password=password)}
+</pre>
+</p>
+<p>
+${_("It is recommended that you change your password.")}
+</p>
+<p>
+${_("Sincerely yours,"
+""
+"The {course_name} Team").format(course_name=course.display_name_with_default_escaped)}
+</p>
+</%block>

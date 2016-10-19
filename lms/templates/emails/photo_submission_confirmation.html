@@ -1,0 +1,19 @@
+<%inherit file="main.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="message">
+<p>
+${_("Hi {full_name},").format(full_name=full_name)}
+</p>
+<p>
+${_("Thanks for submitting your photos!")}
+</p>
+<p>
+${_("We've received your information and the verification process has begun. You can check the status of the verification process on your dashboard.")}
+</p>
+<p>
+${_("Thank you,")}
+ 
+${_("The {platform_name} team").format(platform_name=platform_name)}
+</p>
+</%block>

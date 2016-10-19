@@ -1,0 +1,20 @@
+<%inherit file="main.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="message">
+<p>
+${_("Dear Student,")}
+</p>
+<p>
+${_("You have been un-enrolled from course {course_name} by a member "
+    "of the course staff. Please disregard the invitation "
+    "previously sent.").format(course_name=display_name or course.display_name_with_default_escaped)}
+</p>
+<p>
+<hr />
+${_("This email was automatically sent from {site_name} "
+	"to {email_address}").format(
+		site_name=site_name, email_address=email_address
+	)}
+</p>
+</%block>
