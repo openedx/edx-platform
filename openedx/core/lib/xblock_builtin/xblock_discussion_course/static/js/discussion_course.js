@@ -3,7 +3,6 @@ function DiscussionCourseBlock(runtime, element) {
     'use strict';
     var hasPushState = window.history && window.history.pushState ? true : false;
     DiscussionUtil.force_async = true;
-    loadDiscussionApp();
 
     // Restart the Backbone router to use the discussion root when
     // links inside this component are clicked.
