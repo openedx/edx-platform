@@ -52,22 +52,24 @@
 
     <div class="post-body"><%- body %></div>
     <div class="post-context">
-        <% if (mode == "tab" && obj.courseware_url) { %>
-            <%
-            var courseware_title_linked = interpolate(
-                '<a href="%(courseware_url)s">%(courseware_title)s</a>',
-                {courseware_url: courseware_url, courseware_title: _.escape(courseware_title)},
-                true
-            );
-            %>
-            <%=
-            interpolate(
-                _.escape(gettext('Related to: %(courseware_title_linked)s')),
-                {courseware_title_linked: courseware_title_linked},
-                true
-            )
-            %>
-        <% } %>
+        <div class="related-to-label">
+          <% if (mode == "tab" && obj.courseware_url) { %>
+              <%
+              var courseware_title_linked = interpolate(
+                  '<a href="%(courseware_url)s">%(courseware_title)s</a>',
+                  {courseware_url: courseware_url, courseware_title: _.escape(courseware_title)},
+                  true
+              );
+              %>
+              <%=
+              interpolate(
+                  _.escape(gettext('Related to: %(courseware_title_linked)s')),
+                  {courseware_title_linked: courseware_title_linked},
+                  true
+              )
+              %>
+          <% } %>
+        </div>
         <div class="group-visibility-label">
             <% if (obj.group_name) { %>
                 <%-
