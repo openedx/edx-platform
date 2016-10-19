@@ -33,16 +33,6 @@
                     course_settings: course_settings
                 });
                 /* jshint +W031*/
-
-                // Avoid re-initializing Backbone.history
-                if (!Backbone.History.started) {
-                    // Changes the current URL to the given root when links
-                    // inside this component are clicked.
-                    Backbone.history.start({
-                        pushState: true,
-                        root: "/courses/" + $$course_id + "/discussion/forum/"
-                    });
-                }
             }
         };
 
