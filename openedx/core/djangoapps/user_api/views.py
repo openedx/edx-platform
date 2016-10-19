@@ -852,8 +852,9 @@ class RegistrationView(APIView):
         the SSO provider with which they're authenticating.
         """
         label = _(
-            "I agree to allow my course data to be shared with {sso_name}"
+            "I agree to allow {platform_name} to share data about my enrollment, completion and performance in all {platform_name} courses and programs where my enrollment is sponsored by {sso_name}."
         ).format(
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             sso_name=sso_name
         )
 
