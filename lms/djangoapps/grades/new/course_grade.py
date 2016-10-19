@@ -34,9 +34,11 @@ class CourseGrade(object):
         self._letter_grade = None
 
     @classmethod
-    def init_from_model(cls, user, course, course_structure, current_grading_policy_hash):
+    def load_persisted_grade(cls, user, course, course_structure, current_grading_policy_hash):
         """
         Initializes a CourseGrade object, filling its members with persisted values from the database.
+
+        If the grading policy is out of date, recomputes the grade.
 
         If no persisted values are found, returns None.
         """
@@ -347,7 +349,7 @@ class CourseGradeFactory(object):
             GradesTransformer,
             'grading_policy_hash'
         )
-        saved_course_grade = CourseGrade.init_from_model(
+        saved_course_grade = CourseGrade.load_persisted_grade(
             self.student,
             course,
             course_structure,
