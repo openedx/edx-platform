@@ -502,6 +502,10 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
 
     def click_leave_team_link(self, remaining_members=0, cancel=False):
         """ Click on Leave Team link"""
+        self.wait_for(
+            lambda: self.team_leave_link_present,
+            description="Leave Team button did not become present"
+        )
         self.q(css='.leave-team-link').first.click()
         confirm_prompt(self, cancel, require_notification=False)
 
