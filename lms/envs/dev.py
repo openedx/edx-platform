@@ -39,6 +39,22 @@ DJFS = {
     'url_root': '/static/djpyfs'
 }
 
+# cdodge: This is the specifier for the MongoDB (using GridFS) backed static content store
+# This is for static content for courseware, not system static content (e.g. javascript, css, edX branding, etc)
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'DOC_STORE_CONFIG': {
+        'host': 'localhost',
+        'db': 'xcontent',
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
+    }
+}
+
 # If there is a database called 'read_replica', you can use the use_read_replica_if_available
 # function in util/query.py, which is useful for very large database reads
 DATABASES = {
