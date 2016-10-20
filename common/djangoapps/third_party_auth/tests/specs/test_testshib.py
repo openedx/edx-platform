@@ -5,6 +5,7 @@ import ddt
 import unittest
 import httpretty
 from mock import patch
+from django.core.urlresolvers import reverse
 from social.apps.django_app.default.models import UserSocialAuth
 
 from third_party_auth.saml import log as saml_log
@@ -95,6 +96,126 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         self._configure_testshib_provider()
         super(TestShibIntegrationTest, self).test_register()
 
+    def test_register_with_data_sharing_consent(self):
+        """
+        Configure TestShib to require data sharing consent before running the registration test
+        """
+        self._configure_testshib_provider(data_sharing_consent='required')
+        super(TestShibIntegrationTest, self).test_register(data_sharing_consent=True)
+
+    def test_login_redirects_to_consent_when_required(self):
+        """
+        Register a user without data sharing consent required, logout, set data sharing
+        consent to be required, and then check we're directed to a prompt to provide
+        consent when logging in.
+        """
+        # Set up the provider with standard settings
+        self._configure_testshib_provider()
+        # Register a user with the provider
+        super(TestShibIntegrationTest, self).test_register()
+        # Log out and clear the browser session
+        self.client.logout()
+        # Set up the provider to require data sharing consent
+        self._configure_testshib_provider(
+            data_sharing_consent='required',
+            assert_metadata_updates=False,
+        )
+        provider_login_url = self._check_login_page()
+        # The user clicks on the provider's button:
+        try_login_response = self.client.get(provider_login_url)
+        # The user should be redirected to the provider's login page:
+        self.assertEqual(try_login_response.status_code, 302)
+        complete_response = self.do_provider_login(try_login_response['Location'])
+        # We should be redirected to a screen to provide data sharing consent.
+        self.assertEqual(complete_response.status_code, 302)
+        self.assertEqual(
+            complete_response['Location'],
+            self.url_prefix + self.provide_additional_consent_url
+        )
+
+    def test_registration_form_has_data_sharing_consent_when_optional(self):
+        """
+        Configure TestShib to request data sharing consent, and then check
+        the form to make sure that the option to enable it is present.
+        """
+        self._configure_testshib_provider(data_sharing_consent='optional')
+        # The user goes to the register page, and sees a button to register with the provider:
+        provider_register_url = self._check_register_page()
+        # The user clicks on the Dummy button:
+        try_login_response = self.client.get(provider_register_url)
+        # The user should be redirected to the provider's login page:
+        self.assertEqual(try_login_response.status_code, 302)
+        provider_response = self.do_provider_login(try_login_response['Location'])
+        # We should be redirected to the register screen since this account is not linked to an edX account:
+        self.assertEqual(provider_response.status_code, 302)
+        self.assertEqual(provider_response['Location'], self.url_prefix + self.register_page_url)
+        register_response = self.client.get(self.register_page_url)
+        tpa_context = register_response.context["data"]["third_party_auth"]  # pylint: disable=no-member
+        self.assertEqual(tpa_context["errorMessage"], None)
+        # Check that the "You've successfully signed into [PROVIDER_NAME]" message is shown.
+        self.assertEqual(tpa_context["currentProvider"], self.PROVIDER_NAME)
+        # Check that the data (e.g. email) from the provider is displayed in the form:
+        form_data = register_response.context['data']['registration_form_desc']  # pylint: disable=no-member
+        form_fields = {field['name']: field for field in form_data['fields']}
+        # Verify that the data sharing consent checkbox is present
+        self.assertIn('data_sharing_consent', form_fields)
+        # Verify that the data sharing consent checkbox is not required
+        self.assertFalse(form_fields['data_sharing_consent']['required'])
+        registration_values = {
+            'email': 'email-edited@tpa-test.none',
+            'name': 'My Customized Name',
+            'username': 'new_username',
+            'honor_code': True,
+            'data_sharing_consent': False
+        }
+        # Now complete the form:
+        ajax_register_response = self.client.post(
+            reverse('user_api_registration'),
+            registration_values
+        )
+        self.assertEqual(ajax_register_response.status_code, 200)
+
+    def test_registration_not_allowed_without_data_sharing_consent(self):
+        """
+        Configure TestShib to require data sharing consent, but don't provide
+        consent when registering
+        """
+        self._configure_testshib_provider(data_sharing_consent='required')
+        # The user goes to the register page, and sees a button to register with the provider:
+        provider_register_url = self._check_register_page()
+        # The user clicks on the Dummy button:
+        try_login_response = self.client.get(provider_register_url)
+        # The user should be redirected to the provider's login page:
+        self.assertEqual(try_login_response.status_code, 302)
+        provider_response = self.do_provider_login(try_login_response['Location'])
+        # We should be redirected to the register screen since this account is not linked to an edX account:
+        self.assertEqual(provider_response.status_code, 302)
+        self.assertEqual(provider_response['Location'], self.url_prefix + self.register_page_url)
+        register_response = self.client.get(self.register_page_url)
+        tpa_context = register_response.context["data"]["third_party_auth"]  # pylint: disable=no-member
+        self.assertEqual(tpa_context["errorMessage"], None)
+        # Check that the "You've successfully signed into [PROVIDER_NAME]" message is shown.
+        self.assertEqual(tpa_context["currentProvider"], self.PROVIDER_NAME)
+        # Check that the data (e.g. email) from the provider is displayed in the form:
+        form_data = register_response.context['data']['registration_form_desc']  # pylint: disable=no-member
+        form_fields = {field['name']: field for field in form_data['fields']}
+        self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
+        self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
+        self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
+        registration_values = {
+            'email': 'email-edited@tpa-test.none',
+            'name': 'My Customized Name',
+            'username': 'new_username',
+            'honor_code': True,
+            'data_sharing_consent': False
+        }
+        # Now complete the form:
+        ajax_register_response = self.client.post(
+            reverse('user_api_registration'),
+            registration_values
+        )
+        self.assertEqual(ajax_register_response.status_code, 400)
+
     def test_login_records_attributes(self):
         """
         Test that attributes sent by a SAML provider are stored in the UserSocialAuth table.
@@ -163,6 +284,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
     def _configure_testshib_provider(self, **kwargs):
         """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
         fetch_metadata = kwargs.pop('fetch_metadata', True)
+        assert_metadata_updates = kwargs.pop('assert_metadata_updates', True)
         kwargs.setdefault('name', self.PROVIDER_NAME)
         kwargs.setdefault('enabled', True)
         kwargs.setdefault('visible', True)
@@ -176,9 +298,10 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         if fetch_metadata:
             self.assertTrue(httpretty.is_enabled())
             num_changed, num_failed, num_total = fetch_saml_metadata()
-            self.assertEqual(num_failed, 0)
-            self.assertEqual(num_changed, 1)
-            self.assertEqual(num_total, 1)
+            if assert_metadata_updates:
+                self.assertEqual(num_failed, 0)
+                self.assertEqual(num_changed, 1)
+                self.assertEqual(num_total, 1)
 
     def do_provider_login(self, provider_redirect_url):
         """ Mocked: the user logs in to TestShib and then gets redirected back """

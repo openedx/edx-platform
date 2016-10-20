@@ -1179,6 +1179,9 @@ MIDDLEWARE_CLASSES = (
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
+    # sign out TPA users who don't meet provider auth requirements
+    'third_party_auth.middleware.ResetSessionIfPipelineBrokenMiddleware',
+
     # This must be last
     'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 )
