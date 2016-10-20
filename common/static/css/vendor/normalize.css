@@ -384,11 +384,19 @@ input::-moz-focus-inner {
 /**
  * 1. Remove default vertical scrollbar in IE 8/9.
  * 2. Improve readability and alignment in all browsers.
+ * 3. Width (plus padding) results in the same widht as input fields.
+ * 4. Same border and border-radius as input fields.
+ * 5. Minimum height to make the textarea more apparent.
  */
 
 textarea {
     overflow: auto; /* 1 */
     vertical-align: top; /* 2 */
+    width: 43%; /* 3 */
+    padding: 1%;
+    border: 1px solid #b2b2b2; /* 4 */
+    border-radius: 3px;
+    min-height: 80px; /* 5 */
 }
 
 /* ==========================================================================
