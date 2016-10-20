@@ -92,14 +92,6 @@
       "%s r\u00e9sultat", 
       "%s r\u00e9sultats"
     ], 
-    "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s point)", 
-      "(%(earned)s/%(possible)s points)"
-    ], 
-    "(%(num_points)s point possible)": [
-      "(%(num_points)s point possible)", 
-      "(%(num_points)s points possibles)"
-    ], 
     "(Add signatories for a certificate)": "(Ajouter des signatures pour le certificat)", 
     "(Caption will be displayed when you start playing the video.)": "(Les sous-titres s'afficheront quand vous lancerez la vid\u00e9o.)", 
     "(Required Field)": "(Champ requis)", 
@@ -221,8 +213,6 @@
     "Anchors": "Ancres", 
     "Annotation": "Annotation", 
     "Annotation Text": "Texte de l'annotation", 
-    "Answer hidden": "R\u00e9ponse cach\u00e9e", 
-    "Answer:": "R\u00e9ponse:", 
     "Any content that has listed this content as a prerequisite will also have access limitations removed.": "Tous les contenus qui ont list\u00e9 ce contenu comme pr\u00e9requis auront aussi leurs droits d'acc\u00e8s supprim\u00e9s.", 
     "Are you sure you want to delete this comment?": "\u00cates-vous s\u00fbr de vouloir supprimer ce commentaire ?", 
     "Are you sure you want to delete this page? This action cannot be undone.": "\u00cates-vous s\u00fbr de vouloir supprimer cette page ? Cette action ne peut pas \u00eatre annul\u00e9e.", 
@@ -654,7 +644,6 @@
     "Headings": "Titres", 
     "Height": "Hauteur", 
     "Hide Annotations": "Cacher les annotations", 
-    "Hide Answer": "Masquer la r\u00e9ponse", 
     "Hide Deprecated Settings": "Cacher les param\u00e8tres obsol\u00e8tes", 
     "Hide Discussion": "Masquer la discussion", 
     "Hide Previews": "Cacher les aper\u00e7us", 
@@ -1069,7 +1058,6 @@
     "Short explanation": "Br\u00e8ve explication", 
     "Show All": "Voir tout", 
     "Show Annotations": "Afficher les annotations", 
-    "Show Answer": "Afficher la r\u00e9ponse", 
     "Show Comment (%(num_comments)s)": [
       "Afficher (%(num_comments)s) Commentaire", 
       "Afficher (%(num_comments)s) Commentaires"

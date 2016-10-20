@@ -163,7 +163,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-06 15:00+0000\n"
+"POT-Creation-Date: 2016-10-13 18:42+0000\n"
 "PO-Revision-Date: 2016-10-12 23:16+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -431,23 +431,41 @@ msgstr "Commentaires"
 msgid "Reply to Annotation"
 msgstr "Répondre à l'annotation"
 
-#. Translators: %(earned)s is the number of points earned. %(total)s is the
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
 #. points (example: 0/1 point; 1/2 points);
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "(%(earned)s/%(possible)s point)"
-msgid_plural "(%(earned)s/%(possible)s points)"
-msgstr[0] "(%(earned)s/%(possible)s point)"
-msgstr[1] "(%(earned)s/%(possible)s points)"
+msgid "%(earned)s/%(possible)s point (graded)"
+msgid_plural "%(earned)s/%(possible)s points (graded)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: %(earned)s is the number of points earned. %(possible)s is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(earned)s/%(possible)s point (ungraded)"
+msgid_plural "%(earned)s/%(possible)s points (ungraded)"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10). There will always be at least 1 point possible.;
+#. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "(%(num_points)s point possible)"
-msgid_plural "(%(num_points)s points possible)"
-msgstr[0] "(%(num_points)s point possible)"
-msgstr[1] "(%(num_points)s points possibles)"
+msgid "%(num_points)s point possible (graded)"
+msgid_plural "%(num_points)s points possible (graded)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (ungraded)"
+msgid_plural "%(num_points)s points possible (ungraded)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -455,25 +473,21 @@ msgstr ""
 "Le processus d'évaluation est toujours en cours. Rafraîchir la page pour "
 "mettre à jour."
 
+#. Translators: This is only translated to allow for reording of label and
+#. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Answer:"
-msgstr "Réponse:"
-
-#. Translators: the word Answer here refers to the answer to a problem the
-#. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Hide Answer"
-msgstr "Masquer la réponse"
-
-#. Translators: the word Answer here refers to the answer to a problem the
-#. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Show Answer"
-msgstr "Afficher la réponse"
+msgid "{label}: {status}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Answer hidden"
-msgstr "Réponse cachée"
+msgid "This problem has been reset."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid ""
+"Answers to this problem are now shown. Navigate through the problem to "
+"review it with answers inline."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
@@ -7455,10 +7469,9 @@ msgid "timed"
 msgstr "temps limité"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid ""
-"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
-"on it before you select \"End My Exam\"."
+"To receive credit for problems, you must select \"Submit\" for each problem "
+"before you select \"End My Exam\"."
 msgstr ""
 
 #: lms/templates/courseware/proctored-exam-status.underscore
@@ -7916,6 +7929,10 @@ msgstr ""
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
+msgid "Only the parent course staff of a CCX can create content groups."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -9262,6 +9279,12 @@ msgstr ""
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
+msgstr ""
+
+#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
+msgid ""
+"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
+"on it before you select \"End My Exam\"."
 msgstr ""
 
 #: cms/templates/js/access-editor.underscore

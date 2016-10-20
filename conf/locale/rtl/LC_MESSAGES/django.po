@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 16:11+0000\n"
-"PO-Revision-Date: 2016-10-13 16:12:03.523015\n"
+"POT-Creation-Date: 2016-10-20 15:37+0000\n"
+"PO-Revision-Date: 2016-10-20 15:37:55.843388\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -48,6 +48,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion"
 msgstr "يهسذعسسهخر"
@@ -116,14 +117,6 @@ msgstr "سفشفعس"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "حثريهرل"
-
-#: common/djangoapps/cors_csrf/models.py
-msgid ""
-"List of domains that are allowed to make cross-domain requests to this site."
-"  Please list each domain on its own line."
-msgstr ""
-"مهسف خب يخوشهرس فاشف شقث شممخصثي فخ وشنث ذقخسس-يخوشهر قثضعثسفس فخ فاهس سهفث."
-"  حمثشسث مهسف ثشذا يخوشهر خر هفس خصر مهرث."
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
@@ -296,26 +289,6 @@ msgstr "هردشمهي شوخعرف سثمثذفثي."
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
 msgstr "رخ سثمثذفثي حقهذث خق سثمثذفثي حقهذث هس فخخ مخص."
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
-msgstr "حقثدهثص مشرلعشلث هس ذعققثرفمغ يهسشزمثي"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr "مشرلعشلث ذخيث رخف حقخدهيثي"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language set to language code: {preview_language_code}"
-msgstr "مشرلعشلث سثف فخ مشرلعشلث ذخيث: {preview_language_code}"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
-msgstr "مشرلعشلث قثسثف فخ فاث يثبشعمف مشرلعشلث ذخيث"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to user's preference: {preview_language_code}"
-msgstr "مشرلعشلث قثسثف فخ عسثق'س حقثبثقثرذث: {preview_language_code}"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -1738,16 +1711,9 @@ msgid ""
 msgstr ""
 "فاثقث صشس ش حقخزمثو صهفا فاث سفشبب شرسصثق فخ فاهس حقخزمثو: ثوحفغ زخعريشقغ."
 
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "فثطف هرحعف"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "ثققخق"
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
 #. Translators: Separator used in StringResponse to display multiple answers.
 #. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
@@ -1760,6 +1726,15 @@ msgstr "ثققخق"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "خق"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "فثطف هرحعف"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr "ثققخق"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Custom Evaluated Script"
@@ -2110,10 +2085,8 @@ msgstr ""
 "ذخوحقخوهسثي. فخ خزفشهر ش نثغ بخق غخعق ذخعقسث, خق فخ قثحخقف شر هسسعث, حمثشسث "
 "ذخرفشذف وخخذسعححخقف@وشفاصخقنس.ذخو"
 
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -3315,6 +3288,18 @@ msgstr "دهسعشم"
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Raw"
 msgstr "قشص"
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Hide Page From Learners"
+msgstr "اهيث حشلث بقخو مثشقرثقس"
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid ""
+"If you select this option, only course team members with the Staff or Admin "
+"role see this page."
+msgstr ""
+"هب غخع سثمثذف فاهس خحفهخر, خرمغ ذخعقسث فثشو وثوزثقس صهفا فاث سفشبب خق شيوهر "
+"قخمث سثث فاهس حشلث."
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "HTML for the additional pages"
@@ -8822,6 +8807,43 @@ msgstr ""
 msgid "Skip to main content"
 msgstr "سنهح فخ وشهر ذخرفثرف"
 
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Authorize"
+msgstr "شعفاخقهظث"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"The above application requests the following permissions from your account:"
+msgstr ""
+"فاث شزخدث شححمهذشفهخر قثضعثسفس فاث بخممخصهرل حثقوهسسهخرس بقخو غخعق شذذخعرف:"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"Please click the 'Allow' button to grant these permissions to the above "
+"application. Otherwise, to withhold these permissions, please click the "
+"'Cancel' button."
+msgstr ""
+"حمثشسث ذمهذن فاث 'شممخص' زعففخر فخ لقشرف فاثسث حثقوهسسهخرس فخ فاث شزخدث "
+"شححمهذشفهخر. خفاثقصهسث, فخ صهفااخمي فاثسث حثقوهسسهخرس, حمثشسث ذمهذن فاث "
+"'ذشرذثم' زعففخر."
+
+#: lms/templates/oauth2_provider/authorize.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: lms/templates/modal/accessible_confirm.html
+msgid "Cancel"
+msgstr "ذشرذثم"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Allow"
+msgstr "شممخص"
+
+#: lms/templates/oauth2_provider/authorize.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/ccx/schedule.html
+msgid "Error"
+msgstr "ثققخق"
+
 #: lms/templates/registration/password_reset_email.html
 #, python-format
 msgid ""
@@ -9420,6 +9442,14 @@ msgstr ""
 "سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل خب شحه قثسحخرسثس زغ سثففهرل فاهس فخ ش "
 "دشمعث لقثشفثق فاشر 0."
 
+#: openedx/core/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
+msgstr ""
+"مهسف خب يخوشهرس فاشف شقث شممخصثي فخ وشنث ذقخسس-يخوشهر قثضعثسفس فخ فاهس سهفث."
+"  حمثشسث مهسف ثشذا يخوشهر خر هفس خصر مهرث."
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr "يثبشعمف لقخعح"
@@ -9595,6 +9625,26 @@ msgstr "ذقثيهف قثضعهقثوثرف سفشفعسثس"
 #: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr "يثشيمهرث بخق حعقذاشسهرل شري قثضعثسفهرل ذقثيهف."
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Preview Language is currently disabled"
+msgstr "حقثدهثص مشرلعشلث هس ذعققثرفمغ يهسشزمثي"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language code not provided"
+msgstr "مشرلعشلث ذخيث رخف حقخدهيثي"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language set to language code: {preview_language_code}"
+msgstr "مشرلعشلث سثف فخ مشرلعشلث ذخيث: {preview_language_code}"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default language code"
+msgstr "مشرلعشلث قثسثف فخ فاث يثبشعمف مشرلعشلث ذخيث"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to user's preference: {preview_language_code}"
+msgstr "مشرلعشلث قثسثف فخ عسثق'س حقثبثقثرذث: {preview_language_code}"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -10527,12 +10577,6 @@ msgid "Settings"
 msgstr "سثففهرلس"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Cancel"
-msgstr "ذشرذثم"
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "ذخعقسث رعوزثق"
@@ -10662,13 +10706,11 @@ msgid "View"
 msgstr "دهثص"
 
 #: cms/templates/darklang/preview_lang.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/darklang/preview_lang.html
 msgid "Preview Language Setting"
 msgstr "حقثدهثص مشرلعشلث سثففهرل"
 
 #: cms/templates/maintenance/_force_publish_course.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
 msgstr "قثسثف"
@@ -10807,18 +10849,6 @@ msgstr "ذقثشفهدث ذخووخرس مهذثرسثي ذخرفثرف, صهف�
 msgid "Some Rights Reserved"
 msgstr "سخوث قهلافس قثسثقدثي"
 
-#: common/templates/darklang/preview_lang_include.html
-msgid "Language Code"
-msgstr "مشرلعشلث ذخيث"
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr "بخق ثطشوحمث عسث ثر بخق ثرلمهسا"
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
-msgstr "حمثشسث قثبقثسا فاث حشلث فخ سثث فاث ذاشرلثس شححمهثي."
-
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -10829,7 +10859,6 @@ msgid "Discussions"
 msgstr "يهسذعسسهخرس"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
 msgstr "شيي ش حخسف"
 
@@ -12146,11 +12175,6 @@ msgstr "رثطف"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
 msgstr "قثذثرف لهف مخشي شذفهدهفغ بخق {course_id}"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/ccx/schedule.html
-msgid "Error"
-msgstr "ثققخق"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
@@ -14761,6 +14785,10 @@ msgstr ""
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
 msgstr "قثسعمفس:"
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Topic:"
+msgstr "فخحهذ:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
