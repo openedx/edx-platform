@@ -98,7 +98,7 @@ class Bookmark(TimeStampedModel):
         """
         Return the resource id: {username,usage_id}.
         """
-        return "{0},{1}".format(self.user.username, self.usage_key)  # pylint: disable=no-member
+        return u"{0},{1}".format(self.user.username, self.usage_key)  # pylint: disable=no-member
 
     @property
     def display_name(self):
