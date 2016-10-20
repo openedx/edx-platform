@@ -6,7 +6,7 @@ Teams pages.
 from common.test.acceptance.pages.lms.course_page import CoursePage
 from common.test.acceptance.pages.lms.discussion import InlineDiscussionPage
 from common.test.acceptance.pages.common.paging import PaginatedUIMixin
-from common.test.acceptance.pages.common.utils import confirm_prompt
+from common.test.acceptance.pages.common.utils import confirm_prompt, click_css
 
 from common.test.acceptance.pages.lms.fields import FieldsMixin
 
@@ -502,11 +502,7 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
 
     def click_leave_team_link(self, remaining_members=0, cancel=False):
         """ Click on Leave Team link"""
-        self.wait_for(
-            lambda: self.team_leave_link_present,
-            description="Leave Team button did not become present"
-        )
-        self.q(css='.leave-team-link').first.click()
+        click_css(self, '.leave-team-link', require_notification=False)
         confirm_prompt(self, cancel, require_notification=False)
 
         if cancel is False:
