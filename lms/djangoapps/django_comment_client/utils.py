@@ -1,6 +1,7 @@
 import json
 import logging
 import string
+import re
 from collections import defaultdict
 from datetime import datetime
 
@@ -132,7 +133,7 @@ def get_accessible_discussion_xblocks(course, user, include_all=False):  # pylin
     are accessible to the given user.
     """
     all_xblocks = modulestore().get_items(course.id, qualifiers={
-        'category': ['discussion', 'discussion-forum']
+        'category': re.compile(r'discussion|discussion-forum')
     }, include_orphans=False)
 
     return [
