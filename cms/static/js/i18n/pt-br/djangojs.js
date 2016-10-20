@@ -92,14 +92,6 @@
       "%s resultado", 
       "%s resultados"
     ], 
-    "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s ponto)", 
-      "(%(earned)s/%(possible)s pontos)"
-    ], 
-    "(%(num_points)s point possible)": [
-      "(%(num_points) ponto poss\u00edvel)", 
-      "(%(num_points)s pontos poss\u00edveis)"
-    ], 
     "(Add signatories for a certificate)": "(Adicionar assinaturas para um certificado)", 
     "(Caption will be displayed when you start playing the video.)": "(A legenda aparecer\u00e1 quando voc\u00ea reproduzir o v\u00eddeo.)", 
     "(Required Field)": "(Campo Obrigat\u00f3rio)", 
@@ -209,8 +201,6 @@
     "Anchors": "\u00c2ncoras", 
     "Annotation": "Anota\u00e7\u00e3o", 
     "Annotation Text": "Texto da anota\u00e7\u00e3o", 
-    "Answer hidden": "Resposta ocultada", 
-    "Answer:": "Resposta:", 
     "Are you having trouble finding a team to join?": "Voc\u00ea est\u00e1 com problemas para encontrar uma equipe para fazer parte ?", 
     "Are you sure you want to delete this comment?": "Tem certeza de que deseja apagar este coment\u00e1rio?", 
     "Are you sure you want to delete this page? This action cannot be undone.": "Voc\u00ea tem certeza que quer apagar esta p\u00e1gina? Esta a\u00e7\u00e3o n\u00e3o pode ser desfeita.", 
@@ -657,7 +647,6 @@
     "Height": "Altura", 
     "Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.": "Ajude outros estudantes decidir se entram em sua equipe especificando algumas caracter\u00edsticas dela. Escolha com aten\u00e7\u00e3o porque menos pessoas se interessar\u00e3o em entrar em sua equipe se ela parecer muito restritiva.", 
     "Hide Annotations": "Ocultar anota\u00e7\u00f5es ", 
-    "Hide Answer": "Ocultar resposta", 
     "Hide Deprecated Settings": "Ocultar configura\u00e7\u00f5es obsoletas", 
     "Hide Discussion": "Ocultar discuss\u00e3o", 
     "Hide Previews": "Ocultar Pr\u00e9-visualiza\u00e7\u00f5es", 
@@ -1064,7 +1053,6 @@
     "Short explanation": "Explica\u00e7\u00e3o resumida", 
     "Show All": "Mostrar todos", 
     "Show Annotations": "Exibir anota\u00e7\u00f5es", 
-    "Show Answer": "Exibir resposta", 
     "Show Comment (%(num_comments)s)": [
       "Mostrar Coment\u00e1rios (%(num_comments)s)", 
       "Mostrar Coment\u00e1rios (%(num_comments)s)"

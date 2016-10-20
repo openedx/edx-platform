@@ -81,12 +81,6 @@
     "%s result": [
       "%s \u4e2a\u7ed3\u679c"
     ], 
-    "(%(earned)s/%(possible)s point)": [
-      "\uff08%(earned)s/%(possible)s \u5206\uff09"
-    ], 
-    "(%(num_points)s point possible)": [
-      "\uff08\u53ef\u80fd\u4e3a %(num_points)s \u5206\uff09"
-    ], 
     "(Caption will be displayed when you start playing the video.)": "(\u5f53\u89c6\u9891\u5f00\u59cb\u64ad\u653e\u65f6\u5c06\u663e\u793a\u5b57\u5e55)", 
     "(Required Field)": "(\u5fc5\u586b\u5b57\u6bb5)", 
     "(contains %(student_count)s student)": [
@@ -187,8 +181,6 @@
     "Anchors": "\u951a\u70b9", 
     "Annotation": "\u6279\u6ce8", 
     "Annotation Text": "\u6279\u6ce8\u6587\u672c", 
-    "Answer hidden": "\u7b54\u6848\u9690\u85cf", 
-    "Answer:": "\u56de\u7b54\uff1a", 
     "Are you having trouble finding a team to join?": "\u4f60\u662f\u5426\u5728\u627e\u56e2\u961f\u52a0\u5165\u8fc7\u7a0b\u4e2d\u9047\u5230\u56f0\u96be\uff1f", 
     "Are you sure you want to delete this comment?": "\u60a8\u786e\u5b9a\u8981\u5220\u9664\u8fd9\u6761\u8bc4\u8bba\u5417\uff1f", 
     "Are you sure you want to delete this page? This action cannot be undone.": "\u60a8\u786e\u8ba4\u8981\u5220\u9664\u8be5\u9875\u9762\u5417\uff1f\u8be5\u64cd\u4f5c\u65e0\u6cd5\u64a4\u9500\u3002", 
@@ -575,7 +567,6 @@
     "Height": "\u9ad8\u5ea6", 
     "Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.": "\u4ecb\u7ecd\u4f60\u7684\u56e2\u961f\u7684\u7279\u70b9\uff0c\u5e2e\u52a9\u5176\u4ed6\u5b66\u5458\u51b3\u5b9a\u662f\u5426\u52a0\u5165\u4f60\u7684\u56e2\u961f\u3002\u8bf7\u4ed4\u7ec6\u9009\u62e9\uff0c\u5982\u679c\u770b\u8d77\u6765\u9650\u5236\u592a\u591a\uff0c\u5c31\u4f1a\u6709\u8f83\u5c11\u7684\u4eba\u613f\u610f\u52a0\u5165\u4f60\u7684\u56e2\u961f\u3002", 
     "Hide Annotations": "\u9690\u85cf\u6279\u6ce8", 
-    "Hide Answer": "\u9690\u85cf\u7b54\u6848", 
     "Hide Deprecated Settings": "\u9690\u85cf\u5df2\u8fc7\u65f6\u7684\u8bbe\u7f6e", 
     "Hide Discussion": "\u9690\u85cf\u8ba8\u8bba", 
     "Hide Previews": "\u9690\u85cf\u9884\u89c8", 
@@ -942,7 +933,6 @@
     "Share your \"%(display_name)s\" award": "\u5206\u4eab\u60a8\u7684 \"%(display_name)s\" \u5956\u52b1", 
     "Short explanation": "\u7b80\u8981\u8bf4\u660e", 
     "Show Annotations": "\u663e\u793a\u6279\u6ce8", 
-    "Show Answer": "\u663e\u793a\u7b54\u6848", 
     "Show Comment (%(num_comments)s)": [
       "\u663e\u793a\u8bc4\u8bba (%(num_comments)s)"
     ], 

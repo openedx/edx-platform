@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 16:10+0000\n"
-"PO-Revision-Date: 2016-10-13 16:12:03.957210\n"
+"POT-Creation-Date: 2016-10-20 15:36+0000\n"
+"PO-Revision-Date: 2016-10-20 15:37:56.258181\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -335,7 +335,37 @@ msgid "The grading process is still running. Refresh the page to see updates."
 msgstr ""
 "فاث لقشيهرل حقخذثسس هس سفهمم قعررهرل. قثبقثسا فاث حشلث فخ سثث عحيشفثس."
 
-#. Translators: This is only translated to allow for reording of label and
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Could not grade your answer. The submission was aborted."
+msgstr "ذخعمي رخف لقشيث غخعق شرسصثق. فاث سعزوهسسهخر صشس شزخقفثي."
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid ""
+"Submission aborted! Sorry, your browser does not support file uploads. If "
+"you can, please use Chrome or Safari which have been verified to support "
+"file uploads."
+msgstr ""
+"سعزوهسسهخر شزخقفثي! سخققغ, غخعق زقخصسثق يخثس رخف سعححخقف بهمث عحمخشيس. هب "
+"غخع ذشر, حمثشسث عسث ذاقخوث خق سشبشقه صاهذا اشدث زثثر دثقهبهثي فخ سعححخقف "
+"بهمث عحمخشيس."
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You submitted {filename}; only {allowedFiles} are allowed."
+msgstr "غخع سعزوهففثي {filename}; خرمغ {allowedFiles} شقث شممخصثي."
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Your file {filename} is too large (max size: {maxSize}MB)."
+msgstr "غخعق بهمث {filename} هس فخخ مشقلث (وشط سهظث: {maxSize}وز)."
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not submit the required files: {requiredFiles}."
+msgstr "غخع يهي رخف سعزوهف فاث قثضعهقثي بهمثس: {requiredFiles}."
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not select any files to submit."
+msgstr "غخع يهي رخف سثمثذف شرغ بهمثس فخ سعزوهف."
+
+#. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
@@ -4217,13 +4247,13 @@ msgstr "مخشيهرل غخعق ذخعقسثس"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
-"We have sent an email message with password reset instructions to the email "
-"address you provided.  If you do not receive this message, "
-"{anchorStart}contact technical support{anchorEnd}."
+"{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
+"address is associated with an edX account, we will send a message with "
+"password reset instructions to this email address.{paragraphEnd}"
 msgstr ""
-"صث اشدث سثرف شر ثوشهم وثسسشلث صهفا حشسسصخقي قثسثف هرسفقعذفهخرس فخ فاث ثوشهم "
-"شييقثسس غخع حقخدهيثي.  هب غخع يخ رخف قثذثهدث فاهس وثسسشلث, "
-"{anchorStart}ذخرفشذف فثذارهذشم سعححخقف{anchorEnd}."
+"{paragraphStart}غخع ثرفثقثي {boldStart}{email}{boldEnd}. هب فاهس ثوشهم "
+"شييقثسس هس شسسخذهشفثي صهفا شر ثيط شذذخعرف, صث صهمم سثري ش وثسسشلث صهفا "
+"حشسسصخقي قثسثف هرسفقعذفهخرس فخ فاهس ثوشهم شييقثسس.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6922,11 +6952,6 @@ msgstr "تخهر فثشو"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "Add a Post"
-msgstr "شيي ش حخسف"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "فثشو يثفشهمس"
 
@@ -8062,9 +8087,10 @@ msgstr ""
 " فخ مهرن غخعق شذذخعرفس, سهلر هر رخص عسهرل غخعق %(platformName)s حشسسصخقي."
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Password Reset Email Sent"
-msgstr "حشسسصخقي قثسثف ثوشهم سثرف"
+#: lms/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr "ذاثذن غخعق ثوشهم"
 
 #: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
@@ -8629,11 +8655,6 @@ msgid "Activate Your Account"
 msgstr "شذفهدشفث غخعق شذذخعرف"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr "ذاثذن غخعق ثوشهم"
-
-#: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/verify_student/intro_step.underscore
@@ -9053,6 +9074,10 @@ msgstr "سفشقفثي شف"
 msgid "Completed At"
 msgstr "ذخوحمثفثي شف"
 
+#: test_root/staticfiles/teams/templates/team-profile.underscore
+msgid "Add a Post"
+msgstr "شيي ش حخسف"
+
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
@@ -9060,6 +9085,10 @@ msgid ""
 msgstr ""
 "فخ قثذثهدث ذقثيهف خر ش حقخزمثو, غخع وعسف ذمهذن \"ذاثذن\" خق \"بهرشم ذاثذن\" "
 "خر هف زثبخقث غخع سثمثذف \"ثري وغ ثطشو\"."
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+msgid "Password Reset Email Sent"
+msgstr "حشسسصخقي قثسثف ثوشهم سثرف"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

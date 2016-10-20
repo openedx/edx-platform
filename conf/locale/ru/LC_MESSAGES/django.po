@@ -193,7 +193,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-06 15:01+0000\n"
+"POT-Creation-Date: 2016-10-13 18:43+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -264,7 +264,6 @@ msgid "Video ID"
 msgstr "Идентификатор видео"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: common/djangoapps/config_models/admin.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
@@ -278,64 +277,6 @@ msgstr "Состояние"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Ожидание"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Revert to the selected configuration"
-msgstr "Вернуться к выбранной конфигурации"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Please select a single configuration to revert to."
-msgstr "Выберите одну конфигурацию, к которой следует вернуться."
-
-#: common/djangoapps/config_models/admin.py
-msgid "Reverted configuration."
-msgstr "Предыдущая конфигурация."
-
-#: common/djangoapps/config_models/admin.py
-msgid "Current Configuration"
-msgstr "Текущая конфигурация"
-
-#: common/djangoapps/config_models/admin.py
-msgid "All (Show History)"
-msgstr "Все (показать историю)"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Update"
-msgstr "Обновить"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A file containing JSON must be specified."
-msgstr "Необходимо указать файл содержащий  JSON "
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A valid username must be specified."
-msgstr "Должно быть указано действительное имя пользователя. "
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "File {0} does not exist"
-msgstr "Файл {0} не существует"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Importing JSON data from file {0}"
-msgstr "Импорт данных в формате JSON из файла {0}"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Import complete, {0} new entries created"
-msgstr "Импорт завершен, {0} новые записи созданы"
-
-#: common/djangoapps/config_models/models.py
-msgid "Change date"
-msgstr "Изменить дату"
-
-#. Translators: this label indicates the name of the user who made this
-#. change:
-#: common/djangoapps/config_models/models.py
-msgid "Changed by"
-msgstr "Изменено:"
-
-#: common/djangoapps/config_models/models.py
-msgid "Enabled"
-msgstr "Включено"
 
 #: common/djangoapps/cors_csrf/models.py
 msgid ""
@@ -422,6 +363,7 @@ msgstr "Курс"
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -609,23 +551,6 @@ msgstr "Добавить страну «{country}» в белый список �
 #: common/djangoapps/embargo/models.py
 msgid "Blacklist {country} for {course}"
 msgstr "Добавить страну «{country}» в черный список курса «{course}»"
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"You have already created an account using an external login like WebAuth or "
-"Shibboleth. Please contact {tech_support_email} for support."
-msgstr ""
-"Вы уже создали учётную запись, пользуясь внешним идентификатором "
-"пользователя, таким как WebAuth или Shibboleth.  Если вам нужна помощь, "
-"пожалуйста, свяжитесь с нами по адресу {tech_support_email}."
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"\n"
-"        Your university identity server did not return your ID information to us.\n"
-"        Please try logging in again.  (You may need to restart your browser.)\n"
-"        "
-msgstr ""
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -955,6 +880,14 @@ msgid ""
 msgstr ""
 "Период времени в микросекундах после записи на курс, в течение которого "
 "платёж может быть возвращён пользователю.  По умолчанию составляет 14 дней."
+
+#: common/djangoapps/student/models.py
+msgid "Name of the UTM cookie"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Name of the affiliate cookie"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -1708,6 +1641,16 @@ msgstr "Не поддерживается"
 msgid "Cannot rescore problems with possible file submissions"
 msgstr "Не удалось скорректировать оценки за задания с прикреплёнными файлами"
 
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect"
+msgstr "Неверных"
+
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct"
+msgstr "Верных"
+
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
 msgstr "верно"
@@ -1789,6 +1732,14 @@ msgstr ""
 "Ответ отправлен. После его проверки вместо этого сообщения появится оценка."
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "{programming_language} editor"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Submitted. As soon as a response is returned, this message will be replaced "
 "by that feedback."
@@ -1841,12 +1792,16 @@ msgid "Question {index}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Correct"
-msgstr "Верных"
+msgid "Correct:"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect"
-msgstr "Неверных"
+msgid "Incorrect:"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -2133,6 +2088,7 @@ msgid "Annotation"
 msgstr "Пояснение"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr ""
@@ -2319,11 +2275,6 @@ msgstr ""
 "не полностью."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "String customization substitutions for particular locations"
-msgstr ""
-"Значения для подстановки в строку для специфических локальных настроек"
-
-#: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Enable LaTeX templates?"
 msgstr "Разрешить использование шаблонов LaTeX?"
@@ -2349,17 +2300,18 @@ msgstr ""
 "известен посторонним. Для получения ключа для вашего курса или отправки "
 "сообщения о проблеме, пожалуйста, свяжитесь с moocsupport@mathworks.com"
 
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Check"
-msgstr "Проверить"
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "Отправить"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Final Check"
-msgstr "Проверить/последняя попытка"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Checking..."
-msgstr "Проверка..."
+msgid "Submitting"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
@@ -2380,15 +2332,50 @@ msgstr ""
 "Если это сообщение об ошибке продолжает появляться, пожалуйста, свяжитесь с "
 "сотрудниками курса."
 
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Hint: "
-msgstr "Подсказка:"
+msgid ""
+"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgstr ""
 
-#. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
+#. This text is shown in bold before the accompanying hint text.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "Подсказка ({hint_num} из {hints_count}): "
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially Correct"
+msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -2397,9 +2384,8 @@ msgid "Problem is closed."
 msgstr "Срок сдачи задания прошёл."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be reset before it can be checked again."
+msgid "Problem must be reset before it can be submitted again."
 msgstr ""
-"Необходимо перезагрузить задание, прежде чем снова сдать ответ на проверку."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
@@ -2469,11 +2455,15 @@ msgstr ""
 "Ваши ответы сохранены, но не оценены. Нажмите '{button_name}', чтобы "
 "получить оценку."
 
-#. Translators: A student must "make an attempt" to solve the problem on the
-#. page before they can reset it.
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Refresh the page and make an attempt before resetting."
-msgstr "Обновите страницу и сделайте попытку перед сбросом."
+msgid "You cannot select Reset for a problem that is closed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "You must submit an answer before you can select Reset."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2490,6 +2480,70 @@ msgid ""
 msgstr ""
 "Статус этого задания изменился после того, как вы загрузили страницу.  "
 "Пожалуйста, перезагрузите страницу."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "List of urls of children that are references to external modules"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Source Components"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The component location IDs of all source components that are used to "
+"determine whether a learner is shown the content of this conditional module."
+" Copy the component location ID of a component from its Settings dialog in "
+"Studio."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Attribute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The attribute of the source components that determines whether a learner is "
+"shown the content of this conditional module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Value"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The value that the conditional attribute of the source components must match"
+" before a learner is shown the content of this conditional module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Blocked Content Message"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The message that is shown to learners when not all conditions are met to "
+"show the content of this conditional module. Include {link} in the text of "
+"your message to give learners a direct link to required units. For example, "
+"'You must complete {link} before you can access this unit'."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "You must complete {link} before you can access this unit."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "This component has no source components configured yet."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Configure list of sources"
+msgstr ""
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
@@ -4031,16 +4085,6 @@ msgstr ""
 "загрузки». Это значение переопределяет значение по умолчанию c4x://."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Text Customization"
-msgstr "Переопределение названия элементов интерфейса"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter string customization substitutions for particular locations."
-msgstr ""
-"Введите замены названий некоторых элементов интерфейса, в частности, кнопок "
-"проверки ответа."
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable LaTeX Compiler"
 msgstr "Разрешить использование компилятора LaTeX"
 
@@ -4457,6 +4501,15 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
 msgstr "Основное"
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "There is no transcript file associated with the {lang} language."
+msgid_plural ""
+"There are no transcript files associated with the {lang} languages."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -9827,6 +9880,23 @@ msgstr ""
 msgid "Deadline for purchasing and requesting credit."
 msgstr "Крайний срок подачи заявки и оформления кредита."
 
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"You have already created an account using an external login like WebAuth or "
+"Shibboleth. Please contact {tech_support_email} for support."
+msgstr ""
+"Вы уже создали учётную запись, пользуясь внешним идентификатором "
+"пользователя, таким как WebAuth или Shibboleth.  Если вам нужна помощь, "
+"пожалуйста, свяжитесь с нами по адресу {tech_support_email}."
+
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
+msgstr ""
+
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be smaller than {image_max_size} in size."
 msgstr "Размер файла не должен превышать {image_max_size}."
@@ -10999,10 +11069,6 @@ msgstr "Выпадающий список меню пользователя"
 msgid "Sign Out"
 msgstr "Выйти"
 
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "{programming_language} editor"
-msgstr "Редактор {programming_language}"
-
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr "Все права защищены"
@@ -11038,15 +11104,6 @@ msgstr "Код языка"
 #: common/templates/darklang/preview_lang_include.html
 msgid "For example use en for English"
 msgstr "Например, en обозначает Английский"
-
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "Отправить"
 
 #: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
@@ -11818,10 +11875,6 @@ msgid "You do not have any notes."
 msgstr "У вас нет заметок."
 
 #: lms/templates/problem.html
-msgid "your answer"
-msgstr "ваш ответ"
-
-#: lms/templates/problem.html
 msgid "Hint"
 msgstr "Подсказка"
 
@@ -11830,13 +11883,29 @@ msgid "Save"
 msgstr "Сохранить"
 
 #: lms/templates/problem.html
-msgid "Toggle Answer Visibility"
-msgstr "Включить/выключить видимость ответа"
+msgid "Save your answer"
+msgstr ""
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} submissions"
+msgid "Reset your answer"
 msgstr ""
-"Вы отправили материалы на проверку {num_used} раз из {num_total} возможных"
+
+#: lms/templates/problem.html
+msgid "Submit your answer"
+msgstr ""
+
+#: lms/templates/problem.html
+msgid "You have used {num_used} of {num_total} attempts"
+msgstr ""
+
+#: lms/templates/problem_notifications.html
+msgid "Next Hint"
+msgstr ""
+
+#: lms/templates/problem_notifications.html
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Review"
+msgstr "Просмотреть"
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -14702,32 +14771,45 @@ msgid "Verify Now"
 msgstr "Подтвердить"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have already verified your ID!"
-msgstr "Вы уже подтвердили документ, удостоверяющий личность."
+msgid "You have submitted your verification information."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Thanks for your patience as we process your request."
-msgstr "Благодарим вас за терпение, пока мы обрабатываем ваш запрос."
+msgid ""
+"You will see a message on your dashboard when the verification process is "
+"complete (usually within 1-2 days)."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification status is good until {date}."
-msgstr "Ваш подтвержденный статус действует до {date}."
+msgid "Your current verification will expire soon!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification will expire soon!"
-msgstr "Срок действия вашей верификации скоро истечет!"
+msgid ""
+"You have submitted your reverification information. You will see a message "
+"on your dashboard when the verification process is complete (usually within "
+"1-2 days)."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You have successfully verified your ID with edX"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification is effective until {date}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification will expire soon."
+msgstr ""
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Your current verification will expire before the verification deadline for "
-"this course. {start_link}Re-verify your identity now{end_link} using a "
-"webcam and a government-issued ID."
+"Your current verification will expire in {days} days. {start_link}Re-verify "
+"your identity now{end_link} using a webcam and a government-issued photo ID."
 msgstr ""
-"Ваше текущая проверка личности истекает до окончания этого курса. "
-"{start_link}Провести повторную проверку{end_link} вам потребуется веб-камера"
-" и удостоверение личности: паспорт, студенческий билет."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14843,34 +14925,34 @@ msgstr ""
 "{support_email}."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Approved"
-msgstr "Статус подтверждения личности: Подтверждено"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"Your edX Verification is reviewed and approved. Your verification status is "
-"good for one year after submission."
+msgid "Current Verification Status: Approved"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Pending"
-msgstr "Статус подтверждения личности: ожидание ответа"
+msgid ""
+"Your edX verification has been approved. Your verification is effective for "
+"one year after submission."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current Verification Status: Pending"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification is pending. Your verification photos have been "
+"Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Expired"
-msgstr "Статус подтверждения личности: срок истёк"
+msgid "Current Verification Status: Expired"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification has expired. To receive a verified certificate, you "
-"have to submit a new photo of yourself and your government-issued photo ID "
-"before the course ends."
+"Your verification has expired. To receive a verified certificate, you must "
+"submit a new photo of yourself and your government-issued photo ID before "
+"the verification deadline for your course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -18371,10 +18453,6 @@ msgstr "Корзина"
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "{platform_name} -  Shopping Cart"
 msgstr "{platform_name} - Корзина "
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Review"
-msgstr "Просмотреть"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Confirmation"
