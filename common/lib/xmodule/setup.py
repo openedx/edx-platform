@@ -35,6 +35,7 @@ XMODULES = [
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
+    "staffgrading = xmodule.staff_grading_module:StaffGradingDescriptor",
 ]
 XBLOCKS = [
     "library = xmodule.library_root_xblock:LibraryRoot",
