@@ -15,7 +15,7 @@ def get_initial_sass_variables():
     for the sass_variables field on new Microsite objects.
     """
     sass_var_file = os.path.join(settings.ENV_ROOT, "themes",
-                                 settings.THEME_NAME, 'lms', 'src', 'base', '_branding-basics.scss')
+                                 settings.THEME_NAME, 'lms', 'static', 'sass', 'base', '_branding-basics.scss')
     with open(sass_var_file, 'r') as f:
         return f.read()
 

@@ -133,13 +133,20 @@ class SiteConfiguration(models.Model):
         return org in cls.get_all_orgs()
 
     def compile_microsite_sass(self):
-        theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME, 'lms', 'src', 'main.scss')
+        theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME,
+                                       'lms', 'static', 'sass', 'main.scss')
+        customer_specific_includes = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME,
+                                       'customer_specific', 'lms', 'static', 'sass')
         domain_without_port_number = self.site.domain.split(':')[0]
         output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(
             domain_without_port_number))
         collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(
             domain_without_port_number))
-        sass_output = sass.compile(filename=theme_sass_file, importers=[(0, self._sass_var_override)])
+        sass_output = sass.compile(
+            filename=theme_sass_file,
+            include_paths=[customer_specific_includes],
+            importers=[(0, self._sass_var_override)]
+        )
         with open(output_path, 'w') as f:
             f.write(sass_output)
         with open(collected_output_path, 'w') as f:
