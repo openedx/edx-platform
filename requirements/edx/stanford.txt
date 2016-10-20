@@ -8,4 +8,4 @@ xblock-image-modal==0.3.1
 -e git+https://github.com/Stanford-Online/xblock-submit-and-compare.git@55b717aae26747ebf5809c5cb4ecaeedfea5dd71#egg=xblock-submit-and-compare
 -e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
 -e git+https://github.com/Stanford-Online/edx-analytics-data-api-client.git@1b8260ce8dd6edb999fffc46b09f77c83f87e1f9#egg=edx-analytics-data-api-client
--e git+https://github.com/openlearninginitiative/xblock-inline-dropdown.git@0a540b87053756a9b3b497ef3aa3e4bd057b1fe2#egg=inline_dropdown
+-e git+https://github.com/openlearninginitiative/xblock-inline-dropdown.git@dfb96f6e3d42d8faff04c9b183d773a65d85824d#egg=inline_dropdown
