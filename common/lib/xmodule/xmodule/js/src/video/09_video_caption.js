@@ -34,13 +34,12 @@
                 'handleKeypress', 'handleKeypressLink', 'openLanguageMenu', 'closeLanguageMenu',
                 'previousLanguageMenuItem', 'nextLanguageMenuItem', 'handleCaptionToggle',
                 'showClosedCaptions', 'hideClosedCaptions', 'toggleClosedCaptions',
-                'updateCaptioningCookie', 'handleCaptioningCookie', 'handleTranscriptToggle',
+                'handleTranscriptToggle',
                 'listenForDragDrop'
             );
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
-            this.handleCaptioningCookie();
             this.listenForDragDrop();
 
             return $.Deferred().resolve().promise();
@@ -1146,31 +1145,14 @@
                 }
             },
 
-            handleCaptioningCookie: function() {
-                if ($.cookie('show_closed_captions') === 'true') {
-                    this.state.showClosedCaptions = true;
-                    this.showClosedCaptions();
-
-                    // keep it going until turned off
-                    $.cookie('show_closed_captions', 'true', {
-                        expires: 3650,
-                        path: '/'
-                    });
-                } else {
-                    this.hideClosedCaptions();
-                }
-            },
-
             toggleClosedCaptions: function(event) {
                 event.preventDefault();
 
                 if (this.state.el.hasClass('has-captions')) {
                     this.state.showClosedCaptions = false;
-                    this.updateCaptioningCookie(false);
                     this.hideClosedCaptions();
                 } else {
                     this.state.showClosedCaptions = true;
-                    this.updateCaptioningCookie(true);
                     this.showClosedCaptions();
                 }
             },
@@ -1210,19 +1192,6 @@
                     .attr('title', gettext('Turn on closed captioning'));
 
                 this.state.el.trigger('captions:hide');
-            },
-
-            updateCaptioningCookie: function(method) {
-                if (method) {
-                    $.cookie('show_closed_captions', 'true', {
-                        expires: 3650,
-                        path: '/'
-                    });
-                } else {
-                    $.cookie('show_closed_captions', null, {
-                        path: '/'
-                    });
-                }
             },
 
             listenForDragDrop: function() {
