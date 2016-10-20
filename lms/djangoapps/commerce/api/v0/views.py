@@ -22,6 +22,7 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
+from student.views import notify_enrollment_by_email
 from util.json_request import JsonResponse
 
 
@@ -113,6 +114,7 @@ class BasketsView(APIView):
                                                   username=user.username)
             log.info(msg)
             self._enroll(course_key, user)
+            notify_enrollment_by_email(courses.get_course(course_key), user, request)
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
 
@@ -122,6 +124,7 @@ class BasketsView(APIView):
             api = ecommerce_api_client(user)
         except ValueError:
             self._enroll(course_key, user)
+            notify_enrollment_by_email(courses.get_course(course_key), user, request)
             msg = Messages.NO_ECOM_API.format(username=user.username, course_id=unicode(course_key))
             log.debug(msg)
             return DetailResponse(msg)
