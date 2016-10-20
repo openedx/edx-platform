@@ -203,7 +203,7 @@ class CourseGrade(object):
         subsections_created = len(subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
         subsections_read = subsections_total - subsections_created
         blocks_total = len(self.locations_to_scores)
-        if not read_only:
+        if not read_only and self.has_access_to_course:
             subsection_grade_factory.bulk_create_unsaved()
             grading_policy_hash = self.course_structure.get_transformer_block_field(
                 self.course.location,

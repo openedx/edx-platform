@@ -1355,7 +1355,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
         # subsequent accesses to the progress page require fewer queries.
         for _ in range(2):
-            with self.assertNumQueries(17), check_mongo_calls(4):
+            with self.assertNumQueries(21), check_mongo_calls(4):
                 self._get_progress_page()
 
     @patch(
