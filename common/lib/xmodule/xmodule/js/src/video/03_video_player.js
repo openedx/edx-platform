@@ -130,6 +130,7 @@ function(HTML5Video, Resizer) {
         }
 
         state.videoPlayer.currentTime = 0;
+        state.videoPlayer.lastLoggedTime = 0;
 
         state.videoPlayer.goToStartTime = true;
         state.videoPlayer.stopAtEndTime = true;
@@ -379,6 +380,22 @@ function(HTML5Video, Resizer) {
             }
             this.el.trigger('timeupdate', [this.videoPlayer.currentTime]);
         }
+
+        // Write a tracking log event "heartbeat" message every minute
+        // TODO: make log interval configurable (not sure how to do this)
+        firstLogCycle = (this.videoPlayer.lastLoggedTime === 0);
+        secondsSinceLastLog = this.videoPlayer.currentTime - this.videoPlayer.lastLoggedTime;
+        if (secondsSinceLastLog > 60.0) {
+            this.videoPlayer.lastLoggedTime = this.videoPlayer.currentTime;
+            if (!firstLogCycle) {
+                this.videoPlayer.log(
+                    'continue_video',
+                    {
+                        currentTime: this.videoPlayer.currentTime
+                    }
+                );
+            }
+        }
     }
 
     function setPlaybackRate(newSpeed, useCueVideoById) {
@@ -535,6 +552,7 @@ function(HTML5Video, Resizer) {
 
     function stopTimer() {
         window.clearInterval(this.videoPlayer.updateInterval);
+        this.videoPlayer.lastLoggedTime = 0;
         delete this.videoPlayer.updateInterval;
     }
 
