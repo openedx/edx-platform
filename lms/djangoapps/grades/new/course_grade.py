@@ -56,7 +56,9 @@ class CourseGrade(object):
             course_grade.course_version = persistent_grade.course_version
             course_grade.course_edited_timestamp = persistent_grade.course_edited_timestamp
 
+        course_grade._populate_course_structure_grades()
         course_grade._log_event(log.info, u"init_from_model")  # pylint: disable=protected-access
+
         return course_grade
 
     @lazy
@@ -79,6 +81,8 @@ class CourseGrade(object):
         """
         Returns a dict of problem scores keyed by their locations.
         """
+        if not self.chapter_grades:
+            self._populate_course_structure_grades()
         locations_to_scores = {}
         for chapter in self.chapter_grades:
             for subsection_grade in chapter['sections']:
@@ -164,7 +168,8 @@ class CourseGrade(object):
         grade_summary['grade'] = self.letter_grade
 
         # These two fields are stored separately from percent and grade. The should match unless accessed in between
-        # course and subsection grade updates.
+        # course and subsection grade updates. If that happens we re-populate them here.
+        # TODO: re-run tests that hit this code after Eric's PR lands without explicitly populating grades
         grade_summary['totaled_scores'] = self.subsection_grade_totals_by_format
         grade_summary['raw_scores'] = list(self.locations_to_scores.itervalues())
 
@@ -306,6 +311,28 @@ class CourseGrade(object):
             self.course.id,
             self.student.id
         ))
+
+    def _populate_course_structure_grades(self):
+        """
+        A course grade provides access to its chapter and subsection grades.
+        These are not persisted so we load them here.
+        TODO: determine if we should persist these values
+        """
+        if not self.chapter_grades:
+            subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, self.course_structure)
+            for chapter_key in self.course_structure.get_children(self.course.location):
+                chapter = self.course_structure[chapter_key]
+                chapter_subsection_grades = []
+                children = self.course_structure.get_children(chapter_key)
+                for subsection_key in children:
+                    chapter_subsection_grades.append(
+                        subsection_grade_factory.create(self.course_structure[subsection_key], read_only=True)
+                    )
+                self.chapter_grades.append({
+                    'display_name': block_metadata_utils.display_name_with_default_escaped(chapter),
+                    'url_name': block_metadata_utils.url_name_for_block(chapter),
+                    'sections': chapter_subsection_grades
+                })
 
 
 class CourseGradeFactory(object):
