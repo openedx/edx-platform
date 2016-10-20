@@ -48,12 +48,14 @@ class InstructorDashboardPage(CoursePage):
         data_download_section.wait_for_page()
         return data_download_section
 
-    def select_student_admin(self):
+    def select_student_admin(self, admin_class):
         """
-        Selects the student admin tab and returns the MembershipSection
+        Selects the student admin tab and returns the requested
+        admin section.
+        admin_class should be a subclass of StudentAdminPage.
         """
         self.q(css='[data-section="student_admin"]').first.click()
-        student_admin_section = StudentAdminPage(self.browser)
+        student_admin_section = admin_class(self.browser)
         student_admin_section.wait_for_page()
         return student_admin_section
 
@@ -1025,8 +1027,18 @@ class StudentAdminPage(PageObject):
     Student admin section of the Instructor dashboard.
     """
     url = None
-    EE_CONTAINER = ".entrance-exam-grade-container"
-    CS_CONTAINER = ".course-specific-container"
+    CONTAINER = None
+
+    PROBLEM_INPUT_NAME = None
+    STUDENT_EMAIL_INPUT_NAME = None
+
+    RESET_ATTEMPTS_BUTTON_NAME = None
+    RESCORE_BUTTON_NAME = None
+    RESCORE_IF_HIGHER_BUTTON_NAME = None
+    DELETE_STATE_BUTTON_NAME = None
+
+    BACKGROUND_TASKS_BUTTON_NAME = None
+    TASK_HISTORY_TABLE_NAME = None
 
     def is_browser_on_page(self):
         """
@@ -1034,167 +1046,185 @@ class StudentAdminPage(PageObject):
         """
         return self.q(css='[data-section=student_admin].active-section').present
 
+    def _input_with_name(self, input_name):
+        """
+        Returns the input box with the given name
+        for this object's container.
+        """
+        return self.q(css='{} input[name={}]'.format(self.CONTAINER, input_name))
+
     @property
-    def student_email_input(self):
+    def problem_location_input(self):
+        """
+        Returns input box for problem location
+        """
+        return self._input_with_name(self.PROBLEM_INPUT_NAME)
+
+    def set_problem_location(self, problem_location):
+        """
+        Returns input box for problem location
+        """
+        input_box = self.problem_location_input.first.results[0]
+        input_box.send_keys(unicode(problem_location))
+
+    @property
+    def student_email_or_username_input(self):
         """
         Returns email address/username input box.
         """
-        return self.q(css='{} input[name=entrance-exam-student-select-grade]'.format(self.EE_CONTAINER))
+        return self._input_with_name(self.STUDENT_EMAIL_INPUT_NAME)
 
-    @property
-    def rescore_problem_input(self):
+    def set_student_email_or_username(self, email_or_username):
         """
-        Returns input box for rescore/reset all on a problem
+        Sets given email or username as value of
+        student email/username input box.
         """
-        return self.q(css='{} input[name=problem-select-all]'.format(self.CS_CONTAINER))
+        input_box = self.student_email_or_username_input.first.results[0]
+        input_box.send_keys(email_or_username)
 
     @property
     def reset_attempts_button(self):
         """
         Returns reset student attempts button.
         """
-        return self.q(css='{} input[name=reset-entrance-exam-attempts]'.format(self.EE_CONTAINER))
+        return self._input_with_name(self.RESET_ATTEMPTS_BUTTON_NAME)
 
     @property
-    def rescore_submission_button(self):
+    def rescore_button(self):
         """
-        Returns rescore student submission button.
+        Returns rescore button.
         """
-        return self.q(css='{} input[name=rescore-entrance-exam]'.format(self.EE_CONTAINER))
+        return self._input_with_name(self.RESCORE_BUTTON_NAME)
 
     @property
-    def rescore_all_submissions_button(self):
+    def rescore_if_higher_button(self):
         """
-        Returns rescore student submission button.
+        Returns rescore if higher button.
         """
-        return self.q(css='{} input[name=rescore-problem-all]'.format(self.CS_CONTAINER))
+        return self._input_with_name(self.RESCORE_IF_HIGHER_BUTTON_NAME)
 
     @property
-    def show_background_tasks_button(self):
+    def delete_state_button(self):
         """
-        Return Show Background Tasks button.
+        Returns delete state button.
         """
-        return self.q(css='{} input[name=task-history-all]'.format(self.CS_CONTAINER))
+        return self._input_with_name(self.DELETE_STATE_BUTTON_NAME)
+
+    @property
+    def task_history_button(self):
+        """
+        Return Background Tasks History button.
+        """
+        return self._input_with_name(self.BACKGROUND_TASKS_BUTTON_NAME)
+
+    def wait_for_task_history_table(self):
+        """
+        Waits until the task history table is visible.
+        """
+        def check_func():
+            """
+            Promise Check Function
+            """
+            query = self.q(css="{} .{}".format(self.CONTAINER, self.TASK_HISTORY_TABLE_NAME))
+            return query.visible, query
+
+        return Promise(check_func, "Waiting for student admin task history table to be visible.").fulfill()
+
+    def wait_for_task_completion(self, expected_task_string):
+        """
+        Waits until the task history table is visible.
+        """
+        def check_func():
+            """
+            Promise Check Function
+            """
+            self.task_history_button.click()
+            table = self.wait_for_task_history_table()
+            return len(table) > 0 and expected_task_string in table.results[0].text
+
+        return EmptyPromise(check_func, "Waiting for student admin task to complete.").fulfill()
+
+
+class StudentSpecificAdmin(StudentAdminPage):
+    """
+    Student specific section of the Student Admin page.
+    """
+    CONTAINER = ".student-grade-container"
+
+    PROBLEM_INPUT_NAME = "problem-select-single"
+    STUDENT_EMAIL_INPUT_NAME = "student-select-grade"
+
+    RESET_ATTEMPTS_BUTTON_NAME = "reset-attempts-single"
+    RESCORE_BUTTON_NAME = "rescore-problem-single"
+    RESCORE_IF_HIGHER_BUTTON_NAME = "rescore-problem-if-higher-single"
+    DELETE_STATE_BUTTON_NAME = "delete-state-single"
+
+    BACKGROUND_TASKS_BUTTON_NAME = "task-history-single"
+    TASK_HISTORY_TABLE_NAME = "task-history-single-table"
+
+
+class CourseSpecificAdmin(StudentAdminPage):
+    """
+    Course specific section of the Student Admin page.
+    """
+    CONTAINER = ".course-specific-container"
+
+    PROBLEM_INPUT_NAME = "problem-select-all"
+    STUDENT_EMAIL_INPUT_NAME = None
+
+    RESET_ATTEMPTS_BUTTON_NAME = "reset-attempts-all"
+    RESCORE_BUTTON_NAME = "rescore-problem-all"
+    RESCORE_IF_HIGHER_BUTTON_NAME = "rescore-problem-all-if-higher"
+    DELETE_STATE_BUTTON_NAME = None
+
+    BACKGROUND_TASKS_BUTTON_NAME = "task-history-all"
+    TASK_HISTORY_TABLE_NAME = "task-history-all-table"
+
+
+class EntranceExamAdmin(StudentAdminPage):
+    """
+    Entrance exam section of the Student Admin page.
+    """
+    CONTAINER = ".entrance-exam-grade-container"
+
+    STUDENT_EMAIL_INPUT_NAME = "entrance-exam-student-select-grade"
+    PROBLEM_INPUT_NAME = None
+
+    RESET_ATTEMPTS_BUTTON_NAME = "reset-entrance-exam-attempts"
+    RESCORE_BUTTON_NAME = "rescore-entrance-exam"
+    RESCORE_IF_HIGHER_BUTTON_NAME = "rescore-entrance-exam-if-higher"
+    DELETE_STATE_BUTTON_NAME = "delete-entrance-exam-state"
+
+    BACKGROUND_TASKS_BUTTON_NAME = "entrance-exam-task-history"
+    TASK_HISTORY_TABLE_NAME = "entrance-exam-task-history-table"
 
     @property
     def skip_entrance_exam_button(self):
         """
         Return Let Student Skip Entrance Exam button.
         """
-        return self.q(css='{} input[name=skip-entrance-exam]'.format(self.EE_CONTAINER))
-
-    @property
-    def delete_student_state_button(self):
-        """
-        Returns delete student state button.
-        """
-        return self.q(css='{} input[name=delete-entrance-exam-state]'.format(self.EE_CONTAINER))
-
-    @property
-    def background_task_history_button(self):
-        """
-        Returns show background task history for student button.
-        """
-        return self.q(css='{} input[name=entrance-exam-task-history]'.format(self.EE_CONTAINER))
+        return self.q(css='{} input[name=skip-entrance-exam]'.format(self.CONTAINER))
 
     @property
     def top_notification(self):
         """
         Returns show background task history for student button.
         """
-        return self.q(css='{} .request-response-error'.format(self.EE_CONTAINER)).first
+        return self.q(css='{} .request-response-error'.format(self.CONTAINER)).first
 
-    def is_student_email_input_visible(self):
+    def are_all_buttons_visible(self):
         """
-        Returns True if student email address/username input box is present.
+        Returns whether all buttons related to entrance exams
+        are visible.
         """
-        return self.student_email_input.is_present()
-
-    def is_reset_attempts_button_visible(self):
-        """
-        Returns True if reset student attempts button is present.
-        """
-        return self.reset_attempts_button.is_present()
-
-    def is_rescore_submission_button_visible(self):
-        """
-        Returns True if rescore student submission button is present.
-        """
-        return self.rescore_submission_button.is_present()
-
-    def is_delete_student_state_button_visible(self):
-        """
-        Returns True if delete student state for entrance exam button is present.
-        """
-        return self.delete_student_state_button.is_present()
-
-    def is_background_task_history_button_visible(self):
-        """
-        Returns True if show background task history for student button is present.
-        """
-        return self.background_task_history_button.is_present()
-
-    def is_background_task_history_table_visible(self):
-        """
-        Returns True if background task history table is present.
-        """
-        return self.q(css='{} .entrance-exam-task-history-table'.format(self.EE_CONTAINER)).is_present()
-
-    def click_reset_attempts_button(self):
-        """
-        clicks reset student attempts button.
-        """
-        return self.reset_attempts_button.click()
-
-    def click_rescore_submissions_button(self):
-        """
-        clicks rescore submissions button.
-        """
-        return self.rescore_submission_button.click()
-
-    def click_rescore_all_button(self):
-        """
-        clicks rescore all for problem button.
-        """
-        return self.rescore_all_submissions_button.click()
-
-    def click_show_background_tasks_button(self):
-        """
-        clicks show background tasks button.
-        """
-        return self.show_background_tasks_button.click()
-
-    def click_skip_entrance_exam_button(self):
-        """
-        clicks let student skip entrance exam button.
-        """
-        return self.skip_entrance_exam_button.click()
-
-    def click_delete_student_state_button(self):
-        """
-        clicks delete student state button.
-        """
-        return self.delete_student_state_button.click()
-
-    def click_task_history_button(self):
-        """
-        clicks background task history button.
-        """
-        return self.background_task_history_button.click()
-
-    def set_student_email(self, email_address):
-        """
-        Sets given email address as value of student email address/username input box.
-        """
-        input_box = self.student_email_input.first.results[0]
-        input_box.send_keys(email_address)
-
-    def set_problem_to_rescore(self, problem_locator):
-        """
-        Sets the problem for which to rescore/reset all scores.
-        """
-        input_box = self.rescore_problem_input.first.results[0]
-        input_box.send_keys(problem_locator)
+        return (
+            self.student_email_or_username_input.is_present() and
+            self.reset_attempts_button.is_present() and
+            self.rescore_button.is_present() and
+            self.rescore_if_higher_button.is_present() and
+            self.delete_state_button.is_present() and
+            self.task_history_button.is_present()
+        )
 
 
 class CertificatesPage(PageObject):

@@ -169,6 +169,13 @@ class ContainerPage(PageObject, HelpMixin):
         """
         return self.q(css='.action-publish').first
 
+    def publish(self):
+        """
+        Publishes the container.
+        """
+        self.publish_action.click()
+        self.wait_for_ajax()
+
     def discard_changes(self):
         """
         Discards draft changes (which will then re-render the page).

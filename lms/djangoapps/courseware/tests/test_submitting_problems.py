@@ -153,7 +153,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         self.student_user = User.objects.get(email=self.student)
         self.factory = RequestFactory()
         # Disable the score change signal to prevent other components from being pulled into tests.
-        self.score_changed_signal_patch = patch('courseware.module_render.SCORE_CHANGED.send')
+        self.score_changed_signal_patch = patch('lms.djangoapps.grades.signals.handlers.SCORE_CHANGED.send')
         self.score_changed_signal_patch.start()
 
     def tearDown(self):

@@ -1,3 +1,7 @@
+"""
+Helpers for courseware tests.
+"""
+import crum
 import json
 
 from django.contrib.auth.models import User
@@ -19,6 +23,9 @@ def get_request_for_user(user):
     request.is_secure = lambda: True
     request.get_host = lambda: "edx.org"
     request.method = 'GET'
+    request.GET = {}
+    request.POST = {}
+    crum.set_current_request(request)
     return request
 
 

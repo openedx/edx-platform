@@ -353,17 +353,29 @@ def is_404_page(browser):
     return 'Page not found (404)' in browser.find_element_by_tag_name('h1').text
 
 
+def create_multiple_choice_xml(correct_choice=2, num_choices=4):
+    """
+    Return the Multiple Choice Problem XML, given the name of the problem.
+    """
+    # all choices are incorrect except for correct_choice
+    choices = [False for _ in range(num_choices)]
+    choices[correct_choice] = True
+
+    choice_names = ['choice_{}'.format(index) for index in range(num_choices)]
+    question_text = 'The correct answer is Choice {}'.format(correct_choice)
+
+    return MultipleChoiceResponseXMLFactory().build_xml(
+        question_text=question_text,
+        choices=choices,
+        choice_names=choice_names,
+    )
+
+
 def create_multiple_choice_problem(problem_name):
     """
     Return the Multiple Choice Problem Descriptor, given the name of the problem.
     """
-    factory = MultipleChoiceResponseXMLFactory()
-    xml_data = factory.build_xml(
-        question_text='The correct answer is Choice 2',
-        choices=[False, False, True, False],
-        choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-    )
-
+    xml_data = create_multiple_choice_xml()
     return XBlockFixtureDesc(
         'problem',
         problem_name,

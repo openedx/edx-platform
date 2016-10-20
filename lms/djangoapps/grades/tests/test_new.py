@@ -106,7 +106,7 @@ class TestCourseGradeFactory(GradeTestBase):
 
 
 @ddt.ddt
-class SubsectionGradeFactoryTest(GradeTestBase):
+class TestSubsectionGradeFactory(GradeTestBase, ProblemSubmissionTestMixin):
     """
     Tests for SubsectionGradeFactory functionality.
 
@@ -115,17 +115,36 @@ class SubsectionGradeFactoryTest(GradeTestBase):
     enable saving subsection grades blocks/enables that feature as expected.
     """
 
+    def assert_grade(self, grade, expected_earned, expected_possible):
+        """
+        Asserts that the given grade object has the expected score.
+        """
+        self.assertEqual(
+            (grade.all_total.earned, grade.all_total.possible),
+            (expected_earned, expected_possible),
+        )
+
     def test_create(self):
         """
-        Tests to ensure that a persistent subsection grade is created, saved, then fetched on re-request.
+        Assuming the underlying score reporting methods work,
+        test that the score is calculated properly.
+        """
+        with mock_get_score(1, 2):
+            grade = self.subsection_grade_factory.create(self.sequence)
+        self.assert_grade(grade, 1, 2)
+
+    def test_create_internals(self):
+        """
+        Tests to ensure that a persistent subsection grade is
+        created, saved, then fetched on re-request.
         """
         with patch(
             'lms.djangoapps.grades.new.subsection_grade.PersistentSubsectionGrade.create_grade',
             wraps=PersistentSubsectionGrade.create_grade
         ) as mock_create_grade:
             with patch(
-                'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_saved_grade',
-                wraps=self.subsection_grade_factory._get_saved_grade
+                'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_bulk_cached_grade',
+                wraps=self.subsection_grade_factory._get_bulk_cached_grade
             ) as mock_get_saved_grade:
                 with self.assertNumQueries(14):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
@@ -142,6 +161,30 @@ class SubsectionGradeFactoryTest(GradeTestBase):
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
         self.assertEqual(grade_a.all_total, grade_b.all_total)
+
+    def test_update(self):
+        """
+        Assuming the underlying score reporting methods work,
+        test that the score is calculated properly.
+        """
+        with mock_get_score(1, 2):
+            grade = self.subsection_grade_factory.update(self.sequence)
+        self.assert_grade(grade, 1, 2)
+
+    def test_update_if_higher(self):
+        def verify_update_if_higher(mock_score, expected_grade):
+            """
+            Updates the subsection grade and verifies the
+            resulting grade is as expected.
+            """
+            with mock_get_score(*mock_score):
+                grade = self.subsection_grade_factory.update(self.sequence, only_if_higher=True)
+                self.assert_grade(grade, *expected_grade)
+
+        verify_update_if_higher((1, 2), (1, 2))  # previous value was non-existent
+        verify_update_if_higher((2, 4), (1, 2))  # previous value was equivalent
+        verify_update_if_higher((1, 4), (1, 2))  # previous value was greater
+        verify_update_if_higher((3, 4), (3, 4))  # previous value was less
 
     @ddt.data(
         (
@@ -162,7 +205,8 @@ class SubsectionGradeFactoryTest(GradeTestBase):
             with patch(underlying_method) as underlying:
                 underlying.side_effect = DatabaseError("I'm afraid I can't do that")
                 method_to_test(self)
-                # By making it this far, we implicitly assert "the factory method swallowed the exception correctly"
+                # By making it this far, we implicitly assert
+                # "the factory method swallowed the exception correctly"
                 self.assertTrue(
                     log_mock.warning.call_args_list[0].startswith("Persistent Grades: Persistence Error, falling back.")
                 )
@@ -196,18 +240,10 @@ class SubsectionGradeTest(GradeTestBase):
     Tests SubsectionGrade functionality.
     """
 
-    def test_compute(self):
-        """
-        Assuming the underlying score reporting methods work, test that the score is calculated properly.
-        """
-        with mock_get_score(1, 2):
-            grade = self.subsection_grade_factory.create(self.sequence)
-        self.assertEqual(grade.all_total.earned, 1)
-        self.assertEqual(grade.all_total.possible, 2)
-
     def test_save_and_load(self):
         """
-        Test that grades are persisted to the database properly, and that loading saved grades returns the same data.
+        Test that grades are persisted to the database properly,
+        and that loading saved grades returns the same data.
         """
         # Create a grade that *isn't* saved to the database
         input_grade = SubsectionGrade(self.sequence, self.course)

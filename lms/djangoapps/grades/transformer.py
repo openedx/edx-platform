@@ -9,7 +9,7 @@ from logging import getLogger
 import json
 
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
+import courseware.module_render
 from lms.djangoapps.course_blocks.transformers.utils import collect_unioned_set_field, get_field_on_block
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
@@ -186,5 +186,5 @@ class GradesTransformer(BlockStructureTransformer):
         for block_locator in block_structure.post_order_traversal():
             block = block_structure.get_xblock(block_locator)
             if getattr(block, 'has_score', False):
-                module = get_module_for_descriptor(user, request, block, cache, course_key)
+                module = courseware.module_render.get_module_for_descriptor(user, request, block, cache, course_key)
                 yield module
