@@ -1,0 +1,53 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+
+<!--<%namespace name='static' file='/static_content.html'/>-->
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">${_("Additional permissions required")}</%block>
+<main id="main" aria-label="Content" tabindex="-1">
+    <div id="data-sharing-consent-form" class="login-register">
+        <section class="form-type">
+            <div class="form-wrapper">
+                <form
+                    id="data-sharing"
+                    class="register-form"
+                    autocomplete="off"
+                    action="${reverse('grant_data_sharing_permissions')}",
+                    method="POST"
+                >
+                    <div class="section-title lines">
+                        <h2>
+                            <span class="text">
+                                ${_("Data Sharing Consent")}
+                            </span>
+                        </h2>
+                    </div>
+                    <span class="text">
+                        ${_("In order to link your account, we need consent to share your course data with {provider}.").format(provider=sso_provider)}
+                    </span>
+                    <div class="form-field data-sharing-consent">
+                        <input
+                            id="register-data_sharing_consent"
+                            type="checkbox"
+                            name="data_sharing_consent"
+                            class="input-block checkbox"
+                        />
+                        <label for="register-data_sharing_consent">
+                            ${_("I agree to allow {platform_name} to share data about my enrollment, completion and performance in all {platform_name} courses and programs where my enrollment is sponsored by {provider}.*").format(provider=sso_provider, platform_name=platform_name)}
+                        </label>
+                    </div>
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrftoken }" />
+                    <button type="submit" class="action-primary action">Submit</button>
+                    <p class="note">${_("*{provider} requires data sharing consent; if consent is not provided, you will be redirected to log in manually.").format(provider=sso_provider)}
+                </form>
+            </div>
+        </section>
+    </div>
+</main>
