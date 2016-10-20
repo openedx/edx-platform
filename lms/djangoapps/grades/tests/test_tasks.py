@@ -4,6 +4,7 @@ Tests for the functionality and infrastructure of grades tasks.
 
 import ddt
 from django.conf import settings
+from django.db.utils import IntegrityError
 from mock import patch
 from unittest import skip
 
@@ -154,3 +155,20 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
                         self.score_changed_kwargs['usage_id'],
                     )
                 )
+
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    def test_retry_on_integrity_error(self, mock_update, mock_retry):
+        """
+        Ensures that tasks will be retried if IntegrityErrors are encountered.
+        """
+        self.set_up_course()
+        mock_update.side_effect = IntegrityError("WHAMMY")
+        recalculate_subsection_grade.apply(
+            args=(
+                self.score_changed_kwargs['user_id'],
+                self.score_changed_kwargs['course_id'],
+                self.score_changed_kwargs['usage_id'],
+            )
+        )
+        self.assertTrue(mock_retry.called)

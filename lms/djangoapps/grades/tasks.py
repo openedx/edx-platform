@@ -5,6 +5,7 @@ This module contains tasks for asynchronous execution of grade updates.
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.utils import IntegrityError
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.courseware.courses import get_course_by_id
@@ -17,7 +18,7 @@ from .transformer import GradesTransformer
 from .new.subsection_grade import SubsectionGradeFactory
 
 
-@task(routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+@task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
 def recalculate_subsection_grade(user_id, course_id, usage_id):
     """
     Updates a saved subsection grade.
@@ -43,12 +44,15 @@ def recalculate_subsection_grade(user_id, course_id, usage_id):
         set()
     )
 
-    for subsection_usage_key in subsections_to_update:
-        transformed_subsection_structure = get_course_blocks(
-            student,
-            subsection_usage_key,
-            collected_block_structure=collected_block_structure,
-        )
-        subsection_grade_factory.update(
-            transformed_subsection_structure[subsection_usage_key], transformed_subsection_structure
-        )
+    try:
+        for subsection_usage_key in subsections_to_update:
+            transformed_subsection_structure = get_course_blocks(
+                student,
+                subsection_usage_key,
+                collected_block_structure=collected_block_structure,
+            )
+            subsection_grade_factory.update(
+                transformed_subsection_structure[subsection_usage_key], transformed_subsection_structure
+            )
+    except IntegrityError as exc:
+        raise recalculate_subsection_grade.retry(args=[user_id, course_id, usage_id], exc=exc)
