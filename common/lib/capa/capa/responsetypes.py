@@ -1710,6 +1710,8 @@ class NumericalResponse(LoncapaResponse):
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
+        self.additional_answers = []
+        self.additional_answer_index = -1
         self.tolerance = default_tolerance
         self.range_tolerance = False
         self.answer_range = self.inclusion = None
@@ -1719,6 +1721,10 @@ class NumericalResponse(LoncapaResponse):
         xml = self.xml
         context = self.context
         answer = xml.get('answer')
+
+        self.additional_answers = (
+            [element.get('answer') for element in xml.findall('additional_answer')]
+        )
 
         if answer.startswith(('[', '(')) and answer.endswith((']', ')')):  # range tolerance case
             self.range_tolerance = True
@@ -1930,6 +1936,20 @@ class NumericalResponse(LoncapaResponse):
                 if compare_with_tolerance(student_float, correct_float, expanded_tolerance):
                     is_correct = 'partially-correct'
 
+        # Reset self.additional_answer_index to -1 so that we always have a fresh index to look up.
+        self.additional_answer_index = -1
+
+        # Compare with additional answers.
+        if is_correct == 'incorrect':
+            temp_additional_answer_idx = 0
+            for additional_answer in self.additional_answers:
+                staff_answer = self.get_staff_ans(additional_answer)
+                if complex(student_float) == staff_answer:
+                    is_correct = 'correct'
+                    self.additional_answer_index = temp_additional_answer_idx
+                    break
+                temp_additional_answer_idx += 1
+
         if is_correct == 'partially-correct':
             return CorrectMap(self.answer_id, is_correct, npoints=partial_score)
         else:
@@ -1957,7 +1977,38 @@ class NumericalResponse(LoncapaResponse):
             return False
 
     def get_answers(self):
-        return {self.answer_id: self.correct_answer}
+        _ = self.capa_system.i18n.ugettext
+        # Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+        separator = Text(' {b_start}{or_separator}{b_end} ').format(
+            # Translators: Separator used in NumericalResponse to display multiple answers.
+            or_separator=_('or'),
+            b_start=HTML('<b>'),
+            b_end=HTML('</b>'),
+        )
+        return {self.answer_id: separator.join([self.correct_answer] + self.additional_answers)}
+
+    def set_cmap_msg(self, student_answers, new_cmap, hint_type, hint_index):
+        """
+        Sets feedback to correct hint node in correct map.
+
+        Arguments:
+            student_answers (dict): Dict containing student input.
+            new_cmap (dict): Dict containing correct map properties.
+            hint_type (str): Hint type, either `correcthint` or `additional_answer`
+            hint_index (int): Index of the hint node
+        """
+        # Note: using self.id here, not the more typical self.answer_id
+        hint_nodes = self.xml.xpath('//numericalresponse[@id=$id]/' + hint_type, id=self.id)
+        if hint_nodes:
+            hint_node = hint_nodes[hint_index]
+            if hint_type == 'additional_answer':
+                hint_node = hint_nodes[hint_index].find('./correcthint')
+            new_cmap[self.answer_id]['msg'] += self.make_hint_div(
+                hint_node,
+                True,
+                [student_answers[self.answer_id]],
+                self.tags[0]
+            )
 
     def get_extended_hints(self, student_answers, new_cmap):
         """
@@ -1966,16 +2017,11 @@ class NumericalResponse(LoncapaResponse):
         """
         if self.answer_id in student_answers:
             if new_cmap.cmap[self.answer_id]['correctness'] == 'correct':  # if the grader liked the student's answer
-                # Note: using self.id here, not the more typical self.answer_id
-                hints = self.xml.xpath('//numericalresponse[@id=$id]/correcthint', id=self.id)
-                if hints:
-                    hint_node = hints[0]
-                    new_cmap[self.answer_id]['msg'] += self.make_hint_div(
-                        hint_node,
-                        True,
-                        [student_answers[self.answer_id]],
-                        self.tags[0]
-                    )
+                # Answer is not an additional answer.
+                if self.additional_answer_index == -1:
+                    self.set_cmap_msg(student_answers, new_cmap, 'correcthint', 0)
+                else:
+                    self.set_cmap_msg(student_answers, new_cmap, 'additional_answer', self.additional_answer_index)
 
 #-----------------------------------------------------------------------------
 

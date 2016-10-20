@@ -236,6 +236,9 @@ class NumericInputHintsTest(HintTest):
     @data(
         {'problem_id': u'1_2_1', 'choice': '1.141',
          'expected_string': u'<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Nice </span><div class="hint-text">The square root of two turns up in the strangest places.</div></div>'},
+        # additional answer
+        {'problem_id': u'1_2_1', 'choice': '10',
+         'expected_string': u'<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">This is an additional hint.</div></div>'},
         {'problem_id': u'1_3_1', 'choice': '4',
          'expected_string': u'<div class="feedback-hint-correct"><div class="explanation-title">Answer</div><span class="hint-label">Correct: </span><div class="hint-text">Pretty easy, uh?.</div></div>'},
         # should get hint, when correct via numeric-tolerance
