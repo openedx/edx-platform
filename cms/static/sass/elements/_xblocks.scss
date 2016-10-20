@@ -492,6 +492,31 @@
       }
     }
   }
+
+  .location-footer {
+    .location-container {
+      position: relative;
+      background: #f9f9f9;
+      border-top: 1px solid #ddd;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+
+      .location-label {
+        position: absolute;
+        left: 0;
+        padding: 8px 10px;
+        border-right: 1px solid #ddd;
+        z-index: 11;
+      }
+      .location-value {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 5px 10px 5px 90px;
+        z-index: 10;
+        font-size: .75em;
+      }
+    }
+  }
 }
 
 // +Editing - Xblocks

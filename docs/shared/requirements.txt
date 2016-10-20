@@ -33,7 +33,7 @@ mako==0.7.3
 Markdown==2.2.1
 mock==1.0.1
 networkx==1.7
-nltk==2.0.5
+nltk==2.0.6
 oauthlib==0.6.3
 paramiko==1.9.0
 path.py==7.2
