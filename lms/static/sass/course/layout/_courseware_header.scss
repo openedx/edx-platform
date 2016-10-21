@@ -18,7 +18,7 @@
     padding: ($baseline*0.75) 0 ($baseline*0.75) 0;
 
     li {
-      @include float(left);
+      display: inline-block;
       list-style: none;
 
       &.prominent {
@@ -41,21 +41,13 @@
         display: block;
         text-align: center;
         text-decoration: none;
+        border-bottom: 4px solid transparent;
 
         &:hover,
-        &:focus {
-          color: $uxpl-blue-hover-active;
-          border-bottom: 4px solid $uxpl-blue-hover-active;
-        }
-
+        &:focus,
         &.active {
-          border-bottom: 4px solid $uxpl-blue-base;
-          color: $uxpl-blue-base;
-
-          &:hover,
-          &:focus {
-            color: $uxpl-blue-base;
-          }
+          color: $uxpl-blue-hover-active;
+          border-bottom-color: $uxpl-blue-hover-active;
         }
       }
     }

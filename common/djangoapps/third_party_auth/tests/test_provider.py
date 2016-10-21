@@ -1,9 +1,14 @@
 """Unit tests for provider.py."""
 
+from django.contrib.sites.models import Site
 from mock import Mock, patch
+from openedx.core.djangoapps.site_configuration.tests.test_util import with_site_configuration
 from third_party_auth import provider
 from third_party_auth.tests import testutil
 import unittest
+
+SITE_DOMAIN_A = 'professionalx.example.com'
+SITE_DOMAIN_B = 'somethingelse.example.com'
 
 
 @unittest.skipUnless(testutil.AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
@@ -48,7 +53,12 @@ class RegistryTest(testutil.TestCase):
         """ Test that only backend_names listed in settings.AUTHENTICATION_BACKENDS can be used """
         self.configure_oauth_provider(enabled=True, name="Disallowed", backend_name="disallowed")
         self.enable_saml()
-        self.configure_saml_provider(enabled=True, name="Disallowed", idp_slug="test", backend_name="disallowed")
+        self.configure_saml_provider(
+            enabled=True,
+            name="Disallowed",
+            idp_slug="test",
+            backend_name="disallowed"
+        )
         self.assertEqual(len(provider.Registry.enabled()), 0)
 
     def test_enabled_returns_list_of_enabled_providers_sorted_by_name(self):
@@ -61,6 +71,39 @@ class RegistryTest(testutil.TestCase):
 
         with patch('third_party_auth.provider._PSA_OAUTH2_BACKENDS', backend_names):
             self.assertEqual(sorted(provider_names), [prov.name for prov in provider.Registry.enabled()])
+
+    def test_providers_displayed_for_login(self):
+        """
+        Tests to ensure that only providers that we can use to log in are presented
+        for rendering in the UI.
+        """
+        hidden_provider = self.configure_google_provider(visible=False, enabled=True)
+        normal_provider = self.configure_facebook_provider(visible=True, enabled=True)
+        implicitly_hidden_provider = self.configure_linkedin_provider(enabled=True)
+        disabled_provider = self.configure_twitter_provider(visible=True, enabled=False)
+        no_log_in_provider = self.configure_lti_provider()
+        provider_ids = [idp.provider_id for idp in provider.Registry.displayed_for_login()]
+        self.assertNotIn(hidden_provider.provider_id, provider_ids)
+        self.assertNotIn(implicitly_hidden_provider.provider_id, provider_ids)
+        self.assertNotIn(disabled_provider.provider_id, provider_ids)
+        self.assertNotIn(no_log_in_provider.provider_id, provider_ids)
+        self.assertIn(normal_provider.provider_id, provider_ids)
+
+    def test_provider_enabled_for_current_site(self):
+        """
+        Verify that enabled_for_current_site returns True when the provider matches the current site.
+        """
+        prov = self.configure_google_provider(visible=True, enabled=True, site=Site.objects.get_current())
+        self.assertEqual(prov.enabled_for_current_site, True)
+
+    @with_site_configuration(SITE_DOMAIN_A)
+    def test_provider_disabled_for_mismatching_site(self):
+        """
+        Verify that enabled_for_current_site returns False when the provider is configured for a different site.
+        """
+        site_b = Site.objects.get_or_create(domain=SITE_DOMAIN_B, name=SITE_DOMAIN_B)[0]
+        prov = self.configure_google_provider(visible=True, enabled=True, site=site_b)
+        self.assertEqual(prov.enabled_for_current_site, False)
 
     def test_get_returns_enabled_provider(self):
         google_provider = self.configure_google_provider(enabled=True)

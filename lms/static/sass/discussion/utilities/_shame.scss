@@ -21,11 +21,6 @@
 // navigation - browse menu
 // ------------------------
 
-// Override global a rules
-.forum-nav-browse-title {
-  color: inherit !important;
-}
-
 // Override global label rules
 .forum-nav-browse-filter label {
   margin-bottom: 0;
@@ -47,7 +42,7 @@
 }
 
 .forum-nav-browse-menu {
-  padding-left: 0;
+  @include padding-left(0);
 }
 
 // --------------------------------
@@ -96,27 +91,8 @@ li[class*=forum-nav-thread-label-] {
     text-shadow: none;
   }
 
-  .post-type, .topic-filter-label {
+  .post-type {
     margin-bottom: 0;
-  }
-
-  // Override global ul rules
-  .topic-menu {
-    padding-left: 0;
-  }
-
-  .topic-menu, .topic-submenu {
-    margin-top: 0;
-    margin-bottom: 0;
-  }
-
-  // Override global span rules
-  .post-topic-button .drop-arrow {
-    line-height: 36px;
-  }
-
-  .topic-title {
-    line-height: 14px;
   }
 }
 
@@ -129,7 +105,6 @@ li[class*=forum-nav-thread-label-] {
   // Override courseware
   .post-actions-list, .response-actions-list, .comment-actions-list {
     @extend %t-copy-sub2;
-    padding-left: 0 !important;
   }
 
   // Override global span

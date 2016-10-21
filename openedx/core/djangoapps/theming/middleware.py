@@ -18,5 +18,7 @@ class CurrentSiteThemeMiddleware(object):
         """
         fetch Site Theme for the current site and add it to the request object.
         """
-        default_theme = SiteTheme(site=request.site, theme_dir_name=settings.DEFAULT_SITE_THEME)
+        default_theme = None
+        if settings.DEFAULT_SITE_THEME:
+            default_theme = SiteTheme(site=request.site, theme_dir_name=settings.DEFAULT_SITE_THEME)
         request.site_theme = SiteTheme.get_theme(request.site, default=default_theme)

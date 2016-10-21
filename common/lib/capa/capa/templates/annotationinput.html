@@ -1,3 +1,4 @@
+<%! from openedx.core.djangolib.markup import HTML %>
 <form class="annotation-input">
 <div class="script_placeholder" data-src="${STATIC_URL}js/capa/annotationinput.js"/>
 
@@ -16,7 +17,7 @@
     <div class="block">${comment_prompt}</div>
     <textarea class="comment" id="input_${id}_comment" name="input_${id}_comment" aria-describedby="answer_${id}">${comment_value|h}</textarea>
 
-    <div class="block">${tag_prompt}</div>
+    <div class="block" id="label_${id}">${tag_prompt}</div>
     <ul class="tags">
     % for option in options:
         <li>
@@ -52,13 +53,12 @@
         <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     % endif
 
-    <span class="status ${status.classname}" id="status_${id}" aria-describedby="input_${id}"><span class="sr">${status.display_name}</span></span>
+    <span class="status ${status.classname}" id="status_${id}" aria-describedby="label_${id}"><span class="sr">${status.display_name}</span></span>
 
     <p id="answer_${id}" class="answer answer-annotation"></p>
 </div>
 </form>
 
 % if msg:
-<span class="message">${msg|n}</span>
+<span class="message" aria-describedby="label_${id}" tabindex="-1">${HTML(msg)}</span>
 % endif
-

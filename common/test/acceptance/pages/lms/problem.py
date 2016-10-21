@@ -2,6 +2,8 @@
 Problem Page.
 """
 from bok_choy.page_object import PageObject
+from common.test.acceptance.pages.common.utils import click_css
+from selenium.webdriver.common.keys import Keys
 
 
 class ProblemPage(PageObject):
@@ -20,6 +22,7 @@ class ProblemPage(PageObject):
         """
         Return the current problem name.
         """
+        self.wait_for_element_visibility(self.CSS_PROBLEM_HEADER, 'wait for problem header')
         return self.q(css='.problem-header').text[0]
 
     @property
@@ -48,14 +51,15 @@ class ProblemPage(PageObject):
         """
         Return the "hint" text of the problem from html
         """
-        return self.q(css="div.problem div.problem-hint").html[0].split(' <', 1)[0]
+        hints_html = self.q(css="div.problem .notification-hint .notification-message li").html
+        return [hint_html.split(' <span', 1)[0] for hint_html in hints_html]
 
     @property
     def hint_text(self):
         """
         Return the "hint" text of the problem from its div.
         """
-        return self.q(css="div.problem div.problem-hint").text[0]
+        return self.q(css="div.problem .notification-hint .notification-message").text[0]
 
     def verify_mathjax_rendered_in_problem(self):
         """
@@ -104,36 +108,122 @@ class ProblemPage(PageObject):
         """
         Fill in the answer to a numerical problem.
         """
-        self.q(css='div.problem section.inputtype input').fill(text)
+        self.q(css='div.problem div.inputtype input').fill(text)
         self.wait_for_element_invisibility('.loading', 'wait for loading icon to disappear')
         self.wait_for_ajax()
 
-    def click_check(self):
+    def click_submit(self):
         """
-        Click the Check button.
+        Click the Submit button.
         """
-        self.q(css='div.problem button.check').click()
-        self.wait_for_ajax()
+        click_css(self, '.problem .submit', require_notification=False)
 
     def click_save(self):
         """
         Click the Save button.
         """
-        self.q(css='div.problem button.save').click()
-        self.wait_for_ajax()
+        click_css(self, '.problem .save', require_notification=False)
 
     def click_reset(self):
         """
         Click the Reset button.
         """
-        self.q(css='div.problem button.reset').click()
+        click_css(self, '.problem .reset', require_notification=False)
+
+    def click_show(self):
+        """
+        Click the Show Answer button.
+        """
+        self.q(css='.problem .show').click()
         self.wait_for_ajax()
+
+    def is_hint_notification_visible(self):
+        """
+        Is the Hint Notification visible?
+        """
+        return self.q(css='.notification.notification-hint').visible
+
+    def is_save_notification_visible(self):
+        """
+        Is the Save Notification Visible?
+        """
+        return self.q(css='.notification.warning.notification-save').visible
+
+    def is_success_notification_visible(self):
+        """
+        Is the Submit Notification Visible?
+        """
+        return self.q(css='.notification.success.notification-submit').visible
+
+    def wait_for_save_notification(self):
+        """
+        Wait for the Save Notification to be present
+        """
+        self.wait_for_element_visibility('.notification.warning.notification-save',
+                                         'Waiting for Save notification to be visible')
+        self.wait_for(lambda: self.q(css='.notification.warning.notification-save').focused,
+                      'Waiting for the focus to be on the save notification')
+
+    def wait_for_gentle_alert_notification(self):
+        """
+        Wait for the Gentle Alert Notification to be present
+        """
+        self.wait_for_element_visibility('.notification.warning.notification-gentle-alert',
+                                         'Waiting for Gentle Alert notification to be visible')
+        self.wait_for(lambda: self.q(css='.notification.warning.notification-gentle-alert').focused,
+                      'Waiting for the focus to be on the gentle alert notification')
+
+    def is_gentle_alert_notification_visible(self):
+        """
+        Is the Gentle Alert Notification visible?
+        """
+        return self.q(css='.notification.warning.notification-gentle-alert').visible
+
+    def is_reset_button_present(self):
+        """ Check for the presence of the reset button. """
+        return self.q(css='.problem .reset').present
+
+    def is_save_button_enabled(self):
+        """ Is the Save button enabled """
+        return self.q(css='.action .save').attrs('disabled') == [None]
+
+    def is_focus_on_problem_meta(self):
+        """
+        Check for focus problem meta.
+        """
+        return self.q(css='.problem-header').focused
+
+    def is_submit_disabled(self):
+        """
+        Checks if the submit button is disabled
+        """
+        disabled_attr = self.q(css='.problem .submit').attrs('disabled')[0]
+        return disabled_attr == 'true'
+
+    def wait_for_submit_disabled(self):
+        """
+        Waits until the Submit button becomes disabled.
+        """
+        self.wait_for(self.is_submit_disabled, 'Waiting for submit to be enabled')
+
+    def wait_for_focus_on_submit_notification(self):
+        """
+        Check for focus submit notification.
+        """
+
+        def focus_check():
+            """
+            Checks whether or not the focus is on the notification-submit
+            """
+            return self.q(css='.notification-submit').focused
+
+        self.wait_for(promise_check_func=focus_check, description='Waiting for the notification-submit to gain focus')
 
     def wait_for_status_icon(self):
         """
         wait for status icon
         """
-        self.wait_for_element_visibility('div.problem section.inputtype div .status', 'wait for status icon')
+        self.wait_for_element_visibility('div.problem div.inputtype div .status', 'wait for status icon')
 
     def wait_for_expected_status(self, status_selector, message):
         """
@@ -146,18 +236,73 @@ class ProblemPage(PageObject):
         msg = "Wait for status to be {}".format(message)
         self.wait_for_element_visibility(status_selector, msg)
 
+    def wait_success_notification(self):
+        """
+        Check for visibility of the success notification and icon.
+        """
+        msg = "Wait for success notification to be visible"
+        self.wait_for_element_visibility('.notification.success.notification-submit', msg)
+        self.wait_for_element_visibility('.fa-check', "Waiting for success icon")
+        self.wait_for_focus_on_submit_notification()
+
+    def wait_incorrect_notification(self):
+        """
+        Check for visibility of the incorrect notification and icon.
+        """
+        msg = "Wait for error notification to be visible"
+        self.wait_for_element_visibility('.notification.error.notification-submit', msg)
+        self.wait_for_element_visibility('.fa-close', "Waiting for incorrect notification icon")
+        self.wait_for_focus_on_submit_notification()
+
+    def wait_partial_notification(self):
+        """
+        Check for visibility of the partially visible notification and icon.
+        """
+        msg = "Wait for partial correct notification to be visible"
+        self.wait_for_element_visibility('.notification.success.notification-submit', msg)
+        self.wait_for_element_visibility('.fa-asterisk', "Waiting for asterisk notification icon")
+        self.wait_for_focus_on_submit_notification()
+
     def click_hint(self):
         """
         Click the Hint button.
         """
-        self.q(css='div.problem button.hint-button').click()
-        self.wait_for_ajax()
+        click_css(self, '.problem .hint-button', require_notification=False)
+        self.wait_for_focus_on_hint_notification()
+
+    def wait_for_focus_on_hint_notification(self):
+        """
+        Wait for focus to be on the hint notification.
+        """
+        self.wait_for(
+            lambda: self.q(css='.notification-hint').focused,
+            'Waiting for the focus to be on the hint notification'
+        )
+
+    def click_review_in_notification(self):
+        """
+        Click on the "Review" button within the visible notification.
+        """
+        # The review button cannot be clicked on until it is tabbed to, so first tab to it.
+        # Multiple tabs may be required depending on the content (for instance, hints with links).
+        def tab_until_review_focused():
+            """ Tab until the review button is focused """
+            self.browser.switch_to_active_element().send_keys(Keys.TAB)
+            return self.q(css='.notification .review-btn').focused
+
+        self.wait_for(tab_until_review_focused, 'Waiting for the Review button to become focused')
+
+        click_css(self, '.notification .review-btn', require_notification=False)
+
+    def get_hint_button_disabled_attr(self):
+        """ Return the disabled attribute of all hint buttons (once hints are visible, there will be two). """
+        return self.q(css='.problem .hint-button').attrs('disabled')
 
     def click_choice(self, choice_value):
         """
         Click the choice input(radio, checkbox or option) where value matches `choice_value` in choice group.
         """
-        self.q(css='div.problem .choicegroup input[value="' + choice_value + '"]').click()
+        self.q(css='div.problem .choicegroup input[value="' + choice_value + '"]').first.click()
         self.wait_for_ajax()
 
     def is_correct(self):
@@ -170,19 +315,19 @@ class ProblemPage(PageObject):
         """
         Is there a "correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.correct span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.correct span.status").is_present()
 
     def simpleprob_is_partially_correct(self):
         """
         Is there a "partially correct" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.partially-correct span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.partially-correct span.status").is_present()
 
     def simpleprob_is_incorrect(self):
         """
         Is there an "incorrect" status showing? Works with simple problem types.
         """
-        return self.q(css="div.problem section.inputtype div.incorrect span.status").is_present()
+        return self.q(css="div.problem div.inputtype div.incorrect span.status").is_present()
 
     def click_clarification(self, index=0):
         """
@@ -199,3 +344,49 @@ class ProblemPage(PageObject):
         """
         self.wait_for_element_visibility('body > .tooltip', 'A tooltip is visible.')
         return self.q(css='body > .tooltip').text[0]
+
+    def is_solution_tag_present(self):
+        """
+        Check if solution/explanation is shown.
+        """
+        solution_selector = '.solution-span div.detailed-solution'
+        return self.q(css=solution_selector).is_present()
+
+    def is_correct_choice_highlighted(self, correct_choices):
+        """
+        Check if correct answer/choice highlighted for choice group.
+        """
+        xpath = '//fieldset/div[contains(@class, "field")][{0}]/label[contains(@class, "choicegroup_correct")]'
+        for choice in correct_choices:
+            if not self.q(xpath=xpath.format(choice)).is_present():
+                return False
+        return True
+
+    @property
+    def problem_question(self):
+        """
+        Return the question text of the problem.
+        """
+        return self.q(css="div.problem .wrapper-problem-response legend").text[0]
+
+    @property
+    def problem_question_descriptions(self):
+        """
+        Return a list of question descriptions of the problem.
+        """
+        return self.q(css="div.problem .wrapper-problem-response .question-description").text
+
+    @property
+    def problem_progress_graded_value(self):
+        """
+        Return problem progress text which contains weight of problem, if it is graded, and the student's current score.
+        """
+        self.wait_for_element_visibility('.problem-progress', "Problem progress is visible")
+        return self.q(css='.problem-progress').text[0]
+
+    @property
+    def status_sr_text(self):
+        """
+        Returns the text in the special "sr" region used for display status.
+        """
+        return self.q(css='#reader-feedback').text[0]

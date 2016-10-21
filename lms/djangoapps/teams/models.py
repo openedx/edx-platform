@@ -23,7 +23,7 @@ from django_comment_common.signals import (
     comment_voted,
     comment_endorsed
 )
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from util.model_utils import slugify
 from student.models import LanguageField, CourseEnrollment
 from .errors import AlreadyOnTeamInCourse, NotEnrolledInCourseForTeam, ImmutableMembershipFieldException

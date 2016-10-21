@@ -569,7 +569,7 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
     @property
     def new_post_button_present(self):
         """ Returns True if New Post button is present else False """
-        return self.q(css='.discussion-module .new-post-btn').present
+        return self.q(css='.discussion-module .new-post-btn').visible
 
     @property
     def edit_team_button_present(self):

@@ -39,7 +39,7 @@ from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE, EnrollStatusChange
 from util.query import use_read_replica_if_available
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from .exceptions import (
     InvalidCartItem,
     PurchasedCallbackException,
@@ -415,7 +415,7 @@ class Order(models.Model):
                 if csv_file:
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
                 if pdf_file is not None:
-                    email.attach(u'Receipt.pdf', pdf_file.getvalue(), 'application/pdf')
+                    email.attach(u'ReceiptOrder{}.pdf'.format(str(self.id)), pdf_file.getvalue(), 'application/pdf')
                 else:
                     file_buffer = StringIO.StringIO(_('pdf download unavailable right now, please contact support.'))
                     email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
@@ -1792,7 +1792,7 @@ class CourseRegCodeItem(OrderItem):
         # we should ultimately refactor code to have save_registration_code in this models.py
         # file, but there's also a shared dependency on a random string generator which
         # is in another PR (for another feature)
-        from instructor.views.api import save_registration_code
+        from lms.djangoapps.instructor.views.api import save_registration_code
         for i in range(total_registration_codes):  # pylint: disable=unused-variable
             save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 

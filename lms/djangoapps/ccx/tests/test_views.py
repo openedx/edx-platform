@@ -17,7 +17,10 @@ from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
 from courseware.testutils import FieldOverrideTestMixin
-from instructor.access import (
+from django_comment_client.utils import has_forum_access
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
+from django_comment_common.utils import are_permissions_roles_seeded
+from lms.djangoapps.instructor.access import (
     allow_access,
     list_with_level,
 )
@@ -415,18 +418,26 @@ class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         course_enrollments = get_override_for_ccx(ccx, self.course, 'max_student_enrollments_allowed')
         self.assertEqual(course_enrollments, settings.CCX_MAX_STUDENTS_ALLOWED)
 
-        # assert ccx creator has role=ccx_coach
-        role = CourseCcxCoachRole(course_key)
+        # assert ccx creator has role=staff
+        role = CourseStaffRole(course_key)
         self.assertTrue(role.has_user(self.coach))
 
         # assert that staff and instructors of master course has staff and instructor roles on ccx
         list_staff_master_course = list_with_level(self.course, 'staff')
         list_instructor_master_course = list_with_level(self.course, 'instructor')
 
+        # assert that forum roles are seeded
+        self.assertTrue(are_permissions_roles_seeded(course_key))
+        self.assertTrue(has_forum_access(self.coach.username, course_key, FORUM_ROLE_ADMINISTRATOR))
+
         with ccx_course(course_key) as course_ccx:
             list_staff_ccx_course = list_with_level(course_ccx, 'staff')
-            self.assertEqual(len(list_staff_master_course), len(list_staff_ccx_course))
-            self.assertEqual(list_staff_master_course[0].email, list_staff_ccx_course[0].email)
+            # The "Coach" in the parent course becomes "Staff" on the CCX, so the CCX should have 1 "Staff"
+            # user more than the parent course
+            self.assertEqual(len(list_staff_master_course) + 1, len(list_staff_ccx_course))
+            self.assertIn(list_staff_master_course[0].email, [ccx_staff.email for ccx_staff in list_staff_ccx_course])
+            # Make sure the "Coach" on the parent course is "Staff" on the CCX
+            self.assertIn(self.coach, list_staff_ccx_course)
 
             list_instructor_ccx_course = list_with_level(course_ccx, 'instructor')
             self.assertEqual(len(list_instructor_ccx_course), len(list_instructor_master_course))
@@ -1148,7 +1159,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         )
 
     @patch('ccx.views.render_to_response', intercept_renderer)
-    @patch('instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
+    @patch('lms.djangoapps.instructor.views.gradebook_api.MAX_STUDENTS_PER_PAGE_GRADE_BOOK', 1)
     def test_gradebook(self):
         self.course.enable_ccx = True
         RequestCache.clear_request_cache()

@@ -12,8 +12,9 @@ from lms.lib.comment_client.utils import CommentClientPaginatedResult
 from django_comment_common.utils import ThreadContext
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
+    GroupIdAssertionMixin,
     CohortedTopicGroupIdTestMixin,
-    NonCohortedTopicGroupIdTestMixin
+    NonCohortedTopicGroupIdTestMixin,
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_client.tests.utils import CohortedTestCase
@@ -347,11 +348,11 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
         # course is outside the context manager that is verifying the number of queries,
         # and with split mongo, that method ends up querying disabled_xblocks (which is then
         # cached and hence not queried as part of call_single_thread).
-        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 18, 8),
-        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 18, 8),
+        (ModuleStoreEnum.Type.mongo, 1, 6, 4, 15, 3),
+        (ModuleStoreEnum.Type.mongo, 50, 6, 4, 15, 3),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3, 3, 17, 8),
-        (ModuleStoreEnum.Type.split, 50, 3, 3, 17, 8),
+        (ModuleStoreEnum.Type.split, 1, 3, 3, 14, 3),
+        (ModuleStoreEnum.Type.split, 50, 3, 3, 14, 3),
     )
     @ddt.unpack
     def test_number_of_mongo_queries(
@@ -550,8 +551,8 @@ class SingleThreadAccessTestCase(CohortedTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
-    cs_endpoint = "/threads"
+class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
+    cs_endpoint = "/threads/dummy_thread_id"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
         mock_request.side_effect = make_mock_request_impl(

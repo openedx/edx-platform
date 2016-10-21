@@ -46,6 +46,7 @@
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # Kevin Min <gr326887@graded.br>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
+# kmooc <shevious@gmail.com>, 2016
 # Sunah Lim <whitetree70@snu.ac.kr>, 2013
 # Sunah Lim <whitetree70@snu.ac.kr>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
@@ -61,7 +62,7 @@
 # shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
-# Chanseok <kcsgoodboy@gmail.com>, 2014
+# Chanseok <kcsgoodboy@naver.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # JiyeonLee <leejiyeon00@gmail.com>, 2014
 # Sunah Lim <whitetree70@snu.ac.kr>, 2013
@@ -76,7 +77,7 @@
 # Gil <gedwarp@gmail.com>, 2014
 # kmooc <shevious@gmail.com>, 2015
 # shevious <shevious@yahoo.com>, 2015
-# Chanseok <kcsgoodboy@gmail.com>, 2014
+# Chanseok <kcsgoodboy@naver.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # Nicole <dlruddk1112@gmail.com>, 2014
 # shin2012 <shin2013@gmail.com>, 2014
@@ -84,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-08-25 15:05+0000\n"
+"POT-Creation-Date: 2016-10-13 18:43+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -156,64 +157,6 @@ msgstr "상태"
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
-msgstr ""
-
-#: common/djangoapps/config_models/admin.py
-msgid "Revert to the selected configuration"
-msgstr ""
-
-#: common/djangoapps/config_models/admin.py
-msgid "Please select a single configuration to revert to."
-msgstr ""
-
-#: common/djangoapps/config_models/admin.py
-msgid "Reverted configuration."
-msgstr ""
-
-#: common/djangoapps/config_models/admin.py
-msgid "Current Configuration"
-msgstr ""
-
-#: common/djangoapps/config_models/admin.py
-msgid "All (Show History)"
-msgstr ""
-
-#: common/djangoapps/config_models/admin.py
-msgid "Update"
-msgstr ""
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A file containing JSON must be specified."
-msgstr ""
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A valid username must be specified."
-msgstr ""
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "File {0} does not exist"
-msgstr ""
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Importing JSON data from file {0}"
-msgstr ""
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Import complete, {0} new entries created"
-msgstr ""
-
-#: common/djangoapps/config_models/models.py
-msgid "Change date"
-msgstr ""
-
-#. Translators: this label indicates the name of the user who made this
-#. change:
-#: common/djangoapps/config_models/models.py
-msgid "Changed by"
-msgstr ""
-
-#: common/djangoapps/config_models/models.py
-msgid "Enabled"
 msgstr ""
 
 #: common/djangoapps/cors_csrf/models.py
@@ -446,20 +389,6 @@ msgstr ""
 
 #: common/djangoapps/embargo/models.py
 msgid "Blacklist {country} for {course}"
-msgstr ""
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"You have already created an account using an external login like WebAuth or "
-"Shibboleth. Please contact {tech_support_email} for support."
-msgstr ""
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"\n"
-"        Your university identity server did not return your ID information to us.\n"
-"        Please try logging in again.  (You may need to restart your browser.)\n"
-"        "
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -767,6 +696,14 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/student/models.py
+msgid "Name of the UTM cookie"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Name of the affiliate cookie"
+msgstr ""
+
+#: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
 msgstr ""
 
@@ -931,6 +868,10 @@ msgid "Password reset unsuccessful"
 msgstr ""
 
 #: common/djangoapps/student/views.py
+msgid "Error in resetting your password. Please try again."
+msgstr ""
+
+#: common/djangoapps/student/views.py
 msgid "No inactive user with this e-mail exists"
 msgstr ""
 
@@ -965,6 +906,10 @@ msgid ""
 msgstr ""
 
 #: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this provider configuration belongs to."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
 msgid ""
 "If this option is enabled, users will not be asked to confirm their details "
 "(name, email, etc.) during the registration process. Only select this option"
@@ -975,6 +920,17 @@ msgstr ""
 msgid ""
 "If this option is selected, users will not be required to confirm their "
 "email, and their account will be activated immediately upon registration."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid ""
+"If this option is not selected, users will not be presented with the "
+"provider as an option to authenticate with on the login screen, but manual "
+"authentication using the correct link is still possible."
+msgstr ""
+
+#: common/djangoapps/third_party_auth/models.py
+msgid "The Site that this SAML configuration belongs to."
 msgstr ""
 
 #: lms/templates/student_account/finish_auth.html
@@ -1443,6 +1399,16 @@ msgstr ""
 msgid "Cannot rescore problems with possible file submissions"
 msgstr ""
 
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect"
+msgstr ""
+
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct"
+msgstr ""
+
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
 msgstr ""
@@ -1482,12 +1448,16 @@ msgid "This answer is partially correct."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This answer is unanswered."
+msgid "This answer is being processed."
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
-msgid "This answer is being processed."
+msgid "Not yet answered."
 msgstr ""
+
+#: wiki/forms.py
+msgid "Select an option"
+msgstr "평가 기준을 선택하세요."
 
 #. Translators: 'ChoiceGroup' is an input type and should not be translated.
 #: common/lib/capa/capa/inputtypes.py
@@ -1514,6 +1484,14 @@ msgstr ""
 msgid ""
 "Your answer has been submitted. As soon as your submission is graded, this "
 "message will be replaced with the grader's feedback."
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "{programming_language} editor"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
 msgstr ""
 
 #: common/lib/capa/capa/inputtypes.py
@@ -1559,12 +1537,21 @@ msgstr ""
 msgid "Expected a {expected_tag} tag; got {given_tag} instead"
 msgstr ""
 
+#. Translators: index here could be 1,2,3 and so on
 #: common/lib/capa/capa/responsetypes.py
-msgid "Correct"
+msgid "Question {index}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect"
+msgid "Correct:"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Incorrect:"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
@@ -1822,6 +1809,7 @@ msgid "Annotation"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr ""
@@ -1986,10 +1974,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "String customization substitutions for particular locations"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Enable LaTeX templates?"
 msgstr ""
@@ -2009,16 +1993,17 @@ msgid ""
 "contact moocsupport@mathworks.com"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Check"
-msgstr ""
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "제출"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Final Check"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Checking..."
+msgid "Submitting"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2037,14 +2022,40 @@ msgstr ""
 msgid "If this error persists, please contact the course staff."
 msgstr ""
 
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Hint: "
+msgid ""
+"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 msgstr ""
 
-#. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
+#. This text is shown in bold before the accompanying hint text.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially Correct"
 msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
@@ -2054,7 +2065,7 @@ msgid "Problem is closed."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be reset before it can be checked again."
+msgid "Problem must be reset before it can be submitted again."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -2111,10 +2122,14 @@ msgid ""
 "them."
 msgstr ""
 
-#. Translators: A student must "make an attempt" to solve the problem on the
-#. page before they can reset it.
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Refresh the page and make an attempt before resetting."
+msgid "You cannot select Reset for a problem that is closed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "You must submit an answer before you can select Reset."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
@@ -2127,6 +2142,70 @@ msgstr ""
 msgid ""
 "The state of this problem has changed since you loaded this page. Please "
 "refresh your page."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "List of urls of children that are references to external modules"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Source Components"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The component location IDs of all source components that are used to "
+"determine whether a learner is shown the content of this conditional module."
+" Copy the component location ID of a component from its Settings dialog in "
+"Studio."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Attribute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The attribute of the source components that determines whether a learner is "
+"shown the content of this conditional module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Value"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The value that the conditional attribute of the source components must match"
+" before a learner is shown the content of this conditional module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Blocked Content Message"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The message that is shown to learners when not all conditions are met to "
+"show the content of this conditional module. Include {link} in the text of "
+"your message to give learners a direct link to required units. For example, "
+"'You must complete {link} before you can access this unit'."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "You must complete {link} before you can access this unit."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "This component has no source components configured yet."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Configure list of sources"
 msgstr ""
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
@@ -2870,16 +2949,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Enable Subsection Grades Saved"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
-msgid ""
-"Enter true or false. If this value is true, the robust grades feature of "
-"saving subsection grades is enabled for this course."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/course_module.py
 msgid "Course Learning Information"
 msgstr ""
 
@@ -3082,17 +3151,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
-#: common/lib/xmodule/xmodule/lti_module.py
-msgid "Scored"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_content_module.py
-msgid ""
-"Set this value to True if this module is either a graded assignment or a "
-"practice problem."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
 msgstr ""
 
@@ -3218,6 +3276,10 @@ msgid ""
 "a new window. Select False if you want the LTI content to open in an IFrame "
 "in the current page. This setting is only used when Hide External Tool is "
 "set to False.  "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Scored"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3414,14 +3476,6 @@ msgstr ""
 msgid ""
 "Enter the path to use for files on the Files & Uploads page. This value "
 "overrides the Studio default, c4x://."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Text Customization"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter string customization substitutions for particular locations."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
@@ -3761,6 +3815,12 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
 msgstr ""
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "There is no transcript file associated with the {lang} language."
+msgid_plural ""
+"There are no transcript files associated with the {lang} languages."
+msgstr[0] ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -4902,6 +4962,57 @@ msgstr "{currency_symbol}{price}"
 #. course costs nothing so it is free.
 #: lms/djangoapps/courseware/views/views.py
 msgid "Free"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your enrollment: Audit track"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You are enrolled in the audit track for this course. The audit track does "
+"not include a certificate."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate has been invalidated"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Please contact your course team if you have any questions."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Your certificate is available"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You can keep working for a higher grade, or request your certificate now."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "We're working on it..."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"We're creating your certificate. You can keep working in your courses and a "
+"link to it will appear here and on your Dashboard when it is ready."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Certificate unavailable"
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid ""
+"You have not received a certificate because you do not have a current "
+"{platform_name} verified identity."
+msgstr ""
+
+#: lms/djangoapps/courseware/views/views.py
+msgid "Congratulations, you qualified for a certificate!"
 msgstr ""
 
 #: lms/djangoapps/courseware/views/views.py
@@ -8050,7 +8161,9 @@ msgstr ""
 #: lms/templates/wiki/plugins/attachments/index.html
 #: lms/templates/dashboard.html lms/templates/index.html
 #: lms/templates/api_admin/catalogs/search.html
-#: lms/templates/courseware/courses.html lms/templates/edxnotes/edxnotes.html
+#: lms/templates/courseware/courses.html
+#: lms/templates/courseware/courseware.html
+#: lms/templates/edxnotes/edxnotes.html
 #: themes/edx.org/lms/templates/dashboard.html
 #: themes/stanford-style/lms/templates/index.html
 msgid "Search"
@@ -8391,6 +8504,20 @@ msgstr ""
 msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"You have already created an account using an external login like WebAuth or "
+"Shibboleth. Please contact {tech_support_email} for support."
+msgstr ""
+
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
+msgstr ""
+
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be smaller than {image_max_size} in size."
 msgstr ""
@@ -8656,18 +8783,18 @@ msgstr ""
 msgid "Please select your Country."
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Review the Honor Code"
+msgstr ""
+
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "Terms of Service and Honor Code"
 msgstr ""
 
-#. Translators: "Terms of Service" is a legal document users must agree to
-#. in order to register a new account.
-#. Translators: "Terms of service" is a legal document users must agree to
-#. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "I agree to the {platform_name} {terms_of_service}."
+msgid "Review the Terms of Service and Honor Code"
 msgstr ""
 
 #. Translators: "Terms of Service" is a legal document users must agree to
@@ -8675,7 +8802,19 @@ msgstr ""
 #. Translators: "Terms of service" is a legal document users must agree to
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
-msgid "You must agree to the {platform_name} {terms_of_service}."
+msgid "I agree to the {platform_name} {terms_of_service}"
+msgstr ""
+
+#. Translators: "Terms of Service" is a legal document users must agree to
+#. in order to register a new account.
+#. Translators: "Terms of service" is a legal document users must agree to
+#. in order to register a new account.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "You must agree to the {platform_name} {terms_of_service}"
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Review the Terms of Service"
 msgstr ""
 
 #: openedx/core/lib/api/view_utils.py
@@ -8851,7 +8990,7 @@ msgstr ""
 msgid "HTML"
 msgstr ""
 
-#: cms/djangoapps/contentstore/views/component.py
+#: cms/djangoapps/contentstore/views/component.py lms/templates/video.html
 msgid "Video"
 msgstr ""
 
@@ -9391,8 +9530,9 @@ msgstr ""
 msgid "Account"
 msgstr "계정"
 
-#: cms/templates/widgets/header.html lms/templates/help_modal.html
-#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
+#: cms/templates/widgets/header.html lms/templates/navigation.html
+#: lms/templates/static_templates/help.html
+#: themes/edx.org/lms/templates/header.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "도움말"
 
@@ -9467,10 +9607,6 @@ msgstr ""
 msgid "Sign Out"
 msgstr "로그아웃"
 
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "{programming_language} editor"
-msgstr ""
-
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr "모든 저작권이 보호됩니다."
@@ -9508,15 +9644,6 @@ msgid "For example use en for English"
 msgstr ""
 
 #: common/templates/darklang/preview_lang_include.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "제출"
-
-#: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
 msgstr ""
 
@@ -9524,6 +9651,10 @@ msgstr ""
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
 msgstr "토의 - {course_number}"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_board.html
+msgid "Discussions"
+msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/templates/discussion/_discussion_inline.html
@@ -9574,8 +9705,12 @@ msgstr ""
 msgid "Click to add"
 msgstr ""
 
+#: lms/templates/bookmark_button.html lms/templates/seq_module.html
+msgid "Bookmarked"
+msgstr ""
+
 #: lms/templates/bookmark_button.html
-msgid "Bookmark"
+msgid "Bookmark this page"
 msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
@@ -9772,8 +9907,12 @@ msgid "Email is incorrect."
 msgstr "이메일이 틀립니다"
 
 #: lms/templates/help_modal.html
-msgid "{platform_name} Help"
-msgstr "{platform_name} 도움말"
+msgid "Support"
+msgstr ""
+
+#: lms/templates/help_modal.html
+msgid "{platform_name} Support"
+msgstr ""
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -10226,10 +10365,6 @@ msgid "You do not have any notes."
 msgstr "노트가 없습니다."
 
 #: lms/templates/problem.html
-msgid "your answer"
-msgstr "답"
-
-#: lms/templates/problem.html
 msgid "Hint"
 msgstr "힌트"
 
@@ -10238,12 +10373,29 @@ msgid "Save"
 msgstr "저장"
 
 #: lms/templates/problem.html
-msgid "Toggle Answer Visibility"
+msgid "Save your answer"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} submissions"
-msgstr "총 풀이 가능 횟수 {num_total}회 중 {num_used}회 풀었습니다."
+msgid "Reset your answer"
+msgstr ""
+
+#: lms/templates/problem.html
+msgid "Submit your answer"
+msgstr ""
+
+#: lms/templates/problem.html
+msgid "You have used {num_used} of {num_total} attempts"
+msgstr ""
+
+#: lms/templates/problem_notifications.html
+msgid "Next Hint"
+msgstr ""
+
+#: lms/templates/problem_notifications.html
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Review"
+msgstr "검토"
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -10496,10 +10648,6 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "이전"
-
-#: lms/templates/seq_module.html
-msgid "Bookmarked"
-msgstr ""
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -10892,12 +11040,28 @@ msgid "No playable video sources found."
 msgstr "재생 가능한 동영상 소스가 없습니다."
 
 #: lms/templates/video.html
-msgid "Download video"
-msgstr "동영상 다운로드"
+msgid "Downloads and transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download video file"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Transcripts"
+msgstr ""
+
+#: lms/templates/video.html
+msgid "Download {file}"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download transcript"
 msgstr "자막 다운로드"
+
+#: lms/templates/video.html
+msgid "Handouts"
+msgstr ""
 
 #: lms/templates/video.html
 msgid "Download Handout"
@@ -12302,10 +12466,6 @@ msgid "Course Search"
 msgstr "강좌 검색"
 
 #: lms/templates/courseware/courseware.html
-msgid "search"
-msgstr "검색"
-
-#: lms/templates/courseware/courseware.html
 msgid "No content has been added to this course"
 msgstr "강좌 내용을 추가하세요. "
 
@@ -12792,31 +12952,45 @@ msgid "Verify Now"
 msgstr "자신을 인증 하세요!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have already verified your ID!"
-msgstr "벌써 당신의 신분증을 인증했습니다! "
+msgid "You have submitted your verification information."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Thanks for your patience as we process your request."
-msgstr "기다려 주셔서 감사합니다."
+msgid ""
+"You will see a message on your dashboard when the verification process is "
+"complete (usually within 1-2 days)."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification status is good until {date}."
-msgstr "인증 유효기간은 {date}까지입니다. "
+msgid "Your current verification will expire soon!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification will expire soon!"
-msgstr "인증이 곧 만료될것입니다."
+msgid ""
+"You have submitted your reverification information. You will see a message "
+"on your dashboard when the verification process is complete (usually within "
+"1-2 days)."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You have successfully verified your ID with edX"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification is effective until {date}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification will expire soon."
+msgstr ""
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Your current verification will expire before the verification deadline for "
-"this course. {start_link}Re-verify your identity now{end_link} using a "
-"webcam and a government-issued ID."
+"Your current verification will expire in {days} days. {start_link}Re-verify "
+"your identity now{end_link} using a webcam and a government-issued photo ID."
 msgstr ""
-"현재 인증은 강좌의 인증 마감시간 전에 만료될것입니다. 웹캠과 정부가 발급한 신분증으로 {start_link} 신분 "
-"재인증{end_link} 을 하세요. "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -12913,34 +13087,34 @@ msgid ""
 msgstr "결제 처리과정에서 오류가 발생했습니다. {support_email}에게 문의하세요."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Approved"
+msgid "Current Verification Status: Approved"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification is reviewed and approved. Your verification status is "
-"good for one year after submission."
+"Your edX verification has been approved. Your verification is effective for "
+"one year after submission."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Pending"
+msgid "Current Verification Status: Pending"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification is pending. Your verification photos have been "
+"Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Expired"
+msgid "Current Verification Status: Expired"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification has expired. To receive a verified certificate, you "
-"have to submit a new photo of yourself and your government-issued photo ID "
-"before the course ends."
+"Your verification has expired. To receive a verified certificate, you must "
+"submit a new photo of yourself and your government-issued photo ID before "
+"the verification deadline for your course."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
@@ -12979,6 +13153,10 @@ msgstr "게시판을 보려면, 학습활동 설정에서 미리 보기나 적�
 #: lms/templates/discussion/_discussion_inline_studio.html
 msgid "Discussion ID: {discussion_id}"
 msgstr "토의 ID: {discussion_id}"
+
+#: lms/templates/discussion/_filter_dropdown.html
+msgid "Discussion topics list"
+msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
@@ -16102,10 +16280,6 @@ msgid "{platform_name} -  Shopping Cart"
 msgstr "{platform_name} - 장바구니"
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Review"
-msgstr "검토"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Confirmation"
 msgstr "확인"
 
@@ -16332,11 +16506,9 @@ msgstr "질문이 있다면 누구에게 연락해야하나요?"
 
 #: lms/templates/survey/survey.html
 msgid ""
-"If you have any questions about this course or this form, you can contact <a"
-" href=\"{mail_to_link}\"\">{mail_to_link}</a>."
+"If you have any questions about this course or this form, you can contact "
+"{link_start}{mail_to_link}{link_end}."
 msgstr ""
-"이 강좌나 형식에 대해 질문이 있다면 <a href=\"{mail_to_link}\"\">{mail_to_link}</a>로 "
-"연락해주세요."
 
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
@@ -16469,8 +16641,9 @@ msgstr "edX 소개"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© edX Inc.  All rights reserved except where noted.  EdX, Open edX and the "
-"edX and Open EdX logos are registered trademarks or trademarks of edX Inc."
+"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
+"the edX and Open EdX logos are registered trademarks or trademarks of edX "
+"Inc."
 msgstr ""
 
 #: themes/edx.org/lms/templates/header.html
@@ -19021,7 +19194,7 @@ msgid "Last day students can enroll."
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Contact your edX Partner Manager to update these settings."
+msgid "Contact your edX partner manager to update these settings."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -19915,10 +20088,6 @@ msgstr ""
 #: wiki/forms.py
 msgid "No changes made. Nothing to save."
 msgstr "변경사항이 없습니다. 저장할 내용이 없습니다."
-
-#: wiki/forms.py
-msgid "Select an option"
-msgstr "평가 기준을 선택하세요."
 
 #: wiki/forms.py
 msgid "Slug"

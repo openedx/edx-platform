@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 import logging
 
 from student.models import CourseAccessRole
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 log = logging.getLogger(__name__)
@@ -153,7 +153,7 @@ class RoleBase(AccessRole):
         # legit get updated.
         from student.models import CourseAccessRole
         for user in users:
-            if user.is_authenticated and user.is_active and not self.has_user(user):
+            if user.is_authenticated() and user.is_active and not self.has_user(user):
                 entry = CourseAccessRole(user=user, role=self._role_name, course_id=self.course_key, org=self.org)
                 entry.save()
                 if hasattr(user, '_roles'):
@@ -349,7 +349,7 @@ class UserBasedRole(object):
         """
         Grant this object's user the object's role for the supplied courses
         """
-        if self.user.is_authenticated and self.user.is_active:
+        if self.user.is_authenticated() and self.user.is_active:
             for course_key in course_keys:
                 entry = CourseAccessRole(user=self.user, role=self.role, course_id=course_key, org=course_key.org)
                 entry.save()

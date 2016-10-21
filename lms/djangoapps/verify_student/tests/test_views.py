@@ -2071,6 +2071,23 @@ class TestReverifyView(TestCase):
         # Cannot reverify because the user is already verified.
         self._assert_cannot_reverify()
 
+    @override_settings(VERIFY_STUDENT={"DAYS_GOOD_FOR": 5, "EXPIRING_SOON_WINDOW": 10})
+    def test_reverify_view_can_reverify_approved_expired_soon(self):
+        """
+        Verify that learner can submit photos if verification is set to expired soon.
+        Verification will be good for next DAYS_GOOD_FOR (i.e here it is 5 days) days,
+        and learner can submit photos if verification is set to expire in
+        EXPIRING_SOON_WINDOW(i.e here it is 10 days) or less days.
+        """
+
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+        attempt.approve()
+
+        # Can re-verify because verification is set to expired soon.
+        self._assert_can_reverify()
+
     def _get_reverify_page(self):
         """
         Retrieve the reverification page and return the response.
@@ -2491,7 +2508,7 @@ class TestEmailMessageWithCustomICRVBlock(ModuleStoreTestCase):
 
         self.assertIn("Thanks,", body)
         self.assertIn(
-            "The {platform_name} team".format(
+            u"The {platform_name} team".format(
                 platform_name=settings.PLATFORM_NAME
             ),
             body

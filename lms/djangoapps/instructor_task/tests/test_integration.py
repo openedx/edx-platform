@@ -5,6 +5,8 @@ Runs tasks on answers to course problems to validate that code
 paths actually work.
 
 """
+from collections import namedtuple
+import ddt
 import json
 import logging
 from mock import patch
@@ -23,20 +25,23 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from courseware.model_data import StudentModule
 
-from instructor_task.api import (submit_rescore_problem_for_all_students,
-                                 submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students,
-                                 submit_delete_problem_state_for_all_students)
-from instructor_task.models import InstructorTask
-from instructor_task.tasks_helper import upload_grades_csv
-from instructor_task.tests.test_base import (
+from lms.djangoapps.instructor_task.api import (
+    submit_rescore_problem_for_all_students,
+    submit_rescore_problem_for_student,
+    submit_reset_problem_attempts_for_all_students,
+    submit_delete_problem_state_for_all_students
+)
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.tasks_helper import upload_grades_csv
+from lms.djangoapps.instructor_task.tests.test_base import (
     InstructorTaskModuleTestCase,
     TestReportMixin,
     OPTION_1,
     OPTION_2,
 )
 from capa.responsetypes import StudentInputError
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from openedx.core.lib.url_utils import quote_slashes
 
 
 log = logging.getLogger(__name__)
@@ -65,6 +70,7 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
 
 
 @attr(shard=3)
+@ddt.ddt
 class TestRescoringTask(TestIntegrationTask):
     """
     Integration-style tests for rescoring problems in a background task.
@@ -77,10 +83,11 @@ class TestRescoringTask(TestIntegrationTask):
 
         self.initialize_course()
         self.create_instructor('instructor')
-        self.create_student('u1')
-        self.create_student('u2')
-        self.create_student('u3')
-        self.create_student('u4')
+        self.user1 = self.create_student('u1')
+        self.user2 = self.create_student('u2')
+        self.user3 = self.create_student('u3')
+        self.user4 = self.create_student('u4')
+        self.users = [self.user1, self.user2, self.user3, self.user4]
         self.logout()
 
         # set up test user for performing test operations
@@ -103,7 +110,7 @@ class TestRescoringTask(TestIntegrationTask):
         resp = self.client.post(modx_url, {})
         return resp
 
-    def check_state(self, username, descriptor, expected_score, expected_max_score, expected_attempts):
+    def check_state(self, user, descriptor, expected_score, expected_max_score, expected_attempts=1):
         """
         Check that the StudentModule state contains the expected values.
 
@@ -111,7 +118,7 @@ class TestRescoringTask(TestIntegrationTask):
 
         Values checked include the number of attempts, the score, and the max score for a problem.
         """
-        module = self.get_student_module(username, descriptor)
+        module = self.get_student_module(user.username, descriptor)
         self.assertEqual(module.grade, expected_score)
         self.assertEqual(module.max_grade, expected_max_score)
         state = json.loads(module.state)
@@ -123,19 +130,38 @@ class TestRescoringTask(TestIntegrationTask):
             self.assertGreater(len(state['correct_map']), 0)
             self.assertGreater(len(state['student_answers']), 0)
 
-    def submit_rescore_all_student_answers(self, instructor, problem_url_name):
+        # assume only one problem in the subsection and the grades
+        # are in sync.
+        expected_subsection_grade = expected_score
+
+        course_grade = CourseGradeFactory(user).create(self.course)
+        self.assertEquals(
+            course_grade.subsection_grade_totals_by_format['Homework'][0].earned,
+            expected_subsection_grade,
+        )
+
+    def submit_rescore_all_student_answers(self, instructor, problem_url_name, only_if_higher=False):
         """Submits the particular problem for rescoring"""
-        return submit_rescore_problem_for_all_students(self.create_task_request(instructor),
-                                                       InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        return submit_rescore_problem_for_all_students(
+            self.create_task_request(instructor),
+            InstructorTaskModuleTestCase.problem_location(problem_url_name),
+            only_if_higher,
+        )
 
-    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student):
+    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student, only_if_higher=False):
         """Submits the particular problem for rescoring for a particular student"""
-        return submit_rescore_problem_for_student(self.create_task_request(instructor),
-                                                  InstructorTaskModuleTestCase.problem_location(problem_url_name),
-                                                  student)
+        return submit_rescore_problem_for_student(
+            self.create_task_request(instructor),
+            InstructorTaskModuleTestCase.problem_location(problem_url_name),
+            student,
+            only_if_higher,
+        )
 
-    def test_rescoring_option_problem(self):
-        """Run rescore scenario on option problem"""
+    def verify_rescore_results(self, problem_edit, new_expected_scores, new_expected_max, rescore_if_higher):
+        """
+        Common helper to verify the results of rescoring for a single
+        student and all students are as expected.
+        """
         # get descriptor:
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
@@ -148,31 +174,63 @@ class TestRescoringTask(TestIntegrationTask):
         self.submit_student_answer('u3', problem_url_name, [OPTION_2, OPTION_1])
         self.submit_student_answer('u4', problem_url_name, [OPTION_2, OPTION_2])
 
-        self.check_state('u1', descriptor, 2, 2, 1)
-        self.check_state('u2', descriptor, 1, 2, 1)
-        self.check_state('u3', descriptor, 1, 2, 1)
-        self.check_state('u4', descriptor, 0, 2, 1)
+        # verify each user's grade
+        expected_original_scores = (2, 1, 1, 0)
+        expected_original_max = 2
+        for i, user in enumerate(self.users):
+            self.check_state(user, descriptor, expected_original_scores[i], expected_original_max)
 
-        # update the data in the problem definition
-        self.redefine_option_problem(problem_url_name)
-        # confirm that simply rendering the problem again does not result in a change
-        # in the grade:
+        # update the data in the problem definition so the answer changes.
+        self.redefine_option_problem(problem_url_name, **problem_edit)
+
+        # confirm that simply rendering the problem again does not change the grade
         self.render_problem('u1', problem_url_name)
-        self.check_state('u1', descriptor, 2, 2, 1)
+        self.check_state(self.user1, descriptor, expected_original_scores[0], expected_original_max)
 
         # rescore the problem for only one student -- only that student's grade should change:
-        self.submit_rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
-        self.check_state('u1', descriptor, 0, 2, 1)
-        self.check_state('u2', descriptor, 1, 2, 1)
-        self.check_state('u3', descriptor, 1, 2, 1)
-        self.check_state('u4', descriptor, 0, 2, 1)
+        self.submit_rescore_one_student_answer('instructor', problem_url_name, self.user1, rescore_if_higher)
+        self.check_state(self.user1, descriptor, new_expected_scores[0], new_expected_max)
+        for i, user in enumerate(self.users[1:], start=1):  # everyone other than user1
+            self.check_state(user, descriptor, expected_original_scores[i], expected_original_max)
 
         # rescore the problem for all students
-        self.submit_rescore_all_student_answers('instructor', problem_url_name)
-        self.check_state('u1', descriptor, 0, 2, 1)
-        self.check_state('u2', descriptor, 1, 2, 1)
-        self.check_state('u3', descriptor, 1, 2, 1)
-        self.check_state('u4', descriptor, 2, 2, 1)
+        self.submit_rescore_all_student_answers('instructor', problem_url_name, rescore_if_higher)
+        for i, user in enumerate(self.users):
+            self.check_state(user, descriptor, new_expected_scores[i], new_expected_max)
+
+    RescoreTestData = namedtuple('RescoreTestData', 'edit, new_expected_scores, new_expected_max')
+
+    @ddt.data(
+        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(0, 1, 1, 2), new_expected_max=2),
+        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
+        RescoreTestData(edit=dict(num_inputs=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
+        RescoreTestData(edit=dict(num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
+        RescoreTestData(edit=dict(num_inputs=2, num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
+    )
+    @ddt.unpack
+    def test_rescoring_option_problem(self, problem_edit, new_expected_scores, new_expected_max):
+        """
+        Run rescore scenario on option problem.
+        Verify rescoring updates grade after content change.
+        Original problem definition has:
+            num_inputs = 1
+            num_responses = 2
+            correct_answer = OPTION_1
+        """
+        self.verify_rescore_results(
+            problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=False,
+        )
+
+    @ddt.data(
+        RescoreTestData(edit=dict(), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
+        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(2, 1, 1, 2), new_expected_max=2),
+        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
+    )
+    @ddt.unpack
+    def test_rescoring_if_higher(self, problem_edit, new_expected_scores, new_expected_max):
+        self.verify_rescore_results(
+            problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=True,
+        )
 
     def test_rescoring_failure(self):
         """Simulate a failure in rescoring a problem"""
@@ -298,45 +356,45 @@ class TestRescoringTask(TestIntegrationTask):
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
         descriptor = self.module_store.get_item(location)
         # run with more than one user
-        userlist = ['u1', 'u2', 'u3', 'u4']
-        for username in userlist:
+        for user in self.users:
             # first render the problem, so that a seed will be created for this user
-            self.render_problem(username, problem_url_name)
+            self.render_problem(user.username, problem_url_name)
             # submit a bogus answer, in order to get the problem to tell us its real answer
             dummy_answer = "1000"
-            self.submit_student_answer(username, problem_url_name, [dummy_answer, dummy_answer])
+            self.submit_student_answer(user.username, problem_url_name, [dummy_answer, dummy_answer])
             # we should have gotten the problem wrong, since we're way out of range:
-            self.check_state(username, descriptor, 0, 1, 1)
+            self.check_state(user, descriptor, 0, 1, expected_attempts=1)
             # dig the correct answer out of the problem's message
-            module = self.get_student_module(username, descriptor)
+            module = self.get_student_module(user.username, descriptor)
             state = json.loads(module.state)
             correct_map = state['correct_map']
             log.info("Correct Map: %s", correct_map)
             # only one response, so pull it out:
             answer = correct_map.values()[0]['msg']
-            self.submit_student_answer(username, problem_url_name, [answer, answer])
+            self.submit_student_answer(user.username, problem_url_name, [answer, answer])
             # we should now get the problem right, with a second attempt:
-            self.check_state(username, descriptor, 1, 1, 2)
+            self.check_state(user, descriptor, 1, 1, expected_attempts=2)
 
         # redefine the problem (as stored in Mongo) so that the definition of correct changes
         self.define_randomized_custom_response_problem(problem_url_name, redefine=True)
         # confirm that simply rendering the problem again does not result in a change
         # in the grade (or the attempts):
         self.render_problem('u1', problem_url_name)
-        self.check_state('u1', descriptor, 1, 1, 2)
+        self.check_state(self.user1, descriptor, 1, 1, expected_attempts=2)
 
         # rescore the problem for only one student -- only that student's grade should change
         # (and none of the attempts):
         self.submit_rescore_one_student_answer('instructor', problem_url_name, User.objects.get(username='u1'))
-        for username in userlist:
-            self.check_state(username, descriptor, 0 if username == 'u1' else 1, 1, 2)
+        for user in self.users:
+            expected_score = 0 if user.username == 'u1' else 1
+            self.check_state(user, descriptor, expected_score, 1, expected_attempts=2)
 
         # rescore the problem for all students
         self.submit_rescore_all_student_answers('instructor', problem_url_name)
 
         # all grades should change to being wrong (with no change in attempts)
-        for username in userlist:
-            self.check_state(username, descriptor, 0, 1, 2)
+        for user in self.users:
+            self.check_state(user, descriptor, 0, 1, expected_attempts=2)
 
 
 class TestResetAttemptsTask(TestIntegrationTask):
@@ -541,7 +599,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
         self.submit_student_answer(self.student_b.username, problem_b_url, [OPTION_1, OPTION_2])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
@@ -564,7 +622,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
 
         self.submit_student_answer(self.student_a.username, problem_a_url, [OPTION_1, OPTION_1])
 
-        with patch('instructor_task.tasks_helper._get_current_task'):
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, self.course.id, None, 'graded')
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(

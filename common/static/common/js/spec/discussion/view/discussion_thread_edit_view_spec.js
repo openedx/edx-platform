@@ -30,11 +30,16 @@
             };
         });
 
-        testUpdate = function(view, thread, newTopicId, newTopicName) {
+        testUpdate = function(view, thread, newTopicId, newTopicName, mode) {
+            var discussionMode = mode || 'tab';
+
+
             spyOn($, 'ajax').and.callFake(function(params) {
                 expect(params.url.path()).toEqual(DiscussionUtil.urlFor('update_thread', 'dummy_id'));
                 expect(params.data.thread_type).toBe('discussion');
-                expect(params.data.commentable_id).toBe(newTopicId);
+                if (discussionMode !== 'inline') {
+                    expect(params.data.commentable_id).toBe(newTopicId);
+                }
                 expect(params.data.title).toBe('changed thread title');
                 params.success();
                 return {
@@ -42,19 +47,23 @@
                     }
                 };
             });
-
             view.$el.find('.topic-title').filter(function(idx, el) {
                 return $(el).data('discussionId') === newTopicId;
-            }).click(); // set new topic
+            }).prop('selected', true); // set new topic
+            view.$('.post-topic').trigger('change');
             view.$('.edit-post-title').val('changed thread title'); // set new title
-            view.$("label[for$='post-type-discussion']").click(); // set new thread type
+            if (discussionMode !== 'inline') {
+                view.$("label[for$='post-type-discussion']").click(); // set new thread type
+            }
             view.$('.post-update').click();
             expect($.ajax).toHaveBeenCalled();
 
             expect(thread.get('title')).toBe('changed thread title');
             expect(thread.get('thread_type')).toBe('discussion');
-            expect(thread.get('commentable_id')).toBe(newTopicId);
-            expect(thread.get('courseware_title')).toBe(newTopicName);
+            if (discussionMode !== 'inline') {
+                expect(thread.get('commentable_id')).toBe(newTopicId);
+                expect(thread.get('courseware_title')).toBe(newTopicName);
+            }
             expect(view.$('.edit-post-title')).toHaveValue('');
             expect(view.$('.wmd-preview p')).toHaveText('');
         };
@@ -66,7 +75,7 @@
 
         it('can save new data correctly in inline mode', function() {
             this.createEditView({'mode': 'inline'});
-            testUpdate(this.view, this.thread, 'other_topic', 'Other Topic');
+            testUpdate(this.view, this.thread, 'other_topic', 'Other Topic', 'inline');
         });
 
         testCancel = function(view) {

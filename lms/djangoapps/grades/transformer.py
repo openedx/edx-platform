@@ -1,12 +1,21 @@
 """
 Grades Transformer
 """
+from base64 import b64encode
 from django.test.client import RequestFactory
+from functools import reduce as functools_reduce
+from hashlib import sha1
+from logging import getLogger
+import json
 
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
+import courseware.module_render
+from lms.djangoapps.course_blocks.transformers.utils import collect_unioned_set_field, get_field_on_block
 from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from openedx.core.djangoapps.util.user_utils import SystemUser
+
+
+log = getLogger(__name__)
 
 
 class GradesTransformer(BlockStructureTransformer):
@@ -16,8 +25,8 @@ class GradesTransformer(BlockStructureTransformer):
 
     No runtime transformations are performed.
 
-    The following values are stored as xblock_fields on their respective blocks in the
-    block structure:
+    The following values are stored as xblock_fields on their respective blocks
+    in the block structure:
 
         due: (datetime) when the problem is due.
         format: (string) what type of problem it is
@@ -25,13 +34,15 @@ class GradesTransformer(BlockStructureTransformer):
         has_score: (boolean)
         weight: (numeric)
 
-    Additionally, the following value is calculated and stored as a transformer_block_field
-    for each block:
+    Additionally, the following value is calculated and stored as a
+    transformer_block_field for each block:
 
         max_score: (numeric)
     """
-    VERSION = 2
+    VERSION = 4
     FIELDS_TO_COLLECT = [u'due', u'format', u'graded', u'has_score', u'weight', u'course_version', u'subtree_edited_on']
+
+    EXPLICIT_GRADED_FIELD_NAME = 'explicit_graded'
 
     @classmethod
     def name(cls):
@@ -49,12 +60,58 @@ class GradesTransformer(BlockStructureTransformer):
         """
         block_structure.request_xblock_fields(*cls.FIELDS_TO_COLLECT)
         cls._collect_max_scores(block_structure)
+        collect_unioned_set_field(
+            block_structure=block_structure,
+            transformer=cls,
+            merged_field_name='subsections',
+            filter_by=lambda block_key: block_key.block_type == 'sequential',
+        )
+        cls._collect_explicit_graded(block_structure)
+        cls._collect_grading_policy_hash(block_structure)
 
     def transform(self, block_structure, usage_context):
         """
         Perform no transformations.
         """
         pass
+
+    @classmethod
+    def _collect_explicit_graded(cls, block_structure):
+        """
+        Collect the 'explicit_graded' field for every block.
+        """
+        def _set_field(block_key, field_value):
+            """
+            Sets the explicit graded field to the given value for the
+            given block.
+            """
+            block_structure.set_transformer_block_field(block_key, cls, cls.EXPLICIT_GRADED_FIELD_NAME, field_value)
+
+        def _get_field(block_key):
+            """
+            Gets the explicit graded field to the given value for the
+            given block.
+            """
+            return block_structure.get_transformer_block_field(block_key, cls, cls.EXPLICIT_GRADED_FIELD_NAME)
+
+        block_types_to_ignore = {'course', 'chapter', 'sequential'}
+
+        for block_key in block_structure.topological_traversal():
+            if block_key.block_type in block_types_to_ignore:
+                _set_field(block_key, None)
+            else:
+                explicit_field_on_block = get_field_on_block(block_structure.get_xblock(block_key), 'graded')
+                if explicit_field_on_block is not None:
+                    _set_field(block_key, explicit_field_on_block)
+                else:
+                    values_from_parents = [
+                        _get_field(parent)
+                        for parent in block_structure.get_parents(block_key)
+                        if parent.block_type not in block_types_to_ignore
+                    ]
+                    non_null_values_from_parents = [value for value in values_from_parents if not None]
+                    explicit_from_parents = functools_reduce(lambda x, y: x or y, non_null_values_from_parents, None)
+                    _set_field(block_key, explicit_from_parents)
 
     @classmethod
     def _collect_max_scores(cls, block_structure):
@@ -70,14 +127,45 @@ class GradesTransformer(BlockStructureTransformer):
         Collect the `max_score` from the given module, storing it as a
         `transformer_block_field` associated with the `GradesTransformer`.
         """
-        score = module.max_score()
-        block_structure.set_transformer_block_field(module.location, cls, 'max_score', score)
+        max_score = module.max_score()
+        block_structure.set_transformer_block_field(module.location, cls, 'max_score', max_score)
+        if max_score is None:
+            log.warning("GradesTransformer: max_score is None for {}".format(module.location))
+
+    @classmethod
+    def _collect_grading_policy_hash(cls, block_structure):
+        """
+        Collect a hash of the course's grading policy, storing it as a
+        `transformer_block_field` associated with the `GradesTransformer`.
+        """
+        def _hash_grading_policy(policy):
+            """
+            Creates a hash from the course grading policy.
+            The keys are sorted in order to make the hash
+            agnostic to the ordering of the policy coming in.
+            """
+            ordered_policy = json.dumps(
+                policy,
+                separators=(',', ':'),  # Remove spaces from separators for more compact representation
+                sort_keys=True,
+            )
+            return b64encode(sha1(ordered_policy).digest())
+
+        course_location = block_structure.root_block_usage_key
+        course_block = block_structure.get_xblock(course_location)
+        grading_policy = course_block.grading_policy
+        block_structure.set_transformer_block_field(
+            course_block.location,
+            cls,
+            "grading_policy_hash",
+            _hash_grading_policy(grading_policy)
+        )
 
     @staticmethod
     def _iter_scorable_xmodules(block_structure):
         """
-        Loop through all the blocks locators in the block structure, and retrieve
-        the module (XModule or XBlock) associated with that locator.
+        Loop through all the blocks locators in the block structure, and
+        retrieve the module (XModule or XBlock) associated with that locator.
 
         For implementation reasons, we need to pull the max_score from the
         XModule, even though the data is not user specific.  Here we bind the
@@ -98,5 +186,5 @@ class GradesTransformer(BlockStructureTransformer):
         for block_locator in block_structure.post_order_traversal():
             block = block_structure.get_xblock(block_locator)
             if getattr(block, 'has_score', False):
-                module = get_module_for_descriptor(user, request, block, cache, course_key)
+                module = courseware.module_render.get_module_for_descriptor(user, request, block, cache, course_key)
                 yield module

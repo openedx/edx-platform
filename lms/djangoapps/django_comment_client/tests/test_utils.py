@@ -241,17 +241,17 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         )
 
     def test_cache_returns_correct_key(self):
-        usage_key = utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+        usage_key = utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
         self.assertEqual(usage_key, self.discussion.location)
 
     def test_cache_returns_none_if_id_is_not_present(self):
-        usage_key = utils.get_cached_discussion_key(self.course, 'bogus_id')
+        usage_key = utils.get_cached_discussion_key(self.course.id, 'bogus_id')
         self.assertIsNone(usage_key)
 
     def test_cache_raises_exception_if_course_structure_not_cached(self):
         CourseStructure.objects.all().delete()
         with self.assertRaises(utils.DiscussionIdMapIsNotCached):
-            utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+            utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
 
     def test_cache_raises_exception_if_discussion_id_not_cached(self):
         cache = CourseStructure.objects.get(course_id=self.course.id)
@@ -259,7 +259,7 @@ class CachedDiscussionIdMapTestCase(ModuleStoreTestCase):
         cache.save()
 
         with self.assertRaises(utils.DiscussionIdMapIsNotCached):
-            utils.get_cached_discussion_key(self.course, 'test_discussion_id')
+            utils.get_cached_discussion_key(self.course.id, 'test_discussion_id')
 
     def test_xblock_does_not_have_required_keys(self):
         self.assertTrue(utils.has_required_keys(self.discussion))

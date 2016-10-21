@@ -19,8 +19,8 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
     def setUp(self):
         super(TestHandleScoreChanged, self).setUp()
         self.course = CourseFactory.create(org='TestX', number='TS01', run='2016_Q1')
-        self.user = UserFactory()
-        self.test_usage_key = UsageKey.from_string('i4x://the/content/key/12345678')
+        self.user = UserFactory.create()
+        self.test_usage_key = self.course.location
 
     @patch('gating.signals.gating_api.evaluate_prerequisite')
     def test_gating_enabled(self, mock_evaluate):
@@ -31,11 +31,11 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             sender=None,
             points_possible=1,
             points_earned=1,
-            user=self.user,
+            user_id=self.user.id,
             course_id=unicode(self.course.id),
             usage_id=unicode(self.test_usage_key)
         )
-        mock_evaluate.assert_called_with(self.course, self.test_usage_key, self.user.id)  # pylint: disable=no-member
+        mock_evaluate.assert_called_with(self.course, self.course, self.user.id)  # pylint: disable=no-member
 
     @patch('gating.signals.gating_api.evaluate_prerequisite')
     def test_gating_disabled(self, mock_evaluate):
@@ -44,7 +44,7 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
             sender=None,
             points_possible=1,
             points_earned=1,
-            user=self.user,
+            user_id=self.user.id,
             course_id=unicode(self.course.id),
             usage_id=unicode(self.test_usage_key)
         )

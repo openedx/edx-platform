@@ -31,7 +31,8 @@
                         discussionTopicsSettingsModel: discussionTopicsSettings,
                         uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
                         verifiedTrackCohortingUrl: cohortManagementElement.data('verified_track_cohorting_url'),
-                        studioGroupConfigurationsUrl: studioGroupConfigurationsUrl
+                        studioGroupConfigurationsUrl: studioGroupConfigurationsUrl,
+                        isCcxEnabled: cohortManagementElement.data('is_ccx_enabled')
                     }
                 });
 

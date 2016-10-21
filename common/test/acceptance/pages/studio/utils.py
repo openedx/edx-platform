@@ -9,6 +9,12 @@ from bok_choy.promise import EmptyPromise
 from common.test.acceptance.pages.common.utils import click_css, wait_for_notification
 
 
+NAV_HELP_NOT_SIGNED_IN_CSS = '.nav-item.nav-not-signedin-help a'
+NAV_HELP_CSS = '.nav-item.nav-account-help a'
+SIDE_BAR_HELP_AS_LIST_ITEM = '.bit li.action-item a'
+SIDE_BAR_HELP_CSS = '.external-help a, .external-help-button'
+
+
 @js_defined('window.jQuery')
 def press_the_notification_button(page, name):
     # Because the notification uses a CSS transition,
@@ -148,6 +154,7 @@ def type_in_codemirror(page, index, text, find_prefix="$"):
     CodeMirror.signal(cm, "focus", cm);
     cm.setValue(arguments[0]);
     CodeMirror.signal(cm, "blur", cm);""".format(index=index, find_prefix=find_prefix)
+
     page.browser.execute_script(script, str(text))
 
 
@@ -239,14 +246,73 @@ def verify_ordering(test_class, page, expected_orderings):
 
 
 def click_studio_help(page):
-    """Click the Studio help link in the page footer."""
-    page.q(css='.cta-show-sock').click()
+    """
+    Click the Studio help link in the page footer.
+    """
+    help_link_selector = '.cta-show-sock'
+    # check if help link is visible
+    EmptyPromise(lambda: page.q(css=help_link_selector).visible, "Help link visible").fulfill()
+
+    page.q(css=help_link_selector).click()
+
+    # check if extended support section is visible.
     EmptyPromise(
-        lambda: page.q(css='.support .list-actions a').results[0].text != '',
-        'Support section opened'
+        lambda: page.q(css='.support .list-actions a').results[0].text != '', 'Support section opened'
     ).fulfill()
 
 
 def studio_help_links(page):
     """Return the list of Studio help links in the page footer."""
     return page.q(css='.support .list-actions a').results
+
+
+class HelpMixin(object):
+    """
+    Mixin for testing Help links.
+    """
+    def get_nav_help_element_and_click_help(self, signed_in=True):
+        """
+        Click on the help, and also get the DOM help element.
+
+        It operates on the help elements in the navigation bar.
+
+        Arguments:
+            signed_in (bool): Indicates whether user is signed in or not.
+
+        Returns:
+            WebElement: Help DOM element in the navigation bar.
+        """
+
+        element_css = None
+        if signed_in:
+            element_css = NAV_HELP_CSS
+        else:
+            element_css = NAV_HELP_NOT_SIGNED_IN_CSS
+
+        self.q(css=element_css).first.click()
+        return self.q(css=element_css).results[0]
+
+    def get_side_bar_help_element_and_click_help(self, as_list_item=False, index=-1):
+        """
+        Click on the help, and also get the DOM help element.
+
+        It operates on the help elements in the side bar.
+
+        Arguments:
+            as_list_item (bool): Indicates whether help element is
+                                 enclosed in a 'li' DOM element.
+            index (int): The index of element in case there are more than
+                         one matching elements.
+
+        Returns:
+            WebElement: Help DOM element in the side bar.
+        """
+        element_css = None
+        if as_list_item:
+            element_css = SIDE_BAR_HELP_AS_LIST_ITEM
+        else:
+            element_css = SIDE_BAR_HELP_CSS
+
+        help_element = self.q(css=element_css).results[index]
+        help_element.click()
+        return help_element

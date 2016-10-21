@@ -33,12 +33,13 @@ from django.core.management import call_command
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from bulk_email.models import CourseEmail, Optout, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
+from bulk_email.tasks import _get_course_email_context
 
-from instructor_task.tasks import send_bulk_course_email
-from instructor_task.subtasks import update_subtask_status, SubtaskStatus
-from instructor_task.models import InstructorTask
-from instructor_task.tests.test_base import InstructorTaskCourseTestCase
-from instructor_task.tests.factories import InstructorTaskFactory
+from lms.djangoapps.instructor_task.tasks import send_bulk_course_email
+from lms.djangoapps.instructor_task.subtasks import update_subtask_status, SubtaskStatus
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.tests.test_base import InstructorTaskCourseTestCase
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
@@ -434,3 +435,14 @@ class TestBulkEmailInstructorTask(InstructorTaskCourseTestCase):
         with patch('bulk_email.tasks.get_connection', autospec=True) as get_conn:
             get_conn.return_value.send_messages.side_effect = cycle([None])
             self._test_run_with_task(send_bulk_course_email, 'emailed', num_emails, num_emails)
+
+    def test_get_course_email_context_has_correct_keys(self):
+        result = _get_course_email_context(self.course)
+        self.assertIn('course_title', result)
+        self.assertIn('course_root', result)
+        self.assertIn('course_url', result)
+        self.assertIn('course_image_url', result)
+        self.assertIn('course_end_date', result)
+        self.assertIn('account_settings_url', result)
+        self.assertIn('email_settings_url', result)
+        self.assertIn('platform_name', result)

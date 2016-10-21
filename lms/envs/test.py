@@ -298,6 +298,9 @@ OIDC_COURSE_HANDLER_CACHE_TIMEOUT = 0
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
+########################### Grades #################################
+FEATURES['PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'] = True
+
 ###################### Payment ##############################3
 # Enable fake payment processing page
 FEATURES['ENABLE_PAYMENT_FAKE'] = True
@@ -421,7 +424,8 @@ FEATURES['CLASS_DASHBOARD'] = True
 import openid.oidutil
 openid.oidutil.log = lambda message, level=0: None
 
-PLATFORM_NAME = "edX"
+# Include a non-ascii character in PLATFORM_NAME to uncover possible UnicodeEncodeErrors in tests.
+PLATFORM_NAME = u"édX"
 SITE_NAME = "edx.org"
 
 # set up some testing for microsites
@@ -578,22 +582,9 @@ JWT_AUTH.update({
     'JWT_AUDIENCE': 'test-key',
 })
 
-# Set the default Oauth2 Provider Model so that migrations can run in
-# verbose mode
-OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
-
 COURSE_CATALOG_API_URL = 'https://catalog.example.com/api/v1'
 
 COMPREHENSIVE_THEME_DIRS = [REPO_ROOT / "themes", REPO_ROOT / "common/test"]
+COMPREHENSIVE_THEME_LOCALE_PATHS = [REPO_ROOT / "themes/conf/locale", ]
 
 LMS_ROOT_URL = "http://localhost:8000"
-
-# Test configuration for neo4j
-NEO4J_CONFIG = {
-    'bolt': True,
-    'password': 'password',
-    'user': 'neo4j',
-    'https_port': 7473,
-    'host': 'localhost',
-    'secure': True,
-}

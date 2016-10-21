@@ -61,22 +61,6 @@
 @import 'course/auto-cert';
 @import 'views/api-access';
 
-// app - discussion
-@import "discussion/utilities/variables-v1";
-@import "discussion/mixins";
-@import 'discussion/discussion'; // Process old file after definitions but before everything else, partial is deprecated.
-@import 'discussion/discussion-v1'; // Non-Pattern Library styling
-@import "discussion/elements/actions";
-@import "discussion/elements/editor";
-@import "discussion/elements/labels";
-@import "discussion/elements/navigation";
-@import "discussion/views/home";
-@import "discussion/views/thread";
-@import "discussion/views/create-edit-post";
-@import "discussion/views/response";
-@import 'discussion/utilities/developer';
-@import 'discussion/utilities/shame';
-
 // search
 @import 'search/search';
 
@@ -90,3 +74,6 @@
 // overrides
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss
+
+// CAPA Problem Feedback
+@import 'edx-pattern-library-shims/buttons';

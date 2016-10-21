@@ -31,7 +31,7 @@ ${block_content}
 </div>
 %  endif
 
-<section aria-hidden="true" role="dialog" tabindex="-1" id="${element_id}_xqa-modal" class="modal xqa-modal">
+<div aria-hidden="true" role="dialog" tabindex="-1" id="${element_id}_xqa-modal" class="modal xqa-modal">
   <div class="inner-wrapper">
     <header>
       <h2>${_("{platform_name} Content Quality Assessment").format(platform_name=settings.PLATFORM_NAME)}</h2>
@@ -51,9 +51,9 @@ ${block_content}
     </form>
 
   </div>
-</section>
+</div>
 
-<section aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal staff-modal" id="${element_id}_debug" >
   <div class="inner-wrapper">
     <header>
       <h2>${_('Staff Debug')}</h2>
@@ -69,14 +69,16 @@ ${block_content}
       <div data-location="${location | h}" data-location-name="${location.name | h}">
         [
         % if can_reset_attempts:
-        <button type="button" class="btn-link staff-debug-reset">${_('Reset Student Attempts')}</button>
+        <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
         |
         % endif
         % if has_instructor_access:
-        <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Student State')}</button>
+        <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Learner\'s State')}</button>
         % if can_rescore_problem:
         |
-        <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Student Submission')}</button>
+        <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Learner\'s Submission')}</button>
+        |
+        <button type="button" class="btn-link staff-debug-rescore-if-higher">${_('Rescore Only If Score Improves')}</button>
         % endif
         % endif
         ]
@@ -106,9 +108,9 @@ category = ${category | h}
     <div id="histogram_${element_id}" class="histogram" data-histogram="${histogram}"></div>
     %endif
   </div>
-</section>
+</div>
 
-<section aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="${element_id}_history">
+<div aria-hidden="true" role="dialog" tabindex="-1" class="modal history-modal" id="${element_id}_history">
   <div class="inner-wrapper">
     <header>
       <h2>${_("Submission History Viewer")}</h2>
@@ -125,7 +127,7 @@ category = ${category | h}
     <div id="${element_id}_history_text" class="staff_info" style="display:block">
     </div>
   </div>
-</section>
+</div>
 
 <div id="${element_id}_setup"></div>
 

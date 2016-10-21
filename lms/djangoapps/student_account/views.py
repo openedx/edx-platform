@@ -8,6 +8,7 @@ from datetime import datetime
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.core.urlresolvers import reverse, resolve
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpRequest
@@ -21,15 +22,15 @@ from edxmako.shortcuts import render_to_response
 import pytz
 
 from commerce.models import CommerceConfiguration
-from external_auth.login_and_register import (
+from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
-from lang_pref.api import released_languages, all_languages
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
+from openedx.core.djangoapps.lang_pref.api import released_languages, all_languages
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.helpers import is_request_in_themed_site
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
 from openedx.core.lib.time_zone_utils import TIME_ZONE_CHOICES
@@ -39,7 +40,7 @@ from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
-from student.helpers import get_next_url_for_login_page
+from student.helpers import get_next_url_for_login_page, destroy_oauth_tokens
 import third_party_auth
 from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
@@ -48,6 +49,7 @@ from util.date_utils import strftime_localized
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
+User = get_user_model()  # pylint:disable=invalid-name
 
 
 @require_http_methods(['GET'])
@@ -171,6 +173,8 @@ def password_change_request_handler(request):
     if email:
         try:
             request_password_change(email, request.get_host(), request.is_secure())
+            user = user if user.is_authenticated() else User.objects.get(email=email)
+            destroy_oauth_tokens(user)
         except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter
@@ -203,7 +207,7 @@ def _third_party_auth_context(request, redirect_to):
     }
 
     if third_party_auth.is_enabled():
-        for enabled in third_party_auth.provider.Registry.accepting_logins():
+        for enabled in third_party_auth.provider.Registry.displayed_for_login():
             info = {
                 "id": enabled.provider_id,
                 "name": enabled.name,
@@ -347,7 +351,7 @@ def get_user_orders(user):
                                     'order_date': strftime_localized(
                                         date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
                                     ),
-                                    'receipt_url': commerce_configuration.get_receipt_page_url(order['number'])
+                                    'receipt_url': commerce_configuration.receipt_page + order['number']
                                 }
                                 user_orders.append(order_data)
                             except KeyError:
@@ -487,6 +491,8 @@ def account_settings_context(request):
             # If the user is connected, sending a POST request to this url removes the connection
             # information for this provider from their edX account.
             'disconnect_url': pipeline.get_disconnect_url(state.provider.provider_id, state.association_id),
-        } for state in auth_states]
+            # We only want to include providers if they are either currently available to be logged
+            # in with, or if the user is already authenticated with them.
+        } for state in auth_states if state.provider.display_for_login or state.has_account]
 
     return context

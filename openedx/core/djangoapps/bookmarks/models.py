@@ -13,7 +13,7 @@ from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from xmodule_django.models import CourseKeyField, LocationKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 
 from . import PathItem
 

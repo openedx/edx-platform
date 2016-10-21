@@ -32,7 +32,7 @@ CLASS_SELECTORS = {
 
 BUTTON_SELECTORS = {
     'create_video': 'button[data-category="video"]',
-    'handout_download': '.video-handout.video-download-button a',
+    'handout_download': '.wrapper-handouts .btn-link',
     'handout_download_editor': '.wrapper-comp-setting.file-uploader .download-action',
     'upload_asset': '.upload-action',
     'asset_submit': '.action-upload',
@@ -123,6 +123,12 @@ class VideoComponentPage(VideoPage):
             self._wait_for(lambda: not self.q(css=CLASS_SELECTORS['video_spinner']).visible,
                            'Video Buffering Completed')
             self._wait_for(self.is_controls_visible, 'Player Controls are Visible')
+
+    def wait_for_message(self, message_type, expected_message):
+        """
+        Wait until the message of the requested type is as expected.
+        """
+        self._wait_for(lambda: self.message(message_type) == expected_message, "Waiting for message update.")
 
     @wait_for_js
     def is_controls_visible(self):

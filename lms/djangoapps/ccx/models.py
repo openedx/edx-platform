@@ -1,6 +1,7 @@
 """
 Models for the custom course feature
 """
+from __future__ import unicode_literals
 import json
 import logging
 from datetime import datetime
@@ -8,10 +9,11 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from pytz import utc
-
 from lazy import lazy
+
+from ccx_keys.locator import CCXLocator
 from openedx.core.lib.time_zone_utils import get_time_zone_abbr
-from xmodule_django.models import CourseKeyField, LocationKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
@@ -120,6 +122,16 @@ class CustomCourseForEdX(models.Model):
         if self.structure_json:
             return json.loads(self.structure_json)
         return None
+
+    @property
+    def locator(self):
+        """
+        Helper property that gets a corresponding CCXLocator for this CCX.
+
+        Returns:
+            The CCXLocator corresponding to this CCX.
+        """
+        return CCXLocator.from_course_locator(self.course_id, unicode(self.id))
 
 
 class CcxFieldOverride(models.Model):

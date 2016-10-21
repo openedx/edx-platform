@@ -13,8 +13,8 @@ from celery.states import READY_STATES
 
 from xmodule.modulestore.django import modulestore
 
-from instructor_task.models import InstructorTask
-from instructor_task.tasks import (
+from lms.djangoapps.instructor_task.models import InstructorTask
+from lms.djangoapps.instructor_task.tasks import (
     rescore_problem,
     reset_problem_attempts,
     delete_problem_state,
@@ -35,7 +35,7 @@ from instructor_task.tasks import (
 
 from certificates.models import CertificateGenerationHistory
 
-from instructor_task.api_helper import (
+from lms.djangoapps.instructor_task.api_helper import (
     check_arguments_for_rescoring,
     encode_problem_and_student_input,
     encode_entrance_exam_and_student_input,
@@ -95,7 +95,7 @@ def get_entrance_exam_instructor_task_history(course_id, usage_key=None, student
 
 
 # Disabling invalid-name because this fn name is longer than 30 chars.
-def submit_rescore_problem_for_student(request, usage_key, student):  # pylint: disable=invalid-name
+def submit_rescore_problem_for_student(request, usage_key, student, only_if_higher=False):  # pylint: disable=invalid-name
     """
     Request a problem to be rescored as a background task.
 
@@ -110,13 +110,14 @@ def submit_rescore_problem_for_student(request, usage_key, student):  # pylint: 
     # check arguments:  let exceptions return up to the caller.
     check_arguments_for_rescoring(usage_key)
 
-    task_type = 'rescore_problem'
+    task_type = 'rescore_problem_if_higher' if only_if_higher else 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_problem_and_student_input(usage_key, student)
+    task_input.update({'only_if_higher': only_if_higher})
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_rescore_problem_for_all_students(request, usage_key):  # pylint: disable=invalid-name
+def submit_rescore_problem_for_all_students(request, usage_key, only_if_higher=False):  # pylint: disable=invalid-name
     """
     Request a problem to be rescored as a background task.
 
@@ -136,10 +137,11 @@ def submit_rescore_problem_for_all_students(request, usage_key):  # pylint: disa
     task_type = 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_problem_and_student_input(usage_key)
+    task_input.update({'only_if_higher': only_if_higher})
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_rescore_entrance_exam_for_student(request, usage_key, student=None):  # pylint: disable=invalid-name
+def submit_rescore_entrance_exam_for_student(request, usage_key, student=None, only_if_higher=False):  # pylint: disable=invalid-name
     """
     Request entrance exam problems to be re-scored as a background task.
 
@@ -161,6 +163,7 @@ def submit_rescore_entrance_exam_for_student(request, usage_key, student=None): 
     task_type = 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
+    task_input.update({'only_if_higher': only_if_higher})
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 

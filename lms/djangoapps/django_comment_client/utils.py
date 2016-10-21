@@ -14,7 +14,6 @@ import pystache_custom as pystache
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from lms.djangoapps.ccx.overrides import get_current_ccx
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
@@ -28,6 +27,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_course_cohorted
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from request_cache.middleware import request_cached
 
 
 log = logging.getLogger(__name__)
@@ -155,17 +155,19 @@ class DiscussionIdMapIsNotCached(Exception):
     pass
 
 
-def get_cached_discussion_key(course, discussion_id):
+@request_cached
+def get_cached_discussion_key(course_id, discussion_id):
     """
     Returns the usage key of the discussion xblock associated with discussion_id if it is cached. If the discussion id
     map is cached but does not contain discussion_id, returns None. If the discussion id map is not cached for course,
     raises a DiscussionIdMapIsNotCached exception.
     """
     try:
-        cached_mapping = CourseStructure.objects.get(course_id=course.id).discussion_id_map
-        if not cached_mapping:
+        mapping = CourseStructure.objects.get(course_id=course_id).discussion_id_map
+        if not mapping:
             raise DiscussionIdMapIsNotCached()
-        return cached_mapping.get(discussion_id)
+
+        return mapping.get(discussion_id)
     except CourseStructure.DoesNotExist:
         raise DiscussionIdMapIsNotCached()
 
@@ -178,7 +180,7 @@ def get_cached_discussion_id_map(course, discussion_ids, user):
     try:
         entries = []
         for discussion_id in discussion_ids:
-            key = get_cached_discussion_key(course, discussion_id)
+            key = get_cached_discussion_key(course.id, discussion_id)
             if not key:
                 continue
             xblock = modulestore().get_item(key)
@@ -399,7 +401,7 @@ def discussion_category_id_access(course, user, discussion_id, xblock=None):
         return True
     try:
         if not xblock:
-            key = get_cached_discussion_key(course, discussion_id)
+            key = get_cached_discussion_key(course.id, discussion_id)
             if not key:
                 return False
             xblock = modulestore().get_item(key)
@@ -806,11 +808,8 @@ def is_commentable_cohorted(course_key, commentable_id):
 
 def is_discussion_enabled(course_id):
     """
-    Return True if Discussion is enabled for a course; else False
+    Return True if discussions are enabled; else False
     """
-    if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-        if get_current_ccx(course_id):
-            return False
     return settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE')
 
 

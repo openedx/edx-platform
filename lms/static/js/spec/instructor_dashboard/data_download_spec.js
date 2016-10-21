@@ -1,6 +1,6 @@
 /* global define */
 define(['jquery',
-        'coffee/src/instructor_dashboard/data_download',
+        'js/instructor_dashboard/data_download',
         'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
         'slick.grid'],
     function($, DataDownload, AjaxHelpers) {

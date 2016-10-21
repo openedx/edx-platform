@@ -1,6 +1,9 @@
 """
 Bok choy acceptance tests for conditionals in the LMS
 """
+
+from flaky import flaky
+
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 from common.test.acceptance.tests.helpers import UniqueCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
@@ -47,8 +50,9 @@ class ConditionalTest(UniqueCourseTest):
         course_fixture.install()
 
         # Construct conditional block
-        conditional_metadata = {}
         source_block = None
+        conditional_attr = None
+        conditional_value = None
         if block_type == 'problem':
             problem_factory = StringResponseXMLFactory()
             problem_xml = problem_factory.build_xml(
@@ -57,12 +61,9 @@ class ConditionalTest(UniqueCourseTest):
                 answer='correct string',
             ),
             problem = XBlockFixtureDesc('problem', 'Test Problem', data=problem_xml[0])
-            conditional_metadata = {
-                'xml_attributes': {
-                    'attempted': 'True'
-                }
-            }
             source_block = problem
+            conditional_attr = 'attempted'
+            conditional_value = 'True'
         elif block_type == 'poll':
             poll = XBlockFixtureDesc(
                 'poll_question',
@@ -73,11 +74,8 @@ class ConditionalTest(UniqueCourseTest):
                     {'id': 'no', 'text': 'Of course not!'}
                 ],
             )
-            conditional_metadata = {
-                'xml_attributes': {
-                    'poll_answer': 'yes'
-                }
-            }
+            conditional_attr = 'poll_answer'
+            conditional_value = 'yes'
             source_block = poll
         else:
             raise NotImplementedError()
@@ -87,8 +85,9 @@ class ConditionalTest(UniqueCourseTest):
         conditional = XBlockFixtureDesc(
             'conditional',
             'Test Conditional',
-            metadata=conditional_metadata,
             sources_list=[source_block.locator],
+            conditional_attr=conditional_attr,
+            conditional_value=conditional_value
         )
         result_block = XBlockFixtureDesc(
             'html', 'Conditional Contents',
@@ -109,13 +108,14 @@ class ConditionalTest(UniqueCourseTest):
         # Answer the problem
         problem_page = ProblemPage(self.browser)
         problem_page.fill_answer('correct string')
-        problem_page.click_check()
+        problem_page.click_submit()
         # The conditional does not update on its own, so we need to reload the page.
         self.courseware_page.visit()
         # Verify that we can see the content.
         conditional_page = ConditionalPage(self.browser)
         self.assertTrue(conditional_page.is_content_visible())
 
+    @flaky  # TNL-5770
     def test_conditional_handles_polls(self):
         self.install_course_fixture(block_type='poll')
         self.courseware_page.visit()

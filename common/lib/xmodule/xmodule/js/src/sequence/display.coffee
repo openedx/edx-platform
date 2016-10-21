@@ -3,6 +3,7 @@ class @Sequence
     @updatedProblems = {}
     @requestToken = $(element).data('request-token')
     @el = $(element).find('.sequence')
+    @path = $('.path')
     @contents = @$('.seq_contents')
     @content_container = @$('#seq_content')
     @sr_container = @$('.sr-is-focusable')
@@ -190,7 +191,7 @@ class @Sequence
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
 
-      @el.find('.path').text(@el.find('.nav-item.active').data('path'))
+      @path.text(@el.find('.nav-item.active').data('path'))
 
       @sr_container.focus()
 
@@ -215,7 +216,7 @@ class @Sequence
         widget_placement: widget_placement
 
       # On Sequence change, destroy any existing polling thread
-      # for queued submissions, see ../capa/display.coffee
+      # for queued submissions, see ../capa/display.js
       if window.queuePollerID
         window.clearTimeout(window.queuePollerID)
         delete window.queuePollerID

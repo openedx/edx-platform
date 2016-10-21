@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from nose.plugins.attrib import attr
 from pytz import UTC
+from flaky import flaky
 
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionTestCase
 from common.test.acceptance.tests.helpers import UniqueCourseTest
@@ -210,8 +211,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4635
-                'icon-aria-hidden',  # TNL-4637
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -435,29 +435,12 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         view = MultipleThreadFixture(threads)
         view.push()
 
-    def test_page_scroll_on_thread_change_view(self):
-        """
-        Check switching between threads changes the page focus
-        """
-        # verify threads are rendered on the page
-        self.assertTrue(
-            self.thread_page_1.check_threads_rendered_successfully(thread_count=self.thread_count)
-        )
-
-        # From the thread_page_1 open & verify next thread
-        self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
-        self.assertTrue(self.thread_page_2.is_browser_on_page())
-
-        # Verify that the focus is changed
-        self.thread_page_2.check_focus_is_set(selector=".discussion-article")
-
     @attr('a11y')
     def test_page_accessibility(self):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'icon-aria-hidden',  # TNL-4641
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
 
@@ -466,8 +449,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'icon-aria-hidden',  # TNL-4641
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
 
@@ -528,8 +510,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -538,8 +519,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -783,6 +763,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
 
+    @flaky  # TODO fix this, see TNL-5453
     def test_vote_report_endorse_after_edit(self):
         """
         Scenario: Moderator should be able to vote, report or endorse after editing the response.
@@ -825,9 +806,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
-                'duplicate-id',  # TNL-4647
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         page.visit()
@@ -925,8 +904,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4644
-                'icon-aria-hidden',  # TNL-4645
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -964,6 +942,22 @@ class DiscussionEditorPreviewTest(UniqueCourseTest):
             "<li>line 2</li>\n"
             "</ul>"
         ))
+
+    def test_mathjax_rendering_in_order(self):
+        """
+        Tests that mathjax is rendered in proper order.
+
+        When user types mathjax expressions into discussion editor, it should render in the proper
+        order.
+        """
+        self.page.set_new_post_editor_value(
+            'Text line 1 \n'
+            '$$e[n]=d_1$$ \n'
+            'Text line 2 \n'
+            '$$e[n]=d_2$$'
+        )
+
+        self.assertEqual(self.page.get_new_post_preview_text(), 'Text line 1\nText line 2')
 
 
 @attr(shard=2)
@@ -1041,6 +1035,11 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         # Check if 'thread-wrapper' is focused after expanding thread
         self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
 
+    def test_add_a_post_is_present_if_can_create_thread_when_expanded(self):
+        self.discussion_page.expand_discussion()
+        # Add a Post link is present
+        self.assertTrue(self.discussion_page.q(css='.new-post-btn').present)
+
     def test_initial_render(self):
         self.assertFalse(self.discussion_page.is_discussion_expanded())
 
@@ -1086,14 +1085,8 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
             [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)])
         thread_fixture.push()
         self.setup_thread_page(thread.get("id"))
-        self.assertFalse(self.discussion_page.element_exists(".new-post-btn"))
         self.assertFalse(self.thread_page.has_add_response_button())
-        self.assertFalse(self.thread_page.is_response_editable("response1"))
-        self.assertFalse(self.thread_page.is_add_comment_visible("response1"))
-        self.assertFalse(self.thread_page.is_comment_editable("comment1"))
-        self.assertFalse(self.thread_page.is_comment_editable("comment2"))
-        self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
-        self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
+        self.assertFalse(self.thread_page.is_element_visible("action-more"))
 
     def test_dual_discussion_xblock(self):
         """
@@ -1114,13 +1107,16 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         """
         self.discussion_page.wait_for_page()
         self.additional_discussion_page.wait_for_page()
+        self.discussion_page.expand_discussion()
         self.discussion_page.click_new_post_button()
         with self.discussion_page.handle_alert():
             self.discussion_page.click_cancel_new_post()
+        self.additional_discussion_page.expand_discussion()
         self.additional_discussion_page.click_new_post_button()
         self.assertFalse(self.discussion_page._is_element_visible(".new-post-article"))
         with self.additional_discussion_page.handle_alert():
             self.additional_discussion_page.click_cancel_new_post()
+        self.discussion_page.expand_discussion()
         self.discussion_page.click_new_post_button()
         self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
@@ -1332,8 +1328,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # TNL-4639
-                'icon-aria-hidden',  # TNL-4641
+                'aria-required-children',  # TNL-5169, AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

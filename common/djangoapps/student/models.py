@@ -10,7 +10,7 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-from collections import defaultdict, OrderedDict
+from collections import defaultdict, OrderedDict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
 import hashlib
@@ -45,15 +45,15 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from simple_history.models import HistoricalRecords
 from track import contexts
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
-from lms.djangoapps.badges.utils import badges_enabled
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
 import lms.lib.comment_client as cc
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+import request_cache
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
@@ -974,6 +974,12 @@ class CourseEnrollmentManager(models.Manager):
         )
 
 
+# Named tuple for fields pertaining to the state of
+# CourseEnrollment for a user in a course.  This type
+# is used to cache the state in the request cache.
+CourseEnrollmentState = namedtuple('CourseEnrollmentState', 'mode, is_active')
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -1120,6 +1126,11 @@ class CourseEnrollment(models.Model):
 
         if activation_changed or mode_changed:
             self.save()
+            self._update_enrollment_in_request_cache(
+                self.user,
+                self.course_id,
+                CourseEnrollmentState(self.mode, self.is_active),
+            )
 
         if activation_changed:
             if self.is_active:
@@ -1285,9 +1296,7 @@ class CourseEnrollment(models.Model):
         # User is allowed to enroll if they've reached this point.
         enrollment = cls.get_or_create_enrollment(user, course_key)
         enrollment.update_enrollment(is_active=True, mode=mode)
-        if badges_enabled():
-            from lms.djangoapps.badges.events.course_meta import award_enrollment_badge
-            award_enrollment_badge(user)
+        enrollment.send_signal(EnrollStatusChange.enroll)
 
         return enrollment
 
@@ -1389,12 +1398,9 @@ class CourseEnrollment(models.Model):
         """
         if not user.is_authenticated():
             return False
-
-        try:
-            record = cls.objects.get(user=user, course_id=course_key)
-            return record.is_active
-        except cls.DoesNotExist:
-            return False
+        else:
+            enrollment_state = cls._get_enrollment_state(user, course_key)
+            return enrollment_state.is_active or False
 
     @classmethod
     def is_enrolled_by_partial(cls, user, course_id_partial):
@@ -1436,11 +1442,8 @@ class CourseEnrollment(models.Model):
             and is_active is whether the enrollment is active.
         Returns (None, None) if the courseenrollment record does not exist.
         """
-        try:
-            record = cls.objects.get(user=user, course_id=course_id)
-            return (record.mode, record.is_active)
-        except cls.DoesNotExist:
-            return (None, None)
+        enrollment_state = cls._get_enrollment_state(user, course_id)
+        return enrollment_state.mode, enrollment_state.is_active
 
     @classmethod
     def enrollments_for_user(cls, user):
@@ -1592,6 +1595,45 @@ class CourseEnrollment(models.Model):
             Unicode cache key
         """
         return cls.COURSE_ENROLLMENT_CACHE_KEY.format(user_id, unicode(course_key))
+
+    @classmethod
+    def _get_enrollment_state(cls, user, course_key):
+        """
+        Returns the CourseEnrollmentState for the given user
+        and course_key, caching the result for later retrieval.
+        """
+        enrollment_state = cls._get_enrollment_in_request_cache(user, course_key)
+        if not enrollment_state:
+            try:
+                record = cls.objects.get(user=user, course_id=course_key)
+                enrollment_state = CourseEnrollmentState(record.mode, record.is_active)
+            except cls.DoesNotExist:
+                enrollment_state = CourseEnrollmentState(None, None)
+            cls._update_enrollment_in_request_cache(user, course_key, enrollment_state)
+        return enrollment_state
+
+    @classmethod
+    def _get_mode_active_request_cache(cls):
+        """
+        Returns the request-specific cache for CourseEnrollment
+        """
+        return request_cache.get_cache('CourseEnrollment.mode_and_active')
+
+    @classmethod
+    def _get_enrollment_in_request_cache(cls, user, course_key):
+        """
+        Returns the cached value (CourseEnrollmentState) for the user's
+        enrollment in the request cache.  If not cached, returns None.
+        """
+        return cls._get_mode_active_request_cache().get((user.id, course_key))
+
+    @classmethod
+    def _update_enrollment_in_request_cache(cls, user, course_key, enrollment_state):
+        """
+        Updates the cached value for the user's enrollment in the
+        request cache.
+        """
+        cls._get_mode_active_request_cache()[(user.id, course_key)] = enrollment_state
 
 
 @receiver(models.signals.post_save, sender=CourseEnrollment)
@@ -2206,6 +2248,28 @@ class EnrollmentRefundConfiguration(ConfigurationModel):
     def refund_window(self, refund_window):
         """Set the current refund window to the given timedelta."""
         self.refund_window_microseconds = int(refund_window.total_seconds() * 1000000)
+
+
+class RegistrationCookieConfiguration(ConfigurationModel):
+    """
+    Configuration for registration cookies.
+    """
+    utm_cookie_name = models.CharField(
+        max_length=255,
+        help_text=_("Name of the UTM cookie")
+    )
+
+    affiliate_cookie_name = models.CharField(
+        max_length=255,
+        help_text=_("Name of the affiliate cookie")
+    )
+
+    def __unicode__(self):
+        """Unicode representation of this config. """
+        return u"UTM: {utm_name}; AFFILIATE: {affiliate_name}".format(
+            utm_name=self.utm_cookie_name,
+            affiliate_name=self.affiliate_cookie_name
+        )
 
 
 class UserAttribute(TimeStampedModel):

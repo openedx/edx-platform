@@ -1,18 +1,22 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from capa.util import remove_markup
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
 <% element_checked = False %>
 % for choice_id, _ in choices:
-    <%choice_id = choice_id %>
+    <% choice_id = choice_id %>
     %if choice_id in value:
         <% element_checked = True %>
     %endif
-%endfor
+% endfor
 <section id="choicetextinput_${id}" class="choicetextinput">
 <form class="choicetextgroup capa_inputtype" id="inputtype_${id}">
     <div class="script_placeholder" data-src="${STATIC_URL}js/capa/choicetextinput.js"/>
-    
-    <fieldset aria-label="${label}">
+
+    <fieldset aria-label="${remove_markup(response_data['label'])}">
         % for choice_id, choice_description in choices:
-        <%choice_id= choice_id %>
+        <% choice_id = choice_id %>
         <section id="forinput${choice_id}"
             % if input_type == 'radio' and choice_id in value :
             <%
@@ -59,10 +63,12 @@
         <span id="answer_${id}"></span>
     </fieldset>
         <input class= "choicetextvalue" type="hidden"  name="input_${id}{}" id="input_${id}" value="${value|h}" />
-    
+
     <div class="indicator-container">
     % if input_type == 'checkbox' or not element_checked:
-        <span class="status ${status.classname}" id="status_${id}"></span>
+        <span class="status ${status.classname}" id="status_${id}">
+            <span class="sr">${status.display_name}</span>
+        </span>
     % endif
     </div>
 
@@ -70,7 +76,7 @@
     <div class="capa_alert">${_(submitted_message)}</div>
     %endif
     % if msg:
-    <span class="message">${msg|n}</span>
+    <span class="message" tabindex="-1">${HTML(msg)}</span>
     % endif
 </form>
 </section>

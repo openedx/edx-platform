@@ -32,9 +32,8 @@ $headings-base-color:                       $gray-d2;
 
 
 %hd-2 {
-    margin-bottom: 1em;
-    font-size: 1.5em;
-    font-weight: $headings-font-weight-normal;
+    font-size: em(18);
+    font-weight: $headings-font-weight-bold;
     line-height: 1.4em;
 }
 
@@ -118,8 +117,19 @@ $headings-base-color:                       $gray-d2;
 
     h3 {
         @extend %hd-2;
-        font-weight: $headings-font-weight-normal;
+        font-weight: $headings-font-weight-bold;
         // override external modules and xblocks that use inline CSS
         text-transform: initial;
+
+        &.unit-title {
+            margin-bottom: 0;
+            font-size: 1.5em;
+        }
+
+        &.discussion-module-title {
+            margin-bottom: 0;
+            display: inline-block;
+        }
     }
 }
+

@@ -64,7 +64,7 @@ class TestProgramListing(ProgramsApiConfigMixin, ProgramsDataMixin, SharedModule
         self.mock_programs_api(data={'results': []})
 
         response = self.client.get(self.studio_home)
-        self.assertIn(Text("You haven't created any programs yet."), response.content)
+        self.assertIn(Text("You haven't created any programs yet."), response.content.decode('utf-8'))
 
         # When data is provided, expect a program listing.
         self.mock_programs_api()

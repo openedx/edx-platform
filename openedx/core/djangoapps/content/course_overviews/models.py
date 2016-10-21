@@ -25,7 +25,7 @@ from xmodule import course_metadata_utils, block_metadata_utils
 from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule_django.models import CourseKeyField, UsageKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, UsageKeyField
 
 log = logging.getLogger(__name__)
 

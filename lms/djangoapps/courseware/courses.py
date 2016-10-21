@@ -16,7 +16,6 @@ from edxmako.shortcuts import render_to_string
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from static_replace import replace_static_urls
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 
 from courseware.access import has_access
@@ -70,7 +69,7 @@ def get_course_by_id(course_key, depth=0):
     if course:
         return course
     else:
-        raise Http404("Course not found.")
+        raise Http404("Course not found: {}.".format(unicode(course_key)))
 
 
 class UserNotEnrolled(Http404):

@@ -17,7 +17,7 @@ import mock
 from pytz import UTC
 import requests
 
-from . import new_loncapa_problem, test_capa_system, load_fixture
+from capa.tests.helpers import new_loncapa_problem, test_capa_system, load_fixture
 import calc
 
 from capa.responsetypes import LoncapaProblemError, \
@@ -168,6 +168,35 @@ class MultiChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstrin
 
         correct_map = problem.grade_answers({'1_2_1': 'choice_2'})
         self.assertAlmostEqual(correct_map.get_npoints('1_2_1'), 0)
+
+    def test_contextualized_choices(self):
+        script = textwrap.dedent("""
+            a = 2
+            b = 9
+            c = a + b
+
+            ok0 = c % 2 == 0 # check remainder modulo 2
+            text0 = "$a + $b is even"
+
+            ok1 = c % 2 == 1 # check remainder modulo 2
+            text1 = "$a + $b is odd"
+
+            ok2 = "partial"
+            text2 = "infinity may be both"
+        """)
+        choices = ["$ok0", "$ok1", "$ok2"]
+        choice_names = ["$text0 ... (should be $ok0)",
+                        "$text1 ... (should be $ok1)",
+                        "$text2 ... (should be $ok2)"]
+        problem = self.build_problem(script=script,
+                                     choices=choices,
+                                     choice_names=choice_names,
+                                     credit_type='points')
+
+        # Ensure the expected correctness and choice names
+        self.assert_grade(problem, 'choice_2 + 9 is even ... (should be False)', 'incorrect')
+        self.assert_grade(problem, 'choice_2 + 9 is odd ... (should be True)', 'correct')
+        self.assert_grade(problem, 'choice_infinity may be both ... (should be partial)', 'partially-correct')
 
 
 class TrueFalseResponseTest(ResponseTest):  # pylint: disable=missing-docstring
@@ -1292,6 +1321,26 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         correct_map = problem.grade_answers({})
         self.assertEqual(correct_map.get_correctness('1_2_1'), 'incorrect')
 
+    def test_contextualized_choices(self):
+        script = textwrap.dedent("""
+            a = 6
+            b = 4
+            c = a + b
+
+            ok0 = c % 2 == 0 # check remainder modulo 2
+            ok1 = c % 3 == 0 # check remainder modulo 3
+            ok2 = c % 5 == 0 # check remainder modulo 5
+            ok3 = not any([ok0, ok1, ok2])
+        """)
+        choices = ["$ok0", "$ok1", "$ok2", "$ok3"]
+        problem = self.build_problem(script=script,
+                                     choice_type='checkbox',
+                                     choices=choices)
+
+        # Ensure the expected correctness
+        self.assert_grade(problem, ['choice_0', 'choice_2'], 'correct')
+        self.assert_grade(problem, ['choice_1', 'choice_3'], 'incorrect')
+
 
 class JavascriptResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     xml_factory_class = JavascriptResponseXMLFactory
@@ -1341,7 +1390,7 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
     # For simple things its not worth the effort.
     def test_grade_range_tolerance(self):
         problem_setup = [
-            # [given_asnwer, [list of correct responses], [list of incorrect responses]]
+            # [given_answer, [list of correct responses], [list of incorrect responses]]
             ['[5, 7)', ['5', '6', '6.999'], ['4.999', '7']],
             ['[1.6e-5, 1.9e24)', ['0.000016', '1.6*10^-5', '1.59e24'], ['1.59e-5', '1.9e24', '1.9*10^24']],
             ['[0, 1.6e-5]', ['1.6*10^-5'], ["2"]],
@@ -1350,6 +1399,54 @@ class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         for given_answer, correct_responses, incorrect_responses in problem_setup:
             problem = self.build_problem(answer=given_answer)
             self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+    def test_additional_answer_grading(self):
+        """
+        Test additional answers are graded correct with their associated correcthint.
+        """
+        primary_answer = '100'
+        primary_correcthint = 'primary feedback'
+        additional_answers = {
+            '1': '1. additional feedback',
+            '2': '2. additional feedback',
+            '4': '4. additional feedback',
+            '5': ''
+        }
+        problem = self.build_problem(
+            answer=primary_answer,
+            additional_answers=additional_answers,
+            correcthint=primary_correcthint
+        )
+
+        # Assert primary answer is graded correctly.
+        correct_map = problem.grade_answers({'1_2_1': primary_answer})
+        self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+        self.assertIn(primary_correcthint, correct_map.get_msg('1_2_1'))
+
+        # Assert additional answers are graded correct
+        for answer, correcthint in additional_answers.items():
+            correct_map = problem.grade_answers({'1_2_1': answer})
+            self.assertEqual(correct_map.get_correctness('1_2_1'), 'correct')
+            self.assertIn(correcthint, correct_map.get_msg('1_2_1'))
+
+    def test_additional_answer_get_score(self):
+        """
+        Test `get_score` is working for additional answers.
+        """
+        problem = self.build_problem(answer='100', additional_answers={'1': ''})
+        responder = problem.responders.values()[0]
+
+        # Check primary answer.
+        new_cmap = responder.get_score({'1_2_1': '100'})
+        self.assertEqual(new_cmap.get_correctness('1_2_1'), 'correct')
+
+        # Check additional answer.
+        new_cmap = responder.get_score({'1_2_1': '1'})
+        self.assertEqual(new_cmap.get_correctness('1_2_1'), 'correct')
+
+        # Check any wrong answer.
+        new_cmap = responder.get_score({'1_2_1': '2'})
+        self.assertEqual(new_cmap.get_correctness('1_2_1'), 'incorrect')
 
     def test_grade_range_tolerance_partial_credit(self):
         problem_setup = [

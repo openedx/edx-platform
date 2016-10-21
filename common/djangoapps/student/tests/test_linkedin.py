@@ -2,8 +2,9 @@
 """Tests for LinkedIn Add to Profile configuration. """
 
 import ddt
-from urllib import urlencode
+from urllib import urlencode, quote
 
+from django.conf import settings
 from django.test import TestCase
 from opaque_keys.edx.locator import CourseLocator
 from student.models import LinkedInAddToProfileConfiguration
@@ -18,10 +19,10 @@ class LinkedInAddToProfileUrlTests(TestCase):
     CERT_URL = u"http://s3.edx/cert"
 
     @ddt.data(
-        ('honor', u'edX+Honor+Code+Certificate+for+Test+Course+%E2%98%83'),
-        ('verified', u'edX+Verified+Certificate+for+Test+Course+%E2%98%83'),
-        ('professional', u'edX+Professional+Certificate+for+Test+Course+%E2%98%83'),
-        ('default_mode', u'edX+Certificate+for+Test+Course+%E2%98%83')
+        ('honor', u'Honor+Code+Certificate+for+Test+Course+%E2%98%83'),
+        ('verified', u'Verified+Certificate+for+Test+Course+%E2%98%83'),
+        ('professional', u'Professional+Certificate+for+Test+Course+%E2%98%83'),
+        ('default_mode', u'Certificate+for+Test+Course+%E2%98%83')
     )
     @ddt.unpack
     def test_linked_in_url(self, cert_mode, expected_cert_name):
@@ -33,10 +34,13 @@ class LinkedInAddToProfileUrlTests(TestCase):
         expected_url = (
             'http://www.linkedin.com/profile/add'
             '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            'pfCertificationName={expected_cert_name}&'
+            'pfCertificationName={platform_name}+{expected_cert_name}&'
             'pfCertificationUrl=http%3A%2F%2Fs3.edx%2Fcert&'
             'source=o'
-        ).format(expected_cert_name=expected_cert_name)
+        ).format(
+            expected_cert_name=expected_cert_name,
+            platform_name=quote(settings.PLATFORM_NAME.encode('utf-8'))
+        )
 
         actual_url = config.add_to_profile_url(
             self.COURSE_KEY,

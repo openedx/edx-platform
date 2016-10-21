@@ -36,10 +36,10 @@ from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from openedx.core.lib.courses import course_image_url
 from openedx.core.lib.gating import api as gating_api
+from openedx.core.lib.url_utils import quote_slashes
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
@@ -67,8 +67,10 @@ from edx_proctoring.api import (
 )
 from edx_proctoring.runtime import set_runtime_service
 from edx_proctoring.tests.test_services import MockCreditService
+from verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 
 from milestones.tests.utils import MilestonesTestCaseMixin
+
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -250,14 +252,6 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                     self.mock_module.id,
                     self.dispatch
                 )
-
-    def test_get_score_bucket(self):
-        self.assertEquals(render.get_score_bucket(0, 10), 'incorrect')
-        self.assertEquals(render.get_score_bucket(1, 10), 'partial')
-        self.assertEquals(render.get_score_bucket(10, 10), 'correct')
-        # get_score_bucket calls error cases 'incorrect'
-        self.assertEquals(render.get_score_bucket(11, 10), 'incorrect')
-        self.assertEquals(render.get_score_bucket(-1, 10), 'incorrect')
 
     def test_anonymous_handle_xblock_callback(self):
         dispatch_url = reverse(
@@ -740,6 +734,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory.create()
         self.user = UserFactory.create()
+        SoftwareSecurePhotoVerificationFactory.create(user=self.request.user)
         self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access
         with self.modulestore.bulk_operations(self.course_key):
             self.toy_course = self.store.get_course(self.course_key, depth=2)
@@ -1020,6 +1015,7 @@ class TestProctoringRendering(SharedModuleStoreTestCase):
         if attempt_status:
             create_exam_attempt(exam_id, self.request.user.id, taking_as_proctored=True)
             update_attempt_status(exam_id, self.request.user.id, attempt_status)
+
         return usage_key
 
     def _find_url_name(self, toc, url_name):
@@ -1835,7 +1831,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @patch('courseware.module_render.SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.SCORE_CHANGED.send')
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
         self.set_module_grade_using_publish(self.grade_dict)
@@ -1843,9 +1839,10 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             'sender': None,
             'points_possible': self.grade_dict['max_value'],
             'points_earned': self.grade_dict['value'],
-            'user': self.student_user,
+            'user_id': self.student_user.id,
             'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.problem.location)
+            'usage_id': unicode(self.problem.location),
+            'only_if_higher': None,
         }
         send_mock.assert_called_with(**expected_signal_kwargs)
 

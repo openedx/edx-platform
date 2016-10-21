@@ -61,7 +61,7 @@ def index(request):
             return redirect(reverse('dashboard'))
 
     if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
-        from external_auth.views import ssl_login
+        from openedx.core.djangoapps.external_auth.views import ssl_login
         # Set next URL to dashboard if it isn't set to avoid
         # caching a redirect to / that causes a redirect loop on logout
         if not request.GET.get('next'):
@@ -76,7 +76,11 @@ def index(request):
     )
 
     if enable_mktg_site:
-        return redirect(settings.MKTG_URLS.get('ROOT'))
+        marketing_urls = configuration_helpers.get_value(
+            'MKTG_URLS',
+            settings.MKTG_URLS
+        )
+        return redirect(marketing_urls.get('ROOT'))
 
     domain = request.META.get('HTTP_HOST')
 

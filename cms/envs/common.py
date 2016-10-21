@@ -226,6 +226,8 @@ SOCIAL_SHARING_SETTINGS = {
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+OPENEDX_ROOT = REPO_ROOT / "openedx"
+CMS_ROOT = REPO_ROOT / "cms"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 
@@ -249,8 +251,10 @@ MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
-    COMMON_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
     COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+    OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
+    OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
+    CMS_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
 
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
@@ -334,7 +338,7 @@ simplefilter('ignore')
 MIDDLEWARE_CLASSES = (
     'crum.CurrentRequestUserMiddleware',
     'request_cache.middleware.RequestCache',
-    'header_control.middleware.HeaderControlMiddleware',
+    'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -347,22 +351,22 @@ MIDDLEWARE_CLASSES = (
     'method_override.middleware.MethodOverrideMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
-    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'openedx.core.djangoapps.cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     # Enable SessionAuthenticationMiddleware in order to invalidate
     # user sessions after a password change.
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'student.middleware.UserStandingMiddleware',
-    'contentserver.middleware.StaticContentServer',
+    'openedx.core.djangoapps.contentserver.middleware.StaticContentServer',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
 
     # This is used to set or update the user language preferences.
-    'lang_pref.middleware.LanguagePreferenceMiddleware',
+    'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Allows us to dark-launch particular languages
-    'dark_lang.middleware.DarkLangMiddleware',
+    'openedx.core.djangoapps.dark_lang.middleware.DarkLangMiddleware',
 
     'embargo.middleware.EmbargoMiddleware',
 
@@ -375,7 +379,7 @@ MIDDLEWARE_CLASSES = (
     'ratelimitbackend.middleware.RateLimitMiddleware',
 
     # for expiring inactive sessions
-    'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+    'openedx.core.djangoapps.session_inactivity_timeout.middleware.SessionInactivityTimeout',
 
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
@@ -808,16 +812,16 @@ INSTALLED_APPS = (
     'config_models',
 
     # Monitor the status of services
-    'service_status',
+    'openedx.core.djangoapps.service_status',
 
     # Testing
     'django_nose',
 
     # For CMS
     'contentstore',
-    'contentserver',
+    'openedx.core.djangoapps.contentserver',
     'course_creators',
-    'external_auth',
+    'openedx.core.djangoapps.external_auth',
     'student',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
     'openedx.core.djangoapps.coursetalk',  # not used in cms (yet), but tests run
@@ -831,7 +835,7 @@ INSTALLED_APPS = (
     'eventtracking.django.apps.EventTrackingConfig',
 
     # Monitoring
-    'datadog',
+    'openedx.core.djangoapps.datadog',
 
     # For asset pipelining
     'edxmako',
@@ -855,19 +859,17 @@ INSTALLED_APPS = (
     'course_modes',
 
     # Dark-launching languages
-    'dark_lang',
-
-    # Student identity reverification
-    'reverification',
+    'openedx.core.djangoapps.dark_lang',
 
     # User preferences
     'openedx.core.djangoapps.user_api',
     'django_openid_auth',
 
+    # Country embargo support
     'embargo',
 
     # Monitoring signals
-    'monitoring',
+    'openedx.core.djangoapps.monitoring',
 
     # Course action state
     'course_action_state',
@@ -878,6 +880,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.course_overviews',
     'openedx.core.djangoapps.content.course_structures.apps.CourseStructuresConfig',
     'openedx.core.djangoapps.content.block_structure.apps.BlockStructureConfig',
+
+    # Coursegraph
+    'openedx.core.djangoapps.coursegraph.apps.CoursegraphConfig',
 
     # Credit courses
     'openedx.core.djangoapps.credit',
@@ -911,7 +916,6 @@ INSTALLED_APPS = (
     # other apps that are.  Django 1.8 wants to have imported models supported
     # by installed apps.
     'lms.djangoapps.verify_student',
-    'lms.djangoapps.grades',
 
     # Microsite configuration application
     'microsite_configuration',
@@ -1089,6 +1093,10 @@ ADVANCED_PROBLEM_TYPES = [
         'component': 'openassessment',
         'boilerplate_name': None,
     },
+    {
+        'component': 'drag-and-drop-v2',
+        'boilerplate_name': None
+    }
 ]
 
 
@@ -1190,3 +1198,13 @@ AFFILIATE_COOKIE_NAME = 'affiliate_id'
 ############## Settings for Studio Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = None
+
+# Theme directory locale paths
+COMPREHENSIVE_THEME_LOCALE_PATHS = []
+
+# This is required for the migrations in oauth_dispatch.models
+# otherwise it fails saying this attribute is not present in Settings
+# Although Studio does not exable OAuth2 Provider capability, the new approach
+# to generating test databases will discover and try to create all tables
+# and this setting needs to be present
+OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'

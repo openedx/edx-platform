@@ -10,13 +10,13 @@ from common.test.acceptance.pages.studio.container import XBlockWrapper
 from common.test.acceptance.pages.studio.users import UsersPageMixin
 from common.test.acceptance.pages.studio.pagination import PaginatedMixin
 from selenium.webdriver.common.keys import Keys
-
+from common.test.acceptance.pages.studio.utils import HelpMixin
 from common.test.acceptance.pages.common.utils import confirm_prompt, wait_for_notification
 
 from common.test.acceptance.pages.studio import BASE_URL
 
 
-class LibraryPage(PageObject):
+class LibraryPage(PageObject, HelpMixin):
     """
     Base page for Library pages. Defaults URL to the edit page.
     """
@@ -140,7 +140,6 @@ class StudioLibraryContentEditor(ComponentEditorView):
     # Labels used to identify the fields on the edit modal:
     LIBRARY_LABEL = "Library"
     COUNT_LABEL = "Count"
-    SCORED_LABEL = "Scored"
     PROBLEM_TYPE_LABEL = "Problem Type"
 
     @property
@@ -173,26 +172,6 @@ class StudioLibraryContentEditor(ComponentEditorView):
         count_text.send_keys(Keys.BACK_SPACE)
         count_text.send_keys(count)
         EmptyPromise(lambda: self.count == count, "count is updated in modal.").fulfill()
-
-    @property
-    def scored(self):
-        """
-        Gets value of scored select
-        """
-        value = self.get_selected_option_text(self.SCORED_LABEL)
-        if value == 'True':
-            return True
-        elif value == 'False':
-            return False
-        raise ValueError("Unknown value {value} set for {label}".format(value=value, label=self.SCORED_LABEL))
-
-    @scored.setter
-    def scored(self, scored):
-        """
-        Sets value of scored select
-        """
-        self.set_select_value(self.SCORED_LABEL, str(scored))
-        EmptyPromise(lambda: self.scored == scored, "scored is updated in modal.").fulfill()
 
     @property
     def capa_type(self):

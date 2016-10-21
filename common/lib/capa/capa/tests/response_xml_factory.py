@@ -37,7 +37,7 @@ class ResponseXMLFactory(object):
         For all response types, **kwargs can contain:
 
         *question_text*: The text of the question to display,
-            wrapped in <p> tags.
+            wrapped in <label> tags.
 
         *explanation_text*: The detailed explanation that will
             be shown if the user answers incorrectly.
@@ -72,10 +72,6 @@ class ResponseXMLFactory(object):
             script_element.set("type", "loncapa/python")
             script_element.text = str(script)
 
-        # The problem has a child <p> with question text
-        question = etree.SubElement(root, "p")
-        question.text = question_text
-
         # Add the response(s)
         for __ in range(int(num_responses)):
             response_element = self.create_response_element(**kwargs)
@@ -85,6 +81,10 @@ class ResponseXMLFactory(object):
                 response_element.set('partial_credit', str(credit_type))
 
             root.append(response_element)
+
+            # Add the question label
+            question = etree.SubElement(response_element, "label")
+            question.text = question_text
 
             # Add input elements
             for __ in range(int(num_inputs)):
@@ -113,8 +113,12 @@ class ResponseXMLFactory(object):
         """
         math_display = kwargs.get('math_display', False)
         size = kwargs.get('size', None)
+        input_element_label = kwargs.get('input_element_label', '')
 
         input_element = etree.Element('textline')
+
+        if input_element_label:
+            input_element.set('label', input_element_label)
 
         if math_display:
             input_element.set('math', '1')
@@ -172,6 +176,8 @@ class ResponseXMLFactory(object):
                 correctness = 'false'
             elif 'partial' in correct_val:
                 correctness = 'partial'
+            else:
+                correctness = correct_val
 
             choice_element.set('correct', correctness)
 
@@ -198,6 +204,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
 
         *answer*: The correct answer (e.g. "5")
 
+        *correcthint*: The feedback describing correct answer.
+
+        *additional_answers*: A dict of additional answers along with their correcthint.
+
         *tolerance*: The tolerance within which a response
         is considered correct.  Can be a decimal (e.g. "0.01")
         or percentage (e.g. "2%")
@@ -213,6 +223,8 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         """
 
         answer = kwargs.get('answer', None)
+        correcthint = kwargs.get('correcthint', '')
+        additional_answers = kwargs.get('additional_answers', {})
         tolerance = kwargs.get('tolerance', None)
         credit_type = kwargs.get('credit_type', None)
         partial_range = kwargs.get('partial_range', None)
@@ -226,6 +238,13 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             else:
                 response_element.set('answer', str(answer))
 
+        for additional_answer, additional_correcthint in additional_answers.items():
+            additional_element = etree.SubElement(response_element, 'additional_answer')
+            additional_element.set('answer', str(additional_answer))
+            if additional_correcthint:
+                correcthint_element = etree.SubElement(additional_element, 'correcthint')
+                correcthint_element.text = str(additional_correcthint)
+
         if tolerance:
             responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('type', 'tolerance')
@@ -237,6 +256,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
             # The line below throws a false positive pylint violation, so it's excepted.
             responseparam_element = etree.SubElement(response_element, 'responseparam')
             responseparam_element.set('partial_answers', partial_answers)
+
+        if correcthint:
+            correcthint_element = etree.SubElement(response_element, 'correcthint')
+            correcthint_element.text = str(correcthint)
 
         return response_element
 
@@ -726,7 +749,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *regexp*: Whether the response is regexp
 
-            *additional_answers*: list of additional asnwers.
+            *additional_answers*: list of additional answers.
 
             *non_attribute_answers*: list of additional answers to be coded in the
                 non-attribute format

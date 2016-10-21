@@ -32,8 +32,8 @@
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
-            'moment': 'xmodule_js/common_static/js/vendor/moment.min',
-            'moment-with-locales': 'xmodule_js/common_static/js/vendor/moment-with-locales.min',
+            moment: 'common/js/vendor/moment-with-locales',
+            'moment-timezone': 'common/js/vendor/moment-timezone-with-data',
             'text': 'xmodule_js/common_static/js/vendor/requirejs/text',
             'underscore': 'common/js/vendor/underscore',
             'underscore.string': 'common/js/vendor/underscore.string',
@@ -54,7 +54,7 @@
             mathjax: '//cdn.mathjax.org/mathjax/2.6-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
             'youtube': '//www.youtube.com/player_api?noext',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
-            'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
+            'js/instructor_dashboard/student_admin': 'js/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
             'xblock': 'common/js/xblock',
@@ -283,8 +283,8 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
-            'coffee/src/instructor_dashboard/util': {
-                exports: 'coffee/src/instructor_dashboard/util',
+            'js/instructor_dashboard/util': {
+                exports: 'js/instructor_dashboard/util',
                 deps: ['jquery', 'underscore', 'slick.core', 'slick.grid'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
@@ -298,9 +298,9 @@
                     });
                 }
             },
-            'coffee/src/instructor_dashboard/student_admin': {
-                exports: 'coffee/src/instructor_dashboard/student_admin',
-                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            'js/instructor_dashboard/student_admin': {
+                exports: 'js/instructor_dashboard/student_admin',
+                deps: ['jquery', 'underscore', 'js/instructor_dashboard/util', 'string_utils']
             },
             'js/instructor_dashboard/certificates': {
                 exports: 'js/instructor_dashboard/certificates',
@@ -731,6 +731,7 @@
         'js/spec/learner_dashboard/course_card_view_spec.js',
         'js/spec/learner_dashboard/course_enroll_view_spec.js',
         'js/spec/markdown_editor_spec.js',
+        'js/spec/dateutil_factory_spec.js',
         'js/spec/navigation_spec.js',
         'js/spec/search/search_spec.js',
         'js/spec/shoppingcart/shoppingcart_spec.js',

@@ -22,19 +22,18 @@ html.video-fullscreen {
   overflow: hidden;
 
   &.studio-view {
-    position: relative;
-    top: -($baseline/2);
     margin: 0;
+    display: inline;
   }
 
   .instructor-info-action {
     @extend %t-copy-sub2;
     @include float(right);
     @include margin-left($baseline/2);
+    @include text-align(right);
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);
     background-color: $light-gray1;
-    text-align: right;
     text-transform: uppercase;
     color: $staff-color;
 
@@ -48,11 +47,11 @@ html.video-fullscreen {
 .content-wrapper {
 
   .container-footer {
+    @include text-align(right);
     margin: 0 auto;
     max-width: grid-width(12);
     min-width: 760px;
     color: $gray;
-    text-align: $bi-app-right;
   }
 }
 
@@ -122,6 +121,7 @@ html.video-fullscreen {
 
     h1 {
       margin: 0 0 lh();
+      letter-spacing: 0;
     }
     div.timed-exam {
       h3 {
@@ -188,12 +188,12 @@ html.video-fullscreen {
         }
       }
       .proctored-exam-select-code {
-        margin-left: 30px;
+        @include margin-left(30px);
       }
 
       .exam-action-button {
         @extend %t-weight4;
-        margin-right: $baseline;
+        @include margin-right($baseline);
         background-image: none;
         box-shadow: none;
         text-shadow: none;
@@ -293,8 +293,8 @@ html.video-fullscreen {
           }
         }
         > .fa {
+          @include right(35px);
           position: absolute;
-          right: 35px;
           top: 50%;
           font-size: 30px;
           margin-top: -15px;
@@ -365,11 +365,11 @@ html.video-fullscreen {
 
       }
       a.contest-review {
-        float: right;
+        @include float(right);
+        @include text-align(right);
         font-size: 12px;
         margin: 0;
         width: 20%;
-        text-align: right;
       }
       p {
         margin-bottom: ($baseline/20);
@@ -412,7 +412,7 @@ html.video-fullscreen {
       }
     }
 
-    .sequence .path {
+    .path {
       @extend %t-copy-sub1;
       margin-top: -($baseline);
       margin-bottom: $baseline;
@@ -455,11 +455,11 @@ html.video-fullscreen {
           }
 
           h2 {
-            float: right;
+            @include float(right);
+            @include text-align(right);
+            @include border-right(0);
+            @include padding-right(0);
             margin: 12px 0 0;
-            text-align: right;
-            padding-right: 0;
-            border-right: 0;
             font-size: em(14, 24);
           }
         }
@@ -476,12 +476,12 @@ html.video-fullscreen {
         }
 
         ul {
+          @include padding-left(1em);
           list-style: disc outside none;
-          padding-left: 1em;
 
           &.discussion-errors {
+            @include padding-left(2em);
             list-style: none;
-            padding-left: 2em;
           }
 
           &.admin-actions {
@@ -490,7 +490,7 @@ html.video-fullscreen {
         }
 
         nav.sequence-nav ul li.prev {
-          left: 4px;
+          @include left(4px);
         }
 
         nav.sequence-bottom {
@@ -531,14 +531,14 @@ html.video-fullscreen {
         list-style: none;
 
         li {
+          @include float(left);
+          @include margin-right(flex-gutter(9));
           width: flex-grid(3, 9);
-          float: left;
-          margin-right: flex-gutter(9);
           margin-bottom: lh();
           line-height: lh();
 
           &:nth-child(3n) {
-            margin-right: 0;
+            @include margin-right(0);
           }
 
           &:nth-child(3n+1) {
@@ -561,7 +561,7 @@ html.video-fullscreen {
       }
     }
 
-    section.xqa-modal, section.staff-modal, section.history-modal {
+    .xqa-modal, .staff-modal, .history-modal {
         width: 80%;
         height: 80%;
         left: left(20%);

@@ -149,6 +149,20 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertIn(self.problem_display_name, problem_html)
         self.assertEqual(show_answer_expected, "Show Answer" in problem_html)
 
+    def verify_real_user_profile_link(self):
+        """
+        Verifies that the 'Profile' link in the navigation dropdown is pointing
+        to the real user.
+        """
+        content = self.get_courseware_page().content
+        self.assertIn(
+            '<a href="/u/{}" role="menuitem" class="action dropdown-menuitem">Profile</a>'.format(
+                self.test_user.username
+            ),
+            content,
+            "Profile link should point to real user",
+        )
+
 
 @attr(shard=1)
 class NormalStudentVisibilityTest(MasqueradeTestCase):
@@ -325,6 +339,9 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Masquerade as the student, and check we can see the student state.
         self.update_masquerade(role='student', user_name=self.student_user.username)
         self.assertEqual(self.get_progress_detail(), u'2/2')
+
+        # Verify that the user dropdown links have not changed
+        self.verify_real_user_profile_link()
 
         # Temporarily override the student state.
         self.submit_answer('Correct', 'Incorrect')

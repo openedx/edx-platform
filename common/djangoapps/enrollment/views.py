@@ -9,7 +9,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
 from course_modes.models import CourseMode
-from lms.djangoapps.commerce.utils import audit_log
+from openedx.core.lib.log_utils import audit_log
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from rest_framework import status
@@ -18,8 +18,8 @@ from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
 from embargo import api as embargo_api
-from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
-from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
+from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
+from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
@@ -600,7 +600,7 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                     log.warning(msg)
                     return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": msg})
 
-                response = api.update_enrollment(
+                enrollment_detail = api.update_enrollment(
                     username,
                     unicode(course_id),
                     mode=mode,
@@ -609,20 +609,28 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 )
             else:
                 # Will reactivate inactive enrollments.
-                response = api.add_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
+                enrollment_detail = api.add_enrollment(username, unicode(course_id), mode=mode, is_active=is_active)
 
             email_opt_in = request.data.get('email_opt_in', None)
             if email_opt_in is not None:
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)
 
-            return Response(response)
+            return Response(
+                status=status.HTTP_200_OK,
+                data={
+                    "message": (
+                        u"The user [{username}] has already been enrolled in course run [{course_id}]."
+                    ).format(username=username, course_id=course_id),
+                    "enrollment_detail": enrollment_detail
+                }
+            )
         except CourseModeNotFoundError as error:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"The course mode '{mode}' is not available for course '{course_id}'."
+                        u"The [{mode}] course mode is expired or otherwise unavailable for course run [{course_id}]."
                     ).format(mode=mode, course_id=course_id),
                     "course_details": error.data
                 })
@@ -634,7 +642,15 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
         except CourseEnrollmentExistsError as error:
-            return Response(data=error.enrollment)
+            return Response(
+                status=status.HTTP_200_OK,
+                data={
+                    "message": (
+                        u"An enrollment already exists for user [{username}] in course run [{course_id}]."
+                    ).format(username=username, course_id=course_id),
+                    "enrollment_detail": error.enrollment
+                }
+            )
         except CourseEnrollmentError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,

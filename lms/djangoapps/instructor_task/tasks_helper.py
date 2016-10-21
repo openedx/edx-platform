@@ -24,7 +24,7 @@ import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 from StringIO import StringIO
 from edxmako.shortcuts import render_to_string
-from instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
+from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
 from shoppingcart.models import (
     PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
     Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
@@ -58,7 +58,7 @@ from instructor_analytics.basic import (
 )
 from instructor_analytics.csvs import format_dictlist
 from openassessment.data import OraAggregateData
-from instructor_task.models import ReportStore, InstructorTask, PROGRESS
+from lms.djangoapps.instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -310,9 +310,9 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     argument, which is the query being filtered, and returns the filtered version of the query.
 
     The `update_fcn` is called on each StudentModule that passes the resulting filtering.
-    It is passed three arguments:  the module_descriptor for the module pointed to by the
-    module_state_key, the particular StudentModule to update, and the xmodule_instance_args being
-    passed through.  If the value returned by the update function evaluates to a boolean True,
+    It is passed four arguments:  the module_descriptor for the module pointed to by the
+    module_state_key, the particular StudentModule to update, the xmodule_instance_args, and the task_input
+    being passed through.  If the value returned by the update function evaluates to a boolean True,
     the update is successful; False indicates the update on the particular student module failed.
     A raised exception indicates a fatal condition -- that no other student modules should be considered.
 
@@ -382,7 +382,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
         with dog_stats_api.timer('instructor_tasks.module.time.step', tags=[u'action:{name}'.format(name=action_name)]):
-            update_status = update_fcn(module_descriptor, module_to_update)
+            update_status = update_fcn(module_descriptor, module_to_update, task_input)
             if update_status == UPDATE_STATUS_SUCCEEDED:
                 # If the update_fcn returns true, then it performed some kind of work.
                 # Logging of failures is left to the update_fcn itself.
@@ -470,7 +470,7 @@ def _get_module_instance_for_task(course_id, student, module_descriptor, xmodule
 
 
 @outer_atomic
-def rescore_problem_module_state(xmodule_instance_args, module_descriptor, student_module):
+def rescore_problem_module_state(xmodule_instance_args, module_descriptor, student_module, task_input):
     '''
     Takes an XModule descriptor and a corresponding StudentModule object, and
     performs rescoring on the student's problem submission.
@@ -517,7 +517,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             msg = "Specified problem does not support rescoring."
             raise UpdateProblemModuleStateError(msg)
 
-        result = instance.rescore_problem()
+        result = instance.rescore_problem(only_if_higher=task_input['only_if_higher'])
         instance.save()
         if 'success' not in result:
             # don't consider these fatal, but false means that the individual call didn't complete:
@@ -559,7 +559,7 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
 
 
 @outer_atomic
-def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, student_module):
+def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, student_module, _task_input):
     """
     Resets problem attempts to zero for specified `student_module`.
 
@@ -586,7 +586,7 @@ def reset_attempts_module_state(xmodule_instance_args, _module_descriptor, stude
 
 
 @outer_atomic
-def delete_problem_module_state(xmodule_instance_args, _module_descriptor, student_module):
+def delete_problem_module_state(xmodule_instance_args, _module_descriptor, student_module, _task_input):
     """
     Delete the StudentModule entry.
 
@@ -948,7 +948,7 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
 
         final_grade = gradeset['percent']
         # Only consider graded problems
-        problem_scores = {unicode(score.module_id): score for score, _ in gradeset['raw_scores'] if score.graded}
+        problem_scores = {unicode(score.module_id): score for score in gradeset['raw_scores'] if score.graded}
         earned_possible_values = list()
         for problem_id in problems:
             try:

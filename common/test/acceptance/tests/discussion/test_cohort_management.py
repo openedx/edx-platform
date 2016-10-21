@@ -250,10 +250,6 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         start_time = datetime.now(UTC)
         self.assertNotIn(cohort_name, self.cohort_management_page.get_cohorts())
         self.cohort_management_page.add_cohort(cohort_name, assignment_type=assignment_type)
-        # After adding the cohort, it should automatically be selected
-        EmptyPromise(
-            lambda: cohort_name == self.cohort_management_page.get_selected_cohort(), "Waiting for new cohort to appear"
-        ).fulfill()
         self.assertEqual(0, self.cohort_management_page.get_selected_cohort_count())
         # After adding the cohort, it should automatically be selected and its
         # assignment_type should be "manual" as this is the default assignment type
@@ -1154,11 +1150,6 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         Creates a new cohort linked to a content group.
         """
         self.cohort_management_page.add_cohort(new_cohort, content_group=cohort_group)
-        # After adding the cohort, it should automatically be selected
-        EmptyPromise(
-            lambda: new_cohort == self.cohort_management_page.get_selected_cohort(),
-            "Waiting for new cohort to appear"
-        ).fulfill()
         self.assertEqual(cohort_group, self.cohort_management_page.get_cohort_associated_content_group())
 
     def _link_cohort_to_content_group(self, cohort_name, content_group):

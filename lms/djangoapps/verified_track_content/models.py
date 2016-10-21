@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 from student.models import CourseEnrollment
 from courseware.courses import get_course_by_id
 

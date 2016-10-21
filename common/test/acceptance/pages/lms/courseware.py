@@ -267,6 +267,10 @@ class CoursewarePage(CoursePage):
         """ Return the course tree breadcrumb shown above the sequential bar """
         return [part.strip() for part in self.q(css='.path').text[0].split('>')]
 
+    def unit_title_visible(self):
+        """ Check if unit title is visible """
+        return self.q(css='.unit-title').visible
+
     def bookmark_button_visible(self):
         """ Check if bookmark button is visible """
         EmptyPromise(lambda: self.q(css='.bookmark-button').visible, "Bookmark button visible").fulfill()

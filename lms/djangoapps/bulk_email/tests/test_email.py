@@ -9,6 +9,7 @@ from nose.plugins.attrib import attr
 import os
 from unittest import skipIf
 
+from django.conf import settings
 from django.core import mail
 from django.core.mail.message import forbid_multi_line_headers
 from django.core.urlresolvers import reverse
@@ -20,7 +21,7 @@ from bulk_email.tasks import _get_source_address, _get_course_email_context
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from courseware.tests.factories import StaffFactory, InstructorFactory
-from instructor_task.subtasks import update_subtask_status
+from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -503,7 +504,7 @@ class TestCourseEmailContext(SharedModuleStoreTestCase):
         """
         This test tests that the bulk email context uses http or https urls as appropriate.
         """
-        self.assertEquals(email_context['platform_name'], 'edX')
+        self.assertEquals(email_context['platform_name'], settings.PLATFORM_NAME)
         self.assertEquals(email_context['course_title'], self.course_title)
         self.assertEquals(email_context['course_url'],
                           '{}://edx.org/courses/{}/{}/{}/'.format(scheme,

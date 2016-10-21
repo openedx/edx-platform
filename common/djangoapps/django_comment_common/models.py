@@ -12,7 +12,7 @@ from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
 FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
 FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
@@ -46,7 +46,14 @@ def assign_default_role(course_id, user):
     """
     Assign forum default role 'Student' to user
     """
-    role, __ = Role.objects.get_or_create(course_id=course_id, name=FORUM_ROLE_STUDENT)
+    assign_role(course_id, user, FORUM_ROLE_STUDENT)
+
+
+def assign_role(course_id, user, rolename):
+    """
+    Assign forum role `rolename` to user
+    """
+    role, __ = Role.objects.get_or_create(course_id=course_id, name=rolename)
     user.roles.add(role)
 
 

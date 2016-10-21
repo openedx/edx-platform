@@ -54,7 +54,7 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
-    LogoutViewConfiguration)
+    LogoutViewConfiguration, RegistrationCookieConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
@@ -78,14 +78,12 @@ from courseware.access import has_access
 
 from django_comment_common.models import Role
 
-from external_auth.models import ExternalAuthMap
-import external_auth.views
-from external_auth.login_and_register import (
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+import openedx.core.djangoapps.external_auth.views
+from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
-
-from lang_pref import LANGUAGE_KEY
 
 import track.views
 
@@ -105,6 +103,7 @@ from student.helpers import (
     check_verify_status_by_course,
     auth_pipeline_urls, get_next_url_for_login_page,
     DISABLE_UNENROLL_CERT_STATES,
+    destroy_oauth_tokens
 )
 from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
@@ -119,11 +118,12 @@ from eventtracking import tracker
 from notification_prefs.views import enable_notifications
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
-from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.programs import utils as programs_utils
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 
 
 log = logging.getLogger("edx.student")
@@ -132,6 +132,14 @@ ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number d
 SETTING_CHANGE_INITIATED = 'edx.user.settings.change_initiated'
 # Used as the name of the user attribute for tracking affiliate registrations
 REGISTRATION_AFFILIATE_ID = 'registration_affiliate_id'
+REGISTRATION_UTM_PARAMETERS = {
+    'utm_source': 'registration_utm_source',
+    'utm_medium': 'registration_utm_medium',
+    'utm_campaign': 'registration_utm_campaign',
+    'utm_term': 'registration_utm_term',
+    'utm_content': 'registration_utm_content',
+}
+REGISTRATION_UTM_CREATED_AT = 'registration_utm_created_at'
 # used to announce a registration
 REGISTER_USER = Signal(providing_args=["user", "profile"])
 
@@ -469,7 +477,9 @@ def register_user(request, extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
 
-    if context.get("extauth_domain", '').startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+    if context.get("extauth_domain", '').startswith(
+            openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
+    ):
         return render_to_response('register-shib.html', context)
 
     # If third-party auth is enabled, prepopulate the form with data from the
@@ -545,6 +555,18 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 @login_required
 @ensure_csrf_cookie
 def dashboard(request):
+    """
+    Provides the LMS dashboard view
+
+    TODO: This is lms specific and does not belong in common code.
+
+    Arguments:
+        request: The request object.
+
+    Returns:
+        The dashboard response.
+
+    """
     user = request.user
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
@@ -987,6 +1009,8 @@ def change_enrollment(request, check_access=True):
     """
     Modify the enrollment status for the logged-in user.
 
+    TODO: This is lms specific and does not belong in common code.
+
     The request parameter must be a POST request (other methods return 405)
     that specifies course_id and enrollment_action parameters. If course_id or
     enrollment_action is not specified, if course_id is not valid, if
@@ -1076,8 +1100,7 @@ def change_enrollment(request, check_access=True):
             try:
                 enroll_mode = CourseMode.auto_enroll_mode(course_id, available_modes)
                 if enroll_mode:
-                    enrollment = CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
-                    enrollment.send_signal(EnrollStatusChange.enroll)
+                    CourseEnrollment.enroll(user, course_id, check_access=check_access, mode=enroll_mode)
             except Exception:  # pylint: disable=broad-except
                 return HttpResponseBadRequest(_("Could not enroll"))
 
@@ -1194,7 +1217,7 @@ def login_user(request, error=""):  # pylint: disable=too-many-statements,unused
     if settings.FEATURES.get('AUTH_USE_SHIB') and user:
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
-            if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
+            if eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
                 return JsonResponse({
                     "success": False,
                     "redirect": reverse('shib-login'),
@@ -1636,9 +1659,7 @@ def create_account_with_params(request, params):
         not settings.FEATURES.get("AUTH_USE_SHIB") or
         not settings.FEATURES.get("SHIB_DISABLE_TOS") or
         not do_external_auth or
-        not eamap.external_domain.startswith(
-            external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
-        )
+        not eamap.external_domain.startswith(openedx.core.djangoapps.external_auth.views.SHIBBOLETH_DOMAIN_PREFIX)
     )
 
     form = AccountCreationForm(
@@ -1817,7 +1838,11 @@ def create_account_with_params(request, params):
     login(request, new_user)
     request.session.set_expiry(0)
 
-    _record_registration_attribution(request, new_user)
+    try:
+        record_registration_attributions(request, new_user)
+    # Don't prevent a user from registering due to attribution errors.
+    except Exception:   # pylint: disable=broad-except
+        log.exception('Error while attributing cookies to user registration.')
 
     # TODO: there is no error checking here to see that the user actually logged in successfully,
     # and is not yet an active user.
@@ -1859,14 +1884,52 @@ def _enroll_user_in_pending_courses(student):
                 )
 
 
-def _record_registration_attribution(request, user):
+def record_affiliate_registration_attribution(request, user):
     """
     Attribute this user's registration to the referring affiliate, if
     applicable.
     """
     affiliate_id = request.COOKIES.get(settings.AFFILIATE_COOKIE_NAME)
-    if user is not None and affiliate_id is not None:
+    if user and affiliate_id:
         UserAttribute.set_user_attribute(user, REGISTRATION_AFFILIATE_ID, affiliate_id)
+
+
+def record_utm_registration_attribution(request, user):
+    """
+    Attribute this user's registration to the latest UTM referrer, if
+    applicable.
+    """
+    utm_cookie_name = RegistrationCookieConfiguration.current().utm_cookie_name
+    utm_cookie = request.COOKIES.get(utm_cookie_name)
+    if user and utm_cookie:
+        utm = json.loads(utm_cookie)
+        for utm_parameter_name in REGISTRATION_UTM_PARAMETERS:
+            utm_parameter = utm.get(utm_parameter_name)
+            if utm_parameter:
+                UserAttribute.set_user_attribute(
+                    user,
+                    REGISTRATION_UTM_PARAMETERS.get(utm_parameter_name),
+                    utm_parameter
+                )
+        created_at_unixtime = utm.get('created_at')
+        if created_at_unixtime:
+            # We divide by 1000 here because the javascript timestamp generated is in milliseconds not seconds.
+            # PYTHON: time.time()      => 1475590280.823698
+            # JS: new Date().getTime() => 1475590280823
+            created_at_datetime = datetime.datetime.fromtimestamp(int(created_at_unixtime) / float(1000), tz=UTC)
+            UserAttribute.set_user_attribute(
+                user,
+                REGISTRATION_UTM_CREATED_AT,
+                created_at_datetime
+            )
+
+
+def record_registration_attributions(request, user):
+    """
+    Attribute this user's registration based on referrer cookies.
+    """
+    record_affiliate_registration_attribution(request, user)
+    record_utm_registration_attribution(request, user)
 
 
 @csrf_exempt
@@ -2116,6 +2179,7 @@ def password_reset(request):
                 "user_id": request.user.id,
             }
         )
+        destroy_oauth_tokens(request.user)
     else:
         # bad user? tick the rate limiter counter
         AUDIT_LOG.info("Bad password_reset user passed in.")
@@ -2241,6 +2305,13 @@ def password_reset_confirm_wrapper(request, uidb36=None, token=None):
         response = password_reset_confirm(
             request, uidb64=uidb64, token=token, extra_context=platform_name
         )
+
+        # If password reset was unsuccessful a template response is returned (status_code 200).
+        # Check if form is invalid then show an error to the user.
+        # Note if password reset was successful we get response redirect (status_code 302).
+        if response.status_code == 200 and not response.context_data['form'].is_valid():
+            response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
+            return response
 
         # get the updated user
         updated_user = User.objects.get(id=uid_int)

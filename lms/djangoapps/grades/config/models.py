@@ -3,8 +3,9 @@ Models for configuration of the feature flags
 controlling persistent grades.
 """
 from config_models.models import ConfigurationModel
+from django.conf import settings
 from django.db.models import BooleanField
-from xmodule_django.models import CourseKeyField
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class PersistentGradesEnabledFlag(ConfigurationModel):
@@ -29,13 +30,13 @@ class PersistentGradesEnabledFlag(ConfigurationModel):
         If the flag is enabled and no course ID is given,
             we return True since the global setting is enabled.
         """
+        if settings.FEATURES.get('PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS'):
+            return True
         if not PersistentGradesEnabledFlag.is_enabled():
             return False
         elif not PersistentGradesEnabledFlag.current().enabled_for_all_courses and course_id:
-            try:
-                return CoursePersistentGradesFlag.objects.get(course_id=course_id).enabled
-            except CoursePersistentGradesFlag.DoesNotExist:
-                return False
+            effective = CoursePersistentGradesFlag.objects.filter(course_id=course_id).order_by('-change_date').first()
+            return effective.enabled if effective is not None else False
         return True
 
     class Meta(object):
@@ -60,7 +61,7 @@ class CoursePersistentGradesFlag(ConfigurationModel):
         app_label = "grades"
 
     # The course that these features are attached to.
-    course_id = CourseKeyField(max_length=255, db_index=True, unique=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
 
     def __unicode__(self):
         not_en = "Not "

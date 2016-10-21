@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Acceptance tests for studio related to the outline page.
 """
@@ -18,7 +19,7 @@ from common.test.acceptance.fixtures.config import ConfigModelFixture
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 
 from base_studio_test import StudioCourseTest
-from common.test.acceptance.tests.helpers import load_data_str
+from common.test.acceptance.tests.helpers import load_data_str, disable_animations
 from common.test.acceptance.pages.lms.progress import ProgressPage
 
 
@@ -1314,8 +1315,12 @@ class ExpandCollapseMultipleSectionsTest(CourseOutlineTest):
             And all sections are expanded
         """
         self.course_outline_page.visit()
+        # We have seen unexplainable sporadic failures in this test. Try disabling animations to see
+        # if that helps.
+        disable_animations(self.course_outline_page)
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.EXPAND)
+        self.verify_all_sections(collapsed=True)
         self.course_outline_page.section_at(0).expand_subsection()
         self.course_outline_page.toggle_expand_collapse()
         self.assertEquals(self.course_outline_page.expand_collapse_link_state, ExpandCollapseLinkState.COLLAPSE)
@@ -1604,10 +1609,12 @@ class DeprecationWarningMessageTest(CourseOutlineTest):
     """
     HEADING_TEXT = 'This course uses features that are no longer supported.'
     COMPONENT_LIST_HEADING = 'You must delete or replace the following components.'
-    ADVANCE_MODULES_REMOVE_TEXT = ('To avoid errors, edX strongly recommends that you remove unsupported features '
-                                   'from the course advanced settings. To do this, go to the Advanced Settings '
-                                   'page, locate the "Advanced Module List" setting, and then delete the following '
-                                   'modules from the list.')
+    ADVANCE_MODULES_REMOVE_TEXT = (
+        u'To avoid errors, édX strongly recommends that you remove unsupported features '
+        u'from the course advanced settings. To do this, go to the Advanced Settings '
+        u'page, locate the "Advanced Module List" setting, and then delete the following '
+        u'modules from the list.'
+    )
     DEFAULT_DISPLAYNAME = "Deprecated Component"
 
     def _add_deprecated_advance_modules(self, block_types):

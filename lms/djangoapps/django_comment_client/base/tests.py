@@ -370,8 +370,8 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         return inner
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 4, 32),
-        (ModuleStoreEnum.Type.split, 3, 13, 32),
+        (ModuleStoreEnum.Type.mongo, 3, 4, 31),
+        (ModuleStoreEnum.Type.split, 3, 13, 31),
     )
     @ddt.unpack
     @count_queries
@@ -379,8 +379,8 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.create_thread_helper(mock_request)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 3, 3, 26),
-        (ModuleStoreEnum.Type.split, 3, 10, 26),
+        (ModuleStoreEnum.Type.mongo, 3, 3, 27),
+        (ModuleStoreEnum.Type.split, 3, 10, 27),
     )
     @ddt.unpack
     @count_queries
@@ -734,7 +734,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -752,7 +752,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -812,7 +812,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }
@@ -830,7 +830,7 @@ class ViewsTestCase(
                 ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
-                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'params': {'mark_as_read': True, 'request_id': ANY, 'with_responses': False},
                     'headers': ANY,
                     'timeout': 5
                 }

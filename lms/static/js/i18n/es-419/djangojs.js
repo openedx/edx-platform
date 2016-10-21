@@ -45,18 +45,6 @@
       "%(memberCount)s / %(maxMemberCount)s Miembros"
     ], 
     "%(new_item_message)s": "%(new_item_message)s", 
-    "%(numResponses)s other response": [
-      "%(numResponses)s otra respuesta", 
-      "%(numResponses)s otras respuestas"
-    ], 
-    "%(numResponses)s response": [
-      "%(numResponses)s respuesta", 
-      "%(numResponses)s respuestas"
-    ], 
-    "%(numVotes)s Vote": [
-      "%(numVotes)s voto", 
-      "%(numVotes)s votos"
-    ], 
     "%(num_questions)s question": [
       "%(num_questions)s pregunta", 
       "%(num_questions)s preguntas"
@@ -75,10 +63,6 @@
       "%(team_count)s Equipos"
     ], 
     "%(type)s Component Template Menu": "Plantilla de men\u00fa de componentes %(type)s", 
-    "%(unread_count)s new comment": [
-      "%(unread_count)s nuevo comentario", 
-      "%(unread_count)s nuevos comentarios"
-    ], 
     "%(value)s hour": [
       "%(value)s hora", 
       "%(value)s horas"
@@ -112,14 +96,6 @@
     "%s result": [
       "%s resultado", 
       "%s resultados"
-    ], 
-    "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s punto)", 
-      "(%(earned)s/%(possible)s puntos)"
-    ], 
-    "(%(num_points)s point possible)": [
-      "(%(num_points)s punto posible)", 
-      "(%(num_points)s puntos posibles)"
     ], 
     "(Add signatories for a certificate)": "(A\u00f1adir signatarios para el certificado)", 
     "(Caption will be displayed when you start playing the video.)": "(Los subt\u00edtulos ser\u00e1n mostrados al iniciar la reproducci\u00f3n del video.)", 
@@ -162,6 +138,7 @@
     "Active Uploads": "Cargas activas", 
     "Add": "A\u00f1adir", 
     "Add Additional Signatory": "A\u00f1adir signatario adicional", 
+    "Add Allowance": "A\u00f1adir autorizaci\u00f3n", 
     "Add Cohort": "A\u00f1adir cohorte", 
     "Add Component:": "A\u00f1adir Componente:", 
     "Add Country": "A\u00f1adir pa\u00eds", 
@@ -170,6 +147,7 @@
     "Add Students": "A\u00f1adir estudiantes", 
     "Add URLs for additional versions": "A\u00f1ada URLs para las versiones adicionales", 
     "Add a Chapter": "A\u00f1adir cap\u00edtulo", 
+    "Add a New Allowance": "A\u00f1adir nueva autorizaci\u00f3n", 
     "Add a New Cohort": "A\u00f1adir NuevaCohorte", 
     "Add a Post": "A\u00f1adir un comentario:", 
     "Add a Response": "A\u00f1adir una respuesta", 
@@ -193,6 +171,7 @@
     "Adding": "A\u00f1adiendo", 
     "Adding the selected course to your cart": "A\u00f1adiendo el curso seleccionado a su carrito de compras", 
     "Additional Information": "Informaci\u00f3n adicional", 
+    "Additional Time (minutes)": "Tiempo adicional (minutos)", 
     "Adjust video speed": "Ajustar velocidad del video", 
     "Adjust video volume": "Ajustar volumen del video", 
     "Admin": "Administrador", 
@@ -227,6 +206,9 @@
     "Allow others to copy, distribute, display and perform your work - and derivative works based upon it - but for noncommercial purposes only.": "Permitir que otros copien, distribuyan, muestren y representen su trabajo \u2013 y otros trabajos derivados basados en \u00e9ste solamente para fines no comerciales.", 
     "Allow others to distribute derivative works only under a license identical to the license that governs your work. This option is incompatible with \"No Derivatives\".": "Permitir la distribuci\u00f3n de obras derivadas solamente bajo una licencia id\u00e9ntica a la licencia que regula la obra original. Esta opci\u00f3n es incompatible con \u201cNo Derivadas\u201d. ", 
     "Allow students to generate certificates for this course?": "\u00bfPermitir a los estudiantes generar certificados para este curso ?", 
+    "Allowance Type": "Tipo de autorizaci\u00f3n", 
+    "Allowance Value": "Valor de la autorizaci\u00f3n", 
+    "Allowances": "Autorizaciones", 
     "Already a course team member": "Ya un miembro del equipo del curso.", 
     "Already a library team member": "Ya es un miembro del equipo de la librer\u00eda", 
     "Already a member": "Ya es miembro", 
@@ -257,8 +239,6 @@
     "Anchors": "Anclas", 
     "Annotation": "Anotacion", 
     "Annotation Text": "Anotaci\u00f3n", 
-    "Answer hidden": "Respuesta oculta", 
-    "Answer:": "Respuesta:", 
     "Any content that has listed this content as a prerequisite will also have access limitations removed.": "Se eliminar\u00e1n las restricciones de acceso a cualquier contenido que inscriba este contenido como prerrequisito.", 
     "Are you having trouble finding a team to join?": "\u00bfTiene problemas para encontrar un equipo al cual unirse?", 
     "Are you sure you want to delete this comment?": "\u00bfEst\u00e1 seguro de que desea borrar este comentario?", 
@@ -298,6 +278,7 @@
     "Body": "Cuerpo", 
     "Bold": "Negrita", 
     "Bold (Ctrl+B)": "Negrita (Ctrl+B)", 
+    "Bookmark this page": "Marcar esta p\u00e1gina", 
     "Bookmarked": "A\u00f1adido a marcadores", 
     "Bookmarked on": "A\u00f1adido a marcadores en", 
     "Border": "Borde", 
@@ -411,7 +392,9 @@
     "Commentary": "Comentario", 
     "Common Problem Types": "Tipos de problemas comunes", 
     "Community TA": "TA de la comunidad", 
+    "Completed At": "Finalizado a las", 
     "Component": "Componente", 
+    "Component Location ID": "ID de la Ubicaci\u00f3n del componente", 
     "Configure": "Configurar", 
     "Confirm": "Confirmar", 
     "Confirm Timed Transcript": "Confirmar la transcripci\u00f3n", 
@@ -446,7 +429,7 @@
     "Course Code": "C\u00f3digo del curso", 
     "Course Credit Requirements": "Requerimientos de cr\u00e9ditos para el curso", 
     "Course End": "Finalizaci\u00f3n del curso", 
-    "Course Handouts": "Apuntes del curso", 
+    "Course Handouts": "Materiales del curso", 
     "Course ID": "Id de Curso", 
     "Course Index": "Indice de Curso", 
     "Course Key": "Llave del curso", 
@@ -528,7 +511,6 @@
     "Discussion": "Discusi\u00f3n", 
     "Discussion Home": "Inicio de la discusi\u00f3n", 
     "Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.": "Admins de discusiones, moderadores y TA pueden hacer sus publicaciones visibles a todos los estudiantes o para un grupo com\u00fan espec\u00edfico.", 
-    "Discussion topics; currently listing: ": "Temas de discusi\u00f3n, actualmente:", 
     "Display Name": "Nombre para mostrar:", 
     "Div": "Div", 
     "Do not show again": "No mostrar nuevamente", 
@@ -571,7 +553,6 @@
     "Edit Membership": "Editar membres\u00eda", 
     "Edit Team": "Editar Equipo", 
     "Edit Your Name": "Edite su nombre", 
-    "Edit post title": "Editar el t\u00edtulo de la publicaci\u00f3n", 
     "Edit the name": "Editar el nombre", 
     "Edit the program marketing slug": "Editar el slug de marketing para el programa", 
     "Edit the program subtitle": "Editar el subt\u00edtulo del programa", 
@@ -580,6 +561,7 @@
     "Edit the program\\'s name.": "Editar el nombre del programa", 
     "Edit the program\\'s subtitle.": "Editar el subt\u00edtulo del programa", 
     "Edit this certificate?": "\u00bfEditar este certificado?", 
+    "Edit your post below.": "Edite su publicaci\u00f3n a continuaci\u00f3n.", 
     "Editable": "Editable", 
     "Editing comment": "Editando comentario", 
     "Editing post": "Editando entrada", 
@@ -620,7 +602,7 @@
     "Enter the page number you'd like to quickly navigate to.": "Introduzca el n\u00famero de p\u00e1gina al cual le gustar\u00eda dirigirse", 
     "Enter the username or email address of each learner that you want to add as an exception.": "Ingrese el nombre de usuario y correo electr\u00f3nico de cada estudiante que quiere agregar como excepci\u00f3n ", 
     "Enter username or email": "Ingrese el nombre de usuario o el correo electr\u00f3nico.", 
-    "Enter your question or comment": "Ingresa tu pregunta o comentario", 
+    "Enter your question or comment.": "Ingrese su pregunta o comentario.", 
     "Entrance exam attempts is being reset for student '{student_id}'.": "Intentos para ex\u00e1men de ingreso esta siendo reiniciado para el estudiante '{student_id}'", 
     "Entrance exam state is being deleted for student '{student_id}'.": "El estado del examen de ingreso est\u00e1 siendo borrado para el estudiante '{student_id}'.", 
     "Error": "Error", 
@@ -645,6 +627,7 @@
     "Error getting task history for problem '<%= problem_id %>' and student '<%= student_id %>'. Make sure that the problem and student identifiers are complete and correct.": "Error al obtener el historial de tareas para el problema '<%= problem_id %>' y el estudiante '<%= student_id %>'.  Verifique que el problema y el estudiante est\u00e9n identificados correctamente.", 
     "Error importing course": "Error importando curso", 
     "Error listing task history for this student and problem.": "Error listando el historial de tareas para este estudiante y problema.", 
+    "Error posting your message.": "Error al publicar su mensaje.", 
     "Error removing user": "Error al remover el usuario.", 
     "Error resetting entrance exam attempts for student '{student_id}'. Make sure student identifier is correct.": "Error reiniciando los intentos de ex\u00e1men de ingreso para el estudiante '{student_id}'. Aseg\u00farese que el identificador es correcto.", 
     "Error resetting problem attempts for problem '<%= problem_id %>' and student '<%= student_id %>'. Make sure that the problem and student identifiers are complete and correct.": "Error al reiniciar los env\u00edos para el problema '<%= problem_id %>' y el estudiante '<%= student_id %>'. Verifique que el problema y el estudiante est\u00e9n identificados correctamente.", 
@@ -667,6 +650,8 @@
     "Error: You cannot remove yourself from the Instructor group!": "Error: No puede eliminarse a usted mismo del grupo de instructores!", 
     "Errors": "Errores", 
     "Everyone who has staff privileges in this course": "todos los usuarios con rol de funcionario para este curso", 
+    "Exam Name": "Nombre del examen", 
+    "Exam Type": "Tipo de ex\u00e1men", 
     "Exam Types": "Tipos de ex\u00e1men", 
     "Exception Granted": "Acceso concedido", 
     "Exit full browser": "Salir del navegador expandido", 
@@ -690,7 +675,6 @@
     "Files must be in JPEG or PNG format.": "Los archivos deben estar en formato JPEG o PNG.", 
     "Fill browser": "Expandir el navegador", 
     "Filter and sort topics": "Filtrar y ordenar los temas", 
-    "Filter topics": "Filtrar temas", 
     "Financial Assistance": "Asistencia financiera", 
     "Financial Assistance Application": "Solicitud de asistencia financiera", 
     "Find": "Buscar", 
@@ -764,7 +748,6 @@
     "Height": "Altura", 
     "Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.": "Ayude a otros estudiantes a decidir si unirse o no a su equipo, especificando la caracter\u00edsticas del mismo. Tenga cuidado en no desmotivar la participaci\u00f3n de otros usuarios con esta descripci\u00f3n.", 
     "Hide Annotations": "Esconder anotaciones", 
-    "Hide Answer": "Ocultar Respuesta", 
     "Hide Deprecated Settings": "Ocultar configuraciones descartadas", 
     "Hide Discussion": "Ocultar Discusi\u00f3n", 
     "Hide Previews": "Ocultar vistas previas", 
@@ -892,7 +875,6 @@
     "Load Another File": "Cargar otro archivo", 
     "Load all responses": "Cargando todas las respuestas", 
     "Load more": "Cargar m\u00e1s", 
-    "Load next %(numResponses)s responses": "Cargar las siguientes %(numResponses)s respuestas", 
     "Load next %(num_items)s result": [
       "Cargar el siguiente %(num_items)s resultado", 
       "Cargar los siguientes %(num_items)s resultados"
@@ -978,7 +960,6 @@
     "No receipt available": "No hay recibo disponible", 
     "No results": "Sin resultados", 
     "No results found for \"%(query_string)s\". Please try searching again.": "No se encontraron resultados para \"%(query_string)s\". Por favor intente nuevamente.", 
-    "No results found for %(original_query)s. Showing results for %(suggested_query)s.": "No se encontraron resultados para %(original_query)s. Mostrando resultados para %(suggested_query)s.", 
     "No results found for {original_query}. ": "No se encontraron resultados para {original_query}.", 
     "No sources": "No hay fuentes", 
     "No tasks currently running.": "No hay tareas corriendo en el momento.", 
@@ -1188,11 +1169,11 @@
     "Replace with": "Reemplazar con", 
     "Reply": "Responder", 
     "Reply to Annotation": "Responder a la anotaci\u00f3n", 
-    "Report": "Reporte", 
-    "Report abuse": "Reportar un abuso", 
-    "Report abuse, topics, and responses": "Reportar abusos, temas y respuestas", 
+    "Report": "Denunciar", 
+    "Report abuse": "Denunciar un abuso", 
+    "Report abuse, topics, and responses": "Denunciar abusos, temas, y respuestas", 
     "Report annotation as inappropriate or offensive.": "Reportar una publicaci\u00f3n como ofensiva o inapropiada.", 
-    "Reported": "Reportado", 
+    "Reported": "Denunciado", 
     "Requester": "Solicitante", 
     "Required field": "Campo requerido", 
     "Required field.": "Campo requerido.", 
@@ -1271,7 +1252,6 @@
     "Short explanation": "explicaci\u00f3n breve", 
     "Show All": "Mostrar todo", 
     "Show Annotations": "Mostrar anotaciones", 
-    "Show Answer": "Mostrar Respuesta", 
     "Show Comment (%(num_comments)s)": [
       "Mostrar Comentarios (%(num_comments)s)", 
       "Mostrar comentarios (%(num_comments)s)"
@@ -1284,12 +1264,11 @@
     "Show invisible characters": "Mostrar caracteres invisibles", 
     "Show me other ways to sign in or register": "Mostrar otras formas de iniciar sesi\u00f3n o registrarme", 
     "Show notes": "Mostrar notas", 
-    "Show posts by %(username)s.": "Mostrar las publicaciones de %(username)s.", 
     "Show posts by {username}.": "Mostrar las publicaciones por {username}.", 
     "Showing all responses": "Mostrando todas las respuestas", 
     "Showing first response": [
       "Mostrando la primera respuesta", 
-      "Mostrando las %(numResponses)s primeras respuestas"
+      "Mostrando las primeras {numResponses} respuestas"
     ], 
     "Showing results for \"{searchString}\"": "Mostrando resultados para \"{searchString}\"", 
     "Showing {currentItemRange} out of {totalItemsCount}, filtered by {assetType}, sorted by {sortName} ascending": "Mostrando {currentItemRange} de {totalItemsCount}, filtrado por {assetType}, ordenado por {sortName} asc", 
@@ -1319,6 +1298,7 @@
     "Sorted by": "Ordenados por", 
     "Source": "Fuente", 
     "Source code": "C\u00f3digo fuente", 
+    "Special Exam": "Examen especial", 
     "Special character": "Caracter especial", 
     "Specify an alternative to the official course title to display on certificates. Leave blank to use the official course title.": "Especificar una alternativa al t\u00edtulo oficial del curso para ser visualizado en los certificados. Dejar vac\u00edo para utilizar el t\u00edtulo oficial del curso.", 
     "Specify any additional rules or rule exceptions that the proctoring review team should enforce when reviewing the videos. For example, you could specify that calculators are allowed.": "Especifique cualquier regla adicional o reglas de excepci\u00f3n que el equipo de revisi\u00f3n de ex\u00e1menes supervisados deba validar al revisar los videos. Por ejemplo, puede especificar que se permite el uso de calculadoras.", 
@@ -1339,6 +1319,7 @@
     "Start regenerating certificates for students in this course?": "Iniciar regeneraci\u00f3n de certificados para estudiantes de este curso?", 
     "Start search": "Iniciar b\u00fasqueda", 
     "Start working toward your next learning goal.": "Empieza a trabajar hacia tu pr\u00f3xima meta de aprendizaje.", 
+    "Started At": "Iniciado a las", 
     "Started entrance exam rescore task for student '{student_id}'. Click the 'Show Background Task History for Student' button to see the status of the task.": "Iniciada tarea de recalificaci\u00f3n de ex\u00e1men de ingreso para estudiante '{student_id}'. Clic en el bot\u00f3n 'Mostrar historial de tareas para estudiante' para ver el estado de la tarea.", 
     "Started rescore problem task for problem '<%= problem_id %>' and student '<%= student_id %>'. Click the 'Show Background Task History for Student' button to see the status of the task.": "Inici\u00f3 el proceso de re puntuaci\u00f3n del problema '<%= problem_id %>' para el estudiante '<%= student_id %>'.  Haga clic en el bot\u00f3n de 'Mostrar historial de tareas por estudiante' para ver el estado de dicha tarea.", 
     "Starts": "Empieza", 
@@ -1545,6 +1526,7 @@
     "This team is full.": "Este equipo est\u00e1 lleno.", 
     "This thread is closed.": "Este hilo est\u00e1 cerrado.", 
     "Time Allotted (HH:MM):": "Tiempo permitido (HH:MM):", 
+    "Time Limit": "L\u00edmite de tiempo", 
     "Time Sent": "Hora de env\u00edo", 
     "Time Sent:": "Hora de env\u00edo:", 
     "Time Zone": "Zona horaria", 
@@ -1611,7 +1593,7 @@
     "Unpublished changes to content that will release in the future": "Cambios no publicados del contenido que ser\u00e1 liberado en el futuro", 
     "Unpublished changes to live content": "Cambios no publicados en el contenido en vivo", 
     "Unpublished units will not be released": "Las unidades no publicadas no ser\u00e1n liberadas", 
-    "Unreport": "No reportar", 
+    "Unreport": "No denunciar", 
     "Unscheduled": "No programado", 
     "Update": "Actualizar", 
     "Update comment": "Actualizar comentario", 
@@ -1620,7 +1602,7 @@
     "Update team.": "Actualizar el equipo.", 
     "Updating Tags": "Actualizando Etiquetas", 
     "Updating with latest library content": "Actualizando con el m\u00e1s reciente contenido de la librer\u00eda", 
-    "Upgrade Deadline": "Actualizar la fecha l\u00edmite", 
+    "Upgrade Deadline": "Fecha l\u00edmite para el upgrade", 
     "Upgrade Now": "Actualizar Ahora", 
     "Upgrade to a Verified Certificate for {courseName}": "Optar por el Certificado Verificado para {courseName}", 
     "Upload": "Subir", 
@@ -1671,6 +1653,7 @@
     "User": "Usuario", 
     "User Email": "Correo electr\u00f3nico del usuario", 
     "Username": "Nombre de usuario", 
+    "Username or Email": "Nombre de usuario o correo electr\u00f3nico", 
     "Username or email address": "Nombre de usuario o  correo electr\u00f3nico", 
     "Users": "Usuarios", 
     "Users must create and activate their account before they can be promoted to beta tester.": "Los usuarios deben crear y activar su cuenta antes de que puedan ser promovidos a usuarios de prueba.", 
@@ -1678,6 +1661,7 @@
     "Valid": "V\u00e1lido", 
     "Validation Error": "Error de Validaci\u00f3n", 
     "Validation Error While Saving": "Error de Validaci\u00f3n al Guardar", 
+    "Value": "Valor", 
     "Verification Checkpoint": "Punto de verificaci\u00f3n", 
     "Verification Deadline": "Fecha l\u00edmite de verificaci\u00f3n", 
     "Verification checkpoint to be completed": "El punto de verificaci\u00f3n debe ser completado", 
@@ -1738,8 +1722,6 @@
     "We had some trouble marking this response endorsed.  Please try again.": "Tenemos problemas para marcar tu respuesta como aprobada. Por favor intenta de nuevo.", 
     "We had some trouble pinning this thread. Please try again.": "Tenemos problemas fijando este hilo. Por favor intenta de nuevo.", 
     "We had some trouble processing your request. Please ensure you have copied any ": "Ocurri\u00f3 un problema al procesar su solicitud. Asegurese de haber copiado cualquier", 
-    "We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.": "Tuvimos problemas al procesar su solicitud. Por favor aseg\u00farese de guardar su trabajo y luego recargue la p\u00e1gina.", 
-    "We had some trouble processing your request. Please try again.": "Ocurri\u00f3 un problema al procesar su solicitud. Por favor intente nuevamente.", 
     "We had some trouble removing this endorsement.  Please try again.": "Tenemos problemas borrando tu respuesta. Por favor intenta de nuevo.", 
     "We had some trouble removing this response as an answer.  Please try again.": "Tenemos algunos problemas borrando tu mensaje como respuesta. Por favor int\u00e9ntalo de nuevo.", 
     "We had some trouble removing your flag on this post.  Please try again.": "Tenemos problemas borrando tu marca para esta publicaci\u00f3n. Por favor intenta de nuevo.", 
@@ -1808,7 +1790,7 @@
     "You have been logged out of your edX account. ": "Ha cerrado su sesi\u00f3n de edX.", 
     "You have done a dry run of force publishing the course. Nothing has changed. Had you run it, the following course versions would have been change.": "Ha corrido un simulacro de publicaci\u00f3n del curso. No han habido cambios. Si lo hubiera hecho realmente, las siguientes versiones habr\u00edan tenido cambios.", 
     "You have earned certificates in %(completed_courses)s of the %(total_courses)s courses so far.": "Has obtenido certificados en %(completed_courses)s de los %(total_courses)s cursos hasta el momento.", 
-    "You have no handouts defined": "No tiene apuntes denifidos", 
+    "You have no handouts defined": "No tiene Materiales denifidos", 
     "You have not bookmarked any courseware pages yet.": "Todav\u00eda no ha marcado ninguna p\u00e1gina del curso.", 
     "You have not created any certificates yet.": "Todav\u00eda no ha creado ning\u00fan certificado.", 
     "You have not created any content groups yet.": "Todav\u00eda no ha a\u00f1adido ninguna librer\u00eda.", 
@@ -1931,6 +1913,7 @@
     "marked as answer %(time_ago)s": "marcado como respuesta %(time_ago)s", 
     "marked as answer %(time_ago)s by %(user)s": "marcado como respuesta %(time_ago)s por %(user)s", 
     "message": "mensaje", 
+    "minutes": "minutos", 
     "name": "nombre", 
     "not enrolled": "No est\u00e1 inscrito", 
     "off": "Apagar", 
@@ -1956,10 +1939,6 @@
     "team count": "Cantidad de equipos", 
     "text_word_{uniqueId}": "text_word_{uniqueId}", 
     "text_word_{uniqueId} title_word_{uniqueId}": "text_word_{uniqueId} title_word_{uniqueId}", 
-    "there is currently %(numVotes)s vote": [
-      "actualmente tiene %(numVotes)s voto", 
-      "actualmente tiene %(numVotes)s votos"
-    ], 
     "there is currently {numVotes} vote": [
       "actualmente hay {numVotes} voto", 
       "actualmente hay {numVotes} votos"

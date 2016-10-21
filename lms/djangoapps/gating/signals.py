@@ -2,10 +2,11 @@
 Signal handlers for the gating djangoapp
 """
 from django.dispatch import receiver
+
+from gating import api as gating_api
+from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
-from lms.djangoapps.grades.signals import SCORE_CHANGED
-from gating import api as gating_api
 
 
 @receiver(SCORE_CHANGED)
@@ -22,9 +23,6 @@ def handle_score_changed(**kwargs):
         None
     """
     course = modulestore().get_course(CourseKey.from_string(kwargs.get('course_id')))
-    if course.enable_subsection_gating:
-        gating_api.evaluate_prerequisite(
-            course,
-            UsageKey.from_string(kwargs.get('usage_id')),
-            kwargs.get('user').id,
-        )
+    block = modulestore().get_item(UsageKey.from_string(kwargs.get('usage_id')))
+    gating_api.evaluate_prerequisite(course, block, kwargs.get('user_id'))
+    gating_api.evaluate_entrance_exam(course, block, kwargs.get('user_id'))

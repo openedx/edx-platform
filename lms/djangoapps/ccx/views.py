@@ -30,6 +30,8 @@ from courseware.access import has_access
 from courseware.courses import get_course_by_id
 
 from courseware.field_overrides import disable_overrides
+from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
+from django_comment_common.utils import seed_permissions_roles
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.grades.course_grades import iterate_grades_for
 from opaque_keys.edx.keys import CourseKey
@@ -38,9 +40,9 @@ from student.roles import CourseCcxCoachRole
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import SignalHandler
 
-from instructor.views.api import _split_input_list
-from instructor.views.gradebook_api import get_grade_book_page
-from instructor.enrollment import (
+from lms.djangoapps.instructor.views.api import _split_input_list
+from lms.djangoapps.instructor.views.gradebook_api import get_grade_book_page
+from lms.djangoapps.instructor.enrollment import (
     enroll_email,
     get_email_params,
 )
@@ -54,7 +56,7 @@ from lms.djangoapps.ccx.overrides import (
 )
 from lms.djangoapps.ccx.utils import (
     add_master_course_staff_to_ccx,
-    assign_coach_role_to_ccx,
+    assign_staff_role_to_ccx,
     ccx_course,
     ccx_students_enrolling_center,
     get_ccx_for_coach,
@@ -145,7 +147,8 @@ def dashboard(request, course, ccx=None):
 
     if ccx:
         ccx_locator = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
-
+        # At this point we are done with verification that current user is ccx coach.
+        assign_staff_role_to_ccx(ccx_locator, request.user, course.id)
         schedule = get_ccx_schedule(course, ccx)
         grading_policy = get_override_for_ccx(
             ccx, course, 'grading_policy', course.grading_policy)
@@ -220,6 +223,11 @@ def create_ccx(request, course, ccx=None):
 
     ccx_id = CCXLocator.from_course_locator(course.id, unicode(ccx.id))
 
+    # Create forum roles
+    seed_permissions_roles(ccx_id)
+    # Assign administrator forum role to CCX coach
+    assign_role(ccx_id, request.user, FORUM_ROLE_ADMINISTRATOR)
+
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': ccx_id})
 
     # Enroll the coach in the course
@@ -232,7 +240,7 @@ def create_ccx(request, course, ccx=None):
         email_params=email_params,
     )
 
-    assign_coach_role_to_ccx(ccx_id, request.user, course.id)
+    assign_staff_role_to_ccx(ccx_id, request.user, course.id)
     add_master_course_staff_to_ccx(course, ccx_id, ccx.display_name)
 
     # using CCX object as sender here.

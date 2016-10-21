@@ -14,22 +14,22 @@ from celery.states import SUCCESS, FAILURE
 from django.core.urlresolvers import reverse
 from django.test.testcases import TestCase
 from django.contrib.auth.models import User
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
 from courseware.tests.tests import LoginEnrollmentTestCase
+from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from openedx.core.lib.url_utils import quote_slashes
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from instructor_task.api_helper import encode_problem_and_student_input
-from instructor_task.models import PROGRESS, QUEUING, ReportStore
-from instructor_task.tests.factories import InstructorTaskFactory
-from instructor_task.views import instructor_task_status
+from lms.djangoapps.instructor_task.api_helper import encode_problem_and_student_input
+from lms.djangoapps.instructor_task.models import PROGRESS, QUEUING, ReportStore
+from lms.djangoapps.instructor_task.tests.factories import InstructorTaskFactory
+from lms.djangoapps.instructor_task.views import instructor_task_status
 
 
 TEST_COURSE_ORG = 'edx'
@@ -208,15 +208,24 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
         else:
             return TEST_COURSE_KEY.make_usage_key('problem', problem_url_name)
 
+    def _option_problem_factory_args(self, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
+        """
+        Returns the factory args for the option problem type.
+        """
+        return {
+            'question_text': 'The correct answer is {0}'.format(correct_answer),
+            'options': [OPTION_1, OPTION_2],
+            'correct_option': correct_answer,
+            'num_responses': num_responses,
+            'num_inputs': num_inputs,
+        }
+
     def define_option_problem(self, problem_url_name, parent=None, **kwargs):
         """Create the problem definition so the answer is Option 1"""
         if parent is None:
             parent = self.problem_section
         factory = OptionResponseXMLFactory()
-        factory_args = {'question_text': 'The correct answer is {0}'.format(OPTION_1),
-                        'options': [OPTION_1, OPTION_2],
-                        'correct_option': OPTION_1,
-                        'num_responses': 2}
+        factory_args = self._option_problem_factory_args()
         problem_xml = factory.build_xml(**factory_args)
         ItemFactory.create(parent_location=parent.location,
                            parent=parent,
@@ -225,13 +234,10 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
                            data=problem_xml,
                            **kwargs)
 
-    def redefine_option_problem(self, problem_url_name):
+    def redefine_option_problem(self, problem_url_name, correct_answer=OPTION_1, num_inputs=1, num_responses=2):
         """Change the problem definition so the answer is Option 2"""
         factory = OptionResponseXMLFactory()
-        factory_args = {'question_text': 'The correct answer is {0}'.format(OPTION_2),
-                        'options': [OPTION_1, OPTION_2],
-                        'correct_option': OPTION_2,
-                        'num_responses': 2}
+        factory_args = self._option_problem_factory_args(correct_answer, num_inputs, num_responses)
         problem_xml = factory.build_xml(**factory_args)
         location = InstructorTaskTestCase.problem_location(problem_url_name)
         item = self.module_store.get_item(location)

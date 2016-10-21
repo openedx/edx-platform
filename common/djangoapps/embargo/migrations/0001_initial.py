@@ -5,7 +5,7 @@ from django.db import migrations, models
 import django_countries.fields
 import django.db.models.deletion
 from django.conf import settings
-import xmodule_django.models
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
 
 
 class Migration(migrations.Migration):
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('timestamp', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('course_key', xmodule_django.models.CourseKeyField(max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(max_length=255, db_index=True)),
                 ('snapshot', models.TextField(null=True, blank=True)),
             ],
             options={
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
             name='EmbargoedCourse',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_id', xmodule_django.models.CourseKeyField(unique=True, max_length=255, db_index=True)),
+                ('course_id', CourseKeyField(unique=True, max_length=255, db_index=True)),
                 ('embargoed', models.BooleanField(default=False)),
             ],
         ),
@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
             name='RestrictedCourse',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('course_key', xmodule_django.models.CourseKeyField(help_text='The course key for the restricted course.', unique=True, max_length=255, db_index=True)),
+                ('course_key', CourseKeyField(help_text='The course key for the restricted course.', unique=True, max_length=255, db_index=True)),
                 ('enroll_msg_key', models.CharField(default=b'default', help_text='The message to show when a user is blocked from enrollment.', max_length=255, choices=[(b'default', b'Default'), (b'embargo', b'Embargo')])),
                 ('access_msg_key', models.CharField(default=b'default', help_text='The message to show when a user is blocked from accessing a course.', max_length=255, choices=[(b'default', b'Default'), (b'embargo', b'Embargo')])),
                 ('disable_access_check', models.BooleanField(default=False, help_text='Allow users who enrolled in an allowed country to access restricted courses from excluded countries.')),

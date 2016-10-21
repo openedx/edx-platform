@@ -4,6 +4,14 @@ import urllib
 
 from pytz import UTC
 from django.core.urlresolvers import reverse, NoReverseMatch
+from oauth2_provider.models import (
+    AccessToken as dot_access_token,
+    RefreshToken as dot_refresh_token
+)
+from provider.oauth2.models import (
+    AccessToken as dop_access_token,
+    RefreshToken as dop_refresh_token
+)
 
 import third_party_auth
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
@@ -14,6 +22,7 @@ from course_modes.models import CourseMode
 # we display on the student dashboard.
 VERIFY_STATUS_NEED_TO_VERIFY = "verify_need_to_verify"
 VERIFY_STATUS_SUBMITTED = "verify_submitted"
+VERIFY_STATUS_RESUBMITTED = "re_verify_submitted"
 VERIFY_STATUS_APPROVED = "verify_approved"
 VERIFY_STATUS_MISSED_DEADLINE = "verify_missed_deadline"
 VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
@@ -32,6 +41,8 @@ def check_verify_status_by_course(user, course_enrollments):
         * VERIFY_STATUS_NEED_TO_VERIFY: The student has not yet submitted photos for verification.
         * VERIFY_STATUS_SUBMITTED: The student has submitted photos for verification,
           but has have not yet been approved.
+        * VERIFY_STATUS_RESUBMITTED: The student has re-submitted photos for re-verification while
+          they still have an active but expiring ID verification
         * VERIFY_STATUS_APPROVED: The student has been successfully verified.
         * VERIFY_STATUS_MISSED_DEADLINE: The student did not submit photos within the course's deadline.
         * VERIFY_STATUS_NEED_TO_REVERIFY: The student has an active verification, but it is
@@ -72,6 +83,11 @@ def check_verify_status_by_course(user, course_enrollments):
         user, queryset=verifications
     )
 
+    # Retrieve expiration_datetime of most recent approved verification
+    # To avoid another database hit, we re-use the queryset we have already retrieved.
+    expiration_datetime = SoftwareSecurePhotoVerification.get_expiration_datetime(user, verifications)
+    verification_expiring_soon = SoftwareSecurePhotoVerification.is_verification_expiring_soon(expiration_datetime)
+
     # Retrieve verification deadlines for the enrolled courses
     enrolled_course_keys = [enrollment.course_id for enrollment in course_enrollments]
     course_deadlines = VerificationDeadline.deadlines_for_courses(enrolled_course_keys)
@@ -104,9 +120,15 @@ def check_verify_status_by_course(user, course_enrollments):
             # Check whether the user was approved or is awaiting approval
             if relevant_verification is not None:
                 if relevant_verification.status == "approved":
-                    status = VERIFY_STATUS_APPROVED
+                    if verification_expiring_soon:
+                        status = VERIFY_STATUS_NEED_TO_REVERIFY
+                    else:
+                        status = VERIFY_STATUS_APPROVED
                 elif relevant_verification.status == "submitted":
-                    status = VERIFY_STATUS_SUBMITTED
+                    if verification_expiring_soon:
+                        status = VERIFY_STATUS_RESUBMITTED
+                    else:
+                        status = VERIFY_STATUS_SUBMITTED
 
             # If the user didn't submit at all, then tell them they need to verify
             # If the deadline has already passed, then tell them they missed it.
@@ -119,11 +141,12 @@ def check_verify_status_by_course(user, course_enrollments):
             )
             if status is None and not submitted:
                 if deadline is None or deadline > datetime.now(UTC):
-                    if has_active_or_pending:
-                        # The user has an active verification, but the verification
-                        # is set to expire before the deadline.  Tell the student
-                        # to reverify.
-                        status = VERIFY_STATUS_NEED_TO_REVERIFY
+                    if SoftwareSecurePhotoVerification.user_is_verified(user):
+                        if verification_expiring_soon:
+                            # The user has an active verification, but the verification
+                            # is set to expire within "EXPIRING_SOON_WINDOW" days (default is 4 weeks).
+                            # Tell the student to reverify.
+                            status = VERIFY_STATUS_NEED_TO_REVERIFY
                     else:
                         status = VERIFY_STATUS_NEED_TO_VERIFY
                 else:
@@ -194,7 +217,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None):
     return {
         provider.provider_id: third_party_auth.pipeline.get_login_url(
             provider.provider_id, auth_entry, redirect_url=redirect_url
-        ) for provider in third_party_auth.provider.Registry.accepting_logins()
+        ) for provider in third_party_auth.provider.Registry.displayed_for_login()
     }
 
 
@@ -230,3 +253,13 @@ def get_next_url_for_login_page(request):
         # be saved in the session as part of the pipeline state. That URL will take priority
         # over this one.
     return redirect_to
+
+
+def destroy_oauth_tokens(user):
+    """
+    Destroys ALL OAuth access and refresh tokens for the given user.
+    """
+    dop_access_token.objects.filter(user=user).delete()
+    dop_refresh_token.objects.filter(user=user).delete()
+    dot_access_token.objects.filter(user=user).delete()
+    dot_refresh_token.objects.filter(user=user).delete()

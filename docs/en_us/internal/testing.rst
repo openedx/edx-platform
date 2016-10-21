@@ -173,17 +173,21 @@ To run these tests without ``collectstatic``, which is faster, append the follow
 
     paver test_system -s lms --fasttest
 
-For even more speed, use the ``--disable-migrations`` option to run tests without applying migrations and instead create tables directly from apps' models.
-
-::
-
-    paver test_system -s lms --disable-migrations
-
 To run cms python tests without ``collectstatic`` use this command.
 
 ::
 
     paver test_system -s cms --fasttest
+
+For the sake of speed, by default the python unit test database tables
+are created directly from apps' models. If you want to run the tests
+against a database created by applying the migrations instead, use the
+``--enable-migrations`` option.
+
+
+::
+
+    paver test_system -s lms --enable-migrations
 
 To run a single django test class use this command.
 

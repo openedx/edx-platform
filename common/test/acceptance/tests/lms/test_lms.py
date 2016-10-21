@@ -81,7 +81,7 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         self.reset_password_page.is_success_visible(".submission-success")
 
         # Expect that we're shown a success message
-        self.assertIn("Password Reset Email Sent", self.reset_password_page.get_success_message())
+        self.assertIn("Check Your Email", self.reset_password_page.get_success_message())
 
 
 @attr(shard=8)
@@ -143,7 +143,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         self.login_page.visit().password_reset(email=email)
 
         # Expect that we're shown a success message
-        self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
+        self.assertIn("Check Your Email", self.login_page.wait_for_success())
 
     def test_password_reset_no_user(self):
         # Navigate to the password reset form
@@ -153,7 +153,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         self.login_page.password_reset(email="nobody@nowhere.com")
 
         # Expect that we're shown a success message
-        self.assertIn("Password Reset Email Sent", self.login_page.wait_for_success())
+        self.assertIn("Check Your Email", self.login_page.wait_for_success())
 
     def test_third_party_login(self):
         """
@@ -175,7 +175,10 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         # The user will be redirected somewhere and then back to the login page:
         msg_text = self.login_page.wait_for_auth_status_message()
         self.assertIn("You have successfully signed into Dummy", msg_text)
-        self.assertIn("To link your accounts, sign in now using your edX password", msg_text)
+        self.assertIn(
+            u"To link your accounts, sign in now using your édX password",
+            msg_text
+        )
 
         # Now login with username and password:
         self.login_page.login(email=email, password=password)
@@ -337,7 +340,10 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         # Verify that the expected errors are displayed.
         errors = self.register_page.wait_for_errors()
         self.assertIn(u'Please enter your Public username.', errors)
-        self.assertIn(u'You must agree to the edX Terms of Service and Honor Code.', errors)
+        self.assertIn(
+            u'You must agree to the édX Terms of Service and Honor Code',
+            errors
+        )
         self.assertIn(u'Please select your Country.', errors)
         self.assertIn(u'Please tell us your favorite movie.', errors)
 
@@ -732,6 +738,7 @@ class HighLevelTabTest(UniqueCourseTest):
         }
 
         actual_sections = self.course_nav.sections
+
         for section, subsections in EXPECTED_SECTIONS.iteritems():
             self.assertIn(section, actual_sections)
             self.assertEqual(actual_sections[section], EXPECTED_SECTIONS[section])
@@ -746,6 +753,10 @@ class HighLevelTabTest(UniqueCourseTest):
         self.assertEqual(len(actual_items), len(EXPECTED_ITEMS))
         for expected in EXPECTED_ITEMS:
             self.assertIn(expected, actual_items)
+
+        # Navigate to a particular section other than the default landing section.
+        self.course_nav.go_to_section('Test Section 2', 'Test Subsection 3')
+        self.assertTrue(self.course_nav.is_on_section('Test Section 2', 'Test Subsection 3'))
 
 
 @attr(shard=1)
@@ -1074,12 +1085,12 @@ class ProblemExecutionTest(UniqueCourseTest):
 
         # Fill in the answer correctly.
         problem_page.fill_answer("20")
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertTrue(problem_page.is_correct())
 
         # Fill in the answer incorrectly.
         problem_page.fill_answer("4")
-        problem_page.click_check()
+        problem_page.click_submit()
         self.assertFalse(problem_page.is_correct())
 
 

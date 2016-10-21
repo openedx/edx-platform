@@ -1,15 +1,18 @@
 """
 API for the gating djangoapp
 """
-import logging
-import json
-
 from collections import defaultdict
 from django.contrib.auth.models import User
-from xmodule.modulestore.django import modulestore
+from django.test.client import RequestFactory
+import json
+import logging
+
 from openedx.core.lib.gating import api as gating_api
+from opaque_keys.edx.keys import UsageKey
+from lms.djangoapps.courseware.entrance_exams import get_entrance_exam_score
 from lms.djangoapps.grades.module_grades import get_module_score
 from util import milestones_helpers
+
 
 log = logging.getLogger(__name__)
 
@@ -34,7 +37,7 @@ def _get_xblock_parent(xblock, category=None):
 
 
 @gating_api.gating_enabled(default=False)
-def evaluate_prerequisite(course, prereq_content_key, user_id):
+def evaluate_prerequisite(course, block, user_id):
     """
     Finds the parent subsection of the content in the course and evaluates
     any milestone relationships attached to that subsection. If the calculated
@@ -42,15 +45,14 @@ def evaluate_prerequisite(course, prereq_content_key, user_id):
     dependent subsections, the related milestone will be fulfilled for the user.
 
     Arguments:
-        user_id (int): ID of User for which evaluation should occur
         course (CourseModule): The course
         prereq_content_key (UsageKey): The prerequisite content usage key
+        user_id (int): ID of User for which evaluation should occur
 
     Returns:
         None
     """
-    xblock = modulestore().get_item(prereq_content_key)
-    sequential = _get_xblock_parent(xblock, 'sequential')
+    sequential = _get_xblock_parent(block, 'sequential')
     if sequential:
         prereq_milestone = gating_api.get_gating_milestone(
             course.id,
@@ -83,3 +85,32 @@ def evaluate_prerequisite(course, prereq_content_key, user_id):
                         milestones_helpers.add_user_milestone({'id': user_id}, prereq_milestone)
                     else:
                         milestones_helpers.remove_user_milestone({'id': user_id}, prereq_milestone)
+
+
+def evaluate_entrance_exam(course, block, user_id):
+    """
+    Update milestone fulfillments for the specified content module
+    """
+    # Fulfillment Use Case: Entrance Exam
+    # If this module is part of an entrance exam, we'll need to see if the student
+    # has reached the point at which they can collect the associated milestone
+    if milestones_helpers.is_entrance_exams_enabled():
+        entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
+        in_entrance_exam = getattr(block, 'in_entrance_exam', False)
+        if entrance_exam_enabled and in_entrance_exam:
+            # We don't have access to the true request object in this context, but we can use a mock
+            request = RequestFactory().request()
+            request.user = User.objects.get(id=user_id)
+            exam_pct = get_entrance_exam_score(request, course)
+            if exam_pct >= course.entrance_exam_minimum_score_pct:
+                exam_key = UsageKey.from_string(course.entrance_exam_id)
+                relationship_types = milestones_helpers.get_milestone_relationship_types()
+                content_milestones = milestones_helpers.get_course_content_milestones(
+                    course.id,
+                    exam_key,
+                    relationship=relationship_types['FULFILLS']
+                )
+                # Add each milestone to the user's set...
+                user = {'id': request.user.id}
+                for milestone in content_milestones:
+                    milestones_helpers.add_user_milestone(user, milestone)

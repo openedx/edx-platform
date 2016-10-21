@@ -1,11 +1,21 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = "inline" if inline else "" %>
 
 <form class="inputtype option-input ${doinline}">
-   <select name="input_${id}" id="input_${id}" aria-label="${label}" aria-describedby="answer_${id}">
-      <option value="option_${id}_dummy_default">  </option>
+  % if response_data['label']:
+      <label class="problem-group-label" for="input_${id}" id="label_${id}">${response_data['label']}</label>
+  % endif
+
+  % for description_id, description_text in response_data['descriptions'].items():
+    <p class="question-description" id="${description_id}">${description_text}</p>
+  % endfor
+
+   <select name="input_${id}" id="input_${id}" ${HTML(describedby_html)}>
+      <option value="option_${id}_dummy_default">${default_option_text}</option>
       % for option_id, option_description in options:
           <option value="${option_id}"
-          % if (option_id==value or option_id==answervariable):
+          % if (option_id == value or option_id == answervariable):
         	selected="true"
           % endif
           > ${option_description}</option>
@@ -15,13 +25,12 @@
   <div class="indicator-container">
     <span class="status ${status.classname}"
         id="status_${id}"
-        aria-describedby="input_${id}" data-tooltip="${status.display_tooltip}">
-      <span class="sr">${value|h} - ${status.display_tooltip}</span>
+        aria-describedby="label_${id}" data-tooltip="${status.display_tooltip}">
+        <span class="sr">${status.display_tooltip}</span>
     </span>
   </div>
   <p class="answer" id="answer_${id}"></p>
   % if msg:
-      <span class="message">${msg|n}</span>
+      <span class="message" aria-describedby="label_${id}" tabindex="-1">${HTML(msg)}</span>
   % endif
-
 </form>

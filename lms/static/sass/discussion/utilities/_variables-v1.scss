@@ -19,6 +19,8 @@ $forum-color-hover-thread: #f6f6f6 !default;
 $forum-color-reading-thread: $gray-d3 !default;
 $forum-color-read-post: $blue !default;
 $forum-color-never-read-post: $gray-d3 !default;
+$forum-color-editor-preview-label: $gray-d2 !default;
+$forum-color-response-count: $gray-d2 !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
@@ -33,3 +35,7 @@ $forum-small-font-size: 12px;
 
 // borders
 $forum-border-radius: 3px;
+
+// btn colors
+$uxpl-primary-blue: $blue !default;
+$btn-default-background-color: $white;

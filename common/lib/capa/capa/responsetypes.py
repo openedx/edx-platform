@@ -51,6 +51,7 @@ from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautifu
 import capa.xqueue_interface as xqueue_interface
 
 import capa.safe_exec as safe_exec
+from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
@@ -250,8 +251,35 @@ class LoncapaResponse(object):
           - renderer : procedure which produces HTML given an ElementTree
           - response_msg: a message displayed at the end of the Response
         """
-        # render ourself as a <span> + our content
-        tree = etree.Element('span')
+        _ = self.capa_system.i18n.ugettext
+
+        # response_id = problem_id + response index
+        response_id = self.xml.attrib['id']
+
+        response_index = response_id.split('_')[-1]
+        # Translators: index here could be 1,2,3 and so on
+        response_label = _(u'Question {index}').format(index=response_index)
+
+        # wrap the content inside a section
+        tree = etree.Element('div')
+        tree.set('class', 'wrapper-problem-response')
+        tree.set('tabindex', '-1')
+        tree.set('aria-label', response_label)
+        tree.set('role', 'group')
+
+        if self.xml.get('multiple_inputtypes'):
+            # add <div> to wrap all inputtypes
+            content = etree.SubElement(tree, 'div')
+            content.set('class', 'multi-inputs-group')
+            content.set('role', 'group')
+
+            if self.xml.get('multiinput-group-label-id'):
+                content.set('aria-labelledby', self.xml.get('multiinput-group-label-id'))
+
+            if self.xml.get('multiinput-group_description_ids'):
+                content.set('aria-describedby', self.xml.get('multiinput-group_description_ids'))
+        else:
+            content = tree
 
         # problem author can make this span display:inline
         if self.xml.get('inline', ''):
@@ -261,12 +289,12 @@ class LoncapaResponse(object):
             # call provided procedure to do the rendering
             item_xhtml = renderer(item)
             if item_xhtml is not None:
-                tree.append(item_xhtml)
+                content.append(item_xhtml)
         tree.tail = self.xml.tail
 
         # Add a <div> for the message at the end of the response
         if response_msg:
-            tree.append(self._render_response_msg_html(response_msg))
+            content.append(self._render_response_msg_html(response_msg))
 
         return tree
 
@@ -333,9 +361,9 @@ class LoncapaResponse(object):
         # Tricky: label None means output defaults, while '' means output empty label
         if label is None:
             if correct:
-                label = _(u'Correct')
+                label = _(u'Correct:')
             else:
-                label = _(u'Incorrect')
+                label = _(u'Incorrect:')
 
         # self.runtime.track_function('get_demand_hint', event_info)
         # This this "feedback hint" event
@@ -353,15 +381,23 @@ class LoncapaResponse(object):
         self.capa_module.runtime.track_function('edx.problem.hint.feedback_displayed', event_info)
 
         # Form the div-wrapped hint texts
-        hints_wrap = u''.join(
-            [u'<div class="{0}">{1}</div>'.format(QUESTION_HINT_TEXT_STYLE, dct.get('text'))
-             for dct in hint_log]
+        hints_wrap = HTML('').join(
+            [HTML('<div class="{question_hint_text_style}">{hint_content}</div>').format(
+                question_hint_text_style=QUESTION_HINT_TEXT_STYLE,
+                hint_content=HTML(dct.get('text'))
+            ) for dct in hint_log]
         )
         if multiline_mode:
-            hints_wrap = u'<div class="{0}">{1}</div>'.format(QUESTION_HINT_MULTILINE, hints_wrap)
+            hints_wrap = HTML('<div class="{question_hint_multiline}">{hints_wrap}</div>').format(
+                question_hint_multiline=QUESTION_HINT_MULTILINE,
+                hints_wrap=hints_wrap
+            )
         label_wrap = ''
         if label:
-            label_wrap = u'<div class="{0}">{1}: </div>'.format(QUESTION_HINT_LABEL_STYLE, label)
+            label_wrap = HTML('<span class="{question_hint_label_style}">{label} </span>').format(
+                question_hint_label_style=QUESTION_HINT_LABEL_STYLE,
+                label=Text(label)
+            )
 
         # Establish the outer style
         if correct:
@@ -370,7 +406,12 @@ class LoncapaResponse(object):
             style = QUESTION_HINT_INCORRECT_STYLE
 
         # Ready to go
-        return u'<div class="{0}">{1}{2}</div>'.format(style, label_wrap, hints_wrap)
+        return HTML('<div class="{st}"><div class="explanation-title">{text}</div>{lwrp}{hintswrap}</div>').format(
+            st=style,
+            text=Text(_("Answer")),
+            lwrp=label_wrap,
+            hintswrap=hints_wrap
+        )
 
     def get_extended_hints(self, student_answers, new_cmap):
         """
@@ -832,31 +873,30 @@ class ChoiceResponse(LoncapaResponse):
     def setup_response(self):
         self.assign_choice_names()
 
-        correct_xml = self.xml.xpath(
-            '//*[@id=$id]//choice[@correct="true"]',
-            id=self.xml.get('id')
-        )
+        self.correct_choices = set()
+        self.incorrect_choices = set()
+        for choice in self.get_choices():
 
-        self.correct_choices = set([
-            choice.get('name') for choice in correct_xml
-        ])
+            # contextualize the name and correct attributes
+            name = contextualize_text(choice.get('name'), self.context)
+            correct = contextualize_text(choice.get('correct'), self.context).upper()
 
-        incorrect_xml = self.xml.xpath(
-            '//*[@id=$id]//choice[@correct="false"]',
-            id=self.xml.get('id')
-        )
+            # divide choices into correct and incorrect
+            if correct == 'TRUE':
+                self.correct_choices.add(name)
+            elif correct == 'FALSE':
+                self.incorrect_choices.add(name)
 
-        self.incorrect_choices = set([
-            choice.get('name') for choice in incorrect_xml
-        ])
+    def get_choices(self):
+        """Returns this response's XML choice elements."""
+        return self.xml.xpath('//*[@id=$id]//choice', id=self.xml.get('id'))
 
     def assign_choice_names(self):
         """
         Initialize name attributes in <choice> tags for this response.
         """
 
-        for index, choice in enumerate(self.xml.xpath('//*[@id=$id]//choice',
-                                                      id=self.xml.get('id'))):
+        for index, choice in enumerate(self.get_choices()):
             choice.set("name", "choice_" + str(index))
             # If a choice does not have an id, assign 'A' 'B', .. used by CompoundHint
             if not choice.get('id'):
@@ -1670,6 +1710,8 @@ class NumericalResponse(LoncapaResponse):
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
+        self.additional_answers = []
+        self.additional_answer_index = -1
         self.tolerance = default_tolerance
         self.range_tolerance = False
         self.answer_range = self.inclusion = None
@@ -1679,6 +1721,10 @@ class NumericalResponse(LoncapaResponse):
         xml = self.xml
         context = self.context
         answer = xml.get('answer')
+
+        self.additional_answers = (
+            [element.get('answer') for element in xml.findall('additional_answer')]
+        )
 
         if answer.startswith(('[', '(')) and answer.endswith((']', ')')):  # range tolerance case
             self.range_tolerance = True
@@ -1890,6 +1936,20 @@ class NumericalResponse(LoncapaResponse):
                 if compare_with_tolerance(student_float, correct_float, expanded_tolerance):
                     is_correct = 'partially-correct'
 
+        # Reset self.additional_answer_index to -1 so that we always have a fresh index to look up.
+        self.additional_answer_index = -1
+
+        # Compare with additional answers.
+        if is_correct == 'incorrect':
+            temp_additional_answer_idx = 0
+            for additional_answer in self.additional_answers:
+                staff_answer = self.get_staff_ans(additional_answer)
+                if complex(student_float) == staff_answer:
+                    is_correct = 'correct'
+                    self.additional_answer_index = temp_additional_answer_idx
+                    break
+                temp_additional_answer_idx += 1
+
         if is_correct == 'partially-correct':
             return CorrectMap(self.answer_id, is_correct, npoints=partial_score)
         else:
@@ -1917,7 +1977,38 @@ class NumericalResponse(LoncapaResponse):
             return False
 
     def get_answers(self):
-        return {self.answer_id: self.correct_answer}
+        _ = self.capa_system.i18n.ugettext
+        # Example: "Answer: Answer_1 or Answer_2 or Answer_3".
+        separator = Text(' {b_start}{or_separator}{b_end} ').format(
+            # Translators: Separator used in NumericalResponse to display multiple answers.
+            or_separator=_('or'),
+            b_start=HTML('<b>'),
+            b_end=HTML('</b>'),
+        )
+        return {self.answer_id: separator.join([self.correct_answer] + self.additional_answers)}
+
+    def set_cmap_msg(self, student_answers, new_cmap, hint_type, hint_index):
+        """
+        Sets feedback to correct hint node in correct map.
+
+        Arguments:
+            student_answers (dict): Dict containing student input.
+            new_cmap (dict): Dict containing correct map properties.
+            hint_type (str): Hint type, either `correcthint` or `additional_answer`
+            hint_index (int): Index of the hint node
+        """
+        # Note: using self.id here, not the more typical self.answer_id
+        hint_nodes = self.xml.xpath('//numericalresponse[@id=$id]/' + hint_type, id=self.id)
+        if hint_nodes:
+            hint_node = hint_nodes[hint_index]
+            if hint_type == 'additional_answer':
+                hint_node = hint_nodes[hint_index].find('./correcthint')
+            new_cmap[self.answer_id]['msg'] += self.make_hint_div(
+                hint_node,
+                True,
+                [student_answers[self.answer_id]],
+                self.tags[0]
+            )
 
     def get_extended_hints(self, student_answers, new_cmap):
         """
@@ -1926,16 +2017,11 @@ class NumericalResponse(LoncapaResponse):
         """
         if self.answer_id in student_answers:
             if new_cmap.cmap[self.answer_id]['correctness'] == 'correct':  # if the grader liked the student's answer
-                # Note: using self.id here, not the more typical self.answer_id
-                hints = self.xml.xpath('//numericalresponse[@id=$id]/correcthint', id=self.id)
-                if hints:
-                    hint_node = hints[0]
-                    new_cmap[self.answer_id]['msg'] += self.make_hint_div(
-                        hint_node,
-                        True,
-                        [student_answers[self.answer_id]],
-                        self.tags[0]
-                    )
+                # Answer is not an additional answer.
+                if self.additional_answer_index == -1:
+                    self.set_cmap_msg(student_answers, new_cmap, 'correcthint', 0)
+                else:
+                    self.set_cmap_msg(student_answers, new_cmap, 'additional_answer', self.additional_answer_index)
 
 #-----------------------------------------------------------------------------
 

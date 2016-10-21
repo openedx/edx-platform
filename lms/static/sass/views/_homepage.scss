@@ -55,18 +55,20 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         .learn-more {
           @include left($learn-more-horizontal-position);
           @include box-sizing(border-box);
-          @include line-height(28);
           @extend %ui-depth2;
           position: absolute;
           top: ($baseline*2.75);
-          opacity: 0;
-          border: 3px solid $white;
-          border-radius: 3px;
           padding: 0 $baseline;
           width: ($baseline*10);
           height: ($baseline*2.5);
-          text-align: center;
+          border-color: $uxpl-blue-base;
+          border-radius: 3px;
+          background: $uxpl-blue-base;
           color: $white;
+          line-height: ($baseline*2.5);
+          text-align: center;
+          opacity: 0;
+          text-transform: none;
         }
       }
 
@@ -171,4 +173,3 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
     @include omega(4n);
   }
 }
-

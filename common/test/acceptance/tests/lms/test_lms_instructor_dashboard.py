@@ -14,7 +14,7 @@ from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 from common.test.acceptance.pages.lms.create_mode import ModeCreationPage
 from common.test.acceptance.pages.lms.courseware import CoursewarePage
-from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage, EntranceExamAdmin
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 from common.test.acceptance.pages.lms.problem import ProblemPage
@@ -403,10 +403,17 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
 
 
 @attr(shard=7)
+@ddt.ddt
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
     Tests for Entrance exam specific student grading tasks.
     """
+    admin_buttons = (
+        'reset_attempts_button',
+        'rescore_button',
+        'rescore_if_higher_button',
+        'delete_state_button',
+    )
 
     def setUp(self):
         super(EntranceExamGradeTest, self).setUp()
@@ -426,7 +433,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
 
         # go to the student admin page on the instructor dashboard
         self.log_in_as_instructor()
-        self.student_admin_section = self.visit_instructor_dashboard().select_student_admin()
+        self.entrance_exam_admin = self.visit_instructor_dashboard().select_student_admin(EntranceExamAdmin)
 
     def test_input_text_and_buttons_are_visible(self):
         """
@@ -437,86 +444,57 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             Then I see Student Email input box, Reset Student Attempt, Rescore Student Submission,
             Delete Student State for entrance exam and Show Background Task History for Student buttons
         """
-        self.assertTrue(self.student_admin_section.is_student_email_input_visible())
-        self.assertTrue(self.student_admin_section.is_reset_attempts_button_visible())
-        self.assertTrue(self.student_admin_section.is_rescore_submission_button_visible())
-        self.assertTrue(self.student_admin_section.is_delete_student_state_button_visible())
-        self.assertTrue(self.student_admin_section.is_background_task_history_button_visible())
+        self.assertTrue(self.entrance_exam_admin.are_all_buttons_visible())
 
-    def test_clicking_reset_student_attempts_button_without_email_shows_error(self):
+    @ddt.data(*admin_buttons)
+    def test_admin_button_without_email_shows_error(self, button_to_test):
         """
-        Scenario: Clicking on the Reset Student Attempts button without entering student email
+        Scenario: Clicking on the requested button without entering student email
         address or username results in error.
             Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Reset Student Attempts Button  under Entrance Exam Grade
+            When I click the requested button under Entrance Exam Grade
             Adjustment without enter an email address
             Then I should be shown an Error Notification
             And The Notification message should read 'Please enter a student email address or username.'
         """
-        self.student_admin_section.click_reset_attempts_button()
+        getattr(self.entrance_exam_admin, button_to_test).click()
         self.assertEqual(
             'Please enter a student email address or username.',
-            self.student_admin_section.top_notification.text[0]
+            self.entrance_exam_admin.top_notification.text[0]
         )
 
-    def test_clicking_reset_student_attempts_button_with_success(self):
+    @ddt.data(*admin_buttons)
+    def test_admin_button_with_success(self, button_to_test):
         """
-        Scenario: Clicking on the Reset Student Attempts button with valid student email
+        Scenario: Clicking on the requested button with valid student email
         address or username should result in success prompt.
             Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Reset Student Attempts Button under Entrance Exam Grade
+            When I click the requested button under Entrance Exam Grade
             Adjustment after entering a valid student
             email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_reset_attempts_button()
-        alert = get_modal_alert(self.student_admin_section.browser)
+        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
+        getattr(self.entrance_exam_admin, button_to_test).click()
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.dismiss()
 
-    def test_clicking_reset_student_attempts_button_with_error(self):
+    @ddt.data(*admin_buttons)
+    def test_admin_button_with_error(self, button_to_test):
         """
-        Scenario: Clicking on the Reset Student Attempts button with email address or username
+        Scenario: Clicking on the requested button with email address or username
         of a non existing student should result in error message.
             Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Reset Student Attempts Button  under Entrance Exam Grade
+            When I click the requested Button under Entrance Exam Grade
             Adjustment after non existing student email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_reset_attempts_button()
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.entrance_exam_admin.set_student_email_or_username('non_existing@example.com')
+        getattr(self.entrance_exam_admin, button_to_test).click()
+        self.entrance_exam_admin.wait_for_ajax()
+        self.assertGreater(len(self.entrance_exam_admin.top_notification.text[0]), 0)
 
-    def test_clicking_rescore_submission_button_with_success(self):
-        """
-        Scenario: Clicking on the Rescore Student Submission button with valid student email
-        address or username should result in success prompt.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Rescore Student Submission Button  under Entrance Exam Grade
-            Adjustment after entering a valid student email address or username
-            Then I should be shown an alert with success message
-        """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_rescore_submissions_button()
-        alert = get_modal_alert(self.student_admin_section.browser)
-        alert.dismiss()
-
-    def test_clicking_rescore_submission_button_with_error(self):
-        """
-        Scenario: Clicking on the Rescore Student Submission button with email address or username
-        of a non existing student should result in error message.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Rescore Student Submission Button under Entrance Exam Grade
-            Adjustment after non existing student email address or username
-            Then I should be shown an error message
-        """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_rescore_submissions_button()
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
-
-    def test_clicking_skip_entrance_exam_button_with_success(self):
+    def test_skip_entrance_exam_button_with_success(self):
         """
         Scenario: Clicking on the  Let Student Skip Entrance Exam button with
         valid student email address or username should result in success prompt.
@@ -526,17 +504,18 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             email address or username
             Then I should be shown an alert with success message
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_skip_entrance_exam_button()
+        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
+        self.entrance_exam_admin.skip_entrance_exam_button.click()
+
         #first we have window.confirm
-        alert = get_modal_alert(self.student_admin_section.browser)
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.accept()
 
         # then we have alert confirming action
-        alert = get_modal_alert(self.student_admin_section.browser)
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.dismiss()
 
-    def test_clicking_skip_entrance_exam_button_with_error(self):
+    def test_skip_entrance_exam_button_with_error(self):
         """
         Scenario: Clicking on the Let Student Skip Entrance Exam button with
         email address or username of a non existing student should result in error message.
@@ -546,47 +525,17 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             student email address or username
             Then I should be shown an error message
         """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_skip_entrance_exam_button()
+        self.entrance_exam_admin.set_student_email_or_username('non_existing@example.com')
+        self.entrance_exam_admin.skip_entrance_exam_button.click()
+
         #first we have window.confirm
-        alert = get_modal_alert(self.student_admin_section.browser)
+        alert = get_modal_alert(self.entrance_exam_admin.browser)
         alert.accept()
 
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+        self.entrance_exam_admin.wait_for_ajax()
+        self.assertGreater(len(self.entrance_exam_admin.top_notification.text[0]), 0)
 
-    def test_clicking_delete_student_attempts_button_with_success(self):
-        """
-        Scenario: Clicking on the Delete Student State for entrance exam button
-        with valid student email address or username should result in success prompt.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Delete Student State for entrance exam Button
-            under Entrance Exam Grade Adjustment after entering a valid student
-            email address or username
-            Then I should be shown an alert with success message
-        """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_delete_student_state_button()
-        alert = get_modal_alert(self.student_admin_section.browser)
-        alert.dismiss()
-
-    def test_clicking_delete_student_attempts_button_with_error(self):
-        """
-        Scenario: Clicking on the Delete Student State for entrance exam button
-        with email address or username of a non existing student should result
-        in error message.
-            Given that I am on the Student Admin tab on the Instructor Dashboard
-            When I click the Delete Student State for entrance exam Button
-            under Entrance Exam Grade Adjustment after non existing student
-            email address or username
-            Then I should be shown an error message
-        """
-        self.student_admin_section.set_student_email('non_existing@example.com')
-        self.student_admin_section.click_delete_student_state_button()
-        self.student_admin_section.wait_for_ajax()
-        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
-
-    def test_clicking_task_history_button_with_success(self):
+    def test_task_history_button_with_success(self):
         """
         Scenario: Clicking on the Show Background Task History for Student
         with valid student email address or username should result in table of tasks.
@@ -594,11 +543,11 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
             When I click the Show Background Task History for Student Button
             under Entrance Exam Grade Adjustment after entering a valid student
             email address or username
-            Then I should be shown an table listing all background tasks
+            Then I should be shown a table listing all background tasks
         """
-        self.student_admin_section.set_student_email(self.student_identifier)
-        self.student_admin_section.click_task_history_button()
-        self.assertTrue(self.student_admin_section.is_background_task_history_table_visible())
+        self.entrance_exam_admin.set_student_email_or_username(self.student_identifier)
+        self.entrance_exam_admin.task_history_button.click()
+        self.entrance_exam_admin.wait_for_task_history_table()
 
 
 @attr(shard=7)

@@ -20,15 +20,6 @@
 
   django.catalog = {
     "#Replies": "#\ub2f5\uae00\ub4e4", 
-    "%(numResponses)s other response": [
-      "\ub2e4\ub978 \ub2f5\ubcc0: %(numResponses)s "
-    ], 
-    "%(numResponses)s response": [
-      "\ub2f5\ubcc0: %(numResponses)s"
-    ], 
-    "%(numVotes)s Vote": [
-      "%(numVotes)s  \ud45c"
-    ], 
     "%(num_questions)s question": [
       "%(num_questions)s\uac1c"
     ], 
@@ -40,9 +31,6 @@
     ], 
     "%(team_count)s Team": [
       "%(team_count)s \ud300"
-    ], 
-    "%(unread_count)s new comment": [
-      "%(unread_count)s \uc758 \uc0c8\ub85c\uc6b4 \ub313\uae00"
     ], 
     "%(value)s hour": [
       "%(value)s \uc2dc\uac04"
@@ -69,12 +57,6 @@
     "%s from now": "\uc9c0\uae08\uc73c\ub85c \ubd80\ud130 %s \uc774\ud6c4", 
     "%s result": [
       "%s \uacb0\uacfc"
-    ], 
-    "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s \ud3ec\uc778\ud2b8)"
-    ], 
-    "(%(num_points)s point possible)": [
-      "(%(num_points)s \uc810)"
     ], 
     "About me": "\uc790\uae30\uc18c\uac1c", 
     "Account Settings": "\uacc4\uc815 \uc124\uc815", 
@@ -111,8 +93,6 @@
     "Anchors": "Anchors", 
     "Annotation": "\uc8fc\uc11d", 
     "Annotation Text": "\uc8fc\uc11d \ud14d\uc2a4\ud2b8", 
-    "Answer hidden": "\uc228\uc740 \ub2f5", 
-    "Answer:": "\ub2f5:", 
     "Are you sure you want to delete this comment?": "\uc774 \ub313\uae00\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
     "Are you sure you want to delete this post?": "\uc774 \uac8c\uc2dc\ubb3c\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
     "Are you sure you want to delete this response?": "\uc774 \ub2f5\ubcc0\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
@@ -311,7 +291,6 @@
     "Headings": "\uc81c\ubaa9", 
     "Height": "\ub192\uc774", 
     "Hide Annotations": "\uc8fc\uc11d \uac10\ucd94\uae30", 
-    "Hide Answer": "\uc815\ub2f5 \uac10\ucd94\uae30", 
     "Hide Discussion": "\uac8c\uc2dc\ud310 \uac10\ucd94\uae30", 
     "Hide notes": "\ub178\ud2b8 \uac10\ucd94\uae30", 
     "Horizontal Rule (Ctrl+R)": "\uac00\ub85c\uc120 (Ctrl+R)", 
@@ -359,8 +338,6 @@
     "Links are generated on demand and expire within 5 minutes due to the sensitive nature of student information.": "\uc694\uccad\uc5d0 \uc758\ud574 \uc0dd\uc131\ub41c \ub9c1\ud06c\ub294 \ud559\uc2b5\uc790 \uc815\ubcf4 \ubcf4\ud638\ub97c \uc704\ud574  5\ubd84 \ub0b4\uc5d0 \uc18c\uba78\ub429\ub2c8\ub2e4.", 
     "List item": "\ubb38\ub2e8\ubc88\ud638", 
     "Load all responses": "\ubaa8\ub4e0 \ub2f5\ubcc0 \ub85c\ub4dc\ud558\uae30", 
-    "Load more": "\ucd94\uac00 \ub85c\ub4dc", 
-    "Load next %(numResponses)s responses": "\ub2e4\uc74c %(numResponses)s \ub2f5\ubcc0\uc744 \ub85c\ub4dc\ud558\uae30", 
     "Loading": "\ub85c\ub529", 
     "Loading content": "\ucf58\ud150\uce20 \ub85c\ub529\uc911", 
     "Loading more threads": "\ub2e4\ub978 \uac8c\uc2dc\ubb3c \ucd94\uac00 \ub85c\ub529\uc911", 
@@ -395,7 +372,6 @@
     "No Webcam Detected": "\uc6f9\ucea0 \ubbf8\uac10\uc9c0", 
     "No color": "\uc0c9\uae54\uc774 \uc5c6\uc74c", 
     "No results found for \"%(query_string)s\". Please try searching again.": "\"%(query_string)s\"\ub85c \uac80\uc0c9\ub41c \uacb0\uacfc\uac00 \uc5c6\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uac80\uc0c9\ud558\uc138\uc694.", 
-    "No results found for %(original_query)s. Showing results for %(suggested_query)s.": " %(original_query)s \ub85c \uac80\uc0c9\ub41c \uacb0\uacfc \uc5c6\uc74c.  %(suggested_query)s \ub85c \uac80\uc0c9\ub41c \uacb0\uacfc \ud45c\uc2dc\ud558\uae30.", 
     "No tasks currently running.": "\uc791\uc5c5\uc774 \uc5c6\uc2b5\ub2c8\ub2e4.", 
     "No threads matched your query.": "\uadc0\ud558\uc758 \uac80\uc0c9\uc5d0 \ubd80\ud569\ud558\ub294 \uac8c\uc2dc\ubb3c\uc774 \uc5c6\uc2b5\ub2c8\ub2e4. ", 
     "Nonbreaking space": "\ub2e8\uc5b4 \uc798\ub9bc \ubc29\uc9c0 \uacf5\ubc31", 
@@ -505,16 +481,11 @@
     "Settings": "\uc124\uc815", 
     "Short explanation": "\uc9e7\uc740 \uc124\uba85", 
     "Show Annotations": "\uc8fc\uc11d \ubcf4\uc774\uae30", 
-    "Show Answer": "\uc815\ub2f5 \ubcf4\uae30", 
     "Show Discussion": "\uac8c\uc2dc\ud310  \ubcf4\uae30", 
     "Show blocks": "\ube14\ub7ed \ubcf4\uc774\uae30", 
     "Show invisible characters": "\uac10\ucdb0\uc9c4 \ubb38\uc790 \ubcf4\uc774\uae30", 
     "Show notes": "\ub178\ud2b8 \ubcf4\uc774\uae30", 
-    "Show posts by %(username)s.": "\uac8c\uc2dc\ubb3c\uc744 %(username)s \uc21c\uc73c\ub85c \ud45c\uc2dc", 
     "Showing all responses": "\ubaa8\ub4e0 \ub2f5\ubcc0 \ubcf4\uc5ec\uc8fc\uae30", 
-    "Showing first response": [
-      "\uccab\ubc88\uc9f8 %(numResponses)s \ub2f5\ubcc0 \ubcf4\uc5ec\uc8fc\uae30"
-    ], 
     "Sign in": "\ub85c\uadf8\uc778", 
     "Skip": "\uac74\ub108\ub6f0\uae30", 
     "Sorry": "\uc8c4\uc1a1\ud569\ub2c8\ub2e4", 
@@ -675,8 +646,6 @@
     "We had some trouble marking this response as an answer.  Please try again.": "\ucc44\ud0dd\ud558\ub294 \ub3c4\uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.", 
     "We had some trouble marking this response endorsed.  Please try again.": "\uc774 \ub2f5\ubcc0\uc744 \uc9c0\uc9c0\ud558\ub294\ub370 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.", 
     "We had some trouble pinning this thread. Please try again.": "\uc774 \uac8c\uc2dc\ubb3c\uc744 \uace0\uc815\ud558\ub294\ub370 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.", 
-    "We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.": "\uc694\uccad \ucc98\ub9ac \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \uc800\uc7a5 \uc548 \ub41c \uc791\uc5c5\uc744 \ubcf5\uc0ac\ud55c \ud6c4 \ud398\uc774\uc9c0\ub97c \ub2e4\uc2dc \uc5ec\uc138\uc694.", 
-    "We had some trouble processing your request. Please try again.": "\uc694\uccad \ucc98\ub9ac \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694", 
     "We had some trouble removing this endorsement.  Please try again.": "\uc774 \ub2f5\ubcc0 \uc9c0\uc9c0\ub97c \ucde8\uc18c\ud558\ub294\ub370 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.", 
     "We had some trouble removing this response as an answer.  Please try again.": "\ucc44\ud0dd \ucde8\uc18c \uc911 \uc624\ub958\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.", 
     "We had some trouble removing your flag on this post.  Please try again.": "\uc774 \uac8c\uc2dc\uae00\uc758 flag\ub97c \uc0ad\uc81c\ud558\ub294\ub370 \ubb38\uc81c\uac00 \ubc1c\uc0dd\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud558\uc138\uc694.", 
@@ -741,9 +710,6 @@
     "name": "\uc774\ub984", 
     "strong text": "\uac15\ud558\uac8c", 
     "team count": "\ud300 \uc778\uc6d0 \uc218", 
-    "there is currently %(numVotes)s vote": [
-      "\ud604\uc7ac %(numVotes)s \uba85\uc774 \ud22c\ud45c\ud558\uc600\uc2b5\ub2c8\ub2e4."
-    ], 
     "{numMoved} student was removed from {oldCohort}": [
       "{oldCohort}\uc5d0\uc11c \uc0ad\uc81c\ub41c \ud559\uc2b5\uc790\ub294 {numMoved} \uba85\uc785\ub2c8\ub2e4."
     ], 

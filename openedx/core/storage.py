@@ -13,6 +13,7 @@ from openedx.core.djangoapps.theming.storage import (
     ThemeCachedFilesMixin,
     ThemePipelineMixin
 )
+from storages.backends.s3boto import S3BotoStorage
 
 
 class ProductionStorage(
@@ -42,6 +43,29 @@ class DevelopmentStorage(
     so that we can skip packaging and optimization.
     """
     pass
+
+
+class S3ReportStorage(S3BotoStorage):  # pylint: disable=abstract-method
+    """
+    Storage for reports.
+    """
+    def __init__(self, acl=None, bucket=None, custom_domain=None, **settings):
+        """
+        init method for S3ReportStorage, Note that we have added an extra key-word
+        argument named "custom_domain" and this argument should not be passed to the superclass's init.
+
+        Args:
+            acl: content policy for the uploads i.e. private, public etc.
+            bucket: Name of S3 bucket to use for storing and/or retrieving content
+            custom_domain: custom domain to use for generating file urls
+            **settings: additional settings to be passed in to S3BotoStorage,
+
+        Returns:
+
+        """
+        if custom_domain:
+            self.custom_domain = custom_domain
+        super(S3ReportStorage, self).__init__(acl=acl, bucket=bucket, **settings)
 
 
 @lru_cache()

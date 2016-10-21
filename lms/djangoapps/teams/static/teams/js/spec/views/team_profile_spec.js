@@ -108,19 +108,17 @@ define([
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
 
-                expect(view.$('.new-post-btn').length).toEqual(0);
                 teamModel.set('membership', DEFAULT_MEMBERSHIP);  // This should re-render the view.
                 view.render();
-                expect(view.$('.new-post-btn').length).toEqual(1);
+                expect(view.$('.btn-link.new-post-btn.is-hidden').length).toEqual(0);
             });
 
             it('hides New Post button when user left a team', function() {
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {membership: DEFAULT_MEMBERSHIP});
 
-                expect(view.$('.new-post-btn').length).toEqual(1);
                 clickLeaveTeam(requests, view, {cancel: false});
-                expect(view.$('.new-post-btn').length).toEqual(0);
+                expect(view.$('.new-post-btn.is-hidden').length).toEqual(0);
             });
         });
 

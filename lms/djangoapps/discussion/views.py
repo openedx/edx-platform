@@ -63,16 +63,27 @@ def make_course_settings(course, user):
 
 
 @newrelic.agent.function_trace()
-def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
+def get_threads(request, course, user_info, discussion_id=None, per_page=THREADS_PER_PAGE):
     """
     This may raise an appropriate subclass of cc.utils.CommentClientError
     if something goes wrong, or ValueError if the group_id is invalid.
+
+    Arguments:
+        request (WSGIRequest): The user request.
+        course (CourseDescriptorWithMixins): The course object.
+        user_info (dict): The comment client User object as a dict.
+        discussion_id (unicode): Optional discussion id/commentable id for context.
+        per_page (int): Optional number of threads per page.
+
+    Returns:
+        (tuple of list, dict): A tuple of the list of threads and a dict of the
+            query parameters used for the search.
+
     """
     default_query_params = {
         'page': 1,
         'per_page': per_page,
         'sort_key': 'activity',
-        'sort_order': 'desc',
         'text': '',
         'course_id': unicode(course.id),
         'user_id': request.user.id,
@@ -90,12 +101,9 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
 
     if not request.GET.get('sort_key'):
         # If the user did not select a sort key, use their last used sort key
-        cc_user = cc.User.from_django_user(request.user)
-        cc_user.retrieve()
-        # TODO: After the comment service is updated this can just be
-        # user.default_sort_key because the service returns the default value
-        default_query_params['sort_key'] = cc_user.get('default_sort_key') or default_query_params['sort_key']
-    else:
+        default_query_params['sort_key'] = user_info.get('default_sort_key') or default_query_params['sort_key']
+
+    elif request.GET.get('sort_key') != user_info.get('default_sort_key'):
         # If the user clicked a sort key, update their default sort key
         cc_user = cc.User.from_django_user(request.user)
         cc_user.default_sort_key = request.GET.get('sort_key')
@@ -113,7 +121,6 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
                 [
                     'page',
                     'sort_key',
-                    'sort_order',
                     'text',
                     'commentable_ids',
                     'flagged',
@@ -175,7 +182,7 @@ def inline_discussion(request, course_key, discussion_id):
     user_info = cc_user.to_dict()
 
     try:
-        threads, query_params = get_threads(request, course, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
+        threads, query_params = get_threads(request, course, user_info, discussion_id, per_page=INLINE_THREADS_PER_PAGE)
     except ValueError:
         return HttpResponseBadRequest("Invalid group_id")
 
@@ -212,7 +219,7 @@ def forum_form_discussion(request, course_key):
     user_info = user.to_dict()
 
     try:
-        unsafethreads, query_params = get_threads(request, course)   # This might process a search query
+        unsafethreads, query_params = get_threads(request, course, user_info)   # This might process a search query
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
     except cc.utils.CommentClientMaintenanceError:
@@ -279,7 +286,11 @@ def forum_form_discussion(request, course_key):
 @use_bulk_ops
 def single_thread(request, course_key, discussion_id, thread_id):
     """
-    Renders a response to display a single discussion thread.
+    Renders a response to display a single discussion thread.  This could either be a page refresh
+    after navigating to a single thread, a direct link to a single thread, or an AJAX call from the
+    discussions UI loading the responses/comments for a single thread.
+
+    Depending on the HTTP headers, we'll adjust our response accordingly.
     """
     nr_transaction = newrelic.agent.current_transaction()
 
@@ -288,12 +299,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
     is_moderator = has_permission(request.user, "see_all_cohorts", course_key)
+    is_staff = has_permission(request.user, 'openclose_thread', course.id)
 
-    # Currently, the front end always loads responses via AJAX, even for this
-    # page; it would be a nice optimization to avoid that extra round trip to
-    # the comments service.
     try:
         thread = cc.Thread.find(thread_id).retrieve(
+            with_responses=request.is_ajax(),
             recursive=request.is_ajax(),
             user_id=request.user.id,
             response_skip=request.GET.get("resp_skip"),
@@ -315,7 +325,6 @@ def single_thread(request, course_key, discussion_id, thread_id):
         if getattr(thread, "group_id", None) is not None and user_group_id != thread.group_id:
             raise Http404
 
-    is_staff = has_permission(request.user, 'openclose_thread', course.id)
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(
@@ -324,20 +333,19 @@ def single_thread(request, course_key, discussion_id, thread_id):
                 request.user,
                 user_info=user_info
             )
+
         content = utils.prepare_content(thread.to_dict(), course_key, is_staff)
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course, request.user)
+
         return utils.JsonResponse({
             'content': content,
             'annotated_content_info': annotated_content_info,
         })
-
     else:
-        try:
-            threads, query_params = get_threads(request, course)
-        except ValueError:
-            return HttpResponseBadRequest("Invalid group_id")
-        threads.append(thread.to_dict())
+        # Since we're in page render mode, and the discussions UI will request the thread list itself,
+        # we need only return the thread information for this one.
+        threads = [thread.to_dict()]
 
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context(threads, course, request.user)
@@ -371,7 +379,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'threads': threads,
             'roles': utils.get_role_ids(course_key),
             'is_moderator': is_moderator,
-            'thread_pages': query_params['num_pages'],
+            'thread_pages': 1,
             'is_course_cohorted': is_course_cohorted(course_key),
             'flag_moderator': bool(
                 has_permission(request.user, 'openclose_thread', course.id) or
@@ -473,7 +481,6 @@ def followed_threads(request, course_key, user_id):
             'page': 1,
             'per_page': THREADS_PER_PAGE,   # more than threads_per_page to show more activities
             'sort_key': 'date',
-            'sort_order': 'desc',
         }
 
         query_params = merge_dict(
@@ -484,7 +491,6 @@ def followed_threads(request, course_key, user_id):
                     [
                         'page',
                         'sort_key',
-                        'sort_order',
                         'flagged',
                         'unread',
                         'unanswered',

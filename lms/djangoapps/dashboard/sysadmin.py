@@ -34,8 +34,8 @@ import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
 from student.roles import CourseStaffRole, CourseInstructorRole
 from dashboard.models import CourseImportLog
-from external_auth.models import ExternalAuthMap
-from external_auth.views import generate_password
+from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
+from openedx.core.djangoapps.external_auth.views import generate_password
 from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
 from xmodule.modulestore.django import modulestore
@@ -345,7 +345,7 @@ class Courses(SysadminDashboardView):
         # Try the data dir, then try to find it in the git import dir
         if not gdir.exists():
             git_repo_dir = getattr(settings, 'GIT_REPO_DIR', git_import.DEFAULT_GIT_REPO_DIR)
-            gdir = path(git_repo_dir / cdir)
+            gdir = path(git_repo_dir) / cdir
             if not gdir.exists():
                 return info
 

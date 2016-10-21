@@ -51,7 +51,11 @@ class TpaAPITestCase(ThirdPartyAuthTestMixin, APITestCase):
         self.configure_facebook_provider(enabled=True)
         self.configure_linkedin_provider(enabled=False)
         self.enable_saml()
-        testshib = self.configure_saml_provider(name='TestShib', enabled=True, idp_slug=IDP_SLUG_TESTSHIB)
+        testshib = self.configure_saml_provider(
+            name='TestShib',
+            enabled=True,
+            idp_slug=IDP_SLUG_TESTSHIB
+        )
 
         # Create several users and link each user to Google and TestShib
         for username in LINKED_USERS:

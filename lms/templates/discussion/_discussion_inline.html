@@ -1,18 +1,24 @@
 <%page expression_filter="h"/>
+
 <%include file="_underscore_templates.html" />
+
 <%!
 from django.utils.translation import ugettext as _
 from json import dumps as json_dumps
 from openedx.core.djangolib.js_utils import js_escaped_string
 %>
 
-<div class="discussion-module" data-discussion-id="${discussion_id}" data-user-create-comment="${json_dumps(can_create_comment)}" data-user-create-subcomment="${json_dumps(can_create_subcomment)}" data-read-only="false">
-    <a class="discussion-show control-button" href="javascript:void(0)" data-discussion-id="${discussion_id}" role="button">
-        <span class="show-hide-discussion-icon"></span><span class="button-text">${_("Show Discussion")}</span>
-    </a>
-    % if can_create_thread:
-        <button class="btn-brand btn-small new-post-btn">${_("Add a Post")}</button>
-    % endif
+<div class="discussion-module" data-discussion-id="${discussion_id}"
+    data-user-create-comment="${json_dumps(can_create_comment)}"
+    data-user-create-subcomment="${json_dumps(can_create_subcomment)}"
+    data-read-only="${'false' if can_create_thread else 'true'}">
+    <div class="discussion-module-header">
+        <h3 class="discussion-module-title">${_(display_name)}</h3>
+        <div class="inline-discussion-topic"><span class="inline-discussion-topic-title">${_("Topic:")}</span> ${discussion_category} / ${discussion_target}</div>
+    </div>
+    <button class="discussion-show btn btn-brand" data-discussion-id="${discussion_id}">
+        <span class="button-text">${_("Show Discussion")}</span>
+    </button>
 </div>
 <script type="text/javascript">
 /* global DiscussionModuleView */

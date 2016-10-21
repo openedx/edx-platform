@@ -1,6 +1,8 @@
 """
 Acceptance Tests for Course Information
 """
+from flaky import flaky
+
 from common.test.acceptance.pages.studio.course_info import CourseUpdatesPage
 from common.test.acceptance.tests.studio.base_studio_test import StudioCourseTest
 
@@ -77,6 +79,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.assertFalse(self.course_updates_page.is_first_update_message('Hello'))
         self.assertTrue(self.course_updates_page.is_first_update_message('Goodbye'))
 
+    @flaky  # TNL-5582
     def test_delete_course_update(self):
         """
         Scenario: Users can delete updates
@@ -106,6 +109,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.click_new_update_save_button()
         self.assertTrue(self.course_updates_page.is_first_update_date('June 1, 2013'))
 
+    @flaky  # TNL-5775
     def test_outside_tag_preserved(self):
         """
         Scenario: Text outside of tags is preserved
@@ -120,6 +124,7 @@ class UsersCanAddUpdatesTest(StudioCourseTest):
         self.course_updates_page.visit()
         self.assertTrue(self.course_updates_page.is_first_update_message('before <strong>middle</strong> after'))
 
+    @flaky  # TNL-5773
     def test_asset_change_in_updates(self):
         """
         Scenario: Static links are rewritten when previewing a course update

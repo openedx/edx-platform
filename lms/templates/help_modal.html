@@ -18,7 +18,7 @@ from xmodule.tabs import CourseTabList
   <a href="#help-modal" rel="leanModal" role="button">${_("Support")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" tabindex="-1" aria-label="${_("{platform_name} Help").format(platform_name=static.get_platform_name())}">
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" tabindex="-1" aria-label="${_("{platform_name} Support").format(platform_name=static.get_platform_name())}">
   <div class="inner-wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal" tabindex="0">
@@ -32,7 +32,7 @@ from xmodule.tabs import CourseTabList
 
         <header>
           <h2>
-        ${Text(_('{platform_name} Help')).format(
+        ${Text(_('{platform_name} Support')).format(
             platform_name=HTML(u'<span class="edx">{}</span>').format(static.get_platform_name())
         )}
           </h2>
@@ -162,13 +162,10 @@ $(document).ready(function() {
             $leanOverlay.removeAttr('tabindex');
         };
 
-    DialogTabControls.setKeydownListner($helpModal, $closeButton);
-
-    $helpModal.click(function () {
-        $helpModal.focus();
-    });
+    DialogTabControls.setKeydownListener($helpModal, $closeButton);
 
     $(".help-tab").click(function() {
+        $helpModal.css("position", "absolute");
         DialogTabControls.initializeTabKeyValues("#help_wrapper", $closeButton);
         $(".field-error").removeClass("field-error");
         $feedbackForm[0].reset();
@@ -198,7 +195,7 @@ $(document).ready(function() {
     };
 
     $("#feedback_link_problem").click(function(event) {
-        $("#feedback_form_details_tip").css("display", "block");
+        $("#feedback_form_details_tip").css({"display": "block", "padding-bottom": "5px"});
         showFeedback(
             event,
             "${_('problem') | n, js_escaped_string}",

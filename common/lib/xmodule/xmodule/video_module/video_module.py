@@ -36,6 +36,7 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
+from xmodule.validation import StudioValidationMessage, StudioValidation
 
 from .transcripts_utils import VideoTranscriptsMixin, Transcript, get_html5_ids
 from .video_utils import create_youtube_string, get_poster, rewrite_video_url, format_xml_exception_message
@@ -151,6 +152,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         resource_string(module, 'css/video/accessible_menu.scss'),
     ]}
     js_module_name = "Video"
+
+    def validate(self):
+        """
+        Validates the state of this Video Module Instance.
+        """
+        return self.descriptor.validate()
 
     def get_transcripts_for_student(self, transcripts):
         """Return transcript information necessary for rendering the XModule student view.
@@ -426,6 +433,35 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         # we should enable `download_track` if following is true:
         if not self.fields['download_track'].is_set_on(self) and self.track:
             self.download_track = True
+
+    def validate(self):
+        """
+        Validates the state of this video Module Instance. This
+        is the override of the general XBlock method, and it will also ask
+        its superclass to validate.
+        """
+        validation = super(VideoDescriptor, self).validate()
+        if not isinstance(validation, StudioValidation):
+            validation = StudioValidation.copy(validation)
+
+        no_transcript_lang = []
+        for lang_code, transcript in self.transcripts.items():
+            if not transcript:
+                no_transcript_lang.append([label for code, label in settings.ALL_LANGUAGES if code == lang_code][0])
+
+        if no_transcript_lang:
+            ungettext = self.runtime.service(self, "i18n").ungettext
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    ungettext(
+                        'There is no transcript file associated with the {lang} language.',
+                        'There are no transcript files associated with the {lang} languages.',
+                        len(no_transcript_lang)
+                    ).format(lang=', '.join(no_transcript_lang))
+                )
+            )
+        return validation
 
     def editor_saved(self, user, old_metadata, old_content):
         """
