@@ -106,6 +106,7 @@ class GetBatchEnrollmentDataView(APIView):
                 'enrollment_id': enrollment.id,
                 'user_id': enrollment.user.id,
                 'username': enrollment.user.username,
+                'course_id': str(enrollment.course_id),
                 'date_enrolled': enrollment.created,
             }
             
