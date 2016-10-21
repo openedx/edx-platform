@@ -121,23 +121,23 @@ Feature: LMS.Answer problems
         Then I should see a score of "<Points Possible>"
 
         Examples:
-        | ProblemType       | Correctness   | Score                        | Points Possible               |
-        | drop down         | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
-        | drop down         | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
-        | multiple choice   | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
-        | multiple choice   | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
-        | checkbox          | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
-        | checkbox          | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
-        | radio             | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
-        | radio             | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
-        | numerical         | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
-        | numerical         | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
-        | formula           | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
-        | formula           | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
-        | script            | correct       | 2/2 points (ungraded) | 2 points possible (ungraded)  |
-        | script            | incorrect     | 2 points possible (ungraded) | 2 points possible (ungraded)  |
-        | image             | correct       | 1/1 point (ungraded)  | 1 point possible (ungraded)   |
-        | image             | incorrect     | 1 point possible (ungraded)  | 1 point possible (ungraded)   |
+        | ProblemType       | Correctness   | Score                 | Points Possible        |
+        | drop down         | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | drop down         | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | multiple choice   | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | multiple choice   | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | checkbox          | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | checkbox          | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | radio             | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | radio             | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | numerical         | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | numerical         | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | formula           | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | formula           | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | script            | correct       | 2/2 points (ungraded) | 0/2 points (ungraded)  |
+        | script            | incorrect     | 0/2 points (ungraded) | 0/2 points (ungraded)  |
+        | image             | correct       | 1/1 point (ungraded)  | 0/1 point (ungraded)   |
+        | image             | incorrect     | 0/1 point (ungraded)  | 0/1 point (ungraded)   |
 
     Scenario: I can see my score on a problem when I answer it and after I reset it
         Given I am viewing a "<ProblemType>" problem with randomization "<Randomization>" with reset button on
@@ -147,23 +147,23 @@ Feature: LMS.Answer problems
         Then I should see a score of "<Points Possible>"
 
         Examples:
-        | ProblemType       | Correctness   | Score                         | Points Possible               | Randomization |
-        | drop down         | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
-        | drop down         | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
-        | multiple choice   | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
-        | multiple choice   | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
-        | checkbox          | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
-        | checkbox          | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
-        | radio             | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
-        | radio             | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
-        | numerical         | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
-        | numerical         | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
-        | formula           | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
-        | formula           | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
-        | script            | correct       | 2/2 points (ungraded)  | 2 points possible (ungraded)  | never         |
-        | script            | incorrect     | 2 points possible (ungraded)  | 2 points possible (ungraded)  | never         |
-        | image             | correct       | 1/1 point (ungraded)   | 1 point possible (ungraded)   | never         |
-        | image             | incorrect     | 1 point possible (ungraded)   | 1 point possible (ungraded)   | never         |
+        | ProblemType       | Correctness   | Score                  | Points Possible        | Randomization |
+        | drop down         | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | drop down         | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | multiple choice   | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | multiple choice   | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | checkbox          | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | checkbox          | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | radio             | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | radio             | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | numerical         | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | numerical         | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | formula           | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | formula           | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | script            | correct       | 2/2 points (ungraded)  | 0/2 points (ungraded)  | never         |
+        | script            | incorrect     | 0/2 points (ungraded)  | 0/2 points (ungraded)  | never         |
+        | image             | correct       | 1/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
+        | image             | incorrect     | 0/1 point (ungraded)   | 0/1 point (ungraded)   | never         |
 
     Scenario: I can see my score on a problem to which I submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -172,7 +172,7 @@ Feature: LMS.Answer problems
 
         Examples:
         | ProblemType       | Points Possible               |
-        | image             | 1 point possible (ungraded)   |
+        | image             | 0/1 point (ungraded)   |
 
     Scenario: I can reset the correctness of a problem after changing my answer
         Given I am viewing a "<ProblemType>" problem

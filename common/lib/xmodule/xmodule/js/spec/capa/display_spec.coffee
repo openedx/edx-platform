@@ -91,9 +91,10 @@ describe 'Problem', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
 
-    testProgessData = (problem, status, detail, graded, expected_progress_after_render) ->
-      problem.el.data('progress_status', status)
-      problem.el.data('progress_detail', detail)
+    testProgessData = (problem, score, total_possible, attempts, graded, expected_progress_after_render) ->
+      problem.el.data('problem-score', score);
+      problem.el.data('problem-total-possible', total_possible);
+      problem.el.data('attempts-used', attempts);
       problem.el.data('graded', graded)
       expect(problem.$('.problem-progress').html()).toEqual ""
       problem.renderProgressState()
@@ -101,35 +102,41 @@ describe 'Problem', ->
 
     describe 'with a status of "none"', ->
       it 'reports the number of points possible and graded', ->
-        testProgessData(@problem, 'none', '0/1', "True", "1 point possible (graded)")
+        testProgessData(@problem, 0, 1, 0, "True", "1 point possible (graded)")
 
       it 'displays the number of points possible when rendering happens with the content', ->
-        testProgessData(@problem, 'none', '0/2', "True", "2 points possible (graded)")
+        testProgessData(@problem, 0, 2, 0, "True", "2 points possible (graded)")
 
       it 'reports the number of points possible and ungraded', ->
-        testProgessData(@problem, 'none', '0/1', "False", "1 point possible (ungraded)")
+        testProgessData(@problem, 0, 1, 0, "False", "1 point possible (ungraded)")
 
       it 'displays ungraded if number of points possible is 0', ->
-        testProgessData(@problem, 'none', '0', "False", "0 points possible (ungraded)")
+        testProgessData(@problem, 0, 0, 0, "False", "0 points possible (ungraded)")
 
       it 'displays ungraded if number of points possible is 0, even if graded value is True', ->
-        testProgessData(@problem, 'none', '0', "True", "0 points possible (ungraded)")
+        testProgessData(@problem, 0, 0, 0, "True", "0 points possible (ungraded)")
+
+      it 'reports the correct score with status none and >0 attempts', ->
+        testProgessData(@problem, 0, 1, 1, "True", "0/1 point (graded)")
+
+      it 'reports the correct score with >1 weight, status none, and >0 attempts', ->
+        testProgessData(@problem, 0, 2, 2, "True", "0/2 points (graded)")
 
     describe 'with any other valid status', ->
 
       it 'reports the current score', ->
-        testProgessData(@problem, 'foo', '1/1', "True", "1/1 point (graded)")
+        testProgessData(@problem, 1, 1, 1, "True", "1/1 point (graded)")
 
       it 'shows current score when rendering happens with the content', ->
-        testProgessData(@problem, 'test status', '2/2', "True", "2/2 points (graded)")
+        testProgessData(@problem, 2, 2, 1, "True", "2/2 points (graded)")
 
       it 'reports the current score even if problem is ungraded', ->
-        testProgessData(@problem, 'test status', '1/1', "False", "1/1 point (ungraded)")
+        testProgessData(@problem, 1, 1, 1, "False", "1/1 point (ungraded)")
 
     describe 'with valid status and string containing an integer like "0" for detail', ->
       # These tests are to address a failure specific to Chrome 51 and 52 +
       it 'shows 0 points possible for the detail', ->
-        testProgessData(@problem, 'foo', '0', "False", "")
+        testProgessData(@problem, 0, 0, 1, "False", "0 points possible (ungraded)")
 
   describe 'render', ->
     beforeEach ->

@@ -20,12 +20,8 @@
     <nav class="sequence-list-wrapper" aria-label="${_('Unit')}">
       <ol id="sequence-list">
         % for idx, item in enumerate(items):
-        ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
-        ## Make sure it gets updated after ajax calls.
-        ## implementation note: will need to figure out how to handle combining detail
-        ## statuses of multiple modules in js.
         <li>
-        <button class="seq_${item['type']} inactive progress-${item['progress_status']} nav-item"
+        <button class="seq_${item['type']} inactive nav-item"
            data-id="${item['id']}"
            data-element="${idx+1}"
            data-page-title="${item['page_title']}"
