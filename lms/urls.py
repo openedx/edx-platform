@@ -91,6 +91,9 @@ urlpatterns = (
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
     url(r'^api/ps_user_api/', include('appsembler.ps_user_api.urls')),
 
+    # Jitterbit API endpoints
+    url(r'^api/jitterbit/', include('appsembler.jitterbit_api.urls')),
+
     # Profile Images API endpoints
     url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
 
