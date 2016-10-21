@@ -46,7 +46,7 @@ class SiteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         site = super(SiteSerializer, self).create(validated_data)
-        site = bootstrap_site(site)
+        organization, site, user  = bootstrap_site(site)
         return site
 
 
