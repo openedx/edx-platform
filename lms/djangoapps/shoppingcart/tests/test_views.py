@@ -639,6 +639,33 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         current_enrollment, __ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_key)
         self.assertEquals('verified', current_enrollment)
 
+    def test_upgrade_from_valid_reg_code(self):
+        """Use a valid registration code to upgrade from honor to verified mode. """
+        # Ensure the course has a verified mode
+        course_key = self.course_key.to_deprecated_string()
+        self._add_course_mode(mode_slug='verified')
+        self.add_reg_code(course_key, mode_slug='verified')
+
+        # Enroll as honor in the course with the current user.
+        CourseEnrollment.enroll(self.user, self.course_key)
+        self.login_user()
+        current_enrollment, __ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_key)
+        self.assertEquals('honor', current_enrollment)
+
+        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        #now activate the user by enrolling him/her to the course
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
+
+        # Once upgraded, should be "verified"
+        current_enrollment, __ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_key)
+        self.assertEquals('verified', current_enrollment)
+
     @patch('shoppingcart.views.log.debug')
     def test_non_existing_coupon_redemption_on_removing_item(self, debug_log):
 

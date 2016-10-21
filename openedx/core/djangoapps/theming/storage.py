@@ -93,6 +93,13 @@ class ThemeStorage(StaticFilesStorage):
             if not all((themes_location, theme, name)):
                 return False
 
+            customer_themed_path = "/".join([
+                themes_location,
+                theme,
+                'customer_specific',
+                get_project_root_name(),
+                "static/"
+            ])
             themed_path = "/".join([
                 themes_location,
                 theme,
@@ -101,7 +108,8 @@ class ThemeStorage(StaticFilesStorage):
             ])
             name = name[1:] if name.startswith("/") else name
             path = safe_join(themed_path, name)
-            return os.path.exists(path)
+            customer_path = safe_join(customer_themed_path, name)
+            return os.path.exists(customer_path) or os.path.exists(path)
         # in live mode check static asset in the static files dir defined by "STATIC_ROOT" setting
         else:
             return self.exists(os.path.join(theme, name))

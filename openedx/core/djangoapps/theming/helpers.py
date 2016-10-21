@@ -87,7 +87,11 @@ def get_template_path_with_theme(relative_path):
 
     template_path = theme.template_path / template_name
     absolute_path = theme.path / "templates" / template_name
-    if absolute_path.exists():
+    customer_template_path = theme.customer_specific_template_path / template_name
+    customer_absolute_path = theme.customer_specific_path / "templates" / template_name
+    if customer_absolute_path.exists():
+        return str(customer_template_path)
+    elif absolute_path.exists():
         return str(template_path)
     else:
         return relative_path
@@ -439,6 +443,16 @@ class Theme(object):
         return Path(self.themes_base_dir) / self.theme_dir_name / get_project_root_name()
 
     @property
+    def customer_specific_path(self):
+        """
+        Get absolute path of the directory that contains current theme's templates, static assets etc.
+
+        Returns:
+            Path: absolute path to current theme's contents
+        """
+        return Path(self.themes_base_dir) / self.theme_dir_name / 'customer_specific' / get_project_root_name()
+
+    @property
     def template_path(self):
         """
         Get absolute path of current theme's template directory.
@@ -449,6 +463,16 @@ class Theme(object):
         return Path(self.theme_dir_name) / get_project_root_name() / 'templates'
 
     @property
+    def customer_specific_template_path(self):
+        """
+        Get absolute path of current theme's template directory.
+
+        Returns:
+            Path: absolute path to current theme's template directory
+        """
+        return Path(self.theme_dir_name) / 'customer_specific' / get_project_root_name() / 'templates'
+
+    @property
     def template_dirs(self):
         """
         Get a list of all template directories for current theme.
@@ -456,6 +480,9 @@ class Theme(object):
         Returns:
             list: list of all template directories for current theme.
         """
-        return [
+        dirs = [
             self.path / 'templates',
         ]
+        if self.customer_specific_path.exists():
+            dirs.insert(0, self.customer_specific_path / 'templates')
+        return dirs

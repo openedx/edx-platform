@@ -1,4 +1,7 @@
+# devstack_appsembler.py
+
 from .devstack import *
+from .appsembler import *
 
 APPSEMBLER_SECRET_KEY = "secret_key"
 # the following ip should work for all dev setups....
@@ -19,9 +22,12 @@ for cache_key in CACHES.keys():
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context_processors.intercom',)
+
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 INSTALLED_APPS += (
+    'appsembler.
     'openedx.core.djangoapps.appsembler.sites',
 )
 

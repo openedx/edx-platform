@@ -61,7 +61,7 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
     <div
       id="pay-and-verify-container"
       class="pay-and-verify"
-      data-full-name='${user_full_name}'
+      data-full-name='${user_full_name | h}'
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'
       data-course-name='${course.display_name}'

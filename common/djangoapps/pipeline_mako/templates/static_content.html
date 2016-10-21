@@ -75,9 +75,9 @@ except:
 <%def name="include(path)"><%
 from django.conf import settings
 from django.template.engine import Engine
-from django.template.loaders.filesystem import Loader
+from openedx.core.djangoapps.theming.template_loaders import ThemeTemplateLoader
 engine = Engine(dirs=settings.DEFAULT_TEMPLATE_ENGINE['DIRS'])
-source, template_path = Loader(engine).load_template_source(path)
+source, template_path = ThemeTemplateLoader(engine).load_template_source(path)
 %>${source | n, decode.utf8}</%def>
 
 <%def name="require_module(module_name, class_name)">
