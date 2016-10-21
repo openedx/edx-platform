@@ -36,5 +36,16 @@ CORS_ALLOW_HEADERS = (
     'cache-control'
 )
 
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
+FEATURES['ENABLE_COURSE_DISCOVERY'] = True
+
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+SEARCH_INITIALIZER = "lms.lib.courseware_search.lms_search_initializer.LmsSearchInitializer"
+SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
+SEARCH_FILTER_GENERATOR = "lms.lib.courseware_search.lms_filter_generator.LmsSearchFilterGenerator"
+
+SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
+
 # disable for now
 #AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS
