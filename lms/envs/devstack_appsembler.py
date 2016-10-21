@@ -27,7 +27,7 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 INSTALLED_APPS += (
-    'appsembler.
+    'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
 
@@ -57,5 +57,4 @@ SITE_ID = 1
 # MULTITENANT_MAPPER_CLASS = 'microsite_configuration.mapper.SimpleTenantMapper'
 
 #DATABASES['default']['ENGINE'] = 'db_multitenant.db.backends.mysql'
-
 AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS

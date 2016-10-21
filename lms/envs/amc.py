@@ -36,4 +36,5 @@ CORS_ALLOW_HEADERS = (
     'cache-control'
 )
 
-AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS
+# disable for now
+#AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS
