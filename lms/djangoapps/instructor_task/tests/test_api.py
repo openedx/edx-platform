@@ -1,6 +1,7 @@
 """
 Test for LMS instructor background task queue management
 """
+import ddt
 from mock import patch, Mock, MagicMock
 from nose.plugins.attrib import attr
 from bulk_email.models import CourseEmail, SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS
@@ -12,8 +13,11 @@ from lms.djangoapps.instructor_task.api import (
     get_instructor_task_history,
     submit_rescore_problem_for_all_students,
     submit_rescore_problem_for_student,
+    submit_rescore_entrance_exam_for_student,
     submit_reset_problem_attempts_for_all_students,
+    submit_reset_problem_attempts_in_entrance_exam,
     submit_delete_problem_state_for_all_students,
+    submit_delete_entrance_exam_state_for_student,
     submit_bulk_course_email,
     submit_calculate_problem_responses_csv,
     submit_calculate_students_features_csv,
@@ -84,6 +88,7 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
 
 
 @attr(shard=3)
+@ddt.ddt
 class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
 
@@ -140,15 +145,35 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     def test_submit_delete_all_with_long_url(self):
         self._test_submit_with_long_url(submit_delete_problem_state_for_all_students)
 
-    def _test_submit_task(self, task_function, student=None):
+    @ddt.data(
+        (submit_rescore_problem_for_all_students, 'rescore_problem'),
+        (submit_rescore_problem_for_all_students, 'rescore_problem_if_higher', {'only_if_higher': True}),
+        (submit_rescore_problem_for_student, 'rescore_problem', {'student': True}),
+        (submit_rescore_problem_for_student, 'rescore_problem_if_higher', {'student': True, 'only_if_higher': True}),
+        (submit_reset_problem_attempts_for_all_students, 'reset_problem_attempts'),
+        (submit_delete_problem_state_for_all_students, 'delete_problem_state'),
+        (submit_rescore_entrance_exam_for_student, 'rescore_problem', {'student': True}),
+        (
+            submit_rescore_entrance_exam_for_student,
+            'rescore_problem_if_higher',
+            {'student': True, 'only_if_higher': True},
+        ),
+        (submit_reset_problem_attempts_in_entrance_exam, 'reset_problem_attempts', {'student': True}),
+        (submit_delete_entrance_exam_state_for_student, 'delete_problem_state', {'student': True}),
+    )
+    @ddt.unpack
+    def test_submit_task(self, task_function, expected_task_type, params=None):
+        if params is None:
+            params = {}
+        if params.get('student'):
+            params['student'] = self.student
+
         # tests submit, and then tests a second identical submission.
         problem_url_name = 'H1P1'
         self.define_option_problem(problem_url_name)
         location = InstructorTaskModuleTestCase.problem_location(problem_url_name)
-        if student is not None:
-            instructor_task = task_function(self.create_task_request(self.instructor), location, student)
-        else:
-            instructor_task = task_function(self.create_task_request(self.instructor), location)
+        instructor_task = task_function(self.create_task_request(self.instructor), location, **params)
+        self.assertEquals(instructor_task.task_type, expected_task_type)
 
         # test resubmitting, by updating the existing record:
         instructor_task = InstructorTask.objects.get(id=instructor_task.id)
@@ -156,22 +181,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         instructor_task.save()
 
         with self.assertRaises(AlreadyRunningError):
-            if student is not None:
-                task_function(self.create_task_request(self.instructor), location, student)
-            else:
-                task_function(self.create_task_request(self.instructor), location)
-
-    def test_submit_rescore_all(self):
-        self._test_submit_task(submit_rescore_problem_for_all_students)
-
-    def test_submit_rescore_student(self):
-        self._test_submit_task(submit_rescore_problem_for_student, self.student)
-
-    def test_submit_reset_all(self):
-        self._test_submit_task(submit_reset_problem_attempts_for_all_students)
-
-    def test_submit_delete_all(self):
-        self._test_submit_task(submit_delete_problem_state_for_all_students)
+            task_function(self.create_task_request(self.instructor), location, **params)
 
 
 @attr(shard=3)
