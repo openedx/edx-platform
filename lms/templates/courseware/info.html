@@ -58,8 +58,9 @@ from openedx.core.djangolib.markup import HTML, Text
     <div class="container">
       <div class="home">
         <div class="page-header-main">
-            <h1 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}</h1>
-            <h2 class="page-subtitle">${course.display_name_with_default}</h2>
+            <h3 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}
+            <div class="page-subtitle">${course.display_name_with_default}</div>
+            </h3>
         </div>
         % if last_accessed_courseware_url:
           <div class="page-header-secondary">
@@ -78,7 +79,7 @@ from openedx.core.djangolib.markup import HTML, Text
           </div>
           % endif
 
-          <h1>${_("Course Updates and News")}</h1>
+          <h4>${_("Course Updates and News")}</h4>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
 
           ## CourseTalk widget
@@ -90,20 +91,20 @@ from openedx.core.djangolib.markup import HTML, Text
         </section>
         <section aria-label="${_('Handout Navigation')}" class="handouts">
           % if SelfPacedConfiguration.current().enable_course_home_improvements:
-            <h1 class="handouts-header">${_("Important Course Dates")}</h1>
+          <h4 class="handouts-header">${_("Important Course Dates")}</h4>
             ${HTML(get_course_date_summary(course, user))}
           % endif
 
-          <h1 class="handouts-header">${_(course.info_sidebar_name)}</h1>
+          <h4 class="handouts-header">${_(course.info_sidebar_name)}</h4>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
         </section>
         % else:
         <section class="updates">
-          <h1 class="handouts-header">${_("Course Updates and News")}</h1>
+          <h4 class="handouts-header">${_("Course Updates and News")}</h4>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_updates'))}
         </section>
         <section aria-label="${_('Handout Navigation')}" class="handouts">
-          <h1 class="handouts-header">${_("Course Handouts")}</h1>
+          <h4 class="handouts-header">${_("Course Handouts")}</h4>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_handouts'))}
         </section>
         % endif
