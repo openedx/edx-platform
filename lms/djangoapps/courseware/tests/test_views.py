@@ -2000,7 +2000,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
         self.assertIn('Page not found', response.content)
 
-    def get_response(self, url_encoded_params=None, usage_key=None):
+    def get_response(self, usage_key, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """

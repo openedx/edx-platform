@@ -1263,8 +1263,11 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True, course=course
         )
 
+        student_view_context = request.GET.dict()
+        student_view_context['show_bookmark_button'] = False
+
         context = {
-            'fragment': block.render('student_view', context=request.GET),
+            'fragment': block.render('student_view', context=student_view_context),
             'course': course,
             'disable_accordion': True,
             'allow_iframing': True,
