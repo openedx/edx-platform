@@ -536,6 +536,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$enrollment_button = this.$container.find('.enrollment-button');
             this.$is_course_white_label = this.$container.find('#is_course_white_label').val();
             this.$reason_field = this.$container.find("textarea[name='reason-field']");
+            this.$course_mode = this.$container.find('select#course-modes-list-selector');
             this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
             this.$checkbox_emailstudents = this.$container.find("input[name='email-students']");
             this.$task_response = this.$container.find('.request-response');
@@ -553,6 +554,7 @@ such that the value can be defined later than this assignment (file load order).
                     action: $(event.target).data('action'),
                     identifiers: batchEnroll.$identifier_input.val(),
                     auto_enroll: batchEnroll.$checkbox_autoenroll.is(':checked'),
+                    course_mode: batchEnroll.$course_mode.val(),
                     email_students: emailStudents,
                     reason: batchEnroll.$reason_field.val()
                 };
@@ -575,6 +577,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$identifier_input.val('');
             this.$reason_field.val('');
             this.$checkbox_emailstudents.attr('checked', true);
+            this.$course_mode.find('option:eq(0)').prop('selected', true);
             return this.$checkbox_autoenroll.attr('checked', true);
         };
 

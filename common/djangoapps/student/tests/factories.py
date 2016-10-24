@@ -146,6 +146,7 @@ class CourseEnrollmentAllowedFactory(DjangoModelFactory):
 
     email = 'test@edx.org'
     course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+    mode = 'audit'
 
 
 class PendingEmailChangeFactory(DjangoModelFactory):

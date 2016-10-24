@@ -54,6 +54,7 @@ from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from course_modes.tests.factories import CourseModeFactory
 from xmodule.fields import Date
 
 from courseware.models import StudentFieldOverride
@@ -1080,11 +1081,66 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
+    def test_enroll_in_specific_course_mode_with_username(self):
+        # add two course modes 'honor' and 'verified' for the provided course
+        CourseModeFactory.create(course_id=unicode(self.course.id), mode_slug=CourseMode.HONOR)
+        CourseModeFactory.create(course_id=unicode(self.course.id), mode_slug=CourseMode.VERIFIED)
+
+        # verify that there are now two course modes 'honor' and 'verified'
+        self.assertEqual(len(CourseMode.modes_for_course_dict(self.course.id)), 2)
+
+        # now use enrollment api to enroll a student in 'verified' mode directly
+        url = reverse('students_update_enrollment', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(
+            url,
+            {
+                'identifiers': self.notenrolled_student.username,
+                'action': 'enroll',
+                'email_students': False,
+                'course_mode': CourseMode.VERIFIED,
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # expected response data for students update enrollment api
+        expected = {
+            'action': 'enroll',
+            'auto_enroll': False,
+            'results': [
+                {
+                    'identifier': self.notenrolled_student.username,
+                    'before': {
+                        'enrollment': False,
+                        'auto_enroll': False,
+                        'user': True,
+                        'allowed': False,
+                    },
+                    'after': {
+                        'enrollment': True,
+                        'auto_enroll': False,
+                        'user': True,
+                        'allowed': False,
+                    }
+                }
+            ]
+        }
+
+        # verify the enrollment api response data and check that the student
+        # is now enrolled in the 'verified' mode
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.notenrolled_student, course_id=self.course.id
+        )
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+        self.assertEqual(course_enrollment.mode, 'verified')
+
     def test_enroll_without_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {'identifiers': self.notenrolled_student.email, 'action': 'enroll',
                                           'email_students': False})
-        print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now enrolled
@@ -1130,7 +1186,6 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
 
-        print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now enrolled
@@ -1242,7 +1297,6 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox
@@ -1267,11 +1321,102 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
             )
         )
 
+    @ddt.data('http', 'https')
+    def test_enroll_in_specific_course_mode_with_email_not_registered_autoenroll(self, protocol):
+        # add two course modes 'honor' and 'verified' for the provided course
+        CourseModeFactory.create(course_id=unicode(self.course.id), mode_slug=CourseMode.HONOR)
+        CourseModeFactory.create(course_id=unicode(self.course.id), mode_slug=CourseMode.VERIFIED)
+
+        # verify that there are now two course modes 'honor' and 'verified'
+        self.assertEqual(len(CourseMode.modes_for_course_dict(self.course.id)), 2)
+
+        # now use enrollment api to enroll a student in 'verified' mode directly
+        url = reverse('students_update_enrollment', kwargs={'course_id': unicode(self.course.id)})
+        environ = {'wsgi.url_scheme': protocol}
+        response = self.client.post(
+            url,
+            {
+                'identifiers': self.notregistered_email,
+                'action': 'enroll',
+                'auto_enroll': True,
+                'email_students': True,
+                'course_mode': CourseMode.VERIFIED,
+            },
+            **environ
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # expected response data for students update enrollment api
+        expected = {
+            'action': 'enroll',
+            'auto_enroll': True,
+            'results': [
+                {
+                    'identifier': self.notregistered_email,
+                    'before': {
+                        'enrollment': False,
+                        'auto_enroll': False,
+                        'user': False,
+                        'allowed': False,
+                    },
+                    'after': {
+                        'enrollment': False,
+                        'auto_enroll': True,
+                        'user': False,
+                        'allowed': True,
+                    }
+                }
+            ]
+        }
+
+        # check that the student is not yet enrolled in the 'verified' mode
+        # instead of enrollment there in new record in the model
+        # 'CourseEnrollmentAllowed' with desired course mode
+        self.assertEqual(
+            CourseEnrollment.objects.filter(user=self.notenrolled_student, course_id=self.course.id).count(), 0
+        )
+        self.assertTrue(
+            CourseEnrollmentAllowed.objects.filter(email=self.notregistered_email, course_id=self.course.id).exists()
+        )
+        self.assertEqual(
+            CourseEnrollmentAllowed.objects.get(email=self.notregistered_email, course_id=self.course.id).mode,
+            CourseMode.VERIFIED
+        )
+
+        # check that the student is not yet enrolled in the 'verified' mode
+        # verify the enrollment api response data
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ALLOWEDTOENROLL)
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox and verify the content of generated email
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            u'You have been invited to register for {}'.format(self.course.display_name)
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear student,\n\nYou have been invited to join {display_name} at edx.org by a member of the "
+            "course staff.\n\n"
+            "To finish your registration, please visit {protocol}://{site}/register and fill out the "
+            "registration form making sure to use {user_email} in the E-mail field.\n"
+            "Once you have registered and activated your account, "
+            "you will see {display_name} listed on your dashboard.\n\n----\n"
+            "This email was automatically sent from edx.org to {user_email}".format(
+                display_name=self.course.display_name,
+                protocol=protocol,
+                site=self.site_name,
+                user_email=self.notregistered_email,
+            )
+        )
+
     def test_unenroll_without_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': False})
-        print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now unenrolled
@@ -1314,7 +1459,6 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {'identifiers': self.enrolled_student.email, 'action': 'unenroll',
                                           'email_students': True})
-        print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
         self.assertEqual(response.status_code, 200)
 
         # test that the user is now unenrolled
@@ -1371,7 +1515,6 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url,
                                     {'identifiers': self.allowed_email, 'action': 'unenroll', 'email_students': True})
-        print "type(self.allowed_email): {}".format(type(self.allowed_email))
         self.assertEqual(response.status_code, 200)
 
         # test the response data
@@ -1477,7 +1620,6 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
                   'auto_enroll': True}
         environ = {'wsgi.url_scheme': protocol}
         response = self.client.post(url, params, **environ)
-        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
         self.assertEqual(response.status_code, 200)
 
         # Check the outbox

@@ -734,6 +734,7 @@
         'js/spec/edxnotes/views/visibility_decorator_spec.js',
         'js/spec/financial-assistance/financial_assistance_form_view_spec.js',
         'js/spec/groups/views/cohorts_spec.js',
+        'js/spec/instructor_dashboard/batch_enrollment_spec.js',
         'js/spec/instructor_dashboard/certificates_bulk_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_exception_spec.js',
         'js/spec/instructor_dashboard/certificates_invalidation_spec.js',

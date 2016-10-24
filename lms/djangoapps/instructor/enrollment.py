@@ -89,7 +89,8 @@ def get_user_email_language(user):
     return UserPreference.get_value(user, LANGUAGE_KEY)
 
 
-def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, email_params=None, language=None):
+def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, email_params=None,
+                 language=None, course_mode=None):
     """
     Enroll a student by email.
 
@@ -100,6 +101,7 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     `email_students` determines if student should be notified of action by email.
     `email_params` parameters used while parsing email templates (a `dict`).
     `language` is the language used to render the email.
+    `course_mode` is the course mode in which user will be enrolled.
 
     returns two EmailEnrollmentState's
         representing state before and after the action.
@@ -109,16 +111,6 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
     if previous_state.user:
         # if the student is currently unenrolled, don't enroll them in their
         # previous mode
-
-        # for now, White Labels use 'shoppingcart' which is based on the
-        # "honor" course_mode. Given the change to use "audit" as the default
-        # course_mode in Open edX, we need to be backwards compatible with
-        # how White Labels approach enrollment modes.
-        if CourseMode.is_white_label(course_id):
-            course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
-        else:
-            course_mode = None
-
         if previous_state.enrollment:
             course_mode = previous_state.mode
 
@@ -129,9 +121,15 @@ def enroll_email(course_id, student_email, auto_enroll=False, email_students=Fal
             email_params['full_name'] = previous_state.full_name
             send_mail_to_student(student_email, email_params, language=language)
     else:
-        cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
-        cea.auto_enroll = auto_enroll
-        cea.save()
+        course_enrollment_allowed, __ = CourseEnrollmentAllowed.objects.get_or_create(
+            course_id=course_id,
+            email=student_email,
+        )
+        course_enrollment_allowed.auto_enroll = auto_enroll
+        if course_mode is not None:
+            course_enrollment_allowed.mode = course_mode
+
+        course_enrollment_allowed.save()
         if email_students:
             email_params['message'] = 'allowed_enroll'
             email_params['email_address'] = student_email

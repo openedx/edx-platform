@@ -1247,7 +1247,7 @@ class CourseEnrollment(models.Model):
 
         Also emits relevant events for analytics purposes.
         """
-        if mode is None:
+        if not mode:
             mode = _default_course_mode(unicode(course_key))
         # All the server-side checks for whether a user is allowed to enroll.
         try:
@@ -1737,6 +1737,8 @@ class CourseEnrollmentAllowed(models.Model):
     email = models.CharField(max_length=255, db_index=True)
     course_id = CourseKeyField(max_length=255, db_index=True)
     auto_enroll = models.BooleanField(default=0)
+    # Represents the course mode in which user is allowed to enroll
+    mode = models.CharField(default=CourseMode.DEFAULT_MODE_SLUG, max_length=100)
 
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
 
@@ -1744,7 +1746,7 @@ class CourseEnrollmentAllowed(models.Model):
         unique_together = (('email', 'course_id'),)
 
     def __unicode__(self):
-        return "[CourseEnrollmentAllowed] %s: %s (%s)" % (self.email, self.course_id, self.created)
+        return '%s: %s [%s] (%s)' % (self.email, self.course_id, self.mode, self.created)
 
     @classmethod
     def may_enroll_and_unenrolled(cls, course_id):

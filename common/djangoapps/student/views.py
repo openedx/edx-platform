@@ -1875,10 +1875,14 @@ def _enroll_user_in_pending_courses(student):
     """
     Enroll student in any pending courses he/she may have.
     """
-    ceas = CourseEnrollmentAllowed.objects.filter(email=student.email)
-    for cea in ceas:
-        if cea.auto_enroll:
-            enrollment = CourseEnrollment.enroll(student, cea.course_id)
+    course_enrollment_allowed_list = CourseEnrollmentAllowed.objects.filter(email=student.email)
+    for course_enrollment_allowed in course_enrollment_allowed_list:
+        if course_enrollment_allowed.auto_enroll:
+            enrollment = CourseEnrollment.enroll(
+                user=student,
+                course_key=course_enrollment_allowed.course_id,
+                mode=course_enrollment_allowed.mode,
+            )
             manual_enrollment_audit = ManualEnrollmentAudit.get_manual_enrollment_by_email(student.email)
             if manual_enrollment_audit is not None:
                 # get the enrolled by user and reason from the ManualEnrollmentAudit table.

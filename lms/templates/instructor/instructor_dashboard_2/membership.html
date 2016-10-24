@@ -37,7 +37,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
     <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
     <label>
         ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
-        ${_("You will not get notification for emails that bounce, so please double-check spelling.")}
+        ${_("You will not receive notifications for messages that cannot be delivered, so be sure to double-check spelling.")}
         <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
     </label>
     <input type="hidden" id="is_course_white_label" value="${section_data['is_white_label']}">
@@ -50,16 +50,34 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
         </label>
     %endif
     <div class="enroll-option">
+        <label for="course-modes-list-selector" class="has-hint">${_("Select a course mode: ")}
+            <select id="course-modes-list-selector" name="course_mode" class="course-modes-list-selector">
+                %for mode_name, mode_data in section_data['course_modes'].items():
+                    <option value="${mode_name}">${mode_data.name}</option>
+                %endfor
+            </select>
+
+            <div class="hint dropdown-hint auto-enroll-hint">
+                <span class="hint-caret"></span>
+                <p id="auto-enroll-tip">
+                    ${_("Learners will be automatically enrolled in the course mode that you select.")}
+                    <br /><br />
+                    ${_("If you select {b_start}Unenroll{b_end} below, you do not need to select a course mode.").format(b_start="<b>", b_end="</b>")}
+                </p>
+            </div>
+        </label>
+    </div>
+    <div class="enroll-option">
         <label class="has-hint">
             <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="heading-batch-enrollment">
-            <span class="label-text">${_("Auto Enroll")}</span>
+            <span class="label-text">${_("Enroll learners automatically")}</span>
             <div class="hint auto-enroll-hint">
                 <span class="hint-caret"></span>
                 <p id="auto-enroll-tip">
-                    ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
-                    ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                    ${_("If you select this option, learners will be automatically enrolled in the course. If a learner does not yet have an account on {platform_name}, the learner will be automatically enrolled in the course when the learner registers and activates an account.").format(platform_name=settings.PLATFORM_NAME)}
+                    ${_("If you do not select this option, learners will not be automatically enrolled in the course. If a learner does not yet have an account on {platform_name}, the learner can enroll in the course after the learner registers and activates an account.").format(platform_name=settings.PLATFORM_NAME)}
                     <br /><br />
-                    ${_("Checking this box has no effect if 'Unenroll' is selected.")}
+                    ${_("If you select {b_start}Unenroll{b_end} below, you do not need to select this option.").format(b_start="<b>", b_end="</b>")}
                 </p>
             </div>
         </label>
@@ -67,11 +85,11 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
     <div class="enroll-option">
         <label class="has-hint">
             <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="heading-batch-enrollment">
-            <span class="label-text">${_("Notify users by email")}</span>
+            <span class="label-text">${_("Notify learners by email")}</span>
             <div class="hint email-students-hint">
                 <span class="hint-caret"></span>
                 <p id="email-students-tip">
-                    ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                    ${_("If you select this option, learners receive an email message when they are successfully enrolled in your course.")}
                 </p>
             </div>
         </label>

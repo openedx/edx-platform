@@ -155,6 +155,15 @@ class CourseEnrollmentAdmin(admin.ModelAdmin):
         model = CourseEnrollment
 
 
+class CourseEnrollmentAllowedAdmin(admin.ModelAdmin):
+    """ Admin interface for the CourseEnrollmentAllowed model. """
+    list_display = ('email', 'course_id', 'mode', 'auto_enroll',)
+    search_fields = ('email', 'course_id', 'mode',)
+
+    class Meta(object):
+        model = CourseEnrollmentAllowed
+
+
 class UserProfileInline(admin.StackedInline):
     """ Inline admin interface for UserProfile model. """
     model = UserProfile
@@ -180,7 +189,7 @@ class UserAttributeAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserTestGroup)
-admin.site.register(CourseEnrollmentAllowed)
+admin.site.register(CourseEnrollmentAllowed, CourseEnrollmentAllowedAdmin)
 admin.site.register(Registration)
 admin.site.register(PendingNameChange)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
