@@ -99,18 +99,6 @@ class @Sequence
       new_progress = _this.mergeProgress progress, new_progress
 
     @progressTable[@position] = new_progress
-    @setProgress(new_progress, @link_for(@position))
-
-  setProgress: (progress, element) ->
-      # If progress is "NA", don't add any css class
-      element.removeClass('progress-none')
-             .removeClass('progress-some')
-             .removeClass('progress-done')
-
-      switch progress
-        when 'none' then element.addClass('progress-none')
-        when 'in_progress' then element.addClass('progress-some')
-        when 'done' then element.addClass('progress-done')
 
   enableButton: (button_class, button_action) ->
     @$(button_class).removeClass('disabled').removeAttr('disabled').click(button_action)
