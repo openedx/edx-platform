@@ -134,7 +134,7 @@ def submit_rescore_problem_for_all_students(request, usage_key, only_if_higher=F
     check_arguments_for_rescoring(usage_key)
 
     # check to see if task is already running, and reserve it otherwise
-    task_type = 'rescore_problem'
+    task_type = 'rescore_problem_if_higher' if only_if_higher else 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_problem_and_student_input(usage_key)
     task_input.update({'only_if_higher': only_if_higher})
@@ -160,7 +160,7 @@ def submit_rescore_entrance_exam_for_student(request, usage_key, student=None, o
     check_entrance_exam_problems_for_rescoring(usage_key)
 
     # check to see if task is already running, and reserve it otherwise
-    task_type = 'rescore_problem'
+    task_type = 'rescore_problem_if_higher' if only_if_higher else 'rescore_problem'
     task_class = rescore_problem
     task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
     task_input.update({'only_if_higher': only_if_higher})
