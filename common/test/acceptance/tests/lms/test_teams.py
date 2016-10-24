@@ -1042,8 +1042,21 @@ class CreateTeamTest(TeamFormActions):
         Then I should see the error message and highlighted fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.team_management_page.submit_form()
 
+        # `submit_form` clicks on a button, but that button doesn't always
+        # have the click event handler registered on it in time. That's why
+        # this test is flaky. Unfortunately, I don't know of a straightforward
+        # way to write something that waits for that event handler to be bound
+        # to the button element. So I used time.sleep as well, even though
+        # the bok choy docs explicitly ask us not to:
+        # http://bok-choy.readthedocs.io/en/latest/guidelines.html
+        # Sorry! For the story to address this anti-pattern, see TNL-5820
+        time.sleep(0.5)
+        self.team_management_page.submit_form()
+        self.team_management_page.wait_for(
+            lambda: self.team_management_page.validation_message_text,
+            "Validation message text never loaded."
+        )
         self.assertEqual(
             self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
@@ -1150,6 +1163,13 @@ class CreateTeamTest(TeamFormActions):
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.verify_and_navigate_to_create_team_page()
+
+        # We add a sleep here to allow time for the click event handler to bind
+        # to the cancel button. Using time.sleep in bok-choy tests is,
+        # generally, an anti-pattern. So don't copy this :).
+        # For the story to address this anti-pattern, see TNL-5820
+        time.sleep(0.5)
+
         self.team_management_page.cancel_team()
 
         self.assertTrue(self.browse_teams_page.is_browser_on_page())
@@ -1941,6 +1961,13 @@ class TeamPageTest(TeamsTabBase):
             }
         ]
         with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+            # I think we're seeing the same problem that we're seeing in
+            # CreateTeamTest.test_user_can_see_error_message_for_missing_data.
+            # We click on the "leave team" link after it's loaded, but before
+            # its JavaScript event handler is added. Adding this sleep gives
+            # enough time for that event handler to bind to the link. Sorry!
+            # For the story to address this anti-pattern, see TNL-5820
+            time.sleep(0.5)
             self.team_page.click_leave_team_link()
         self.assert_team_details(num_members=0, is_member=False)
         self.assertTrue(self.team_page.join_team_button_present)
