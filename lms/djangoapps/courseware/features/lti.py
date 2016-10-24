@@ -338,7 +338,6 @@ def see_graph(_step, progress):
         progress=progress,
     )
     node = world.browser.find_by_xpath(xpath)
-
     assert node
 
 

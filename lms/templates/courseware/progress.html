@@ -1,3 +1,4 @@
+<%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%def name="online_help_token()"><% return "progress" %></%def>
@@ -5,10 +6,12 @@
 from course_modes.models import CourseMode
 from certificates.models import CertificateStatuses
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
 from django.core.urlresolvers import reverse
 from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
 from django.conf import settings
 from django.utils.http import urlquote_plus
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 <%block name="bodyclass">view-in-course view-progress</%block>
 
@@ -20,16 +23,16 @@ from django.utils.http import urlquote_plus
 
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
-<%block name="pagetitle">${_("{course_number} Progress").format(course_number=course.display_number_with_default) | h}</%block>
+<%block name="pagetitle">${_("{course_number} Progress").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="js_extra">
-<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js') | h}"></script>
-<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js') | h}"></script>
-<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js') | h}"></script>
-<script type="text/javascript" src="${static.url('js/courseware/certificates_api.js') | h}"></script>
-<script type="text/javascript" src="${static.url('js/courseware/credit_progress.js') | h}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
+<script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/certificates_api.js')}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/credit_progress.js')}"></script>
 <script>
-  ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade) | h}
+  ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
 </script>
 </%block>
 
@@ -42,12 +45,12 @@ from django.utils.http import urlquote_plus
         <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
           % if staff_access and studio_url is not None:
             <div class="wrap-instructor-info">
-              <a class="instructor-info-action studio-view" href="${studio_url | h}">${_("View Grading in studio")}</a>
+              <a class="instructor-info-action studio-view" href="${studio_url}">${_("View Grading in studio")}</a>
             </div>
           % endif
 
           <header class="progress-certificates">
-            <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email) | h}</h1>
+            <h1 class="progress-certificates-title">${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
           </header>
         <div class="wrapper-msg wrapper-auto-cert">
           %if certificate_data:
@@ -57,20 +60,20 @@ from django.utils.http import urlquote_plus
               <div class="has-actions">
                   <% post_url = reverse('generate_user_cert', args=[unicode(course.id)]) %>
                   <div class="msg-content">
-                    <h2 class="title">${certificate_data.title | h}</h2>
-                    <p class="copy">${certificate_data.msg | h}</p>
+                    <h2 class="title">${certificate_data.title}</h2>
+                    <p class="copy">${certificate_data.msg}</p>
                   </div>
                   <div class="msg-actions">
                     %if certificate_data.cert_web_view_url:
-                    <a class="btn" href="${certificate_data.cert_web_view_url | h}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
+                    <a class="btn" href="${certificate_data.cert_web_view_url}" target="_blank" title="${_('View certificate in a new browser window or tab.')}">
                       ${_("View Certificate")}
                     </a>
                     %elif certificate_data.cert_status == CertificateStatuses.downloadable and certificate_data.download_url:
-                    <a class="btn" href="${certificate_data.download_url | h}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
+                    <a class="btn" href="${certificate_data.download_url}" target="_blank" title="${_('PDF will open in a new browser window or tab.')}">
                       ${_("Download Your Certificate")}
                     </a>
                     %elif certificate_data.cert_status == CertificateStatuses.requesting:
-                      <button class="btn generate_certs" data-endpoint="${post_url | h}" id="btn_generate_cert">${_('Request Certificate')}</button>
+                      <button class="btn generate_certs" data-endpoint="${post_url}" id="btn_generate_cert">${_('Request Certificate')}</button>
                     %endif
                   </div>
               </div>
@@ -81,7 +84,7 @@ from django.utils.http import urlquote_plus
 
 
           %if not course.disable_progress_graph:
-            <div class="grade-detail-graph" id="grade-detail-graph" aria-hidden="true"></div>
+            <div class="grade-detail-graph" id="grade-detail-graph"></div>
           %endif
 
           % if credit_course_requirements:
@@ -91,25 +94,30 @@ from django.utils.http import urlquote_plus
                         <h2>${_("Requirements for Course Credit")}</h2>
                     </div>
                     %if credit_course_requirements['eligibility_status'] == 'not_eligible':
-                        <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name) | h}</span>
+                        <span class="eligibility_msg">${_("{student_name}, you are no longer eligible for credit in this course.").format(student_name=student.profile.name)}</span>
                     %elif credit_course_requirements['eligibility_status'] == 'eligible':
-                        <span class="eligibility_msg">${_("{student_name}, you have met the requirements for credit in this course.").format(student_name=student.profile.name) | h}
-                            ${_("{a_start}Go to your dashboard{a_end} to purchase course credit.").format(
-    		             a_start=u"<a href={url}>".format(url=reverse('dashboard')),
-    			     a_end="</a>"
-    		      )}
+                        <span class="eligibility_msg">
+                            ${Text(_("{student_name}, you have met the requirements for credit in this course.")).format(
+                                student_name=student.profile.name
+                            )}
+                            ${HTML(_("{a_start}Go to your dashboard{a_end} to purchase course credit.")).format(
+    		                    a_start=HTML("<a href={url}>").format(
+                                    url=reverse('dashboard')
+                                ),
+    			                a_end=HTML("</a>")
+    		                )}
                         </span>
                     %elif credit_course_requirements['eligibility_status'] == 'partial_eligible':
-                        <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name) | h}</span>
+                        <span>${_("{student_name}, you have not yet met the requirements for credit.").format(student_name=student.profile.name)}</span>
                     %endif
-                    <a href="${settings.CREDIT_HELP_LINK_URL | h}" class="credit-help"><span class="fa fa-question" aria-hidden="true"></span><span class="sr">${_("Information about course credit requirements")}</span></a><br>
-                    <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status'] | h}">
+                    <a href="${settings.CREDIT_HELP_LINK_URL}" class="credit-help"><span class="fa fa-question" aria-hidden="true"></span><span class="sr">${_("Information about course credit requirements")}</span></a><br>
+                    <div class="requirement-container" data-eligible="${credit_course_requirements['eligibility_status']}">
                     %for requirement in credit_course_requirements['requirements']:
                         <div class="requirement">
                             <div class="requirement-name">
-                                ${_(requirement['display_name']) | h}
+                                ${_(requirement['display_name'])}
                                 %if requirement['namespace'] == 'grade':
-                                    <span>${int(requirement['criteria']['min_grade'] * 100) | h}%</span>
+                                    <span>${int(requirement['criteria']['min_grade'] * 100)}%</span>
                                 %endif
                             </div>
                             <div class="requirement-status">
@@ -144,7 +152,7 @@ from django.utils.http import urlquote_plus
             %for chapter in courseware_summary:
             %if not chapter['display_name'] == "hidden":
             <section>
-              <h2>${ chapter['display_name'] | h}</h2>
+              <h2>${ chapter['display_name']}</h2>
 
               <div class="sections">
                 %for section in chapter['sections']:
@@ -155,20 +163,20 @@ from django.utils.http import urlquote_plus
                   percentageString = "{0:.0%}".format( float(earned)/total) if earned > 0 and total > 0 else ""
                   %>
 
-                  <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section.url_name)) | h}">
-                    ${ section.display_name | h}
+                  <h3><a href="${reverse('courseware_section', kwargs=dict(course_id=course.id.to_deprecated_string(), chapter=chapter['url_name'], section=section.url_name))}">
+                    ${ section.display_name}
                     %if total > 0 or earned > 0:
                       <span class="sr">
-                        ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total))) | h}
+                        ${_("{earned} of {total} possible points").format(earned='{:.3n}'.format(float(earned)), total='{:.3n}'.format(float(total)))}
                       </span>
                     %endif
                     </a>
                     %if total > 0 or earned > 0:
-                      <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString ) | h}</span>
+                      <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
                     %endif
                   </h3>
                   <p>
-                    ${section.format | h}
+                    ${section.format}
 
                     %if section.due is not None:
                       <%
@@ -176,7 +184,7 @@ from django.utils.http import urlquote_plus
                           due_date = '' if len(formatted_string)==0 else _(u'due {date}').format(date=formatted_string)
                       %>
                       <em>
-                      ${due_date | h}
+                      ${due_date}
                       </em>
                     %endif
                   </p>
@@ -186,7 +194,7 @@ from django.utils.http import urlquote_plus
                       <h3> ${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")} </h3>
                       <ol>
                         %for score in section.scores:
-                        <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible)) | h}</li>
+                        <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>
                         %endfor
                       </ol>
                     %else:
