@@ -95,7 +95,9 @@ class CertificateStatuses(object):
     readable_statuses = {
         downloadable: "already received",
         notpassing: "didn't receive",
-        error: "error states"
+        error: "error states",
+        audit_passing: "audit passing states",
+        audit_notpassing: "audit not passing states",
     }
 
     PASSED_STATUSES = (downloadable, generating)
