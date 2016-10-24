@@ -34,7 +34,6 @@ class StudioSettingsDetailsTest(StudioCourseTest):
 
         # Before every test, make sure to visit the page first
         self.settings_detail.visit()
-        self.assertTrue(self.settings_detail.is_browser_on_page())
 
 
 @attr(shard=4)

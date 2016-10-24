@@ -228,10 +228,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config.click_outline_anchor()
 
         # Waiting for the page load and verify that we've landed on course outline page
-        EmptyPromise(
-            lambda: self.outline_page.is_browser_on_page(), "loaded page {!r}".format(self.outline_page),
-            timeout=30
-        ).fulfill()
+        self.outline_page.wait_for_page()
 
 
 @attr(shard=8)
@@ -253,7 +250,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
 
         # Before every test, make sure to visit the page first
         self.advanced_settings.visit()
-        self.assertTrue(self.advanced_settings.is_browser_on_page())
 
     def test_modal_shows_one_validation_error(self):
         """
