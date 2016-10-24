@@ -23,6 +23,10 @@ SCORE_CHANGED = Signal(
 )
 
 
+# Signal that indicates that a user's score for a problem has been published
+# for possible persistence and update.  Typically, most clients should listen
+# to the SCORE_CHANGED signal instead, since that is signalled only after the
+# problem's score is changed.
 SCORE_PUBLISHED = Signal(
     providing_args=[
         'block',  # Course block object
@@ -31,5 +35,17 @@ SCORE_PUBLISHED = Signal(
         'raw_possible',  # Maximum score available for the exercise
         'only_if_higher',   # Boolean indicating whether updates should be
                             # made only if the new score is higher than previous.
+    ]
+)
+
+
+# Signal that indicates that a user's score for a subsection has been updated.
+# This is a downstream signal of SCORE_CHANGED sent for each affected containing
+# subsection.
+SUBSECTION_SCORE_CHANGED = Signal(
+    providing_args=[
+        'course',  # Course object
+        'user',  # User object
+        'subsection_grade',  # SubsectionGrade object
     ]
 )
