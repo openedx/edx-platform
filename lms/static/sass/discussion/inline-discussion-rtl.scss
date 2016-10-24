@@ -3,7 +3,7 @@
 // ====================
 
 // Load the RTL version of the edX Pattern Library
-$pattern-library-path: '../edx-pattern-library' !default;
+$pattern-library-path: '../../edx-pattern-library' !default;
 @import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-rtl';
 
 @import '../build-base-v1-rtl';
