@@ -8,11 +8,15 @@ from django.test.client import RequestFactory
 from mock import patch, MagicMock
 from nose.plugins.attrib import attr
 
+from courseware import module_render as render
+from courseware.model_data import FieldDataCache
 from courseware.testutils import RenderXBlockTestMixin
 from lti_provider import views, models
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.x_module import STUDENT_VIEW
 
 
 LTI_DEFAULT_PARAMS = {
@@ -170,7 +174,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    def get_response(self, url_encoded_params=None):
+    def get_response(self, url_encoded_params=None, usage_id=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
@@ -178,7 +182,7 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
             'lti_provider_launch',
             kwargs={
                 'course_id': unicode(self.course.id),
-                'usage_id': unicode(self.html_block.location)
+                'usage_id': unicode(self.html_block.location) if usage_id is None else usage_id
             }
         )
         if url_encoded_params:
@@ -206,3 +210,45 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         self.setup_course()
         self.setup_user(admin=False, enroll=True, login=False)
         self.verify_response()
+
+    def test_hidden_bookmarks(self):
+        """
+        LTI view, which uses the "chromeless" view, should not support bookmarking
+        """
+        self.setup_course()
+        chapter = ItemFactory.create(parent=self.course, category='chapter')
+        self.vertical_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent=chapter,
+            category='vertical'
+        )
+        for i in xrange(2):
+            ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+                parent=self.vertical_block,
+                category='html',
+                data="<p>Test HTML Content %d<p>" % i
+            )
+
+        bookmark_html = '<div class="bookmark-button-wrapper"'
+
+        mock_user = UserFactory()
+        mock_user.id = 100
+
+        mock_request = MagicMock()
+        mock_request.user = mock_user
+
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, mock_user, self.course, depth=2)
+
+        module = render.get_module(
+            mock_user,
+            mock_request,
+            self.course.id.make_usage_key('vertical', self.vertical_block.location.name),
+            field_data_cache,
+        )
+
+        vertical_html = module.render(STUDENT_VIEW).content
+        self.assertIn(bookmark_html, vertical_html)
+
+        self.setup_user(admin=False, enroll=False, login=True)
+        response = self.get_response(usage_id=unicode(self.vertical_block.location))
+        self.assertNotContains(response, bookmark_html)

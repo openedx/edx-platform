@@ -41,7 +41,7 @@ class RenderXBlockTestMixin(object):
     ]
 
     @abstractmethod
-    def get_response(self, url_encoded_params=None):
+    def get_response(self, url_encoded_params=None, usage_id=None):
         """
         Abstract method to get the response from the endpoint that is being tested.
 
