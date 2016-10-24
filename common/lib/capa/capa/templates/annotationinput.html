@@ -22,12 +22,10 @@
     % for option in options:
         <li>
             % if has_options_value:
-                % if all([c == 'correct' for c in option['choice'], status]):
-                <span class="tag-status correct" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Correct</span></span>
-                % elif all([c == 'partially-correct' for c in option['choice'], status]):
-                <span class="tag-status partially-correct" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Partially Correct</span></span>
-                % elif all([c == 'incorrect' for c in option['choice'], status]):
-                <span class="tag-status incorrect" id="status_${id}" aria-describedby="input_${id}_comment"><span class="sr">Status: Incorrect</span></span>
+                % if all([c == status.classname for c in option['choice'], status]):
+                <span class="tag-status ${status.classname}" aria-describedby="input_${id}_comment">
+                    <%include file="status_span.html" args="status=status"/>
+                </span>
                 % endif
             % endif
 
@@ -53,7 +51,7 @@
         <input type="hidden" class="value" name="input_${id}" id="input_${id}" value="${value|h}" />
     % endif
 
-    <span class="status ${status.classname}" id="status_${id}" aria-describedby="label_${id}"><span class="sr">${status.display_name}</span></span>
+    <%include file="status_span.html" args="status=status, status_id=id"/>
 
     <p id="answer_${id}" class="answer answer-annotation"></p>
 </div>

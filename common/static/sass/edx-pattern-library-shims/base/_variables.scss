@@ -144,6 +144,13 @@ $success-color: rgb(0, 155, 0) !default;
 $warning-color: rgb(255, 192, 31) !default;
 $warning-color-accent: rgb(255, 252, 221) !default;
 
+
+// CAPA correctness color to be consistent with Alert styles above
+$correct: $success-color;
+$partially-correct: $success-color;
+$incorrect: $error-color;
+
+
 // BUTTONS
 
 // disabled button

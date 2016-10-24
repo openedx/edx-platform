@@ -23,9 +23,6 @@
 // ====================
 $annotation-yellow: rgba(255,255,10,0.3);
 $color-copy-tip: rgb(100,100,100);
-$correct: $green-d2;
-$partially-correct: $green-d2;
-$incorrect: $red;
 
 // FontAwesome Icon code
 // ====================
@@ -50,11 +47,13 @@ $asterisk-icon: '\f069'; // .fa-asterisk
 // ====================
 @mixin status-icon($color: $gray, $fontAwesomeIcon: "\f00d"){
 
-  &:after {
-    @extend %use-font-awesome;
-    color: $color;
-    font-size: 1.2em;
-    content: $fontAwesomeIcon;
+  .status-icon {
+    &:after {
+      @extend %use-font-awesome;
+      color: $color;
+      font-size: 1.2em;
+      content: $fontAwesomeIcon;
+    }
   }
 }
 
@@ -326,6 +325,12 @@ div.problem {
         @include status-icon($incorrect, $cross-icon);
       }
 
+      &.unsubmitted,
+      &.unanswered {
+        .status-icon {
+          content: '';
+        }
+      }
     }
   }
 }
@@ -826,12 +831,14 @@ div.problem {
       }
 
       .status {
-        &:after {
-          content: ''; // clear out correct or incorrect icon
+        .status-icon {
+          &:after {
+            content: '';
+          }
         }
       }
-
     }
+
   }
 
   .trailing_text {

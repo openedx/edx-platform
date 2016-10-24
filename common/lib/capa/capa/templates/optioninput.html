@@ -11,7 +11,7 @@
     <p class="question-description" id="${description_id}">${description_text}</p>
   % endfor
 
-   <select name="input_${id}" id="input_${id}" ${HTML(describedby_html)}>
+   <select name="input_${id}" id="input_${id}" ${describedby_html}>
       <option value="option_${id}_dummy_default">${default_option_text}</option>
       % for option_id, option_description in options:
           <option value="${option_id}"
@@ -23,11 +23,7 @@
     </select>
 
   <div class="indicator-container">
-    <span class="status ${status.classname}"
-        id="status_${id}"
-        aria-describedby="label_${id}" data-tooltip="${status.display_tooltip}">
-        <span class="sr">${status.display_tooltip}</span>
-    </span>
+    <%include file="status_span.html" args="status=status, status_id=id"/>
   </div>
   <p class="answer" id="answer_${id}"></p>
   % if msg:
