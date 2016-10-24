@@ -621,7 +621,7 @@
       top: ($baseline/2);
       left: -9999em;
       padding: ($baseline/2);
-      width: 50%;
+      width: 40%;
       background-color: $light-gray3;
       box-shadow: 2px 2px 3px $shadow;
 
@@ -641,11 +641,20 @@
      * Ideally we want to handle functionality with JS.
      * This functionality should eventually be moved into CS/JS, and out of here. */ 
     .has-hint:hover > .hint {    
-        @include left($baseline*10);
+        @include left($baseline*15);
     }
     
     .has-hint input:focus ~ .hint {
-        @include left($baseline*10);
+        @include left($baseline*15);
+    }
+    .has-hint:hover > .dropdown-hint {
+        width: 30%;
+        @include left($baseline*20);
+    }
+
+    .has-hint input:focus ~ .dropdown-hint {
+        width: 30%;
+        @include left($baseline*20);
     }
     /* *** */
   }

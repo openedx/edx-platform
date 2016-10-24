@@ -1,0 +1,76 @@
+<section id="membership" class="idash-section active-section" aria-labelledby="header-membership">
+    <h2 class="hd hd-2" id="header-membership">Membership</h2>
+
+    <fieldset class="batch-enrollment membership-section">
+        <legend id="heading-batch-enrollment" class="hd hd-3">Batch Enrollment</legend>
+        <label>
+            Enter email addresses and/or usernames separated by new lines or commas.
+            You will not receive notifications for messages that cannot be delivered, so be sure to double-check
+            spelling.
+            <textarea rows="6" name="student-ids" placeholder="Email Addresses/Usernames" spellcheck="false"></textarea>
+        </label>
+        <input id="is_course_white_label" value="False" type="hidden">
+        <div class="enroll-option">
+            <label for="course-modes-list-selector" class="has-hint">Select a course mode:
+                <select id="course-modes-list-selector" name="course_mode" class="course-modes-list-selector">
+                <option value="honor">Honor code certificate</option>
+                <option value="verified">Verified certificate</option>
+                </select>
+
+                <div class="hint dropdown-hint auto-enroll-hint">
+                    <span class="hint-caret"></span>
+                    <p id="auto-enroll-tip">
+                        Learners will be automatically enrolled in the course mode that you select.
+                        <br><br>
+                        If you select <b>Unenroll</b> below, you do not need to select a course mode.
+                    </p>
+                </div>
+            </label>
+        </div>
+        <div class="enroll-option">
+            <label class="has-hint">
+                <input name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes"
+                       aria-describedby="heading-batch-enrollment" type="checkbox">
+                <span class="label-text">Enroll learners automatically</span>
+                <div class="hint auto-enroll-hint">
+                    <span class="hint-caret"></span>
+                    <p id="auto-enroll-tip">
+                        If you select this option, learners will be automatically enrolled in the course. If a learner
+                        does not yet have an account on Devstack, the learner will be automatically enrolled in the
+                        course when the learner registers and activates an account.
+                        If you do not select this option, learners will not be automatically enrolled in the course. If
+                        a learner does not yet have an account on Devstack, the learner can enroll in the course after
+                        the learner registers and activates an account.
+                        <br><br>
+                        If you select <b>Unenroll</b> below, you do not need to select this option.
+                    </p>
+                </div>
+            </label>
+        </div>
+        <div class="enroll-option">
+            <label class="has-hint">
+                <input name="email-students" id="email-students" value="Notify-students-by-email" checked="yes"
+                       aria-describedby="heading-batch-enrollment" type="checkbox">
+                <span class="label-text">Notify learners by email</span>
+                <div class="hint email-students-hint">
+                    <span class="hint-caret"></span>
+                    <p id="email-students-tip">
+                        If you select this option, learners receive an email message when they are successfully enrolled
+                        in your course.
+                    </p>
+                </div>
+            </label>
+        </div>
+        <div>
+            <input name="enrollment-button" class="enrollment-button" value="Enroll"
+                   data-endpoint="/courses/course-v1:edX+TEST_01+2016_R1/instructor/api/students_update_enrollment"
+                   data-action="enroll" type="button">
+            <input name="enrollment-button" class="enrollment-button" value="Unenroll"
+                   data-endpoint="/courses/course-v1:edX+TEST_01+2016_R1/instructor/api/students_update_enrollment"
+                   data-action="unenroll" type="button">
+        </div>
+        <div class="request-response"></div>
+        <div class="request-response-error"></div>
+    </fieldset>
+
+</section>

@@ -596,6 +596,7 @@ def students_update_enrollment(request, course_id):
     - email_students is a boolean (defaults to false)
         If email_students is true, students will be sent email notification
         If email_students is false, students will not be sent email notification
+    - course_mode is a string identifier for the selected course mode, e.g. 'honor', 'verified' etc
 
     Returns an analog to this JSON structure: {
         "action": "enroll",
@@ -620,6 +621,7 @@ def students_update_enrollment(request, course_id):
     }
     """
     course_id = CourseKey.from_string(course_id)
+    course_mode = request.POST.get('course_mode')
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
@@ -664,7 +666,13 @@ def students_update_enrollment(request, course_id):
             validate_email(email)  # Raises ValidationError if invalid
             if action == 'enroll':
                 before, after, enrollment_obj = enroll_email(
-                    course_id, email, auto_enroll, email_students, email_params, language=language
+                    course_id,
+                    email,
+                    auto_enroll,
+                    email_students,
+                    email_params,
+                    language=language,
+                    course_mode=course_mode
                 )
                 before_enrollment = before.to_dict()['enrollment']
                 before_user_registered = before.to_dict()['user']
