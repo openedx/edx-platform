@@ -55,6 +55,10 @@ def perform_request(method, url, data_or_params=None, raw=False,
                     metric_action=None, metric_tags=None, paged_results=False):
     # To avoid dependency conflict
     from django_comment_common.models import ForumsConfig
+    config = ForumsConfig.current()
+
+    if not config.enabled:
+        raise CommentClientMaintenanceError('service disabled')
 
     if metric_tags is None:
         metric_tags = []
@@ -66,7 +70,7 @@ def perform_request(method, url, data_or_params=None, raw=False,
     if data_or_params is None:
         data_or_params = {}
     headers = {
-        'X-Edx-Api-Key': getattr(settings, "COMMENTS_SERVICE_KEY", None),
+        'X-Edx-Api-Key': config.api_key,
         'Accept-Language': get_language(),
     }
     request_id = uuid4()
@@ -79,7 +83,6 @@ def perform_request(method, url, data_or_params=None, raw=False,
         data = None
         params = merge_dict(data_or_params, request_id_dict)
     with request_timer(request_id, method, url, metric_tags):
-        config = ForumsConfig.current()
         response = requests.request(
             method,
             url,
@@ -112,7 +115,7 @@ def perform_request(method, url, data_or_params=None, raw=False,
                 data = response.json()
             except ValueError:
                 raise CommentClientError(
-                    u"Comments service returned invalid JSON for request {request_id}; first 100 characters: '{content}'".format(
+                    u"Invalid JSON response for request {request_id}; first 100 characters: '{content}'".format(
                         request_id=request_id,
                         content=response.text[:100]
                     )

@@ -31,10 +31,11 @@ from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from django_comment_client.tests.utils import ForumsEnableMixin
 
 
 @ddt.ddt
-class SerializerTestMixin(CommentsServiceMockMixin, UrlResetMixin):
+class SerializerTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUpClass(cls):
@@ -426,7 +427,12 @@ class CommentSerializerTest(SerializerTestMixin, SharedModuleStoreTestCase):
 
 
 @ddt.ddt
-class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleStoreTestCase):
+class ThreadSerializerDeserializationTest(
+        ForumsEnableMixin,
+        CommentsServiceMockMixin,
+        UrlResetMixin,
+        SharedModuleStoreTestCase
+):
     """Tests for ThreadSerializer deserialization."""
     @classmethod
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -629,7 +635,7 @@ class ThreadSerializerDeserializationTest(CommentsServiceMockMixin, UrlResetMixi
 
 
 @ddt.ddt
-class CommentSerializerDeserializationTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
+class CommentSerializerDeserializationTest(ForumsEnableMixin, CommentsServiceMockMixin, SharedModuleStoreTestCase):
     """Tests for ThreadSerializer deserialization."""
     @classmethod
     def setUpClass(cls):
