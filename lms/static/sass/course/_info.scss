@@ -104,7 +104,7 @@ div.info-wrapper {
           }
         }
 
-        h2.date, h5.date {
+        .date {
           @extend %t-title9;
           margin-bottom: ($baseline/4);
           text-transform: none;
