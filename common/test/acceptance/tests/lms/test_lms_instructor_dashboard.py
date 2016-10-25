@@ -7,6 +7,7 @@ import ddt
 
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
+from flaky import flaky
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -377,6 +378,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then, the added record should be visible
         self.assertTrue(allowance_section.is_allowance_record_visible)
 
+    @flaky  # TNL-5832
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
