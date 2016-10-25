@@ -546,7 +546,7 @@ class TestCourseGradeLogging(SharedModuleStoreTestCase):
         Creates a course grade and asserts that the associated logging
         matches the expected totals passed in to the function.
         """
-        factory.create(self.course)
+        factory.create(self.course, read_only=False)
         log_statement = u''.join((
             u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks ",
             u"accessed: {3}, total graded subsections: {4}"
