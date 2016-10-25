@@ -378,7 +378,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
-    @mock.patch('lms.djangoapps.grades.signals.handlers.SCORE_CHANGED.send')
+    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_SCORE_CHANGED.send')
     def test_delete_student_attempts(self, _mock_signal):
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
@@ -404,7 +404,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
 
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
-    @mock.patch('lms.djangoapps.grades.signals.handlers.SCORE_CHANGED.send')
+    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_SCORE_CHANGED.send')
     def test_delete_submission_scores(self, _mock_signal):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')

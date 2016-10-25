@@ -13,6 +13,7 @@ from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from xmodule.modulestore.django import modulestore
 
+from .new.course_grade import CourseGradeFactory
 from .new.subsection_grade import SubsectionGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
@@ -57,7 +58,7 @@ def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher):
                 only_if_higher,
             )
             SUBSECTION_SCORE_CHANGED.send(
-                sender=None,
+                sender=recalculate_subsection_grade,
                 course=course,
                 user=student,
                 subsection_grade=subsection_grade,
@@ -65,3 +66,21 @@ def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher):
 
     except IntegrityError as exc:
         raise recalculate_subsection_grade.retry(args=[user_id, course_id, usage_id], exc=exc)
+
+
+@task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+def recalculate_course_grade(user_id, course_id):
+    """
+    Updates a saved course grade.
+    This method expects the following parameters:
+       - user_id: serialized id of applicable User object
+       - course_id: Unicode string representing the course
+    """
+    student = User.objects.get(id=user_id)
+    course_key = CourseLocator.from_string(course_id)
+    course = modulestore().get_course(course_key, depth=0)
+
+    try:
+        CourseGradeFactory(student).update(course)
+    except IntegrityError as exc:
+        raise recalculate_course_grade.retry(args=[user_id, course_id], exc=exc)

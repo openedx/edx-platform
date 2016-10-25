@@ -260,7 +260,14 @@ class CourseGradeFactory(object):
             self._compute_and_update_grade(course, course_structure, read_only)
         )
 
-    def _compute_and_update_grade(self, course, course_structure, read_only):
+    def update(self, course):
+        """
+        Updates the CourseGrade for this Factory's student.
+        """
+        course_structure = get_course_blocks(self.student, course.location)
+        self._compute_and_update_grade(course, course_structure)
+
+    def _compute_and_update_grade(self, course, course_structure, read_only=False):
         """
         Freshly computes and updates the grade for the student and course.
 
