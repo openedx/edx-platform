@@ -40,6 +40,7 @@
             this.state = state;
             this.state.videoCaption = this;
             this.renderElements();
+            this.hideClosedCaptions();
             this.listenForDragDrop();
 
             return $.Deferred().resolve().promise();

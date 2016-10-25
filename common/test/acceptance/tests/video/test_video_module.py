@@ -246,17 +246,23 @@ class YouTubeVideoTest(VideoBaseTest):
         self.assets.append('chinese_transcripts.srt')
         self.navigate_to_video()
 
-        # Show captions and make sure they're visible and cookie is set
+        # Captions should not be visible by default
+        self.assertFalse(self.video.is_closed_captions_visible())
+
+        # Show captions and make sure they're visible and reset after page reload
         self.video.show_closed_captions()
         self.video.wait_for_closed_captions()
-        self.assertTrue(self.video.is_closed_captions_visible)
+        self.assertTrue(self.video.is_closed_captions_visible())
         self.video.reload_page()
-        self.assertTrue(self.video.is_closed_captions_visible)
+        self.assertFalse(self.video.is_closed_captions_visible())
 
-        # Hide captions and make sure they're hidden and cookie is unset
+        # Now show captions again
+        self.video.show_closed_captions()
+        self.video.wait_for_closed_captions()
+        self.assertTrue(self.video.is_closed_captions_visible())
+
+        # Hide captions and make sure they're hidden
         self.video.hide_closed_captions()
-        self.video.wait_for_closed_captions_to_be_hidden()
-        self.video.reload_page()
         self.video.wait_for_closed_captions_to_be_hidden()
 
     def test_transcript_button_transcripts_and_sub_fields_empty(self):
