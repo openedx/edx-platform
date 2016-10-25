@@ -47,6 +47,7 @@ from courseware.masquerade import (
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
 from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
 from edxmako.shortcuts import render_to_string
+from lms.djangoapps.edxnotes.services import EdxNotesService
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.bookmarks.services import BookmarksService
@@ -754,6 +755,7 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             'milestones': milestones_helpers.get_service(),
             'credit': CreditService(),
             'bookmarks': BookmarksService(user=user),
+            'edxnotes': EdxNotesService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access

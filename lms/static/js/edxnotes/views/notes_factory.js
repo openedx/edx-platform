@@ -5,9 +5,10 @@
         'js/edxnotes/views/shim', 'js/edxnotes/plugins/scroller',
         'js/edxnotes/plugins/events', 'js/edxnotes/plugins/accessibility',
         'js/edxnotes/plugins/caret_navigation',
-        'js/edxnotes/plugins/store_error_handler'
+        'js/edxnotes/plugins/store_error_handler',
+        'js/edxnotes/plugins/request_params_patch'
     ], function($, _, Annotator, NotesLogger) {
-        var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
+        var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags', 'Params'],
             getOptions, setupPlugins, getAnnotator;
 
     /**
@@ -21,10 +22,14 @@
      * @param {String} params.tokenUrl The URL to request the token from.
      * @return {Object} Options.
      **/
-        getOptions = function(element, params) {
+        getOptions = function(element, params, usageIds) {
             var defaultParams = {
                     user: params.user,
-                    usage_id: params.usageId,
+                    course_id: params.courseId
+                },
+                searchParams = {
+                    user: params.user,
+                    usage_ids: usageIds,
                     course_id: params.courseId
                 },
                 prefix = params.endpoint.replace(/(.+)\/$/, '$1');
@@ -40,7 +45,7 @@
                 store: {
                     prefix: prefix,
                     annotationData: defaultParams,
-                    loadFromSearch: defaultParams,
+                    loadFromSearch: searchParams,
                     urls: {
                         create: '/annotations/',
                         read: '/annotations/:id/',
@@ -76,9 +81,11 @@
      * @param {String} params.tokenUrl The URL to request the token from.
      * @return {Object} An instance of Annotator.js.
      **/
-        getAnnotator = function(element, params) {
+        getAnnotator = function(element, params, usageIds) {
+            debugger;
+
             var el = $(element),
-                options = getOptions(el, params),
+                options = getOptions(el, params, usageIds),
                 logger = NotesLogger.getLogger(element.id, params.debug),
                 annotator;
 

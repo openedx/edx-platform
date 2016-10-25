@@ -308,9 +308,11 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 })
 
         fragment.add_content(self.system.render_template('vert_module.html', {
+            'uid': self.location.html_id(),
             'items': contents,
             'xblock_context': context,
             'show_bookmark_button': False,
+            'edxnotes_params': {},
         }))
         return fragment
 

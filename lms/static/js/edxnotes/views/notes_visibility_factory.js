@@ -29,6 +29,7 @@
             },
 
             toggleHandler: function(event) {
+                debugger;
                 event.preventDefault();
                 this.visibility = !this.visibility;
                 AnimationUtil.triggerAnimation(this.actionToggleMessage);
@@ -52,7 +53,7 @@
             },
 
             enableNotes: function() {
-                _.each($('.edx-notes-wrapper'), VisibilityDecorator.enableNote);
+                VisibilityDecorator.enableNote();
                 this.actionLink.addClass('is-active');
                 this.label.text(gettext('Hide notes'));
                 this.actionToggleMessage.text(gettext('Notes visible'));

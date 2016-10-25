@@ -1,5 +1,11 @@
+<%namespace name='static' file='/static_content.html'/>
 <%page expression_filter="h"/>
-<%! from openedx.core.djangolib.markup import HTML %>
+<%! 
+from openedx.core.djangolib.markup import HTML
+from student.models import anonymous_id_for_user
+from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+%>
+
 %if unit_title:
   <h3 class="unit-title">${unit_title}</h3>
 % endif
@@ -8,10 +14,20 @@
     <%include file='bookmark_button.html' args="bookmark_id=bookmark_id, is_bookmarked=bookmarked"/>
 % endif
 
-<div class="vert-mod">
+<div class="vert-mod" id="vert-mod-${uid}">
 % for idx, item in enumerate(items):
   <div class="vert vert-${idx}" data-id="${item['id']}">
     ${HTML(item['content'])}
   </div>
 % endfor
 </div>
+
+
+% if edxnotes_params:
+  <%static:require_module_async module_name="js/edxnotes/views/notes_visibility_factory" class_name="NotesVisibilityFactory">
+      NotesVisibilityFactory.VisibilityDecorator.factory(
+        $('#vert-mod-${uid}'),
+        ${edxnotes_params | n, dump_js_escaped_json}
+      );
+  </%static:require_module_async>
+% endif

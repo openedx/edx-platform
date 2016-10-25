@@ -4,17 +4,19 @@
         'jquery', 'underscore', 'js/edxnotes/views/notes_factory'
     ], function($, _, NotesFactory) {
         var parameters = {}, visibility = null,
-            getIds, createNote, cleanup, factory;
+            getIds, createNote, cleanup, factory, annotatorContainerElement, getAnnotatableComponentsIds;
 
         getIds = function() {
-            return _.map($('.edx-notes-wrapper'), function(element) {
-                return element.id;
-            });
+            return [annotatorContainerElement.id];
         };
 
-        createNote = function(element, params) {
+        getAnnotatableComponentsIds = function () {
+            return _.map($('.edx-notes-wrapper'), function(element){return $(element).data('usageId')});
+        };
+
+        createNote = function(params) {
             if (params) {
-                return NotesFactory.factory(element, params);
+                return NotesFactory.factory(annotatorContainerElement, params, getAnnotatableComponentsIds());
             }
             return null;
         };
@@ -31,14 +33,16 @@
             });
         };
 
-        factory = function(element, params, isVisible) {
+        factory = function(containerElement, params) {
+            debugger;
             // When switching sequentials, we need to keep track of the
             // parameters of each element and the visibility (that may have been
             // changed by the checkbox).
-            parameters[element.id] = params;
+            annotatorContainerElement = containerElement
+            parameters = params || parameters;
 
             if (_.isNull(visibility)) {
-                visibility = isVisible;
+                visibility = params.isVisible;
             }
 
             if (visibility) {
@@ -48,7 +52,7 @@
                 // but keep those found on page being loaded (for the case when
                 // there are more than one HTMLcomponent per vertical).
                 cleanup(getIds());
-                return createNote(element, params);
+                return createNote(parameters);
             }
             return null;
         };
@@ -56,8 +60,8 @@
         return {
             factory: factory,
 
-            enableNote: function(element) {
-                createNote(element, parameters[element.id]);
+            enableNote: function() {
+                createNote(parameters);
                 visibility = true;
             },
 

@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 CLASS_PRIORITY = ['video', 'problem']
 
 
-@XBlock.needs('user', 'bookmarks')
+@XBlock.needs('user', 'bookmarks', 'edxnotes')
 class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParserMixin, MakoTemplateBlockBase, XBlock):
     """
     Layout XBlock for rendering subblocks vertically.
@@ -41,6 +41,8 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         """
         fragment = Fragment()
         contents = []
+
+        # from nose.tools import set_trace; set_trace()
 
         if context:
             child_context = copy(context)
@@ -65,12 +67,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             })
 
         fragment.add_content(self.system.render_template('vert_module.html', {
+            'uid': self.location.html_id(),
             'items': contents,
             'xblock_context': context,
             'unit_title': self.display_name_with_default if not is_child_of_vertical else None,
             'show_bookmark_button': not is_child_of_vertical,
             'bookmarked': child_context['bookmarked'],
-            'bookmark_id': "{},{}".format(child_context['username'], unicode(self.location))
+            'bookmark_id': "{},{}".format(child_context['username'], unicode(self.location)),
+            'edxnotes_params': self.runtime.service(self, 'edxnotes').params(self.runtime),
         }))
 
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/vertical_student_view.js'))

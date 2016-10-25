@@ -160,6 +160,10 @@
       id = obj && obj.id;
       url = this._urlFor(action, id);
       options = this._apiRequestOptions(action, obj, onSuccess);
+      
+
+      options.data
+
       request = $.ajax(url, options);
       request._id = id;
       request._action = action;

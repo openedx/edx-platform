@@ -106,6 +106,7 @@ class HtmlModuleMixin(HtmlBlock, XModule):
 
 
 @edxnotes
+@XBlock.needs('edxnotes')
 class HtmlModule(HtmlModuleMixin):
     """
     Module for putting raw html in a course

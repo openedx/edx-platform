@@ -122,7 +122,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
   outline: none;
 }
 
-.edx-notes-wrapper {
+
   // +individual note (in context)
   // --------------------
   .annotator-outer {
@@ -352,20 +352,20 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       }
     }
   }
-}
+
 // +necessary, but ugly overrides
 // --------------------
-.edx-notes-wrapper .annotator-wrapper.annotator-wrapper .annotator-outer.annotator-viewer .annotator-controls button {
+.annotator-wrapper.annotator-wrapper .annotator-outer.annotator-viewer .annotator-controls button {
   @extend %notes-reset-background;
   opacity: 1.0;
 }
 
-.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-save {
+.annotator-wrapper .annotator-editor.annotator-outer button.annotator-save {
   @extend %btn-inherited-primary;
   @extend %t-action2;
 }
 
-.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-cancel {
+.annotator-wrapper .annotator-editor.annotator-outer button.annotator-cancel {
   @extend %shame-link-base;
   @extend %t-action2;
   @extend %t-regular;
