@@ -92,15 +92,15 @@ class EnrollmentTestMixin(object):
 
                 if expected_status == status.HTTP_200_OK:
                     data = json.loads(response.content)
-                    self.assertEqual(course_id, data['course_details']['course_id'])
+                    self.assertEqual(course_id, data['enrollment_detail']['course_details']['course_id'])
 
                     if mode is not None:
-                        self.assertEqual(mode, data['mode'])
+                        self.assertEqual(mode, data['enrollment_detail']['mode'])
 
                     if is_active is not None:
-                        self.assertEqual(is_active, data['is_active'])
+                        self.assertEqual(is_active, data['enrollment_detail']['is_active'])
                     else:
-                        self.assertTrue(data['is_active'])
+                        self.assertTrue(data['enrollment_detail']['is_active'])
 
                     if as_server:
                         # Verify that an audit message was logged.
@@ -503,7 +503,11 @@ class EnrollmentTest(EnrollmentTestMixin, ModuleStoreTestCase, APITestCase):
     def test_enrollment_already_enrolled(self):
         response = self.assert_enrollment_status()
         repeat_response = self.assert_enrollment_status(expected_status=status.HTTP_200_OK)
-        self.assertEqual(json.loads(response.content), json.loads(repeat_response.content))
+        response_enrollment_detail = json.loads(response.content)
+        repeat_response_enrollment_detail = json.loads(repeat_response.content)
+        self.assertEqual(
+            response_enrollment_detail['enrollment_detail'], repeat_response_enrollment_detail['enrollment_detail']
+        )
 
     def test_get_enrollment_with_invalid_key(self):
         resp = self.client.post(

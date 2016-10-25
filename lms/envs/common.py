@@ -471,6 +471,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'templates',
     COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+    OPENEDX_ROOT / 'core' / 'djangoapps' / 'cors_csrf' / 'templates',
     OPENEDX_ROOT / 'core' / 'djangoapps' / 'dark_lang' / 'templates',
 ]
 
@@ -1129,8 +1130,8 @@ MIDDLEWARE_CLASSES = (
 
     # CORS and CSRF
     'corsheaders.middleware.CorsMiddleware',
-    'cors_csrf.middleware.CorsCSRFMiddleware',
-    'cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CorsCSRFMiddleware',
+    'openedx.core.djangoapps.cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'splash.middleware.SplashMiddleware',
@@ -1173,7 +1174,7 @@ MIDDLEWARE_CLASSES = (
     'openedx.core.djangoapps.theming.middleware.CurrentSiteThemeMiddleware',
 
     # This must be last
-    'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
+    'openedx.core.djangoapps.site_configuration.middleware.SessionCookieDomainOverrideMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
@@ -1318,10 +1319,7 @@ discussion_vendor_js = [
 ]
 
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
-instructor_dash_js = (
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js')) +
-    sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
-)
+instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
 
 verify_student_js = [
     'js/sticky_filter.js',
@@ -1567,7 +1565,7 @@ PIPELINE_JS = {
             [
                 'js/sticky_filter.js',
                 'js/query-params.js',
-                'js/vendor/moment-with-locales.min.js',
+                'common/js/vendor/moment-with-locales.js',
             ]
         ),
         'output_filename': 'js/lms-application.js',
@@ -1715,7 +1713,7 @@ REQUIRE_ENVIRONMENT = "node"
 REQUIRE_JS_PATH_OVERRIDES = {
     'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
-    'moment': 'js/vendor/moment-with-locales.min.js',
+    'moment': 'common/js/vendor/moment-with-locales.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
     'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events.js',
@@ -2077,7 +2075,7 @@ INSTALLED_APPS = (
 
     # CORS and cross-domain CSRF
     'corsheaders',
-    'cors_csrf',
+    'openedx.core.djangoapps.cors_csrf',
 
     'commerce',
 

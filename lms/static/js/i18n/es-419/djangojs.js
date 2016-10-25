@@ -97,14 +97,6 @@
       "%s resultado", 
       "%s resultados"
     ], 
-    "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s punto)", 
-      "(%(earned)s/%(possible)s puntos)"
-    ], 
-    "(%(num_points)s point possible)": [
-      "(%(num_points)s punto posible)", 
-      "(%(num_points)s puntos posibles)"
-    ], 
     "(Add signatories for a certificate)": "(A\u00f1adir signatarios para el certificado)", 
     "(Caption will be displayed when you start playing the video.)": "(Los subt\u00edtulos ser\u00e1n mostrados al iniciar la reproducci\u00f3n del video.)", 
     "(Required Field)": "(Campo requerido)", 
@@ -247,8 +239,6 @@
     "Anchors": "Anclas", 
     "Annotation": "Anotacion", 
     "Annotation Text": "Anotaci\u00f3n", 
-    "Answer hidden": "Respuesta oculta", 
-    "Answer:": "Respuesta:", 
     "Any content that has listed this content as a prerequisite will also have access limitations removed.": "Se eliminar\u00e1n las restricciones de acceso a cualquier contenido que inscriba este contenido como prerrequisito.", 
     "Are you having trouble finding a team to join?": "\u00bfTiene problemas para encontrar un equipo al cual unirse?", 
     "Are you sure you want to delete this comment?": "\u00bfEst\u00e1 seguro de que desea borrar este comentario?", 
@@ -758,7 +748,6 @@
     "Height": "Altura", 
     "Help other learners decide whether to join your team by specifying some characteristics for your team. Choose carefully, because fewer people might be interested in joining your team if it seems too restrictive.": "Ayude a otros estudiantes a decidir si unirse o no a su equipo, especificando la caracter\u00edsticas del mismo. Tenga cuidado en no desmotivar la participaci\u00f3n de otros usuarios con esta descripci\u00f3n.", 
     "Hide Annotations": "Esconder anotaciones", 
-    "Hide Answer": "Ocultar Respuesta", 
     "Hide Deprecated Settings": "Ocultar configuraciones descartadas", 
     "Hide Discussion": "Ocultar Discusi\u00f3n", 
     "Hide Previews": "Ocultar vistas previas", 
@@ -1263,7 +1252,6 @@
     "Short explanation": "explicaci\u00f3n breve", 
     "Show All": "Mostrar todo", 
     "Show Annotations": "Mostrar anotaciones", 
-    "Show Answer": "Mostrar Respuesta", 
     "Show Comment (%(num_comments)s)": [
       "Mostrar Comentarios (%(num_comments)s)", 
       "Mostrar comentarios (%(num_comments)s)"

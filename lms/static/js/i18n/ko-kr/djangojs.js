@@ -58,12 +58,6 @@
     "%s result": [
       "%s \uacb0\uacfc"
     ], 
-    "(%(earned)s/%(possible)s point)": [
-      "(%(earned)s/%(possible)s \ud3ec\uc778\ud2b8)"
-    ], 
-    "(%(num_points)s point possible)": [
-      "(%(num_points)s \uc810)"
-    ], 
     "About me": "\uc790\uae30\uc18c\uac1c", 
     "Account Settings": "\uacc4\uc815 \uc124\uc815", 
     "Account Settings page.": "\uacc4\uc815 \uc124\uc815 \ud398\uc774\uc9c0", 
@@ -99,8 +93,6 @@
     "Anchors": "Anchors", 
     "Annotation": "\uc8fc\uc11d", 
     "Annotation Text": "\uc8fc\uc11d \ud14d\uc2a4\ud2b8", 
-    "Answer hidden": "\uc228\uc740 \ub2f5", 
-    "Answer:": "\ub2f5:", 
     "Are you sure you want to delete this comment?": "\uc774 \ub313\uae00\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
     "Are you sure you want to delete this post?": "\uc774 \uac8c\uc2dc\ubb3c\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
     "Are you sure you want to delete this response?": "\uc774 \ub2f5\ubcc0\uc744 \uc0ad\uc81c\ud558\uc2dc\uaca0\uc2b5\ub2c8\uae4c?", 
@@ -299,7 +291,6 @@
     "Headings": "\uc81c\ubaa9", 
     "Height": "\ub192\uc774", 
     "Hide Annotations": "\uc8fc\uc11d \uac10\ucd94\uae30", 
-    "Hide Answer": "\uc815\ub2f5 \uac10\ucd94\uae30", 
     "Hide Discussion": "\uac8c\uc2dc\ud310 \uac10\ucd94\uae30", 
     "Hide notes": "\ub178\ud2b8 \uac10\ucd94\uae30", 
     "Horizontal Rule (Ctrl+R)": "\uac00\ub85c\uc120 (Ctrl+R)", 
@@ -490,7 +481,6 @@
     "Settings": "\uc124\uc815", 
     "Short explanation": "\uc9e7\uc740 \uc124\uba85", 
     "Show Annotations": "\uc8fc\uc11d \ubcf4\uc774\uae30", 
-    "Show Answer": "\uc815\ub2f5 \ubcf4\uae30", 
     "Show Discussion": "\uac8c\uc2dc\ud310  \ubcf4\uae30", 
     "Show blocks": "\ube14\ub7ed \ubcf4\uc774\uae30", 
     "Show invisible characters": "\uac10\ucdb0\uc9c4 \ubb38\uc790 \ubcf4\uc774\uae30", 

@@ -42,8 +42,8 @@ class PollFields(object):
 class PollModule(PollFields, XModule):
     """Poll Module"""
     js = {
-        'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
             resource_string(__name__, 'js/src/poll/poll.js'),
             resource_string(__name__, 'js/src/poll/poll_main.js')
         ]

@@ -4,11 +4,6 @@
                 data-read-only="<%- readOnly %>"
                 data-user-create-comment="<%- !readOnly %>"
                 data-user-create-subcomment="<%- !readOnly %>">
-            <% if ( !readOnly) { %>
-                <button class="btn-brand btn-small new-post-btn">
-                    <%- gettext("Add a Post") %>
-                </button>
-            <% } %>
         </div>
     </div>
 

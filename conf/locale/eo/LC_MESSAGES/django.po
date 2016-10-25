@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 16:11+0000\n"
-"PO-Revision-Date: 2016-10-13 16:12:03.523015\n"
+"POT-Creation-Date: 2016-10-20 15:37+0000\n"
+"PO-Revision-Date: 2016-10-20 15:37:55.843388\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -48,6 +48,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion"
 msgstr "Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -116,14 +117,6 @@ msgstr "Stätüs Ⱡ'σяєм ιρѕυ#"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Péndïng Ⱡ'σяєм ιρѕυм #"
-
-#: common/djangoapps/cors_csrf/models.py
-msgid ""
-"List of domains that are allowed to make cross-domain requests to this site."
-"  Please list each domain on its own line."
-msgstr ""
-"Lïst öf dömäïns thät äré ällöwéd tö mäké çröss-dömäïn réqüésts tö thïs sïté."
-"  Pléäsé lïst éäçh dömäïn ön ïts öwn lïné. Ⱡ'σяєм ιρѕυм #"
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
@@ -320,34 +313,6 @@ msgid "No selected price or selected price is too low."
 msgstr ""
 "Nö séléçtéd prïçé ör séléçtéd prïçé ïs töö löw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
 " ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
-msgstr ""
-"Prévïéw Längüägé ïs çürréntlý dïsäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr "Längüägé çödé nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language set to language code: {preview_language_code}"
-msgstr ""
-"Längüägé sét tö längüägé çödé: {preview_language_code} Ⱡ'σяєм ιρѕυм ∂σłσя "
-"ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
-msgstr ""
-"Längüägé rését tö thé défäült längüägé çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to user's preference: {preview_language_code}"
-msgstr ""
-"Längüägé rését tö üsér's préférénçé: {preview_language_code} Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -1998,16 +1963,9 @@ msgstr ""
 "Théré wäs ä prößlém wïth thé stäff änswér tö thïs prößlém: émptý ßöündärý. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "Téxt Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "érrör Ⱡ'σяєм ιρѕ#"
-
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
 #. Translators: Separator used in StringResponse to display multiple answers.
 #. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
 #. #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
@@ -2020,6 +1978,15 @@ msgstr "érrör Ⱡ'σяєм ιρѕ#"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "ör Ⱡ'σя#"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "Téxt Ìnpüt Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr "érrör Ⱡ'σяєм ιρѕ#"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Custom Evaluated Script"
@@ -2420,10 +2387,8 @@ msgstr ""
 "çömprömïséd. Tö ößtäïn ä kéý för ýöür çöürsé, ör tö répört än ïssüé, pléäsé "
 "çöntäçt mööçsüppört@mäthwörks.çöm#"
 
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -3855,6 +3820,18 @@ msgstr "Vïsüäl Ⱡ'σяєм ιρѕυ#"
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Raw"
 msgstr "Räw Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Hide Page From Learners"
+msgstr "Hïdé Pägé Fröm Léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid ""
+"If you select this option, only course team members with the Staff or Admin "
+"role see this page."
+msgstr ""
+"Ìf ýöü séléçt thïs öptïön, önlý çöürsé téäm mémßérs wïth thé Stäff ör Àdmïn "
+"rölé séé thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "HTML for the additional pages"
@@ -10256,6 +10233,49 @@ msgstr ""
 msgid "Skip to main content"
 msgstr "Skïp tö mäïn çöntént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Authorize"
+msgstr "Àüthörïzé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"The above application requests the following permissions from your account:"
+msgstr ""
+"Thé äßövé äpplïçätïön réqüésts thé föllöwïng pérmïssïöns fröm ýöür äççöünt: "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"Please click the 'Allow' button to grant these permissions to the above "
+"application. Otherwise, to withhold these permissions, please click the "
+"'Cancel' button."
+msgstr ""
+"Pléäsé çlïçk thé 'Àllöw' ßüttön tö gränt thésé pérmïssïöns tö thé äßövé "
+"äpplïçätïön. Öthérwïsé, tö wïthhöld thésé pérmïssïöns, pléäsé çlïçk thé "
+"'Çänçél' ßüttön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυ#"
+
+#: lms/templates/oauth2_provider/authorize.html
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: lms/templates/modal/accessible_confirm.html
+msgid "Cancel"
+msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Allow"
+msgstr "Àllöw Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/oauth2_provider/authorize.html
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/ccx/schedule.html
+msgid "Error"
+msgstr "Érrör Ⱡ'σяєм ιρѕ#"
+
 #: lms/templates/registration/password_reset_email.html
 #, python-format
 msgid ""
@@ -10913,6 +10933,14 @@ msgstr ""
 "Spéçïfïéd ïn séçönds. Énäßlé çäçhïng öf ÀPÌ réspönsés ßý séttïng thïs tö ä "
 "välüé gréätér thän 0. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
+#: openedx/core/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
+msgstr ""
+"Lïst öf dömäïns thät äré ällöwéd tö mäké çröss-dömäïn réqüésts tö thïs sïté."
+"  Pléäsé lïst éäçh dömäïn ön ïts öwn lïné. Ⱡ'σяєм ιρѕυм #"
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr "Défäült Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -11155,6 +11183,34 @@ msgid "Deadline for purchasing and requesting credit."
 msgstr ""
 "Déädlïné för pürçhäsïng änd réqüéstïng çrédït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Preview Language is currently disabled"
+msgstr ""
+"Prévïéw Längüägé ïs çürréntlý dïsäßléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language code not provided"
+msgstr "Längüägé çödé nöt prövïdéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language set to language code: {preview_language_code}"
+msgstr ""
+"Längüägé sét tö längüägé çödé: {preview_language_code} Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default language code"
+msgstr ""
+"Längüägé rését tö thé défäült längüägé çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to user's preference: {preview_language_code}"
+msgstr ""
+"Längüägé rését tö üsér's préférénçé: {preview_language_code} Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -12207,12 +12263,6 @@ msgid "Settings"
 msgstr "Séttïngs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Cancel"
-msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "Çöürsé Nümßér Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
@@ -12346,13 +12396,11 @@ msgid "View"
 msgstr "Vïéw Ⱡ'σяєм ι#"
 
 #: cms/templates/darklang/preview_lang.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/darklang/preview_lang.html
 msgid "Preview Language Setting"
 msgstr "Prévïéw Längüägé Séttïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: cms/templates/maintenance/_force_publish_course.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
 msgstr "Rését Ⱡ'σяєм ιρѕ#"
@@ -12507,20 +12555,6 @@ msgstr ""
 msgid "Some Rights Reserved"
 msgstr "Sömé Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
-#: common/templates/darklang/preview_lang_include.html
-msgid "Language Code"
-msgstr "Längüägé Çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr "För éxämplé üsé én för Énglïsh Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
-msgstr ""
-"Pléäsé réfrésh thé pägé tö séé thé çhängés äpplïéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -12531,7 +12565,6 @@ msgid "Discussions"
 msgstr "Dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
 msgstr "Àdd ä Pöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -14017,11 +14050,6 @@ msgid "Recent git load activity for {course_id}"
 msgstr ""
 "Réçént gït löäd äçtïvïtý för {course_id} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/ccx/schedule.html
-msgid "Error"
-msgstr "Érrör Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
@@ -16941,6 +16969,10 @@ msgstr ""
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
 msgstr "Résülts: Ⱡ'σяєм ιρѕυм ∂#"
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Topic:"
+msgstr "Töpïç: Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"

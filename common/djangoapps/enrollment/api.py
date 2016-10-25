@@ -241,6 +241,11 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
         }
 
     """
+    log.info(u'Starting Update Enrollment process for user {user} in course {course} to mode {mode}'.format(
+        user=user_id,
+        course=course_id,
+        mode=mode,
+    ))
     if mode is not None:
         _validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
     enrollment = _data_api().update_course_enrollment(user_id, course_id, mode=mode, is_active=is_active)
@@ -251,7 +256,11 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
     else:
         if enrollment_attributes is not None:
             set_enrollment_attributes(user_id, course_id, enrollment_attributes)
-
+    log.info(u'Course Enrollment updated for user {user} in course {course} to mode {mode}'.format(
+        user=user_id,
+        course=course_id,
+        mode=mode
+    ))
     return enrollment
 
 

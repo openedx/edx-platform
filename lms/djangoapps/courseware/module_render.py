@@ -8,7 +8,6 @@ import logging
 from collections import OrderedDict
 from functools import partial
 
-import dogstats_wrapper as dog_stats_api
 import newrelic.agent
 from capa.xqueue_interface import XQueueInterface
 from django.conf import settings
@@ -18,7 +17,6 @@ from django.core.context_processors import csrf
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
-from django.test.client import RequestFactory
 from django.views.decorators.csrf import csrf_exempt
 from edx_proctoring.services import ProctoringService
 from eventtracking import tracker
@@ -34,7 +32,6 @@ from xblock.reference.plugins import FSService
 import static_replace
 from courseware.access import has_access, get_user_role
 from courseware.entrance_exams import (
-    get_entrance_exam_score,
     user_must_complete_entrance_exam,
     user_has_passed_entrance_exam
 )
@@ -44,14 +41,14 @@ from courseware.masquerade import (
     is_masquerading_as_specific_student,
     setup_masquerade,
 )
-from courseware.model_data import DjangoKeyValueStore, FieldDataCache, set_score
-from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
+from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from edxmako.shortcuts import render_to_string
+from lms.djangoapps.grades.signals.signals import SCORE_PUBLISHED
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
-from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from lms.djangoapps.verify_student.services import VerificationService, ReverificationService
+from openedx.core.djangoapps.bookmarks.services import BookmarksService
 from openedx.core.djangoapps.credit.services import CreditService
 from openedx.core.djangoapps.util.user_utils import SystemUser
 from openedx.core.lib.xblock_utils import (
@@ -466,89 +463,17 @@ def get_module_system_for_user(user, student_data,  # TODO  # pylint: disable=to
             course=course
         )
 
-    def _fulfill_content_milestones(user, course_key, content_key):
-        """
-        Internal helper to handle milestone fulfillments for the specified content module
-        """
-        # Fulfillment Use Case: Entrance Exam
-        # If this module is part of an entrance exam, we'll need to see if the student
-        # has reached the point at which they can collect the associated milestone
-        if milestones_helpers.is_entrance_exams_enabled():
-            course = modulestore().get_course(course_key)
-            content = modulestore().get_item(content_key)
-            entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
-            in_entrance_exam = getattr(content, 'in_entrance_exam', False)
-            if entrance_exam_enabled and in_entrance_exam:
-                # We don't have access to the true request object in this context, but we can use a mock
-                request = RequestFactory().request()
-                request.user = user
-                exam_pct = get_entrance_exam_score(request, course)
-                if exam_pct >= course.entrance_exam_minimum_score_pct:
-                    exam_key = UsageKey.from_string(course.entrance_exam_id)
-                    relationship_types = milestones_helpers.get_milestone_relationship_types()
-                    content_milestones = milestones_helpers.get_course_content_milestones(
-                        course_key,
-                        exam_key,
-                        relationship=relationship_types['FULFILLS']
-                    )
-                    # Add each milestone to the user's set...
-                    user = {'id': request.user.id}
-                    for milestone in content_milestones:
-                        milestones_helpers.add_user_milestone(user, milestone)
-
-    def handle_grade_event(block, event_type, event):  # pylint: disable=unused-argument
-        """
-        Manages the workflow for recording and updating of student module grade state
-        """
-        user_id = user.id
-
-        grade = event.get('value')
-        max_grade = event.get('max_value')
-
-        set_score(
-            user_id,
-            descriptor.location,
-            grade,
-            max_grade,
-        )
-
-        # Bin score into range and increment stats
-        score_bucket = get_score_bucket(grade, max_grade)
-
-        tags = [
-            u"org:{}".format(course_id.org),
-            u"course:{}".format(course_id),
-            u"score_bucket:{0}".format(score_bucket)
-        ]
-
-        if grade_bucket_type is not None:
-            tags.append('type:%s' % grade_bucket_type)
-
-        dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
-
-        # Cycle through the milestone fulfillment scenarios to see if any are now applicable
-        # thanks to the updated grading information that was just submitted
-        _fulfill_content_milestones(
-            user,
-            course_id,
-            descriptor.location,
-        )
-
-        # Send a signal out to any listeners who are waiting for score change
-        # events.
-        SCORE_CHANGED.send(
-            sender=None,
-            points_possible=event['max_value'],
-            points_earned=event['value'],
-            user_id=user.id,
-            course_id=unicode(course_id),
-            usage_id=unicode(descriptor.location)
-        )
-
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
         if event_type == 'grade' and not is_masquerading_as_specific_student(user, course_id):
-            handle_grade_event(block, event_type, event)
+            SCORE_PUBLISHED.send(
+                sender=None,
+                block=block,
+                user=user,
+                raw_earned=event['value'],
+                raw_possible=event['max_value'],
+                only_if_higher=event.get('only_if_higher'),
+            )
         else:
             aside_context = {}
             for aside in block.runtime.get_asides(block):
@@ -1136,20 +1061,6 @@ def xblock_view(request, course_id, usage_id, view_name):
             'resources': hashed_resources.items(),
             'csrf_token': unicode(csrf(request)['csrf_token']),
         })
-
-
-def get_score_bucket(grade, max_grade):
-    """
-    Function to split arbitrary score ranges into 3 buckets.
-    Used with statsd tracking.
-    """
-    score_bucket = "incorrect"
-    if grade > 0 and grade < max_grade:
-        score_bucket = "partial"
-    elif grade == max_grade:
-        score_bucket = "correct"
-
-    return score_bucket
 
 
 def _check_files_limits(files):

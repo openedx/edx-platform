@@ -116,8 +116,9 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = self._goto_staff_page().open_staff_debug_info()
         staff_debug_page.reset_attempts()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.USERNAME), msg)
+        self.assertEqual(
+            u'Successfully reset the attempts for user {}'.format(self.USERNAME), msg,
+        )
 
     def test_delete_state_empty(self):
         """
@@ -126,8 +127,9 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = self._goto_staff_page().open_staff_debug_info()
         staff_debug_page.delete_state()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state '
-                         'for user {}'.format(self.USERNAME), msg)
+        self.assertEqual(
+            u'Successfully deleted student state for user {}'.format(self.USERNAME), msg,
+        )
 
     def test_reset_attempts_state(self):
         """
@@ -139,10 +141,11 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.reset_attempts()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.USERNAME), msg)
+        self.assertEqual(
+            u'Successfully reset the attempts for user {}'.format(self.USERNAME), msg,
+        )
 
-    def test_rescore_state(self):
+    def test_rescore_problem(self):
         """
         Rescore the student
         """
@@ -152,7 +155,19 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.rescore()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully rescored problem for user STAFF_TESTER', msg)
+        self.assertEqual(u'Successfully rescored problem for user {}'.format(self.USERNAME), msg)
+
+    def test_rescore_problem_if_higher(self):
+        """
+        Rescore the student
+        """
+        staff_page = self._goto_staff_page()
+        staff_page.answer_problem()
+
+        staff_debug_page = staff_page.open_staff_debug_info()
+        staff_debug_page.rescore_if_higher()
+        msg = staff_debug_page.idash_msg[0]
+        self.assertEqual(u'Successfully rescored problem to improve score for user {}'.format(self.USERNAME), msg)
 
     def test_student_state_delete(self):
         """
@@ -164,8 +179,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.delete_state()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state '
-                         'for user {}'.format(self.USERNAME), msg)
+        self.assertEqual(u'Successfully deleted student state for user {}'.format(self.USERNAME), msg)
 
     def test_student_by_email(self):
         """
@@ -177,8 +191,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.reset_attempts(self.EMAIL)
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.EMAIL), msg)
+        self.assertEqual(u'Successfully reset the attempts for user {}'.format(self.EMAIL), msg)
 
     def test_bad_student(self):
         """
@@ -189,8 +202,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.delete_state('INVALIDUSER')
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Failed to delete student state. '
-                         'User does not exist.', msg)
+        self.assertEqual(u'Failed to delete student state for user. User does not exist.', msg)
 
     def test_reset_attempts_for_problem_loaded_via_ajax(self):
         """
@@ -203,8 +215,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.reset_attempts()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully reset the attempts '
-                         'for user {}'.format(self.USERNAME), msg)
+        self.assertEqual(u'Successfully reset the attempts for user {}'.format(self.USERNAME), msg)
 
     def test_rescore_state_for_problem_loaded_via_ajax(self):
         """
@@ -217,7 +228,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.rescore()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully rescored problem for user STAFF_TESTER', msg)
+        self.assertEqual(u'Successfully rescored problem for user {}'.format(self.USERNAME), msg)
 
     def test_student_state_delete_for_problem_loaded_via_ajax(self):
         """
@@ -230,8 +241,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.delete_state()
         msg = staff_debug_page.idash_msg[0]
-        self.assertEqual(u'Successfully deleted student state '
-                         'for user {}'.format(self.USERNAME), msg)
+        self.assertEqual(u'Successfully deleted student state for user {}'.format(self.USERNAME), msg)
 
 
 class CourseWithContentGroupsTest(StaffViewTest):

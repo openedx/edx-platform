@@ -383,3 +383,10 @@ class ProblemPage(PageObject):
         """
         self.wait_for_element_visibility('.problem-progress', "Problem progress is visible")
         return self.q(css='.problem-progress').text[0]
+
+    @property
+    def status_sr_text(self):
+        """
+        Returns the text in the special "sr" region used for display status.
+        """
+        return self.q(css='#reader-feedback').text[0]

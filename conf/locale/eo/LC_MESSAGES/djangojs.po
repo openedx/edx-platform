@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 16:10+0000\n"
-"PO-Revision-Date: 2016-10-13 16:12:03.957210\n"
+"POT-Creation-Date: 2016-10-20 15:36+0000\n"
+"PO-Revision-Date: 2016-10-20 15:37:56.258181\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -348,7 +348,52 @@ msgstr ""
 "Thé grädïng pröçéss ïs stïll rünnïng. Réfrésh thé pägé tö séé üpdätés. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
-#. Translators: This is only translated to allow for reording of label and
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Could not grade your answer. The submission was aborted."
+msgstr ""
+"Çöüld nöt grädé ýöür änswér. Thé süßmïssïön wäs äßörtéd. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid ""
+"Submission aborted! Sorry, your browser does not support file uploads. If "
+"you can, please use Chrome or Safari which have been verified to support "
+"file uploads."
+msgstr ""
+"Süßmïssïön äßörtéd! Sörrý, ýöür ßröwsér döés nöt süppört fïlé üplöäds. Ìf "
+"ýöü çän, pléäsé üsé Çhrömé ör Säfärï whïçh hävé ßéén vérïfïéd tö süppört "
+"fïlé üplöäds. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂"
+" ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
+"мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
+"єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє "
+"νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυ#"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You submitted {filename}; only {allowedFiles} are allowed."
+msgstr ""
+"Ýöü süßmïttéd {filename}; önlý {allowedFiles} äré ällöwéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Your file {filename} is too large (max size: {maxSize}MB)."
+msgstr ""
+"Ýöür fïlé {filename} ïs töö lärgé (mäx sïzé: {maxSize}MB). Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not submit the required files: {requiredFiles}."
+msgstr ""
+"Ýöü dïd nöt süßmït thé réqüïréd fïlés: {requiredFiles}. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not select any files to submit."
+msgstr ""
+"Ýöü dïd nöt séléçt äný fïlés tö süßmït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
@@ -4683,19 +4728,19 @@ msgstr "Löädïng ýöür çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
-"We have sent an email message with password reset instructions to the email "
-"address you provided.  If you do not receive this message, "
-"{anchorStart}contact technical support{anchorEnd}."
+"{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
+"address is associated with an edX account, we will send a message with "
+"password reset instructions to this email address.{paragraphEnd}"
 msgstr ""
-"Wé hävé sént än émäïl méssägé wïth pässwörd rését ïnstrüçtïöns tö thé émäïl "
-"äddréss ýöü prövïdéd.  Ìf ýöü dö nöt réçéïvé thïs méssägé, "
-"{anchorStart}çöntäçt téçhnïçäl süppört{anchorEnd}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт "
-"ιη ¢υłρα qυι σƒƒι¢#"
+"{paragraphStart}Ýöü éntéréd {boldStart}{email}{boldEnd}. Ìf thïs émäïl "
+"äddréss ïs ässöçïätéd wïth än édX äççöünt, wé wïll sénd ä méssägé wïth "
+"pässwörd rését ïnstrüçtïöns tö thïs émäïl äddréss.{paragraphEnd} Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂#"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -7673,11 +7718,6 @@ msgstr "Jöïn Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "Add a Post"
-msgstr "Àdd ä Pöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "Téäm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -8887,9 +8927,10 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσł#"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Password Reset Email Sent"
-msgstr "Pässwörd Rését Émäïl Sént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+#: lms/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr "Çhéçk Ýöür Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
@@ -9530,11 +9571,6 @@ msgid "Activate Your Account"
 msgstr "Àçtïväté Ýöür Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr "Çhéçk Ýöür Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/verify_student/intro_step.underscore
@@ -10009,6 +10045,10 @@ msgstr "Stärtéd Àt Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Completed At"
 msgstr "Çömplétéd Àt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
+#: test_root/staticfiles/teams/templates/team-profile.underscore
+msgid "Add a Post"
+msgstr "Àdd ä Pöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
@@ -10016,6 +10056,10 @@ msgid ""
 msgstr ""
 "Tö réçéïvé çrédït ön ä prößlém, ýöü müst çlïçk \"Çhéçk\" ör \"Fïnäl Çhéçk\" "
 "ön ït ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+msgid "Password Reset Email Sent"
+msgstr "Pässwörd Rését Émäïl Sént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

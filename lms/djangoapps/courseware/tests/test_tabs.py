@@ -686,6 +686,35 @@ class CourseTabListTestCase(TabListTestCase):
             # get tab by id
             self.assertEquals(xmodule_tabs.CourseTabList.get_tab_by_id(self.course.tabs, tab.tab_id), tab)
 
+    def test_course_tabs_staff_only(self):
+        """
+        Tests the static tabs that available only for instructor
+        """
+        self.course.tabs.append(xmodule_tabs.CourseTab.load('static_tab', name='Static Tab Free',
+                                                            url_slug='extra_tab_1',
+                                                            course_staff_only=False))
+        self.course.tabs.append(xmodule_tabs.CourseTab.load('static_tab', name='Static Tab Instructors Only',
+                                                            url_slug='extra_tab_2',
+                                                            course_staff_only=True))
+        self.course.save()
+
+        user = self.create_mock_user(is_authenticated=True, is_staff=False, is_enrolled=True)
+        request = get_request_for_user(user)
+        course_tab_list = get_course_tab_list(request, self.course)
+        name_list = [x.name for x in course_tab_list]
+        self.assertIn('Static Tab Free', name_list)
+        self.assertNotIn('Static Tab Instructors Only', name_list)
+
+        # Login as member of staff
+        self.client.logout()
+        staff_user = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff_user.username, password='test')
+        request = get_request_for_user(staff_user)
+        course_tab_list_staff = get_course_tab_list(request, self.course)
+        name_list_staff = [x.name for x in course_tab_list_staff]
+        self.assertIn('Static Tab Free', name_list_staff)
+        self.assertIn('Static Tab Instructors Only', name_list_staff)
+
 
 @attr(shard=1)
 class ProgressTestCase(TabTestCase):

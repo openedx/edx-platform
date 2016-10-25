@@ -253,14 +253,6 @@ class ModuleRenderTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
                     self.dispatch
                 )
 
-    def test_get_score_bucket(self):
-        self.assertEquals(render.get_score_bucket(0, 10), 'incorrect')
-        self.assertEquals(render.get_score_bucket(1, 10), 'partial')
-        self.assertEquals(render.get_score_bucket(10, 10), 'correct')
-        # get_score_bucket calls error cases 'incorrect'
-        self.assertEquals(render.get_score_bucket(11, 10), 'incorrect')
-        self.assertEquals(render.get_score_bucket(-1, 10), 'incorrect')
-
     def test_anonymous_handle_xblock_callback(self):
         dispatch_url = reverse(
             'xblock_handler',
@@ -1839,7 +1831,7 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @patch('courseware.module_render.SCORE_CHANGED.send')
+    @patch('lms.djangoapps.grades.signals.handlers.SCORE_CHANGED.send')
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
         self.set_module_grade_using_publish(self.grade_dict)
@@ -1849,7 +1841,8 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
             'points_earned': self.grade_dict['value'],
             'user_id': self.student_user.id,
             'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.problem.location)
+            'usage_id': unicode(self.problem.location),
+            'only_if_higher': None,
         }
         send_mock.assert_called_with(**expected_signal_kwargs)
 

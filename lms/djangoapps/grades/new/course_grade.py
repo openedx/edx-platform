@@ -124,10 +124,13 @@ class CourseGrade(object):
         If read_only is True, doesn't save any updates to the grades.
         """
         subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, self.course_structure)
+        subsections_total = 0
         for chapter_key in self.course_structure.get_children(self.course.location):
             chapter = self.course_structure[chapter_key]
             chapter_subsection_grades = []
-            for subsection_key in self.course_structure.get_children(chapter_key):
+            children = self.course_structure.get_children(chapter_key)
+            subsections_total += len(children)
+            for subsection_key in children:
                 chapter_subsection_grades.append(
                     subsection_grade_factory.create(self.course_structure[subsection_key], read_only=True)
                 )
@@ -138,9 +141,9 @@ class CourseGrade(object):
                 'sections': chapter_subsection_grades
             })
 
-        subsections_total = sum(len(x) for x in self.subsection_grade_totals_by_format.itervalues())
-        subsections_read = len(subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
-        subsections_created = subsections_total - subsections_read
+        total_graded_subsections = sum(len(x) for x in self.subsection_grade_totals_by_format.itervalues())
+        subsections_created = len(subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
+        subsections_read = subsections_total - subsections_created
         blocks_total = len(self.locations_to_scores)
         if not read_only:
             subsection_grade_factory.bulk_create_unsaved()
@@ -148,11 +151,13 @@ class CourseGrade(object):
         self._signal_listeners_when_grade_computed()
         self._log_event(
             log.warning,
-            u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}".format(
+            u"compute_and_update, read_only: {0}, subsections read/created: {1}/{2}, blocks accessed: {3}, total "
+            u"graded subsections: {4}".format(
                 read_only,
                 subsections_read,
                 subsections_created,
                 blocks_total,
+                total_graded_subsections,
             )
         )
 

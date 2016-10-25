@@ -28,6 +28,16 @@ def mock_get_score(earned=0, possible=1):
         yield mock_score
 
 
+@contextmanager
+def mock_get_submissions_score(earned=0, possible=1):
+    """
+    Mocks the _get_submissions_score function to return the specified values
+    """
+    with patch('lms.djangoapps.grades.scores._get_score_from_submissions') as mock_score:
+        mock_score.return_value = (earned, possible, earned, possible)
+        yield mock_score
+
+
 def answer_problem(course, request, problem, score=1, max_value=1):
     """
     Records a correct answer for the given problem.

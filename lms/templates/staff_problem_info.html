@@ -69,14 +69,16 @@ ${block_content}
       <div data-location="${location | h}" data-location-name="${location.name | h}">
         [
         % if can_reset_attempts:
-        <button type="button" class="btn-link staff-debug-reset">${_('Reset Student Attempts')}</button>
+        <button type="button" class="btn-link staff-debug-reset">${_('Reset Learner\'s Attempts to Zero')}</button>
         |
         % endif
         % if has_instructor_access:
-        <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Student State')}</button>
+        <button type="button" class="btn-link staff-debug-sdelete">${_('Delete Learner\'s State')}</button>
         % if can_rescore_problem:
         |
-        <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Student Submission')}</button>
+        <button type="button" class="btn-link staff-debug-rescore">${_('Rescore Learner\'s Submission')}</button>
+        |
+        <button type="button" class="btn-link staff-debug-rescore-if-higher">${_('Rescore Only If Score Improves')}</button>
         % endif
         % endif
         ]

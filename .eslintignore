@@ -45,13 +45,10 @@ common/lib/xmodule/xmodule/js/spec/problem/edit_spec_hint.js
 common/lib/xmodule/xmodule/js/spec/tabs/edit.js
 
 common/lib/xmodule/xmodule/js/src/annotatable/display.js
-common/lib/xmodule/xmodule/js/src/capa/display.js
 common/lib/xmodule/xmodule/js/src/conditional/display.js
 common/lib/xmodule/xmodule/js/src/discussion/display.js
 common/lib/xmodule/xmodule/js/src/html/display.js
 common/lib/xmodule/xmodule/js/src/html/edit.js
-common/lib/xmodule/xmodule/js/src/javascript_loader.js
-common/lib/xmodule/xmodule/js/src/problem/edit.js
 common/lib/xmodule/xmodule/js/src/raw/edit/json.js
 common/lib/xmodule/xmodule/js/src/raw/edit/metadata-only.js
 common/lib/xmodule/xmodule/js/src/raw/edit/xml.js

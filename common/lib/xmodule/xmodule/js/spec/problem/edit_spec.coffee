@@ -187,21 +187,80 @@ describe 'MarkdownEditingDescriptor', ->
 
 
         </problem>""")
-    it 'markup with multiple answers doesn\'t break numerical response', ->
+    it 'markup with additional answer does not break numerical response', ->
       data =  MarkdownEditingDescriptor.markdownToXml("""
         Enter 1 with a tolerance:
         = 1 +- .02
-        or= 2 +- 5%
+        or= 2
         """)
       expect(data).toXMLEqual("""<problem>
         <numericalresponse answer="1">
           <p>Enter 1 with a tolerance:</p>
-        <responseparam type="tolerance" default=".02"/>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="2"/>
           <formulaequationinput/>
         </numericalresponse>
 
+        </problem>"""
+      )
+    it 'markup for numerical with multiple additional answers renders correctly', ->
+      data =  MarkdownEditingDescriptor.markdownToXml("""
+        Enter 1 with a tolerance:
+        = 1 +- .02
+        or= 2
+        or= 3
+        """)
+      expect(data).toXMLEqual("""<problem>
+        <numericalresponse answer="1">
+          <p>Enter 1 with a tolerance:</p>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="2"/>
+          <additional_answer answer="3"/>
+          <formulaequationinput/>
+        </numericalresponse>
 
-        </problem>""")
+        </problem>"""
+      )
+    it 'Do not render ranged/tolerance/alphabetical additional answers for numerical response', ->
+      data =  MarkdownEditingDescriptor.markdownToXml("""
+        Enter 1 with a tolerance:
+        = 1 +- .02
+        or= 2
+        or= 3 +- 0.1
+        or= [4,6]
+        or= ABC
+        or= 7
+        """)
+      expect(data).toXMLEqual("""<problem>
+        <numericalresponse answer="1">
+          <p>Enter 1 with a tolerance:</p>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="2"/>
+          <additional_answer answer="7"/>
+          <formulaequationinput/>
+        </numericalresponse>
+
+        </problem>"""
+      )
+    it 'markup with feedback renders correctly in additional answer for numerical response', ->
+      data =  MarkdownEditingDescriptor.markdownToXml("""
+        Enter 1 with a tolerance:
+        = 100 +- .02 {{ main feedback }}
+        or= 10 {{ additional feedback }}
+        """)
+      expect(data).toXMLEqual("""<problem>
+        <numericalresponse answer="100">
+          <p>Enter 1 with a tolerance:</p>
+          <responseparam type="tolerance" default=".02"/>
+          <additional_answer answer="10">
+            <correcthint>additional feedback</correcthint>
+          </additional_answer>
+          <formulaequationinput/>
+          <correcthint>main feedback</correcthint>
+        </numericalresponse>
+
+        </problem>"""
+      )
     it 'converts multiple choice to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
 

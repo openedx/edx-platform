@@ -6,8 +6,9 @@ See also lettuce tests in lms/djangoapps/courseware/features/problems.feature
 import random
 import textwrap
 
-from nose import SkipTest
 from abc import ABCMeta, abstractmethod
+from flaky import flaky
+from nose import SkipTest
 from nose.plugins.attrib import attr
 from selenium.webdriver import ActionChains
 
@@ -29,8 +30,8 @@ from capa.tests.response_xml_factory import (
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
 from common.test.acceptance.pages.lms.problem import ProblemPage
 from common.test.acceptance.tests.helpers import select_option_by_text
-from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 from common.test.acceptance.tests.helpers import EventsTestMixin
+from common.test.acceptance.tests.lms.test_lms_problems import ProblemsTest
 
 
 class ProblemTypeTestBaseMeta(ABCMeta):
@@ -291,6 +292,7 @@ class ProblemTypeTestMixin(object):
             self.answer_problem(correctness='incorrect')
             self.assertFalse(self.problem_page.is_save_notification_visible())
 
+    @flaky  # TNL-5774
     @attr(shard=7)
     def test_reset_clears_answer_and_focus(self):
         """

@@ -140,35 +140,27 @@ class TestRescoringTask(TestIntegrationTask):
             expected_subsection_grade,
         )
 
-    def submit_rescore_all_student_answers(self, instructor, problem_url_name):
+    def submit_rescore_all_student_answers(self, instructor, problem_url_name, only_if_higher=False):
         """Submits the particular problem for rescoring"""
-        return submit_rescore_problem_for_all_students(self.create_task_request(instructor),
-                                                       InstructorTaskModuleTestCase.problem_location(problem_url_name))
+        return submit_rescore_problem_for_all_students(
+            self.create_task_request(instructor),
+            InstructorTaskModuleTestCase.problem_location(problem_url_name),
+            only_if_higher,
+        )
 
-    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student):
+    def submit_rescore_one_student_answer(self, instructor, problem_url_name, student, only_if_higher=False):
         """Submits the particular problem for rescoring for a particular student"""
-        return submit_rescore_problem_for_student(self.create_task_request(instructor),
-                                                  InstructorTaskModuleTestCase.problem_location(problem_url_name),
-                                                  student)
+        return submit_rescore_problem_for_student(
+            self.create_task_request(instructor),
+            InstructorTaskModuleTestCase.problem_location(problem_url_name),
+            student,
+            only_if_higher,
+        )
 
-    RescoreTestData = namedtuple('RescoreTestData', 'edit, new_expected_scores, new_expected_max')
-
-    @ddt.data(
-        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(0, 1, 1, 2), new_expected_max=2),
-        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
-        RescoreTestData(edit=dict(num_inputs=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
-        RescoreTestData(edit=dict(num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
-        RescoreTestData(edit=dict(num_inputs=2, num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
-    )
-    @ddt.unpack
-    def test_rescoring_option_problem(self, problem_edit, new_expected_scores, new_expected_max):
+    def verify_rescore_results(self, problem_edit, new_expected_scores, new_expected_max, rescore_if_higher):
         """
-        Run rescore scenario on option problem.
-        Verify rescoring updates grade after content change.
-        Original problem definition has:
-            num_inputs = 1
-            num_responses = 2
-            correct_answer = OPTION_1
+        Common helper to verify the results of rescoring for a single
+        student and all students are as expected.
         """
         # get descriptor:
         problem_url_name = 'H1P1'
@@ -196,15 +188,49 @@ class TestRescoringTask(TestIntegrationTask):
         self.check_state(self.user1, descriptor, expected_original_scores[0], expected_original_max)
 
         # rescore the problem for only one student -- only that student's grade should change:
-        self.submit_rescore_one_student_answer('instructor', problem_url_name, self.user1)
+        self.submit_rescore_one_student_answer('instructor', problem_url_name, self.user1, rescore_if_higher)
         self.check_state(self.user1, descriptor, new_expected_scores[0], new_expected_max)
         for i, user in enumerate(self.users[1:], start=1):  # everyone other than user1
             self.check_state(user, descriptor, expected_original_scores[i], expected_original_max)
 
         # rescore the problem for all students
-        self.submit_rescore_all_student_answers('instructor', problem_url_name)
+        self.submit_rescore_all_student_answers('instructor', problem_url_name, rescore_if_higher)
         for i, user in enumerate(self.users):
             self.check_state(user, descriptor, new_expected_scores[i], new_expected_max)
+
+    RescoreTestData = namedtuple('RescoreTestData', 'edit, new_expected_scores, new_expected_max')
+
+    @ddt.data(
+        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(0, 1, 1, 2), new_expected_max=2),
+        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
+        RescoreTestData(edit=dict(num_inputs=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
+        RescoreTestData(edit=dict(num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=4),
+        RescoreTestData(edit=dict(num_inputs=2, num_responses=4), new_expected_scores=(2, 1, 1, 0), new_expected_max=8),
+    )
+    @ddt.unpack
+    def test_rescoring_option_problem(self, problem_edit, new_expected_scores, new_expected_max):
+        """
+        Run rescore scenario on option problem.
+        Verify rescoring updates grade after content change.
+        Original problem definition has:
+            num_inputs = 1
+            num_responses = 2
+            correct_answer = OPTION_1
+        """
+        self.verify_rescore_results(
+            problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=False,
+        )
+
+    @ddt.data(
+        RescoreTestData(edit=dict(), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
+        RescoreTestData(edit=dict(correct_answer=OPTION_2), new_expected_scores=(2, 1, 1, 2), new_expected_max=2),
+        RescoreTestData(edit=dict(num_inputs=2), new_expected_scores=(2, 1, 1, 0), new_expected_max=2),
+    )
+    @ddt.unpack
+    def test_rescoring_if_higher(self, problem_edit, new_expected_scores, new_expected_max):
+        self.verify_rescore_results(
+            problem_edit, new_expected_scores, new_expected_max, rescore_if_higher=True,
+        )
 
     def test_rescoring_failure(self):
         """Simulate a failure in rescoring a problem"""

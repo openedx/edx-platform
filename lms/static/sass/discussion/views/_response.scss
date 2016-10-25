@@ -145,6 +145,7 @@
   > li {
     border-top: 1px solid $forum-color-border;
     padding: ($baseline/2) $baseline;
+    position: relative;
   }
 
   blockquote {

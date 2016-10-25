@@ -2,8 +2,10 @@
 Tests for the functionality and infrastructure of grades tasks.
 """
 
+from collections import OrderedDict
 import ddt
 from django.conf import settings
+from django.db.utils import IntegrityError
 from mock import patch
 from unittest import skip
 
@@ -46,11 +48,12 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
         self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='problem')
 
-        self.score_changed_kwargs = {
-            'user_id': self.user.id,
-            'course_id': unicode(self.course.id),
-            'usage_id': unicode(self.problem.location),
-        }
+        self.score_changed_kwargs = OrderedDict([
+            ('user_id', self.user.id),
+            ('course_id', unicode(self.course.id)),
+            ('usage_id', unicode(self.problem.location)),
+            ('only_if_higher', None),
+        ])
 
         # this call caches the anonymous id on the user object, saving 4 queries in all happy path tests
         _ = anonymous_id_for_user(self.user, self.course.id)
@@ -66,13 +69,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             return_value=None
         ) as mock_task_apply:
             SCORE_CHANGED.send(sender=None, **self.score_changed_kwargs)
-            mock_task_apply.assert_called_once_with(
-                args=(
-                    self.score_changed_kwargs['user_id'],
-                    self.score_changed_kwargs['course_id'],
-                    self.score_changed_kwargs['usage_id'],
-                )
-            )
+            mock_task_apply.assert_called_once_with(args=tuple(self.score_changed_kwargs.values()))
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_subsection_grade_updated(self, default_store):
@@ -80,13 +77,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.set_up_course()
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             with check_mongo_calls(2) and self.assertNumQueries(13):
-                recalculate_subsection_grade.apply(
-                    args=(
-                        self.score_changed_kwargs['user_id'],
-                        self.score_changed_kwargs['course_id'],
-                        self.score_changed_kwargs['usage_id'],
-                    )
-                )
+                recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
 
     def test_single_call_to_create_block_structure(self):
         self.set_up_course()
@@ -95,13 +86,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             'openedx.core.lib.block_structure.factory.BlockStructureFactory.create_from_cache',
             return_value=None,
         ) as mock_block_structure_create:
-            recalculate_subsection_grade.apply(
-                args=(
-                    self.score_changed_kwargs['user_id'],
-                    self.score_changed_kwargs['course_id'],
-                    self.score_changed_kwargs['usage_id'],
-                )
-            )
+            recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -112,13 +97,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
             with check_mongo_calls(2) and self.assertNumQueries(13):
-                recalculate_subsection_grade.apply(
-                    args=(
-                        self.score_changed_kwargs['user_id'],
-                        self.score_changed_kwargs['course_id'],
-                        self.score_changed_kwargs['usage_id'],
-                    )
-                )
+                recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_subsection_grades_not_enabled_on_course(self, default_store):
@@ -126,13 +105,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.set_up_course(enable_subsection_grades=False)
             self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             with check_mongo_calls(2) and self.assertNumQueries(0):
-                recalculate_subsection_grade.apply(
-                    args=(
-                        self.score_changed_kwargs['user_id'],
-                        self.score_changed_kwargs['course_id'],
-                        self.score_changed_kwargs['usage_id'],
-                    )
-                )
+                recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
 
     @skip("Pending completion of TNL-5089")
     @ddt.data(
@@ -147,10 +120,15 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course()
             with check_mongo_calls(0) and self.assertNumQueries(3 if feature_flag else 2):
-                recalculate_subsection_grade.apply(
-                    args=(
-                        self.score_changed_kwargs['user_id'],
-                        self.score_changed_kwargs['course_id'],
-                        self.score_changed_kwargs['usage_id'],
-                    )
-                )
+                recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
+
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    def test_retry_on_integrity_error(self, mock_update, mock_retry):
+        """
+        Ensures that tasks will be retried if IntegrityErrors are encountered.
+        """
+        self.set_up_course()
+        mock_update.side_effect = IntegrityError("WHAMMY")
+        recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
+        self.assertTrue(mock_retry.called)

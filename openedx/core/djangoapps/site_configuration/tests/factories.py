@@ -24,6 +24,7 @@ class SiteFactory(DjangoModelFactory):
     """
     class Meta(object):
         model = Site
+        django_get_or_create = ('domain',)
 
     domain = 'testserver.fake'
     name = 'testserver.fake'

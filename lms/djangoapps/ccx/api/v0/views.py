@@ -9,11 +9,9 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
 from rest_framework import status
-from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_oauth.authentication import OAuth2Authentication
 
 from ccx_keys.locator import CCXLocator
 from courseware import courses
@@ -26,7 +24,10 @@ from lms.djangoapps.instructor.enrollment import (
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.lib.api import permissions
+from openedx.core.lib.api import (
+    authentication,
+    permissions,
+)
 from student.models import CourseEnrollment
 from student.roles import CourseCcxCoachRole
 
@@ -363,7 +364,11 @@ class CCXListView(GenericAPIView):
                 ]
     }
     """
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (
+        JwtAuthentication,
+        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (IsAuthenticated, permissions.IsMasterCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
     pagination_class = CCXAPIPagination
@@ -609,7 +614,11 @@ class CCXDetailView(GenericAPIView):
             response is returned.
     """
 
-    authentication_classes = (JwtAuthentication, OAuth2Authentication, SessionAuthentication,)
+    authentication_classes = (
+        JwtAuthentication,
+        authentication.OAuth2AuthenticationAllowInactiveUser,
+        authentication.SessionAuthenticationAllowInactiveUser,
+    )
     permission_classes = (IsAuthenticated, permissions.IsCourseStaffInstructor)
     serializer_class = CCXCourseSerializer
 

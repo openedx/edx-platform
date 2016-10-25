@@ -29,11 +29,9 @@ class CapaModule(CapaMixin, XModule):
     icon_class = 'problem'
 
     js = {
-        'coffee': [
-            resource_string(__name__, 'js/src/capa/display.coffee'),
-            resource_string(__name__, 'js/src/javascript_loader.coffee'),
-        ],
         'js': [
+            resource_string(__name__, 'js/src/javascript_loader.js'),
+            resource_string(__name__, 'js/src/capa/display.js'),
             resource_string(__name__, 'js/src/collapsible.js'),
             resource_string(__name__, 'js/src/capa/imageinput.js'),
             resource_string(__name__, 'js/src/capa/schematic.js'),
@@ -156,7 +154,7 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     show_in_read_only_mode = True
     template_dir_name = 'problem'
     mako_template = "widgets/problem-edit.html"
-    js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
+    js = {'js': [resource_string(__name__, 'js/src/problem/edit.js')]}
     js_module_name = "MarkdownEditingDescriptor"
     has_author_view = True
     css = {

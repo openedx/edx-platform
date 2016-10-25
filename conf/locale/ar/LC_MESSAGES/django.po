@@ -152,7 +152,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-06 15:01+0000\n"
+"POT-Creation-Date: 2016-10-13 18:43+0000\n"
 "PO-Revision-Date: 2016-09-18 17:18+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -221,7 +221,6 @@ msgid "Video ID"
 msgstr "الرقم التعريفي للفيديو"
 
 #: cms/djangoapps/contentstore/views/videos.py
-#: common/djangoapps/config_models/admin.py
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/shoppingcart/receipt.html
 msgid "Status"
@@ -234,64 +233,6 @@ msgstr "الحالة"
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "Pending"
 msgstr "قيد الانتظار"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Revert to the selected configuration"
-msgstr "العودة إلى الإعدادات المختارة"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Please select a single configuration to revert to."
-msgstr "يرجى اختيار إعداد واحد للعودة إليه."
-
-#: common/djangoapps/config_models/admin.py
-msgid "Reverted configuration."
-msgstr "إعدادات جرى العودة إليها"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Current Configuration"
-msgstr "الإعدادات الحالية"
-
-#: common/djangoapps/config_models/admin.py
-msgid "All (Show History)"
-msgstr "الكل (إظهار التاريخ)"
-
-#: common/djangoapps/config_models/admin.py
-msgid "Update"
-msgstr "تحديث"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A file containing JSON must be specified."
-msgstr "يجب تحديد ملف يتضمن JSON. "
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "A valid username must be specified."
-msgstr "يجب تحديد اسم مستخدم صالح."
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "File {0} does not exist"
-msgstr "الملف {0} غير موجود"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Importing JSON data from file {0}"
-msgstr "يجري استيراد بيانات JSON من ملف {0}"
-
-#: common/djangoapps/config_models/management/commands/populate_model.py
-msgid "Import complete, {0} new entries created"
-msgstr "تم الاستيراد، وأنشئت {0} مدخلات جديدة"
-
-#: common/djangoapps/config_models/models.py
-msgid "Change date"
-msgstr "تغيير التاريخ"
-
-#. Translators: this label indicates the name of the user who made this
-#. change:
-#: common/djangoapps/config_models/models.py
-msgid "Changed by"
-msgstr "جرى التغيير من قِبَل"
-
-#: common/djangoapps/config_models/models.py
-msgid "Enabled"
-msgstr "فعّال"
 
 #: common/djangoapps/cors_csrf/models.py
 msgid ""
@@ -377,6 +318,7 @@ msgstr "المساق "
 #: common/djangoapps/course_modes/models.py
 #: common/lib/xmodule/xmodule/annotatable_module.py
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
@@ -566,25 +508,6 @@ msgstr "أدرج {country} على اللائحة البيضاء للمساق {co
 #: common/djangoapps/embargo/models.py
 msgid "Blacklist {country} for {course}"
 msgstr "أردج {country} على اللائحة السوداء للمساق {course}"
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"You have already created an account using an external login like WebAuth or "
-"Shibboleth. Please contact {tech_support_email} for support."
-msgstr ""
-"لقد قمت بإنشاء حساب في وقت سابق باستخدام تسجيل دخول خارجي مثل WebAuth أو "
-"Shibboleth . يرجى الاتصال بـ {tech_support_email} للحصول على الدعم."
-
-#: common/djangoapps/external_auth/views.py
-msgid ""
-"\n"
-"        Your university identity server did not return your ID information to us.\n"
-"        Please try logging in again.  (You may need to restart your browser.)\n"
-"        "
-msgstr ""
-"\n"
-"لم يقم خادم هوية الجامعة الخاص بك بإرجاع معلومات هويتك إلينا.\n"
-"الرجاء محاولة تسجيل الدخول مرة أخرى. (قد تحتاج إلى إعادة تشغيل المتصفح.) "
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -911,6 +834,14 @@ msgid ""
 msgstr ""
 "الإطار الزمني التالي للتسجيل والذي يُقبل خلاله إعادة المبلغ المدفوع "
 "للمستخدمين، ممثلًا بأجزاء الثواني. الفترة الافتراضية هي 14 يومًا."
+
+#: common/djangoapps/student/models.py
+msgid "Name of the UTM cookie"
+msgstr ""
+
+#: common/djangoapps/student/models.py
+msgid "Name of the affiliate cookie"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -1690,6 +1621,16 @@ msgstr "غير مدعوم"
 msgid "Cannot rescore problems with possible file submissions"
 msgstr "لا يمكن إعادة تقييم المسائل التي يُحتمل تقديم ملفّات فيها."
 
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect"
+msgstr "خاطئ"
+
+#: common/lib/capa/capa/capa_problem.py
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct"
+msgstr "صحيح"
+
 #: common/lib/capa/capa/inputtypes.py
 msgid "correct"
 msgstr "صحيح"
@@ -1774,6 +1715,14 @@ msgstr ""
 "برسالة آخرى تحوي تعليقات الأستاذ الذي أجرى التقييم."
 
 #: common/lib/capa/capa/inputtypes.py
+msgid "{programming_language} editor"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
+msgid "Press ESC then TAB or click outside of the code editor to exit"
+msgstr ""
+
+#: common/lib/capa/capa/inputtypes.py
 msgid ""
 "Submitted. As soon as a response is returned, this message will be replaced "
 "by that feedback."
@@ -1827,12 +1776,16 @@ msgid "Question {index}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Correct"
-msgstr "صحيح"
+msgid "Correct:"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-msgid "Incorrect"
-msgstr "خاطئ"
+msgid "Incorrect:"
+msgstr ""
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "Answer"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -2104,6 +2057,7 @@ msgid "Annotation"
 msgstr "ملاحظة توضيحية"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "This name appears in the horizontal navigation at the top of the page."
 msgstr "يظهر هذا الإسم في شريط التصفّح الأفقي في أعلى الصفحة."
@@ -2285,10 +2239,6 @@ msgstr ""
 "الميزة غير مدعومة بشكل جيّد."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "String customization substitutions for particular locations"
-msgstr "بدائل تخصيص النص لمواقع محدّدة"
-
-#: common/lib/xmodule/xmodule/capa_base.py
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Enable LaTeX templates?"
 msgstr "هل ترغب في تفعيل نماذج LaTeX؟"
@@ -2314,17 +2264,18 @@ msgstr ""
 "مكشوفًا. للحصول على مفتاح لمساقك، أو للإبلاغ عن مشكلة ما، يُرجى مراسلة "
 "الشركة على هذا العنوان moocsupport@mathworks.com."
 
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Check"
-msgstr "تحقّق"
+#: common/templates/darklang/preview_lang_include.html
+#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
+#: lms/templates/register-shib.html
+#: lms/templates/peer_grading/peer_grading_problem.html
+#: lms/templates/survey/survey.html
+#: themes/stanford-style/lms/templates/register-shib.html
+msgid "Submit"
+msgstr "تقديم"
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Final Check"
-msgstr "تحقّق أخير "
-
-#: common/lib/xmodule/xmodule/capa_base.py
-msgid "Checking..."
-msgstr "جاري التحقّق..."
+msgid "Submitting"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
@@ -2342,15 +2293,56 @@ msgstr "أُفسِدت حالة المسألة بسبب تقديم غير صحي
 msgid "If this error persists, please contact the course staff."
 msgstr "إذا استمرّ ظهور هذا الخطأ، يُرجى الاتصال بطاقم المساق."
 
+#. Translators: {previous_hints} is the HTML of hints that have already been
+#. generated, {hint_number_prefix}
+#. is a header for this hint, and {hint_text} is the text of the hint itself.
+#. This string is being passed to translation only for possible reordering of
+#. the placeholders.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Hint: "
-msgstr "تلميح:"
+msgid ""
+"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
+msgstr ""
 
-#. Translators: e.g. "Hint 1 of 3" meaning we are showing the first of three
+#. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
+#. This text is shown in bold before the accompanying hint text.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "التلميح ({hint_num} من أصل {hints_count}):"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Incorrect ({progress} point)"
+msgid_plural "Incorrect ({progress} points)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Correct ({progress} point)"
+msgid_plural "Correct ({progress} points)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially correct ({progress} point)"
+msgid_plural "Partially correct ({progress} points)"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "Partially Correct"
+msgstr ""
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -2359,8 +2351,8 @@ msgid "Problem is closed."
 msgstr "أُغلقت المسألة."
 
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Problem must be reset before it can be checked again."
-msgstr "يجب إعادة ضبط المسألة قبل أن يُتمكّن التحقّق منها مرّة أخرى."
+msgid "Problem must be reset before it can be submitted again."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
@@ -2435,11 +2427,15 @@ msgstr ""
 "حُفِّظت إجاباتك ولكن لم يجرِ تقييمها بعد. يُرجى الضغط على '{button_name}' "
 "لتقييمها."
 
-#. Translators: A student must "make an attempt" to solve the problem on the
-#. page before they can reset it.
+#. Translators: 'closed' means the problem's due date has passed. You may no
+#. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
-msgid "Refresh the page and make an attempt before resetting."
-msgstr "يٌرجى تحديث الصفحة ومحاولة حلّ المسألة قبل طلب إعادة ضبطها. "
+msgid "You cannot select Reset for a problem that is closed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid "You must submit an answer before you can select Reset."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2455,6 +2451,70 @@ msgid ""
 "refresh your page."
 msgstr ""
 "تغيّرت حالة هذه المسألة منذ قيامك بتحميل هذه الصفحة. يُرجى تحديث صفحتك."
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "List of urls of children that are references to external modules"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Source Components"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The component location IDs of all source components that are used to "
+"determine whether a learner is shown the content of this conditional module."
+" Copy the component location ID of a component from its Settings dialog in "
+"Studio."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Attribute"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The attribute of the source components that determines whether a learner is "
+"shown the content of this conditional module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Conditional Value"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The value that the conditional attribute of the source components must match"
+" before a learner is shown the content of this conditional module."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Blocked Content Message"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid ""
+"The message that is shown to learners when not all conditions are met to "
+"show the content of this conditional module. Include {link} in the text of "
+"your message to give learners a direct link to required units. For example, "
+"'You must complete {link} before you can access this unit'."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "You must complete {link} before you can access this unit."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "This component has no source components configured yet."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/conditional_module.py
+msgid "Configure list of sources"
+msgstr ""
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
@@ -3965,14 +4025,6 @@ msgstr ""
 "والتحميلات\". تُلغي هذه القيمة قيمة استوديو الافتراضية، c4x://."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Text Customization"
-msgstr "تخصيص النصّ"
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
-msgid "Enter string customization substitutions for particular locations."
-msgstr "يُرجى إدخال بدائل تعديل النص في أماكن محدّدة."
-
-#: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable LaTeX Compiler"
 msgstr "تفعيل المترجم الخاص بنظام LaTeX"
 
@@ -4372,6 +4424,17 @@ msgstr "نوع ترميز غير صالح. يجب ترميز النصوص باس
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
 msgstr "أساسي"
+
+#: common/lib/xmodule/xmodule/video_module/video_module.py
+msgid "There is no transcript file associated with the {lang} language."
+msgid_plural ""
+"There are no transcript files associated with the {lang} languages."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -9677,6 +9740,25 @@ msgstr "حالات متطلبات الاعتماد"
 msgid "Deadline for purchasing and requesting credit."
 msgstr "الموعد النهائي لشراء الوحدات الدراسية وطلبها."
 
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"You have already created an account using an external login like WebAuth or "
+"Shibboleth. Please contact {tech_support_email} for support."
+msgstr ""
+"لقد قمت بإنشاء حساب في وقت سابق باستخدام تسجيل دخول خارجي مثل WebAuth أو "
+"Shibboleth . يرجى الاتصال بـ {tech_support_email} للحصول على الدعم."
+
+#: openedx/core/djangoapps/external_auth/views.py
+msgid ""
+"\n"
+"        Your university identity server did not return your ID information to us.\n"
+"        Please try logging in again.  (You may need to restart your browser.)\n"
+"        "
+msgstr ""
+"\n"
+"لم يقم خادم هوية الجامعة الخاص بك بإرجاع معلومات هويتك إلينا.\n"
+"الرجاء محاولة تسجيل الدخول مرة أخرى. (قد تحتاج إلى إعادة تشغيل المتصفح.) "
+
 #: openedx/core/djangoapps/profile_images/images.py
 msgid "The file must be smaller than {image_max_size} in size."
 msgstr "يجب ألا يزيد حجم الملف عن {image_max_size}"
@@ -10835,10 +10917,6 @@ msgstr "قائمة المستخدم"
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
 
-#: common/lib/capa/capa/templates/codeinput.html
-msgid "{programming_language} editor"
-msgstr "مُحرّر {programming_language} "
-
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr "جميع الحقوق محفوظة"
@@ -10874,15 +10952,6 @@ msgstr "رمز اللغة"
 #: common/templates/darklang/preview_lang_include.html
 msgid "For example use en for English"
 msgstr "على سبيل المثال، استخدم en للغة الإنجليزية  "
-
-#: common/templates/darklang/preview_lang_include.html
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
-#: lms/templates/peer_grading/peer_grading_problem.html
-#: lms/templates/survey/survey.html
-#: themes/stanford-style/lms/templates/register-shib.html
-msgid "Submit"
-msgstr "تقديم"
 
 #: common/templates/darklang/preview_lang_include.html
 msgid "Please refresh the page to see the changes applied."
@@ -11649,10 +11718,6 @@ msgid "You do not have any notes."
 msgstr "ليس لديك أي ملاحظات."
 
 #: lms/templates/problem.html
-msgid "your answer"
-msgstr "إجابتك"
-
-#: lms/templates/problem.html
 msgid "Hint"
 msgstr "تلميح"
 
@@ -11661,12 +11726,29 @@ msgid "Save"
 msgstr "حفظ"
 
 #: lms/templates/problem.html
-msgid "Toggle Answer Visibility"
-msgstr "بدّل إمكانية رؤية الإجابة"
+msgid "Save your answer"
+msgstr ""
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} submissions"
-msgstr "لقد استخدمتَ {num_used} محاولات من أصل {num_total}"
+msgid "Reset your answer"
+msgstr ""
+
+#: lms/templates/problem.html
+msgid "Submit your answer"
+msgstr ""
+
+#: lms/templates/problem.html
+msgid "You have used {num_used} of {num_total} attempts"
+msgstr ""
+
+#: lms/templates/problem_notifications.html
+msgid "Next Hint"
+msgstr ""
+
+#: lms/templates/problem_notifications.html
+#: lms/templates/shoppingcart/shopping_cart_flow.html
+msgid "Review"
+msgstr "مراجعة "
 
 #: lms/templates/provider_login.html
 msgid "Log In"
@@ -14374,32 +14456,45 @@ msgid "Verify Now"
 msgstr "إجراء التحقّق الآن"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You have already verified your ID!"
-msgstr "سبق أن خضتَ عملية التحقّق من بطاقتك الشخصية! "
+msgid "You have submitted your verification information."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Thanks for your patience as we process your request."
-msgstr "نشكرك على صبرك ريثما نعالج طلبك."
+msgid ""
+"You will see a message on your dashboard when the verification process is "
+"complete (usually within 1-2 days)."
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification status is good until {date}."
-msgstr "يسري مفعول عملية التحقّق من هويّتك حتى تاريخ {date}."
+msgid "Your current verification will expire soon!"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Your verification will expire soon!"
-msgstr "سوف تنتهي صلاحية التحقق من هويتك قريبًا!"
+msgid ""
+"You have submitted your reverification information. You will see a message "
+"on your dashboard when the verification process is complete (usually within "
+"1-2 days)."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "You have successfully verified your ID with edX"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification is effective until {date}."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your current verification will expire soon."
+msgstr ""
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
-"Your current verification will expire before the verification deadline for "
-"this course. {start_link}Re-verify your identity now{end_link} using a "
-"webcam and a government-issued ID."
+"Your current verification will expire in {days} days. {start_link}Re-verify "
+"your identity now{end_link} using a webcam and a government-issued photo ID."
 msgstr ""
-"تنتهي صلاحية التحقق من هويتك قبل تاريخ انتهاء هذا المساق. {start_link}أعد "
-"التحقق من هويتك الآن{end_link} باستخدام كاميرا الكومبيوتر وهوية صادرة عن "
-"الحكومة."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14511,42 +14606,35 @@ msgstr ""
 "{support_email}."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Approved"
-msgstr "وضع التحقق: تمت الموافقة عليه"
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid ""
-"Your edX Verification is reviewed and approved. Your verification status is "
-"good for one year after submission."
+msgid "Current Verification Status: Approved"
 msgstr ""
-"لقد تمت مراجعة طلب تأكيد هويتك والموافقة عليه. هذه الموافقة صالحة لمدة سنة "
-"واحدة من تاريخ التقديم."
-
-#: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Pending"
-msgstr "وضع التحقق: قيد الانتظار"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification is pending. Your verification photos have been "
+"Your edX verification has been approved. Your verification is effective for "
+"one year after submission."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Current Verification Status: Pending"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid ""
+"Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
 msgstr ""
-"لا يزال طلبك لتأكيد هويتك في انتظار بعض الإجراءات. لقد وصلت صورتك وسنقوم "
-"بمراجعتها قريباً."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Verification Status: Expired"
-msgstr "وضع التحقق: انتهت صلاحيته"
+msgid "Current Verification Status: Expired"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"Your edX Verification has expired. To receive a verified certificate, you "
-"have to submit a new photo of yourself and your government-issued photo ID "
-"before the course ends."
+"Your verification has expired. To receive a verified certificate, you must "
+"submit a new photo of yourself and your government-issued photo ID before "
+"the verification deadline for your course."
 msgstr ""
-"لقد انتهت صلاحية تأكيدهويتك. إن أردت الحصول على شهادات مصدقة، يجب أن ترسل "
-"صورة جديدة لك ولأي بطاقة حكومية تحمل صورتك الشخصية قبل انتهاء الدورة "
-"التدريبية."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
@@ -17978,10 +18066,6 @@ msgstr "سلّة التسوّق"
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "{platform_name} -  Shopping Cart"
 msgstr "{platform_name} - سلّة التسوّق"
-
-#: lms/templates/shoppingcart/shopping_cart_flow.html
-msgid "Review"
-msgstr "مراجعة "
 
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 msgid "Confirmation"

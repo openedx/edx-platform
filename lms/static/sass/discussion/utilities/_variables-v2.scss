@@ -35,3 +35,8 @@ $forum-small-font-size: font-size(x-small);
 
 // borders
 $forum-border-radius: $component-border-radius;
+
+
+// btn colors
+$uxpl-primary-blue: palette(primary, base) !default;
+$btn-default-background-color: $lms-container-background-color;
