@@ -775,13 +775,6 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
         """
         username, _ = self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(username)
-
-        profile_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-231
-            ],
-        })
-
         profile_page.a11y_audit.check_for_accessibility_errors()
 
         profile_page.make_field_editable('language_proficiencies')
@@ -802,13 +795,6 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
         different_username, _ = self.initialize_different_user(privacy=self.PRIVACY_PUBLIC)
         self.log_in_as_unique_user()
         profile_page = self.visit_profile_page(different_username)
-
-        profile_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-231
-            ],
-        })
-
         profile_page.a11y_audit.check_for_accessibility_errors()
 
     def test_badges_accessibility(self):
@@ -818,13 +804,6 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
         username = 'testcert'
         AutoAuthPage(self.browser, username=username).visit()
         profile_page = self.visit_profile_page(username)
-
-        profile_page.a11y_audit.config.set_rules({
-            "ignore": [
-                'link-href',  # TODO: AC-231
-                'color-contrast',  # TODO: AC-231
-            ],
-        })
         profile_page.display_accomplishments()
         profile_page.a11y_audit.check_for_accessibility_errors()
         profile_page.badges[0].display_modal()

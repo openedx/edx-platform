@@ -500,12 +500,9 @@ class StudioSettingsA11yTest(StudioCourseTest):
         self.settings_page.visit()
         self.settings_page.wait_for_page()
 
-        # There are several existing color contrast errors on this page,
-        # we will ignore this error in the test until we fix them.
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
-                'link-href',  # TODO: AC-557
-                'icon-aria-hidden',  # TODO: AC-229
+                'link-href',  # TODO: AC-590
             ],
         })
 
@@ -515,7 +512,7 @@ class StudioSettingsA11yTest(StudioCourseTest):
         # on this page. CodeMirror generates markup that does
         # not pass our accessibility testing rules.
         self.settings_page.a11y_audit.config.set_scope(
-            exclude=['.CodeMirror textarea']
+            exclude=['.CodeMirror textarea']  # TODO: TNL-5831
         )
 
         self.settings_page.a11y_audit.check_for_accessibility_errors()
