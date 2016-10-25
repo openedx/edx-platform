@@ -12,7 +12,11 @@ such that the value can be defined later than this assignment (file load order).
 (function() {
     'use strict';
     var AuthListWidget, BatchEnrollment, BetaTesterBulkAddition,
-        MemberListWidget, Membership, emailStudents, plantTimeout, statusAjaxError;
+        MemberListWidget, Membership, emailStudents, plantTimeout, statusAjaxError,
+        /* eslint-disable */
+        __hasProp = {}.hasOwnProperty,
+        __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+        /* eslint-enable */
 
     plantTimeout = function() {
         return window.InstructorDashboard.util.plantTimeout.apply(this, arguments);
@@ -38,10 +42,8 @@ such that the value can be defined later than this assignment (file load order).
                 add_btn_label: 'Add Member',
                 add_handler: function() {}
             });
-            templateHtml = $('#member-list-widget-template').html();
-            edx.HtmlUtils.setHtml(
-                this.$container, window.Mustache.render(templateHtml, edx.HtmlUtils.HTML(memberListParams))
-            );
+            templateHtml = window.Mustache.render($('#member-list-widget-template').html(), memberListParams);
+            edx.HtmlUtils.setHtml(this.$container, edx.HtmlUtils.HTML(templateHtml));
             this.$('input[type="button"].add').click(function() {
                 condition = typeof memberListParams.add_handler === 'function';
                 return condition ? memberListParams.add_handler(memberlistwidget.$('.add-field').val()) : undefined;
@@ -64,7 +66,7 @@ such that the value can be defined later than this assignment (file load order).
                 item = rowArray[i];
                 $td = $('<td>');
                 if (item instanceof jQuery) {
-                    edx.HtmlUtils.append($td, item);
+                    edx.HtmlUtils.append($td, edx.HtmlUtils.HTML(item));
                 } else {
                     $td.text(item);
                 }
@@ -86,13 +88,14 @@ such that the value can be defined later than this assignment (file load order).
         return memberListWidget;
     }());
 
-    AuthListWidget = (function() {
-        function authListWidget($container, rolename, $errorSection) {
+    AuthListWidget = (function(_super) {
+        __extends(AuthListWidget, _super);  // eslint-disable-line no-use-before-define
+        function AuthListWidget($container, rolename, $errorSection) {  // eslint-disable-line no-shadow
             var msg,
                 authlistwidget = this;
             this.rolename = rolename;
             this.$errorSection = $errorSection;
-            authListWidget.super.constructor.call(this, $container, {
+            AuthListWidget.__super__.constructor.call(this, $container, {  // eslint-disable-line no-underscore-dangle
                 title: $container.data('display-name'),
                 info: $container.data('info-text'),
                 labels: [gettext('Username'), gettext('Email'), gettext('Revoke access')],
@@ -112,13 +115,13 @@ such that the value can be defined later than this assignment (file load order).
             this.reload_list();
         }
 
-        authListWidget.prototype.re_view = function() {
+        AuthListWidget.prototype.re_view = function() {
             this.clear_errors();
             this.clear_input();
             return this.reload_list();
         };
 
-        authListWidget.prototype.add_handler = function(input) {
+        AuthListWidget.prototype.add_handler = function(input) {
             var authlistwidgetaddhandler = this;
             if ((input != null) && input !== '') {
                 return this.modify_member_access(input, 'allow', function(error) {
@@ -134,7 +137,7 @@ such that the value can be defined later than this assignment (file load order).
             }
         };
 
-        authListWidget.prototype.reload_list = function() {
+        AuthListWidget.prototype.reload_list = function() {
             var authlistwidgetreloadlist = this;
             return this.get_member_list(function(error, memberList) {
                 if (error !== null) {
@@ -163,19 +166,19 @@ such that the value can be defined later than this assignment (file load order).
             });
         };
 
-        authListWidget.prototype.clear_errors = function() {
+        AuthListWidget.prototype.clear_errors = function() {
             var ref, result;
             result = (this.$error_section) != null ? ref.text('') : undefined;
             return result;
         };
 
-        authListWidget.prototype.show_errors = function(msg) {
+        AuthListWidget.prototype.show_errors = function(msg) {
             var ref, result;
             result = (this.$error_section) != null ? ref.text(msg) : undefined;
             return result;
         };
 
-        authListWidget.prototype.get_member_list = function(cb) {
+        AuthListWidget.prototype.get_member_list = function(cb) {
             var authlistwidgetgetmemberlist = this;
             return $.ajax({
                 type: 'POST',
@@ -190,7 +193,7 @@ such that the value can be defined later than this assignment (file load order).
             });
         };
 
-        authListWidget.prototype.modify_member_access = function(uniqueStudentIdentifier, action, cb) {
+        AuthListWidget.prototype.modify_member_access = function(uniqueStudentIdentifier, action, cb) {
             var authlistwidgetmemberaccess = this;
             return $.ajax({
                 type: 'POST',
@@ -210,7 +213,7 @@ such that the value can be defined later than this assignment (file load order).
             });
         };
 
-        authListWidget.prototype.member_response = function(data) {
+        AuthListWidget.prototype.member_response = function(data) {
             var msg;
             this.clear_errors();
             this.clear_input();
@@ -233,7 +236,7 @@ such that the value can be defined later than this assignment (file load order).
             }
         };
 
-        return authListWidget;
+        return AuthListWidget;
     }(MemberListWidget));
 
     this.AutoEnrollmentViaCsv = (function() {
