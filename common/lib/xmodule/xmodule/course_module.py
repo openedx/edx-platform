@@ -740,6 +740,17 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    allow_proctoring_opt_out = Boolean(
+        display_name=_("Allow Opting Out of Proctored Exams"),
+        help=_(
+            "Enter true or false. If this value is true, learners can choose to take proctored exams "
+            "without proctoring. If this value is false, all learners must take the exam with proctoring. "
+            "This setting only applies if proctored exams are enabled for the course."
+        ),
+        default=True,
+        scope=Scope.settings
+    )
+
     create_zendesk_tickets = Boolean(
         display_name=_("Create Zendesk Tickets For Suspicious Proctored Exam Attempts"),
         help=_(
@@ -752,7 +763,8 @@ class CourseFields(object):
     enable_timed_exams = Boolean(
         display_name=_("Enable Timed Exams"),
         help=_(
-            "Enter true or false. If this value is true, timed exams are enabled in your course."
+            "Enter true or false. If this value is true, timed exams are enabled in your course. "
+            "Regardless of this setting, timed exams are enabled if Enable Proctored Exams is set to true."
         ),
         default=False,
         scope=Scope.settings
