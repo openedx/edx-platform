@@ -975,7 +975,7 @@ div.problem .action {
     }
     .submit {
       @include margin-right($baseline / 2);
-      float: left;
+      @include float(left);
     }
   }
 
