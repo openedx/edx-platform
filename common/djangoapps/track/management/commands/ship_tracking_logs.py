@@ -9,48 +9,6 @@ from openedx.core.storage import get_storage
 
 
 class Command(BaseCommand):
-    """
-    Django Management command utility to copy local tracking logs to
-    a remote storage environment. While this utility was written with Azure
-    Blob Storage in mind, since it uses the Django-Storages abstraction layer
-    it should be easily modified - if at all - to work with other Django-Storages
-    providers such as S3
-
-    To use this command, be sure to run this utility with an identity that has
-    read access to the tracking logs.
-
-    Arguments:
-
-        -p <local-tracking-file-directory-path>
-           The path where the tracking files can be found
-           DEFAULT: /edx/var/log/tracking
-
-        -c <container-name>
-           The name of the remote container/bucket to use
-           DEFAULT: 'tracking-logs'
-
-        -f <folder-name>
-           The name of the folder in the container/bukcet to 
-           put these files. This can be used to segregate tracking logs
-           from multiple Open edX, in the case that it is a shared storage
-           repository. The Open edX hostname might be a good choice of folder.
-           NOTE: This is a required parameter with no default.
-
-        -s <storage-name>
-           The Open edX Django-Storages provider to use
-           DEFAULT: 'openedx.core.storage.AzureStorageExtended'
-
-        -o <overwrite-existing>   (True/False)
-            A Boolean flag whether to overwrite existing files in the
-            targest destination
-            DEFAULT: False (don't overwrite)
-
-    To periodically ship off tracking logs, one can trigger an execution of
-    this command to some recurring task (like cron). Be sure to configure your
-    environments logrotate so that tracking files are rotated on a periodic
-    basis, e.g. daily, hourly, etc. After the system managed logrotation, this
-    django command can be trigger to upload rotated out files to remote storage.
-    """
     option_list = BaseCommand.option_list + (
         make_option('-p', '--path',
             metavar='PATH',
