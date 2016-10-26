@@ -1298,6 +1298,8 @@ def logout_user(request):
     logout(request)
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
+    elif settings.APPSEMBLER_FEATURES.get('ENABLE_CUSTOM_REDIRECT_AFTER_LOGOUT', False) and hasattr(settings, 'CUSTOM_LOGOUT_REDIRECT_URL'):
+        target = settings.CUSTOM_LOGOUT_REDIRECT_URL
     else:
         target = '/'
     response = redirect(target)
