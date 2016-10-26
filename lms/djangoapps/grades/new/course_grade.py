@@ -248,7 +248,7 @@ class CourseGradeFactory(object):
     def __init__(self, student):
         self.student = student
 
-    def create(self, course, read_only=False):
+    def create(self, course, read_only=True):
         """
         Returns the CourseGrade object for the given student and course.
 
