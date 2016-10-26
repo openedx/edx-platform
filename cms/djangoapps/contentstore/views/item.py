@@ -46,8 +46,8 @@ from contentstore.views.helpers import (
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
+from openedx.core.lib.xblock_utils import wrap_xblock, request_token, xblock_local_resource_url
 from openedx.core.lib.gating import api as gating_api
-from openedx.core.lib.xblock_utils import request_token, wrap_xblock
 from static_replace import replace_static_urls
 from student.auth import has_studio_read_access, has_studio_write_access
 from util.date_utils import get_default_time_display
@@ -286,6 +286,12 @@ class StudioEditModuleRuntime(object):
             if service_name == "lti-configuration":
                 return ConfigurationService(CourseEditLTIFieldsEnabledFlag)
         return None
+
+    def local_resource_url(self, *args, **kwargs):
+        """
+        Return URL of XBlock local resource.
+        """
+        return xblock_local_resource_url(*args, **kwargs)
 
 
 @require_http_methods(("GET"))
