@@ -608,7 +608,7 @@ class LogoutDuringAnswering(ProblemsTest):
         with problem_page.handle_alert(confirm=False):
             problem_page.click_submit()
 
-        self.assertTrue(problem_page.is_browser_on_page())
+        problem_page.wait_for_page()
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
 
 

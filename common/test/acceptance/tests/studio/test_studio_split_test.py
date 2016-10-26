@@ -759,10 +759,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         config.click_outline_anchor()
 
         # Waiting for the page load and verify that we've landed on course outline page
-        EmptyPromise(
-            lambda: self.outline_page.is_browser_on_page(), "loaded page {!r}".format(self.outline_page),
-            timeout=30
-        ).fulfill()
+        self.outline_page.wait_for_page()
 
     def test_group_configuration_non_empty_usage(self):
         """
@@ -806,10 +803,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         unit = ContainerPage(self.browser, vertical.locator)
         # Waiting for the page load and verify that we've landed on the unit page
-        EmptyPromise(
-            lambda: unit.is_browser_on_page(), "loaded page {!r}".format(unit),
-            timeout=30
-        ).fulfill()
+        unit.wait_for_page()
 
         self.assertIn(unit.name, usage)
 

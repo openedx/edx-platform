@@ -76,7 +76,6 @@ class BulkEmailTest(BaseInstructorDashboardTest):
 
     @ddt.data(["myself"], ["staff"], ["learners"], ["myself", "staff", "learners"])
     def test_email_queued_for_sending(self, recipient):
-        self.assertTrue(self.send_email_page.is_browser_on_page())
         self.send_email_page.send_message(recipient)
         self.send_email_page.verify_message_queued_successfully()
 
