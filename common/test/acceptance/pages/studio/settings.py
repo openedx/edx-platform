@@ -232,9 +232,14 @@ class SettingsPage(CoursePage):
         """
         Ensure the pre_requisite_course_options dropdown selector is displayed
         """
+        self.wait_for_element_presence('.wrapper-license', 'Element wait failed, render not called.', 500)
         EmptyPromise(
             lambda: self.q(css="#pre-requisite-course").present,
             'Prerequisite course dropdown selector is displayed'
+        ).fulfill()
+        EmptyPromise(
+            lambda: self.q(css=".wrapper-license").present,
+            'Prerequisite course value is set.'
         ).fulfill()
 
     ################
