@@ -90,7 +90,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
-                'button-name',  # TODO: AC-491
+                'button-name',  # TODO: TNL-5830
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -993,13 +993,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
-        self.certificates_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'checkboxgroup',  # TODO: AC-491
-                'duplicate-id',  # TODO: AC-491
-                'radiogroup',  # TODO: AC-491
-            ]
-        })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
@@ -1209,10 +1202,4 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
-        self.certificates_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'duplicate-id',  # TODO: AC-491
-                'radiogroup',  # TODO: AC-491
-            ]
-        })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
