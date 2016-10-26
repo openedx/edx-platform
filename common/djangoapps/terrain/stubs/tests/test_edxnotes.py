@@ -1,6 +1,7 @@
 """
 Unit tests for stub EdxNotes implementation.
 """
+import ddt
 import urlparse
 import json
 import unittest
@@ -9,6 +10,7 @@ from uuid import uuid4
 from ..edxnotes import StubEdxNotesService
 
 
+@ddt.ddt
 class StubEdxNotesServiceTest(unittest.TestCase):
     """
     Test cases for the stub EdxNotes service.
@@ -27,9 +29,9 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         """
         Returns a list of dummy notes.
         """
-        return [self._get_dummy_note() for i in xrange(count)]  # pylint: disable=unused-variable
+        return [self._get_dummy_note(i) for i in xrange(count)]  # pylint: disable=unused-variable
 
-    def _get_dummy_note(self):
+    def _get_dummy_note(self, uid=0):
         """
         Returns a single dummy note.
         """
@@ -39,7 +41,7 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             "created": "2014-10-31T10:05:00.000000",
             "updated": "2014-10-31T10:50:00.101010",
             "user": "dummy-user-id",
-            "usage_id": "dummy-usage-id",
+            "usage_id": "dummy-usage-id-" + str(uid),
             "course_id": "dummy-course-id",
             "text": "dummy note text " + nid,
             "quote": "dummy note quote",
@@ -106,7 +108,6 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         # get response with default page and page size
         response = requests.get(self._get_url("api/v1/search"), params={
             "user": "dummy-user-id",
-            "usage_id": "dummy-usage-id",
             "course_id": "dummy-course-id",
         })
 
@@ -125,7 +126,6 @@ class StubEdxNotesServiceTest(unittest.TestCase):
         # search notes with text that don't exist
         response = requests.get(self._get_url("api/v1/search"), params={
             "user": "dummy-user-id",
-            "usage_id": "dummy-usage-id",
             "course_id": "dummy-course-id",
             "text": "world war 2"
         })
@@ -141,6 +141,28 @@ class StubEdxNotesServiceTest(unittest.TestCase):
             next_page=None,
             previous_page=None
         )
+
+    @ddt.data(
+        '?usage_id=dummy-usage-id-0',
+        '?usage_id=dummy-usage-id-0&usage_id=dummy-usage-id-1&dummy-usage-id-2&dummy-usage-id-3&dummy-usage-id-4'
+    )
+    def test_search_usage_ids(self, usage_ids):
+        """
+        Test search with usage ids.
+        """
+        url = self._get_url('api/v1/search') + usage_ids
+        response = requests.get(url, params={
+            'user': 'dummy-user-id',
+            'course_id': 'dummy-course-id'
+        })
+        self.assertTrue(response.ok)
+        response = response.json()
+        parsed = urlparse.urlparse(url)
+        query_params = urlparse.parse_qs(parsed.query)
+        query_params['usage_id'].reverse()
+        self.assertEqual(len(response), len(query_params['usage_id']))
+        for index, usage_id in enumerate(query_params['usage_id']):
+            self.assertEqual(response[index]['usage_id'], usage_id)
 
     def test_delete(self):
         notes = self._get_notes()
