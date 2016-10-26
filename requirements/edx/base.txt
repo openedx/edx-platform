@@ -44,7 +44,7 @@ edx-drf-extensions==0.5.1
 
 edx-lint==0.5.1
 pylint==1.5.4  # from edx-lint
-pylint-django==0.7.2  # from edx-lint
+pylint-django==0.7.1  # from edx-lint
 astroid==1.4.8  # from edx-lint via pylint
 
 edx-django-oauth2-provider==1.1.4
