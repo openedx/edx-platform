@@ -168,18 +168,7 @@ case "$TEST_SUITE" in
         cp -R $HOME/firefox/ firefox/
         export SELENIUM_FIREFOX_PATH=firefox/firefox
 
-        case "$NUMBER_OF_BOKCHOY_THREADS" in
-
-            "1"|1)
-                XUNIT_ARG=" --with-xunit"
-                ;;
-
-            *)
-                XUNIT_ARG=" --with-xunitmp"
-                ;;
-        esac
-
-        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky $XUNIT_ARG"
+        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunitmp"
 
         case "$SHARD" in
 
