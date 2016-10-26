@@ -3,12 +3,13 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
-
-<!--<%namespace name='static' file='/static_content.html'/>-->
 
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+
+<script type="text/javascript" src="${static.url('common/js/third_party_auth/grant_data_sharing_permissions.js')}"></script>
 
 <%block name="pagetitle">${_("Additional permissions required")}</%block>
 <main id="main" aria-label="Content" tabindex="-1">
@@ -38,6 +39,8 @@ from django.utils.translation import ugettext as _
                             type="checkbox"
                             name="data_sharing_consent"
                             class="input-block checkbox"
+                            data-consent="${data_sharing_consent}"
+                            data-warning-message="${messages['warning'].get(data_sharing_consent, messages['warning']['optional'])}"
                         />
                         <label for="register-data_sharing_consent">
                             ${_("I agree to allow {platform_name} to share data about my enrollment, completion and performance in all {platform_name} courses and programs where my enrollment is sponsored by {provider}.*").format(provider=sso_provider, platform_name=platform_name)}
@@ -45,7 +48,7 @@ from django.utils.translation import ugettext as _
                     </div>
                     <input type="hidden" name="csrfmiddlewaretoken" value="${ csrftoken }" />
                     <button type="submit" class="action-primary action">Submit</button>
-                    <p class="note">${_("*{provider} requires data sharing consent; if consent is not provided, you will be redirected to log in manually.").format(provider=sso_provider)}
+                    <p class="note">${messages['note'].get(data_sharing_consent, messages['note']['optional'])}
                 </form>
             </div>
         </section>

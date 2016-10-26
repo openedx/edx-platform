@@ -8,13 +8,16 @@ from django.shortcuts import redirect, render
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.core.context_processors import csrf
+from django.utils.translation import ugettext as _
+
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import social
 from social.apps.django_app.views import complete
 from social.apps.django_app.utils import load_strategy, load_backend
 from social.utils import setting_name
-from .models import SAMLConfiguration, UserDataSharingConsentAudit
+from .models import SAMLConfiguration, UserDataSharingConsentAudit, ProviderConfig
 from .pipeline import get as get_running_pipeline, get_complete_url, get_real_social_auth_object
+from third_party_auth import pipeline
 from .provider import Registry
 
 from edxmako.shortcuts import render_to_response
@@ -101,20 +104,39 @@ class GrantDataSharingPermissions(View):
         """
         Render a form to collect user input about data sharing consent
         """
+        platform_name = configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         running_pipeline = get_running_pipeline(request)
         if running_pipeline:
             request.session['quarantined_module'] = 'third_party_auth.'
             current_provider = Registry.get_from_pipeline(running_pipeline)
             if current_provider:
                 name = current_provider.name
+                data_sharing_consent = \
+                    "required" if current_provider.enforces_data_sharing_consent(ProviderConfig.AT_LOGIN) \
+                    else "optional"
             else:
                 raise Http404
         else:
             raise Http404
         data = {
-            'platform_name': configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            'platform_name': platform_name,
             'sso_provider': name,
+            'data_sharing_consent': data_sharing_consent,
             'csrftoken': csrf(request)['csrf_token'],
+            "messages": {
+                "warning": {
+                    "optional": _("Are you Sure ?\nIf you do not agree to share your data, you will not get any "
+                                  "discounts from {provider}.").format(provider=name),
+                    "required": _("Are you Sure ?\nIf you do not agree to share your data, you will have to use "
+                                  "another account to access {platform}.").format(platform=platform_name)
+                },
+                "note": {
+                    "optional": _("*{provider} requests data sharing consent; if consent is not provided, you will"
+                                  " not be able to get any discounts from {provider}.").format(provider=name),
+                    "required": _("*{provider} requires data sharing consent; if consent is not provided, you will"
+                                  " be redirected to log in page.").format(provider=name)
+                }
+            },
         }
         return render_to_response('grant_data_sharing_permissions.html', data)
 
@@ -129,15 +151,21 @@ class GrantDataSharingPermissions(View):
         # If the checkbox is unchecked, no value will be sent
         social_auth = get_real_social_auth_object(request)
         consent, _ = UserDataSharingConsentAudit.objects.get_or_create(user_social_auth=social_auth)
+
         if consent_provided:
             consent.enable()
             consent.save()
-            backend_name = running_pipeline['backend']
-            request.session['quarantined_module'] = None
-            return redirect(get_complete_url(backend_name))
         else:
             consent.disable()
             consent.save()
-            request.session.flush()
-            # Flush the session to avoid the possibility of accidental login and to abort the pipeline
-            return redirect(reverse('dashboard'))
+
+            # Flush the session to avoid the possibility of accidental login and to abort the pipeline.
+            # pipeline is flushed only if data sharing is enforced, in other cases let the user to login.
+            if pipeline.active_provider_enforces_data_sharing(request, ProviderConfig.AT_LOGIN):
+                request.session.flush()
+                return redirect(reverse('dashboard'))
+
+        # Resume auth pipeline
+        backend_name = running_pipeline['backend']
+        request.session['quarantined_module'] = None
+        return redirect(get_complete_url(backend_name))
