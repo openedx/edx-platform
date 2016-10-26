@@ -84,7 +84,7 @@ import student
 from logging import getLogger
 
 from . import provider
-from .models import UserDataSharingConsentAudit
+from .models import UserDataSharingConsentAudit, ProviderConfig
 
 
 # These are the query string params you can pass
@@ -202,16 +202,21 @@ def get(request):
     return request.session.get('partial_pipeline')
 
 
-def active_provider_requires_data_sharing(request):
+def active_provider_enforces_data_sharing(request, enforcement_location):
     """
     Determine two things - first, whether there's an active third-party
     identity provider currently running, and second, if that active provider
-    requires data sharing consent in order to proceed.
+    enforces data sharing consent at the given point in order to proceed.
+
+    Args:
+        request: HttpRequest object containing request data.
+        enforcement_location (str): the point where to see data sharing consent state.
+        argument can either be "optional", 'at_login' or 'at_enrollment'
     """
     running_pipeline = get(request)
     if running_pipeline:
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        return current_provider and current_provider.require_data_sharing_consent
+        return current_provider and current_provider.enforces_data_sharing_consent(enforcement_location)
     return False
 
 
@@ -224,7 +229,7 @@ def active_provider_requests_data_sharing(request):
     running_pipeline = get(request)
     if running_pipeline:
         current_provider = provider.Registry.get_from_pipeline(running_pipeline)
-        return current_provider and current_provider.request_data_sharing_consent
+        return current_provider and current_provider.requests_data_sharing_consent
     return False
 
 
@@ -708,13 +713,16 @@ def verify_data_sharing_consent(social, backend, **kwargs):
         return redirect(reverse('grant_data_sharing_permissions'))
 
     current_provider = provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
-    if not current_provider.require_data_sharing_consent:
+
+    if not current_provider.requests_data_sharing_consent:
         return
+
     try:
         consent = social.data_sharing_consent_audit
     except UserDataSharingConsentAudit.DoesNotExist:
         return redirect_to_consent()
-    if not consent.enabled:
+
+    if (not consent.enabled) and current_provider.enforces_data_sharing_consent(ProviderConfig.AT_LOGIN):
         return redirect_to_consent()
 
 

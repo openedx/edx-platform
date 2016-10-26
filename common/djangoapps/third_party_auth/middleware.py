@@ -4,7 +4,7 @@ from social.apps.django_app.middleware import SocialAuthExceptionMiddleware
 from social.apps.django_app.default.models import UserSocialAuth
 
 from . import pipeline
-from .models import UserDataSharingConsentAudit
+from .models import UserDataSharingConsentAudit, ProviderConfig
 
 
 class ExceptionMiddleware(SocialAuthExceptionMiddleware):
@@ -38,7 +38,7 @@ class ResetSessionIfPipelineBrokenMiddleware(object):
         """
         view_module = view_func.__module__
 
-        if not pipeline.active_provider_requires_data_sharing(request):
+        if not pipeline.active_provider_enforces_data_sharing(request, ProviderConfig.AT_LOGIN):
             return
 
         running_pipeline = pipeline.get(request)
