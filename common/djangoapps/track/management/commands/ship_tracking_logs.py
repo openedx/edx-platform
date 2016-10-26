@@ -9,6 +9,16 @@ from openedx.core.storage import get_storage
 
 
 class Command(BaseCommand):
+    help = """
+    This command creates and registers a user in a given course
+    as "audit", "verified" or "honor".
+
+    example:
+        # Enroll a user test@example.com into the demo course
+        # The username and name will default to "test"
+        manage.py ... create_user -e test@example.com -p insecure -c edX/Open_DemoX/edx_demo_course -m verified
+    """
+
     option_list = BaseCommand.option_list + (
         make_option('-p', '--path',
             metavar='PATH',
@@ -19,7 +29,7 @@ class Command(BaseCommand):
         make_option('-c', '--container',
                     metavar='CONTAINER',
                     dest='container',
-                    default='tracking-logs',
+                    default=None,
                     help='Which container/bucket to use'),
         make_option('-f', '--folder',
                     metavar='FOLDER',
@@ -36,7 +46,13 @@ class Command(BaseCommand):
             metavar='OVERWRITE',
             dest='overwrite',
             default=False,
-            help='Overwrite existing files in remote storage')
+            help='Overwrite existing files in remote storage'),
+        make_option('-d', '--delete',
+            metavar='DELETE',
+            dest='delete',
+            default=False,
+            help='delete files already uploaded',
+        )
     )
 
     def handle(self, *args, **options):
@@ -56,8 +72,8 @@ class Command(BaseCommand):
         for file in files:
             print 'Inspecting {} ....'.format(file)
             local_path = join(path, file)
-            try:
-                with open(local_path,'r') as f:
+            with open(local_path,'r') as f:
+                try:
                     dest_fn = '{}/{}'.format(folder, file)
                     exists = storage.exists(dest_fn)
                     # does it already exist? Don't overwrite
@@ -80,6 +96,7 @@ class Command(BaseCommand):
                         storage.save(dest_fn, f)
                     else:
                         print 'File {} already exists in remote storage. Skipping...'.format(file)
-            except Exception, ex:
-                print 'Exception: {}'.format(str(ex))
+                except Exception, ex:
+                    print 'Exception: {}'.format(str(ex))
+
 
