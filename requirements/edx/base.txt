@@ -146,9 +146,7 @@ sqlparse>=0.2.0,<0.3.0
 before_after==0.1.3
 bok-choy==0.5.3
 chrono==1.0.2
-coverage==4.2
 ddt==0.8.0
-diff-cover==0.9.8
 django-crum==0.5
 django_nose==1.4.1
 factory_boy==2.5.1
@@ -193,3 +191,6 @@ edx-django-release-util==0.1.2
 # Used to communicate with Neo4j, which is used internally for
 # modulestore inspection
 py2neo==3.1.2
+
+# for calculating coverage
+-r coverage.txt
