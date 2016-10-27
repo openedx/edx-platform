@@ -274,7 +274,7 @@ def destroy_oauth_tokens(user):
     """
     Destroys ALL OAuth access and refresh tokens for the given user.
     """
-    dop_access_token.objects.filter(user=user).delete()
-    dop_refresh_token.objects.filter(user=user).delete()
-    dot_access_token.objects.filter(user=user).delete()
-    dot_refresh_token.objects.filter(user=user).delete()
+    dop_access_token.objects.filter(user=user.id).delete()
+    dop_refresh_token.objects.filter(user=user.id).delete()
+    dot_access_token.objects.filter(user=user.id).delete()
+    dot_refresh_token.objects.filter(user=user.id).delete()
