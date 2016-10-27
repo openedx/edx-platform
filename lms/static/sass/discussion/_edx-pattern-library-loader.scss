@@ -1,0 +1,26 @@
+// Discussions - CSS application architecture
+// Version 1 styling (pre-Pattern Library)
+// ====================
+
+// Load edX Pattern Library
+$pattern-library-path: '../../edx-pattern-library' !default;
+
+// We don't need entire pattern library for inline discussion - just the "alerts" part to make alert messages styling
+// consistent with other alert messages.
+// Also, we don't want most of reset and normalization styles - see https://openedx.atlassian.net/browse/YONK-437
+
+// TODO: make edx-pattern-library provide "bodyless" version without actual CSS rules (only SASS mixins, vars etc.)
+@import 'edx-pattern-library/pattern-library/sass/global/lib';                    // third-party libraries
+/* parts of pattern-library/sass/global/core */
+@import 'edx-pattern-library/pattern-library/sass/global/functions';
+@import 'edx-pattern-library/pattern-library/sass/global/settings';
+@import 'edx-pattern-library/pattern-library/sass/global/mixins';
+@import 'edx-pattern-library/pattern-library/sass/global/helpers';
+/* end parts of pattern-library/sass/global/core */
+@import 'edx-pattern-library/pattern-library/sass/patterns/alerts';               // Alerts styling
+
+// SHAME
+// Part of edx-pattern-library _reset.scss, but we don't want entire reset to be here
+* {
+  box-sizing: border-box;
+}
