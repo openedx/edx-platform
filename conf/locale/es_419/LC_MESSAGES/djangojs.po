@@ -34,6 +34,7 @@
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015
 # Sarina Canelake <sarina@edx.org>, 2015
+# Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
@@ -117,8 +118,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 18:42+0000\n"
-"PO-Revision-Date: 2016-10-05 16:02+0000\n"
+"POT-Creation-Date: 2016-10-20 15:55+0000\n"
+"PO-Revision-Date: 2016-10-22 05:25+0000\n"
 "Last-Translator: Juan Camilo Montoya Franco <juan.montoya@edunext.co>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -427,7 +428,34 @@ msgstr ""
 "El proceso de calificación todavía está corriendo. Recargue la página para "
 "ver las actualizaciones."
 
-#. Translators: This is only translated to allow for reording of label and
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Could not grade your answer. The submission was aborted."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid ""
+"Submission aborted! Sorry, your browser does not support file uploads. If "
+"you can, please use Chrome or Safari which have been verified to support "
+"file uploads."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You submitted {filename}; only {allowedFiles} are allowed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Your file {filename} is too large (max size: {maxSize}MB)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not submit the required files: {requiredFiles}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not select any files to submit."
+msgstr ""
+
+#. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
@@ -4396,13 +4424,10 @@ msgstr "Cargando sus cursos"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
-"We have sent an email message with password reset instructions to the email "
-"address you provided.  If you do not receive this message, "
-"{anchorStart}contact technical support{anchorEnd}."
+"{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
+"address is associated with an edX account, we will send a message with "
+"password reset instructions to this email address.{paragraphEnd}"
 msgstr ""
-"Le hemos enviado un mensaje por correo electrónico con instrucciones sobre "
-"cómo reiniciar su contraseña a la dirección de correo que usted proveyó. Si "
-"no recibe este mensaje, {anchorStart}contacte a soporte técnico{anchorEnd}."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -7138,11 +7163,6 @@ msgstr "Unirse al equipo"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "Add a Post"
-msgstr "Añadir un comentario:"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "Detalles del equipo"
 
@@ -8291,9 +8311,10 @@ msgstr ""
 "%(platformName)s."
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Password Reset Email Sent"
-msgstr "El correo para restablecer contraseña ha sido enviado."
+#: lms/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr "Revise su correo electrónico"
 
 #: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
@@ -8872,11 +8893,6 @@ msgid "Activate Your Account"
 msgstr "Activar su cuenta"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr "Revise su correo electrónico"
-
-#: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/verify_student/intro_step.underscore
@@ -9304,6 +9320,10 @@ msgstr "Iniciado a las"
 msgid "Completed At"
 msgstr "Finalizado a las"
 
+#: test_root/staticfiles/teams/templates/team-profile.underscore
+msgid "Add a Post"
+msgstr "Añadir un comentario"
+
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
@@ -9312,6 +9332,10 @@ msgstr ""
 "Para recibir créditos para un problema, debe hacer clic en el botón de "
 "\"Revisar\" o \"Envío Final\" de dicho problema antes de seleccionar "
 "\"Terminar el examen\"."
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+msgid "Password Reset Email Sent"
+msgstr "El correo para restablecer contraseña ha sido enviado."
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

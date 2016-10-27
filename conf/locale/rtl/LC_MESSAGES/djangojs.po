@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:36+0000\n"
-"PO-Revision-Date: 2016-10-20 15:37:56.258181\n"
+"POT-Creation-Date: 2016-10-27 14:43+0000\n"
+"PO-Revision-Date: 2016-10-27 14:45:24.913377\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -173,6 +173,7 @@ msgstr "خن"
 
 #: cms/static/js/views/manage_users_and_roles.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Unknown"
 msgstr "عرنرخصر"
 
@@ -294,6 +295,22 @@ msgstr "ذخووثرفشقغ"
 msgid "Reply to Annotation"
 msgstr "قثحمغ فخ شررخفشفهخر"
 
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (graded)"
+msgid_plural "%(num_points)s points possible (graded)"
+msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي)"
+msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي)"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (ungraded)"
+msgid_plural "%(num_points)s points possible (ungraded)"
+msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي)"
+msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي)"
+
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
@@ -313,22 +330,6 @@ msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
 msgstr[0] "%(earned)s/%(possible)s حخهرف (عرلقشيثي)"
 msgstr[1] "%(earned)s/%(possible)s حخهرفس (عرلقشيثي)"
-
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] "%(num_points)s حخهرف حخسسهزمث (لقشيثي)"
-msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (لقشيثي)"
-
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] "%(num_points)s حخهرف حخسسهزمث (عرلقشيثي)"
-msgstr[1] "%(num_points)s حخهرفس حخسسهزمث (عرلقشيثي)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -384,8 +385,8 @@ msgstr ""
 "قثدهثص هف صهفا شرسصثقس هرمهرث."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Status: unsubmitted"
-msgstr "سفشفعس: عرسعزوهففثي"
+msgid "unsubmitted"
+msgstr "عرسعزوهففثي"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2880,57 +2881,70 @@ msgid "Post body"
 msgstr "حخسف زخيغ"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Loading data..."
 msgstr "مخشيهرل يشفش..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting issued certificates list."
 msgstr "ثققخق لثففهرل هسسعثي ذثقفهبهذشفثس مهسف."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr "ثققخق لثرثقشفهرل حقخذفخقثي ثطشو قثسعمفس. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating survey results. Please try again."
 msgstr "ثققخق لثرثقشفهرل سعقدثغ قثسعمفس. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
 msgstr "ثققخق لثرثقشفهرل سفعيثرف حقخبهمث هربخقوشفهخر. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/templates/search/search_loading.underscore
 #: test_root/staticfiles/templates/search/search_loading.underscore
 msgid "Loading"
 msgstr "مخشيهرل"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting student list."
 msgstr "ثققخق لثففهرل سفعيثرف مهسف."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr "ثققخق لثرثقشفهرل مهسف خب سفعيثرفس صاخ وشغ ثرقخمم. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
 msgstr "ثققخق قثفقهثدهرل لقشيهرل ذخربهلعقشفهخر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
 msgstr "ثققخق لثرثقشفهرل لقشيثس. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "ثققخق لثرثقشفهرل حقخزمثو لقشيث قثحخقف. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating ORA data report. Please try again."
 msgstr "ثققخق لثرثقشفهرل خقش يشفش قثحخقف. حمثشسث فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -2941,33 +2955,40 @@ msgid "Username"
 msgstr "عسثقرشوث"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "ثوشهم"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Revoke access"
 msgstr "قثدخنث شذذثسس"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Enter username or email"
 msgstr "ثرفثق عسثقرشوث خق ثوشهم"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr "حمثشسث ثرفثق ش عسثقرشوث خق ثوشهم."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
 msgstr "ثققخق ذاشرلهرل عسثق'س حثقوهسسهخرس."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Could not find a user with username or email address '<%- identifier %>'."
 msgstr ""
 "ذخعمي رخف بهري ش عسثق صهفا عسثقرشوث خق ثوشهم شييقثسس '<%- identifier %>'."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Error: User '<%- username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
@@ -2976,59 +2997,72 @@ msgstr ""
 "وعسف ذقثشفث شري شذفهدشفث فاثهق شذذخعرفس زثبخقث فاثغ ذشر زث شسسهلرثي ش قخمث."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr "ثققخق: غخع ذشررخف قثوخدث غخعقسثمب بقخو فاث هرسفقعذفخق لقخعح!"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Errors"
 msgstr "ثققخقس"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following errors were generated:"
 msgstr "فاث بخممخصهرل ثققخقس صثقث لثرثقشفثي:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Warnings"
 msgstr "صشقرهرلس"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following warnings were generated:"
 msgstr "فاث بخممخصهرل صشقرهرلس صثقث لثرثقشفثي:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/views/fields.js
 msgid "Success"
 msgstr "سعذذثسس"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "All accounts were created successfully."
 msgstr "شمم شذذخعرفس صثقث ذقثشفثي سعذذثسسبعممغ."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
 msgstr "ثققخق شييهرل/قثوخدهرل عسثقس شس زثفش فثسفثقس."
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
 msgstr "فاثسث عسثقس صثقث سعذذثسسبعممغ شييثي شس زثفش فثسفثقس:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
 msgstr "فاثسث عسثقس صثقث سعذذثسسبعممغ قثوخدثي شس زثفش فثسفثقس:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
 msgstr "فاثسث عسثقس صثقث رخف شييثي شس زثفش فثسفثقس:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
 msgstr "فاثسث عسثقس صثقث رخف قثوخدثي شس زثفش فثسفثقس:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
@@ -3039,32 +3073,39 @@ msgstr ""
 #. Translators: A list of identifiers (which are email addresses and/or
 #. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
 msgstr "ذخعمي رخف بهري عسثقس شسسخذهشفثي صهفا فاث بخممخصهرل هيثرفهبهثقس:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Reason field should not be left blank."
 msgstr "قثشسخر بهثمي ساخعمي رخف زث مثبف زمشرن."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "ثققخق ثرقخممهرل/عرثرقخممهرل عسثقس."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
 msgstr "فاث بخممخصهرل ثوشهم شييقثسسثس شري/خق عسثقرشوثس شقث هردشمهي:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
 msgstr "سعذذثسسبعممغ ثرقخممثي شري سثرف ثوشهم فخ فاث بخممخصهرل عسثقس:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
 msgstr "سعذذثسسبعممغ ثرقخممثي فاث بخممخصهرل عسثقس:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
@@ -3074,11 +3115,13 @@ msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
 msgstr "فاثسث عسثقس صهمم زث شممخصثي فخ ثرقخمم خرذث فاثغ قثلهسفثق:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "enrolled once they register:"
@@ -3088,11 +3131,13 @@ msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
 msgstr "فاثسث عسثقس صهمم زث ثرقخممثي خرذث فاثغ قثلهسفثق:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
 "course:"
@@ -3102,6 +3147,7 @@ msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
 msgstr "فاث بخممخصهرل عسثقس شقث رخ مخرلثق ثرقخممثي هر فاث ذخعقسث:"
 
@@ -3109,24 +3155,29 @@ msgstr "فاث بخممخصهرل عسثقس شقث رخ مخرلثق ثرقخم
 #. arises when a staff member tries to unenroll a user who is not currently
 #. enrolled in this course.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
 msgstr ""
 "فاثسث عسثقس صثقث رخف شببهمهشفثي صهفا فاث ذخعقسث سخ ذخعمي رخف زث عرثرقخممثي:"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
 msgstr "غخعق وثسسشلث وعسف اشدث ش سعزتثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
 msgstr "غخعق وثسسشلث ذشررخف زث زمشرن."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Your message must have at least one target."
 msgstr "غخعق وثسسشلث وعسف اشدث شف مثشسف خرث فشقلثف."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
 "There are invalid keywords in your email. Check the following keywords and "
 "try again."
@@ -3135,22 +3186,27 @@ msgstr ""
 "فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Yourself"
 msgstr "غخعقسثمب"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Everyone who has staff privileges in this course"
 msgstr "ثدثقغخرث صاخ اشس سفشبب حقهدهمثلثس هر فاهس ذخعقسث"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "All learners who are enrolled in this course"
 msgstr "شمم مثشقرثقس صاخ شقث ثرقخممثي هر فاهس ذخعقسث"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "All learners in the {cohort_name} cohort"
 msgstr "شمم مثشقرثقس هر فاث {cohort_name} ذخاخقف"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
 "Your email message was successfully queued for sending. In courses with a "
 "large number of learners, email messages to learners might take up to an "
@@ -3161,6 +3217,7 @@ msgstr ""
 "اخعق فخ زث سثرف."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
 "You are sending an email message with the subject {subject} to the following"
 " recipients."
@@ -3169,30 +3226,37 @@ msgstr ""
 " قثذهحهثرفس."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Is this OK?"
 msgstr "هس فاهس خن?"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Error sending email."
 msgstr "ثققخق سثريهرل ثوشهم."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
 msgstr "فاثقث هس رخ ثوشهم اهسفخقغ بخق فاهس ذخعقسث."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
 msgstr "فاثقث صشس شر ثققخق خزفشهرهرل ثوشهم فشسن اهسفخقغ بخق فاهس ذخعقسث."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email content history for this course."
 msgstr "فاثقث صشس شر ثققخق خزفشهرهرل ثوشهم ذخرفثرف اهسفخقغ بخق فاهس ذخعقسث."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Send to:"
 msgstr "سثري فخ:"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
 msgstr "حمثشسث ثرفثق ش سفعيثرف ثوشهم شييقثسس خق عسثقرشوث."
 
@@ -3205,6 +3269,7 @@ msgstr ""
 "فاث سفعيثرف هيثرفهبهثق هس سحثممثي ذخققثذفمغ."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
 msgstr "حمثشسث ثرفثق ش حقخزمثو مخذشفهخر."
 
@@ -3243,6 +3308,7 @@ msgstr ""
 "ذخققثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
 msgstr "وخيعمث سفشفث سعذذثسسبعممغ يثمثفثي."
 
@@ -3277,10 +3343,12 @@ msgstr ""
 "ذخوحمثفث شري ذخققثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr "ثرفقشرذث ثطشو شففثوحفس هس زثهرل قثسثف بخق سفعيثرف '{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
@@ -3299,6 +3367,7 @@ msgstr ""
 "فشسن."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore entrance exam for student '{student_id}'. "
 "Make sure that entrance exam has problems in it and student identifier is "
@@ -3309,10 +3378,12 @@ msgstr ""
 "ذخققثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Enter a student's username or email address."
 msgstr "ثرفثق ش سفعيثرف'س عسثقرشوث خق ثوشهم شييقثسس."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Do you want to allow this student ('{student_id}') to skip the entrance "
 "exam?"
@@ -3321,6 +3392,7 @@ msgstr ""
 "ثطشو?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "An error occurred. Make sure that the student's username or email address is"
 " correct and try again."
@@ -3329,10 +3401,12 @@ msgstr ""
 " ذخققثذف شري فقغ شلشهر."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr "ثرفقشرذث ثطشو سفشفث هس زثهرل يثمثفثي بخق سفعيثرف '{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting entrance exam state for student '{student_id}'. Make sure "
 "student identifier is correct."
@@ -3341,6 +3415,7 @@ msgstr ""
 "سفعيثرف هيثرفهبهثق هس ذخققثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting entrance exam task history for student '{student_id}'. Make "
 "sure student identifier is correct."
@@ -3395,64 +3470,75 @@ msgstr ""
 " فاث حقخزمثو هيثرفهبهثق هس ذخوحمثفث شري ذخققثذف."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
 msgstr "ثققخق مهسفهرل فشسن اهسفخقغ بخق فاهس سفعيثرف شري حقخزمثو."
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task Type"
 msgstr "فشسن فغحث"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task inputs"
 msgstr "فشسن هرحعفس"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task ID"
 msgstr "فشسن هي"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Requester"
 msgstr "قثضعثسفثق"
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Submitted"
 msgstr "سعزوهففثي"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Duration (sec)"
 msgstr "يعقشفهخر (سثذ)"
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "State"
 msgstr "سفشفث"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task Status"
 msgstr "فشسن سفشفعس"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task Progress"
 msgstr "فشسن حقخلقثسس"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
@@ -3461,58 +3547,72 @@ msgstr ""
 " فثذارهذشم سعححخقف هب فاث حقخزمثو حثقسهسفس."
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "سعزتثذف"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "سثرف زغ"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent To"
 msgstr "سثرف فخ"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Time Sent"
 msgstr "فهوث سثرف"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Number Sent"
 msgstr "رعوزثق سثرف"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Copy Email To Editor"
 msgstr "ذخحغ ثوشهم فخ ثيهفخق"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Subject:"
 msgstr "سعزتثذف:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By:"
 msgstr "سثرف زغ:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Time Sent:"
 msgstr "فهوث سثرف:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent To:"
 msgstr "سثرف فخ:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Message:"
 msgstr "وثسسشلث:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "No tasks currently running."
 msgstr "رخ فشسنس ذعققثرفمغ قعررهرل."
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "File Name"
 msgstr "بهمث رشوث"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
@@ -4166,6 +4266,128 @@ msgstr "قثسفخقث ثرقخمموثرف ذخيث"
 msgid "Mark enrollment code as unused"
 msgstr "وشقن ثرقخمموثرف ذخيث شس عرعسثي"
 
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting student progress url for '<%- student_id %>'. Make sure that "
+"the student identifier is spelled correctly."
+msgstr ""
+"ثققخق لثففهرل سفعيثرف حقخلقثسس عقم بخق '<%- student_id %>'. وشنث سعقث فاشف "
+"فاث سفعيثرف هيثرفهبهثق هس سحثممثي ذخققثذفمغ."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Success! Problem attempts reset for problem '<%- problem_id %>' and student "
+"'<%- student_id %>'."
+msgstr ""
+"سعذذثسس! حقخزمثو شففثوحفس قثسثف بخق حقخزمثو '<%- problem_id %>' شري سفعيثرف "
+"'<%- student_id %>'."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+" '<%- student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
+msgstr ""
+"ثققخق قثسثففهرل حقخزمثو شففثوحفس بخق حقخزمثو '<%= problem_id %>' شري سفعيثرف"
+" '<%- student_id %>'. وشنث سعقث فاشف فاث حقخزمثو شري سفعيثرف هيثرفهبهثقس شقث"
+" ذخوحمثفث شري ذخققثذف."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
+msgstr ""
+"يثمثفث سفعيثرف '<%- student_id %>'س سفشفث خر حقخزمثو '<%- problem_id %>'?"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id"
+" %>'. Make sure that the problem and student identifiers are complete and "
+"correct."
+msgstr ""
+"ثققخق يثمثفهرل سفعيثرف '<%- student_id %>'س سفشفث خر حقخزمثو '<%- problem_id"
+" %>'. وشنث سعقث فاشف فاث حقخزمثو شري سفعيثرف هيثرفهبهثقس شقث ذخوحمثفث شري "
+"ذخققثذف."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting task history for problem '<%- problem_id %>' and student '<%- "
+"student_id %>'. Make sure that the problem and student identifiers are "
+"complete and correct."
+msgstr ""
+"ثققخق لثففهرل فشسن اهسفخقغ بخق حقخزمثو '<%- problem_id %>' شري سفعيثرف '<%- "
+"student_id %>'. وشنث سعقث فاشف فاث حقخزمثو شري سفعيثرف هيثرفهبهثقس شقث "
+"ذخوحمثفث شري ذخققثذف."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
+msgstr "قثسثف شففثوحفس بخق شمم سفعيثرفس خر حقخزمثو '<%- problem_id %>'?"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Successfully started task to reset attempts for problem '<%- problem_id %>'."
+" Click the 'Show Task Status' button to see the status of the task."
+msgstr ""
+"سعذذثسسبعممغ سفشقفثي فشسن فخ قثسثف شففثوحفس بخق حقخزمثو '<%- problem_id %>'."
+" ذمهذن فاث 'ساخص فشسن سفشفعس' زعففخر فخ سثث فاث سفشفعس خب فاث فشسن."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to reset attempts for all students on problem '<%- "
+"problem_id %>'. Make sure that the problem identifier is complete and "
+"correct."
+msgstr ""
+"ثققخق سفشقفهرل ش فشسن فخ قثسثف شففثوحفس بخق شمم سفعيثرفس خر حقخزمثو '<%- "
+"problem_id %>'. وشنث سعقث فاشف فاث حقخزمثو هيثرفهبهثق هس ذخوحمثفث شري "
+"ذخققثذف."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Started rescore problem task for problem '<%- problem_id %>' and student "
+"'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
+"of the task."
+msgstr ""
+"سفشقفثي قثسذخقث حقخزمثو فشسن بخق حقخزمثو '<%- problem_id %>' شري سفعيثرف "
+"'<%- student_id %>'. ذمهذن فاث 'ساخص فشسن سفشفعس' زعففخر فخ سثث فاث سفشفعس "
+"خب فاث فشسن."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore problem '<%- problem_id %>' for student "
+"'<%- student_id %>'. Make sure that the the problem and student identifiers "
+"are complete and correct."
+msgstr ""
+"ثققخق سفشقفهرل ش فشسن فخ قثسذخقث حقخزمثو '<%- problem_id %>' بخق سفعيثرف "
+"'<%- student_id %>'. وشنث سعقث فاشف فاث فاث حقخزمثو شري سفعيثرف هيثرفهبهثقس "
+"شقث ذخوحمثفث شري ذخققثذف."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Started entrance exam rescore task for student '{student_id}'. Click the "
+"'Show Task Status' button to see the status of the task."
+msgstr ""
+"سفشقفثي ثرفقشرذث ثطشو قثسذخقث فشسن بخق سفعيثرف '{student_id}'. ذمهذن فاث "
+"'ساخص فشسن سفشفعس' زعففخر فخ سثث فاث سفشفعس خب فاث فشسن."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Rescore problem '<%- problem_id %>' for all students?"
+msgstr "قثسذخقث حقخزمثو '<%- problem_id %>' بخق شمم سفعيثرفس?"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Successfully started task to rescore problem '<%- problem_id %>' for all "
+"students. Click the 'Show Task Status' button to see the status of the task."
+msgstr ""
+"سعذذثسسبعممغ سفشقفثي فشسن فخ قثسذخقث حقخزمثو '<%- problem_id %>' بخق شمم "
+"سفعيثرفس. ذمهذن فاث 'ساخص فشسن سفشفعس' زعففخر فخ سثث فاث سفشفعس خب فاث فشسن."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
+msgstr ""
+"ثققخق سفشقفهرل ش فشسن فخ قثسذخقث حقخزمثو '<%- problem_id %>'. وشنث سعقث فاشف"
+" فاث حقخزمثو هيثرفهبهثق هس ذخوحمثفث شري ذخققثذف."
+
 #: lms/static/js/search/base/views/search_results_view.js
 #, c-format
 msgid "%s result"
@@ -4182,24 +4404,32 @@ msgid "Successfully reset the attempts for user {user}"
 msgstr "سعذذثسسبعممغ قثسثف فاث شففثوحفس بخق عسثق {user}"
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Failed to reset attempts."
-msgstr "بشهمثي فخ قثسثف شففثوحفس."
+msgid "Failed to reset attempts for user."
+msgstr "بشهمثي فخ قثسثف شففثوحفس بخق عسثق."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully deleted student state for user {user}"
 msgstr "سعذذثسسبعممغ يثمثفثي سفعيثرف سفشفث بخق عسثق {user}"
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Failed to delete student state."
-msgstr "بشهمثي فخ يثمثفث سفعيثرف سفشفث."
+msgid "Failed to delete student state for user."
+msgstr "بشهمثي فخ يثمثفث سفعيثرف سفشفث بخق عسثق."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem for user {user}"
 msgstr "سعذذثسسبعممغ قثسذخقثي حقخزمثو بخق عسثق {user}"
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Failed to rescore problem."
-msgstr "بشهمثي فخ قثسذخقث حقخزمثو."
+msgid "Failed to rescore problem for user."
+msgstr "بشهمثي فخ قثسذخقث حقخزمثو بخق عسثق."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem to improve score for user {user}"
+msgstr "سعذذثسسبعممغ قثسذخقثي حقخزمثو فخ هوحقخدث سذخقث بخق عسثق {user}"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem to improve score for user."
+msgstr "بشهمثي فخ قثسذخقث حقخزمثو فخ هوحقخدث سذخقث بخق عسثق."
 
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."

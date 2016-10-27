@@ -37,6 +37,7 @@
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
 # rcelaya <rcelaya@ula.ve>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014-2015
+# Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
 # Sergio A. Salazar <sergiosalazar@live.ru>, 2015
 # sebasco <sjduranh@gmail.com>, 2014
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
@@ -131,6 +132,7 @@
 # Rubén Torres <r.torres@usal.es>, 2015
 # Santiago Salkin <salkin.santiago@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014-2015
+# Ernesto Sánchez Benitez <sbernesto@gmail.com>, 2016
 # Tala Aoun <talaaoun@gmail.com>, 2016
 # UAbierta Universidad de Chile <uabierta@u.uchile.cl>, 2015
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
@@ -187,8 +189,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 18:43+0000\n"
-"PO-Revision-Date: 2016-10-05 15:00+0000\n"
+"POT-Creation-Date: 2016-10-20 15:57+0000\n"
+"PO-Revision-Date: 2016-10-22 05:21+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -203,6 +205,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion"
 msgstr "Discusión"
@@ -271,14 +274,6 @@ msgstr "Estado"
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
 msgstr "Pendiente"
-
-#: common/djangoapps/cors_csrf/models.py
-msgid ""
-"List of domains that are allowed to make cross-domain requests to this site."
-"  Please list each domain on its own line."
-msgstr ""
-"Lista de dominios que tienen permitido hacer peticiones de dominio cruzado a"
-" este sitio.  Por favor ingrese cada dominio en una línea independiente."
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
@@ -452,26 +447,6 @@ msgstr "La cantidad seleccionada es inválida"
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
 msgstr "No ha seleccionado el precio o el precio es demasiado bajo"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
-msgstr "La vista previa de idioma está deshabilitada"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr "No se suministró código de idioma"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language set to language code: {preview_language_code}"
-msgstr "Idioma configurado a: {preview_language_code}"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
-msgstr "Idioma reajustado al código de idioma por defecto"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to user's preference: {preview_language_code}"
-msgstr "Idioma reajustado a preferencias del usuario: {preview_language_code}"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -1932,16 +1907,9 @@ msgstr ""
 "Ocurrió un error con la respuesta del personal de apoyo para este problema: "
 "límites vacíos."
 
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "Entrada de texto"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "error"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
 #. Translators: Separator used in StringResponse to display multiple answers.
 #. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
@@ -1954,6 +1922,15 @@ msgstr "error"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "o"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "Entrada de texto"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr "error"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Custom Evaluated Script"
@@ -2319,7 +2296,6 @@ msgstr ""
 "para su curso, o reportar algún problema, contacte a "
 "moocsupport@mathworks.com."
 
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -3355,7 +3331,7 @@ msgstr "Especifique el idioma del curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Teams Configuration"
-msgstr "Equipo de Configuración"
+msgstr "Configuración de equipos"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
@@ -3546,7 +3522,17 @@ msgstr "Visual"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Raw"
-msgstr "Raw"
+msgstr "HTML"
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Hide Page From Learners"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid ""
+"If you select this option, only course team members with the Staff or Admin "
+"role see this page."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "HTML for the additional pages"
@@ -9196,6 +9182,37 @@ msgstr ""
 msgid "Skip to main content"
 msgstr "Ir al contenido principal"
 
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Authorize"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"The above application requests the following permissions from your account:"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"Please click the 'Allow' button to grant these permissions to the above "
+"application. Otherwise, to withhold these permissions, please click the "
+"'Cancel' button."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: lms/templates/modal/accessible_confirm.html
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Allow"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/ccx/schedule.html
+msgid "Error"
+msgstr "Error"
+
 #: lms/templates/registration/password_reset_email.html
 #, python-format
 msgid ""
@@ -9801,6 +9818,14 @@ msgstr ""
 "Especificado en segundos. Habilitar el almacenamiento en caché de las "
 "respuestas del API estableciendo este a un valor mayor que 0."
 
+#: openedx/core/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
+msgstr ""
+"Lista de dominios que tienen permitido hacer peticiones de dominio cruzado a"
+" este sitio.  Por favor ingrese cada dominio en una línea independiente."
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr "Grupo por defecto"
@@ -9982,6 +10007,26 @@ msgstr "Estados de requerimientos para créditos"
 #: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr "Fecha límite para comprar y solicitar crédito."
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Preview Language is currently disabled"
+msgstr "La vista previa de idioma está deshabilitada"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language code not provided"
+msgstr "No se suministró código de idioma"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language set to language code: {preview_language_code}"
+msgstr "Idioma configurado a: {preview_language_code}"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default language code"
+msgstr "Idioma reajustado al código de idioma por defecto"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to user's preference: {preview_language_code}"
+msgstr "Idioma reajustado a preferencias del usuario: {preview_language_code}"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -10933,12 +10978,6 @@ msgid "Settings"
 msgstr "Configuración"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "Código del curso"
@@ -11068,13 +11107,11 @@ msgid "View"
 msgstr "Ver"
 
 #: cms/templates/darklang/preview_lang.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/darklang/preview_lang.html
 msgid "Preview Language Setting"
 msgstr "Previsualizar configuración de idioma"
 
 #: cms/templates/maintenance/_force_publish_course.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
 msgstr "Reiniciar"
@@ -11214,18 +11251,6 @@ msgstr ""
 msgid "Some Rights Reserved"
 msgstr "Algunos derechos reservados"
 
-#: common/templates/darklang/preview_lang_include.html
-msgid "Language Code"
-msgstr "Código de idioma"
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr "Por ejemplo, use en para inglés"
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
-msgstr "Por favor recargue la página para que los cambios sean aplicados."
-
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -11236,9 +11261,8 @@ msgid "Discussions"
 msgstr "Discusiones"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
-msgstr "Añadir un comentario:"
+msgstr "Añadir un comentario"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
@@ -12573,11 +12597,6 @@ msgstr "siguiente"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
 msgstr "Actividad de carga de git reciente para {course_id}"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/ccx/schedule.html
-msgid "Error"
-msgstr "Error"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
@@ -15136,6 +15155,10 @@ msgstr ""
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
 msgstr "Resultados:"
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Topic:"
+msgstr ""
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
@@ -19360,7 +19383,7 @@ msgid ""
 "file size to {em_start}10 MB{em_end}. In addition, do not upload video or "
 "audio files. You should use a third party service to host multimedia files."
 msgstr ""
-"{em_start} Precaución {em_end}: {platform_name} recomendamos que si usted limita el tamaño de sis archivos a {em_start}10 MB{em_end}. Adicionalmente, no se recomienda subir videos o archivos de audio. \n"
+"{em_start} Precaución {em_end}: {platform_name} recomendamos que si usted limita el tamaño de sus archivos a {em_start}10 MB{em_end}. Adicionalmente, no se recomienda subir videos o archivos de audio. \n"
 "Los archivos multimedia se deben publicar utilizando servicios de terceros."
 
 #: cms/templates/asset_index.html
