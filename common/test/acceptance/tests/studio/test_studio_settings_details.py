@@ -18,6 +18,8 @@ from common.test.acceptance.tests.helpers import (
     element_has_text,
 )
 
+import logging
+log = logging.getLogger('SettingsPage')
 
 @attr(shard=4)
 class StudioSettingsDetailsTest(StudioCourseTest):
@@ -42,14 +44,7 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
     """
     Tests for milestones feature in Studio's settings tab
     """
-    def test_page_has_prerequisite_field(self):
-        """
-        Test to make sure page has pre-requisite course field if milestones app is enabled.
-        """
-
-        self.assertTrue(self.settings_detail.pre_requisite_course_options)
-
-    @skip("Too flaky for the flaky decorator  SOL-1811")  # SOL-1811
+    @flaky(max_runs=30, min_passes=30)  # SOL-1811
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
@@ -88,8 +83,46 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
             self.settings_detail.alert_confirmation_title.text
         )
 
+        log.debug('***********************************************************')
+        log.debug(datetime.now().time())
+
         # Refresh the page again and confirm the prerequisite course selection is properly reflected
         self.settings_detail.refresh_page()
+
+        #Preselected course id
+        logging.debug("\n\n\nPre selected course id '{}'\n\n\n".format(
+            pre_requisite_course_id
+        ))
+
+        #license div
+        logging.debug("\n\n\nHTML of wrapper-license '{}'\n\n\n".format(
+            self.settings_detail.q(css='.wrapper-license').html
+        ))
+
+        # Course org
+        logging.debug("\n\n\nCourse org '{}'\n\n\n".format(
+            self.settings_detail.q(css='#course-organization').attrs('value')[0]
+        ))
+
+        # Course DropDown logs
+        logging.debug("\n\n\nHTML of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course').html
+        ))
+        logging.debug("\n\n\nOptions of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course option').html
+        ))
+        logging.debug("\n\n\noptions Selected of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course option').selected
+        ))
+
+        #single options logs
+        logging.debug("\n\n\nValue of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course').attrs('val')
+        ))
+        logging.debug("\n\n\nselected of dropdown '{}'\n\n\n".format(
+            self.settings_detail.q(css='#pre-requisite-course').attrs('selected')
+        ))
+
         self.settings_detail.wait_for_prerequisite_course_options()
         self.assertTrue(is_option_value_selected(
             browser_query=self.settings_detail.pre_requisite_course_options,
@@ -134,121 +167,3 @@ class SettingsMilestonesTest(StudioSettingsDetailsTest):
             value=pre_requisite_course_id
         )
         self.assertTrue(dropdown_status)
-
-    def test_page_has_enable_entrance_exam_field(self):
-        """
-        Test to make sure page has 'enable entrance exam' field.
-        """
-        self.assertTrue(self.settings_detail.entrance_exam_field)
-
-    @skip('Passes in devstack, passes individually in Jenkins, fails in suite in Jenkins.')
-    def test_enable_entrance_exam_for_course(self):
-        """
-        Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
-        And also that the entrance exam is destroyed after deselecting the checkbox.
-        """
-        self.settings_detail.require_entrance_exam(required=True)
-        self.settings_detail.save_changes()
-
-        # getting the course outline page.
-        course_outline_page = CourseOutlinePage(
-            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
-        )
-        course_outline_page.visit()
-
-        # title with text 'Entrance Exam' should be present on page.
-        self.assertTrue(element_has_text(
-            page=course_outline_page,
-            css_selector='span.section-title',
-            text='Entrance Exam'
-        ))
-
-        # Delete the currently created entrance exam.
-        self.settings_detail.visit()
-        self.settings_detail.require_entrance_exam(required=False)
-        self.settings_detail.save_changes()
-
-        course_outline_page.visit()
-        self.assertFalse(element_has_text(
-            page=course_outline_page,
-            css_selector='span.section-title',
-            text='Entrance Exam'
-        ))
-
-    @flaky  # TODO: SOL-1595
-    def test_entrance_exam_has_unit_button(self):
-        """
-        Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
-        And user has option to add units only instead of any Subsection.
-        """
-        self.settings_detail.require_entrance_exam(required=True)
-        self.settings_detail.save_changes()
-
-        # getting the course outline page.
-        course_outline_page = CourseOutlinePage(
-            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
-        )
-        course_outline_page.visit()
-        course_outline_page.wait_for_ajax()
-
-        # button with text 'New Unit' should be present.
-        self.assertTrue(element_has_text(
-            page=course_outline_page,
-            css_selector='.add-item a.button-new',
-            text='New Unit'
-        ))
-
-        # button with text 'New Subsection' should not be present.
-        self.assertFalse(element_has_text(
-            page=course_outline_page,
-            css_selector='.add-item a.button-new',
-            text='New Subsection'
-        ))
-
-
-@attr(shard=4)
-class CoursePacingTest(StudioSettingsDetailsTest):
-    """Tests for setting a course to self-paced."""
-
-    def populate_course_fixture(self, __):
-        ConfigModelFixture('/config/self_paced', {'enabled': True}).install()
-        # Set the course start date to tomorrow in order to allow setting pacing
-        self.course_fixture.add_course_details({'start_date': datetime.now() + timedelta(days=1)})
-
-    def test_default_instructor_paced(self):
-        """
-        Test that the 'instructor paced' button is checked by default.
-        """
-        self.assertEqual(self.settings_detail.course_pacing, 'Instructor-Paced')
-
-    def test_self_paced(self):
-        """
-        Test that the 'self-paced' button is checked for a self-paced
-        course.
-        """
-        self.course_fixture.add_course_details({
-            'self_paced': True
-        })
-        self.course_fixture.configure_course()
-        self.settings_detail.refresh_page()
-        self.assertEqual(self.settings_detail.course_pacing, 'Self-Paced')
-
-    def test_set_self_paced(self):
-        """
-        Test that the self-paced option is persisted correctly.
-        """
-        self.settings_detail.course_pacing = 'Self-Paced'
-        self.settings_detail.save_changes()
-        self.settings_detail.refresh_page()
-        self.assertEqual(self.settings_detail.course_pacing, 'Self-Paced')
-
-    def test_toggle_pacing_after_course_start(self):
-        """
-        Test that course authors cannot toggle the pacing of their course
-        while the course is running.
-        """
-        self.course_fixture.add_course_details({'start_date': datetime.now()})
-        self.course_fixture.configure_course()
-        self.settings_detail.refresh_page()
-        self.assertTrue(self.settings_detail.course_pacing_disabled())
-        self.assertIn('Course pacing cannot be changed', self.settings_detail.course_pacing_disabled_text)
