@@ -149,14 +149,6 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
 
         prep_course_for_grading(course, request)
         course_grade = CourseGradeFactory(request.user).create(course)
-        if not course_grade.has_access_to_course:
-            # This means the student didn't have access to the course
-            log.info('User %s not allowed to access grade for course %s', request.user.username, username)
-            return self.make_error_response(
-                status_code=status.HTTP_403_FORBIDDEN,
-                developer_message='The user does not have access to the course.',
-                error_code='user_does_not_have_access_to_course'
-            )
 
         return Response([{
             'username': username,

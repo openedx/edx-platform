@@ -720,10 +720,6 @@ def _progress(request, course_key, student_id):
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
     course_grade = CourseGradeFactory(student).create(course)
-    if not course_grade.has_access_to_course:
-        # This means the student didn't have access to the course (which the instructor requested)
-        raise Http404
-
     courseware_summary = course_grade.chapter_grades
     grade_summary = course_grade.summary
 
