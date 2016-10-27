@@ -1,4 +1,7 @@
 (function () {
+    // If new commands are added here that modify the database, be sure to check
+    // expected behavior in error cases, since the backend handles these as
+    // non_atomic_requests (specifically to work with the regenerate_user command)
     var commands = [
         {
             'display_name': gettext('Whitelist a user'),
@@ -47,6 +50,8 @@
             ],
         },
         {
+            // If this command is removed from the sysadmin, the non_atomic_requests decorator can be removed
+            // from the backend dispatch() method
             'display_name': gettext('Generate a single certificate'),
             'method': 'regenerate_user',
             'description': gettext('Put a request on the queue to recreate the certificate for a particular user in a particular course'),

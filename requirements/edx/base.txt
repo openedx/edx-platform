@@ -13,7 +13,7 @@ celery==3.1.18
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
-django-babel-underscore==0.4.2
+django-babel-underscore==0.5.1
 django-celery==3.1.16
 django-countries==3.3
 django-extensions==1.5.9
@@ -31,7 +31,7 @@ django-method-override==0.1.0
 # We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
 #djangorestframework>=3.1,<3.2
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
-django==1.8.7
+django==1.8.15
 edx-rest-api-client==1.2.1
 elasticsearch==0.4.5
 facebook-sdk==0.4.0
@@ -121,7 +121,7 @@ ipaddr==2.1.11
 django-cors-headers==1.1.0
 
 # Debug toolbar
-django_debug_toolbar==1.3.2
+django_debug_toolbar==1.5
 
 # Used for testing
 astroid==1.3.8

@@ -142,6 +142,12 @@ messages = xblock.validate().to_json()
         <article class="xblock-render">
         ${content}
         </article>
+        <footer class="location-footer">
+            <div class="location-container">
+                <label class="location-label">${_('Location:')}</label>
+                <p class="location-value">${ xblock.location }</p>
+            </div>
+        </footer>
     % else:
         <div class="xblock-message-area">
         ${content}

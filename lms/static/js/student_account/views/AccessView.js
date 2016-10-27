@@ -74,7 +74,7 @@
                 };
 
                 this.platformName = options.platform_name;
-                this.isNonMicrositeTheme = options.is_non_microsite_theme
+                this.isNonMicrositeTheme = options.stanford_theme_enabled
 
                 // The login view listens for 'sync' events from the reset model
                 this.resetModel = new PasswordResetModel({}, {

@@ -327,8 +327,8 @@ import calendar
           % endif
         </ol>
       </div>
-      % if self.register_extra_file:
-          <%include file='${self.register_extra_file}' />
+      % if self.theme_enabled() and not self.is_microsite():
+        <%include file='theme-register_extra.html' />
       % endif
       <div class="group group-form group-form-accountacknowledgements">
         <h2 class="sr">${_("Account Acknowledgements")}</h2>
@@ -349,7 +349,7 @@ import calendar
 
             % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
             ## If the stanford theme isn't enabled, check if we have an Honor Code link in our marketing map
-            % if self.is_non_microsite_theme() or (marketing_link('HONOR') and marketing_link('HONOR') != '#'):
+            % if self.stanford_theme_enabled() or (marketing_link('HONOR') and marketing_link('HONOR') != '#'):
             <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
