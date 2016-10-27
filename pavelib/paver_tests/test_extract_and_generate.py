@@ -41,8 +41,8 @@ class TestGenerate(TestCase):
             "this may take a few minutes\n"
         )
         sys.stderr.flush()
-        extract.main(verbosity=0)
-        dummy.main(verbosity=0)
+        extract.main(verbose=0)
+        dummy.main(verbose=0)
 
     @classmethod
     def tearDownClass(cls):
