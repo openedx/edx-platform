@@ -1,0 +1,14 @@
+.instructor-dashboard-wrapper-2 section.idash-section#data_download {
+  .reports-download-container {
+    .delete-report {
+      float: right;
+      margin-right: 10px;
+      text-decoration: underline;
+      color: $blue;
+    }
+    .delete-report:hover {
+      cursor: pointer;
+      text-decoration: none;
+    }
+  }
+}
