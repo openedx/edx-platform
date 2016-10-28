@@ -1,12 +1,14 @@
 (function(define, undefined) {
     'use strict';
     define([
-        'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/logger',
+        'jquery', 'underscore', 'annotator_1.2.9',
+        'js/edxnotes/utils/logger', 'js/edxnotes/utils/notes_collector',
         'js/edxnotes/views/shim', 'js/edxnotes/plugins/scroller',
         'js/edxnotes/plugins/events', 'js/edxnotes/plugins/accessibility',
         'js/edxnotes/plugins/caret_navigation',
-        'js/edxnotes/plugins/store_error_handler'
-    ], function($, _, Annotator, NotesLogger) {
+        'js/edxnotes/plugins/store_error_handler',
+        'js/edxnotes/plugins/search_override'
+    ], function($, _, Annotator, NotesLogger, NotesCollector) {
         var plugins = ['Auth', 'Store', 'Scroller', 'Events', 'Accessibility', 'CaretNavigation', 'Tags'],
             getOptions, setupPlugins, getAnnotator;
 
@@ -84,6 +86,7 @@
 
             annotator = el.annotator(options).data('annotator');
             setupPlugins(annotator, plugins, options);
+            NotesCollector.storeNotesRequestData({annotator: annotator, params: params});
             annotator.logger = logger;
             logger.log({'element': element, 'options': options});
             return annotator;

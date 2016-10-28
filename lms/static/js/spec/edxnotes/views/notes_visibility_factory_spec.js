@@ -1,16 +1,16 @@
 define([
     'jquery', 'underscore', 'annotator_1.2.9', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'js/edxnotes/views/notes_visibility_factory', 'js/spec/edxnotes/helpers'
+    'js/edxnotes/views/notes_visibility_factory', 'js/edxnotes/utils/notes_collector', 'js/spec/edxnotes/helpers'
 ], function(
-    $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, Helpers
+    $, _, Annotator, AjaxHelpers, NotesVisibilityFactory, NotesCollector, Helpers
 ) {
     'use strict';
     describe('EdxNotes ToggleNotesFactory', function() {
         var params = {
-            endpoint: '/test_endpoint',
-            user: 'a user',
-            usageId: 'an usage',
-            courseId: 'a course',
+            endpoint: '/test_endpoint/',
+            user: 'user12345',
+            usageId: 'usageid777',
+            courseId: 'courseid000',
             token: Helpers.makeToken(),
             tokenUrl: '/test_token_url'
         };
@@ -27,10 +27,11 @@ define([
                 document.getElementById('edx-notes-wrapper-456'), params, true
             );
             this.toggleNotes = NotesVisibilityFactory.ToggleVisibilityView(true, '/test_url');
-            this.button = $('.action-toggle-notes');
-            this.label = this.button.find('.utility-control-label');
+            this.toggleVisibilityButton = $('.action-toggle-notes');
+            this.label = this.toggleVisibilityButton.find('.utility-control-label');
             this.toggleMessage = $('.action-toggle-message');
             spyOn(this.toggleNotes, 'toggleHandler').and.callThrough();
+            NotesCollector.cleanup();
         });
 
         afterEach(function() {
@@ -39,49 +40,45 @@ define([
                 Annotator._instances[0].destroy();
             }
             $('.annotator-notice').remove();
+            NotesCollector.cleanup();
         });
 
         it('can toggle notes', function() {
             var requests = AjaxHelpers.requests(this);
 
-            expect(this.button).not.toHaveClass('is-disabled');
+            expect(this.toggleVisibilityButton).not.toHaveClass('is-disabled');
             expect(this.label).toContainText('Hide notes');
-            expect(this.button).toHaveClass('is-active');
-            expect(this.button).toHaveAttr('aria-pressed', 'true');
+            expect(this.toggleVisibilityButton).toHaveClass('is-active');
+            expect(this.toggleVisibilityButton).toHaveAttr('aria-pressed', 'true');
             expect(this.toggleMessage).not.toHaveClass('is-fleeting');
             expect(this.toggleMessage).toContainText('Notes visible');
 
-            this.button.click();
+            this.toggleVisibilityButton.click();
             expect(this.label).toContainText('Show notes');
-            expect(this.button).not.toHaveClass('is-active');
+            expect(this.toggleVisibilityButton).not.toHaveClass('is-active');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
             expect(this.toggleMessage).toContainText('Notes hidden');
             expect(Annotator._instances).toHaveLength(0);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
-                'visibility': false
+                visibility: false
             });
             AjaxHelpers.respondWithJson(requests, {});
 
-            this.button.click();
+            this.toggleVisibilityButton.click();
             expect(this.label).toContainText('Hide notes');
-            expect(this.button).toHaveClass('is-active');
+            expect(this.toggleVisibilityButton).toHaveClass('is-active');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
             expect(this.toggleMessage).toContainText('Notes visible');
             expect(Annotator._instances).toHaveLength(2);
 
-            // TODO: why is the same search request made twice?
             AjaxHelpers.expectJsonRequest(requests, 'GET',
-                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
+                '/test_endpoint/search/?usage_id=usageid777&usage_id=usageid777&user=user12345&course_id=courseid000'
             );
-            AjaxHelpers.respondWithJson(requests, {});
-            AjaxHelpers.expectJsonRequest(requests, 'GET',
-                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
-            );
-            AjaxHelpers.respondWithJson(requests, {});
+            AjaxHelpers.respondWithJson(requests, []);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
-                'visibility': true
+                visibility: true
             });
             AjaxHelpers.respondWithJson(requests, {});
         });
@@ -90,7 +87,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 $errorContainer = $('.annotator-notice');
 
-            this.button.click();
+            this.toggleVisibilityButton.click();
             AjaxHelpers.respondWithError(requests);
             expect($errorContainer).toContainText(
                 'An error has occurred. Make sure that you are connected to the Internet, ' +
@@ -100,19 +97,18 @@ define([
             expect($errorContainer).toHaveClass('annotator-notice-show');
             expect($errorContainer).toHaveClass('annotator-notice-error');
 
-            this.button.click();
+            this.toggleVisibilityButton.click();
 
-            // TODO: why is the same search request made twice?
             AjaxHelpers.expectJsonRequest(requests, 'GET',
-                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
+                '/test_endpoint/search/?usage_id=usageid777&usage_id=usageid777&user=user12345&course_id=courseid000'
             );
-            AjaxHelpers.respondWithJson(requests, {});
-            AjaxHelpers.expectJsonRequest(requests, 'GET',
-                '/test_endpoint/search/?user=a+user&usage_id=an+usage&course_id=a+course'
-            );
+            AjaxHelpers.respondWithJson(requests, []);
+
+            AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
+                visibility: true
+            });
             AjaxHelpers.respondWithJson(requests, {});
 
-            AjaxHelpers.respondWithJson(requests, {});
             expect($errorContainer).not.toHaveClass('annotator-notice-show');
         });
 
