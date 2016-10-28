@@ -423,18 +423,17 @@ class PersistentCourseGrade(TimeStampedModel):
         return cls.objects.get(user_id=user_id, course_id=course_id)
 
     @classmethod
-    def update_or_create_course_grade(cls, user_id, course_id, course_version=None, **kwargs):
+    def update_or_create_course_grade(cls, user_id, course_id, **kwargs):
         """
         Creates a course grade in the database.
         Returns a PersistedCourseGrade object.
         """
-        if course_version is None:
-            course_version = ""
+        if kwargs.get('course_version', None) is None:
+            kwargs['course_version'] = ""
 
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
             course_id=course_id,
-            course_version=course_version,
             defaults=kwargs
         )
         return grade

@@ -106,7 +106,6 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
 
     if update_score:
         set_score(user.id, block.location, raw_earned, raw_possible)
-
         PROBLEM_SCORE_CHANGED.send(
             sender=None,
             points_earned=raw_earned,
@@ -130,6 +129,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             kwargs['course_id'],
             kwargs['usage_id'],
             kwargs.get('only_if_higher'),
+            kwargs.get('points_earned'),
+            kwargs.get('points_possible'),
         )
     )
 
