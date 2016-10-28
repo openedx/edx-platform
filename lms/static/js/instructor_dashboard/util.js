@@ -286,7 +286,7 @@
             $subject = interpolateHeader(gettext('Subject:'), emailInfo.email.subject);
             $requester = interpolateHeader(gettext('Sent By:'), emailInfo.requester);
             $created = interpolateHeader(gettext('Time Sent:'), emailInfo.created);
-            $sentTo = interpolateHeader(gettext('Sent To:'), emailInfo.sentTo.join(', '));
+            $sentTo = interpolateHeader(gettext('Sent To:'), emailInfo.sent_to.join(', '));
             $emailHeader.append($subject);
             $emailHeader.append($requester);
             $emailHeader.append($created);
