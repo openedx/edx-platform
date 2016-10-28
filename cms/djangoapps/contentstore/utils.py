@@ -13,6 +13,7 @@ from django_comment_common.models import assign_default_role
 from django_comment_common.utils import seed_permissions_roles
 
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -88,13 +89,25 @@ def get_lms_link_for_item(location, preview=False):
     """
     assert isinstance(location, UsageKey)
 
-    if settings.LMS_BASE is None:
+    # checks LMS_BASE value in site configuration for the given course_org_filter(org)
+    # if not found returns settings.LMS_BASE
+    lms_base = SiteConfiguration.get_value_for_org(
+        location.org,
+        "LMS_BASE",
+        settings.LMS_BASE
+    )
+
+    if lms_base is None:
         return None
 
     if preview:
-        lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
-    else:
-        lms_base = settings.LMS_BASE
+        # checks PREVIEW_LMS_BASE value in site configuration for the given course_org_filter(org)
+        # if not found returns settings.FEATURES.get('PREVIEW_LMS_BASE')
+        lms_base = SiteConfiguration.get_value_for_org(
+            location.org,
+            "PREVIEW_LMS_BASE",
+            settings.FEATURES.get('PREVIEW_LMS_BASE')
+        )
 
     return u"//{lms_base}/courses/{course_key}/jump_to/{location}".format(
         lms_base=lms_base,
