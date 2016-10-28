@@ -377,6 +377,7 @@ def get_courses(user, org=None, filter_=None):
     filtered by org code (case-insensitive).
     """
     include_hidden = filter_.pop('include_hidden', False) if filter_ else False
+    include_hidden = include_hidden and user.is_staff
     courses = branding.get_visible_courses(org=org, filter_=filter_)
 
     permission_name = configuration_helpers.get_value(
