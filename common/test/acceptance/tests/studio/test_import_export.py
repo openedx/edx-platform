@@ -105,11 +105,7 @@ class BadExportMixin(object):
         self.export_page.click_export()
         self.export_page.wait_for_error_modal()
         self.export_page.click_modal_button()
-        EmptyPromise(
-            lambda: self.edit_page.is_browser_on_page,
-            'Arrived at component edit page',
-            timeout=30
-        )
+        self.edit_page.wait_for_page()
 
 
 @attr(shard=7)

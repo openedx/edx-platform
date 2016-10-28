@@ -180,7 +180,6 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
-@attr(shard=2)
 class DiscussionHomePageTest(UniqueCourseTest):
     """
     Tests for the discussion home page.
@@ -195,6 +194,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
         self.page.visit()
 
+    @attr(shard=2)
     def test_new_post_button(self):
         """
         Scenario: I can create new posts from the Discussion home page.
@@ -211,7 +211,7 @@ class DiscussionHomePageTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()
@@ -397,7 +397,6 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
 
 
-@attr(shard=2)
 class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
     """
     Tests for the discussion page with multiple threads
@@ -423,6 +422,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         )
         self.thread_page_1.visit()
 
+    @attr(shard=2)
     def setup_multiple_threads(self, thread_count):
         threads = []
         for i in range(thread_count):
@@ -440,7 +440,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
 
@@ -449,14 +449,13 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_2.a11y_audit.config.set_rules({
             "ignore": [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
 
         self.thread_page_2.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=2)
 class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
     """
     Tests for checking the display of attributes on open and closed threads
@@ -490,6 +489,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.close_open_thread()
         return page
 
+    @attr(shard=2)
     def test_originally_open_thread_vote_display(self):
         page = self.setup_openclosed_thread_page()
         self.assertFalse(page.is_element_visible('.thread-main-wrapper .action-vote'))
@@ -497,6 +497,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_element_visible('.response_response1 .action-vote'))
         self.assertTrue(page.is_element_visible('.response_response1 .display-vote'))
 
+    @attr(shard=2)
     def test_originally_closed_thread_vote_display(self):
         page = self.setup_openclosed_thread_page(True)
         self.assertTrue(page.is_element_visible('.thread-main-wrapper .action-vote'))
@@ -510,7 +511,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -519,7 +520,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkis but not locally
+                'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -565,7 +566,6 @@ class DiscussionCommentDeletionTest(BaseDiscussionTestCase):
         page.delete_comment("comment_other_author")
 
 
-@attr(shard=2)
 class DiscussionResponseEditTest(BaseDiscussionTestCase):
     """
     Tests for editing responses displayed beneath thread in the single thread view.
@@ -591,6 +591,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.set_response_editor_value(response_id, new_response)
         page.submit_response_edit(response_id, new_response)
 
+    @attr(shard=2)
     def test_edit_response_add_link(self):
         """
         Scenario: User submits valid input to the 'add link' form
@@ -624,6 +625,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
+    @attr(shard=2)
     def test_edit_response_add_image(self):
         """
         Scenario: User submits valid input to the 'add image' form
@@ -657,6 +659,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
+    @attr(shard=2)
     def test_edit_response_add_image_error_msg(self):
         """
         Scenario: User submits invalid input to the 'add image' form
@@ -676,6 +679,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             "image", "response_self_author", '', '')
         page.verify_link_editor_error_messages_shown()
 
+    @attr(shard=2)
     def test_edit_response_add_decorative_image(self):
         """
         Scenario: User submits invalid input to the 'add image' form
@@ -711,6 +715,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         ).html[0]
         self.assertEqual(expected_response_html, actual_response_html)
 
+    @attr(shard=2)
     def test_edit_response_add_link_error_msg(self):
         """
         Scenario: User submits invalid input to the 'add link' form
@@ -730,6 +735,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
             "link", "response_self_author", '', '')
         page.verify_link_editor_error_messages_shown()
 
+    @attr(shard=2)
     def test_edit_response_as_student(self):
         """
         Scenario: Students should be able to edit the response they created not responses of other users
@@ -747,6 +753,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_response_editable("response_other_author"))
         self.edit_response(page, "response_self_author")
 
+    @attr(shard=2)
     def test_edit_response_as_moderator(self):
         """
         Scenario: Moderator should be able to edit the response they created and responses of other users
@@ -763,6 +770,7 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         self.edit_response(page, "response_self_author")
         self.edit_response(page, "response_other_author")
 
+    @attr(shard=2)
     @flaky  # TODO fix this, see TNL-5453
     def test_vote_report_endorse_after_edit(self):
         """
@@ -806,14 +814,13 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         page.visit()
         page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=2)
 class DiscussionCommentEditTest(BaseDiscussionTestCase):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
@@ -835,6 +842,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.set_comment_editor_value(comment_id, new_comment)
         page.submit_comment_edit(comment_id, new_comment)
 
+    @attr(shard=2)
     def test_edit_comment_as_student(self):
         self.setup_user()
         self.setup_view()
@@ -845,6 +853,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.assertFalse(page.is_comment_editable("comment_other_author"))
         self.edit_comment(page, "comment_self_author")
 
+    @attr(shard=2)
     def test_edit_comment_as_moderator(self):
         self.setup_user(roles=["Moderator"])
         self.setup_view()
@@ -855,6 +864,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.edit_comment(page, "comment_self_author")
         self.edit_comment(page, "comment_other_author")
 
+    @attr(shard=2)
     def test_cancel_comment_edit(self):
         self.setup_user()
         self.setup_view()
@@ -866,6 +876,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.set_comment_editor_value("comment_self_author", "edited body")
         page.cancel_comment_edit("comment_self_author", original_body)
 
+    @attr(shard=2)
     def test_editor_visibility(self):
         """Only one editor should be visible at a time within a single response"""
         self.setup_user(roles=["Moderator"])
@@ -904,7 +915,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         page.a11y_audit.check_for_accessibility_errors()
@@ -1250,7 +1261,6 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         self.assertTrue(learner_profile_page.field_is_visible('username'))
 
 
-@attr(shard=2)
 class DiscussionSearchAlertTest(UniqueCourseTest):
     """
     Tests for spawning and dismissing alerts related to user search actions and their results.
@@ -1279,11 +1289,13 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         actual = self.page.get_search_alert_messages()
         self.assertTrue(all(map(lambda msg, sub: msg.lower().find(sub.lower()) >= 0, actual, expected)))
 
+    @attr(shard=2)
     def test_no_rewrite(self):
         self.setup_corrected_text(None)
         self.page.perform_search()
         self.check_search_alert_messages(["no threads"])
 
+    @attr(shard=2)
     def test_rewrite_dismiss(self):
         self.setup_corrected_text("foo")
         self.page.perform_search()
@@ -1291,6 +1303,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.dismiss_alert_message("foo")
         self.check_search_alert_messages([])
 
+    @attr(shard=2)
     def test_new_search(self):
         self.setup_corrected_text("foo")
         self.page.perform_search()
@@ -1304,11 +1317,13 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.perform_search()
         self.check_search_alert_messages(["no threads"])
 
+    @attr(shard=2)
     def test_rewrite_and_user(self):
         self.setup_corrected_text("foo")
         self.page.perform_search(self.SEARCHED_USERNAME)
         self.check_search_alert_messages(["foo", self.SEARCHED_USERNAME])
 
+    @attr(shard=2)
     def test_user_only(self):
         self.setup_corrected_text(None)
         self.page.perform_search(self.SEARCHED_USERNAME)
@@ -1328,7 +1343,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
         self.page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TNL-5169, AC-534
+                'aria-required-children',  # TODO: AC-534
             ]
         })
         self.page.a11y_audit.check_for_accessibility_errors()

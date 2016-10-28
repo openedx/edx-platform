@@ -18,7 +18,7 @@
 
   <span id="answer_${id}"></span>
   <div class="indicator-container">
-    <span class="status ${status.classname}" id="status_${id}" aria-describedby="input_${id}"></span>
-    <span class="sr">${status.display_tooltip}</span>
+    <%include file="status_span.html" args="status=status, status_id=id"/>
+
   </div>
 </div>

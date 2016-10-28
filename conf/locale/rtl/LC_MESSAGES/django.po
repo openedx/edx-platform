@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:37+0000\n"
-"PO-Revision-Date: 2016-10-20 15:37:55.843388\n"
+"POT-Creation-Date: 2016-10-27 14:45+0000\n"
+"PO-Revision-Date: 2016-10-27 14:45:24.494944\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -403,11 +403,11 @@ msgstr "غخعق مثلشم رشوث وعسف زث ش وهرهوعو خب فصخ
 
 #: common/djangoapps/student/forms.py
 msgid ""
-"Usernames must contain only letters, numbers, underscores (_), and hyphens "
-"(-)."
+"Usernames can only contain Roman letters, western numerals (0-9), "
+"underscores (_), and hyphens (-)."
 msgstr ""
-"عسثقرشوثس وعسف ذخرفشهر خرمغ مثففثقس, رعوزثقس, عريثقسذخقثس (_), شري اغحاثرس "
-"(-)."
+"عسثقرشوثس ذشر خرمغ ذخرفشهر قخوشر مثففثقس, صثسفثقر رعوثقشمس (0-9), "
+"عريثقسذخقثس (_), شري اغحاثرس (-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -11619,8 +11619,10 @@ msgid "Submit your answer"
 msgstr "سعزوهف غخعق شرسصثق"
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempts"
-msgstr "غخع اشدث عسثي {num_used} خب {num_total} شففثوحفس"
+msgid "You have used {num_used} of {num_total} attempt"
+msgid_plural "You have used {num_used} of {num_total} attempts"
+msgstr[0] "غخع اشدث عسثي {num_used} خب {num_total} شففثوحف"
+msgstr[1] "غخع اشدث عسثي {num_used} خب {num_total} شففثوحفس"
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
@@ -12007,18 +12009,23 @@ msgid "Actions"
 msgstr "شذفهخرس"
 
 #: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "قثسثف سفعيثرف شففثوحفس"
-
-#: lms/templates/staff_problem_info.html
-msgid "Delete Student State"
-msgstr "يثمثفث سفعيثرف سفشفث"
+msgid "Reset Learner's Attempts to Zero"
+msgstr "قثسثف مثشقرثق'س شففثوحفس فخ ظثقخ"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "قثسذخقث سفعيثرف سعزوهسسهخر"
+msgid "Delete Learner's State"
+msgstr "يثمثفث مثشقرثق'س سفشفث"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Learner's Submission"
+msgstr "قثسذخقث مثشقرثق'س سعزوهسسهخر"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Score Improves"
+msgstr "قثسذخقث خرمغ هب سذخقث هوحقخدثس"
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -14125,10 +14132,6 @@ msgid "{course_number} Progress"
 msgstr "{course_number} حقخلقثسس"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress"
-msgstr "ذخعقسث حقخلقثسس"
-
-#: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
 msgstr "دهثص لقشيهرل هر سفعيهخ"
 
@@ -14137,16 +14140,12 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "ذخعقسث حقخلقثسس بخق سفعيثرف '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
-msgid "View certificate in a new browser window or tab."
-msgstr "دهثص ذثقفهبهذشفث هر ش رثص زقخصسثق صهريخص خق فشز."
-
-#: lms/templates/courseware/progress.html
 msgid "View Certificate"
 msgstr "دهثص ذثقفهبهذشفث"
 
 #: lms/templates/courseware/progress.html
-msgid "PDF will open in a new browser window or tab."
-msgstr "حيب صهمم خحثر هر ش رثص زقخصسثق صهريخص خق فشز."
+msgid "Opens in a new browser window"
+msgstr "خحثرس هر ش رثص زقخصسثق صهريخص"
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -14209,6 +14208,10 @@ msgstr "عحذخوهرل"
 #: lms/templates/courseware/progress.html
 msgid "Less"
 msgstr "مثسس"
+
+#: lms/templates/courseware/progress.html
+msgid "Details for each chapter"
+msgstr "يثفشهمس بخق ثشذا ذاشحفثق"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
@@ -15885,6 +15888,14 @@ msgid "Regenerate for learners who have not received certificates. ({count})"
 msgstr "قثلثرثقشفث بخق مثشقرثقس صاخ اشدث رخف قثذثهدثي ذثقفهبهذشفثس. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit passing state. ({count})"
+msgstr "قثلثرثقشفث بخق مثشقرثقس صهفا شعيهف حشسسهرل سفشفث. ({count})"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit not passing state. ({count})"
+msgstr "قثلثرثقشفث بخق مثشقرثقس صهفا شعيهف رخف حشسسهرل سفشفث. ({count})"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
 msgstr "قثلثرثقشفث بخق مثشقرثقس هر شر ثققخق سفشفث. ({count})"
 
@@ -16569,14 +16580,12 @@ msgstr ""
 "سفعيثرف."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
 "سحثذهبغ فاث {platform_name} ثوشهم شييقثسس خق عسثقرشوث خب ش سفعيثرف اثقث:"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
 msgstr "سفعيثرف ثوشهم خق عسثقرشوث"
 
@@ -17246,155 +17255,194 @@ msgid "Student Special Exam Attempts"
 msgstr "سفعيثرف سحثذهشم ثطشو شففثوحفس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Gradebook"
-msgstr "سفعيثرف لقشيثزخخن"
+msgid "View gradebook for enrolled learners"
+msgstr "دهثص لقشيثزخخن بخق ثرقخممثي مثشقرثقس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Click here to view the gradebook for enrolled students. This feature is only"
-" visible to courses with a small number of total enrolled students."
+"Note: This feature is available only to courses with a small number of "
+"enrolled learners."
 msgstr ""
-"ذمهذن اثقث فخ دهثص فاث لقشيثزخخن بخق ثرقخممثي سفعيثرفس. فاهس بثشفعقث هس خرمغ"
-" دهسهزمث فخ ذخعقسثس صهفا ش سوشمم رعوزثق خب فخفشم ثرقخممثي سفعيثرفس."
+"رخفث: فاهس بثشفعقث هس شدشهمشزمث خرمغ فخ ذخعقسثس صهفا ش سوشمم رعوزثق خب "
+"ثرقخممثي مثشقرثقس."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
 msgstr "دهثص لقشيثزخخن"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade inspection"
-msgstr "سفعيثرف-سحثذهبهذ لقشيث هرسحثذفهخر"
+msgid "View a specific learner's grades and progress"
+msgstr "دهثص ش سحثذهبهذ مثشقرثق'س لقشيثس شري حقخلقثسس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Click this link to view the student's progress page:"
-msgstr "ذمهذن فاهس مهرن فخ دهثص فاث سفعيثرف'س حقخلقثسس حشلث:"
+msgid "Learner's {platform_name} email address or username *"
+msgstr "مثشقرثق'س {platform_name} ثوشهم شييقثسس خق عسثقرشوث *"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Progress Page"
-msgstr "سفعيثرف حقخلقثسس حشلث"
+msgid "Learner email address or username"
+msgstr "مثشقرثق ثوشهم شييقثسس خق عسثقرشوث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade adjustment"
-msgstr "سفعيثرف-سحثذهبهذ لقشيث شيتعسفوثرف"
+msgid "View Progress Page"
+msgstr "دهثص حقخلقثسس حشلث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Specify a problem in the course here with its complete location:"
-msgstr "سحثذهبغ ش حقخزمثو هر فاث ذخعقسث اثقث صهفا هفس ذخوحمثفث مخذشفهخر:"
+msgid "Adjust a learner's grade for a specific problem"
+msgstr "شيتعسف ش مثشقرثق'س لقشيث بخق ش سحثذهبهذ حقخزمثو"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Location of problem in course *"
+msgstr "مخذشفهخر خب حقخزمثو هر ذخعقسث *"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Example"
+msgstr "ثطشوحمث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
 msgstr "حقخزمثو مخذشفهخر"
 
-#. Translators: A location (string of text) follows this sentence.
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You must provide the complete location of the problem. In the Staff Debug "
-"viewer, the location looks like this:"
-msgstr ""
-"غخع وعسف حقخدهيث فاث ذخوحمثفث مخذشفهخر خب فاث حقخزمثو. هر فاث سفشبب يثزعل "
-"دهثصثق, فاث مخذشفهخر مخخنس مهنث فاهس:"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Next, select an action to perform for the given user and problem:"
-msgstr "رثطف, سثمثذف شر شذفهخر فخ حثقبخقو بخق فاث لهدثر عسثق شري حقخزمثو:"
+msgid "Attempts"
+msgstr "شففثوحفس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You may also delete the entire state of a student for the specified problem:"
+"Allow a learner who has used up all attempts to work on the problem again."
 msgstr ""
-"غخع وشغ شمسخ يثمثفث فاث ثرفهقث سفشفث خب ش سفعيثرف بخق فاث سحثذهبهثي حقخزمثو:"
+"شممخص ش مثشقرثق صاخ اشس عسثي عح شمم شففثوحفس فخ صخقن خر فاث حقخزمثو شلشهر."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student State for Problem"
-msgstr "يثمثفث سفعيثرف سفشفث بخق حقخزمثو"
+msgid "Reset Attempts to Zero"
+msgstr "قثسثف شففثوحفس فخ ظثقخ"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore"
+msgstr "قثسذخقث"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Tasks' table. To see status for all tasks submitted for this "
-"problem and student, click on this button:"
+"For the specified problem, rescore the learner's responses. The 'Rescore "
+"Only If Score Improves' option updates the learner's score only if it "
+"improves in the learner's favor."
 msgstr ""
-"قثسذخقهرل قعرس هر فاث زشذنلقخعري, شري سفشفعس بخق شذفهدث فشسنس صهمم شححثشق هر"
-" فاث 'حثريهرل فشسنس' فشزمث. فخ سثث سفشفعس بخق شمم فشسنس سعزوهففثي بخق فاهس "
-"حقخزمثو شري سفعيثرف, ذمهذن خر فاهس زعففخر:"
+"بخق فاث سحثذهبهثي حقخزمثو, قثسذخقث فاث مثشقرثق'س قثسحخرسثس. فاث 'قثسذخقث "
+"خرمغ هب سذخقث هوحقخدثس' خحفهخر عحيشفثس فاث مثشقرثق'س سذخقث خرمغ هب هف "
+"هوحقخدثس هر فاث مثشقرثق'س بشدخق."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Student"
-msgstr "ساخص زشذنلقخعري فشسن اهسفخقغ بخق سفعيثرف"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Entrance Exam Adjustment"
-msgstr "ثرفقشرذث ثطشو شيتعسفوثرف"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student's {platform_name} email address or username:"
-msgstr "سفعيثرف'س {platform_name} ثوشهم شييقثسس خق عسثقرشوث:"
+msgid "Problem History"
+msgstr "حقخزمثو اهسفخقغ"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Select an action for the student's entrance exam. This action will affect "
-"every problem in the student's exam."
+"For the specified problem, permanently and completely delete the learner's "
+"answers and scores from the database."
 msgstr ""
-"سثمثذف شر شذفهخر بخق فاث سفعيثرف'س ثرفقشرذث ثطشو. فاهس شذفهخر صهمم شببثذف "
-"ثدثقغ حقخزمثو هر فاث سفعيثرف'س ثطشو."
+"بخق فاث سحثذهبهثي حقخزمثو, حثقوشرثرفمغ شري ذخوحمثفثمغ يثمثفث فاث مثشقرثق'س "
+"شرسصثقس شري سذخقثس بقخو فاث يشفشزشسث."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Number of Student Attempts"
-msgstr "قثسثف رعوزثق خب سفعيثرف شففثوحفس"
+msgid "Task Status"
+msgstr "فشسن سفشفعس"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and problem."
+msgstr ""
+"ساخص فاث سفشفعس بخق فاث قثسذخقهرل فشسنس فاشف غخع سعزوهففثي بخق فاهس مثشقرثق "
+"شري حقخزمثو."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Task Status"
+msgstr "ساخص فشسن سفشفعس"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's entrance exam results"
+msgstr "شيتعسف ش مثشقرثق'س ثرفقشرذث ثطشو قثسعمفس"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow the learner to take the exam again."
+msgstr "شممخص فاث مثشقرثق فخ فشنث فاث ثطشو شلشهر."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow Skip"
+msgstr "شممخص سنهح"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Waive the requirement for the learner to take the exam."
+msgstr "صشهدث فاث قثضعهقثوثرف بخق فاث مثشقرثق فخ فشنث فاث ثطشو."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Let Learner Skip Entrance Exam"
+msgstr "مثف مثشقرثق سنهح ثرفقشرذث ثطشو"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore any responses that have been submitted. The 'Rescore All Problems "
+"Only If Score Improves' option updates the learner's scores only if it "
+"improves in the learner's favor."
+msgstr ""
+"قثسذخقث شرغ قثسحخرسثس فاشف اشدث زثثر سعزوهففثي. فاث 'قثسذخقث شمم حقخزمثوس "
+"خرمغ هب سذخقث هوحقخدثس' خحفهخر عحيشفثس فاث مثشقرثق'س سذخقثس خرمغ هب هف "
+"هوحقخدثس هر فاث مثشقرثق'س بشدخق."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
 msgstr "قثسذخقث شمم حقخزمثوس"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Let Student Skip Entrance Exam"
-msgstr "مثف سفعيثرف سنهح ثرفقشرذث ثطشو"
+msgid "Rescore All Problems Only If Score Improves"
+msgstr "قثسذخقث شمم حقخزمثوس خرمغ هب سذخقث هوحقخدثس"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Entrance Exam History"
+msgstr "ثرفقشرذث ثطشو اهسفخقغ"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You can also delete all of the student's answers and scores for the entire "
-"entrance exam."
+"For the entire entrance exam, permanently and completely delete the "
+"learner's answers and scores from the database."
 msgstr ""
-"غخع ذشر شمسخ يثمثفث شمم خب فاث سفعيثرف'س شرسصثقس شري سذخقثس بخق فاث ثرفهقث "
-"ثرفقشرذث ثطشو."
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student's Answers and Scores"
-msgstr "يثمثفث سفعيثرف'س شرسصثقس شري سذخقثس"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Student's Exam Adjustment History"
-msgstr "ساخص سفعيثرف'س ثطشو شيتعسفوثرف اهسفخقغ"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Course-specific grade adjustment"
-msgstr "ذخعقسث-سحثذهبهذ لقشيث شيتعسفوثرف"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Then select an action"
-msgstr "فاثر سثمثذف شر شذفهخر"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset ALL students' attempts"
-msgstr "قثسثف شمم سفعيثرفس' شففثوحفس"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore ALL students' problem submissions"
-msgstr "قثسذخقث شمم سفعيثرفس' حقخزمثو سعزوهسسهخرس"
+"بخق فاث ثرفهقث ثرفقشرذث ثطشو, حثقوشرثرفمغ شري ذخوحمثفثمغ يثمثفث فاث "
+"مثشقرثق'س شرسصثقس شري سذخقثس بقخو فاث يشفشزشسث."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"The above actions run in the background, and status for active tasks will "
-"appear in a table on the Course Info tab. To see status for all tasks "
-"submitted for this problem, click on this button"
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and entrance exam."
 msgstr ""
-"فاث شزخدث شذفهخرس قعر هر فاث زشذنلقخعري, شري سفشفعس بخق شذفهدث فشسنس صهمم "
-"شححثشق هر ش فشزمث خر فاث ذخعقسث هربخ فشز. فخ سثث سفشفعس بخق شمم فشسنس "
-"سعزوهففثي بخق فاهس حقخزمثو, ذمهذن خر فاهس زعففخر"
+"ساخص فاث سفشفعس بخق فاث قثسذخقهرل فشسنس فاشف غخع سعزوهففثي بخق فاهس مثشقرثق "
+"شري ثرفقشرذث ثطشو."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Problem"
-msgstr "ساخص زشذنلقخعري فشسن اهسفخقغ بخق حقخزمثو"
+msgid "Adjust all enrolled learners' grades for a specific problem"
+msgstr "شيتعسف شمم ثرقخممثي مثشقرثقس' لقشيثس بخق ش سحثذهبهذ حقخزمثو"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allows all learners to work on the problem again."
+msgstr "شممخصس شمم مثشقرثقس فخ صخقن خر فاث حقخزمثو شلشهر."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
+"updates a learner's score only if it improves in the learner's favor."
+msgstr ""
+"قثسذخقث سعزوهففثي قثسحخرسثس. فاث 'قثسذخقث خرمغ هب سذخقثس هوحقخدث' خحفهخر "
+"عحيشفثس ش مثشقرثق'س سذخقث خرمغ هب هف هوحقخدثس هر فاث مثشقرثق'س بشدخق."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Learners' Submissions"
+msgstr "قثسذخقث شمم مثشقرثقس' سعزوهسسهخرس"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Scores Improve"
+msgstr "قثسذخقث خرمغ هب سذخقثس هوحقخدث"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show the status for the tasks that you submitted for this problem."
+msgstr "ساخص فاث سفشفعس بخق فاث فشسنس فاشف غخع سعزوهففثي بخق فاهس حقخزمثو."
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"

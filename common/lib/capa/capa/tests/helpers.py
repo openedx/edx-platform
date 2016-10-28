@@ -22,7 +22,8 @@ def get_template(template_name):
     Return template for a capa inputtype.
     """
     return TemplateLookup(
-        directories=[path(__file__).dirname().dirname() / 'templates']
+        directories=[path(__file__).dirname().dirname() / 'templates'],
+        default_filters=['decode.utf8']
     ).get_template(template_name)
 
 

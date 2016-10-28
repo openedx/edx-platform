@@ -63,7 +63,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 18:42+0000\n"
+"POT-Creation-Date: 2016-10-20 15:55+0000\n"
 "PO-Revision-Date: 2016-09-29 14:26+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -371,7 +371,34 @@ msgstr[1] ""
 msgid "The grading process is still running. Refresh the page to see updates."
 msgstr "תהליך הדירוג ממשיך לפעול. רענן את הדף כדי לראות עדכונים."
 
-#. Translators: This is only translated to allow for reording of label and
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Could not grade your answer. The submission was aborted."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid ""
+"Submission aborted! Sorry, your browser does not support file uploads. If "
+"you can, please use Chrome or Safari which have been verified to support "
+"file uploads."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You submitted {filename}; only {allowedFiles} are allowed."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "Your file {filename} is too large (max size: {maxSize}MB)."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not submit the required files: {requiredFiles}."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "You did not select any files to submit."
+msgstr ""
+
+#. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
@@ -4202,12 +4229,10 @@ msgstr "טוען את הקורסים שלך"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
-"We have sent an email message with password reset instructions to the email "
-"address you provided.  If you do not receive this message, "
-"{anchorStart}contact technical support{anchorEnd}."
+"{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
+"address is associated with an edX account, we will send a message with "
+"password reset instructions to this email address.{paragraphEnd}"
 msgstr ""
-"שלחנו לך הודעת דואר אלקטרוני עם הוראות לאיפוס סיסמה לכתובת הדוא\"ל שסיפקת. "
-"אם אינך מקבל הודעה זו, {anchorStart}צור קשר עם התמיכה הטכנית{anchorEnd}."
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -6862,11 +6887,6 @@ msgstr "הצטרף לצוות"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "Add a Post"
-msgstr "הוסף פוסט"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "פרטי צוות"
 
@@ -7987,9 +8007,10 @@ msgstr ""
 "%(platformName)s."
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Password Reset Email Sent"
-msgstr "נשלח דוא\"ל איפוס סיסמה"
+#: lms/templates/verify_student/intro_step.underscore
+#: test_root/staticfiles/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr "בדוק את הדואר האלקטרוני שלך"
 
 #: lms/templates/student_account/login.underscore
 #: test_root/staticfiles/templates/student_account/login.underscore
@@ -8546,11 +8567,6 @@ msgid "Activate Your Account"
 msgstr "הפעל את חשבונך"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr "בדוק את הדואר האלקטרוני שלך"
-
-#: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/verify_student/intro_step.underscore
@@ -8957,6 +8973,10 @@ msgstr "התחיל ב"
 msgid "Completed At"
 msgstr "הושלם ב"
 
+#: test_root/staticfiles/teams/templates/team-profile.underscore
+msgid "Add a Post"
+msgstr "הוסף פוסט"
+
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid ""
 "To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
@@ -8964,6 +8984,10 @@ msgid ""
 msgstr ""
 "כדי לקבל נקודת זכות על בעיה, עליך ללחוץ על \"בדוק\" או על \"בדיקה סופית\" "
 "לפני שתבחר \"סיום המבחן שלי\"."
+
+#: test_root/staticfiles/templates/student_account/login.underscore
+msgid "Password Reset Email Sent"
+msgstr "נשלח דוא\"ל איפוס סיסמה"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"

@@ -9,7 +9,7 @@
 % endif
 
 % if status in ('unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete'):
-    <div class="${status.classname} ${doinline}" id="status_${id}">
+    <div class="${status.classname} ${doinline}">
 % endif
 
 % if hidden:
@@ -23,7 +23,7 @@
 % for description_id, description_text in response_data['descriptions'].items():
     <p class="question-description" id="${description_id}">${description_text}</p>
 % endfor
-<input type="text" name="input_${id}" id="input_${id}" ${HTML(describedby_html)} value="${value}"
+<input type="text" name="input_${id}" id="input_${id}" ${describedby_html} value="${value}"
     % if do_math:
         class="math"
     % endif
@@ -36,9 +36,7 @@
 />
 <span class="trailing_text">${trailing_text}</span>
 
-<span class="status" aria-describedby="label_${id}" data-tooltip="${status.display_tooltip}">
-    <span class="sr">${status.display_tooltip}</span>
-</span>
+<%include file="status_span.html" args="status=status, status_id=id"/>
 
 <p id="answer_${id}" class="answer"></p>
 

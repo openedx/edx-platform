@@ -86,7 +86,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # The student progress tab is not accessible to a student
         # before launch, so the instructor view-as-student feature
-        # should return a 404 as well.
+        # should return a 403.
         # TODO (vshnayder): If this is not the behavior we want, will need
         # to make access checking smarter and understand both the effective
         # user (the student), and the requesting user (the prof)
@@ -97,7 +97,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'student_id': self.enrolled_user.id,
             }
         )
-        self.assert_request_status_code(404, url)
+        self.assert_request_status_code(403, url)
 
         # The courseware url should redirect, not 200
         url = self._reverse_urls(['courseware'], course)[0]

@@ -67,6 +67,7 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
             # Sadly, this sleep is necessary in order to ensure that
             # sorting by last_activity_at works correctly when running
             # in Jenkins.
+            # THIS IS AN ANTI-PATTERN - DO NOT COPY.
             time.sleep(time_between_creation)
         return teams
 
@@ -423,19 +424,16 @@ class BrowseTopicsTest(TeamsTabBase):
         topic = [t for t in topics if t['name'] == topic_name][0]
         self.topics_page.browse_teams_for_topic(topic_name)
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
-        self.assertTrue(browse_teams_page.is_browser_on_page())
+        browse_teams_page.wait_for_page()
         browse_teams_page.click_create_team_link()
         create_team_page = TeamManagementPage(self.browser, self.course_id, topic)
-        create_team_page.value_for_text_field(field_id='name', value='Team Name', press_enter=False)
-        create_team_page.set_value_for_textarea_field(
-            field_id='description',
-            value='Team description.'
-        )
-        create_team_page.submit_form()
+        create_team_page.create_team()
+
         team_page = TeamPage(self.browser, self.course_id)
-        self.assertTrue(team_page.is_browser_on_page())
+        team_page.wait_for_page()
+
         team_page.click_all_topics()
-        self.assertTrue(self.topics_page.is_browser_on_page())
+        self.topics_page.wait_for_page()
         self.topics_page.wait_for_ajax()
         self.assertEqual(topic_name, self.topics_page.topic_names[0])
 
@@ -575,7 +573,7 @@ class BrowseTopicsTest(TeamsTabBase):
         self.topics_page.visit()
         self.topics_page.browse_teams_for_topic('Example Topic')
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, topic)
-        self.assertTrue(browse_teams_page.is_browser_on_page())
+        browse_teams_page.wait_for_page()
         self.assertEqual(browse_teams_page.header_name, 'Example Topic')
         self.assertEqual(browse_teams_page.header_description, 'Description')
 
@@ -827,7 +825,7 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.verify_page_header()
 
         self.browse_teams_page.click_browse_all_teams_link()
-        self.assertTrue(self.topics_page.is_browser_on_page())
+        self.topics_page.wait_for_page()
 
     def test_search(self):
         """
@@ -1042,8 +1040,21 @@ class CreateTeamTest(TeamFormActions):
         Then I should see the error message and highlighted fields.
         """
         self.verify_and_navigate_to_create_team_page()
-        self.team_management_page.submit_form()
 
+        # `submit_form` clicks on a button, but that button doesn't always
+        # have the click event handler registered on it in time. That's why
+        # this test is flaky. Unfortunately, I don't know of a straightforward
+        # way to write something that waits for that event handler to be bound
+        # to the button element. So I used time.sleep as well, even though
+        # the bok choy docs explicitly ask us not to:
+        # http://bok-choy.readthedocs.io/en/latest/guidelines.html
+        # Sorry! For the story to address this anti-pattern, see TNL-5820
+        time.sleep(0.5)
+        self.team_management_page.submit_form()
+        self.team_management_page.wait_for(
+            lambda: self.team_management_page.validation_message_text,
+            "Validation message text never loaded."
+        )
         self.assertEqual(
             self.team_management_page.validation_message_text,
             'Check the highlighted fields below and try again.'
@@ -1150,9 +1161,16 @@ class CreateTeamTest(TeamFormActions):
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.verify_and_navigate_to_create_team_page()
+
+        # We add a sleep here to allow time for the click event handler to bind
+        # to the cancel button. Using time.sleep in bok-choy tests is,
+        # generally, an anti-pattern. So don't copy this :).
+        # For the story to address this anti-pattern, see TNL-5820
+        time.sleep(0.5)
+
         self.team_management_page.cancel_team()
 
-        self.assertTrue(self.browse_teams_page.is_browser_on_page())
+        self.browse_teams_page.wait_for_page()
         self.assertTrue(self.browse_teams_page.get_pagination_header_text().startswith('Showing 0 out of 0 total'))
 
         self.teams_page.click_all_topics()
@@ -1215,7 +1233,7 @@ class DeleteTeamTest(TeamFormActions):
         Then I should still see the team
         """
         self.delete_team(cancel=True)
-        self.assertTrue(self.team_management_page.is_browser_on_page())
+        self.team_management_page.wait_for_page()
         self.browser.refresh()
         self.team_management_page.wait_for_page()
         self.assertEqual(
@@ -1248,7 +1266,7 @@ class DeleteTeamTest(TeamFormActions):
         self.team_page.visit()
         self.delete_team(require_notification=False)
         browse_teams_page = BrowseTeamsPage(self.browser, self.course_id, self.topic)
-        self.assertTrue(browse_teams_page.is_browser_on_page())
+        browse_teams_page.wait_for_page()
         self.assertNotIn(self.team['name'], browse_teams_page.team_names)
 
     def delete_team(self, **kwargs):
@@ -1298,7 +1316,7 @@ class DeleteTeamTest(TeamFormActions):
         self.delete_team(require_notification=False)
         BrowseTeamsPage(self.browser, self.course_id, self.topic).click_all_topics()
         topics_page = BrowseTopicsPage(self.browser, self.course_id)
-        self.assertTrue(topics_page.is_browser_on_page())
+        topics_page.wait_for_page()
         self.teams_page.verify_topic_team_count(0)
 
 
@@ -1584,7 +1602,7 @@ class EditMembershipTest(TeamFormActions):
             ):
                 self.edit_membership_page.confirm_delete_membership_dialog()
             self.assertEqual(self.edit_membership_page.team_members, 0)
-        self.assertTrue(self.edit_membership_page.is_browser_on_page)
+        self.edit_membership_page.wait_for_page()
 
     @ddt.data('Moderator', 'Community TA', 'Administrator', None)
     def test_remove_membership(self, role):
@@ -1698,7 +1716,7 @@ class TeamPageTest(TeamsTabBase):
         self.team_page.visit()
         self.assertEqual(self.team_page.discussion_id, self.teams[0]['discussion_topic_id'])
         discussion = self.team_page.discussion_page
-        self.assertTrue(discussion.is_browser_on_page())
+        discussion.wait_for_page()
         self.assertTrue(discussion.is_discussion_expanded())
         self.assertEqual(discussion.get_num_displayed_threads(), 1)
         self.assertTrue(discussion.has_thread(thread['id']))
@@ -1940,6 +1958,13 @@ class TeamPageTest(TeamsTabBase):
             }
         ]
         with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+            # I think we're seeing the same problem that we're seeing in
+            # CreateTeamTest.test_user_can_see_error_message_for_missing_data.
+            # We click on the "leave team" link after it's loaded, but before
+            # its JavaScript event handler is added. Adding this sleep gives
+            # enough time for that event handler to bind to the link. Sorry!
+            # For the story to address this anti-pattern, see TNL-5820
+            time.sleep(0.5)
             self.team_page.click_leave_team_link()
         self.assert_team_details(num_members=0, is_member=False)
         self.assertTrue(self.team_page.join_team_button_present)

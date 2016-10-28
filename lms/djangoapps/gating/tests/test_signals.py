@@ -1,15 +1,14 @@
 """
 Unit tests for gating.signals module
 """
-from mock import patch
+from mock import patch, MagicMock
 
-from opaque_keys.edx.keys import UsageKey
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 
-from gating.signals import handle_score_changed
+from gating.signals import handle_subsection_score_changed
 
 
 class TestHandleScoreChanged(ModuleStoreTestCase):
@@ -27,25 +26,21 @@ class TestHandleScoreChanged(ModuleStoreTestCase):
         """ Test evaluate_prerequisite is called when course.enable_subsection_gating is True """
         self.course.enable_subsection_gating = True
         modulestore().update_item(self.course, 0)
-        handle_score_changed(
+        handle_subsection_score_changed(
             sender=None,
-            points_possible=1,
-            points_earned=1,
-            user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            usage_id=unicode(self.test_usage_key)
+            course=self.course,
+            user=self.user,
+            subsection_grade=MagicMock(),
         )
-        mock_evaluate.assert_called_with(self.course, self.course, self.user.id)  # pylint: disable=no-member
+        mock_evaluate.assert_called()
 
     @patch('gating.signals.gating_api.evaluate_prerequisite')
     def test_gating_disabled(self, mock_evaluate):
         """ Test evaluate_prerequisite is not called when course.enable_subsection_gating is False """
-        handle_score_changed(
+        handle_subsection_score_changed(
             sender=None,
-            points_possible=1,
-            points_earned=1,
-            user_id=self.user.id,
-            course_id=unicode(self.course.id),
-            usage_id=unicode(self.test_usage_key)
+            course=self.course,
+            user=self.user,
+            subsection_grade=MagicMock(),
         )
         mock_evaluate.assert_not_called()

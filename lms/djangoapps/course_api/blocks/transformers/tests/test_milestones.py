@@ -1,14 +1,13 @@
 """
 Tests for ProctoredExamTransformer.
 """
-from mock import patch, Mock
+from mock import patch
 from nose.plugins.attrib import attr
 
 import ddt
 from gating import api as lms_gating_api
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
 from milestones.tests.utils import MilestonesTestCaseMixin
-from opaque_keys.edx.keys import UsageKey
 from openedx.core.lib.gating import api as gating_api
 from student.tests.factories import CourseEnrollmentFactory
 
@@ -134,18 +133,16 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         (
             'H',
             'A',
-            'B',
             ('course', 'A', 'B', 'C',)
         ),
         (
             'H',
             'ProctoredExam',
-            'D',
             ('course', 'A', 'B', 'C'),
         ),
     )
     @ddt.unpack
-    def test_gated(self, gated_block_ref, gating_block_ref, gating_block_child, expected_blocks_before_completion):
+    def test_gated(self, gated_block_ref, gating_block_ref, expected_blocks_before_completion):
         """
         First, checks that a student cannot see the gated block when it is gated by the gating block and no
         attempt has been made to complete the gating block.
@@ -165,17 +162,14 @@ class MilestonesTransformerTestCase(CourseStructureTestCase, MilestonesTestCaseM
         # clear the request cache to simulate a new request
         self.clear_caches()
 
-        # mock the api that the lms gating api calls to get the score for each block to always return 1 (ie 100%)
-        with patch('gating.api.get_module_score', Mock(return_value=1)):
-
-            # this call triggers reevaluation of prerequisites fulfilled by the parent of the
-            # block passed in, so we pass in a child of the gating block
-            lms_gating_api.evaluate_prerequisite(
-                self.course,
-                self.blocks[gating_block_child],
-                self.user.id,
-            )
-        with self.assertNumQueries(2):
+        # this call triggers reevaluation of prerequisites fulfilled by the gating block
+        lms_gating_api.evaluate_prerequisite(
+            self.course,
+            self.user,
+            self.blocks[gating_block_ref].location,
+            100.0,
+        )
+        with self.assertNumQueries(3):
             self.get_blocks_and_check_against_expected(self.user, self.ALL_BLOCKS_EXCEPT_SPECIAL)
 
     def test_staff_access(self):

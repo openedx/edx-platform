@@ -17,6 +17,7 @@ from .utils.timer import timed
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
 NPM_REGISTRY = "http://registry.npmjs.org/"
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
+COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 
 # If you make any changes to this list you also need to make
 # a corresponding change to circle.yml, which is how the python
@@ -142,7 +143,13 @@ def python_prereqs_installation():
     Installs Python prerequisites
     """
     for req_file in PYTHON_REQ_FILES:
-        sh("pip install -q --disable-pip-version-check --exists-action w -r {req_file}".format(req_file=req_file))
+        pip_install_req_file(req_file)
+
+
+def pip_install_req_file(req_file):
+    """Pip install the requirements file."""
+    pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
+    sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
 @task
@@ -235,6 +242,16 @@ def package_in_frozen(package_name, frozen_output):
         pkg_under=re.escape(package_name.replace("-", "_")),
     )
     return bool(re.search(pattern, frozen_output))
+
+
+@task
+@timed
+def install_coverage_prereqs():
+    """ Install python prereqs for measuring coverage. """
+    if no_prereq_install():
+        print NO_PREREQ_MESSAGE
+        return
+    pip_install_req_file(COVERAGE_REQ_FILE)
 
 
 @task

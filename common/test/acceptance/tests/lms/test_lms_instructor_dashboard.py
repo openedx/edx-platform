@@ -7,6 +7,7 @@ import ddt
 
 from nose.plugins.attrib import attr
 from bok_choy.promise import EmptyPromise
+from flaky import flaky
 
 from common.test.acceptance.tests.helpers import UniqueCourseTest, get_modal_alert, EventsTestMixin
 from common.test.acceptance.pages.common.logout import LogoutPage
@@ -75,7 +76,6 @@ class BulkEmailTest(BaseInstructorDashboardTest):
 
     @ddt.data(["myself"], ["staff"], ["learners"], ["myself", "staff", "learners"])
     def test_email_queued_for_sending(self, recipient):
-        self.assertTrue(self.send_email_page.is_browser_on_page())
         self.send_email_page.send_message(recipient)
         self.send_email_page.verify_message_queued_successfully()
 
@@ -89,7 +89,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         ])
         self.send_email_page.a11y_audit.config.set_rules({
             "ignore": [
-                'button-name',  # TODO: AC-491
+                'button-name',  # TODO: TNL-5830
             ]
         })
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
@@ -377,6 +377,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         # Then, the added record should be visible
         self.assertTrue(allowance_section.is_allowance_record_visible)
 
+    @flaky  # TNL-5832
     def test_can_reset_attempts(self):
         """
         Make sure that Exam attempts are visible and can be reset.
@@ -991,13 +992,6 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
-        self.certificates_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'checkboxgroup',  # TODO: AC-491
-                'duplicate-id',  # TODO: AC-491
-                'radiogroup',  # TODO: AC-491
-            ]
-        })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
@@ -1207,10 +1201,4 @@ class CertificateInvalidationTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.config.set_scope([
             '.certificates-wrapper'
         ])
-        self.certificates_section.a11y_audit.config.set_rules({
-            "ignore": [
-                'duplicate-id',  # TODO: AC-491
-                'radiogroup',  # TODO: AC-491
-            ]
-        })
         self.certificates_section.a11y_audit.check_for_accessibility_errors()

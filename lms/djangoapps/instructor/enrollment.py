@@ -19,7 +19,7 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_string
 from lms.djangoapps.grades.scores import weighted_score
-from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
+from lms.djangoapps.grades.signals.signals import PROBLEM_SCORE_CHANGED
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -293,7 +293,7 @@ def _reset_module_attempts(studentmodule):
 
 def _fire_score_changed_for_block(course_id, student, block, module_state_key):
     """
-    Fires a SCORE_CHANGED event for the given module. The earned points are
+    Fires a PROBLEM_SCORE_CHANGED event for the given module. The earned points are
     always zero. We must retrieve the possible points from the XModule, as
     noted below.
     """
@@ -322,7 +322,7 @@ def _fire_score_changed_for_block(course_id, student, block, module_state_key):
             points_earned, points_possible = weighted_score(0, max_score, getattr(module, 'weight', None))
     else:
         points_earned, points_possible = 0, 0
-    SCORE_CHANGED.send(
+    PROBLEM_SCORE_CHANGED.send(
         sender=None,
         points_possible=points_possible,
         points_earned=points_earned,

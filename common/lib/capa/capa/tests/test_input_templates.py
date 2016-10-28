@@ -2,15 +2,16 @@
 Tests for the logic in input type mako templates.
 """
 
-from collections import OrderedDict
-import unittest
-import capa
-import os.path
 import json
-from lxml import etree
-from mako.template import Template as MakoTemplate
-from mako import exceptions
+import unittest
+from collections import OrderedDict
+
 from capa.inputtypes import Status
+from capa.tests.helpers import capa_render_template
+from lxml import etree
+from mako import exceptions
+from openedx.core.djangolib.markup import HTML
+
 from xmodule.stringify import stringify_children
 
 
@@ -23,7 +24,7 @@ class TemplateError(Exception):
 
 class TemplateTestCase(unittest.TestCase):
     """
-    Utilitites for testing templates.
+    Utilities for testing templates.
     """
 
     # Subclasses override this to specify the file name of the template
@@ -46,16 +47,9 @@ class TemplateTestCase(unittest.TestCase):
 
     def setUp(self):
         """
-        Load the template under test.
+        Initialize the context.
         """
         super(TemplateTestCase, self).setUp()
-        capa_path = capa.__path__[0]
-        self.template_path = os.path.join(capa_path,
-                                          'templates',
-                                          self.TEMPLATE_NAME)
-        with open(self.template_path) as f:
-            self.template = MakoTemplate(f.read(), default_filters=['decode.utf8'])
-
         self.context = {}
 
     def render_to_xml(self, context_dict):
@@ -66,7 +60,7 @@ class TemplateTestCase(unittest.TestCase):
         # add dummy STATIC_URL to template context
         context_dict.setdefault("STATIC_URL", "/dummy-static/")
         try:
-            xml_str = self.template.render_unicode(**context_dict)
+            xml_str = capa_render_template(self.TEMPLATE_NAME, context_dict)
         except:
             raise TemplateError(exceptions.text_error_template().render())
 
@@ -196,10 +190,10 @@ class TemplateTestCase(unittest.TestCase):
             # (used to by CSS to draw the green check / red x)
             self.assert_has_text(
                 xml,
-                "//span[@class=normalize-space('status {}')]/span[@class='sr']".format(
+                "//span[@class='status {}']/span[@class='sr']".format(
                     div_class if status_class else ''
                 ),
-                self.context['status'].display_tooltip
+                self.context['status'].display_name
             )
 
     def assert_label(self, xpath=None, aria_label=False):
@@ -259,7 +253,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             'name_array_suffix': '1',
             'value': '3',
             'response_data': self.RESPONSE_DATA,
-            'describedby_html': self.DESCRIBEDBY,
+            'describedby_html': HTML(self.DESCRIBEDBY),
         }
 
     def test_problem_marked_correct(self):
@@ -290,11 +284,9 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
         (not a particular option) is marked incorrect.
         """
         conditions = [
-            {'status': Status('incorrect'), 'input_type': 'radio', 'value': ''},
             {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': []},
             {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': ['2']},
             {'status': Status('incorrect'), 'input_type': 'checkbox', 'value': ['2', '3']},
-            {'status': Status('incomplete'), 'input_type': 'radio', 'value': ''},
             {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': []},
             {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': ['2']},
             {'status': Status('incomplete'), 'input_type': 'checkbox', 'value': ['2', '3']}]
@@ -506,7 +498,7 @@ class TextlineTemplateTest(TemplateTestCase):
             'preprocessor': None,
             'trailing_text': None,
             'response_data': self.RESPONSE_DATA,
-            'describedby_html': self.DESCRIBEDBY,
+            'describedby_html': HTML(self.DESCRIBEDBY),
         }
 
     def test_section_class(self):
@@ -526,7 +518,7 @@ class TextlineTemplateTest(TemplateTestCase):
         """
         Verify status information.
         """
-        self.assert_status(status_div=True)
+        self.assert_status(status_class=True)
 
     def test_label(self):
         """
@@ -632,7 +624,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'reported_status': 'REPORTED_STATUS',
             'trailing_text': None,
             'response_data': self.RESPONSE_DATA,
-            'describedby_html': self.DESCRIBEDBY,
+            'describedby_html': HTML(self.DESCRIBEDBY),
         }
 
     def test_no_size(self):
@@ -657,7 +649,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
         """
         Verify status information.
         """
-        self.assert_status(status_div=True)
+        self.assert_status(status_class=True)
 
     def test_label(self):
         """
@@ -852,7 +844,7 @@ class OptionInputTemplateTest(TemplateTestCase):
             'value': 0,
             'default_option_text': 'Select an option',
             'response_data': self.RESPONSE_DATA,
-            'describedby_html': self.DESCRIBEDBY,
+            'describedby_html': HTML(self.DESCRIBEDBY),
         }
 
     def test_select_options(self):
@@ -929,8 +921,8 @@ class DragAndDropTemplateTest(TemplateTestCase):
             xpath = "//div[@class='{0}']".format(expected_css_class)
             self.assert_has_xpath(xml, xpath, self.context)
 
-            # Expect a <p> with the status
-            xpath = "//p[@class='status drag-and-drop--status']/span[@class='sr']"
+            # Expect a <span> with the status
+            xpath = "//span[@class='status {0}']/span[@class='sr']".format(expected_css_class)
             self.assert_has_text(xml, xpath, expected_text, exact=False)
 
     def test_drag_and_drop_json_html(self):
@@ -1206,7 +1198,7 @@ class CodeinputTemplateTest(TemplateTestCase):
             'aria_label': 'python editor',
             'code_mirror_exit_message': 'Press ESC then TAB or click outside of the code editor to exit',
             'response_data': self.RESPONSE_DATA,
-            'describedby': self.DESCRIBEDBY,
+            'describedby': HTML(self.DESCRIBEDBY),
         }
 
     def test_label(self):

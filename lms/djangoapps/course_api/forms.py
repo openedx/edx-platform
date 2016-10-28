@@ -54,8 +54,10 @@ class CourseListGetForm(UsernameValidatorMixin, Form):
     filter_type = namedtuple('filter_type', ['param_name', 'field_name'])
     supported_filters = [
         filter_type(param_name='mobile', field_name='mobile_available'),
+        filter_type(param_name='include_hidden', field_name='include_hidden'),
     ]
     mobile = ExtendedNullBooleanField(required=False)
+    include_hidden = ExtendedNullBooleanField(required=False)
 
     def clean(self):
         """

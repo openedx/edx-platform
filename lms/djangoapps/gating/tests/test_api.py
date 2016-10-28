@@ -6,15 +6,18 @@ from nose.plugins.attrib import attr
 from ddt import ddt, data, unpack
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from courseware.tests.helpers import LoginEnrollmentTestCase
 
+from lms.djangoapps.courseware.access import has_access
+from lms.djangoapps.courseware.tests.helpers import get_request_for_user
+from lms.djangoapps.grades.tests.utils import answer_problem
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.lib.gating import api as gating_api
-from gating.api import _get_xblock_parent, evaluate_prerequisite
+from request_cache.middleware import RequestCache
 
 
-class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class GatingTestCase(ModuleStoreTestCase):
     """
     Base TestCase class for setting up a basic course structure
     and testing the gating feature
@@ -34,6 +37,16 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             display_name='edX 101'
         )
         self.course.enable_subsection_gating = True
+        grading_policy = {
+            "GRADER": [{
+                "type": "Homework",
+                "min_count": 3,
+                "drop_count": 0,
+                "short_label": "HW",
+                "weight": 1.0
+            }]
+        }
+        self.course.grading_policy = grading_policy
         self.course.save()
         self.store.update_item(self.course, 0)
 
@@ -41,136 +54,195 @@ class GatingTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.chapter1 = ItemFactory.create(
             parent_location=self.course.location,
             category='chapter',
-            display_name='untitled chapter 1'
+            display_name='chapter 1'
         )
 
         # create sequentials
         self.seq1 = ItemFactory.create(
             parent_location=self.chapter1.location,
             category='sequential',
-            display_name='untitled sequential 1'
+            display_name='gating sequential 1',
+            graded=True,
+            format='Homework',
         )
         self.seq2 = ItemFactory.create(
             parent_location=self.chapter1.location,
             category='sequential',
-            display_name='untitled sequential 2'
+            display_name='gated sequential 2',
+            graded=True,
+            format='Homework',
         )
-
-        # create vertical
-        self.vert1 = ItemFactory.create(
-            parent_location=self.seq1.location,
-            category='vertical',
-            display_name='untitled vertical 1'
+        self.seq3 = ItemFactory.create(
+            parent_location=self.chapter1.location,
+            category='sequential',
+            display_name='sequential 3',
+            graded=True,
+            format='Homework',
         )
 
         # create problem
-        self.prob1 = ItemFactory.create(
-            parent_location=self.vert1.location,
+        self.gating_prob1 = ItemFactory.create(
+            parent_location=self.seq1.location,
             category='problem',
-            display_name='untitled problem 1'
+            display_name='gating problem 1',
+        )
+        self.gated_prob2 = ItemFactory.create(
+            parent_location=self.seq2.location,
+            category='problem',
+            display_name='gated problem 2',
+        )
+        self.prob3 = ItemFactory.create(
+            parent_location=self.seq3.location,
+            category='problem',
+            display_name='problem 3',
         )
 
         # create orphan
-        self.prob2 = ItemFactory.create(
+        self.orphan = ItemFactory.create(
             parent_location=self.course.location,
             category='problem',
-            display_name='untitled problem 2'
+            display_name='orphan'
         )
 
-
-class TestGetXBlockParent(GatingTestCase):
-    """
-    Tests for the get_xblock_parent function
-    """
-
-    def test_get_direct_parent(self):
-        """ Test test_get_direct_parent """
-
-        result = _get_xblock_parent(self.vert1)
-        self.assertEqual(result.location, self.seq1.location)
-
-    def test_get_parent_with_category(self):
-        """ Test test_get_parent_of_category """
-
-        result = _get_xblock_parent(self.vert1, 'sequential')
-        self.assertEqual(result.location, self.seq1.location)
-        result = _get_xblock_parent(self.vert1, 'chapter')
-        self.assertEqual(result.location, self.chapter1.location)
-
-    def test_get_parent_none(self):
-        """ Test test_get_parent_none """
-
-        result = _get_xblock_parent(self.vert1, 'unit')
-        self.assertIsNone(result)
-
-
-@attr(shard=3)
-@ddt
-class TestEvaluatePrerequisite(GatingTestCase, MilestonesTestCaseMixin):
-    """
-    Tests for the evaluate_prerequisite function
-    """
-
-    def setUp(self):
-        super(TestEvaluatePrerequisite, self).setUp()
-        self.user_dict = {'id': self.user.id}
         self.prereq_milestone = None
 
-    def _setup_gating_milestone(self, min_score):
+    def setup_gating_milestone(self, min_score):
         """
-        Setup a gating milestone for testing
+        Setup a gating milestone for testing.
+        Gating content: seq1 (must be fulfilled before access to seq2)
+        Gated content: seq2 (requires completion of seq1 before access)
         """
-
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
         gating_api.set_required_content(self.course.id, self.seq2.location, self.seq1.location, min_score)
         self.prereq_milestone = gating_api.get_gating_milestone(self.course.id, self.seq1.location, 'fulfills')
 
-    @patch('gating.api.get_module_score')
-    @data((.5, True), (1, True), (0, False))
+    def verify_access_to_gated_content(self, user, expected_access):
+        """
+        Verifies access to gated content for the given user is as expected.
+        """
+        # clear the request cache to flush any cached access results
+        RequestCache.clear_request_cache()
+
+        # access to gating content (seq1) remains constant
+        self.assertTrue(has_access(user, 'load', self.seq1, self.course.id))
+
+        # access to gated content (seq2) is as expected
+        self.assertEquals(bool(has_access(user, 'load', self.seq2, self.course.id)), expected_access)
+
+    def verify_user_has_prereq_milestone(self, user, expected_has_milestone):
+        """
+        Verifies whether or not the user has the prereq milestone
+        """
+        self.assertEquals(
+            milestones_api.user_has_milestone({'id': user.id}, self.prereq_milestone),
+            expected_has_milestone,
+        )
+
+
+@attr(shard=3)
+class TestGatedContent(GatingTestCase, MilestonesTestCaseMixin):
+    """
+    Tests for gated content.
+    """
+    def setUp(self):
+        super(TestGatedContent, self).setUp()
+        self.setup_gating_milestone(100)
+        self.non_staff_user, _ = self.create_non_staff_user()
+
+    def test_gated_for_nonstaff(self):
+        self.verify_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
+        self.verify_access_to_gated_content(self.non_staff_user, expected_access=False)
+
+    def test_not_gated_for_staff(self):
+        self.verify_user_has_prereq_milestone(self.user, expected_has_milestone=False)
+        self.verify_access_to_gated_content(self.user, expected_access=True)
+
+    def _verify_course_grade(self, user, expected_percent):
+        """
+        Verifies the given user's course grade is the expected percentage.
+        Also verifies the user's grade information contains values for
+        all problems in the course, whether or not they are currently
+        gated.
+        """
+        course_grade = CourseGradeFactory(user).create(self.course)
+        for prob in [self.gating_prob1, self.gated_prob2, self.prob3]:
+            self.assertIn(prob.location, course_grade.locations_to_scores)
+        self.assertNotIn(self.orphan.location, course_grade.locations_to_scores)
+
+        self.assertEquals(course_grade.percent, expected_percent)
+
+    def test_gated_content_always_in_grades(self):
+        request = get_request_for_user(self.non_staff_user)
+
+        # start with a grade from a non-gated subsection
+        answer_problem(self.course, request, self.prob3, 10, 10)
+
+        # verify gated status and overall course grade percentage
+        self.verify_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=False)
+        self.verify_access_to_gated_content(self.non_staff_user, expected_access=False)
+        self._verify_course_grade(self.non_staff_user, .33)
+
+        # fulfill the gated requirements
+        answer_problem(self.course, request, self.gating_prob1, 10, 10)
+
+        # verify gated status and overall course grade percentage
+        self.verify_user_has_prereq_milestone(self.non_staff_user, expected_has_milestone=True)
+        self.verify_access_to_gated_content(self.non_staff_user, expected_access=True)
+        self._verify_course_grade(self.non_staff_user, .67)
+
+
+@attr(shard=3)
+@ddt
+class TestHandleSubsectionGradeUpdates(GatingTestCase, MilestonesTestCaseMixin):
+    """
+    Tests for gated content when subsection grade is updated.
+    """
+
+    def setUp(self):
+        super(TestHandleSubsectionGradeUpdates, self).setUp()
+        self.user, _ = self.create_non_staff_user()  # run tests for a non-staff user
+        self.request = get_request_for_user(self.user)
+
+    def test_signal_handler_called(self):
+        with patch('lms.djangoapps.gating.signals.gating_api.evaluate_prerequisite') as mock_handler:
+            self.assertFalse(mock_handler.called)
+            answer_problem(self.course, self.request, self.gating_prob1, 1, 1)
+            self.assertTrue(mock_handler.called)
+
+    @data((1, 2, True), (1, 1, True), (0, 1, False))
     @unpack
-    def test_min_score_achieved(self, module_score, result, mock_module_score):
-        """ Test test_min_score_achieved """
+    def test_min_score_achieved(self, earned, max_possible, result):
+        self.setup_gating_milestone(50)
 
-        self._setup_gating_milestone(50)
+        self.verify_user_has_prereq_milestone(self.user, expected_has_milestone=False)
+        self.verify_access_to_gated_content(self.user, expected_access=False)
 
-        mock_module_score.return_value = module_score
-        evaluate_prerequisite(self.course, self.prob1, self.user.id)
-        self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
+        answer_problem(self.course, self.request, self.gating_prob1, earned, max_possible)
 
-    @patch('gating.api.log.warning')
-    @patch('gating.api.get_module_score')
-    @data((.5, False), (1, True))
+        self.verify_user_has_prereq_milestone(self.user, expected_has_milestone=result)
+        self.verify_access_to_gated_content(self.user, expected_access=result)
+
+    @data((1, 2, False), (1, 1, True))
     @unpack
-    def test_invalid_min_score(self, module_score, result, mock_module_score, mock_log):
-        """ Test test_invalid_min_score """
+    def test_invalid_min_score(self, earned, max_possible, result):
+        self.setup_gating_milestone(None)
 
-        self._setup_gating_milestone(None)
+        answer_problem(self.course, self.request, self.gating_prob1, earned, max_possible)
+        self.verify_user_has_prereq_milestone(self.user, expected_has_milestone=result)
 
-        mock_module_score.return_value = module_score
-        evaluate_prerequisite(self.course, self.prob1, self.user.id)
-        self.assertEqual(milestones_api.user_has_milestone(self.user_dict, self.prereq_milestone), result)
-        self.assertTrue(mock_log.called)
+    def test_orphaned_xblock(self):
+        with patch('lms.djangoapps.gating.signals.gating_api.evaluate_prerequisite') as mock_handler:
+            self.assertFalse(mock_handler.called)
+            answer_problem(self.course, self.request, self.orphan, 1, 1)
+            self.assertFalse(mock_handler.called)
 
-    @patch('gating.api.get_module_score')
-    def test_orphaned_xblock(self, mock_module_score):
-        """ Test test_orphaned_xblock """
+    @patch('gating.api.milestones_helpers')
+    def test_no_prerequisites(self, mock_milestones):
+        answer_problem(self.course, self.request, self.gating_prob1, 1, 1)
+        self.assertFalse(mock_milestones.called)
 
-        evaluate_prerequisite(self.course, self.prob2, self.user.id)
-        self.assertFalse(mock_module_score.called)
-
-    @patch('gating.api.get_module_score')
-    def test_no_prerequisites(self, mock_module_score):
-        """ Test test_no_prerequisites """
-
-        evaluate_prerequisite(self.course, self.prob1, self.user.id)
-        self.assertFalse(mock_module_score.called)
-
-    @patch('gating.api.get_module_score')
-    def test_no_gated_content(self, mock_module_score):
-        """ Test test_no_gated_content """
-
-        # Setup gating milestones data
+    @patch('gating.api.milestones_helpers')
+    def test_no_gated_content(self, mock_milestones):
         gating_api.add_prerequisite(self.course.id, self.seq1.location)
-
-        evaluate_prerequisite(self.course, self.prob1, self.user.id)
-        self.assertFalse(mock_module_score.called)
+        answer_problem(self.course, self.request, self.gating_prob1, 1, 1)
+        self.assertFalse(mock_milestones.called)
