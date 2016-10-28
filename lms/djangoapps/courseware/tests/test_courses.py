@@ -159,29 +159,6 @@ class CoursesTest(ModuleStoreTestCase):
                 "testing get_courses with filter_={}".format(filter_),
             )
 
-    @override_settings(COURSE_CATALOG_VISIBILITY_PERMISSION='see_in_catalog')
-    def test_get_courses_include_hidden(self):
-        """
-        Verify that include_hidden performs as expected.
-        """
-        user = UserFactory.create()
-        staff_user = UserFactory.create(is_staff=True)
-        hidden_course = CourseFactory.create(emit_signals=True, catalog_visibility='none')
-        visible_course = CourseFactory.create(emit_signals=True, catalog_visibility='both')
-
-        test_cases = (
-            ({}, user, 1),
-            ({'include_hidden': True}, user, 1),
-            ({}, staff_user, 2),
-            ({'include_hidden': True}, staff_user, 2),
-        )
-        for filter_, user, num_courses in test_cases:
-            self.assertEqual(
-                len(get_courses(user, filter_=filter_)),
-                num_courses,
-                "testing get_courses with filter_={} and staff={}".format(filter_, user.is_staff),
-            )
-
 
 @attr(shard=1)
 class ModuleStoreBranchSettingTest(ModuleStoreTestCase):

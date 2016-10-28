@@ -83,4 +83,7 @@ def list_courses(request, username, org=None, filter_=None):
         List of `CourseOverview` objects representing the collection of courses.
     """
     user = get_effective_user(request.user, username)
-    return get_courses(user, org=org, filter_=filter_)
+    include_hidden = filter_.pop('include_hidden', False) if filter_ else False
+    include_hidden = include_hidden and user.is_staff
+    permission_name = 'see_exists' if include_hidden else None
+    return get_courses(user, org=org, filter_=filter_, permission_name=permission_name)
