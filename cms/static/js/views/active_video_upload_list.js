@@ -18,6 +18,7 @@ define(
                 this.listenTo(this.collection, 'add', this.addUpload);
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
+                this.onFileUploadDone = options.onFileUploadDone;
                 if (options.uploadButton) {
                     options.uploadButton.click(this.chooseFile.bind(this));
                 }
@@ -99,9 +100,10 @@ define(
             // individual file uploads, using the extra `redirected` field to
             // indicate that the correct upload url has already been retrieved
             fileUploadAdd: function(event, uploadData) {
-                var view = this;
+                var view = this,
+                    model;
                 if (uploadData.redirected) {
-                    var model = new ActiveVideoUpload({fileName: uploadData.files[0].name});
+                    model = new ActiveVideoUpload({fileName: uploadData.files[0].name, videoId: uploadData.videoId});
                     this.collection.add(model);
                     uploadData.cid = model.cid;
                     uploadData.submit();
@@ -126,6 +128,7 @@ define(
                                 view.$uploadForm.fileupload('add', {
                                     files: [uploadData.files[index]],
                                     url: file['upload_url'],
+                                    videoId: file.edx_video_id,
                                     multipart: false,
                                     global: false,  // Do not trigger global AJAX error handler
                                     redirected: true
@@ -156,10 +159,48 @@ define(
             fileUploadDone: function(event, data) {
                 this.setStatus(data.cid, ActiveVideoUpload.STATUS_COMPLETED);
                 this.setProgress(data.cid, 1);
+                if (this.onFileUploadDone) {
+                    this.onFileUploadDone(this.collection);
+                    this.clearSuccessful();
+                }
             },
 
             fileUploadFail: function(event, data) {
                 this.setStatus(data.cid, ActiveVideoUpload.STATUS_FAILED);
+            },
+
+            removeViewAt: function(index) {
+                this.itemViews.splice(index);
+                this.$('.active-video-upload-list li').eq(index).remove();
+            },
+
+            // Removes the upload progress view for files that have been
+            // uploaded successfully. Also removes the corresponding models
+            // from `collection`, keeping both in sync.
+            clearSuccessful: function() {
+                var idx,
+                    completedIndexes = [],
+                    completedModels = [],
+                    completedMessages = [];
+                this.collection.each(function(model, index) {
+                    if (model.get('status') === ActiveVideoUpload.STATUS_COMPLETED) {
+                        completedModels.push(model);
+                        completedIndexes.push(index - completedIndexes.length);
+                        completedMessages.push(model.get('fileName') +
+                            gettext(': video upload complete.'));
+                    }
+                });
+                for (idx = 0; idx < completedIndexes.length; idx++) {
+                    this.removeViewAt(completedIndexes[idx]);
+                    this.collection.remove(completedModels[idx]);
+                }
+                // Alert screen readers that the uploads were successful
+                if (completedMessages.length) {
+                    completedMessages.push(gettext('Previous Uploads table has been updated.'));
+                    if ($(window).prop('SR') !== undefined) {
+                        $(window).prop('SR').readTexts(completedMessages);
+                    }
+                }
             }
         });
 

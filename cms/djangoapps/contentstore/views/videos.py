@@ -336,7 +336,7 @@ def videos_post(course, request):
             "courses": [course.id]
         })
 
-        resp_files.append({"file_name": file_name, "upload_url": upload_url})
+        resp_files.append({"file_name": file_name, "upload_url": upload_url, "edx_video_id": edx_video_id})
 
     return JsonResponse({"files": resp_files}, status=200)
 
