@@ -4,13 +4,13 @@
 
 // From lms-discussion-main.scss
 
-// Load the LTR version of the edX Pattern Library
-$pattern-library-path: '../../edx-pattern-library' !default;
-@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-ltr';
+@import 'edx-pattern-library/pattern-library/sass/global/ltr';                    // LTR-specific settings and utilities
+@import 'edx-pattern-library-loader';
 
-@import '../build-base-v1';
+@import '../vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import '../base/variables-ltr';
+@import '../build-base-v1-no-reset';
 
-// base - elements
 @import '../elements/typography';
 
 // app - discussion

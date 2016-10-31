@@ -1,12 +1,12 @@
 // Discussions - CSS application architecture
 // Version 1 styling (pre-Pattern Library)
 // ====================
+@import 'edx-pattern-library/pattern-library/sass/global/rtl';                    // RTL-specific settings and utilities
+@import 'edx-pattern-library-loader';
 
-// Load the RTL version of the edX Pattern Library
-$pattern-library-path: '../../edx-pattern-library' !default;
-@import 'edx-pattern-library/pattern-library/sass/edx-pattern-library-rtl';
-
-@import '../build-base-v1-rtl';
+@import '../vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+@import '../base/variables-rtl';
+@import '../build-base-v1-no-reset';
 
 // base - elements
 @import '../elements/typography';
