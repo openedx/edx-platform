@@ -376,7 +376,6 @@ def get_courses(user, org=None, filter_=None):
     Returns a list of courses available, sorted by course.number and optionally
     filtered by org code (case-insensitive).
     """
-    include_hidden = filter_.pop('include_hidden', False) if filter_ else False
     courses = branding.get_visible_courses(org=org, filter_=filter_)
 
     permission_name = configuration_helpers.get_value(
@@ -384,14 +383,8 @@ def get_courses(user, org=None, filter_=None):
         settings.COURSE_CATALOG_VISIBILITY_PERMISSION
     )
 
-    # see_in_catalog is the permission that checks the catalog visibility setting.
-    # include_hidden refers to showing courses that are normally not visible due to this setting.
-    # We don't want to show courses that are hidden for other reasons, which is why we don't
-    # use the override for other permissions.
-    if permission_name is 'see_in_catalog':
-        courses = [c for c in courses if include_hidden or has_access(user, permission_name, c)]
-    else:
-        courses = [c for c in courses if has_access(user, permission_name, c)]
+    courses = [c for c in courses if has_access(user, permission_name, c)]
+
     return courses
 
 
