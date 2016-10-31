@@ -5,14 +5,14 @@ from hashlib import md5
 
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
+from django.test.utils import override_settings
 from opaque_keys.edx.keys import CourseKey
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 from rest_framework.test import APIRequestFactory
-
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import check_mongo_calls
+from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory
 from .mixins import CourseApiFactoryMixin
 from ..api import course_detail, list_courses
 
@@ -154,6 +154,7 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
     def setUp(self):
         super(TestGetCourseListMultipleCourses, self).setUp()
         self.course = self.create_course()
+        self.hidden_course = CourseFactory.create(catalog_visibility='both')
         self.staff_user = self.create_user("staff", is_staff=True)
         self.honor_user = self.create_user("honor", is_staff=False)
 
@@ -183,6 +184,23 @@ class TestGetCourseListMultipleCourses(CourseListTestMixin, ModuleStoreTestCase)
         self.assertTrue(
             all(course.org == self.course.org for course in filtered_courses)
         )
+
+    @override_settings(COURSE_CATALOG_VISIBILITY_PERMISSION='see_in_catalog')
+    def test_filter_include_hidden(self):
+        self.create_course(course='second', catalog_visibility='none')
+        test_cases = (
+            ({}, self.honor_user, 1),
+            (dict(include_hidden=True), self.honor_user, 1),
+            ({}, self.staff_user, 2),
+            (dict(include_hidden=True), self.staff_user, 2),
+        )
+        for filter_, user, num_courses in test_cases:
+            filtered_courses = self._make_api_call(user, user, filter_=filter_)
+            self.assertEquals(
+                len(filtered_courses),
+                num_courses,
+                "testing _make_api_call with filter_={} and staff={}".format(filter_, user.is_staff),
+            )
 
     def test_filter(self):
         # Create a second course to be filtered out of queries.
