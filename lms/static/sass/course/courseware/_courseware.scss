@@ -252,7 +252,7 @@ html.video-fullscreen {
       @extend .timed-exam;
 
       .proctored-exam-message {
-        border-top: ($baseline/10) solid rgb(207, 216, 220);
+        border-top: ($baseline/10) solid $uxpl-gray-background;
         padding-top: 25px;
       }
 
@@ -266,56 +266,47 @@ html.video-fullscreen {
           padding: 0 ($baseline*5) 0 ($baseline*2.5);
         }
       }
+
       hr {
-        border-bottom: 1px solid rgb(207, 216, 220);
+        border-bottom: 1px solid $uxpl-gray-background;
       }
+
       .gated-sequence {
-        border-bottom: 2px solid rgb(207, 216, 220);
+        border-bottom: 2px solid $uxpl-gray-background;
         padding: 22px ($baseline*5) 15px 50px;
         position: relative;
-        span {
-          .fa {
-            position: absolute;
-            font-size: 22px;
-            left: 0;
-            top: $baseline;
-            color: rgb(206, 216, 220);
-          }
-        }
-        .start-timed-exam {
+
+        &.start-timed-exam {
           margin-bottom:($baseline/2);
           display: block;
+
+          &.action-primary {
+            .icon {
+              color: $uxpl-blue-base;
+            }
+          }
         }
+
         p {
-          color: #414141;
+          color: $uxpl-gray-base;
           strong {
             font-weight: 600;
           }
         }
-        > .fa {
+
+        .icon {
           @include right(35px);
           position: absolute;
-          top: 50%;
           font-size: 30px;
-          margin-top: -15px;
-          &.fa-arrow-circle-right {
-            top: 30%;
-          }
+          color: $uxpl-gray-base;
         }
+
         &:last-child {
-          > .fa {
-            color: rgb(206, 216, 220);
-          }
-          border-bottom: none;
-        }
-        &:last-child {
-          > .practice-exam {
-            color: $uxpl-blue-base;
-          }
           border-bottom: none;
         }
       }
     }
+
     .proctored-exam-skip-confirm-wrapper {
       border-left: ($baseline/4) solid $red;
       padding: $baseline ($baseline*1.5);;
@@ -343,7 +334,7 @@ html.video-fullscreen {
       padding: 30px 0px 20px 0px;
       border-bottom: ($baseline/10) solid #CFD9DD;
       hr {
-        border-bottom: 1px solid rgb(207, 216, 220);
+        border-bottom: 1px solid $uxpl-gray-background;
       }
       .clearfix {
         clear: both;
@@ -375,9 +366,9 @@ html.video-fullscreen {
         margin-bottom: ($baseline/20);
         color: #797676;
       }
-      .proctored-exam-instruction{
+      .proctored-exam-instruction {
         padding: ($baseline/2) 0;
-        border-bottom: 2px solid rgb(207, 216, 220);
+        border-bottom: 2px solid $uxpl-gray-background;
       }
     }
     .border-b-0 {
@@ -391,7 +382,7 @@ html.video-fullscreen {
       border-bottom : none;
       a.footer-link {
         display: block;
-        padding: 10px 0px 10px 0px;
+        padding: ($baseline/2) 0;
       }
     }
     p {

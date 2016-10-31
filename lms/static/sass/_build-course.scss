@@ -10,6 +10,10 @@
 @import 'shared/alerts_pattern_library_shim';
 @import 'shared/tooltips';
 
+// Pattern Library shims
+@import 'edx-pattern-library-shims/base/variables';
+@import 'edx-pattern-library-shims/buttons';
+
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
