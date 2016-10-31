@@ -433,6 +433,7 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
         self.courseware_page.visit()
         self.course_nav = CourseNavPage(self.browser)
 
+    @flaky(50, 50)
     def test_navigation_buttons(self):
         # start in first section
         self.assert_navigation_state('Test Section 1', 'Test Subsection 1,1', 0, next_enabled=True, prev_enabled=False)
