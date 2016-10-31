@@ -72,20 +72,9 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     start_type = serializers.CharField()
     pacing = serializers.CharField()
     mobile_available = serializers.BooleanField()
-    hidden = serializers.SerializerMethodField()
 
     # 'course_id' is a deprecated field, please use 'id' instead.
     course_id = serializers.CharField(source='id', read_only=True)
-
-    def get_hidden(self, course_overview):
-        """
-        Get the representation for SerializerMethodField `hidden`
-        Represents whether course is hidden in LMS
-        """
-        catalog_visibility = course_overview.catalog_visibility
-        if catalog_visibility in ['about', 'none']:
-            return True
-        return False
 
     def get_blocks_url(self, course_overview):
         """

@@ -152,10 +152,6 @@ class CourseListView(DeveloperErrorViewMixin, ListAPIView):
             If specified, only visible `CourseOverview` objects that are
             designated as mobile_available are returned.
 
-        include_hidden (optional):
-            If specified, courses that are hidden in the LMS, will be returned
-            with a hidden flag set to true.
-
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
