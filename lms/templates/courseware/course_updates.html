@@ -1,10 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
-<section aria-labelledby="course-updates-heading">
+<div>
 <div class="recent-updates">
   % for index, update in enumerate(visible_updates):
     <article class="updates-article">
       % if not update.get("is_error"):
-        <div class="date" id="msg-date-${index}">${update.get("date")}</div>
+        <div class="date" id="msg-date-${index}">${update.get("date")}</div>      
         <button
             class="toggle-visibility-button"
             data-hide="${_('Hide')}"
@@ -47,4 +47,4 @@
     </article>
   % endfor
 </div>
-</section>
+<div>

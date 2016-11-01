@@ -60,7 +60,7 @@ div.info-wrapper {
       margin-bottom: lh();
     }
 
-    > ol,section {
+    > ol,section,div {
       list-style: none;
       margin-bottom: lh();
       padding-left: 0;
@@ -112,6 +112,7 @@ div.info-wrapper {
           @include padding-left($baseline);
           @include float(left);
         }
+      
 
         .toggle-visibility-button {
           @extend %t-title9;
