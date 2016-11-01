@@ -101,6 +101,7 @@ FEATURES = {
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
+    'DISABLE_REGISTER_BUTTON': False,  # used for cases if you want to register users only after push "enroll" button
 
     # extrernal access methods
     'AUTH_USE_OPENID': False,
