@@ -3,8 +3,6 @@ Acceptance tests for Studio.
 """
 import uuid
 
-from bok_choy.web_app_test import WebAppTest
-
 from base_studio_test import StudioCourseTest
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
@@ -21,10 +19,10 @@ from common.test.acceptance.pages.studio.settings_graders import GradingPage
 from common.test.acceptance.pages.studio.signup import SignupPage
 from common.test.acceptance.pages.studio.textbook_upload import TextbookUploadPage
 from common.test.acceptance.pages.studio.users import CourseTeamPage
-from common.test.acceptance.tests.helpers import UniqueCourseTest
+from common.test.acceptance.tests.helpers import AcceptanceTest, UniqueCourseTest
 
 
-class LoggedOutTest(WebAppTest):
+class LoggedOutTest(AcceptanceTest):
     """
     Smoke test for pages in Studio that are visible when logged out.
     """
@@ -42,7 +40,7 @@ class LoggedOutTest(WebAppTest):
             page.visit()
 
 
-class LoggedInPagesTest(WebAppTest):
+class LoggedInPagesTest(AcceptanceTest):
     """
     Verify the pages in Studio that you can get to when logged in and do not have a course yet.
     """

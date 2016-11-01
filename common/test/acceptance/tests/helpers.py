@@ -408,7 +408,7 @@ def assert_opened_help_link_is_correct(test, url):
     """
     Asserts that url of browser when help link is clicked is correct.
     Arguments:
-        test (WebAppTest): test calling this method.
+        test (AcceptanceTest): test calling this method.
         url (str): url to verify.
     """
     test.browser.switch_to_window(test.browser.window_handles[-1])
@@ -690,7 +690,19 @@ class CollectedEventsDescription(object):
         return '\n\n'.join(message_lines)
 
 
-class UniqueCourseTest(WebAppTest):
+class AcceptanceTest(WebAppTest):
+    """
+    The base class of all acceptance tests.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(AcceptanceTest, self).__init__(*args, **kwargs)
+
+        # Use long messages so that failures show actual and expected values
+        self.longMessage = True  # pylint: disable=invalid-name
+
+
+class UniqueCourseTest(AcceptanceTest):
     """
     Test that provides a unique course ID.
     """
@@ -818,7 +830,7 @@ def assert_nav_help_link(test, page, href, signed_in=True):
     then clicks to ensure that help opens correctly.
 
     Arguments:
-    test (WebAppTest): Test object
+    test (AcceptanceTest): Test object
     page (PageObject): Page object to perform tests on.
     href (str): The help link which we expect to see when it is opened.
     signed_in (bool): Specifies whether user is logged in or not. (It effects the css)
@@ -843,7 +855,7 @@ def assert_side_bar_help_link(test, page, href, help_text, as_list_item=False, i
     then clicks to ensure that help opens correctly.
 
     Arguments:
-    test (WebAppTest): Test object
+    test (AcceptanceTest): Test object
     page (PageObject): Page object to perform tests on.
     href (str): The help link which we expect to see when it is opened.
     as_list_item (bool): Specifies whether help element is in one of the
