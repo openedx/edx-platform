@@ -99,6 +99,7 @@ FEATURES = {
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
 
     'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
+    'ENROLL_ACTIVE_USERS_ONLY': False,
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 

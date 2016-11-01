@@ -5,6 +5,7 @@ source to be used throughout the API.
 import logging
 
 from django.contrib.auth.models import User
+from django.conf import settings
 from opaque_keys.edx.keys import CourseKey
 
 from enrollment.errors import (
@@ -15,7 +16,7 @@ from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import (
-    CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
+    CourseEnrollment, CourseEnrollmentAllowed, NonExistentCourseError, EnrollmentClosedError,
     CourseFullError, AlreadyEnrolledError, CourseEnrollmentAttribute
 )
 
@@ -116,8 +117,13 @@ def create_course_enrollment(username, course_id, mode, is_active):
         raise UserNotFoundError(msg)
 
     try:
-        enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
-        return _update_enrollment(enrollment, is_active=is_active, mode=mode)
+        if settings.FEATURES.get('ENROLL_ACTIVE_USERS_ONLY', False) and not user.is_active:
+            CourseEnrollmentAllowed.objects.get_or_create(course_id=course_key, email=user.email,
+                                                          auto_enroll=True)
+            return None
+        else:
+            enrollment = CourseEnrollment.enroll(user, course_key, check_access=True)
+            return _update_enrollment(enrollment, is_active=is_active, mode=mode)
     except NonExistentCourseError as err:
         raise CourseNotFoundError(err.message)
     except EnrollmentClosedError as err:
