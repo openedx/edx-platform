@@ -834,7 +834,12 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
     def test_basic(self):
         self.register_get_user_response(self.user)
-        self.register_thread({"created_at": "Test Created Date", "updated_at": "Test Updated Date", "read": True})
+        self.register_thread({
+            "created_at": "Test Created Date",
+            "updated_at": "Test Updated Date",
+            "read": True,
+            "resp_total": 2,
+        })
         request_data = {"raw_body": "Edited body"}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 200)
@@ -851,6 +856,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "updated_at": "Test Updated Date",
                 "comment_count": 1,
                 "read": True,
+                "response_count": 2,
             })
         )
         self.assertEqual(
@@ -923,7 +929,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
 
     def test_patch_read_owner_user(self):
         self.register_get_user_response(self.user)
-        self.register_thread()
+        self.register_thread({"resp_total": 2})
         self.register_read_response(self.user, "thread", "test_thread")
         request_data = {"read": True}
 
@@ -938,6 +944,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "editable_fields": [
                     "abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
                 ],
+                "response_count": 2,
             })
         )
 
@@ -946,7 +953,11 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         thread_owner_user = UserFactory.create(password=self.password)
         CourseEnrollmentFactory.create(user=thread_owner_user, course_id=self.course.id)
         self.register_get_user_response(thread_owner_user)
-        self.register_thread({"username": thread_owner_user.username, "user_id": str(thread_owner_user.id)})
+        self.register_thread({
+            "username": thread_owner_user.username,
+            "user_id": str(thread_owner_user.id),
+            "resp_total": 2,
+        })
         self.register_read_response(self.user, "thread", "test_thread")
 
         request_data = {"read": True}
@@ -962,6 +973,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "editable_fields": [
                     "abuse_flagged", "following", "read", "voted"
                 ],
+                "response_count": 2,
             })
         )
 
