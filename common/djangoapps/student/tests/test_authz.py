@@ -141,7 +141,7 @@ class CCXCourseGroupTest(TestCase):
         """
         Set up test variables
         """
-        super(CourseGroupTest, self).setUp()
+        super(CCXCourseGroupTest, self).setUp()
         self.global_admin = AdminFactory()
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
         self.ccx_course_key = CCXLocator.from_string('ccx-v1:edX+DemoX+Demo_Course+ccx@1')
@@ -163,13 +163,13 @@ class CCXCourseGroupTest(TestCase):
         """
         Test that global admins have no read access
         """
-        self.assertFalse(has_studio_write_access(self.global_admin, self.ccx_course_key))
+        self.assertFalse(has_studio_read_access(self.global_admin, self.ccx_course_key))
 
-    def test_no_staff_write_access(self):
+    def test_no_staff_read_access(self):
         """
         Test that course staff have no read access
         """
-        self.assertFalse(has_studio_write_access(self.staff, self.ccx_course_key))
+        self.assertFalse(has_studio_read_access(self.staff, self.ccx_course_key))
 
 
 class CourseGroupTest(TestCase):
