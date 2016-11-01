@@ -1,4 +1,4 @@
-"""Tests for the Zendesk"""
+"""Tests for the Helpdesk"""
 
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
@@ -15,13 +15,13 @@ from student.tests.test_configuration_overrides import fake_get_value
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
-@override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy")
+@override_settings(HELPDESK="zendesk", HELPDESK_URL="dummy", HELPDESK_USER="dummy", HELPDESK_API_KEY="dummy")
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
-class SubmitFeedbackTest(TestCase):
+class SubmitFeedbackTestZendesk(TestCase):
     def setUp(self):
         """Set up data for the test case"""
-        super(SubmitFeedbackTest, self).setUp()
+        super(SubmitFeedbackTestZendesk, self).setUp()
         self._request_factory = RequestFactory()
         self._anon_user = AnonymousUser()
         self._auth_user = UserFactory.create(
@@ -353,6 +353,364 @@ class SubmitFeedbackTest(TestCase):
                 with self.assertRaises(Exception):
                     self._build_and_run_request(self._anon_user, self._anon_fields)
 
-        test_case("django.conf.settings.ZENDESK_URL")
-        test_case("django.conf.settings.ZENDESK_USER")
-        test_case("django.conf.settings.ZENDESK_API_KEY")
+        test_case("django.conf.settings.HELPDESK")
+        test_case("django.conf.settings.HELPDESK_URL")
+        test_case("django.conf.settings.HELPDESK_USER")
+        test_case("django.conf.settings.HELPDESK_API_KEY")
+
+
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
+@override_settings(HELPDESK="freshdesk", HELPDESK_URL="dummy", HELPDESK_USER="dummy", HELPDESK_API_KEY="dummy")
+@mock.patch("util.views.dog_stats_api")
+@mock.patch("util.views._FreshdeskApi", autospec=True)
+class SubmitFeedbackTestFreshdesk(TestCase):
+    """Test for Freshdesk API helpdesk submissions"""
+    def setUp(self):
+        """Set up data for the test case"""
+        super(SubmitFeedbackTestFreshdesk, self).setUp()
+        self._request_factory = RequestFactory()
+        self._anon_user = AnonymousUser()
+        self._auth_user = UserFactory.create(
+            email="test@edx.org",
+            username="test",
+            profile__name="Test User"
+        )
+        # This contains issue_type and course_id to ensure that tags are submitted correctly
+        self._anon_fields = {
+            "email": "test@edx.org",
+            "name": "Test User",
+            "subject": "a subject",
+            "details": "some details",
+            "issue_type": "test_issue",
+            "course_id": "test_course"
+        }
+        # This does not contain issue_type nor course_id to ensure that they are optional
+        self._auth_fields = {"subject": "a subject", "details": "some details"}
+
+    def _build_and_run_request(self, user, fields):
+        """
+        Generate a request and invoke the view, returning the response.
+
+        The request will be a POST request from the given `user`, with the given
+        `fields` in the POST body.
+        """
+        req = self._request_factory.post(
+            "/submit_feedback",
+            data=fields,
+            HTTP_REFERER="test_referer",
+            HTTP_USER_AGENT="test_user_agent",
+            REMOTE_ADDR="1.2.3.4",
+            SERVER_NAME="test_server",
+        )
+        req.user = user
+        return views.submit_feedback(req)
+
+    def _assert_bad_request(self, response, field, freshdesk_mock_class, datadog_mock):
+        """
+        Assert that the given `response` contains correct failure data.
+
+        It should have a 400 status code, and its content should be a JSON
+        object containing the specified `field` and an `error`.
+        """
+        self.assertEqual(response.status_code, 400)
+        resp_json = json.loads(response.content)
+        self.assertIn("field", resp_json)
+        self.assertEqual(resp_json["field"], field)
+        self.assertIn("error", resp_json)
+        # There should be absolutely no interaction with Freshdesk
+        self.assertFalse(freshdesk_mock_class.return_value.mock_calls)
+        self.assertFalse(datadog_mock.mock_calls)
+
+    def _test_bad_request_omit_field(self, user, fields, omit_field, freshdesk_mock_class, datadog_mock):
+        """
+        Invoke the view with a request missing a field and assert correctness.
+
+        The request will be a POST request from the given `user`, with POST
+        fields taken from `fields` minus the entry specified by `omit_field`.
+        The response should have a 400 (bad request) status code and specify
+        the invalid field and an error message, and the Freshdesk API should not
+        have been invoked.
+        """
+        filtered_fields = {k: v for (k, v) in fields.items() if k != omit_field}
+        resp = self._build_and_run_request(user, filtered_fields)
+        self._assert_bad_request(resp, omit_field, freshdesk_mock_class, datadog_mock)
+
+    def _test_bad_request_empty_field(self, user, fields, empty_field, freshdesk_mock_class, datadog_mock):
+        """
+        Invoke the view with an empty field and assert correctness.
+
+        The request will be a POST request from the given `user`, with POST
+        fields taken from `fields`, replacing the entry specified by
+        `empty_field` with the empty string. The response should have a 400
+        (bad request) status code and specify the invalid field and an error
+        message, and the Freshdesk API should not have been invoked.
+        """
+        altered_fields = fields.copy()
+        altered_fields[empty_field] = ""
+        resp = self._build_and_run_request(user, altered_fields)
+        self._assert_bad_request(resp, empty_field, freshdesk_mock_class, datadog_mock)
+
+    def _test_success(self, user, fields):
+        """
+        Generate a request, invoke the view, and assert success.
+
+        The request will be a POST request from the given `user`, with the given
+        `fields` in the POST body. The response should have a 200 (success)
+        status code.
+        """
+        resp = self._build_and_run_request(user, fields)
+        self.assertEqual(resp.status_code, 200)
+
+    def _assert_datadog_called(self, datadog_mock, with_tags):
+        """Protected reusable test to ensure datadog called on feedback submission."""
+        expected_datadog_calls = [
+            mock.call.increment(
+                views.DATADOG_FEEDBACK_METRIC,
+                tags=(["course_id:test_course", "issue_type:test_issue"] if with_tags else [])
+            )
+        ]
+        self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
+
+    def test_bad_request_anon_user_no_name(self, freshdesk_mock_class, datadog_mock):
+        """Test a request from an anonymous user not specifying `name`."""
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "name",
+            freshdesk_mock_class, datadog_mock
+        )
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "name",
+            freshdesk_mock_class, datadog_mock
+        )
+
+    def test_bad_request_anon_user_no_email(self, freshdesk_mock_class, datadog_mock):
+        """Test a request from an anonymous user not specifying `email`."""
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "email",
+            freshdesk_mock_class, datadog_mock
+        )
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "email",
+            freshdesk_mock_class, datadog_mock
+        )
+
+    def test_bad_request_anon_user_invalid_email(self, freshdesk_mock_class, datadog_mock):
+        """Test a request from an anonymous user specifying an invalid `email`."""
+        fields = self._anon_fields.copy()
+        fields["email"] = "This is not a valid email address!"
+        resp = self._build_and_run_request(self._anon_user, fields)
+        self._assert_bad_request(resp, "email", freshdesk_mock_class, datadog_mock)
+
+    def test_bad_request_anon_user_no_subject(self, freshdesk_mock_class, datadog_mock):
+        """Test a request from an anonymous user not specifying `subject`."""
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "subject",
+            freshdesk_mock_class, datadog_mock
+        )
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "subject",
+            freshdesk_mock_class, datadog_mock
+        )
+
+    def test_bad_request_anon_user_no_details(self, freshdesk_mock_class, datadog_mock):
+        """Test a request from an anonymous user not specifying `details`."""
+        self._test_bad_request_omit_field(
+            self._anon_user, self._anon_fields, "details",
+            freshdesk_mock_class, datadog_mock
+        )
+        self._test_bad_request_empty_field(
+            self._anon_user, self._anon_fields, "details",
+            freshdesk_mock_class, datadog_mock
+        )
+
+    def test_valid_request_anon_user(self, freshdesk_mock_class, datadog_mock):
+        """
+        Test a valid request from an anonymous user.
+
+        The response should have a 200 (success) status code, and a ticket with
+        the given information should have been submitted via the Freshdesk API.
+        """
+        freshdesk_mock_instance = freshdesk_mock_class.return_value
+        freshdesk_mock_instance.create_ticket.return_value = 42
+        self._test_success(self._anon_user, self._anon_fields)
+        expected_freshdesk_calls = [
+            mock.call.create_ticket(
+                "a subject",
+                "some details",
+                "Test User",
+                "test@edx.org",
+                1,
+                2,
+                ''
+            ),
+            mock.call.update_ticket(
+                42,
+                "Additional information:\n\n"
+                "Client IP: 1.2.3.4\n"
+                "Host: test_server\n"
+                "Page: test_referer\n"
+                "Browser: test_user_agent"
+            )
+        ]
+        self.assertEqual(freshdesk_mock_instance.mock_calls, expected_freshdesk_calls)
+        self._assert_datadog_called(datadog_mock, with_tags=True)
+
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
+    def test_valid_request_anon_user_configuration_override(self, freshdesk_mock_class, datadog_mock):
+        """
+        Test a valid request from an anonymous user to a mocked out site with configuration override
+
+        The response should have a 200 (success) status code, and a ticket with
+        the given information should have been submitted via the Freshdesk API with the additional
+        tag that will come from site configuration override.
+        """
+        freshdesk_mock_instance = freshdesk_mock_class.return_value
+        freshdesk_mock_instance.create_ticket.return_value = 42
+        self._test_success(self._anon_user, self._anon_fields)
+        expected_freshdesk_calls = [
+            mock.call.create_ticket(
+                "a subject",
+                "some details",
+                "Test User",
+                "test@edx.org",
+                1,
+                2,
+                ''
+            ),
+            mock.call.update_ticket(
+                42,
+                "Additional information:\n\n"
+                "Client IP: 1.2.3.4\n"
+                "Host: test_server\n"
+                "Page: test_referer\n"
+                "Browser: test_user_agent"
+            )
+        ]
+        self.assertEqual(freshdesk_mock_instance.mock_calls, expected_freshdesk_calls)
+        self._assert_datadog_called(datadog_mock, with_tags=True)
+
+    def test_bad_request_auth_user_no_subject(self, freshdesk_mock_class, datadog_mock):
+        """Test a request from an authenticated user not specifying `subject`."""
+        self._test_bad_request_omit_field(
+            self._auth_user, self._auth_fields, "subject",
+            freshdesk_mock_class, datadog_mock
+        )
+        self._test_bad_request_empty_field(
+            self._auth_user, self._auth_fields, "subject",
+            freshdesk_mock_class, datadog_mock
+        )
+
+    def test_bad_request_auth_user_no_details(self, freshdesk_mock_class, datadog_mock):
+        """Test a request from an authenticated user not specifying `details`."""
+        self._test_bad_request_omit_field(
+            self._auth_user, self._auth_fields, "details",
+            freshdesk_mock_class, datadog_mock
+        )
+        self._test_bad_request_empty_field(
+            self._auth_user, self._auth_fields, "details",
+            freshdesk_mock_class, datadog_mock
+        )
+
+    def test_valid_request_auth_user(self, freshdesk_mock_class, datadog_mock):
+        """
+        Test a valid request from an authenticated user.
+
+        The response should have a 200 (success) status code, and a ticket with
+        the given information should have been submitted via the Freshdesk API.
+        """
+        freshdesk_mock_instance = freshdesk_mock_class.return_value
+        freshdesk_mock_instance.create_ticket.return_value = 42
+        self._test_success(self._auth_user, self._auth_fields)
+        expected_freshdesk_calls = [
+            mock.call.create_ticket(
+                "a subject",
+                "some details",
+                "Test User",
+                "test@edx.org",
+                1,
+                2,
+                ''
+            ),
+            mock.call.update_ticket(
+                42,
+                "Additional information:\n\n"
+                "username: test\n"
+                "Client IP: 1.2.3.4\n"
+                "Host: test_server\n"
+                "Page: test_referer\n"
+                "Browser: test_user_agent"
+            )
+        ]
+        self.assertEqual(freshdesk_mock_instance.mock_calls, expected_freshdesk_calls)
+        self._assert_datadog_called(datadog_mock, with_tags=False)
+
+    def test_get_request(self, freshdesk_mock_class, datadog_mock):
+        """Test that a GET results in a 405 even with all required fields"""
+        req = self._request_factory.get("/submit_feedback", data=self._anon_fields)
+        req.user = self._anon_user
+        resp = views.submit_feedback(req)
+        self.assertEqual(resp.status_code, 405)
+        self.assertIn("Allow", resp)
+        self.assertEqual(resp["Allow"], "POST")
+        # There should be absolutely no interaction with Freshdesk
+        self.assertFalse(freshdesk_mock_class.mock_calls)
+        self.assertFalse(datadog_mock.mock_calls)
+
+    def test_freshdesk_error_on_create(self, freshdesk_mock_class, datadog_mock):
+        """
+        Test Freshdesk returning an error on ticket creation.
+
+        We should return a 500 error with no body
+        """
+        err = views.FreshdeskError(msg="", error_code=404)
+        freshdesk_mock_instance = freshdesk_mock_class.return_value
+        freshdesk_mock_instance.create_ticket.side_effect = err
+        resp = self._build_and_run_request(self._anon_user, self._anon_fields)
+        self.assertEqual(resp.status_code, 500)
+        self.assertFalse(resp.content)
+        self._assert_datadog_called(datadog_mock, with_tags=True)
+
+    def test_freshdesk_error_on_update(self, freshdesk_mock_class, datadog_mock):
+        """
+        Test for Freshdesk returning an error on ticket update.
+
+        If Freshdesk returns any error on ticket update, we return a 200 to the
+        browser because the update contains additional information that is not
+        necessary for the user to have submitted their feedback.
+        """
+        err = views.FreshdeskError(msg="", error_code=500)
+        freshdesk_mock_instance = freshdesk_mock_class.return_value
+        freshdesk_mock_instance.update_ticket.side_effect = err
+        resp = self._build_and_run_request(self._anon_user, self._anon_fields)
+        self.assertEqual(resp.status_code, 200)
+        self._assert_datadog_called(datadog_mock, with_tags=True)
+
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": False})
+    def test_not_enabled(self, freshdesk_mock_class, datadog_mock):
+        """
+        Test for Freshdesk submission not enabled in `settings`.
+
+        We should raise Http404.
+        """
+        assert freshdesk_mock_class
+        assert datadog_mock
+        with self.assertRaises(Http404):
+            self._build_and_run_request(self._anon_user, self._anon_fields)
+
+    def test_freshdesk_not_configured(self, freshdesk_mock_class, datadog_mock):
+        """
+        Test for Freshdesk not fully configured in `settings`.
+
+        For each required configuration parameter, test that setting it to
+        `None` causes an otherwise valid request to return a 500 error.
+        """
+        assert freshdesk_mock_class
+        assert datadog_mock
+
+        def test_case(missing_config):
+            with mock.patch(missing_config, None):
+                with self.assertRaises(Exception):
+                    self._build_and_run_request(self._anon_user, self._anon_fields)
+
+        test_case("django.conf.settings.HELPDESK")
+        test_case("django.conf.settings.HELPDESK_URL")
+        test_case("django.conf.settings.HELPDESK_API_KEY")

@@ -6,7 +6,7 @@ import logging
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from commerce.signals import create_zendesk_ticket
+from util.views import create_helpdesk_ticket
 from courseware.models import StudentModule
 from lms.djangoapps.instructor.views.tools import get_student_from_identifier
 from django.core.exceptions import ObjectDoesNotExist
@@ -104,7 +104,7 @@ class InstructorService(object):
         course_key = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_key)
 
-        if course.create_zendesk_tickets:
+        if course.create_helpdesk_tickets:
             requester_name = "edx-proctoring"
             email = "edx-proctoring@edx.org"
             subject = _("Proctored Exam Review: {review_status}").format(review_status=review_status)
@@ -118,4 +118,4 @@ class InstructorService(object):
                 review_status=review_status
             )
             tags = ["proctoring"]
-            create_zendesk_ticket(requester_name, email, subject, body, tags)
+            create_helpdesk_ticket(requester_name, email, subject, body, tags)

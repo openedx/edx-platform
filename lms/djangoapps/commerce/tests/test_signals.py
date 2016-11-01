@@ -16,22 +16,23 @@ from requests import Timeout
 
 from student.models import UNENROLL_DONE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from commerce.signals import (refund_seat, send_refund_notification, generate_refund_notification_body,
-                              create_zendesk_ticket)
+from commerce.signals import (refund_seat, send_refund_notification, generate_refund_notification_body)
 from commerce.tests import TEST_PUBLIC_URL_ROOT, TEST_API_URL, TEST_API_SIGNING_KEY, JSON
 from commerce.tests.mocks import mock_create_refund
 from course_modes.models import CourseMode
 
-ZENDESK_URL = 'http://zendesk.example.com/'
-ZENDESK_USER = 'test@example.com'
-ZENDESK_API_KEY = 'abc123'
+HELPDESK = 'Zendesk'
+HELPDESK_URL = 'http://zendesk.example.com/'
+HELPDESK_USER = 'test@example.com'
+HELPDESK_API_KEY = 'abc123'
 
 
 @ddt.ddt
 @override_settings(
     ECOMMERCE_PUBLIC_URL_ROOT=TEST_PUBLIC_URL_ROOT,
     ECOMMERCE_API_URL=TEST_API_URL, ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,
-    ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=ZENDESK_USER, ZENDESK_API_KEY=ZENDESK_API_KEY
+    HELPDESK=HELPDESK, HELPDESK_URL=HELPDESK_URL, HELPDESK_USER=HELPDESK_USER,
+    HELPDESK_API_KEY=HELPDESK_API_KEY
 )
 class TestRefundSignal(TestCase):
     """
@@ -210,72 +211,9 @@ class TestRefundSignal(TestCase):
     def test_send_refund_notification(self):
         """ Verify the support team is notified of the refund request. """
 
-        with mock.patch('commerce.signals.create_zendesk_ticket') as mock_zendesk:
+        with mock.patch('util.views.create_helpdesk_ticket') as mock_helpdesk:
             refund_ids = [1, 2, 3]
             send_refund_notification(self.course_enrollment, refund_ids)
             body = generate_refund_notification_body(self.student, refund_ids)
-            mock_zendesk.assert_called_with(self.student.profile.name, self.student.email,
-                                            "[Refund] User-Requested Refund", body, ['auto_refund'])
-
-    def _mock_zendesk_api(self, status=201):
-        """ Mock Zendesk's ticket creation API. """
-        httpretty.register_uri(httpretty.POST, urljoin(ZENDESK_URL, '/api/v2/tickets.json'), status=status,
-                               body='{}', content_type=JSON)
-
-    def call_create_zendesk_ticket(self, name=u'Test user', email=u'user@example.com', subject=u'Test Ticket',
-                                   body=u'I want a refund!', tags=None):
-        """ Call the create_zendesk_ticket function. """
-        tags = tags or [u'auto_refund']
-        create_zendesk_ticket(name, email, subject, body, tags)
-
-    @override_settings(ZENDESK_URL=ZENDESK_URL, ZENDESK_USER=None, ZENDESK_API_KEY=None)
-    def test_create_zendesk_ticket_no_settings(self):
-        """ Verify the Zendesk API is not called if the settings are not all set. """
-        with mock.patch('requests.post') as mock_post:
-            self.call_create_zendesk_ticket()
-            self.assertFalse(mock_post.called)
-
-    def test_create_zendesk_ticket_request_error(self):
-        """
-        Verify exceptions are handled appropriately if the request to the Zendesk API fails.
-
-        We simply need to ensure the exception is not raised beyond the function.
-        """
-        with mock.patch('requests.post', side_effect=Timeout) as mock_post:
-            self.call_create_zendesk_ticket()
-            self.assertTrue(mock_post.called)
-
-    @httpretty.activate
-    def test_create_zendesk_ticket(self):
-        """ Verify the Zendesk API is called. """
-        self._mock_zendesk_api()
-
-        name = u'Test user'
-        email = u'user@example.com'
-        subject = u'Test Ticket'
-        body = u'I want a refund!'
-        tags = [u'auto_refund']
-        self.call_create_zendesk_ticket(name, email, subject, body, tags)
-        last_request = httpretty.last_request()
-
-        # Verify the headers
-        expected = {
-            'content-type': JSON,
-            'Authorization': 'Basic ' + base64.b64encode(
-                '{user}/token:{pwd}'.format(user=ZENDESK_USER, pwd=ZENDESK_API_KEY))
-        }
-        self.assertDictContainsSubset(expected, last_request.headers)
-
-        # Verify the content
-        expected = {
-            u'ticket': {
-                u'requester': {
-                    u'name': name,
-                    u'email': email
-                },
-                u'subject': subject,
-                u'comment': {u'body': body},
-                u'tags': [u'LMS'] + tags
-            }
-        }
-        self.assertDictEqual(json.loads(last_request.body), expected)
+            mock_helpdesk.assert_called_with(self.student.profile.name, self.student.email,
+                                             "[Refund] User-Requested Refund", body, ['auto_refund'])
