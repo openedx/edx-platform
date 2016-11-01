@@ -5,7 +5,7 @@ Tests for Course API forms.
 import ddt
 from django.contrib.auth.models import AnonymousUser
 from django.http import QueryDict
-from itertools import product, chain
+from itertools import product
 from urllib import urlencode
 
 from openedx.core.djangoapps.util.test_forms import FormTestMixin
@@ -66,7 +66,6 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
             'org': '',
             'mobile': None,
             'filter_': None,
-            'include_hidden': None,
         }
 
     def test_basic(self):
@@ -79,13 +78,10 @@ class TestCourseListGetForm(FormTestMixin, UsernameTestMixin, SharedModuleStoreT
         self.assert_valid(self.cleaned_data)
 
     @ddt.data(
-        *chain(product(
+        *product(
             [('mobile', 'mobile_available')],
             [(True, True), (False, False), ('1', True), ('0', False), (None, None)],
-        ), product(
-            [('include_hidden', 'include_hidden')],
-            [(True, True), (False, False), ('1', True), ('0', False), (None, None)],
-        ))
+        )
     )
     @ddt.unpack
     def test_filter(self, param_field_name, param_field_value):
