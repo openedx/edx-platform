@@ -26,12 +26,9 @@ from openedx.core.djangolib.markup import HTML
   </span>
 
   <div class="grader-status" tabindex="-1">
-      <span id="status_${id}"
-            class="${status.classname}"
-            aria-describedby="input_${id}"
-      >
-          <span class="status sr">${status.display_name}</span>
-      </span>
+
+    <%include file="status_span.html" args="status=status, status_id=id"/>
+
     % if status == 'queued':
       <span style="display:none;" class="xqueue" id="${id}">${queue_len}</span>
     % endif

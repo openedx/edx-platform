@@ -245,7 +245,7 @@ def test(options, passthrough_options):
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("compare_branch=", None, "deprecated in favor of compare-branch"),
@@ -283,7 +283,7 @@ def coverage():
 
 
 @task
-@needs('pavelib.prereqs.install_prereqs')
+@needs('pavelib.prereqs.install_coverage_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("compare_branch=", None, "deprecated in favor of compare-branch"),

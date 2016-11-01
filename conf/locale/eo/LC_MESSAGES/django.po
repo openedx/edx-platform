@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:37+0000\n"
-"PO-Revision-Date: 2016-10-20 15:37:55.843388\n"
+"POT-Creation-Date: 2016-10-27 14:45+0000\n"
+"PO-Revision-Date: 2016-10-27 14:45:24.494944\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -448,11 +448,11 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid ""
-"Usernames must contain only letters, numbers, underscores (_), and hyphens "
-"(-)."
+"Usernames can only contain Roman letters, western numerals (0-9), "
+"underscores (_), and hyphens (-)."
 msgstr ""
-"Ûsérnämés müst çöntäïn önlý léttérs, nümßérs, ündérsçörés (_), änd hýphéns "
-"(-). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Ûsérnämés çän önlý çöntäïn Römän léttérs, wéstérn nüméräls (0-9), "
+"ündérsçörés (_), änd hýphéns (-). Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -13425,8 +13425,12 @@ msgid "Submit your answer"
 msgstr "Süßmït ýöür änswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempts"
-msgstr ""
+msgid "You have used {num_used} of {num_total} attempt"
+msgid_plural "You have used {num_used} of {num_total} attempts"
+msgstr[0] ""
+"Ýöü hävé üséd {num_used} öf {num_total} ättémpt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тє#"
+msgstr[1] ""
 "Ýöü hävé üséd {num_used} öf {num_total} ättémpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тє#"
 
@@ -13873,18 +13877,24 @@ msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "Rését Stüdént Àttémpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: lms/templates/staff_problem_info.html
-msgid "Delete Student State"
-msgstr "Délété Stüdént Stäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Reset Learner's Attempts to Zero"
+msgstr ""
+"Rését Léärnér's Àttémpts tö Zérö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "Résçöré Stüdént Süßmïssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+msgid "Delete Learner's State"
+msgstr "Délété Léärnér's Stäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Learner's Submission"
+msgstr "Résçöré Léärnér's Süßmïssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Score Improves"
+msgstr "Résçöré Önlý Ìf Sçöré Ìmprövés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -16201,10 +16211,6 @@ msgid "{course_number} Progress"
 msgstr "{course_number} Prögréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress"
-msgstr "Çöürsé Prögréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
 msgstr "Vïéw Grädïng ïn stüdïö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -16215,20 +16221,12 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/courseware/progress.html
-msgid "View certificate in a new browser window or tab."
-msgstr ""
-"Vïéw çértïfïçäté ïn ä néw ßröwsér wïndöw ör täß. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/courseware/progress.html
 msgid "View Certificate"
 msgstr "Vïéw Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/courseware/progress.html
-msgid "PDF will open in a new browser window or tab."
-msgstr ""
-"PDF wïll öpén ïn ä néw ßröwsér wïndöw ör täß. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
+msgid "Opens in a new browser window"
+msgstr "Öpéns ïn ä néw ßröwsér wïndöw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -16300,6 +16298,10 @@ msgstr "Ûpçömïng Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/courseware/progress.html
 msgid "Less"
 msgstr "Léss Ⱡ'σяєм ι#"
+
+#: lms/templates/courseware/progress.html
+msgid "Details for each chapter"
+msgstr "Détäïls för éäçh çhäptér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
@@ -18278,6 +18280,18 @@ msgstr ""
 " ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit passing state. ({count})"
+msgstr ""
+"Régénéräté för léärnérs wïth äüdït pässïng stäté. ({count}) Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit not passing state. ({count})"
+msgstr ""
+"Régénéräté för léärnérs wïth äüdït nöt pässïng stäté. ({count}) Ⱡ'σяєм ιρѕυм"
+" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
 msgstr ""
 "Régénéräté för léärnérs ïn än érrör stäté. ({count}) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
@@ -19089,7 +19103,6 @@ msgstr ""
 " єѕѕє ¢ιłłυм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
@@ -19097,7 +19110,6 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
 msgstr "Stüdént Émäïl ör Ûsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
@@ -19864,194 +19876,235 @@ msgid "Student Special Exam Attempts"
 msgstr "Stüdént Spéçïäl Éxäm Àttémpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Gradebook"
-msgstr "Stüdént Grädéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+msgid "View gradebook for enrolled learners"
+msgstr ""
+"Vïéw grädéßöök för énrölléd léärnérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Click here to view the gradebook for enrolled students. This feature is only"
-" visible to courses with a small number of total enrolled students."
+"Note: This feature is available only to courses with a small number of "
+"enrolled learners."
 msgstr ""
-"Çlïçk héré tö vïéw thé grädéßöök för énrölléd stüdénts. Thïs féätüré ïs önlý"
-" vïsïßlé tö çöürsés wïth ä smäll nümßér öf tötäl énrölléd stüdénts. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕ#"
+"Nöté: Thïs féätüré ïs äväïläßlé önlý tö çöürsés wïth ä smäll nümßér öf "
+"énrölléd léärnérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
 msgstr "Vïéw Grädéßöök Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade inspection"
+msgid "View a specific learner's grades and progress"
 msgstr ""
-"Stüdént-spéçïfïç grädé ïnspéçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"Vïéw ä spéçïfïç léärnér's grädés änd prögréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Click this link to view the student's progress page:"
+msgid "Learner's {platform_name} email address or username *"
 msgstr ""
-"Çlïçk thïs lïnk tö vïéw thé stüdént's prögréss pägé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Léärnér's {platform_name} émäïl äddréss ör üsérnämé * Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
+" αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Progress Page"
-msgstr "Stüdént Prögréss Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Learner email address or username"
+msgstr ""
+"Léärnér émäïl äddréss ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade adjustment"
-msgstr ""
-"Stüdént-spéçïfïç grädé ädjüstmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+msgid "View Progress Page"
+msgstr "Vïéw Prögréss Pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Specify a problem in the course here with its complete location:"
+msgid "Adjust a learner's grade for a specific problem"
 msgstr ""
-"Spéçïfý ä prößlém ïn thé çöürsé héré wïth ïts çömplété löçätïön: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Àdjüst ä léärnér's grädé för ä spéçïfïç prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Location of problem in course *"
+msgstr "Löçätïön öf prößlém ïn çöürsé * Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Example"
+msgstr "Éxämplé Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
 msgstr "Prößlém löçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
-#. Translators: A location (string of text) follows this sentence.
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You must provide the complete location of the problem. In the Staff Debug "
-"viewer, the location looks like this:"
-msgstr ""
-"Ýöü müst prövïdé thé çömplété löçätïön öf thé prößlém. Ìn thé Stäff Déßüg "
-"vïéwér, thé löçätïön lööks lïké thïs: Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Next, select an action to perform for the given user and problem:"
-msgstr ""
-"Néxt, séléçt än äçtïön tö pérförm för thé gïvén üsér änd prößlém: Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+msgid "Attempts"
+msgstr "Àttémpts Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You may also delete the entire state of a student for the specified problem:"
+"Allow a learner who has used up all attempts to work on the problem again."
 msgstr ""
-"Ýöü mäý älsö délété thé éntïré stäté öf ä stüdént för thé spéçïfïéd prößlém:"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+"Àllöw ä léärnér whö häs üséd üp äll ättémpts tö wörk ön thé prößlém ägäïn. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student State for Problem"
-msgstr ""
-"Délété Stüdént Stäté för Prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+msgid "Reset Attempts to Zero"
+msgstr "Rését Àttémpts tö Zérö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore"
+msgstr "Résçöré Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Tasks' table. To see status for all tasks submitted for this "
-"problem and student, click on this button:"
+"For the specified problem, rescore the learner's responses. The 'Rescore "
+"Only If Score Improves' option updates the learner's score only if it "
+"improves in the learner's favor."
 msgstr ""
-"Résçörïng rüns ïn thé ßäçkgröünd, änd stätüs för äçtïvé täsks wïll äppéär ïn"
-" thé 'Péndïng Täsks' täßlé. Tö séé stätüs för äll täsks süßmïttéd för thïs "
-"prößlém änd stüdént, çlïçk ön thïs ßüttön: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση "
-"υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє "
-"∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα"
-" ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт #"
+"För thé spéçïfïéd prößlém, résçöré thé léärnér's réspönsés. Thé 'Résçöré "
+"Önlý Ìf Sçöré Ìmprövés' öptïön üpdätés thé léärnér's sçöré önlý ïf ït "
+"ïmprövés ïn thé léärnér's fävör. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Student"
+msgid "Problem History"
+msgstr "Prößlém Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"For the specified problem, permanently and completely delete the learner's "
+"answers and scores from the database."
 msgstr ""
-"Shöw Bäçkgröünd Täsk Hïstörý för Stüdént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"För thé spéçïfïéd prößlém, pérmänéntlý änd çömplétélý délété thé léärnér's "
+"änswérs änd sçörés fröm thé dätäßäsé. Ⱡ'σяєм ιρѕυм ∂σłσя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Task Status"
+msgstr "Täsk Stätüs Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and problem."
+msgstr ""
+"Shöw thé stätüs för thé résçörïng täsks thät ýöü süßmïttéd för thïs léärnér "
+"änd prößlém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Task Status"
+msgstr "Shöw Täsk Stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's entrance exam results"
+msgstr ""
+"Àdjüst ä léärnér's éntränçé éxäm résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Entrance Exam Adjustment"
-msgstr "Éntränçé Éxäm Àdjüstmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+msgid "Allow the learner to take the exam again."
+msgstr ""
+"Àllöw thé léärnér tö täké thé éxäm ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student's {platform_name} email address or username:"
+msgid "Allow Skip"
+msgstr "Àllöw Skïp Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Waive the requirement for the learner to take the exam."
 msgstr ""
-"Stüdént's {platform_name} émäïl äddréss ör üsérnämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя#"
+"Wäïvé thé réqüïrémént för thé léärnér tö täké thé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя "
+"ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Let Learner Skip Entrance Exam"
+msgstr "Lét Léärnér Skïp Éntränçé Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Select an action for the student's entrance exam. This action will affect "
-"every problem in the student's exam."
+"Rescore any responses that have been submitted. The 'Rescore All Problems "
+"Only If Score Improves' option updates the learner's scores only if it "
+"improves in the learner's favor."
 msgstr ""
-"Séléçt än äçtïön för thé stüdént's éntränçé éxäm. Thïs äçtïön wïll äfféçt "
-"évérý prößlém ïn thé stüdént's éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Number of Student Attempts"
-msgstr ""
-"Rését Nümßér öf Stüdént Àttémpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+"Résçöré äný réspönsés thät hävé ßéén süßmïttéd. Thé 'Résçöré Àll Prößléms "
+"Önlý Ìf Sçöré Ìmprövés' öptïön üpdätés thé léärnér's sçörés önlý ïf ït "
+"ïmprövés ïn thé léärnér's fävör. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
 msgstr "Résçöré Àll Prößléms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Let Student Skip Entrance Exam"
-msgstr "Lét Stüdént Skïp Éntränçé Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You can also delete all of the student's answers and scores for the entire "
-"entrance exam."
+msgid "Rescore All Problems Only If Score Improves"
 msgstr ""
-"Ýöü çän älsö délété äll öf thé stüdént's änswérs änd sçörés för thé éntïré "
-"éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student's Answers and Scores"
-msgstr ""
-"Délété Stüdént's Ànswérs änd Sçörés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Student's Exam Adjustment History"
-msgstr ""
-"Shöw Stüdént's Éxäm Àdjüstmént Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Course-specific grade adjustment"
-msgstr ""
-"Çöürsé-spéçïfïç grädé ädjüstmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Then select an action"
-msgstr "Thén séléçt än äçtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset ALL students' attempts"
-msgstr "Rését ÀLL stüdénts' ättémpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore ALL students' problem submissions"
-msgstr ""
-"Résçöré ÀLL stüdénts' prößlém süßmïssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"Résçöré Àll Prößléms Önlý Ìf Sçöré Ìmprövés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"The above actions run in the background, and status for active tasks will "
-"appear in a table on the Course Info tab. To see status for all tasks "
-"submitted for this problem, click on this button"
-msgstr ""
-"Thé äßövé äçtïöns rün ïn thé ßäçkgröünd, änd stätüs för äçtïvé täsks wïll "
-"äppéär ïn ä täßlé ön thé Çöürsé Ìnfö täß. Tö séé stätüs för äll täsks "
-"süßmïttéd för thïs prößlém, çlïçk ön thïs ßüttön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ησ#"
+msgid "Entrance Exam History"
+msgstr "Éntränçé Éxäm Hïstörý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Problem"
+msgid ""
+"For the entire entrance exam, permanently and completely delete the "
+"learner's answers and scores from the database."
 msgstr ""
-"Shöw Bäçkgröünd Täsk Hïstörý för Prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
+"För thé éntïré éntränçé éxäm, pérmänéntlý änd çömplétélý délété thé "
+"léärnér's änswérs änd sçörés fröm thé dätäßäsé. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and entrance exam."
+msgstr ""
+"Shöw thé stätüs för thé résçörïng täsks thät ýöü süßmïttéd för thïs léärnér "
+"änd éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust all enrolled learners' grades for a specific problem"
+msgstr ""
+"Àdjüst äll énrölléd léärnérs' grädés för ä spéçïfïç prößlém Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allows all learners to work on the problem again."
+msgstr ""
+"Àllöws äll léärnérs tö wörk ön thé prößlém ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
+"updates a learner's score only if it improves in the learner's favor."
+msgstr ""
+"Résçöré süßmïttéd réspönsés. Thé 'Résçöré Önlý Ìf Sçörés Ìmprövé' öptïön "
+"üpdätés ä léärnér's sçöré önlý ïf ït ïmprövés ïn thé léärnér's fävör. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ єѕт#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Learners' Submissions"
+msgstr ""
+"Résçöré Àll Léärnérs' Süßmïssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Scores Improve"
+msgstr "Résçöré Önlý Ìf Sçörés Ìmprövé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show the status for the tasks that you submitted for this problem."
+msgstr ""
+"Shöw thé stätüs för thé täsks thät ýöü süßmïttéd för thïs prößlém. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"

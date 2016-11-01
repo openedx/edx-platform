@@ -1,9 +1,11 @@
 """Helpers for the student app. """
 from datetime import datetime
+import logging
 import urllib
 
 from pytz import UTC
 from django.core.urlresolvers import reverse, NoReverseMatch
+from django.utils import http
 from oauth2_provider.models import (
     AccessToken as dot_access_token,
     RefreshToken as dot_refresh_token
@@ -31,6 +33,9 @@ DISABLE_UNENROLL_CERT_STATES = [
     'generating',
     'ready',
 ]
+
+
+log = logging.getLogger(__name__)
 
 
 def check_verify_status_by_course(user, course_enrollments):
@@ -239,6 +244,16 @@ def get_next_url_for_login_page(request):
     specified.
     """
     redirect_to = request.GET.get('next', None)
+
+    # if we get a redirect parameter, make sure it's safe. If it's not, drop the
+    # parameter.
+    if redirect_to and not http.is_safe_url(redirect_to):
+        log.error(
+            u'Unsafe redirect parameter detected: %(redirect_to)r',
+            {"redirect_to": redirect_to}
+        )
+        redirect_to = None
+
     if not redirect_to:
         try:
             redirect_to = reverse('dashboard')
@@ -259,7 +274,7 @@ def destroy_oauth_tokens(user):
     """
     Destroys ALL OAuth access and refresh tokens for the given user.
     """
-    dop_access_token.objects.filter(user=user).delete()
-    dop_refresh_token.objects.filter(user=user).delete()
-    dot_access_token.objects.filter(user=user).delete()
-    dot_refresh_token.objects.filter(user=user).delete()
+    dop_access_token.objects.filter(user=user.id).delete()
+    dop_refresh_token.objects.filter(user=user.id).delete()
+    dot_access_token.objects.filter(user=user.id).delete()
+    dot_refresh_token.objects.filter(user=user.id).delete()

@@ -2,7 +2,7 @@
   <div class="script_placeholder" data-src="${applet_loader}"/>
 
     % if status in ['unsubmitted', 'correct', 'incorrect', 'partially-correct', 'incomplete']:
-    <div class="${status.classname}" id="status_${id}">
+    <div class="${status.classname}">
     % endif
 
     <div id="applet_${id}" class="applet" data-molfile-src="${file}" style="display:block;width:500px;height:400px">
@@ -17,7 +17,7 @@
     <p id="answer_${id}" class="answer"></p>
 
     <p class="status" aria-describedby="input_${id}">
-      <span class="sr">${status.display_name}</span>
+      <%include file="status_span.html" args="status=status, status_id=id"/>
     </p>
 
     <div class="error_message" style="padding: 5px 5px 5px 5px; background-color:#FA6666; height:60px;width:400px; display: none"></div>

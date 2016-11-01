@@ -28,13 +28,13 @@
                 context.topics_html = this.renderCategoryMap(this.course_settings.get('category_map'));
                 edx.HtmlUtils.setHtml(this.$el, edx.HtmlUtils.template($('#topic-template').html())(context));
 
-                $general = this.$('.post-topic option:contains(General)');
+                $general = this.$('.post-topic option:contains(General)');  // always return array.
 
                 if (this.getCurrentTopicId()) {
                     this.setTopic(this.$('.post-topic option').filter(
                         '[data-discussion-id="' + this.getCurrentTopicId() + '"]'
                     ));
-                } else if ($general) {
+                } else if ($general.length > 0) {
                     this.setTopic($general);
                 } else {
                     this.setTopic(this.$('.post-topic option').first());

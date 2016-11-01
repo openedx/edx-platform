@@ -1075,7 +1075,7 @@ class CreateSectionsTest(CourseOutlineTest):
         self.assertEqual(len(self.course_outline_page.section_at(0).subsections()), 1)
         self.course_outline_page.section_at(0).subsection_at(0).add_unit()
         unit_page = ContainerPage(self.browser, None)
-        EmptyPromise(unit_page.is_browser_on_page, 'Browser is on the unit page').fulfill()
+        unit_page.wait_for_page()
         self.assertTrue(unit_page.is_inline_editing_display_name())
 
 
@@ -1473,7 +1473,7 @@ class UnitNavigationTest(CourseOutlineTest):
         self.course_outline_page.visit()
         self.course_outline_page.section_at(0).subsection_at(0).expand_subsection()
         unit = self.course_outline_page.section_at(0).subsection_at(0).unit_at(0).go_to()
-        self.assertTrue(unit.is_browser_on_page)
+        unit.wait_for_page()
 
 
 @attr(shard=3)

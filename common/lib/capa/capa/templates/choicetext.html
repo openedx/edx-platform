@@ -66,9 +66,7 @@ from openedx.core.djangolib.markup import HTML
 
     <div class="indicator-container">
     % if input_type == 'checkbox' or not element_checked:
-        <span class="status ${status.classname}" id="status_${id}">
-            <span class="sr">${status.display_name}</span>
-        </span>
+        <%include file="status_span.html" args="status=status, status_id=id"/>
     % endif
     </div>
 

@@ -100,10 +100,10 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expect(learnerProfileView.$('.wrapper-profile-section-two').length).toBe(0);
     };
 
-    var expectTabbedViewToBeHidden = function(requests, tabbedViewView) {
+    var expectTabbedViewToBeUndefined = function(requests, tabbedViewView) {
         // Unrelated initial request, no badge request
         expect(requests.length).toBe(1);
-        expect(tabbedViewView.$el.find('.page-content-nav').is(':visible')).toBe(false);
+        expect(tabbedViewView).toBe(undefined);
     };
 
     var expectTabbedViewToBeShown = function(tabbedViewView) {
@@ -228,10 +228,17 @@ define(['underscore', 'URI', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
         expectLimitedProfileSectionsAndFieldsToBeRendered: expectLimitedProfileSectionsAndFieldsToBeRendered,
         expectProfileSectionsAndFieldsToBeRendered: expectProfileSectionsAndFieldsToBeRendered,
         expectProfileSectionsNotToBeRendered: expectProfileSectionsNotToBeRendered,
-        expectTabbedViewToBeHidden: expectTabbedViewToBeHidden, expectTabbedViewToBeShown: expectTabbedViewToBeShown,
-        expectBadgesDisplayed: expectBadgesDisplayed, expectBadgesHidden: expectBadgesHidden,
-        expectBadgeLoadingErrorIsRendered: expectBadgeLoadingErrorIsRendered, breakBadgeLoading: breakBadgeLoading,
-        firstPageBadges: firstPageBadges, secondPageBadges: secondPageBadges, thirdPageBadges: thirdPageBadges,
-        emptyBadges: emptyBadges, expectPage: expectPage, makeBadge: makeBadge
+        expectTabbedViewToBeUndefined: expectTabbedViewToBeUndefined,
+        expectTabbedViewToBeShown: expectTabbedViewToBeShown,
+        expectBadgesDisplayed: expectBadgesDisplayed,
+        expectBadgesHidden: expectBadgesHidden,
+        expectBadgeLoadingErrorIsRendered: expectBadgeLoadingErrorIsRendered,
+        breakBadgeLoading: breakBadgeLoading,
+        firstPageBadges: firstPageBadges,
+        secondPageBadges: secondPageBadges,
+        thirdPageBadges: thirdPageBadges,
+        emptyBadges: emptyBadges,
+        expectPage: expectPage,
+        makeBadge: makeBadge
     };
 });

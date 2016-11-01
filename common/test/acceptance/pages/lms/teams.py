@@ -163,6 +163,9 @@ class BrowseTopicsPage(CoursePage, PaginatedUIMixin):
 
     def is_browser_on_page(self):
         """Check if the Browse tab is being viewed."""
+        # First off, you need to make sure that you're on the Teams page.
+        if not self.q(css='.teams-main').visible:
+            return False
         button_classes = self.q(css=BROWSE_BUTTON_CSS).attrs('class')
         if len(button_classes) == 0:
             return False
@@ -211,6 +214,8 @@ class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin, BreadcrumbsMix
         the same convention as a course module's topic.
         """
         super(BaseTeamsPage, self).__init__(browser, course_id)
+        self.browser = browser
+        self.course_id = course_id
         self.topic = topic
 
     def is_browser_on_page(self):
@@ -248,7 +253,10 @@ class BaseTeamsPage(CoursePage, PaginatedUIMixin, TeamCardsMixin, BreadcrumbsMix
         query = self.q(css=CREATE_TEAM_LINK_CSS)
         if query.present:
             query.first.click()
-            self.wait_for_ajax()
+
+        # This will bring you to the team management page
+        team_management_page = TeamManagementPage(self.browser, self.course_id, self.topic)
+        team_management_page.wait_for_page()
 
     def click_search_team_link(self):
         """ Click on create team link."""
@@ -332,7 +340,9 @@ class TeamManagementPage(CoursePage, FieldsMixin, BreadcrumbsMixin):
 
     def is_browser_on_page(self):
         """Check if we're on the create team page for a particular topic."""
-        return self.q(css='.team-edit-fields').present
+        fields_css = '.team-edit-fields'
+        button_sr_css = '.action.action-primary > .sr'
+        return self.q(css=fields_css).present and self.q(css=button_sr_css).visible
 
     @property
     def header_page_name(self):
@@ -348,6 +358,15 @@ class TeamManagementPage(CoursePage, FieldsMixin, BreadcrumbsMixin):
     def validation_message_text(self):
         """Get the error message text"""
         return self.q(css='.create-team.wrapper-msg .copy')[0].text
+
+    def create_team(self, name='Team Name', description='Team description.'):
+        """Create a new team"""
+        self.value_for_text_field(field_id='name', value=name, press_enter=False)
+        self.set_value_for_textarea_field(
+            field_id='description',
+            value=description
+        )
+        self.submit_form()
 
     def submit_form(self):
         """Click on create team button"""
@@ -444,7 +463,7 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
         if self.team:
             if not self.url.endswith(self.url_path):
                 return False
-        return self.q(css='.team-profile').present
+        return self.q(css='.teams-main .team-members').visible
 
     @property
     def discussion_id(self):
@@ -502,7 +521,9 @@ class TeamPage(CoursePage, PaginatedUIMixin, BreadcrumbsMixin):
 
     def click_leave_team_link(self, remaining_members=0, cancel=False):
         """ Click on Leave Team link"""
-        click_css(self, '.leave-team-link', require_notification=False)
+        leave_team_css = '.leave-team-link'
+        self.wait_for_element_visibility(leave_team_css, 'Leave Team link is visible.')
+        click_css(self, leave_team_css, require_notification=False)
         confirm_prompt(self, cancel, require_notification=False)
 
         if cancel is False:

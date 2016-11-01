@@ -42,7 +42,7 @@ class SubmissionSignalRelayTest(TestCase):
         Configure mocks for all the dependencies of the render method
         """
         super(SubmissionSignalRelayTest, self).setUp()
-        self.signal_mock = self.setup_patch('lms.djangoapps.grades.signals.signals.SCORE_CHANGED.send', None)
+        self.signal_mock = self.setup_patch('lms.djangoapps.grades.signals.signals.PROBLEM_SCORE_CHANGED.send', None)
         self.user_mock = MagicMock()
         self.user_mock.id = 42
         self.get_user_mock = self.setup_patch(
@@ -68,7 +68,7 @@ class SubmissionSignalRelayTest(TestCase):
     def test_score_set_signal_handler(self, handler, kwargs, earned, possible):
         """
         Ensure that on receipt of a score_(re)set signal from the Submissions API,
-        the signal handler correctly converts it to a SCORE_CHANGED signal.
+        the signal handler correctly converts it to a PROBLEM_SCORE_CHANGED signal.
 
         Also ensures that the handler calls user_by_anonymous_id correctly.
         """

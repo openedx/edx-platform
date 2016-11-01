@@ -71,6 +71,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     start_display = serializers.CharField()
     start_type = serializers.CharField()
     pacing = serializers.CharField()
+    mobile_available = serializers.BooleanField()
 
     # 'course_id' is a deprecated field, please use 'id' instead.
     course_id = serializers.CharField(source='id', read_only=True)

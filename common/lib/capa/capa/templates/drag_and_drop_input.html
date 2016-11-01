@@ -17,8 +17,9 @@
     <input type="text" name="input_${id}" id="input_${id}" aria-describedby="answer_${id}" value="${value|h}"
     style="display:none;"/>
 
+
     <p class="status drag-and-drop--status" aria-describedby="input_${id}">
-        <span class="sr">${status.display_name}</span>
+        <%include file="status_span.html" args="status=status, status_id=id"/>
     </p>
 
     <p id="answer_${id}" class="answer"></p>

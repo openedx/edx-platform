@@ -617,12 +617,12 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
             metadata={'graded': True},
             display_name='Problem Vertical'
         )
-        self.define_option_problem(u'Pröblem1', parent=vertical)
+        self.define_option_problem(u'Problem1', parent=vertical)
 
-        self.submit_student_answer(self.student_1.username, u'Pröblem1', ['Option 1'])
+        self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
         result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
-        problem_name = u'Homework 1: Problem - Pröblem1'
+        problem_name = u'Homework 1: Problem - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
             dict(zip(
@@ -646,7 +646,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
 
     @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
     @patch('lms.djangoapps.instructor_task.tasks_helper.iterate_grades_for')
-    @ddt.data(u'Cannöt grade student', '')
+    @ddt.data(u'Cannot grade student', '')
     def test_grading_failure(self, error_message, mock_iterate_grades_for, _mock_current_task):
         """
         Test that any grading errors are properly reported in the progress
@@ -683,8 +683,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
     def setUp(self):
         super(TestProblemReportSplitTestContent, self).setUp()
-        self.problem_a_url = u'pröblem_a_url'
-        self.problem_b_url = u'pröblem_b_url'
+        self.problem_a_url = u'problem_a_url'
+        self.problem_b_url = u'problem_b_url'
         self.define_option_problem(self.problem_a_url, parent=self.vertical_a)
         self.define_option_problem(self.problem_b_url, parent=self.vertical_b)
 
@@ -711,7 +711,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result
             )
 
-        problem_names = [u'Homework 1: Problem - pröblem_a_url', u'Homework 1: Problem - pröblem_b_url']
+        problem_names = [u'Homework 1: Problem - problem_a_url', u'Homework 1: Problem - problem_b_url']
         header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
@@ -817,12 +817,12 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             display_name='Problem Vertical'
         )
         self.define_option_problem(
-            u"Pröblem0",
+            u"Problem0",
             parent=vertical,
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[0].id]}
         )
         self.define_option_problem(
-            u"Pröblem1",
+            u"Problem1",
             parent=vertical,
             group_access={self.course.user_partitions[0].id: [self.course.user_partitions[0].groups[1].id]}
         )
@@ -845,20 +845,20 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         ))
 
     def test_cohort_content(self):
-        self.submit_student_answer(self.alpha_user.username, u'Pröblem0', ['Option 1', 'Option 1'])
-        resp = self.submit_student_answer(self.alpha_user.username, u'Pröblem1', ['Option 1', 'Option 1'])
+        self.submit_student_answer(self.alpha_user.username, u'Problem0', ['Option 1', 'Option 1'])
+        resp = self.submit_student_answer(self.alpha_user.username, u'Problem1', ['Option 1', 'Option 1'])
         self.assertEqual(resp.status_code, 404)
 
-        resp = self.submit_student_answer(self.beta_user.username, u'Pröblem0', ['Option 1', 'Option 2'])
+        resp = self.submit_student_answer(self.beta_user.username, u'Problem0', ['Option 1', 'Option 2'])
         self.assertEqual(resp.status_code, 404)
-        self.submit_student_answer(self.beta_user.username, u'Pröblem1', ['Option 1', 'Option 2'])
+        self.submit_student_answer(self.beta_user.username, u'Problem1', ['Option 1', 'Option 2'])
 
         with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
             result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
             )
-        problem_names = [u'Homework 1: Problem - Pröblem0', u'Homework 1: Problem - Pröblem1']
+        problem_names = [u'Homework 1: Problem - Problem0', u'Homework 1: Problem - Problem1']
         header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
@@ -1674,7 +1674,7 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
             'failed': 3,
             'skipped': 2
         }
-        with self.assertNumQueries(191):
+        with self.assertNumQueries(166):
             self.assertCertificatesGenerated(task_input, expected_results)
 
         expected_results = {

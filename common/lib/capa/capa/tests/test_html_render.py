@@ -1,16 +1,17 @@
 """
 CAPA HTML rendering tests.
 """
-import ddt
-import unittest
-from lxml import etree
-import os
 import textwrap
+import unittest
 
+import ddt
 import mock
+import os
+from capa.tests.helpers import test_capa_system, new_loncapa_problem
+from lxml import etree
+from openedx.core.djangolib.markup import HTML
 
 from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
-from capa.tests.helpers import test_capa_system, new_loncapa_problem
 
 
 @ddt.ddt
@@ -190,7 +191,7 @@ class CapaHtmlRenderTest(unittest.TestCase):
             'trailing_text': '',
             'size': None,
             'response_data': {'label': 'Test question', 'descriptions': {}},
-            'describedby_html': ''
+            'describedby_html': HTML('aria-describedby="status_1_2_1"')
         }
 
         expected_solution_context = {'id': '1_solution_1'}

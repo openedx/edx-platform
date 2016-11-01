@@ -152,7 +152,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 18:43+0000\n"
+"POT-Creation-Date: 2016-10-20 15:57+0000\n"
 "PO-Revision-Date: 2016-09-18 17:18+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -167,6 +167,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Discussion"
 msgstr "المناقشة"
 
@@ -233,14 +234,6 @@ msgstr "الحالة"
 #: openedx/core/djangoapps/api_admin/models.py
 msgid "Pending"
 msgstr "قيد الانتظار"
-
-#: common/djangoapps/cors_csrf/models.py
-msgid ""
-"List of domains that are allowed to make cross-domain requests to this site."
-"  Please list each domain on its own line."
-msgstr ""
-"قائمة بالمجالات المختلفة التي يُسمح بتقديم طلبات حولها على هذا الموقع. يرجى "
-"ذكر كل مجال في سطر منفصل."
 
 #: common/djangoapps/course_modes/admin.py
 #: common/djangoapps/course_modes/models.py
@@ -411,26 +404,6 @@ msgstr "عذرًا، لقد اخترتَ مبلغًا غير صحيح."
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
 msgstr "لم يجري اختيار سعر أو أن السعر المختار ضئيل جدًا."
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
-msgstr "معاينة اللغة معطلة حاليًا"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr "رمز اللغة غير مقدم"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language set to language code: {preview_language_code}"
-msgstr "اللغة مضبوطة على رمز اللغة:  {preview_language_code} "
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
-msgstr "إعادة تعيين اللغة على رمز اللغة الافتراضي"
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to user's preference: {preview_language_code}"
-msgstr "إعادة تعيين اللغة على تفضيل المستخدم: {preview_language_code}"
 
 #: common/djangoapps/django_comment_common/models.py
 msgid "Administrator"
@@ -1891,16 +1864,9 @@ msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
 msgstr "نعتذر لحدوث مشكلة في إجابة طاقم المساق عن هذه المسألة: حدود خالية."
 
-#: common/lib/capa/capa/responsetypes.py
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "قيم دخَل نصّية"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr "حدث خطأ"
-
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: Separator used in NumericalResponse to display multiple
+#. answers.
 #. Translators: Separator used in StringResponse to display multiple answers.
 #. Example: "Answer: Answer_1 or Answer_2 or Answer_3".
 #. #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
@@ -1913,6 +1879,15 @@ msgstr "حدث خطأ"
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "أو"
+
+#: common/lib/capa/capa/responsetypes.py
+#: cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "قيم دخَل نصّية"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr "حدث خطأ"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Custom Evaluated Script"
@@ -2264,7 +2239,6 @@ msgstr ""
 "مكشوفًا. للحصول على مفتاح لمساقك، أو للإبلاغ عن مشكلة ما، يُرجى مراسلة "
 "الشركة على هذا العنوان moocsupport@mathworks.com."
 
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -3479,6 +3453,16 @@ msgstr "مرئي"
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Raw"
 msgstr "أوّلي"
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Hide Page From Learners"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid ""
+"If you select this option, only course team members with the Staff or Admin "
+"role see this page."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "HTML for the additional pages"
@@ -8968,6 +8952,37 @@ msgstr ""
 msgid "Skip to main content"
 msgstr "الانتقال إلى المحتوى الرئيسي"
 
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Authorize"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"The above application requests the following permissions from your account:"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"Please click the 'Allow' button to grant these permissions to the above "
+"application. Otherwise, to withhold these permissions, please click the "
+"'Cancel' button."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: lms/templates/modal/accessible_confirm.html
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Allow"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/ccx/schedule.html
+msgid "Error"
+msgstr "خطأ"
+
 #: lms/templates/registration/password_reset_email.html
 #, python-format
 msgid ""
@@ -9566,6 +9581,14 @@ msgstr ""
 "حدد مدة الذاكرة المؤقتة بالثواني لتفعل تخزين النتائج مؤقتاً عند إدخالك قيمةً"
 " أكبر من 0."
 
+#: openedx/core/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
+msgstr ""
+"قائمة بالمجالات المختلفة التي يُسمح بتقديم طلبات حولها على هذا الموقع. يرجى "
+"ذكر كل مجال في سطر منفصل."
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr "المجموعة الافتراضية"
@@ -9739,6 +9762,26 @@ msgstr "حالات متطلبات الاعتماد"
 #: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
 msgstr "الموعد النهائي لشراء الوحدات الدراسية وطلبها."
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Preview Language is currently disabled"
+msgstr "معاينة اللغة معطلة حاليًا"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language code not provided"
+msgstr "رمز اللغة غير مقدم"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language set to language code: {preview_language_code}"
+msgstr "اللغة مضبوطة على رمز اللغة:  {preview_language_code} "
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default language code"
+msgstr "إعادة تعيين اللغة على رمز اللغة الافتراضي"
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to user's preference: {preview_language_code}"
+msgstr "إعادة تعيين اللغة على تفضيل المستخدم: {preview_language_code}"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -10663,12 +10706,6 @@ msgid "Settings"
 msgstr "الإعدادات"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Cancel"
-msgstr "إلغاء"
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "رقم المساق "
@@ -10798,13 +10835,11 @@ msgid "View"
 msgstr "عرض"
 
 #: cms/templates/darklang/preview_lang.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/darklang/preview_lang.html
 msgid "Preview Language Setting"
 msgstr "معاينة إعداد اللغة"
 
 #: cms/templates/maintenance/_force_publish_course.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
 msgstr "إعادة الضبط"
@@ -10945,18 +10980,6 @@ msgstr "محتوى مُجاز مشترك ومبتكر، شروطه كالتال�
 msgid "Some Rights Reserved"
 msgstr "بعض الحقوق محفوظة"
 
-#: common/templates/darklang/preview_lang_include.html
-msgid "Language Code"
-msgstr "رمز اللغة"
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr "على سبيل المثال، استخدم en للغة الإنجليزية  "
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
-msgstr "يرجى تحديث الصفحة لمشاهدة التغييرات المطبقة."
-
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -10967,7 +10990,6 @@ msgid "Discussions"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
 msgstr "أضف منشوراً"
 
@@ -12295,11 +12317,6 @@ msgstr "التالي"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
 msgstr "أحدث نشاط تحميل git لمساق {course_id}"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/ccx/schedule.html
-msgid "Error"
-msgstr "خطأ"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
@@ -14662,6 +14679,10 @@ msgstr ""
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
 msgstr "النتائج: "
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Topic:"
+msgstr ""
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"

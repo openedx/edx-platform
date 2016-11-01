@@ -228,10 +228,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config.click_outline_anchor()
 
         # Waiting for the page load and verify that we've landed on course outline page
-        EmptyPromise(
-            lambda: self.outline_page.is_browser_on_page(), "loaded page {!r}".format(self.outline_page),
-            timeout=30
-        ).fulfill()
+        self.outline_page.wait_for_page()
 
 
 @attr(shard=8)
@@ -253,7 +250,6 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
 
         # Before every test, make sure to visit the page first
         self.advanced_settings.visit()
-        self.assertTrue(self.advanced_settings.is_browser_on_page())
 
     def test_modal_shows_one_validation_error(self):
         """
@@ -500,12 +496,9 @@ class StudioSettingsA11yTest(StudioCourseTest):
         self.settings_page.visit()
         self.settings_page.wait_for_page()
 
-        # There are several existing color contrast errors on this page,
-        # we will ignore this error in the test until we fix them.
         self.settings_page.a11y_audit.config.set_rules({
             "ignore": [
-                'link-href',  # TODO: AC-557
-                'icon-aria-hidden',  # TODO: AC-229
+                'link-href',  # TODO: AC-590
             ],
         })
 
@@ -515,7 +508,7 @@ class StudioSettingsA11yTest(StudioCourseTest):
         # on this page. CodeMirror generates markup that does
         # not pass our accessibility testing rules.
         self.settings_page.a11y_audit.config.set_scope(
-            exclude=['.CodeMirror textarea']
+            exclude=['.CodeMirror textarea']  # TODO: TNL-5831
         )
 
         self.settings_page.a11y_audit.check_for_accessibility_errors()

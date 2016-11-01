@@ -17,7 +17,7 @@
       margin: 0;
       padding: lh(0.5);
 
-      h1 {
+      .hd {
         margin: 0;
         padding-right: 30px;
       }
@@ -138,7 +138,7 @@
       @extend h1.top-header;
       margin-bottom: lh();
 
-      h1 {
+      .hd {
         @include float(left);
         font-size: 1em;
         font-weight: 100;
@@ -174,7 +174,7 @@
       }
     }
 
-    #grade-detail-graph {
+    .grade-detail-graph {
       min-height: 400px;
       width: 100%;
     }
@@ -257,7 +257,7 @@
           border-bottom: 0px;
         }
 
-        h2 {
+        .hd {
           @include border-right(1px dashed #ddd);
           @include box-sizing(border-box);
           display: table-cell;
@@ -267,10 +267,11 @@
           padding-right: flex-gutter(9);
           text-transform: none;
           width: flex-grid(2, 9);
+          vertical-align: top;
         }
 
         .sections {
-          display: table-cell;
+          display: inline-block;
           @include padding-left(flex-gutter(9));
           width: flex-grid(7, 9);
 
@@ -285,7 +286,7 @@
               border-bottom: 0;
             }
 
-            h3 {
+            .hd {
               color: $gray-d1;
 
               span {
@@ -296,30 +297,33 @@
             }
 
             p {
-              color: $gray-d2;;
+              margin: lh(0.5) 0;
+              color: $gray-d1;;
               font-size: em(14);
+              font-weight: 600;
             }
 
             .scores {
               margin: lh(0.5) 0;
 
-              h3 {
-                font-size: em(14);
+              dt {
                 display: inline-block;
+                width: auto;
+                margin: initial;
+                @include margin-right($baseline);
+                border: initial;
+                padding: initial;
+                font-size: em(14);
               }
 
-              ol {
-                list-style: none;
-                margin: 0;
-                padding: 0;
+              dd {
                 display: inline-block;
-
-                li {
-                  display: inline-block;
-                  font-size: em(14);
-                  font-weight: normal;
-                  padding-right: 1em;
-                }
+                margin: 0;
+                @include margin-right($baseline);
+                @include padding-right(1em);
+                font-size: em(14);
+                font-weight: normal;
+                color: $gray-d2;
               }
             }
           }

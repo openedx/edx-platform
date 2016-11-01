@@ -2,7 +2,7 @@
 <%! from openedx.core.djangolib.markup import HTML %>
 <% doinline = 'style="display:inline-block;vertical-align:top"' if inline else "" %>
 <div id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline | n, decode.utf8}>
-    <div class="${status.classname}" id="status_${id}">
+    <div class="${status.classname}">
       % if response_data['label']:
           <label class="problem-group-label" for="input_${id}" id="label_${id}">${response_data['label']}</label>
       % endif
@@ -11,16 +11,14 @@
         % endfor
         <input type="text" name="input_${id}" id="input_${id}"
             data-input-id="${id}" value="${value}"
-            ${HTML(describedby_html)}
+            ${describedby_html}
             % if size:
             size="${size}"
             % endif
             />
         <span class="trailing_text">${trailing_text}</span>
 
-        <span class="status" id="${id}_status" aria-describedby="label_${id}" data-tooltip="${status.display_tooltip}">
-            <span class="sr">${status.display_tooltip}</span>
-        </span>
+        <%include file="status_span.html" args="status=status, status_id=id"/>
 
         <p id="answer_${id}" class="answer"></p>
 

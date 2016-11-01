@@ -8,7 +8,7 @@ from django.dispatch import receiver
 import logging
 
 from lms.djangoapps.grades import progress
-from lms.djangoapps.grades.signals.signals import SCORE_CHANGED
+from lms.djangoapps.grades.signals.signals import PROBLEM_SCORE_CHANGED
 from lms import CELERY_APP
 from lti_provider.models import GradedAssignment
 import lti_provider.outcomes as outcomes
@@ -19,11 +19,11 @@ from xmodule.modulestore.django import modulestore
 log = logging.getLogger("edx.lti_provider")
 
 
-@receiver(SCORE_CHANGED)
+@receiver(PROBLEM_SCORE_CHANGED)
 def score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume signals that indicate score changes. See the definition of
-    SCORE_CHANGED for a description of the signal.
+    PROBLEM_SCORE_CHANGED for a description of the signal.
     """
     points_possible = kwargs.get('points_possible', None)
     points_earned = kwargs.get('points_earned', None)

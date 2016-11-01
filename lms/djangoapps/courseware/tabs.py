@@ -304,7 +304,7 @@ def get_course_tab_list(request, course):
                 continue
             tab.name = _("Entrance Exam")
         if tab.type == 'static_tab' and tab.course_staff_only and \
-                not bool(user and CourseStaffRole(course.id).has_user(user)):
+                not bool(user and has_access(user, 'staff', course, course.id)):
             continue
         course_tab_list.append(tab)
 

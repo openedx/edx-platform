@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-13 18:43+0000\n"
+"POT-Creation-Date: 2016-10-20 15:57+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -101,6 +101,7 @@ msgstr ""
 #. the discussion forums
 #: cms/djangoapps/contentstore/views/component.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/discussion/plugins.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion"
 msgstr ""
@@ -157,12 +158,6 @@ msgstr "상태"
 #: cms/djangoapps/contentstore/views/videos.py
 #: openedx/core/djangoapps/api_admin/models.py cms/templates/index.html
 msgid "Pending"
-msgstr ""
-
-#: common/djangoapps/cors_csrf/models.py
-msgid ""
-"List of domains that are allowed to make cross-domain requests to this site."
-"  Please list each domain on its own line."
 msgstr ""
 
 #: common/djangoapps/course_modes/admin.py
@@ -302,26 +297,6 @@ msgstr ""
 
 #: common/djangoapps/course_modes/views.py
 msgid "No selected price or selected price is too low."
-msgstr ""
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Preview Language is currently disabled"
-msgstr ""
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language code not provided"
-msgstr ""
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language set to language code: {preview_language_code}"
-msgstr ""
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to the default language code"
-msgstr ""
-
-#: common/djangoapps/dark_lang/views.py
-msgid "Language reset to user's preference: {preview_language_code}"
 msgstr ""
 
 #: common/djangoapps/django_comment_common/models.py
@@ -1652,14 +1627,6 @@ msgid ""
 "There was a problem with the staff answer to this problem: empty boundary."
 msgstr ""
 
-#: cms/templates/widgets/problem-edit.html
-msgid "Text Input"
-msgstr "텍스트 입력"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "error"
-msgstr ""
-
 #. Translators: this is the last choice of a number of choices of how to log
 #. in
 #. to the site.
@@ -1669,6 +1636,14 @@ msgstr ""
 #: themes/stanford-style/lms/templates/register-form.html
 msgid "or"
 msgstr "혹은"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Text Input"
+msgstr "텍스트 입력"
+
+#: common/lib/capa/capa/responsetypes.py
+msgid "error"
+msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Custom Evaluated Script"
@@ -1993,7 +1968,6 @@ msgid ""
 "contact moocsupport@mathworks.com"
 msgstr ""
 
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/help_modal.html lms/templates/manage_user_standing.html
 #: lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
@@ -3010,6 +2984,16 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Raw"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid "Hide Page From Learners"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/html_module.py
+msgid ""
+"If you select this option, only course team members with the Staff or Admin "
+"role see this page."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/html_module.py
@@ -7786,6 +7770,37 @@ msgstr ""
 msgid "Skip to main content"
 msgstr "본문 영역으로 바로가기"
 
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Authorize"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"The above application requests the following permissions from your account:"
+msgstr ""
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid ""
+"Please click the 'Allow' button to grant these permissions to the above "
+"application. Otherwise, to withhold these permissions, please click the "
+"'Cancel' button."
+msgstr ""
+
+#: cms/templates/course-create-rerun.html cms/templates/index.html
+#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
+#: lms/templates/modal/accessible_confirm.html
+msgid "Cancel"
+msgstr "취소"
+
+#: lms/templates/oauth2_provider/authorize.html
+msgid "Allow"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+#: lms/templates/ccx/schedule.html
+msgid "Error"
+msgstr "오류"
+
 #: lms/templates/registration/password_reset_email.html
 #, python-format
 msgid ""
@@ -8353,6 +8368,12 @@ msgid ""
 "value greater than 0."
 msgstr ""
 
+#: openedx/core/djangoapps/cors_csrf/models.py
+msgid ""
+"List of domains that are allowed to make cross-domain requests to this site."
+"  Please list each domain on its own line."
+msgstr ""
+
 #: openedx/core/djangoapps/course_groups/cohorts.py
 msgid "Default Group"
 msgstr ""
@@ -8502,6 +8523,26 @@ msgstr ""
 
 #: openedx/core/djangoapps/credit/models.py
 msgid "Deadline for purchasing and requesting credit."
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Preview Language is currently disabled"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language code not provided"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language set to language code: {preview_language_code}"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to the default language code"
+msgstr ""
+
+#: openedx/core/djangoapps/dark_lang/views.py
+msgid "Language reset to user's preference: {preview_language_code}"
 msgstr ""
 
 #: openedx/core/djangoapps/external_auth/views.py
@@ -9355,12 +9396,6 @@ msgid "Settings"
 msgstr "설정"
 
 #: cms/templates/course-create-rerun.html cms/templates/index.html
-#: cms/templates/manage_users.html cms/templates/manage_users_lib.html
-#: lms/templates/modal/accessible_confirm.html
-msgid "Cancel"
-msgstr "취소"
-
-#: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Course Number"
 msgstr "강좌 번호"
@@ -9490,13 +9525,11 @@ msgid "View"
 msgstr "보기"
 
 #: cms/templates/darklang/preview_lang.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/darklang/preview_lang.html
 msgid "Preview Language Setting"
 msgstr ""
 
 #: cms/templates/maintenance/_force_publish_course.html
-#: common/templates/darklang/preview_lang_include.html
 #: lms/templates/problem.html lms/templates/shoppingcart/shopping_cart.html
 msgid "Reset"
 msgstr "초기화"
@@ -9635,18 +9668,6 @@ msgstr "Creative Commons 저작물인 콘텐츠로 다음의 조건을 따릅니
 msgid "Some Rights Reserved"
 msgstr "일부 저작권 보호"
 
-#: common/templates/darklang/preview_lang_include.html
-msgid "Language Code"
-msgstr ""
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "For example use en for English"
-msgstr ""
-
-#: common/templates/darklang/preview_lang_include.html
-msgid "Please refresh the page to see the changes applied."
-msgstr ""
-
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -9657,7 +9678,6 @@ msgid "Discussions"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/templates/discussion/_discussion_inline.html
 msgid "Add a Post"
 msgstr ""
 
@@ -10919,11 +10939,6 @@ msgstr "다음"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
 msgstr "최신 git 로드 수행 {course_id}"
-
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-#: lms/templates/ccx/schedule.html
-msgid "Error"
-msgstr "오류"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
@@ -13141,6 +13156,10 @@ msgstr "선택한 {provider_name} 계정은 이미 다른 {platform_name} 계정
 #: lms/templates/debug/run_python_form.html
 msgid "Results:"
 msgstr "결과"
+
+#: lms/templates/discussion/_discussion_inline.html
+msgid "Topic:"
+msgstr ""
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"

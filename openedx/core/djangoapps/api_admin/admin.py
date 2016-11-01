@@ -14,14 +14,18 @@ class ApiAccessRequestAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     search_fields = ('user__email',)
     raw_id_fields = ('user',)
-    readonly_fields = ('user', 'website', 'reason', 'company_name', 'company_address', 'contacted', )
+    readonly_fields = ('user', 'email_address', 'website', 'reason', 'company_name', 'company_address', 'contacted',)
     exclude = ('site',)
+
+    def email_address(self, obj):
+        """User email requesting for API Access."""
+        return obj.user.email
 
     def get_fieldsets(self, request, obj=None):
         return (
             (None, {
                 'fields': (
-                    'user', 'website', 'reason', 'company_name', 'company_address',
+                    'user', 'email_address', 'website', 'reason', 'company_name', 'company_address',
                 )
             },),
             ('Status', {

@@ -7,7 +7,7 @@
     ))
 %>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
-    <fieldset ${HTML(describedby_html)}>
+    <fieldset ${describedby_html}>
       % if response_data['label']:
         <legend id="${id}-legend" class="response-fieldset-legend field-group-hd">${response_data['label']}</legend>
       % endif
@@ -37,7 +37,7 @@
                     % endif
                 % endif
                 class="${label_class}"
-                ${HTML(describedby_html)}
+                ${describedby_html}
                 >
                 <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" class="field-input input-${input_type}" value="${choice_id}"
                 ## If the student selected this choice...
@@ -49,8 +49,8 @@
                 /> ${HTML(choice_label)}
 
                 % if is_radio_input(choice_id):
-                  % if status in ('correct', 'partially-correct', 'incorrect') and not show_correctness == 'never':
-                    <span class="sr status" id="${id}-${choice_id}-labeltext">${status.display_name}</span>
+                  % if not show_correctness == 'never' and status.classname != 'unanswered':
+                    <%include file="status_span.html" args="status=status, status_id=id"/>
                   % endif
                 % endif
             </label>
@@ -59,10 +59,12 @@
         <span id="answer_${id}"></span>
     </fieldset>
     <div class="indicator-container">
-        % if input_type == 'checkbox' or not value:
-            <span class="status ${status.classname if show_correctness != 'never' else 'unanswered'}" id="status_${id}" aria-describedby="${id}-legend" data-tooltip="${status.display_tooltip}">
-                <span class="sr">${status.display_tooltip}</span>
-            </span>
+        % if input_type == 'checkbox' or status.classname == 'unanswered':
+          % if show_correctness != 'never':
+            <%include file="status_span.html" args="status=status, status_id=id"/>
+          % else:
+            <%include file="status_span.html" args="status=status, status_id=id, hide_correctness=True"/>
+          % endif
         % endif
     </div>
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):
