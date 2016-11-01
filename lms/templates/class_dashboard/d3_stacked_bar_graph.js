@@ -439,6 +439,12 @@ edx_d3CreateStackedBarGraph = function(parameters, svg, divTooltip) {
       .attr("transform","rotate(-90)")
       .style("text-anchor","end")
       .text(gettext("Number of Students"));
+    
+    graph.svgGroup.xAxis
+      .on("mouseover", function() {
+    	d3.select(this).style("cursor", "pointer");
+    });
+    
   };
 
   return graph;
