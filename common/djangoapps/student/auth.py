@@ -20,6 +20,18 @@ STUDIO_VIEW_CONTENT = 1
 # In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself
 
 
+def is_ccx_course(course_key):
+    """
+    Check whether the course locator maps to a CCX course; this is important
+    because we don't allow access to CCX courses in Studio.
+    """
+    ccx_namespaces = (
+        'ccx-v1',
+        'ccx-block-v1',
+    )
+    return course_key.CANONICAL_NAMESPACE in ccx_namespaces
+
+
 def user_has_role(user, role):
     """
     Check whether this user has access to this role (either direct or implied)
@@ -61,6 +73,9 @@ def get_user_permissions(user, course_key, org=None):
     else:
         assert course_key is None
     all_perms = STUDIO_EDIT_ROLES | STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
+    # No one has studio permissions for CCX courses
+    if is_ccx_course(course_key):
+        return 0
     # global staff, org instructors, and course instructors have all permissions:
     if GlobalStaff().has_user(user) or OrgInstructorRole(org=org).has_user(user):
         return all_perms
