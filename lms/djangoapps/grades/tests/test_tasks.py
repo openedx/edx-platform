@@ -179,7 +179,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.set_up_course(enable_subsection_grades=False)
             self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             additional_queries = 1 if default_store == ModuleStoreEnum.Type.mongo else 0
-            with check_mongo_calls(2) and self.assertNumQueries(16 + additional_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(5):
                 recalculate_subsection_grade.apply(args=tuple(self.score_changed_kwargs.values()))
 
     @skip("Pending completion of TNL-5089")

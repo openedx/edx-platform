@@ -13,6 +13,7 @@ from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.content.block_structure.api import get_course_in_cache
 from xmodule.modulestore.django import modulestore
 
+from .config.models import PersistentGradesEnabledFlag
 from .new.course_grade import CourseGradeFactory
 from .new.subsection_grade import SubsectionGradeFactory
 from .signals.signals import SUBSECTION_SCORE_CHANGED
@@ -76,6 +77,8 @@ def recalculate_course_grade(user_id, course_id):
        - user_id: serialized id of applicable User object
        - course_id: Unicode string representing the course
     """
+    if not PersistentGradesEnabledFlag.feature_enabled(course_id):
+        return
     student = User.objects.get(id=user_id)
     course_key = CourseLocator.from_string(course_id)
     course = modulestore().get_course(course_key, depth=0)
