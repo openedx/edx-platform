@@ -251,12 +251,6 @@ class StudioEditModuleRuntime(object):
                 return StudioPermissionsService(self._user)
         return None
 
-    def local_resource_url(self, *args, **kwargs):
-        """
-        Return URL of XBlock local resource.
-        """
-        return xblock_local_resource_url(*args, **kwargs)
-
 
 @require_http_methods(("GET"))
 @login_required
