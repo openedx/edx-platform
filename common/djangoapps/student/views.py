@@ -64,6 +64,7 @@ from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
     has_html_certificates_enabled,
 )
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
@@ -401,14 +402,17 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     cert_status['download_url']
                 )
 
-    if status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'):
-        if 'grade' not in cert_status:
+    if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
+        persisted_grade = CourseGradeFactory(user).get_persisted(course_overview)
+        if persisted_grade is not None:
+            status_dict['grade'] = unicode(persisted_grade.percent)
+        elif 'grade' in cert_status:
+            status_dict['grade'] = cert_status['grade']
+        else:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
-        else:
-            status_dict['grade'] = cert_status['grade']
 
     return status_dict
 
