@@ -100,13 +100,20 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
     """
     weight = _get_weight_from_block(persisted_block, block)
 
+    last_answer_timestamp = None
+
     # Priority order for retrieving the scores:
     # submissions API -> CSM -> grades persisted block -> latest block content
-    raw_earned, raw_possible, weighted_earned, weighted_possible = (
-        _get_score_from_submissions(submissions_scores, block) or
-        _get_score_from_csm(csm_scores, block, weight) or
-        _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
-    )
+    data = _get_score_from_submissions(submissions_scores, block)
+    if data:
+        raw_earned, raw_possible, weighted_earned, weighted_possible = data
+    else:
+        data = _get_score_from_csm(csm_scores, block, weight)
+        if data:
+            raw_earned, raw_possible, weighted_earned, weighted_possible, last_answer_timestamp = data
+        else:
+            data = _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
+            raw_earned, raw_possible, weighted_earned, weighted_possible = data
 
     if weighted_possible is None or weighted_earned is None:
         return None
@@ -124,6 +131,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
             graded,
             display_name=display_name_with_default_escaped(block),
             module_id=block.location,
+            last_answer_timestamp=last_answer_timestamp
         )
 
 
@@ -177,7 +185,8 @@ def _get_score_from_csm(csm_scores, block, weight):
     if has_valid_score:
         raw_earned = score.correct if score.correct is not None else 0.0
         raw_possible = score.total
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight)
+        last_timestamp = score.modified
+        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (last_timestamp,)
 
 
 def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
