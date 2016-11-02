@@ -6,12 +6,12 @@
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop.git@92ee2055a16899090a073e1df81e35d5293ad767#egg=xblock-drag-and-drop
 -e git+https://github.com/edx-solutions/xblock-drag-and-drop-v2.git@7b054467159fd2cbe2e0adccf9a0665d36a2a197#egg=xblock-drag-and-drop-v2
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@42a65052beaa9e99ce9cf13001ad23905c1551cf#egg=xblock-ooyala
--e git+https://github.com/edx-solutions/xblock-group-project.git@6b3393a1a5eb76224ecd3311e870ab8adf4badbf#egg=xblock-group-project
+-e git+https://github.com/edx-solutions/xblock-group-project.git@6a68ea09478e49e796ee4c0a985018ec4257b7d7#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@7bdeb62b1055377dc04a7b503f7eea8264f5847b#egg=xblock-adventure
 -e git+https://github.com/open-craft/xblock-poll.git@bd93e4851c15d9cb1522e692f8b692cf584d23b1#egg=xblock-poll
 -e git+https://github.com/edx/edx-notifications.git@261b507e0e6b2130286e5a34b9010a419aaa8e3f#egg=edx-notifications
 -e git+https://github.com/open-craft/problem-builder.git@527671f1c2b1f0e6a1f815c14740c494ce623aa5#egg=problem-builder
--e git+https://github.com/open-craft/xblock-group-project-v2.git@bf09c7e91089d4323655071cb5ab9cd65a4b4f0a#egg=xblock-group-project-v2
+-e git+https://github.com/open-craft/xblock-group-project-v2.git@5140bc71f3e8da10839d96de6b31e9e27c80e7c6#egg=xblock-group-project-v2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
 # git+https://github.com/edx-solutions/api-integration.git@v1.0.6#egg=api-integration==1.0.6
