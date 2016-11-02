@@ -14,10 +14,10 @@ from mock import patch
 import pytz
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.tests.helpers import get_request_for_user
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -70,7 +70,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(GradeTestBase, self).setUp()
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
@@ -321,7 +321,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
-        self.request = get_request_for_user(self.student)
+        self.request = get_mock_request(self.student)
         self.course_structure = get_course_blocks(self.student, self.course.location)
 
     @classmethod
@@ -411,7 +411,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
               </optionresponse>
             </problem>
         '''
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
         course_structure = get_course_blocks(self.request.user, self.course.location)
@@ -549,7 +549,7 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
             display_name="test_problem_3",
             data=problem_xml
         )
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)

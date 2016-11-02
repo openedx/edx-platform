@@ -10,12 +10,8 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.model_data import set_score
-from courseware.tests.helpers import (
-    LoginEnrollmentTestCase,
-    get_request_for_user
-)
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.block_metadata_utils import display_name_with_default_escaped
@@ -184,7 +180,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
     def setUp(self):
         super(TestWeightedProblems, self).setUp()
         self.user = UserFactory()
-        self.request = get_request_for_user(self.user)
+        self.request = get_mock_request(self.user)
 
     def _verify_grades(self, raw_earned, raw_possible, weight, expected_score):
         """
@@ -286,7 +282,7 @@ class TestScoreForModule(SharedModuleStoreTestCase):
         cls.m = ItemFactory.create(parent=cls.f, category="html", display_name="m")
         cls.n = ItemFactory.create(parent=cls.g, category="problem", display_name="n")
 
-        cls.request = get_request_for_user(UserFactory())
+        cls.request = get_mock_request(UserFactory())
         CourseEnrollment.enroll(cls.request.user, cls.course.id)
 
         answer_problem(cls.course, cls.request, cls.h, score=2, max_value=5)

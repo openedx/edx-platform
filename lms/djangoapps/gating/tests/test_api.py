@@ -8,11 +8,11 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from lms.djangoapps.courseware.access import has_access
-from lms.djangoapps.courseware.tests.helpers import get_request_for_user
 from lms.djangoapps.grades.tests.utils import answer_problem
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from milestones import api as milestones_api
 from milestones.tests.utils import MilestonesTestCaseMixin
+from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.gating import api as gating_api
 from request_cache.middleware import RequestCache
 
@@ -172,7 +172,7 @@ class TestGatedContent(GatingTestCase, MilestonesTestCaseMixin):
         self.assertEquals(course_grade.percent, expected_percent)
 
     def test_gated_content_always_in_grades(self):
-        request = get_request_for_user(self.non_staff_user)
+        request = get_mock_request(self.non_staff_user)
 
         # start with a grade from a non-gated subsection
         answer_problem(self.course, request, self.prob3, 10, 10)
@@ -201,7 +201,7 @@ class TestHandleSubsectionGradeUpdates(GatingTestCase, MilestonesTestCaseMixin):
     def setUp(self):
         super(TestHandleSubsectionGradeUpdates, self).setUp()
         self.user, _ = self.create_non_staff_user()  # run tests for a non-staff user
-        self.request = get_request_for_user(self.user)
+        self.request = get_mock_request(self.user)
 
     def test_signal_handler_called(self):
         with patch('lms.djangoapps.gating.signals.gating_api.evaluate_prerequisite') as mock_handler:

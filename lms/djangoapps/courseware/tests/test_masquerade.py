@@ -20,8 +20,8 @@ from courseware.masquerade import (
     get_masquerading_group_info
 )
 from courseware.tests.factories import StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
+from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
 from xmodule.modulestore.django import modulestore
@@ -111,7 +111,7 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         Returns a mock JSON request for the specified user
         """
-        request = get_request_for_user(user)
+        request = get_mock_request(user)
         request.method = method
         request.META = {'CONTENT_TYPE': ['application/json']}
         request.body = body

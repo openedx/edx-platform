@@ -19,10 +19,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
 
 from ..middleware import SafeSessionMiddleware, SafeCookieData
-from .test_utils import TestSafeSessionsLogMixin, 
-
-
-create_mock_request = get_mock_request
+from .test_utils import TestSafeSessionsLogMixin,
 
 
 @attr(shard=2)
@@ -33,7 +30,7 @@ class TestSafeSessionProcessRequest(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionProcessRequest, self).setUp()
         self.user = UserFactory.create()
-        self.request = create_mock_request()
+        self.request = get_mock_request()
 
     def assert_response(self, safe_cookie_data=None, success=True):
         """
@@ -135,7 +132,7 @@ class TestSafeSessionProcessResponse(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionProcessResponse, self).setUp()
         self.user = UserFactory.create()
-        self.request = create_mock_request()
+        self.request = get_mock_request()
         self.request.session = {}
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
@@ -239,7 +236,7 @@ class TestSafeSessionMiddleware(TestSafeSessionsLogMixin, TestCase):
     def setUp(self):
         super(TestSafeSessionMiddleware, self).setUp()
         self.user = UserFactory.create()
-        self.request = create_mock_request()
+        self.request = get_mock_request()
         self.client.response = HttpResponse()
         self.client.response.cookies = SimpleCookie()
 

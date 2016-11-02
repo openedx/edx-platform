@@ -16,9 +16,6 @@ from student.models import Registration
 from openedx.core.djangolib.testing.utils import get_mock_request
 
 
-get_request_for_user = get_mock_request
-
-
 class LoginEnrollmentTestCase(TestCase):
     """
     Provides support for user creation,
