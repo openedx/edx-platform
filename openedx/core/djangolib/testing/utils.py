@@ -10,9 +10,11 @@ Utility classes for testing django applications.
 
 import copy
 
+import crum
 from django import db
+from django.contrib.auth.models import AnonymousUser
 from django.core.cache import caches
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.conf import settings
 from django.contrib import sites
 
@@ -158,3 +160,19 @@ class NoseDatabaseIsolation(Plugin):
         """
         for db_ in db.connections.all():
             db_.close()
+
+def get_mock_request(user=None):
+    """
+    Create a request object for the user, if specified.
+    """
+    request = RequestFactory().get('/')
+    if user is not None:
+        request.user = user
+    else:
+        request.user = AnonymousUser()
+    request.COOKIES = {}
+    request.META = {}
+    request.is_secure = lambda: True
+    request.get_host = lambda: "edx.org"
+    crum.set_current_request(request)
+    return request

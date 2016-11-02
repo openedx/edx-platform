@@ -14,21 +14,15 @@ from django.test.utils import override_settings
 from mock import patch
 from nose.plugins.attrib import attr
 
+from openedx.core.djangolib.testing.utils import get_mock_request
+
 from student.tests.factories import UserFactory
 
 from ..middleware import SafeSessionMiddleware, SafeCookieData
-from .test_utils import TestSafeSessionsLogMixin
+from .test_utils import TestSafeSessionsLogMixin, 
 
 
-def create_mock_request():
-    """
-    Creates and returns a mock request object for testing.
-    """
-    request = RequestFactory()
-    request.COOKIES = {}
-    request.META = {}
-    request.path = '/'
-    return request
+create_mock_request = get_mock_request
 
 
 @attr(shard=2)

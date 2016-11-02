@@ -13,20 +13,10 @@ from courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import Registration
 
+from openedx.core.djangolib.testing.utils import get_mock_request
 
-def get_request_for_user(user):
-    """Create a request object for user."""
-    request = RequestFactory()
-    request.user = user
-    request.COOKIES = {}
-    request.META = {}
-    request.is_secure = lambda: True
-    request.get_host = lambda: "edx.org"
-    request.method = 'GET'
-    request.GET = {}
-    request.POST = {}
-    crum.set_current_request(request)
-    return request
+
+get_request_for_user = get_mock_request
 
 
 class LoginEnrollmentTestCase(TestCase):
