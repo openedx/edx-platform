@@ -444,7 +444,9 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     def _test_course_about_property_index(self, store):
         """ Test that informational properties in the course object end up in the course_info index """
         display_name = "Help, I need somebody!"
+        display_organization = "HogwartsX"
         self.course.display_name = display_name
+        self.course.display_organization = display_organization
         self.update_item(store, self.course)
         self.reindex_course(store)
         response = self.searcher.search(
@@ -453,6 +455,7 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
         )
         self.assertEqual(response["total"], 1)
         self.assertEqual(response["results"][0]["data"]["content"]["display_name"], display_name)
+        self.assertEqual(response["results"][0]["data"]["content"]["display_organization"], display_organization)
 
     def _test_course_about_store_index(self, store):
         """ Test that informational properties in the about store end up in the course_info index """
