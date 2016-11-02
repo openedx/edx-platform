@@ -363,7 +363,8 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
             session=self.session
         )
         response = handle_ajax(request, unicode(self.course.id))
-        self.assertEquals(response.status_code, 200)
+        # pylint has issues analyzing this class (maybe due to circular imports?)
+        self.assertEquals(response.status_code, 200)  # pylint: disable=no-member
 
         # Now setup the masquerade for the test user
         setup_masquerade(request, self.course.id, True)
