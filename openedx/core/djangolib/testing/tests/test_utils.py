@@ -11,7 +11,10 @@ from ..utils import get_mock_request
 USER_MODEL = get_user_model()
 
 
-class TestGetRequestForUser(TestCase):
+class TestGetMockRequest(TestCase):
+    """
+    Validate the behavior of get_mock_request
+    """
     def test_mock_request_is_request(self):
         request = get_mock_request(USER_MODEL())
         self.assertIsInstance(request, HttpRequest)

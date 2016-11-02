@@ -161,6 +161,7 @@ class NoseDatabaseIsolation(Plugin):
         for db_ in db.connections.all():
             db_.close()
 
+
 def get_mock_request(user=None):
     """
     Create a request object for the user, if specified.

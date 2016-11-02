@@ -19,7 +19,7 @@ from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
 
 from ..middleware import SafeSessionMiddleware, SafeCookieData
-from .test_utils import TestSafeSessionsLogMixin,
+from .test_utils import TestSafeSessionsLogMixin
 
 
 @attr(shard=2)
