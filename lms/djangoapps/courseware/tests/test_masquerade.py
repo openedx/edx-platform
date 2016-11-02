@@ -20,6 +20,7 @@ from courseware.masquerade import (
     get_masquerading_group_info
 )
 from courseware.tests.factories import StaffFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
