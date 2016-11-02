@@ -359,13 +359,15 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         }
         request = self._create_mock_json_request(
             self.test_user,
-            body=json.dumps(request_json),
+            data=request_json,
             session=self.session
         )
-        handle_ajax(request, unicode(self.course.id))
+        response = handle_ajax(request, unicode(self.course.id))
+        # pylint has issues analyzing this class (maybe due to circular imports?)
+        self.assertEquals(response.status_code, 200)  # pylint: disable=no-member
 
         # Now setup the masquerade for the test user
-        setup_masquerade(request, self.test_user, True)
+        setup_masquerade(request, self.course.id, True)
         scheme = self.user_partition.scheme
         self.assertEqual(
             scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),

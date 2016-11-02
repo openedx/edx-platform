@@ -19,6 +19,7 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware.model_data import StudentModule
 from courseware.tests.tests import LoginEnrollmentTestCase
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.url_utils import quote_slashes
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -45,7 +46,7 @@ OPTION_1 = 'Option 1'
 OPTION_2 = 'Option 2'
 
 
-class InstructorTaskTestCase(TestCase):
+class InstructorTaskTestCase(CacheIsolationTestCase):
     """
     Tests API and view methods that involve the reporting of status for background tasks.
     """
