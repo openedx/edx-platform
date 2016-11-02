@@ -1,0 +1,260 @@
+<%page expression_filter="h"/>
+<%inherit file="main.html" />
+<%def name="online_help_token()"><% return "learnerdashboard" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.template import RequestContext
+import third_party_auth
+from third_party_auth import pipeline
+from django.core.urlresolvers import reverse
+import json
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangoapps.theming import helpers as theming_helpers
+%>
+
+<%
+  cert_name_short = settings.CERT_NAME_SHORT
+  cert_name_long = settings.CERT_NAME_LONG
+%>
+
+
+<%block name="pagetitle">${_("Dashboard")}</%block>
+<%block name="bodyclass">view-dashboard is-authenticated</%block>
+
+<%block name="header_extras">
+% for template_name in ["donation"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="dashboard/${template_name}.underscore" />
+</script>
+% endfor
+
+% for template_name in ["dashboard_search_item", "dashboard_search_results", "search_loading", "search_error"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="search/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="js_extra">
+  <script src="${static.url('js/commerce/credit.js')}"></script>
+  <%static:js group='dashboard'/>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      edx.dashboard.legacy.init({
+        dashboard: "${reverse('dashboard') | n, js_escaped_string}",
+        signInUser: "${reverse('signin_user') | n, js_escaped_string}",
+        changeEmailSettings: "${reverse('change_email_settings') | n, js_escaped_string}"
+      });
+    });
+  </script>
+  % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+    <%static:require_module module_name="js/search/dashboard/dashboard_search_factory" class_name="DashboardSearchFactory">
+        DashboardSearchFactory();
+    </%static:require_module>
+  % endif
+  % if redirect_message:
+    <%static:require_module module_name="js/views/message_banner" class_name="MessageBannerView">
+        var banner = new MessageBannerView({urgency: 'low', type: 'warning'});
+        $('#content').prepend(banner.$el);
+        banner.showMessage(${redirect_message | n, dump_js_escaped_json})
+    </%static:require_module>
+  % endif
+</%block>
+
+<div class="dashboard-notifications" tabindex="-1">
+    %if message:
+        <section class="dashboard-banner">
+            ${message | n, decode.utf8}
+        </section>
+    %endif
+
+    %if enrollment_message:
+        <section class="dashboard-banner">
+            ${enrollment_message | n, decode.utf8}
+        </section>
+    %endif
+</div>
+
+<section class="container dashboard" id="dashboard-main">
+<main id="main" aria-label="Content" tabindex="-1">
+  <section class="my-courses" id="my-courses">
+    <header class="wrapper-header-courses">
+      <h2 class="header-courses">${_("My Courses")}</h2>
+    </header>
+
+
+    % if len(course_enrollments) > 0:
+      <ul class="listing-courses">
+      <% share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {}) %>
+      % for dashboard_index, enrollment in enumerate(course_enrollments):
+        <% show_courseware_link = (enrollment.course_id in show_courseware_links_for) %>
+        <% cert_status = cert_statuses.get(enrollment.course_id) %>
+        <% can_unenroll = (not cert_status) or cert_status.get('can_unenroll') %>
+        <% credit_status = credit_statuses.get(enrollment.course_id) %>
+        <% show_email_settings = (enrollment.course_id in show_email_settings_for) %>
+        <% course_mode_info = all_course_modes.get(enrollment.course_id) %>
+        <% show_refund_option = (enrollment.course_id in show_refund_option_for) %>
+        <% is_paid_course = (enrollment.course_id in enrolled_courses_either_paid) %>
+        <% is_course_blocked = (enrollment.course_id in block_courses) %>
+        <% course_verification_status = verification_status_by_course.get(enrollment.course_id, {}) %>
+        <% course_requirements = courses_requirements_not_met.get(enrollment.course_id) %>
+        <% related_programs = programs_by_run.get(unicode(enrollment.course_id)) %>
+        <%include file = 'dashboard/_dashboard_course_listing.html' args="course_overview=enrollment.course_overview, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, can_unenroll=can_unenroll, credit_status=credit_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, show_refund_option=show_refund_option, is_paid_course=is_paid_course, is_course_blocked=is_course_blocked, verification_status=course_verification_status, course_requirements=course_requirements, dashboard_index=dashboard_index, share_settings=share_settings, user=user, related_programs=related_programs" />
+      % endfor
+
+      </ul>
+    % else:
+      <section class="empty-dashboard-message">
+        <p>${_("You are not enrolled in any courses yet.")}</p>
+
+        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+          <a href="${marketing_link('COURSES')}">
+            ${_("Explore courses")}
+          </a>
+        %endif
+      </section>
+    % endif
+
+    % if staff_access and len(errored_courses) > 0:
+      <div id="course-errors">
+        <h2>${_("Course-loading errors")}</h2>
+
+      % for course_dir, errors in errored_courses.items():
+         <h3>${course_dir}</h3>
+             <ul>
+           % for (msg, err) in errors:
+               <li>${msg}
+                 <ul><li><pre>${err}</pre></li></ul>
+               </li>
+           % endfor
+             </ul>
+      % endfor
+      </div>
+    % endif
+  </section>
+</main>
+
+  % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+    <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
+      <form>
+        <label for="dashboard-search-input">${_('Search Your Courses')}</label>
+        <div class="search-field-wrapper">
+          <input id="dashboard-search-input" type="text" class="search-field"/>
+          <button type="submit" class="search-button" title="${_('Search')}">
+            <span class="icon fa fa-search" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="cancel-button" title="${_('Clear search')}">
+            <span class="icon fa fa-remove" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  % endif
+
+  % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
+    <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
+  % endif
+
+  % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
+      <div class="wrapper-find-courses">
+          <div class="course-advertise">
+              <div class="advertise-message">
+                  ${_("Browse recently launched courses and see what's new in your favorite subjects.")}
+              </div>
+              <div class="ad-link">
+                  <a class="btn-neutral" href="${marketing_link('COURSES')}">
+                      <span class="icon fa fa-search" aria-hidden="true"></span>
+                      ${_("Explore New Courses")}
+                  </a>
+              </div>
+          </div>
+      </div>
+  % endif
+
+  <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
+    <header class="profile">
+      <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
+    </header>
+    <section class="user-info">
+      <ul>
+
+        % if len(order_history_list):
+        <li class="order-history">
+          <span class="title">${_("Order History")}</span>
+          % for order_history_item in order_history_list:
+            <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
+          % endfor
+        </li>
+        % endif
+
+        <%include file="${theming_helpers.get_template_path('dashboard/_dashboard_status_verification.html')}" />
+
+      </ul>
+    </section>
+  </section>
+</section>
+
+<section id="email-settings-modal" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="email-settings-title">
+    <button class="close-modal">
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_("Close")}
+      </span>
+    </button>
+
+    <header>
+      <h2 id="email-settings-title">
+        ${Text(_("Email Settings for {course_number}")).format(course_number=HTML('<span id="email_settings_course_number"></span>'))}
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("window open")}
+        </span>
+      </h2>
+      <hr/>
+    </header>
+
+    <form id="email_settings_form" method="post">
+      <input name="course_id" id="email_settings_course_id" type="hidden" />
+      <label>${_("Receive course emails")} <input type="checkbox" id="receive_emails" name="receive_emails" /></label>
+      <div class="submit">
+        <input type="submit" id="submit" value="${_("Save Settings")}" />
+      </div>
+    </form>
+  </div>
+</section>
+
+<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="unenrollment-modal-title">
+    <button class="close-modal">
+      <span class="icon fa fa-remove" aria-hidden="true"></span>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_("Close")}
+      </span>
+    </button>
+
+    <header>
+      <h2 id="unenrollment-modal-title">
+        <span id='track-info'></span>
+        <span id='refund-info'></span>
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("window open")}
+        </span>
+      </h2>
+      <hr/>
+    </header>
+    <div id="unenroll_error" class="modal-form-error"></div>
+    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <input name="course_id" id="unenroll_course_id" type="hidden" />
+      <input name="enrollment_action" type="hidden" value="unenroll" />
+      <div class="submit">
+        <input name="submit" type="submit" value="${_("Unenroll")}" />
+      </div>
+    </form>
+  </div>
+</section>

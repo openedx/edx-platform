@@ -1,0 +1,8 @@
+<course org="edX" course="pure_xblock" url_name="2012_Fall">
+    <pure field1="a.field1" url_name="pure0">
+        <vertical url_name="vert0">
+            <pure field2="10" url_name="pure1"/>
+            <pure field2="20" url_name="pure2"/>
+        </vertical>
+    </pure>
+</course>

@@ -1,0 +1,27 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+% for course_msg in course_enrollment_messages:
+    <div class="wrapper-msg urgency-high">
+        <div class="msg has-actions">
+            <div class="msg-content donate-content">
+                <h2 class="sr">${_("Enrollment Successful")}</h2>
+                <div class="copy">
+                    <p>${_("Thank you for enrolling in {enrolled_course}. We hope you enjoy the course.").format(enrolled_course=course_msg["course_name"])}</p>
+                    % if course_msg["allow_donation"]:
+                        <p>
+                            ${_("{platform_name} is a nonprofit bringing high-quality education to everyone, everywhere. "
+                                "Your help allows us to continuously improve the learning experience for millions and "
+                                "make a better future one learner at a time.").format(platform_name=platform_name)}
+                        </p>
+                    % endif
+                </div>
+            </div>
+            % if course_msg["allow_donation"]:
+                <div class="nav-actions donate-actions">
+                    <h3 class="sr">${_('Donation Actions')}</h3>
+                    <div class="donate-container" data-course="${ course_msg['course_id'] }"></div>
+                </div>
+            % endif
+        </div>
+    </div>
+% endfor

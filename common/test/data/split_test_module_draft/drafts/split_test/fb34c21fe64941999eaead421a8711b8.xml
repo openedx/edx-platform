@@ -1,0 +1,4 @@
+<split_test group_id_to_child="{&quot;1&quot;: &quot;i4x://foo/1111/vertical/0faf29473cf1497baa33fcc828b179cd&quot;, &quot;0&quot;: &quot;i4x://foo/1111/vertical/9f0941d021414798836ef140fb5f6841&quot;}" user_partition_id="0">
+  <vertical url_name="9f0941d021414798836ef140fb5f6841"/>
+  <vertical url_name="0faf29473cf1497baa33fcc828b179cd"/>
+</split_test>

@@ -1,0 +1,280 @@
+<%namespace name='static' file='/static_content.html'/>
+<%page args="section_data"/>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.courses import get_studio_url
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+%>
+<script type="text/template" id="member-list-widget-template">
+  <div class="member-list-widget">
+    <div class="header">
+      <div class="title"> {{title}} </div>
+    </div>
+    <div class="info"> {{info}} </div>
+    <div class="member-list">
+      <table>
+        <thead>
+          <tr>
+            {{#labels}}
+              <th class="label" scope="column">{{.}}</th>
+            {{/labels}}
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="bottom-bar">
+      <label>
+          <span class="label-text sr">{{add_placeholder}}</span>
+          <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
+      </label>
+      <input type="button" name="add" class="add" value="{{add_btn_label}}">
+    </div>
+  </div>
+</script>
+
+<fieldset class="batch-enrollment membership-section">
+    <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
+    <label>
+        ${_("Enter email addresses and/or usernames separated by new lines or commas.")}
+        ${_("You will not get notification for emails that bounce, so please double-check spelling.")}
+        <textarea rows="6" name="student-ids" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
+    </label>
+    <input type="hidden" id="is_course_white_label" value="${section_data['is_white_label']}">
+    % if section_data['is_white_label']:
+        <label>
+            ${_("Enter the reason why the students are to be manually enrolled or unenrolled.")}
+            ${_("This cannot be left blank and will be recorded and presented in Enrollment Reports.")}
+            ${_("Therefore, please give enough detail to account for this action.")}
+            <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
+        </label>
+    %endif
+    <div class="enroll-option">
+        <label class="has-hint">
+            <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="heading-batch-enrollment">
+            <span class="label-text">${_("Auto Enroll")}</span>
+            <div class="hint auto-enroll-hint">
+                <span class="hint-caret"></span>
+                <p id="auto-enroll-tip">
+                    ${_("If this option is <em>checked</em>, users who have not yet registered for {platform_name} will be automatically enrolled.").format(platform_name=settings.PLATFORM_NAME)}
+                    ${_("If this option is left <em>unchecked</em>, users who have not yet registered for {platform_name} will not be enrolled, but will be allowed to enroll once they make an account.").format(platform_name=settings.PLATFORM_NAME)}
+                    <br /><br />
+                    ${_("Checking this box has no effect if 'Unenroll' is selected.")}
+                </p>
+            </div>
+        </label>
+    </div>
+    <div class="enroll-option">
+        <label class="has-hint">
+            <input type="checkbox" name="email-students" id="email-students" value="Notify-students-by-email" checked="yes" aria-describedby="heading-batch-enrollment">
+            <span class="label-text">${_("Notify users by email")}</span>
+            <div class="hint email-students-hint">
+                <span class="hint-caret"></span>
+                <p id="email-students-tip">
+                    ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                </p>
+            </div>
+        </label>
+    </div>
+    <div>
+        <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" data-action="enroll" >
+        <input type="button" name="enrollment-button" class="enrollment-button" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" data-action="unenroll" >
+    </div>
+    <div class="request-response"></div>
+    <div class="request-response-error"></div>
+</fieldset>
+
+%if static.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+<hr class="divider" />
+
+  <div class="auto_enroll auto_enroll_csv">
+    <h3 class="hd hd-3">${_("Register/Enroll Students")}</h3>
+    <p>${_("To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.")}</p>
+    <form id="student-auto-enroll-form" method="post" action="${ section_data['upload_student_csv_button_url'] }" enctype="multipart/form-data">
+      <div class="customBrowseBtn">
+        <label for="browseBtn-auto-enroll">${_("Upload a CSV for bulk enrollment")}</label>
+        <span id="browseFile" class="enhanced-input-file"></span>
+        <div class="file-browse btn btn-primary" aria-hidden="true">
+            <span class="browse">${('Browse')}</span>
+            <input class="file_field" id="browseBtn-auto-enroll" name="students_list" type="file" accept=".csv"/>
+        </div>
+      </div>
+      <button type="submit" class="btn-blue" id="submitBtn-auto_enroll_csv" name="enrollment_signup_button">${_("Upload CSV")}</button>
+      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+    </form>
+    <div class="results"></div>
+</div>
+%endif
+
+<hr class="divider" />
+
+%if section_data['access']['instructor']:
+<fieldset class="batch-beta-testers membership-section">
+    <legend id="heading-batch-beta-testers" class="hd hd-3">${_("Batch Beta Tester Addition")}</legend>
+    <label>
+        ${_("Enter email addresses and/or usernames separated by new lines or commas.")}<br/>
+        ${_("Note: Users must have an activated {platform_name} account before they can be enrolled as beta testers.").format(platform_name=settings.PLATFORM_NAME)}
+        <textarea rows="6" cols="50" name="student-ids-for-beta" placeholder="${_("Email Addresses/Usernames")}" spellcheck="false"></textarea>
+    </label>
+    <div class="enroll-option">
+        <label class="has-hint">
+            <input type="checkbox" name="auto-enroll-beta" id="auto-enroll-beta" value="Auto-Enroll" checked="yes" aria-describedby="heading-batch-beta-testers">
+            <span class="label-text">${_("Auto Enroll")}</span>
+            <div class="hint auto-enroll-beta-hint">
+                <span class="hint-caret"></span>
+                <p id="auto-enroll-beta-tip">
+                    ${_("If this option is <em>checked</em>, users who have not enrolled in your course will be automatically enrolled.")}
+                    <br /><br />
+                    ${_("Checking this box has no effect if 'Remove beta testers' is selected.")}
+                </p>
+            </div>
+        </label>
+    </div>
+    <div class="enroll-option">
+        <label class="has-hint">
+            <input type="checkbox" name="email-students-beta" id="email-students-beta" value="Notify-students-by-email" checked="yes" aria-describedby="heading-batch-beta-testers">
+            <span class="label-text">${_("Notify users by email")}</span>
+            <div class="hint email-students-beta-hint">
+                <span class="hint-caret"></span>
+                <p id="email-students-beta-tip">
+                    ${_("If this option is <em>checked</em>, users will receive an email notification.")}
+                </p>
+            </div>
+        </label>
+    </div>
+    <div>
+        <input type="button" name="beta-testers" class="enrollment-button" value="${_("Add beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="add" >
+        <input type="button" name="beta-testers" class="enrollment-button" value="${_("Remove beta testers")}" data-endpoint="${ section_data['modify_beta_testers_button_url'] }" data-action="remove" >
+    </div>
+    <div class="request-response"></div>
+    <div class="request-response-error"></div>
+</fieldset>
+
+<hr class="divider" />
+%endif
+
+<div class="member-lists-management membership-section" aria-live="polite">
+  ## Translators: an "Administration List" is a list, such as Course Staff, that users can be added to.
+  <h3 class="hd hd-3">${_("Course Team Management")}</h3>
+
+  <div class="request-response-error"></div>
+
+  <div class="wrapper-member-select">
+    ## Translators: an "Administrator Group" is a group, such as Course Staff, that users can be added to.
+    <label>${_("Select a course team role:")}
+        <select id="member-lists-selector" class="member-lists-selector">
+          <option> ${_("Getting available lists...")} </option>
+        </select>
+    </label>
+  </div>
+
+
+  %if not section_data['access']['instructor']:
+    <p>
+      ${_("Staff cannot modify these lists. To manage course team membership, "
+      "a course Admin must give you the Admin role to add Staff or Beta Testers, "
+      "or the Discussion Admin role to add discussion moderators and TAs.")}
+    </p>
+  %endif
+
+  %if section_data['access']['instructor']:
+    <div class="auth-list-container"
+      data-rolename="staff"
+      data-display-name="${_("Staff")}"
+      data-info-text="
+        ${_("Course team members with the Staff role help you manage your course. "
+        "Staff can enroll and unenroll learners, as well as modify their grades and "
+        "access all course data. Staff also have access to your course in Studio and "
+        "Insights. You can only give course team roles to enrolled users.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add Staff")}"
+    ></div>
+
+    ## Note that "Admin" is identified as "Instructor" in the Django admin panel.
+    <div class="auth-list-container"
+      data-rolename="instructor"
+      data-display-name="${_("Admin")}"
+      data-info-text="
+        ${_("Course team members with the Admin role help you manage your course. "
+          "They can do all of the tasks that Staff can do, and can also add and "
+          "remove the Staff and Admin roles, discussion moderation roles, and the "
+          "beta tester role to manage course team membership. You can only give "
+          "course team roles to enrolled users.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add Admin")}"
+    >
+    </div>
+
+    <div class="auth-list-container"
+      data-rolename="beta"
+      data-display-name="${_("Beta Testers")}"
+      data-info-text="
+        ${_("Beta Testers can see course content before other learners. "
+        "They can make sure that the content works, but have no additional "
+        "privileges. You can only give course team roles to enrolled users.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add Beta Tester")}"
+    ></div>
+
+    <div class="auth-list-container"
+      data-rolename="Administrator"
+      data-display-name="${_("Discussion Admins")}"
+      data-info-text="
+        ${_("Discussion Admins can edit or delete any post, clear misuse flags, close "
+         "and re-open threads, endorse responses, and see posts from all cohorts. "
+         "Their posts are marked as 'staff'. They can also add and remove the "
+         "discussion moderation roles to manage course team membership. You can "
+         "only give course team roles to enrolled users.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="${_("Add Discussion Admin")}"
+    ></div>
+  %endif
+
+  %if section_data['access']['instructor'] or section_data['access']['forum_admin']:
+    <div class="auth-list-container"
+      data-rolename="Moderator"
+      data-display-name="${_("Discussion Moderators")}"
+      data-info-text="
+        ${_("Discussion Moderators can edit or delete any post, clear misuse flags, close "
+         "and re-open threads, endorse responses, and see posts from all cohorts. "
+         "Their posts are marked as 'staff'. They cannot manage course team membership by "
+         "adding or removing discussion moderation roles. You can only give course team "
+         "roles to enrolled users.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="${_("Add Moderator")}"
+    ></div>
+
+    <div class="auth-list-container"
+      data-rolename="Community TA"
+      data-display-name="${_("Discussion Community TAs")}"
+      data-info-text="
+        ${_("Community TA's are members of the community whom you deem particularly "
+        "helpful on the discussion boards. They can edit or delete any post, clear "
+        "misuse flags, close and re-open threads, endorse responses, and see posts from "
+        "all cohorts. Their posts are marked as 'Community TA'. You can only give course "
+        "team roles to enrolled users.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="${_("Add Community TA")}"
+    ></div>
+  %endif
+
+  %if section_data['access']['instructor'] and section_data['ccx_is_enabled']:
+    <div class="auth-list-container"
+      data-rolename="ccx_coach"
+      data-display-name="${_("CCX Coaches")}"
+      data-info-text="
+        ${_("CCX Coaches are able to create their own Custom Courses "
+            "based on this course, which they can use to provide personalized "
+            "instruction to their own students based in this course material.")}"
+      data-list-endpoint="${section_data['list_course_role_members_url']}"
+      data-modify-endpoint="${section_data['modify_access_url']}"
+      data-add-button-label="${_("Add CCX Coach")}"
+    ></div>
+  %endif
+</div>

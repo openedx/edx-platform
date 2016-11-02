@@ -1,0 +1,57 @@
+h2.problem-header {
+  display: inline-block;
+}
+
+div.problem-progress {
+  display: inline-block;
+  padding-left: ($baseline/4);
+  color: #666;
+  font-weight: 100;
+  font-size: em(16);
+}
+
+
+div.lti {
+    // align center
+    margin: 0 auto;
+
+    .wrapper-lti-link {
+        @include font-size(14);
+        background-color: $sidebar-color;
+        padding: $baseline;
+
+        .lti-link {
+            margin-bottom: 0;
+            text-align: right;
+
+            .link_lti_new_window {
+                @extend .gray-button;
+                @include font-size(13);
+                @include line-height(14);
+            }
+        }
+    }
+
+    form.ltiLaunchForm {
+        display: none;
+    }
+
+    iframe.ltiLaunchFrame {
+        width: 100%;
+        height: 800px;
+        display: block;
+        border: 0px;
+    }
+
+    h4.problem-feedback-label {
+        font-weight: 100;
+        font-size: em(16);
+        font-family: "Source Sans", "Open Sans", Verdana, Geneva, sans-serif, sans-serif;
+    }
+
+    div.problem-feedback {
+        margin-top: ($baseline/4);
+        margin-bottom: ($baseline/4);
+
+    }
+}

@@ -1,0 +1,138 @@
+<%
+from django.utils.translation import ugettext as _
+from openedx.core.djangoapps.credit.partition_schemes import VerificationPartitionScheme
+from contentstore.utils import ancestor_has_staff_lock, get_visibility_partition_info
+
+partition_info = get_visibility_partition_info(xblock)
+user_partitions = partition_info["user_partitions"]
+cohort_partitions = partition_info["cohort_partitions"]
+verification_partitions = partition_info["verification_partitions"]
+has_selected_groups = partition_info["has_selected_groups"]
+selected_verified_partition_id = partition_info["selected_verified_partition_id"]
+
+is_staff_locked = ancestor_has_staff_lock(xblock)
+%>
+
+<div class="modal-section visibility-summary">
+    % if len(user_partitions) == 0:
+        <div class="is-not-configured has-actions">
+            <h4 class="title">${_('No content groups exist')}</h4>
+
+            <div class="copy">
+                <p>${_('Use content groups to give groups of students access to a specific set of course content. Create one or more content groups, and make specific components visible to them.')}</p>
+            </div>
+
+            <div class="actions">
+                <a href="${manage_groups_url}" class="action action-primary action-settings">${_('Manage content groups')}</a>
+            </div>
+        </div>
+    % elif is_staff_locked:
+        <div class="summary-message summary-message-warning visibility-summary-message">
+            <span class="icon fa fa-exclamation-triangle" aria-hidden="true"></span>
+            <p class="copy">
+                ## Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                ${_(
+                    "{screen_reader_start}Warning:{screen_reader_end} The Unit this component is contained in is hidden from students. Visibility settings here will be trumped by this."
+                    ).format(
+                        screen_reader_start='<span class="sr">',
+                        screen_reader_end='</span>',
+                    )
+                }
+            </p>
+        </div>
+    % endif
+</div>
+
+% if len(user_partitions) > 0:
+    <form class="visibility-controls-form" method="post" action="">
+
+        <div class="modal-section visibility-controls">
+            <h3 class="modal-section-title">${_('Make visible to:')}</h3>
+
+            <div class="modal-section-content">
+
+                <section class="visibility-controls-primary">
+                    <div class="list-fields list-radio">
+                        <div class="field field-radio field-visibility-level">
+                            <input type="radio" id="visibility-level-all" name="visibility-level" value="" class="input input-radio visibility-level-all" ${'checked="checked"' if not has_selected_groups else ''} />
+                            <label for="visibility-level-all" class="label">${_('All Students and Staff')}</label>
+                        </div>
+
+                        <div class="field field-radio field-visibility-level">
+                            <input type="radio" id="visibility-level-specific" name="visibility-level" value="" class="input input-radio visibility-level-specific"  ${'checked="checked"' if has_selected_groups else ''} />
+                            <label for="visibility-level-specific" class="label">${_('Specific Content Groups')}</label>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="wrapper-visibility-specific">
+                    <section class="visibility-controls-secondary">
+                        <div class="visibility-controls-group">
+                            <h4 class="visibility-controls-title modal-subsection-title sr">${_('Content Groups')}</h4>
+                            <div class="list-fields list-checkbox">
+                            % for partition in cohort_partitions:
+                                % for group in partition["groups"]:
+                                    <div class="field field-checkbox field-visibility-content-group ${'was-removed' if group["deleted"] else ''}">
+                                        <input type="checkbox"
+                                            id="visibility-content-group-${partition["id"]}-${group["id"]}"
+                                            name="visibility-content-group"
+                                            value="${partition["id"]}-${group["id"]}"
+                                            class="input input-checkbox"
+                                            ${'checked="checked"' if group["selected"] else ''}
+                                        />
+                                        % if group["deleted"]:
+                                            <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">
+                                                ${_('Deleted Content Group')}
+                                                <span class="note">${_('Content group no longer exists. Please choose another or allow access to All Students and staff')}</span>
+                                            </label>
+                                        % else:
+                                            <label for="visibility-content-group-${partition["id"]}-${group["id"]}" class="label">${group["name"] | h}</label>
+                                        % endif
+                                    </div>
+                                % endfor
+                            % endfor
+
+                            ## Allow only one verification checkpoint to be selected at a time.
+                            % if verification_partitions:
+                                <div role="group" aria-labelledby="verification-access-title">
+                                    <div id="verification-access-title" class="sr">${_('Verification Checkpoint')}</div>
+                                    <div class="field field-checkbox field-visibility-verification">
+                                        <input type="checkbox"
+                                            id="verification-access-checkbox"
+                                            name="verification-access-checkbox"
+                                            class="input input-checkbox"
+                                            value=""
+                                            aria-describedby="verification-help-text"
+                                            ${'checked="checked"' if selected_verified_partition_id is not None else ''}
+                                        />
+                                        <label for="verification-access-checkbox" class="label">
+                                            ${_('Verification Checkpoint')}:
+                                        </label>
+
+                                        <label class="sr" for="verification-access-dropdown">
+                                            ${_('Verification checkpoint to complete')}
+                                        </label>
+
+                                        <select id="verification-access-dropdown">
+                                            % for partition in verification_partitions:
+                                            <option
+                                                value="${partition["id"]}"
+                                                ${ "selected" if partition["id"] == selected_verified_partition_id else ""}
+                                            >${partition["name"]}</option>
+                                            % endfor
+                                        </select>
+
+                                        <div class="note" id="verification-help-text">
+                                            ${_("Learners who require verification must pass the selected checkpoint to see the content in this component. Learners who do not require verification see this content by default.")}
+                                        </div>
+                                    </div>
+                                </div>
+                            % endif
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </form>
+% endif

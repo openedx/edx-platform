@@ -1,0 +1,337 @@
+.discussion {
+
+  // discussion - elements - actions
+  // ====================
+
+  // UI: general action list
+  .post-actions-list,
+  .response-actions-list,
+  .comment-actions-list {
+    @extend %ui-no-list;
+    @include text-align(right);
+
+    .actions-item {
+      box-sizing: border-box;
+      display: block;
+      margin: ($baseline/4) 0;
+
+      &.is-hidden {
+        display: none;
+      }
+
+      &.is-disabled {
+        a {
+          pointer-events: none;
+
+          .action-icon {
+            display: none;
+          }
+
+          .action-label {
+            @include padding-right(0);
+          }
+
+          &:hover {
+            border-color: transparent;
+
+            .action-label {
+              color: $forum-color-active-text;
+            }
+          }
+        }
+      }
+    }
+
+    .more-wrapper {
+      position: relative;
+    }
+  }
+
+  // ====================
+
+  // UI: general actions dropdown layout
+  .actions-dropdown {
+    @extend %ui-no-list;
+    @extend %ui-depth1;
+    @include right(0);
+    display: none;
+    position: absolute;
+    top: 100%;
+    pointer-events: none;
+    min-width: $actions-dropdown-width;
+
+    &.is-expanded {
+      display: block;
+      pointer-events: auto;
+    }
+
+    .actions-dropdown-list {
+      box-sizing: border-box;
+      box-shadow: 0 1px 1px $shadow-l1;
+      position: relative;
+      width: 100%;
+      border-radius: $forum-border-radius;
+      margin: ($baseline/4) 0 0 0;
+      border: 1px solid $gray-l3;
+      padding: ($baseline/2) ($baseline*0.75);
+      background: $forum-color-background;
+
+      // ui triangle/nub
+      &:after,
+      &:before {
+        @include right(6px);
+        bottom: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+
+      &:after {
+        @include margin-right(1px);
+        border-color: $transparent;
+        border-bottom-color: $white;
+        border-width: 6px;
+      }
+
+      &:before {
+        border-color: $transparent;
+        border-bottom-color: $forum-color-border;
+        border-width: 7px;
+      }
+    }
+
+    .actions-item {
+      display: block;
+      margin: 0;
+
+      &.is-hidden {
+        display: none;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: general action
+  .action-button {
+    @include transition(border .5s linear 0s);
+    box-sizing: border-box;
+    display: inline-block;
+    border: 1px solid transparent;
+    border-radius: $forum-border-radius;
+    color: $gray-l1;
+
+    .action-icon {
+      display: inline-block;
+      font-size: $forum-small-font-size;
+      height: $baseline;
+      width: $baseline;
+      border: 1px solid $forum-color-border;
+      border-radius: $forum-border-radius;
+      text-align: center;
+      color: $gray-l1;
+
+      .icon {
+        vertical-align: middle;
+      }
+    }
+
+    .action-label {
+      @extend %t-copy-sub2;
+      display: none;
+      vertical-align: middle;
+      padding: 2px 8px;
+    }
+
+    &:hover, &:focus {
+
+      .action-label {
+        display: inline-block;
+      }
+
+      .action-icon {
+        @include border-radius(0, $forum-border-radius, $forum-border-radius, 0);
+      }
+    }
+
+    // specific button styles
+    &.action-follow {
+
+      .action-label {
+        color: $blue-d1;
+      }
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          background-color: $forum-color-following;
+          border: 1px solid $blue-d1;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $forum-color-following;
+      }
+    }
+
+    &.action-vote {
+
+      .action-label {
+        opacity: 1;
+      }
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          background-color: $green-d1;
+          border: 1px solid $green-d2;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $green-d2;
+
+        .action-label {
+          color: $green-d2;
+        }
+      }
+    }
+
+    &.action-endorse {
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          background-color: $blue-d1;
+          border: 1px solid $blue-d2;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $blue-d2;
+        background-color: $forum-color-background;
+
+        .action-label {
+          color: $blue-d2;
+        }
+      }
+    }
+
+    &.action-answer {
+
+      &.is-checked, &:hover, &:focus {
+
+        .action-icon {
+          border: 1px solid $green-d1;
+          background-color: $green-d1;
+          color: $white;
+        }
+      }
+
+      &:hover, &:focus {
+        border-color: $green-d1;
+        background-color: $forum-color-background;
+
+        .action-label {
+          color: $green-d2;
+        }
+      }
+    }
+
+    // more drop-down menu
+    &.action-more {
+      position: relative;
+
+      &:hover, &:focus {
+        border-color: $gray;
+        background-color: $forum-color-background;
+
+        .action-icon {
+          border: 1px solid $gray;
+          background-color: $gray;
+          color: $white;
+        }
+
+        .action-label {
+          opacity: 1;
+          color: $black;
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  .actions-dropdown {
+
+    // UI: secondary action
+    .action-list-item {
+      @extend %t-copy-sub2;
+      @include text-align(right);
+      display: block;
+      width: 100%;
+      padding: ($baseline/10) 0;
+      white-space: nowrap;
+      color: $gray-l1;
+
+      &:hover, &:focus {
+        color: $link-color;
+      }
+
+      .action-icon {
+        @include margin-left($baseline/4);
+        display: inline-block;
+        width: ($baseline/2);
+        color: inherit;
+      }
+
+      .action-label {
+        display: inline-block;
+        color: inherit;
+      }
+
+      // CASE: checked
+      &.is-checked {
+        // CASE: pin action
+        &.action-pin {
+          color: $pink;
+        }
+
+        // CASE: report action
+        &.action-report {
+          color: $pink;
+        }
+
+        // CASE: hover for any action
+        &:hover, &:focus {
+          color: $link-color;
+        }
+      }
+    }
+  }
+
+  .action-button, .action-list-item {
+    .action-label {
+      @include float(left);
+      .label-checked {
+        display: none;
+      }
+    }
+
+    &.is-checked {
+      .label-unchecked {
+        display: none;
+      }
+
+      .label-checked {
+        display: inline;
+      }
+    }
+  }
+}

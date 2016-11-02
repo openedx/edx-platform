@@ -1,0 +1,8 @@
+<!-- A file named "course.xml" in your top-level should point 
+at the appropriate roots file. You can do so like this:
+
+$ rm course.xml
+$ ln -s roots/YEAR_SEMESTER.xml course.xml
+
+
+Ask Sarina for help with this. -->

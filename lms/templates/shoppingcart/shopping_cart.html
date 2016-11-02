@@ -1,0 +1,503 @@
+<%inherit file="shopping_cart_flow.html" />
+<%block name="review_highlight">class="active"</%block>
+
+<%!
+from django.core.urlresolvers import reverse
+from edxmako.shortcuts import marketing_link
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
+from openedx.core.lib.courses import course_image_url
+%>
+
+<section class="wrapper confirm-enrollment shopping-cart cart-view">
+  <%block name="custom_content">
+
+  % if is_course_enrollment_closed:
+    <%
+      ## Translators: course_names is a comma-separated list of one or more course names
+      expiry_message = ungettext(
+          "{course_names} has been removed because the enrollment period has closed.",
+          "{course_names} have been removed because the enrollment period has closed.",
+          len(expired_course_names)
+      ).format(
+          course_names=", ".join(expired_course_names),
+      )
+    %>
+  % endif
+
+  <div class="container">
+    % if shoppingcart_items:
+      <%block name="billing_details_highlight">
+        % if order.order_type == 'business':
+          <li class="billing">${_('Billing Details')}</li>
+        % else:
+          <li class="billing hidden">${_('Billing Details')}</li>
+        % endif
+      </%block>
+
+      % if is_course_enrollment_closed:
+        <p id="expiry-msg">${expiry_message}</p>
+      % endif
+   <%
+      discount_applied = False
+      order_type = 'personal'
+   %>
+
+    <article class="wrapper confirm-enrollment shopping-cart cart-view" aria-label="${_('Shopping Cart')}">
+      % for item, course in shoppingcart_items:
+        <%
+          ## Translators: currency_symbol is a symbol indicating type of currency, ex "$".
+          ## This string would look like this when all variables are in:
+          ## "$500.00"
+          unit_cost = _(
+            "{currency_symbol}{price}"
+          ).format(
+            currency_symbol=currency_symbol,
+            price="{0:0.2f}".format(item.unit_cost)
+          )
+        %>
+        % if loop.index > 0 :
+          <hr>
+        %endif
+        % if item.order.order_type == 'business':
+          <% order_type = 'business' %>
+        %endif
+        <div class="user-data">
+        <div class="clearfix">
+        <div class="image">
+          <img class="item-image" src="${course_image_url(course)}"
+              alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} ${_('Cover Image')}" />
+        </div>
+        <div class="data-input">
+          ## Translators: "Registration for:" is followed by a course name
+          <h3 class="course-title-info" id="course-title">
+            <span class="course-registration-title">${_('Registration for:')}</span>
+            <span class="course-display-name">${ course.display_name }</span>
+          </h3>
+          <hr>
+          <div class="three-col">
+              <div class="col-1">
+                  % if item.is_discounted:
+                    <% discount_applied = True %>
+                    <div class="price">${_('Price per student:')}
+                      <span class="line-through">
+                        ## Translators: currency_symbol is a symbol indicating type of currency, ex "$".
+                        ## This string would look like this when all variables are in:
+                        ## "$500.00"
+                        ${_("{currency_symbol}{price}").format(currency_symbol=currency_symbol, price="{0:0.2f}".format(item.list_price))}
+                      </span>
+                    </div>
+                    <div class="price green">${_('Discount Applied:')}
+                      <span>${unit_cost}</span>
+                    </div>
+                  % else:
+                    <div class="price">${_('Price per student:')}
+                      <span>${unit_cost}</span>
+                    </div>
+                  % endif
+              </div>
+              <div class="col-2">
+                % if enable_bulk_purchase:
+                <div class="numbers-row" aria-live="polite">
+                  <label for="field_${item.id}">${_('Students:')}</label>
+                  <div class="counter">
+                      <input maxlength="3" class="spin-counter" title="${_('Input quantity and press enter.')}" max="999" type="text" name="students" value="${item.qty}" id="field_${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}" data-item-id="${item.id}" aria-describedby="students-${item.id}">
+                  </div>
+                  <button class="inc button" data-operation="inc">
+                    <span class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></span>
+                    <span class="sr">${_('Increase')}</span>
+                  </button>
+                  <button class="dec button" data-operation="dec">
+                    <span class="icon fa fa-caret-down" aria-hidden="true"></span>
+                    <span class="sr">${_('Decrease')}</span>
+                  </button>
+                      <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
+                  <span class="error-text hidden" id="students-${item.id}"></span>
+                </div>
+                % endif
+              </div>
+
+              <div class="col-3">
+                 <button href="#" class="btn-remove" data-item-id="${item.id}">
+                  <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+                  <span class="sr">${_('Remove')}</span>
+                </button>
+              </div>
+          </div>
+        </div>
+            </div>
+
+        </div>
+      % endfor
+        <div class="discount">
+
+            <div class="code-text">
+            % if not discount_applied:
+              <div class="code-input" aria-live="polite">
+                <label for="input_code" class="sr">${_('Discount or activation code')}</label>
+                <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
+                <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
+                <span class="error-text hidden" id="code"></span>
+              </div>
+            % else:
+              <div class="code-applied">
+                <span class="green"><span class="icon fa fa-check-square-o" aria-hidden="true"></span>${_('code has been applied')}</span>
+                <button type="submit" class="blue-border" id="submit-reset-redemption">${_('Reset')}</button>
+              </div>
+            % endif
+                <span class="pull-right">${_('TOTAL:')}
+                  <b id="total-amount" data-amount="${'{price:0.2f}'.format(price=amount)}">
+                    ## Translators: currency_symbol is a symbol indicating type of currency, ex "$". currency_abbr is
+                    ## an abbreviation for the currency, ex "USD". This string would look like this when all variables are in:
+                    ## "$500.00 USD"
+                    ${_("{currency_symbol}{price} {currency_abbr}").format(currency_symbol=currency_symbol, price="{0:0.2f}".format(amount), currency_abbr=currency.upper())}
+                  </b>
+                </span>
+            </div>
+        </div>
+        <div class="col-two">
+            <div class="col-2 relative">
+               % if order_type == 'business':
+                  <div name="billing">
+                      <button type="submit" name="billing-details" aria-describedby="billing_business_helper_text">
+                        ${_('Billing Details')}
+                        <span class="icon fa fa-caret-right" aria-hidden="true"></span>
+                      </button>
+                      <p id="billing_business_helper_text">
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                      </p>
+                  </div>
+                   <div name="payment" class="hidden">
+                    <div id="processor_form" aria-describedby="payment_business_helper_text">
+                      ${form_html}
+                    </div>
+                    <p id="payment_business_helper_text">
+                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                    </p>
+                  </div>
+               % else:
+                  <div name="payment" aria-describedby="payment_helper_text">
+                    ${form_html}
+                    <p id="payment_helper_text">
+                        ${_('After this purchase is complete, {username} will be enrolled in this course.').format(username=u'<br/><b>{username}</b>'.format(username=order.user.username))}
+                    </p>
+                  </div>
+                  <div name="billing" class="hidden">
+                      <button type="submit" name="billing-details" aria-describedby="billing_helper_text">
+                        ${_('Billing Details')}
+                        <span class="icon fa fa-caret-right" aria-hidden="true"></span>
+                      </button>
+                      <p id="billing_helper_text">
+                          ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
+                      </p>
+                  </div>
+               %endif
+            </div>
+        </div>
+     </article>
+      % else:
+        <article aria-label="${_('Empty Cart')}">
+          <div class="empty-cart" >
+            <h2>${_('Your Shopping cart is currently empty.')}</h2>
+            % if is_course_enrollment_closed:
+              <p>${expiry_message}</p>
+            % endif
+            <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
+          </div>
+        </article>
+      % endif
+  </div>
+</section>
+<form id='refresh_tracker'>
+   <input id="reloadValue" type="hidden" name="reloadValue" value="" />
+</form>
+</%block>
+<script>
+    $(function() {
+        var isSpinnerBtnEnabled = true;
+        var prevQty = 0;
+
+        // This snipnet of code is to detect when and
+        // end-user has clicked the back button to the
+        // page. We want to force refresh to make
+        // sure there is no cached data happening
+        var d = new Date();
+        d = d.getTime();
+        if (jQuery('#reloadValue').val().length == 0)
+        {
+          jQuery('#reloadValue').val(d);
+        } else
+        {
+          jQuery('body').hide();
+          jQuery('#reloadValue').val('');
+          location.reload(true);
+        }
+
+      $('button.btn-remove').click(function(event) {
+      event.preventDefault();
+      var post_url = "${reverse('shoppingcart.views.remove_item')}";
+      $.post(post_url, {id:$(this).data('item-id')})
+        .always(function(data){
+        location.reload(true);
+      });
+    });
+
+   $('#submit-code').click(function(event){
+      event.preventDefault();
+      var post_url = "${reverse('shoppingcart.views.use_code')}";
+      if($('#input_code').val() == "") {
+        showErrorMsgs('Must enter a valid code','code');
+        return;
+      }
+      $.post(post_url,{
+                  "code" :  $('#input_code').val()
+              }
+      )
+      .success(function(data) {
+        if (data.coupon_code_applied) {
+          location.reload(true); // Reload the page if the coupon code was applied.
+        }
+        else {
+          // Redirect to the redemption URL if the Registration code was applied.
+          location.href = data.redemption_url;
+        }
+      })
+      .error(function(data,status) {
+                  if(status=="parsererror"){
+                       location.reload(true);
+                  }else{
+                        showErrorMsgs(data.responseText, 'code')
+                      }
+              })
+   });
+
+   $('#submit-reset-redemption').click(function(event){
+       event.preventDefault();
+       var post_url = "${reverse('shoppingcart.views.reset_code_redemption')}";
+       $.post(post_url)
+       .success(function(data) {
+                   location.reload(true);
+              })
+       .error(function(data,status) {
+                   if(status=="parsererror"){
+                       location.reload(true);
+                  }else{
+                        showErrorMsgs(data.responseText,'code')
+                      }
+               })
+   });
+
+   $("button[name='billing-details']").click(function(event){
+       // check if there is code exists in the inout_code field
+       // before going to billing details page
+       // if exists then trigger click event of the apply code button
+       var code = $('div.code-input input#input_code').val();
+       if (typeof(code) != 'undefined' && code != ''){
+          $('div.code-input #submit-code').trigger('click');
+          return false;
+       }
+       event.preventDefault();
+       location.href = "${reverse('shoppingcart.views.billing_details')}";
+   });
+
+
+ $(".button").on("click", function() {
+     if(isSpinnerBtnEnabled){
+         var isBusinessType = false;
+         var wasBusinessType = false;
+         var studentField =  $(this).parent().find("input[type='text']");
+         var unit_cost = parseFloat(studentField.data('unit-cost'));
+         var ItemId = studentField.data('item-id');
+
+         var $button = $(this);
+         var oldValue =   studentField.data('qty');
+         var newVal = 1; // initialize with 1.
+         oldValue = parseFloat(oldValue);
+         hideErrorMsg('students-'+ItemId);
+         if ($.isNumeric(oldValue)){
+             if ($button.data("operation") == "inc") {
+                 if(oldValue > 0){
+                     newVal = oldValue + 1;
+                     if(newVal > 1000){
+                         newVal = 1000;
+                     }
+                 }
+             }
+             else {
+                 // Don't allow decrementing below one
+                 if (oldValue > 1) {
+                     newVal = oldValue - 1;
+                 }
+             }
+         }
+
+         wasBusinessType = getBusinessType();
+         $button.parent().find("input").val(newVal);
+         isBusinessType = getBusinessType();
+         update_user_cart(ItemId, newVal, oldValue, unit_cost, wasBusinessType, isBusinessType);
+         studentField.data('qty', newVal);
+     }
+ });
+
+  function getBusinessType(){
+      var isTypeBusiness = false;
+      var elements = $('.numbers-row').find("input[type='text']");
+      elements.each(function(index){
+          if(this.value > 1){
+              isTypeBusiness = true;
+          }
+      });
+      return isTypeBusiness;
+  }
+
+  function showErrorMsgs(msg, msg_area){
+
+      $( "span.error-text#"+ msg_area +"" ).removeClass("hidden");
+      $( "span.error-text#"+ msg_area +"" ).html(msg).show();
+
+      if(msg_area=='code'){
+        $("#input_code").addClass('error');
+      }
+  }
+
+  function hideErrorMsg(msg_area){
+      $( "span.error-text#"+ msg_area +"" ).addClass("hidden");
+  }
+
+  function getNewTotal(prevQty, newQty, unit_cost, prevTotal){
+
+      var prevQty   = parseInt(prevQty);
+      var newQty    = parseInt(newQty);
+      var unit_cost = parseFloat(unit_cost);
+
+      return (( newQty - prevQty ) * unit_cost + parseFloat(prevTotal));
+  }
+
+  function update_user_cart(ItemId, newQty, prevQty, unit_cost, wasbusinessType, isbusinessType){
+
+      var post_url = "${reverse('shoppingcart.views.update_user_cart')}";
+      var typeChanged = false;
+      var prevTotal = $('#total-amount').data('amount');
+      var newTotal = getNewTotal(prevQty, newQty, unit_cost, prevTotal);
+      $('#total-amount').html('$'+newTotal.toFixed(2)+' USD');
+      $('#total-amount').data('amount', newTotal);
+
+      if(isbusinessType != wasbusinessType){
+          isSpinnerBtnEnabled = false;
+          typeChanged = true;
+          $('html').css({'cursor':'wait'});
+          $(".button").css({'cursor':'wait'});
+          $('.col-2.relative').find("button[type='submit']").attr('disabled', true);
+      }
+
+
+
+      $.post(post_url, {
+          ItemId:ItemId,
+          qty:newQty
+          }
+      )
+      .success(function(data) {
+                  var prevTotal = data['total_cost'];
+                  $('html').css({'cursor':'default'});
+                  $(".button").css({'cursor':'default'});
+                  $("#processor_form").html(data['form_html']);
+                  if(typeChanged){
+                      var submit_button = $('.col-2.relative').find("button[type='submit']");
+                      submit_button.removeAttr('disabled');
+                      for (var i = 0; i< data['oldToNewIdMap'].length; i++) {
+                          var oldId = data['oldToNewIdMap'][i]['oldId'];
+                          var newId = data['oldToNewIdMap'][i]['newId'];
+
+                          $('input.spin-counter[data-item-id]=' + oldId ).data('item-id', newId);
+                          $('button.btn-remove[data-item-id]=' + oldId ).data('item-id', newId);
+                      }
+                      if(isbusinessType){
+                          $( "div[name='payment']").addClass('hidden');
+                          $( "div[name='billing']").removeClass('hidden');
+                          $('li.billing').removeClass('hidden');
+
+                      }else{
+                          $( "div[name='payment']").removeClass('hidden');
+                          $( "div[name='billing']").addClass('hidden');
+                          $('li.billing').addClass('hidden');
+                      }
+
+//                      $('#total-amount').html('$'+data['total_cost'].toFixed(2)+' USD');
+                      isSpinnerBtnEnabled = true;
+                  }
+
+            })
+      .error(function(data,status) {
+                  location.reload(true);
+              })
+  }
+
+  $("input[name=students]").keyup(function(event) {
+      var eventEnter        = 13;
+      if(event.keyCode == eventEnter){
+
+         updateTextFieldQty(event);
+      }
+      else{
+           event.preventDefault();
+       }
+  });
+
+  function updateTextFieldQty(event){
+
+      if(isSpinnerBtnEnabled){
+          var el_id = event.currentTarget.id;
+          var itemId = $("#"+el_id).data('item-id');
+          var prevQty = $("#"+el_id).data('qty');
+          var newQty = event.currentTarget.value;
+          var unitCost = event.currentTarget.dataset.unitCost;
+          var isBusinessType = getBusinessType();
+
+          var wasBusinessType = !isBusinessType;
+          isSpinnerBtnEnabled = false;
+          update_user_cart(itemId, newQty, prevQty, unitCost, wasBusinessType, isBusinessType);
+          $("#"+el_id).data('qty', newQty);
+
+      }
+  }
+
+  $("input[name=students]").focusout(function(event) {
+      updateTextFieldQty(event);
+  });
+
+// allowing user to enter numeric qty only.
+  $("input[name=students]").keydown(function(event) {
+      if(isSpinnerBtnEnabled){
+          var eventDelete       = 46;
+          var eventBackSpace    = 8;
+          var eventLeftKey      = 37;
+          var eventRightKey     = 39;
+          var allowedEventCodes = [eventDelete, eventBackSpace, eventLeftKey, eventRightKey ];
+
+          // Allow only backspace and delete
+          if (allowedEventCodes.indexOf(event.keyCode) > -1) {
+              // let it happen, don't do anything
+            }
+          else {
+             /*
+              Ensure that it is a number.
+              KeyCode range 48 - 57 represents [0-9]
+              KeyCode range 96 - 105 represents [numpad 0 - numpad 9]
+             */
+            if ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) ) {
+
+            }
+            else{
+                event.preventDefault();
+            }
+          }
+      }
+      else{
+          event.preventDefault();
+      }
+
+	});
+});
+
+</script>
