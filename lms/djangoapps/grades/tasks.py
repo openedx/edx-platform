@@ -32,8 +32,10 @@ def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher):
         be updated only if the new grade is higher than the previous
         value.
     """
-    course_key = CourseLocator.from_string(course_id)
+    if not PersistentGradesEnabledFlag.feature_enabled(course_id):
+        return
 
+    course_key = CourseLocator.from_string(course_id)
     student = User.objects.get(id=user_id)
     scored_block_usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
 
