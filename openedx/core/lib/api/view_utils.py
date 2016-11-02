@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin
 from rest_framework.generics import GenericAPIView
 
+from edx_rest_framework_extensions.authentication import JwtAuthentication
 from openedx.core.lib.api.authentication import (
     SessionAuthenticationAllowInactiveUser,
     OAuth2AuthenticationAllowInactiveUser,
@@ -93,6 +94,7 @@ def view_auth_classes(is_user=False, is_authenticated=True):
         If is_user is True, also requires username in URL matches the request user.
         """
         func_or_class.authentication_classes = (
+            JwtAuthentication,
             OAuth2AuthenticationAllowInactiveUser,
             SessionAuthenticationAllowInactiveUser
         )
