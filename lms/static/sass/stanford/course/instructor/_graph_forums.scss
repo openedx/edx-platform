@@ -1,0 +1,35 @@
+.instructor-dashboard-wrapper-2 section.idash-section#data_download {
+  .reports-download-container {
+    .graph-forums {
+      padding-left: 25px;
+      padding-right: 10px;
+      cursor: pointer;
+      float:right;
+    }
+  }
+  .report-downloads-graph-block {
+    width:100%;
+  }
+  .report-downloads-graph-title {
+    text-align:center;
+    margin: 0 auto;
+  }
+  .report-downloads-graph {
+    width:100%;
+    margin-left: auto ;
+    margin-right: auto ;
+    font: 10px sans-serif;
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    .bar {
+      fill: steelblue;
+    }
+    .x.axis path {
+      display: none;
+    }
+  }
+}
