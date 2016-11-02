@@ -13,8 +13,6 @@ from courseware.access import has_access
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import Registration
 
-from openedx.core.djangolib.testing.utils import get_mock_request
-
 
 class LoginEnrollmentTestCase(TestCase):
     """
