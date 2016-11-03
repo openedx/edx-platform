@@ -5,7 +5,7 @@ describe 'MarkdownEditingDescriptor', ->
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
       saveResult = @descriptor.save()
       expect(saveResult.metadata.markdown).toEqual('markdown')
-      expect(saveResult.data).toEqual('<problem>\n  <p>markdown</p>\n</problem>')
+      expect(saveResult.data).toXMLEqual('<problem>\n  <p>markdown</p>\n</problem>')
     it 'clears markdown when xml editor is selected', ->
       loadFixtures 'problem-with-markdown.html'
       @descriptor = new MarkdownEditingDescriptor($('.problem-editor'))
@@ -101,7 +101,7 @@ describe 'MarkdownEditingDescriptor', ->
   describe 'markdownToXml', ->
     it 'converts raw text to paragraph', ->
       data = MarkdownEditingDescriptor.markdownToXml('foo')
-      expect(data).toEqual('<problem>\n  <p>foo</p>\n</problem>')
+      expect(data).toXMLEqual('<problem>\n  <p>foo</p>\n</problem>')
     # test default templates
     it 'converts numerical response to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.
@@ -133,7 +133,7 @@ describe 'MarkdownEditingDescriptor', ->
         If you look at your hand, you can count that you have five fingers.
         [Explanation]
         """)
-      expect(data).toEqual("""<problem>
+      expect(data).toXMLEqual("""<problem>
           <p>A numerical response problem accepts a line of text input from the student, and evaluates the input for correctness based on its numerical value.</p>
           <p>The answer is correct if it is within a specified numerical tolerance of the expected answer.</p>
           <p>Enter the numerical value of Pi:</p>
@@ -356,7 +356,7 @@ describe 'MarkdownEditingDescriptor', ->
         When the student is ready, the explanation appears.
         [Explanation]
         """)
-      expect(data).toEqual("""
+      expect(data).toXMLEqual("""
         <problem>
           <p>bleh</p>
           <multiplechoiceresponse>
@@ -680,7 +680,7 @@ describe 'MarkdownEditingDescriptor', ->
         Code should be nicely monospaced.
         [/code]
         """)
-      expect(data).toEqual("""
+      expect(data).toXMLEqual("""
       <problem>
         <p>Not a header</p>
         <h3 class="hd hd-2 problem-header">A header</h3>

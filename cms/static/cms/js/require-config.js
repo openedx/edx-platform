@@ -28,7 +28,6 @@
             'mustache': 'js/vendor/mustache',
             'codemirror': 'js/vendor/codemirror-compressed',
             'codemirror/stex': 'js/vendor/CodeMirror/stex',
-            'pretty-print': 'js/lib/pretty-print',
             'jquery': 'common/js/vendor/jquery',
             'jquery-migrate': 'common/js/vendor/jquery-migrate',
             'jquery.ui': 'js/vendor/jquery-ui.min',
