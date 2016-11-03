@@ -165,6 +165,7 @@ FEATURES = {
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo.
     'ENABLE_CONTENT_LIBRARIES': True,
+    'DISABLE_LIBRARY_CREATION': False
 
     # Milestones application flag
     'MILESTONES_APP': False,
