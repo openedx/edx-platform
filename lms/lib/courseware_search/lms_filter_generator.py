@@ -52,4 +52,5 @@ class LmsSearchFilterGenerator(SearchFilterGenerator):
             if org_filter_out_set:
                 exclude_dictionary['org'] = list(org_filter_out_set)
 
+        exclude_dictionary['catalog_visibility'] = ['none', 'about']
         return exclude_dictionary
