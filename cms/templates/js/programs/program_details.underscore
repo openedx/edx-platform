@@ -1,5 +1,5 @@
 <header class="app-header">
-    <form>
+    <form class="layout layout-1q3q">
         <div class="layout-col layout-col-b">
             <div class="js-inline-edit field">
                 <span class="js-model-value copy copy-large emphasized"><%- name %></span>
