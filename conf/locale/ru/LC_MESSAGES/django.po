@@ -193,7 +193,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:57+0000\n"
+"POT-Creation-Date: 2016-10-27 14:59+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -561,11 +561,9 @@ msgstr "Имя по документам должно состоять мини�
 
 #: common/djangoapps/student/forms.py
 msgid ""
-"Usernames must contain only letters, numbers, underscores (_), and hyphens "
-"(-)."
+"Usernames can only contain Roman letters, western numerals (0-9), "
+"underscores (_), and hyphens (-)."
 msgstr ""
-"Имена пользователей должны содержать только буквы латинского алфавита, "
-"цифры, нижнее подчёркивание (_) и дефисы (-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -3061,7 +3059,7 @@ msgstr "Название для сертификата (полное)"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Certificate Web/HTML View Enabled"
-msgstr "Разрешить просмотр HTML-версии сертификата"
+msgstr "Разрешить выпуск HTML-сертификатов"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "If true, certificate Web/HTML views are enabled for the course."
@@ -6885,9 +6883,7 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Student (username/email={user}) already in certificate exception list."
-msgstr ""
-"Обучающийся (username/email={user}) исключён из списка владельцев "
-"сертификатов."
+msgstr "Обучающийся (username/email={user}) уже добавлен в список исключений."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
@@ -11917,8 +11913,12 @@ msgid "Submit your answer"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempts"
-msgstr ""
+msgid "You have used {num_used} of {num_total} attempt"
+msgid_plural "You have used {num_used} of {num_total} attempts"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
@@ -12309,18 +12309,23 @@ msgid "Actions"
 msgstr "Действия"
 
 #: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "Сбросить попытки слушателя"
-
-#: lms/templates/staff_problem_info.html
-msgid "Delete Student State"
-msgstr "Удалить состояние слушателя"
+msgid "Reset Learner's Attempts to Zero"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "Заново проверить задание"
+msgid "Delete Learner's State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Learner's Submission"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Score Improves"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -13839,7 +13844,7 @@ msgstr ""
 
 #: lms/templates/certificates/server-error.html
 msgid "The institution&#39;s logo."
-msgstr "Логотип&#39;s образовательной организации."
+msgstr "Логотип образовательной организации."
 
 #: lms/templates/certificates/server-error.html
 msgid "The institution that is linked to the course."
@@ -14340,10 +14345,6 @@ msgid "{course_number} Progress"
 msgstr "Достижения на курсе {course_number}"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress"
-msgstr "Достижения на курсе"
-
-#: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
 msgstr "Просмотр оценивания в Studio"
 
@@ -14352,16 +14353,12 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Достижения '{username}' ({email}) на курсе"
 
 #: lms/templates/courseware/progress.html
-msgid "View certificate in a new browser window or tab."
-msgstr "Открыть сертификат для просмотра в новом окне или вкладке браузера."
-
-#: lms/templates/courseware/progress.html
 msgid "View Certificate"
 msgstr "Просмотреть сертификат"
 
 #: lms/templates/courseware/progress.html
-msgid "PDF will open in a new browser window or tab."
-msgstr "PDF откроется в новом окне или в новой вкладке браузера."
+msgid "Opens in a new browser window"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -14369,7 +14366,7 @@ msgstr "Скачать свой сертификат"
 
 #: lms/templates/courseware/progress.html
 msgid "Request Certificate"
-msgstr "Запросить Сертификат"
+msgstr "Запросить сертификат"
 
 #: lms/templates/courseware/progress.html
 msgid "Requirements for Course Credit"
@@ -14429,6 +14426,10 @@ msgstr "Скоро"
 #: lms/templates/courseware/progress.html
 msgid "Less"
 msgstr "Скрыть"
+
+#: lms/templates/courseware/progress.html
+msgid "Details for each chapter"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
@@ -16131,6 +16132,14 @@ msgid "Regenerate for learners who have not received certificates. ({count})"
 msgstr "Создать повторно для слушателей, не получивших сертификаты. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit passing state. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit not passing state. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
 msgstr "Создать повторно для слушателей с ошибкой. ({count})"
 
@@ -16831,13 +16840,11 @@ msgstr ""
 "назначения более раннего срока сдачи задания."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr "Укажите e-mail или имя пользователя {platform_name}:"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
 msgstr "E-mail или имя пользователя"
 
@@ -17516,157 +17523,175 @@ msgid "Student Special Exam Attempts"
 msgstr "Попытки сдачи контрольных испытаний"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Gradebook"
-msgstr "Оценочный лист"
+msgid "View gradebook for enrolled learners"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Click here to view the gradebook for enrolled students. This feature is only"
-" visible to courses with a small number of total enrolled students."
+"Note: This feature is available only to courses with a small number of "
+"enrolled learners."
 msgstr ""
-"Нажмите, чтобы просмотреть оценочный лист. Эта функция доступна только для "
-"курсов с небольшим количеством участников."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
 msgstr "Просмотр оценок"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade inspection"
-msgstr "Проверка оценок отдельных обучающихся"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Click this link to view the student's progress page:"
+msgid "View a specific learner's grades and progress"
 msgstr ""
-"Пройдите по этой ссылке, чтобы просмотреть страницу достижений обучающегося:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Progress Page"
-msgstr "Страница достижений"
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade adjustment"
-msgstr "Корректировка оценок отдельных обучающихся"
+msgid "Learner email address or username"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Specify a problem in the course here with its complete location:"
-msgstr "Укажите задание в курсе, введя его полное местонахождение:"
+msgid "View Progress Page"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's grade for a specific problem"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Location of problem in course *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Example"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
 msgstr "Местонахождение задания"
 
-#. Translators: A location (string of text) follows this sentence.
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You must provide the complete location of the problem. In the Staff Debug "
-"viewer, the location looks like this:"
+msgid "Attempts"
 msgstr ""
-"Вы должны полностью указать местонахождение задания.  В окне отладочной "
-"информации для сотрудников местонахождение выглядит следующим образом:"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Next, select an action to perform for the given user and problem:"
-msgstr ""
-"Теперь выберите действие, которое будет применено к данному пользователю и "
-"заданию:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You may also delete the entire state of a student for the specified problem:"
-msgstr "Вы можете удалить статус выполнения задания обучающимся:"
+"Allow a learner who has used up all attempts to work on the problem again."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student State for Problem"
-msgstr "Удалить статус задания, выполненного обучающимся"
+msgid "Reset Attempts to Zero"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Tasks' table. To see status for all tasks submitted for this "
-"problem and student, click on this button:"
+"For the specified problem, rescore the learner's responses. The 'Rescore "
+"Only If Score Improves' option updates the learner's score only if it "
+"improves in the learner's favor."
 msgstr ""
-"Перепроверка происходит в фоновом режиме. Статус выполняемых задач можно "
-"узнать в разделе «Текущие задачи». Чтобы посмотреть статус всех задач для "
-"данного задания или слушателя, нажмите эту кнопку:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Student"
-msgstr "Показать историю фоновых задач"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Entrance Exam Adjustment"
-msgstr "Настройка вступительного испытания"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student's {platform_name} email address or username:"
-msgstr "Электронная почта или имя пользователя в {platform_name}:"
+msgid "Problem History"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Select an action for the student's entrance exam. This action will affect "
-"every problem in the student's exam."
+"For the specified problem, permanently and completely delete the learner's "
+"answers and scores from the database."
 msgstr ""
-"Выберите действие для вступительного испытания. Это действие повлияет на все"
-" задачи в задании."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Number of Student Attempts"
-msgstr "Сбросить количество попыток"
+msgid "Task Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and problem."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Task Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's entrance exam results"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow the learner to take the exam again."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow Skip"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Waive the requirement for the learner to take the exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Let Learner Skip Entrance Exam"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore any responses that have been submitted. The 'Rescore All Problems "
+"Only If Score Improves' option updates the learner's scores only if it "
+"improves in the learner's favor."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
 msgstr "Заново оценить все задания"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Let Student Skip Entrance Exam"
-msgstr "Разрешить пропустить вступительное испытание"
+msgid "Rescore All Problems Only If Score Improves"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Entrance Exam History"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You can also delete all of the student's answers and scores for the entire "
-"entrance exam."
+"For the entire entrance exam, permanently and completely delete the "
+"learner's answers and scores from the database."
 msgstr ""
-"Вы также можете удалить все ответы и оценки слушателей, полученные за "
-"вступительное испытание."
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student's Answers and Scores"
-msgstr "Удалить ответы и оценки слушателей"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Student's Exam Adjustment History"
-msgstr "Показать историю настроек вступительного теста"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Course-specific grade adjustment"
-msgstr "Коррекция оценок для конкретных курсов"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Then select an action"
-msgstr "Теперь выберите действие"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset ALL students' attempts"
-msgstr "Сбросить счётчик попыток для ВСЕХ слушателей"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore ALL students' problem submissions"
-msgstr "Перепроверить задание у ВСЕХ слушателей"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"The above actions run in the background, and status for active tasks will "
-"appear in a table on the Course Info tab. To see status for all tasks "
-"submitted for this problem, click on this button"
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and entrance exam."
 msgstr ""
-"Описанные действия протекают в фоновом режиме, и статус активных заданий "
-"появится на вкладке с информацией о курсе. Чтобы просмотреть статус всех "
-"задач, связанных с этим заданием, нажмите эту кнопку"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Problem"
-msgstr "Показать историю фоновых задач"
+msgid "Adjust all enrolled learners' grades for a specific problem"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allows all learners to work on the problem again."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
+"updates a learner's score only if it improves in the learner's favor."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Learners' Submissions"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Scores Improve"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show the status for the tasks that you submitted for this problem."
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"

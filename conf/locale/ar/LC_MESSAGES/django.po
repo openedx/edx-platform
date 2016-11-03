@@ -39,6 +39,7 @@
 # omarithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # SiddigSami <siddigsami@live.com>, 2014-2015
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2014
@@ -152,8 +153,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:57+0000\n"
-"PO-Revision-Date: 2016-09-18 17:18+0000\n"
+"POT-Creation-Date: 2016-10-27 14:59+0000\n"
+"PO-Revision-Date: 2016-10-28 18:29+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -520,11 +521,11 @@ msgstr "يجب أن يتألّف اسمك القانوني من حرفين عل�
 
 #: common/djangoapps/student/forms.py
 msgid ""
-"Usernames must contain only letters, numbers, underscores (_), and hyphens "
-"(-)."
+"Usernames can only contain Roman letters, western numerals (0-9), "
+"underscores (_), and hyphens (-)."
 msgstr ""
-"يجب أن تحتوي أسماء المستخدمين على حروف وأرقام وحرف الخط السفلي(_) "
-"والشرطة(-)فقط"
+"يجب أن يحتوي اسم المستخدم على حروف انجليزية وأرقام غربية (0-9) وخطوط سفلية "
+"(_) والوصلات (-) فقط."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -11760,8 +11761,14 @@ msgid "Submit your answer"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempts"
-msgstr ""
+msgid "You have used {num_used} of {num_total} attempt"
+msgid_plural "You have used {num_used} of {num_total} attempts"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+msgstr[4] ""
+msgstr[5] ""
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
@@ -12149,18 +12156,23 @@ msgid "Actions"
 msgstr "العمليات"
 
 #: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "إعادة ضبط عدد محاولات الطالب "
-
-#: lms/templates/staff_problem_info.html
-msgid "Delete Student State"
-msgstr "حذف حالة الطالب"
+msgid "Reset Learner's Attempts to Zero"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "إعادة تقييم ورقة الطالب "
+msgid "Delete Learner's State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Learner's Submission"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Score Improves"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -14039,10 +14051,6 @@ msgid "{course_number} Progress"
 msgstr "تقدّم العمل {course_number}"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress"
-msgstr "تقدّم العمل على المساق"
-
-#: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
 msgstr "استعراض عملية التقييم في استوديو"
 
@@ -14051,16 +14059,12 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "تقدّم عمل الطالب '{username}'‏ ({email}) في المساق"
 
 #: lms/templates/courseware/progress.html
-msgid "View certificate in a new browser window or tab."
-msgstr "مشاهدة الشهادة في نافذة متصفح جديدة/تبويبة جديدة"
-
-#: lms/templates/courseware/progress.html
 msgid "View Certificate"
 msgstr "معاينة الشهادة"
 
 #: lms/templates/courseware/progress.html
-msgid "PDF will open in a new browser window or tab."
-msgstr "سوف يفتح ملف PDF في نافذة متصفح جديدة أو تبويبة جديدة"
+msgid "Opens in a new browser window"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -14122,6 +14126,10 @@ msgstr "قريبًا"
 #: lms/templates/courseware/progress.html
 msgid "Less"
 msgstr "أقل"
+
+#: lms/templates/courseware/progress.html
+msgid "Details for each chapter"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
@@ -15789,6 +15797,14 @@ msgstr ""
 "({count})."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit passing state. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit not passing state. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
 msgstr "أعد إنشاء شهادات المتعلّمين الذين واجههم خطأ ما وعددهم ({count})."
 
@@ -16464,7 +16480,6 @@ msgstr ""
 "معيّن."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
@@ -16472,7 +16487,6 @@ msgstr ""
 "  هنا: "
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
 msgstr "عنوان البريد الإلكتروني أو اسم المستخدم للطالب"
 
@@ -17139,152 +17153,175 @@ msgid "Student Special Exam Attempts"
 msgstr "محاولات امتحانات الطلاب المخصّصة"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Gradebook"
-msgstr "سجل الدرجات الخاص بالطالب"
+msgid "View gradebook for enrolled learners"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Click here to view the gradebook for enrolled students. This feature is only"
-" visible to courses with a small number of total enrolled students."
+"Note: This feature is available only to courses with a small number of "
+"enrolled learners."
 msgstr ""
-"الرجاء النقر هنا لعرض سجل الدرجات الخاص بالطلاب المسجّلين. يمكن رؤية هذه "
-"الميزة فقط في المساقات التي يكون عدد الطلاب المسجلّين فيها قليلًا."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
 msgstr "عرض سجل الدرجات"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade inspection"
-msgstr "بحث عن درجات طالب معين "
+msgid "View a specific learner's grades and progress"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Click this link to view the student's progress page:"
-msgstr "اضغط على هذا الرابط لمشاهدة صفحة تطور الطالب: "
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Progress Page"
-msgstr "صفحة تطور الطالب "
+msgid "Learner email address or username"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade adjustment"
-msgstr "تعديل درجات طالب محدد "
+msgid "View Progress Page"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Specify a problem in the course here with its complete location:"
-msgstr "قم بتحديد مسألة في المساق هنا مع موقعها الكامل:"
+msgid "Adjust a learner's grade for a specific problem"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Location of problem in course *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Example"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
 msgstr "موقع المسألة"
 
-#. Translators: A location (string of text) follows this sentence.
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You must provide the complete location of the problem. In the Staff Debug "
-"viewer, the location looks like this:"
+msgid "Attempts"
 msgstr ""
-"يجب إعطاء العنوان الكامل للمسألة. في شاشة عرض تنقيح طاقم المساق، يظهر الموقع"
-" بالشكل التالي:"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Next, select an action to perform for the given user and problem:"
-msgstr "تالياً، قم باختيار عمليّة يتم أداؤها للمستخدم والمسألة المعينين: "
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You may also delete the entire state of a student for the specified problem:"
-msgstr "بإمكانك كذلك حذف حالة طالب بالكامل للمسألة المحددة:  "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student State for Problem"
-msgstr "حذف حالة الطالب بالنسبة لمسألة محددة "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Tasks' table. To see status for all tasks submitted for this "
-"problem and student, click on this button:"
+"Allow a learner who has used up all attempts to work on the problem again."
 msgstr ""
-"تجري عمليات إعادة التقييم في الخلفية، بينما تظهر حالة أي مهمّات مفعّلة في "
-"جدول ’المهام القيد الانتظار‘. لاستعراض الحالة الخاصة بكافة المهمّات التي تم "
-"تقديمها لهذه المسألة وهذا الطالب، اضغط هذا الزر:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Student"
-msgstr "أظهر تاريخ المهام للطالب "
+msgid "Reset Attempts to Zero"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Entrance Exam Adjustment"
-msgstr "تعديل اختبار الدخول"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student's {platform_name} email address or username:"
-msgstr "البريد الإلكتروني {platform_name} للطالب أو اسم المستخدم الخاص به:"
+msgid "Rescore"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Select an action for the student's entrance exam. This action will affect "
-"every problem in the student's exam."
+"For the specified problem, rescore the learner's responses. The 'Rescore "
+"Only If Score Improves' option updates the learner's score only if it "
+"improves in the learner's favor."
 msgstr ""
-"اختر إجراءًا لاختبار الدخول للطالب. هذا الإجراء سيؤثر على جميع المسائل في "
-"اختبار الطالب."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Number of Student Attempts"
-msgstr "أعد ضبط عدد محاولات الطالب."
+msgid "Problem History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"For the specified problem, permanently and completely delete the learner's "
+"answers and scores from the database."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Task Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and problem."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Task Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's entrance exam results"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow the learner to take the exam again."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow Skip"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Waive the requirement for the learner to take the exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Let Learner Skip Entrance Exam"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore any responses that have been submitted. The 'Rescore All Problems "
+"Only If Score Improves' option updates the learner's scores only if it "
+"improves in the learner's favor."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
 msgstr "أعد تقييم جميع المسائل"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Let Student Skip Entrance Exam"
-msgstr "اسمح للطالب بتجاوز اختبار الدخول"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You can also delete all of the student's answers and scores for the entire "
-"entrance exam."
-msgstr "يمكنك أيضًا حذف جميع إجابات الطلاب وعلاماتهم في اختبار الدخول كاملاً"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student's Answers and Scores"
-msgstr "حذف إجابات وعلامات الطلاب"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Student's Exam Adjustment History"
-msgstr "عرض تاريخ تعديل اختبار الطالب"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Course-specific grade adjustment"
-msgstr "تعديل الدرجات بحسب المساق "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Then select an action"
-msgstr "ثم اختر عملية"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset ALL students' attempts"
-msgstr "أعد ضبط جميع محاولات الطلاب "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore ALL students' problem submissions"
-msgstr "أعد تقييم جميع المسائل التي قام الطلاب بتسليمها "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"The above actions run in the background, and status for active tasks will "
-"appear in a table on the Course Info tab. To see status for all tasks "
-"submitted for this problem, click on this button"
+msgid "Rescore All Problems Only If Score Improves"
 msgstr ""
-"تجري العمليات المذكورة أعلاه في الخلفية، بينما تظهر حالة أي مهمّات مفعّلة في"
-" جدول موجود ضمن تبويب معلومات المساق. لاستعراض الحالة الخاصة بكافة المهمّات "
-"التي تم إرسالها لهذه المسألة، اضغط هذا الزر:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Problem"
-msgstr "إظهار تاريخ المهام لمسألة معينة"
+msgid "Entrance Exam History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"For the entire entrance exam, permanently and completely delete the "
+"learner's answers and scores from the database."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and entrance exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust all enrolled learners' grades for a specific problem"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allows all learners to work on the problem again."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
+"updates a learner's score only if it improves in the learner's favor."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Learners' Submissions"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Scores Improve"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show the status for the tasks that you submitted for this problem."
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
