@@ -3,10 +3,12 @@
 <%def name="online_help_token()"><% return "courseinfo" %></%def>
 <%namespace name='static' file='../static_content.html'/>
 <%!
+from datetime import datetime
+from pytz import timezone, utc
+
 from django.utils.translation import ugettext as _
 
-from courseware.courses import get_course_info_section, get_course_date_summary
-
+from courseware.courses import get_course_info_section, get_course_date_blocks
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from openedx.core.djangolib.markup import HTML, Text
 %>
@@ -89,15 +91,40 @@ from openedx.core.djangolib.markup import HTML, Text
           % endif
         </section>
         <section aria-label="${_('Handout Navigation')}" class="handouts">
-          % if SelfPacedConfiguration.current().enable_course_home_improvements:
-            <h1 class="handouts-header">${_("Important Course Dates")}</h1>
-            ${HTML(get_course_date_summary(course, user))}
-          % endif
 
-          <h1 class="handouts-header">${_(course.info_sidebar_name)}</h1>
-          ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
+      % if SelfPacedConfiguration.current().enable_course_home_improvements:
+            <h1 class="handouts-header">${_("Important Course Dates")}</h1>
+            ## Should be organized by date, last date appearing at the bottom
+
+            % for course_date in get_course_date_blocks(course, user):
+                <div class="date-summary-container">
+                    <div class="date-summary date-summary-${course_date.css_class}">
+                        % if course_date.title:
+                            % if course_date.title == 'current_datetime':
+                                <h3 class="heading localized-datetime" data-datetime="${course_date.date}" data-string="${_(u'Today is {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></h3>
+                            % else:
+                                <h3 class="heading">${course_date.title}</h3>
+                            % endif
+                        % endif
+                        % if course_date.date and course_date.title != 'current_datetime':
+                            <h4 class="date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}" data-string="${_(course_date.relative_datestring)}"></h4>
+                        % endif
+                        % if course_date.description:
+                          <p class="description">${course_date.description}</p>
+                        % endif
+                        % if course_date.link and course_date.link_text:
+                          <span class="date-summary-link">
+                              <a href="${course_date.link}">${course_date.link_text}</a>
+                          </span>
+                        % endif
+                    </div>
+                </div>
+            % endfor
+      % endif
+        <h1 class="handouts-header">${_(course.info_sidebar_name)}</h1>
+        ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
         </section>
-        % else:
+    % else:
         <section class="updates">
           <h1 class="handouts-header">${_("Course Updates and News")}</h1>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_updates'))}
@@ -106,7 +133,12 @@ from openedx.core.djangolib.markup import HTML, Text
           <h1 class="handouts-header">${_("Course Handouts")}</h1>
           ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_handouts'))}
         </section>
-        % endif
+
+    % endif
       </div>
   </div>
 </main>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

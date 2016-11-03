@@ -294,18 +294,7 @@ def get_course_info_section(request, user, course, section_key):
     return html
 
 
-def get_course_date_summary(course, user):
-    """
-    Return the snippet of HTML to be included on the course info page
-    in the 'Date Summary' section.
-    """
-    blocks = _get_course_date_summary_blocks(course, user)
-    return '\n'.join(
-        b.render() for b in blocks
-    )
-
-
-def _get_course_date_summary_blocks(course, user):
+def get_course_date_blocks(course, user):
     """
     Return the list of blocks to display on the course info page,
     sorted by date.
