@@ -11,10 +11,9 @@ import ddt
 from mock import patch
 from student.auth import has_studio_read_access, has_studio_write_access
 from student.roles import (
-    CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
+    CourseInstructorRole, CourseStaffRole, LibraryUserRole,
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
-from xblock.reference.user_service import XBlockUser
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -25,6 +24,8 @@ from openedx.core.djangoapps.content.course_structures.tests import SignalDiscon
 from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.x_module import STUDIO_VIEW
 from student import auth
+from student.tests.factories import UserFactory
+from course_creators.views import add_user_with_status_granted
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -34,6 +35,7 @@ class LibraryTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(LibraryTestCase, self).setUp()
 
+        self.user = UserFactory(password=self.user_password, is_staff=True)
         self.client = AjaxEnabledTestClient()
         self._login_as_staff_user(logout_first=False)
 
@@ -63,7 +65,7 @@ class LibraryTestCase(ModuleStoreTestCase):
         self.assertIsInstance(lib_key, LibraryLocator)
         return lib_key
 
-    def _add_library_content_block(self, course, library_key, other_settings=None):
+    def _add_library_content_block(self, course, library_key, publish_item=False, other_settings=None):
         """
         Helper method to add a LibraryContent block to a course.
         The block will be configured to select content from the library
@@ -74,7 +76,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             category='library_content',
             parent_location=course.location,
             user_id=self.user.id,
-            publish_item=False,
+            publish_item=publish_item,
             source_library_id=unicode(library_key),
             **(other_settings or {})
         )
@@ -158,7 +160,7 @@ class TestLibraries(LibraryTestCase):
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
 
-        lc_block = self._add_library_content_block(course, self.lib_key, {'max_count': num_to_select})
+        lc_block = self._add_library_content_block(course, self.lib_key, other_settings={'max_count': num_to_select})
         self.assertEqual(len(lc_block.children), 0)
         lc_block = self._refresh_children(lc_block)
 
@@ -477,7 +479,8 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
     def setUp(self):
         """ Create a library, staff user, and non-staff user """
         super(TestLibraryAccess, self).setUp()
-        self.non_staff_user, self.non_staff_user_password = self.create_non_staff_user()
+        self.non_staff_user_password = 'foo'
+        self.non_staff_user = UserFactory(password=self.non_staff_user_password, is_staff=False)
 
     def _login_as_non_staff_user(self, logout_first=True):
         """ Login as a user that starts out with no roles/permissions granted. """
@@ -487,7 +490,7 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
 
     def _assert_cannot_create_library(self, org="org", library="libfail", expected_code=403):
         """ Ensure the current user is not able to create a library. """
-        self.assertTrue(expected_code >= 300)
+        self.assertGreaterEqual(expected_code, 300)
         response = self.client.ajax_post(
             LIBRARY_REST_URL,
             {'org': org, 'library': library, 'display_name': "Irrelevant"}
@@ -531,9 +534,13 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
         self.client.logout()
         self._assert_cannot_create_library(expected_code=302)  # 302 redirect to login expected
 
-        # Now check that logged-in users without CourseCreator role can still create libraries
+        # Now check that logged-in users without CourseCreator role cannot create libraries
         self._login_as_non_staff_user(logout_first=False)
-        self.assertFalse(CourseCreatorRole().has_user(self.non_staff_user))
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
+            self._assert_cannot_create_library(expected_code=403)  # 403 user is not CourseCreator
+
+        # Now check that logged-in users with CourseCreator role can create libraries
+        add_user_with_status_granted(self.user, self.non_staff_user)
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
             lib_key2 = self._create_library(library="lib2", display_name="Test Library 2")
             library2 = modulestore().get_library(lib_key2)
