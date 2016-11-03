@@ -15,15 +15,13 @@ class SASSDictField(serializers.DictField):
 
 
 class SiteConfigurationSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='site.name', read_only=True)
-    domain = serializers.CharField(source='site.domain', read_only=True)
     values = serializers.DictField()
-    sass_variables = SASSDictField()
-    page_elements = serializers.DictField()
+    sassVariables = SASSDictField(source='sass_variables')
+    pageElements = serializers.DictField(source='page_elements')
 
     class Meta:
         model = SiteConfiguration
-        fields = ('id', 'name', 'domain', 'values', 'sass_variables', 'page_elements')
+        fields = ('id', 'values', 'sassVariables', 'pageElements')
 
     def update(self, instance, validated_data):
         object = super(SiteConfigurationSerializer, self).update(instance, validated_data)
@@ -38,7 +36,7 @@ class SiteConfigurationListSerializer(SiteConfigurationSerializer):
 
 
 class SiteSerializer(serializers.ModelSerializer):
-    configuration = serializers.PrimaryKeyRelatedField(read_only=True)
+    configuration = SiteConfigurationSerializer()
 
     class Meta:
         model = Site
@@ -46,7 +44,7 @@ class SiteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         site = super(SiteSerializer, self).create(validated_data)
-        organization, site, user  = bootstrap_site(site)
+        organization, site, user = bootstrap_site(site)
         return site
 
 

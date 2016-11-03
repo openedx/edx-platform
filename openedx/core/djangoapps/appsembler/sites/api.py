@@ -1,11 +1,18 @@
+from django.contrib.sites.models import Site
 from django.core.files.storage import DefaultStorage
 from rest_framework import generics, views, viewsets
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer, RegistrationSerializer
+from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer,\
+    RegistrationSerializer
 from .utils import delete_site
+
+
+class SiteViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Site.objects.exclude(configuration=None)
+    serializer_class = SiteSerializer
 
 
 class SiteConfigurationViewSet(viewsets.ModelViewSet):
