@@ -173,6 +173,7 @@ splinter==0.5.4
 testtools==0.9.34
 testfixtures==4.5.0
 nose-faulthandler==0.1
+nodeenv==1.0.0
 
 # Used for Segment analytics
 analytics-python==1.1.0
