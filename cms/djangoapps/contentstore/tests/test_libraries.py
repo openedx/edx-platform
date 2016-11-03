@@ -11,7 +11,7 @@ import ddt
 from mock import patch
 from student.auth import has_studio_read_access, has_studio_write_access
 from student.roles import (
-    CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
+    CourseInstructorRole, CourseStaffRole, LibraryUserRole,
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
 from xmodule.modulestore import ModuleStoreEnum
@@ -25,6 +25,7 @@ from xblock_django.user_service import DjangoXBlockUserService
 from xmodule.x_module import STUDIO_VIEW
 from student import auth
 from student.tests.factories import UserFactory
+from course_creators.views import add_user_with_status_granted
 
 
 class LibraryTestCase(ModuleStoreTestCase):
@@ -533,9 +534,13 @@ class TestLibraryAccess(SignalDisconnectTestMixin, LibraryTestCase):
         self.client.logout()
         self._assert_cannot_create_library(expected_code=302)  # 302 redirect to login expected
 
-        # Now check that logged-in users without CourseCreator role can still create libraries
+        # Now check that logged-in users without CourseCreator role cannot create libraries
         self._login_as_non_staff_user(logout_first=False)
-        self.assertFalse(CourseCreatorRole().has_user(self.non_staff_user))
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
+            self._assert_cannot_create_library(expected_code=403)  # 403 user is not CourseCreator
+
+        # Now check that logged-in users with CourseCreator role can create libraries
+        add_user_with_status_granted(self.user, self.non_staff_user)
         with patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
             lib_key2 = self._create_library(library="lib2", display_name="Test Library 2")
             library2 = modulestore().get_library(lib_key2)
