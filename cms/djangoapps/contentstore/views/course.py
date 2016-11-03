@@ -493,38 +493,36 @@ def course_listing(request):
     """
     List all courses available to the logged in user
     """
-    optimization_enabled = GlobalStaff().has_user(request.user) and \
-        WaffleSwitchNamespace(name=WAFFLE_NAMESPACE).is_enabled(u'enable_global_staff_optimization')
-
-    if optimization_enabled:
-        org = request.GET.get('org', '')
-        show_libraries = LIBRARIES_ENABLED and request.GET.get('libraries', 'false').lower() == 'true'
-    else:
-        org = None
-        show_libraries = LIBRARIES_ENABLED
-    courses_iter, in_process_course_actions = get_courses_accessible_to_user(request, org)
+    courses, in_process_course_actions = get_courses_accessible_to_user(request)
     user = request.user
-    libraries = _accessible_libraries_iter(request.user) if show_libraries else []
+    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
+
+    programs_config = ProgramsApiConfig.current()
+    raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
+
+    # Sort programs alphabetically by name.
+    # TODO: Support ordering in the Programs API itself.
+    programs = sorted(raw_programs, key=lambda p: p['name'].lower())
 
     def format_in_process_course_view(uca):
         """
         Return a dict of the data which the view requires for each unsucceeded course
         """
         return {
-            u'display_name': uca.display_name,
-            u'course_key': unicode(uca.course_key),
-            u'org': uca.course_key.org,
-            u'number': uca.course_key.course,
-            u'run': uca.course_key.run,
-            u'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
-            u'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
-            u'dismiss_link': reverse_course_url(
-                u'course_notifications_handler',
+            'display_name': uca.display_name,
+            'course_key': unicode(uca.course_key),
+            'org': uca.course_key.org,
+            'number': uca.course_key.course,
+            'run': uca.course_key.run,
+            'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
+            'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
                 uca.course_key,
                 kwargs={
-                    u'action_state_id': uca.id,
+                    'action_state_id': uca.id,
                 },
-            ) if uca.state == CourseRerunUIStateManager.State.FAILED else u''
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
     def format_library_for_view(library):
@@ -532,30 +530,32 @@ def course_listing(request):
         Return a dict of the data which the view requires for each library
         """
         return {
-            u'display_name': library.display_name,
-            u'library_key': unicode(library.location.library_key),
-            u'url': reverse_library_url(u'library_handler', unicode(library.location.library_key)),
-            u'org': library.display_org_with_default,
-            u'number': library.display_number_with_default,
-            u'can_edit': has_studio_write_access(request.user, library.location.library_key),
+            'display_name': library.display_name,
+            'library_key': unicode(library.location.library_key),
+            'url': reverse_library_url('library_handler', unicode(library.location.library_key)),
+            'org': library.display_org_with_default,
+            'number': library.display_number_with_default,
+            'can_edit': has_studio_write_access(request.user, library.location.library_key),
         }
 
-    courses_iter = _remove_in_process_courses(courses_iter, in_process_course_actions)
+    courses = _remove_in_process_courses(courses, in_process_course_actions)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
 
-    return render_to_response(u'index.html', {
-        u'courses': list(courses_iter),
-        u'in_process_course_actions': in_process_course_actions,
-        u'libraries_enabled': show_libraries,
-        u'libraries': [format_library_for_view(lib) for lib in libraries],
-        u'show_new_library_button': show_libraries and get_library_creator_status(user),
-        u'user': user,
-        u'request_course_creator_url': reverse(u'contentstore.views.request_course_creator'),
-        u'course_creator_status': _get_course_creator_status(user),
-        u'rerun_creator_status': GlobalStaff().has_user(user),
-        u'allow_unicode_course_id': settings.FEATURES.get(u'ALLOW_UNICODE_COURSE_ID', False),
-        u'allow_course_reruns': settings.FEATURES.get(u'ALLOW_COURSE_RERUNS', True),
-        u'optimization_enabled': optimization_enabled
+    return render_to_response('index.html', {
+        'courses': courses,
+        'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries': [format_library_for_view(lib) for lib in libraries],
+        'show_new_library_button': get_library_creator_status(user),
+        'user': user,
+        'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
+        'course_creator_status': _get_course_creator_status(user),
+        'rerun_creator_status': GlobalStaff().has_user(user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
+        'programs': programs,
+        'program_authoring_url': reverse('programs'),
     })
 
 
