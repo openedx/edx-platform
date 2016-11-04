@@ -6,8 +6,6 @@ from os.path import abspath, dirname, join
 
 from openedx.stanford.cms.envs.aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
-FEATURES['USE_DJANGO_PIPELINE'] = False
-
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
 MEDIA_ROOT = "/edx/var/edxapp/uploads"
