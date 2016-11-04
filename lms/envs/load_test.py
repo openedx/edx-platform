@@ -6,7 +6,7 @@ Settings for load testing.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-from .aws import *
+from openedx.stanford.lms.envs.aws import *
 
 # Disable CSRF for load testing
 EXCLUDE_CSRF = lambda elem: elem not in [

@@ -18,7 +18,7 @@ sessions. Assumes structure:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-from .common import *
+from openedx.stanford.cms.envs.common import *
 import os
 from path import Path as path
 from warnings import filterwarnings, simplefilter

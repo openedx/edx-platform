@@ -13,7 +13,7 @@ This is the default template for our main set of AWS servers.
 
 import json
 
-from .common import *
+from openedx.stanford.cms.envs.common import *
 
 from openedx.core.lib.logsettings import get_logger_config
 import os

@@ -9,7 +9,7 @@ LMS with enough privileges to modify the database schema.
 # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Import everything from .aws so that our settings are based on those.
-from .aws import *
+from openedx.stanford.lms.envs.aws import *
 import os
 from django.core.exceptions import ImproperlyConfigured
 

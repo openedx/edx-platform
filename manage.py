@@ -50,8 +50,8 @@ def parse_args():
         help='Turn on pycontracts for local development')
     lms.set_defaults(
         help_string=lms.format_help(),
-        settings_base='lms/envs',
-        default_settings='lms.envs.dev',
+        settings_base='openedx/stanford/lms/envs',
+        default_settings='openedx.stanford.lms.envs.dev',
         startup='lms.startup',
     )
 
@@ -73,8 +73,8 @@ def parse_args():
         help='Turn on pycontracts for local development')
     cms.set_defaults(
         help_string=cms.format_help(),
-        settings_base='cms/envs',
-        default_settings='cms.envs.dev',
+        settings_base='openedx/stanford/cms/envs',
+        default_settings='openedx.stanford.cms.envs.dev',
         service_variant='cms',
         startup='cms.startup',
     )

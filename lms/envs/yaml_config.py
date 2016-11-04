@@ -15,7 +15,7 @@ defined in the environment:
 
 import yaml
 
-from .common import *
+from openedx.stanford.lms.envs.common import *
 from openedx.core.lib.logsettings import get_logger_config
 from util.config_parse import convert_tokens
 import os

@@ -19,7 +19,7 @@ Common traits:
 import datetime
 import json
 
-from .common import *
+from openedx.stanford.lms.envs.common import *
 from openedx.core.lib.logsettings import get_logger_config
 import os
 
