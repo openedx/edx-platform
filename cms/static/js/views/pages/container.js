@@ -209,10 +209,12 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                     buttonPanel = target.closest('.add-xblock-component'),
                     listPanel = buttonPanel.prev(),
                     scrollOffset = ViewUtils.getScrollOffset(buttonPanel),
-                    placeholderElement = this.createPlaceholderElement().appendTo(listPanel),
+                    $placeholderEl = $(this.createPlaceholderElement()),
                     requestData = _.extend(template, {
                         parent_locator: parentLocator
-                    });
+                    }),
+                    placeholderElement;
+                placeholderElement = $placeholderEl.appendTo(listPanel);
                 return $.postJSON(this.getURLRoot() + '/', requestData,
                     _.bind(this.onNewXBlock, this, placeholderElement, scrollOffset, false))
                     .fail(function() {
@@ -226,22 +228,19 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                 // and then onNewXBlock will replace it with a rendering of the xblock. Note that
                 // for xblocks that can't be replaced inline, the entire parent will be refreshed.
                 var self = this,
-                    parent = xblockElement.parent();
-                ViewUtils.runOperationShowingMessage(gettext('Duplicating'),
-                    function() {
-                        var scrollOffset = ViewUtils.getScrollOffset(xblockElement),
-                            placeholderElement = self.createPlaceholderElement().insertAfter(xblockElement),
-                            parentElement = self.findXBlockElement(parent),
-                            requestData = {
-                                duplicate_source_locator: xblockElement.data('locator'),
-                                parent_locator: parentElement.data('locator')
-                            };
-                        return $.postJSON(self.getURLRoot() + '/', requestData,
-                            _.bind(self.onNewXBlock, self, placeholderElement, scrollOffset, true))
-                            .fail(function() {
-                                // Remove the placeholder if the update failed
-                                placeholderElement.remove();
-                            });
+                    parentElement = self.findXBlockElement(xblockElement.parent()),
+                    scrollOffset = ViewUtils.getScrollOffset(xblockElement),
+                    $placeholderEl = $(self.createPlaceholderElement()),
+                    placeholderElement;
+
+                placeholderElement = $placeholderEl.insertAfter(xblockElement);
+                XBlockUtils.duplicateXBlock(xblockElement, parentElement)
+                    .done(function(data) {
+                        self.onNewXBlock(placeholderElement, scrollOffset, true, data);
+                    })
+                    .fail(function() {
+                        // Remove the placeholder if the update failed
+                        placeholderElement.remove();
                     });
             },
 
@@ -319,7 +318,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                     updateHtml: function(element, html) {
                         // Replace the element with the new HTML content, rather than adding
                         // it as child elements.
-                        this.$el = $(html).replaceAll(element);
+                        this.$el = $(html).replaceAll(element); // safe-lint: disable=javascript-jquery-insertion
                     }
                 });
                 temporaryView = new TemporaryXBlockView({
