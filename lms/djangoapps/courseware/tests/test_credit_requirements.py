@@ -2,11 +2,8 @@
 Tests for credit requirement display on the progress page.
 """
 
-import datetime
-
 import ddt
 from mock import patch
-from pytz import UTC
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -122,7 +119,10 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
             "{}, you have met the requirements for credit in this course.".format(self.USER_FULL_NAME)
         )
         self.assertContains(response, "Completed by {date}")
-        self.assertContains(response, datetime.datetime.now(UTC).strftime('%Y-%m-%d %H'))
+
+        credit_requirements = credit_api.get_credit_requirement_status(self.course.id, self.user.username)
+        for requirement in credit_requirements:
+            self.assertContains(response, requirement['status_date'].strftime('%Y-%m-%d %H:%M'))
         self.assertNotContains(response, "95%")
 
     def test_credit_requirements_not_eligible(self):

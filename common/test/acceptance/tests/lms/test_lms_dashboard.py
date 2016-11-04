@@ -11,7 +11,7 @@ from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
 DEFAULT_SHORT_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year}'
-TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour}:{dt.minute:02}'
+TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
 
 
 class BaseLmsDashboardTest(UniqueCourseTest):
