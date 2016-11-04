@@ -40,7 +40,6 @@ from lms.envs.common import (
     # The following setting is included as it is used to check whether to
     # display credit eligibility table on the CMS or not.
     ENABLE_CREDIT_ELIGIBILITY, YOUTUBE_API_KEY,
-    DEFAULT_COURSE_ABOUT_IMAGE_URL,
 
     # Django REST framework configuration
     REST_FRAMEWORK,
@@ -78,9 +77,6 @@ FEATURES = {
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
-
-    # warning to instructors about publicly-viewable content
-    'CONTENT_VISIBILITY_NOTICE': True,
 
     # Segment - must explicitly turn it on for production
     'CMS_SEGMENT_KEY': None,
@@ -126,9 +122,6 @@ FEATURES = {
 
     # Turn off Advanced Security by default
     'ADVANCED_SECURITY': False,
-
-    # Display option to send email confirmation of course enrollment
-    'ENABLE_ENROLLMENT_EMAIL': False,
 
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
@@ -345,9 +338,6 @@ MIDDLEWARE_CLASSES = (
 
     # use Django built in clickjacking protection
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # Log out sneakpeek users
-    'sneakpeek.middleware.SneakPeekLogoutMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
@@ -434,7 +424,6 @@ EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'registration@example.com'
 DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
 SERVER_EMAIL = 'devops@example.com'
-COPYRIGHT_EMAIL = 'copyright@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -707,36 +696,6 @@ YOUTUBE = {
     'IMAGE_API': 'http://img.youtube.com/vi/{youtube_id}/0.jpg',  # /maxresdefault.jpg for 1920*1080
 }
 
-############################## Utilities ##########################################
-
-# Todo: add aws entries for this
-COURSE_UTILITIES = [
-    {
-        'short_description': 'Bulk Operations',
-        'items': [
-            {
-                'short_description': 'Get all captions from YouTube',
-                'long_description': (
-                    'This utility will attempt to get or update captions for all videos '
-                    'in the course from YouTube. Please allow it a couple of minutes to run.'
-                ),
-                'action_url': 'utility_captions_handler',
-                'action_text': 'Check Captions',
-                'action_external': False,
-            },
-            {
-                'short_description': 'Bulk view problem settings',
-                'long_description': (
-                    'This utility will allow you to view all section, subsection '
-                    'and problem settings in one page.'
-                ),
-                'action_url': 'utility_bulksettings_handler',
-                'action_text': 'View Problem Settings',
-                'action_external': False,
-            },
-        ],
-    }
-]
 ############################# VIDEO UPLOAD PIPELINE #############################
 
 VIDEO_UPLOAD_PIPELINE = {
@@ -980,11 +939,6 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
-### SHIB
-# For SHIB backup register and login URLs
-SHIB_ONLY_SITE = False
-SHIB_REDIRECT_DOMAIN_WHITELIST = {}
-
 ### Size of chunks into which asset uploads will be divided
 UPLOAD_CHUNK_SIZE_IN_MB = 10
 
@@ -1070,9 +1024,6 @@ ADVANCED_COMPONENT_TYPES = [
     'ubcpi',
 ]
 
-# XBlock types listed here will _always_ be selectable as Studio components
-XBLOCKS_ALWAYS_IN_STUDIO = [
-]
 # Adding components in this list will disable the creation of new problem for
 # those components in Studio. Existing problems will work fine and one can edit
 # them in Studio.
