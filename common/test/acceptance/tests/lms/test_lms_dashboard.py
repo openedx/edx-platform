@@ -303,7 +303,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
 
         # Test that proper course date with 'starts' message is displayed if a course is about to start in future,
         # and course starts within 5 days
-        self.assertEqual(course_date, expected_course_date)
+        self.assertEqual(unicode(course_date), unicode(expected_course_date))
 
 
 @attr('a11y')
