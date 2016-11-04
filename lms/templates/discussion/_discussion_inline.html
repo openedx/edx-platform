@@ -1,6 +1,7 @@
 <%page expression_filter="h"/>
 
 <%include file="_underscore_templates.html" />
+<%include file="_thread_list_template.html" />
 
 <%!
 from django.utils.translation import ugettext as _
@@ -21,13 +22,10 @@ from openedx.core.djangolib.js_utils import js_escaped_string
     </button>
 </div>
 <script type="text/javascript">
-/* global DiscussionModuleView */
-/* exported DiscussionInlineBlock, $$course_id */
 var $$course_id = "${course_id | n, js_escaped_string}";
 
 function DiscussionInlineBlock(runtime, element) {
     'use strict';
-    var el = $(element).find('.discussion-module');
-    new DiscussionModuleView({ el: el });
+    new DiscussionInlineView({ el: $(element).find('.discussion-module') });
 }
 </script>
