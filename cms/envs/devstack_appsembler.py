@@ -3,7 +3,10 @@
 from .devstack import *
 from .appsembler import *
 
-INSTALLED_APPS += ('appsembler', 'appsembler_cms', 'appsembler_lms',)
+INSTALLED_APPS += (
+    'appsembler',
+    'openedx.core.djangoapps.appsembler.sites',
+)
 
 APPSEMBLER_SECRET_KEY = "secret_key"
 OAUTH_ENFORCE_SECURE = False
