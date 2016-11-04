@@ -36,6 +36,10 @@ from student.auth import user_has_role
 from student.models import User
 from student.roles import CourseStaffRole, GlobalStaff
 
+from courseware.views.views import is_course_passed
+from xmodule.modulestore.django import modulestore
+from django.contrib.auth.models import User as django_user
+
 
 log = logging.getLogger(__name__)
 REQUIRED_ATTRIBUTES = {
@@ -181,6 +185,71 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
                         u"An error occurred while retrieving enrollments for user "
                         u"'{username}' in course '{course_id}'"
                     ).format(username=username, course_id=course_id)
+                }
+            )
+
+
+@can_disable_rate_limit
+class EnrollmentCoursePassedView(APIView, ApiKeyPermissionMixIn):
+    """
+        **Use Case**
+
+            See if a student has passed a course.
+            Optional: pass username of user as a querystring
+            Response value is True or False.
+
+        **Example Requests**
+
+            GET /api/enrollment/v1/course/{course_id}/passed/?username=JohnDoe
+
+        **Response Values**
+
+            If the request is successful, an HTTP 200 "OK" response is
+            returned along with the response.
+
+    """
+
+    authentication_classes = OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
+    throttle_classes = EnrollmentUserThrottle,
+
+    def get(self, request, course_id):
+        """Read enrollment information for a particular course.
+
+        HTTP Endpoint to see if student has passed a course.
+
+        Args:
+            request (Request): To see if student has passed the course, 
+                a GET request True or False.
+            course_id (str): URI element specifying the course location.
+
+        Return:
+            A JSON serialized representation of student status on a course.
+
+        """
+
+        username = request.GET.get('username', request.user.username)
+        if request.user.username != username and not self.has_api_key_permissions(request) \
+                and not request.user.is_superuser:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = django_user.objects.get(username=username)
+            course_key = CourseKey.from_string(course_id)
+            course = modulestore().get_course(course_key, depth=1)
+            return Response(
+                status=status.HTTP_200_OK,
+                data={
+                    "passed": is_course_passed(course, None, user, request)
+                }
+            )
+        except CourseNotFoundError:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": (
+                        u"No course found for course ID '{course_id}'"
+                    ).format(course_id=course_id)
                 }
             )
 
