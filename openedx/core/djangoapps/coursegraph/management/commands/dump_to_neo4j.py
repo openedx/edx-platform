@@ -40,12 +40,14 @@ class ModuleStoreSerializer(object):
     one graph per course.
     """
 
-    def __init__(self, courses=None):
+    def __init__(self, courses=None, skip=None):
         """
         Sets the object's course_keys attribute from the `courses` parameter.
         If that parameter isn't furnished, loads all course_keys from the
         modulestore.
+        Filters out course_keys in the `skip` parameter, if provided.
         :param courses: string serialization of course keys
+        :param skip: string serialization of course keys
         """
         if courses:
             course_keys = [CourseKey.from_string(course.strip()) for course in courses]
@@ -53,6 +55,9 @@ class ModuleStoreSerializer(object):
             course_keys = [
                 course.id for course in modulestore().get_course_summaries()
             ]
+        if skip is not None:
+            skip_keys = [CourseKey.from_string(course.strip()) for course in skip]
+            course_keys = [course_key for course_key in course_keys if course_key not in skip_keys]
         self.course_keys = course_keys
 
     @staticmethod
@@ -287,13 +292,14 @@ class Command(BaseCommand):
         --secure --user user --password password --settings=aws
     """
     def add_arguments(self, parser):
-        parser.add_argument('--host', type=unicode)
+        parser.add_argument('--host', type=six.text_type)
         parser.add_argument('--https_port', type=int, default=7473)
         parser.add_argument('--http_port', type=int, default=7474)
         parser.add_argument('--secure', action='store_true')
-        parser.add_argument('--user', type=unicode)
-        parser.add_argument('--password', type=unicode)
-        parser.add_argument('--courses', type=unicode, nargs='*')
+        parser.add_argument('--user', type=six.text_type)
+        parser.add_argument('--password', type=six.text_type)
+        parser.add_argument('--courses', type=six.text_type, nargs='*')
+        parser.add_argument('--skip', type=six.text_type, nargs='*')
         parser.add_argument(
             '--override',
             action='store_true',
@@ -328,7 +334,7 @@ class Command(BaseCommand):
             secure=secure,
         )
 
-        mss = ModuleStoreSerializer(options['courses'])
+        mss = ModuleStoreSerializer(options['courses'], options['skip'])
 
         successful_courses, unsuccessful_courses = mss.dump_courses_to_neo4j(
             graph, override_cache=options['override']
