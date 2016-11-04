@@ -1,10 +1,12 @@
 """Tests covering time zone utilities."""
 from freezegun import freeze_time
 from student.tests.factories import UserFactory
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from openedx.core.lib.time_zone_utils import (
     get_display_time_zone,
     get_time_zone_abbr,
     get_time_zone_offset,
+    get_user_time_zone,
 )
 from pytz import timezone, utc
 from unittest import TestCase
@@ -22,6 +24,20 @@ class TestTimeZoneUtils(TestCase):
 
         self.user = UserFactory.build()
         self.user.save()
+
+    def test_get_user_time_zone(self):
+        """
+        Test to ensure get_user_time_zone() returns the correct time zone
+        or UTC if user has not specified time zone.
+        """
+        # User time zone should be UTC when no time zone has been chosen
+        user_tz = get_user_time_zone(self.user)
+        self.assertEqual(user_tz, utc)
+
+        # User time zone should change when user specifies time zone
+        set_user_preference(self.user, 'time_zone', 'Asia/Tokyo')
+        user_tz = get_user_time_zone(self.user)
+        self.assertEqual(user_tz, timezone('Asia/Tokyo'))
 
     def _display_time_zone_helper(self, time_zone_string):
         """
