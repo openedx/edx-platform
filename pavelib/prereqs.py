@@ -15,7 +15,7 @@ from .utils.timer import timed
 
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
-NPM_REGISTRY = "http://registry.npmjs.org/"
+NPM_REGISTRY = "https://registry.npmjs.org/"
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 
