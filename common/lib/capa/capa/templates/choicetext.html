@@ -11,7 +11,7 @@ from openedx.core.djangolib.markup import HTML
     %endif
 % endfor
 <section id="choicetextinput_${id}" class="choicetextinput">
-<form class="choicetextgroup capa_inputtype" id="inputtype_${id}">
+<div class="choicetextgroup capa_inputtype" id="inputtype_${id}">
     <div class="script_placeholder" data-src="${STATIC_URL}js/capa/choicetextinput.js"/>
 
     <fieldset aria-label="${remove_markup(response_data['label'])}">
@@ -76,5 +76,5 @@ from openedx.core.djangolib.markup import HTML
     % if msg:
     <span class="message" tabindex="-1">${HTML(msg)}</span>
     % endif
-</form>
+</div>
 </section>
