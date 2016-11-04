@@ -1118,6 +1118,7 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         self.student = UserFactory.create()
         self.profiled_user = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.profiled_user, course_id=self.course.id)
 
     def get_response(self, mock_request, params, **headers):
         mock_request.side_effect = make_mock_request_impl(
@@ -1188,6 +1189,21 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
 
     def test_ajax_p2(self, mock_request):
         self.check_ajax(mock_request, page="2")
+
+    def test_404_non_enrolled_user(self, __):
+        """
+        Test that when student try to visit un-enrolled students' discussion profile,
+        the system raises Http404.
+        """
+        unenrolled_user = UserFactory.create()
+        request = RequestFactory().get("dummy_url")
+        request.user = self.student
+        with self.assertRaises(Http404):
+            views.user_profile(
+                request,
+                self.course.id.to_deprecated_string(),
+                unenrolled_user.id
+            )
 
     def test_404_profiled_user(self, mock_request):
         request = RequestFactory().get("dummy_url")
