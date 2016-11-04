@@ -131,8 +131,6 @@ XQUEUE_INTERFACE = {
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
-TIME_ZONE = 'UTC'
-
 # Don't rely on a real staff grading backend
 MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
@@ -405,7 +403,7 @@ PASSWORD_HASHERS = (
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
-########################## CLASS DASHBOARD ########################
+### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = True
 
 ################### Make tests quieter
