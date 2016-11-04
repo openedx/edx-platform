@@ -56,6 +56,7 @@
 ignore = ,.git,migrations,node_modules,.pycharm_helpers
 persistent = yes
 load-plugins = edx_lint.pylint,pylint_django,pylint_celery
+jobs = 4
 
 [MESSAGES CONTROL]
 disable = 
@@ -180,4 +181,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 42ec1461de97fc01d7191c1c5f2fd5ec67671a61
+# b9b034e582825692e64f53f240de935c5adaf223

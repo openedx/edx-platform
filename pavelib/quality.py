@@ -54,21 +54,23 @@ def find_fixme(options):
 
         apps_list = ' '.join(top_python_dirs(system))
 
-        pythonpath_prefix = (
-            "PYTHONPATH={system}/djangoapps:common/djangoapps:common/lib".format(
-                system=system
-            )
+        pythonpath = "{system}/djangoapps:common/djangoapps:common/lib".format(
+            system=system
         )
 
+        env = dict(os.environ)
+        env['PYTHONPATH'] = pythonpath
+        env['PYTHONBUFFERED'] = '1'
+
         sh(
-            "{pythonpath_prefix} pylint --disable R,C,W,E --enable=fixme "
+            "pylint --disable R,C,W,E --enable=fixme "
             "--msg-template={msg_template} {apps} "
             "| tee {report_dir}/pylint_fixme.report".format(
-                pythonpath_prefix=pythonpath_prefix,
                 msg_template='"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"',
                 apps=apps_list,
                 report_dir=report_dir
-            )
+            ),
+            env=env,
         )
 
         num_fixme += _count_pylint_violations(
@@ -109,21 +111,23 @@ def run_pylint(options):
 
         apps_list = ' '.join(top_python_dirs(system))
 
-        pythonpath_prefix = (
-            "PYTHONPATH={system}/djangoapps:common/djangoapps:common/lib".format(
-                system=system
-            )
+        pythonpath = "{system}/djangoapps:common/djangoapps:common/lib".format(
+            system=system
         )
 
+        env = dict(os.environ)
+        env['PYTHONPATH'] = pythonpath
+        env['PYTHONBUFFERED'] = '1'
+
         sh(
-            "{pythonpath_prefix} pylint {flags} --msg-template={msg_template} {apps} | "
+            "pylint {flags} --msg-template={msg_template} {apps} | "
             "tee {report_dir}/pylint.report".format(
-                pythonpath_prefix=pythonpath_prefix,
                 flags=" ".join(flags),
                 msg_template='"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"',
                 apps=apps_list,
                 report_dir=report_dir
-            )
+            ),
+            env=env,
         )
 
         num_violations += _count_pylint_violations(

@@ -54,6 +54,7 @@ set -e
 # or else no tests will be executed.
 SHARD=${SHARD:="all"}
 NUMBER_OF_BOKCHOY_THREADS=${NUMBER_OF_BOKCHOY_THREADS:=1}
+export PYTHONUNBUFFERED=1
 
 # Clean up previous builds
 git clean -qxfd
