@@ -36,18 +36,13 @@
                     context = {
                         datetime: $(this).data('datetime'),
                         timezone: $(this).data('timezone'),
-                        language: $(this).data('language'),
-                        format: DateUtils.dateFormatEnum[$(this).data('format')]
+                        language: $(this).attr('lang'),
+                        format: $(this).data('format')
                     };
                     displayDatetime = stringHandler(
                         localizedTime(context),
                         $(this).data('string'),
                         $(this).data('datetoken')
-                    );
-                    $(this).text(displayDatetime);
-                } else {
-                    displayDatetime = stringHandler(
-                        $(this).data('string')
                     );
                     $(this).text(displayDatetime);
                 }

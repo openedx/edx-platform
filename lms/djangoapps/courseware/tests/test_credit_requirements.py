@@ -14,6 +14,7 @@ from django.core.urlresolvers import reverse
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
 
 from course_modes.models import CourseMode
 from openedx.core.djangoapps.credit import api as credit_api
@@ -121,8 +122,7 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
             response,
             "{}, you have met the requirements for credit in this course.".format(self.USER_FULL_NAME)
         )
-        self.assertContains(response, "Completed by {date}")
-        self.assertContains(response, datetime.datetime.now(UTC).strftime('%Y-%m-%d %H'))
+        self.assertContains(response, "Completed by {date}".format(date=self._now_formatted_date()))
         self.assertNotContains(response, "95%")
 
     def test_credit_requirements_not_eligible(self):
@@ -172,3 +172,11 @@ class ProgressPageCreditRequirementsTest(SharedModuleStoreTestCase):
         """Load the progress page for the course the user is enrolled in. """
         url = reverse("progress", kwargs={"course_id": unicode(self.course.id)})
         return self.client.get(url)
+
+    def _now_formatted_date(self):
+        """Retrieve the formatted current date. """
+        return get_time_display(
+            datetime.datetime.now(UTC),
+            DEFAULT_SHORT_DATE_FORMAT,
+            settings.TIME_ZONE
+        )
