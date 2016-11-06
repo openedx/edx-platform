@@ -1193,11 +1193,23 @@ STATICFILES_STORAGE = 'openedx.core.storage.ProductionStorage'
 # List of finder classes that know how to find static files in various locations.
 # Note: the pipeline finder is included to be able to discover optimized files
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.site_configuration.finders.AppDirectoriesTemplateFinder',
     'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
     'pipeline.finders.PipelineFinder',
+]
+
+# TODO: The following apps need further cleanup, extracting static files from
+# their templates directory.  This setting works with
+# `AppDirectoriesTemplateFinder`, above, and is here to make it easier to
+# refactor templates into app directories.  Templates at the project level are
+# currently included in our static assets, and some of them need to be in both
+# places.
+
+APPS_WITH_STATICFILES_IN_TEMPLATES_DIRECTORY = [
+    'lms.djangoapps.student_account',
 ]
 
 PIPELINE_CSS_COMPRESSOR = None
@@ -1945,6 +1957,7 @@ INSTALLED_APPS = (
     'lms.djangoapps.grades.apps.GradesConfig',
 
     # Student support tools
+    'lms.djangoapps.student_account',
     'support',
 
     # External auth (OpenID, shib)
@@ -2137,6 +2150,7 @@ INSTALLED_APPS = (
 
     # additional release utilities to ease automation
     'release_util',
+
 )
 
 # Migrations which are not in the standard module "migrations"

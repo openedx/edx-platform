@@ -5,7 +5,7 @@
         'jquery',
         'underscore',
         'backbone',
-        'text!templates/student_account/account_settings_section.underscore'
+        'text!student_account/account_settings_section.underscore'
     ], function(gettext, $, _, Backbone, sectionTemplate) {
         var AccountSectionView = Backbone.View.extend({
 

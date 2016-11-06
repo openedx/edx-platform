@@ -40,12 +40,11 @@ XQUEUE_INTERFACE = {
 # Use RequireJS optimized storage
 STATICFILES_STORAGE = 'openedx.core.lib.django_require.staticstorage.OptimizedCachedRequireJsStorage'
 
-# Revert to the default set of finders as we don't want to dynamically pick up files from the pipeline
-STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder',
-]
+# Remove production pipeline finders
+STATICFILES_FINDERS.remove(
+    'openedx.core.lib.xblock_pipeline.finder.XBlockPipelineFinder'
+)
+STATICFILES_FINDERS.remove('pipeline.finders.PipelineFinder')
 
 # Redirect to the test_root folder within the repo
 TEST_ROOT = REPO_ROOT / "test_root"
