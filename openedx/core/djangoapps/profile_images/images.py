@@ -205,7 +205,8 @@ def _update_exif_orientation(exif, orientation):
     the exif orientation, return a new exif with the orientation set.
     """
     exif_dict = piexif.load(exif)
-    exif_dict['0th'][piexif.ImageIFD.Orientation] = orientation
+    if orientation:
+        exif_dict['0th'][piexif.ImageIFD.Orientation] = orientation
     return piexif.dump(exif_dict)
 
 
