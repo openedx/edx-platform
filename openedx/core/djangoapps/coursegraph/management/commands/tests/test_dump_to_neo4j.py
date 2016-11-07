@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import (
     ModuleStoreSerializer,
-    ITERABLE_NEO4J_TYPES,
 )
 from openedx.core.djangoapps.coursegraph.signals import _listen_for_course_publish
 
@@ -131,21 +130,6 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         self.assertEqual(len(nodes), 9)
         self.assertEqual(len(relationships), 7)
 
-    @ddt.data(*ITERABLE_NEO4J_TYPES)
-    def test_coerce_types_iterable(self, iterable_type):
-        """
-        Tests the coerce_types helper method for iterable types
-        """
-        example_iterable = iterable_type([object, object, object])
-
-        # each element in the iterable is not unicode:
-        self.assertFalse(any(isinstance(tab, six.text_type) for tab in example_iterable))
-        # but after they are coerced, they are:
-        coerced = ModuleStoreSerializer().coerce_types(example_iterable)
-        self.assertTrue(all(isinstance(tab, six.text_type) for tab in coerced))
-        # finally, make sure we haven't changed the type:
-        self.assertEqual(type(coerced), iterable_type)
-
     @ddt.data(
         (1, 1),
         (object, "<type 'object'>"),
@@ -154,11 +138,15 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         (b"plain string", b"plain string"),
         (True, True),
         (None, "None"),
+        ((1,), "(1,)"),
+        # list of elements should be coerced into a list of the
+        # string representations of those elements
+        ([object, object], ["<type 'object'>", "<type 'object'>"])
     )
     @ddt.unpack
-    def test_coerce_types_base(self, original_value, coerced_expected):
+    def test_coerce_types(self, original_value, coerced_expected):
         """
-        Tests the coerce_types helper for the neo4j base types
+        Tests the coerce_types helper
         """
         coerced_value = self.mss.coerce_types(original_value)
         self.assertEqual(coerced_value, coerced_expected)
