@@ -5,8 +5,8 @@ from django.conf import settings
 from mock import patch
 
 from courseware.access_response import MilestoneError
-from courseware.tests.helpers import get_request_for_user
 from courseware.tests.test_entrance_exam import answer_entrance_exam_problem, add_entrance_exam_milestone
+from openedx.core.djangolib.testing.utils import get_mock_request
 from util.milestones_helpers import (
     add_prerequisite_course,
     fulfill_course_milestone,
@@ -115,7 +115,7 @@ class MobileAPIMilestonesMixin(object):
 
     def _pass_entrance_exam(self):
         """ Helper function to pass the entrance exam """
-        request = get_request_for_user(self.user)
+        request = get_mock_request(self.user)
         answer_entrance_exam_problem(self.course, request, self.problem_1)
 
     def _verify_unfulfilled_milestone_response(self):

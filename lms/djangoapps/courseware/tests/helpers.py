@@ -14,21 +14,6 @@ from openedx.core.djangoapps.content.course_overviews.models import CourseOvervi
 from student.models import Registration
 
 
-def get_request_for_user(user):
-    """Create a request object for user."""
-    request = RequestFactory()
-    request.user = user
-    request.COOKIES = {}
-    request.META = {}
-    request.is_secure = lambda: True
-    request.get_host = lambda: "edx.org"
-    request.method = 'GET'
-    request.GET = {}
-    request.POST = {}
-    crum.set_current_request(request)
-    return request
-
-
 class LoginEnrollmentTestCase(TestCase):
     """
     Provides support for user creation,

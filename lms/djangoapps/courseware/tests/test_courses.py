@@ -23,9 +23,9 @@ from courseware.courses import (
     get_course_with_access,
 )
 from courseware.module_render import get_module_for_descriptor
-from courseware.tests.helpers import get_request_for_user
 from courseware.model_data import FieldDataCache
 from lms.djangoapps.courseware.courseware_access_exception import CoursewareAccessException
+from openedx.core.djangolib.testing.utils import get_mock_request
 from openedx.core.lib.courses import course_image_url
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import _get_modulestore_branch_setting, modulestore
@@ -276,7 +276,7 @@ class CoursesRenderTest(ModuleStoreTestCase):
         course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['toy'])
         course_key = course_items[0].id
         self.course = get_course_by_id(course_key)
-        self.request = get_request_for_user(UserFactory.create())
+        self.request = get_mock_request(UserFactory.create())
 
     def test_get_course_info_section_render(self):
         # Test render works okay
