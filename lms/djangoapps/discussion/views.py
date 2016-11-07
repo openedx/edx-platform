@@ -4,15 +4,23 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 
 from functools import wraps
 import logging
+from sets import Set
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import render_to_response
+from django.template.loader import render_to_string
+from django.templatetags.static import static
+from django.utils.translation import get_language_bidi
 from django.views.decorators.http import require_GET
 import newrelic.agent
+
+from django_component_views.component_views import ComponentView
+from django_component_views.fragment import Fragment
 
 from courseware.courses import get_course_with_access
 from openedx.core.djangoapps.course_groups.cohorts import (
@@ -20,6 +28,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     get_cohort_id,
     get_course_cohorts,
 )
+
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
@@ -214,31 +223,29 @@ def forum_form_discussion(request, course_key):
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
-    course_settings = make_course_settings(course, request.user)
-
-    user = cc.User.from_django_user(request.user)
-    user_info = user.to_dict()
-
-    try:
-        unsafethreads, query_params = get_threads(request, course, user_info)   # This might process a search query
-        is_staff = has_permission(request.user, 'openclose_thread', course.id)
-        threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
-    except cc.utils.CommentClientMaintenanceError:
-        log.warning("Forum is in maintenance mode")
-        return render_to_response('discussion/maintenance.html', {
-            'disable_courseware_js': True,
-            'uses_pattern_library': True,
-        })
-    except ValueError:
-        return HttpResponseBadRequest("Invalid group_id")
-
-    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
-        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
-
-    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
-        add_courseware_context(threads, course, request.user)
-
     if request.is_ajax():
+        user = cc.User.from_django_user(request.user)
+        user_info = user.to_dict()
+
+        try:
+            unsafethreads, query_params = get_threads(request, course, user_info)  # This might process a search query
+            is_staff = has_permission(request.user, 'openclose_thread', course.id)
+            threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
+        except cc.utils.CommentClientMaintenanceError:
+            log.warning("Forum is in maintenance mode")
+            return render_to_response('discussion/maintenance.html', {
+                'disable_courseware_js': True,
+                'uses_pattern_library': True,
+            })
+        except ValueError:
+            return HttpResponseBadRequest("Invalid group_id")
+
+        with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+            annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
+        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+            add_courseware_context(threads, course, request.user)
+
         return utils.JsonResponse({
             'discussion_data': threads,   # TODO: Standardize on 'discussion_data' vs 'threads'
             'annotated_content_info': annotated_content_info,
@@ -247,37 +254,9 @@ def forum_form_discussion(request, course_key):
             'corrected_text': query_params['corrected_text'],
         })
     else:
-        with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
-            user_cohort_id = get_cohort_id(request.user, course_key)
-
-        context = {
-            'csrf': csrf(request)['csrf_token'],
-            'course': course,
-            #'recent_active_threads': recent_active_threads,
-            'staff_access': bool(has_access(request.user, 'staff', course)),
-            'threads': threads,
-            'thread_pages': query_params['num_pages'],
-            'user_info': user_info,
-            'can_create_comment': has_permission(request.user, "create_comment", course.id),
-            'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
-            'can_create_thread': has_permission(request.user, "create_thread", course.id),
-            'flag_moderator': bool(
-                has_permission(request.user, 'openclose_thread', course.id) or
-                has_access(request.user, 'staff', course)
-            ),
-            'annotated_content_info': annotated_content_info,
-            'course_id': course.id.to_deprecated_string(),
-            'roles': utils.get_role_ids(course_key),
-            'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
-            'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
-            'user_cohort': user_cohort_id,  # read from container in NewPostView
-            'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
-            'sort_preference': user.default_sort_key,
-            'category_map': course_settings["category_map"],
-            'course_settings': course_settings,
-            'disable_courseware_js': True,
-            'uses_pattern_library': True,
-        }
+        context = _create_discussion_board_context(request, course_key, nr_transaction)
+        course_id = course.id.to_deprecated_string()
+        context["fragment"] = DiscussionBoardComponentView().render_component(request, course_id=course_id)
         # print "start rendering.."
         return render_to_response('discussion/discussion_board.html', context)
 
@@ -364,9 +343,11 @@ def single_thread(request, course_key, discussion_id, thread_id):
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
             user_cohort = get_cohort_id(request.user, course_key)
 
+        course_id = course.id.to_deprecated_string()
         context = {
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
+            'fragment': DiscussionBoardComponentView().render_component(request, course_id=course_id),
             'init': '',   # TODO: What is this?
             'user_info': user_info,
             'can_create_comment': has_permission(request.user, "create_comment", course.id),
@@ -395,6 +376,68 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'uses_pattern_library': True,
         }
         return render_to_response('discussion/discussion_board.html', context)
+
+
+def _create_discussion_board_context(request, course_key, nr_transaction):
+    """
+    Returns the template context for rendering the discussion board.
+    """
+    course = get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+    course_settings = make_course_settings(course, request.user)
+
+    user = cc.User.from_django_user(request.user)
+    user_info = user.to_dict()
+
+    try:
+        unsafethreads, query_params = get_threads(request, course, user_info)   # This might process a search query
+        is_staff = has_permission(request.user, 'openclose_thread', course.id)
+        threads = [utils.prepare_content(thread, course_key, is_staff) for thread in unsafethreads]
+    except cc.utils.CommentClientMaintenanceError:
+        log.warning("Forum is in maintenance mode")
+        return render_to_response('discussion/maintenance.html', {
+            'disable_courseware_js': True,
+            'uses_pattern_library': True,
+        })
+    except ValueError:
+        return HttpResponseBadRequest("Invalid group_id")
+
+    with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
+        annotated_content_info = utils.get_metadata_for_threads(course_key, threads, request.user, user_info)
+
+    with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+        add_courseware_context(threads, course, request.user)
+
+    with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
+        user_cohort_id = get_cohort_id(request.user, course_key)
+
+    return {
+        'csrf': csrf(request)['csrf_token'],
+        'course': course,
+        # 'recent_active_threads': recent_active_threads,
+        'staff_access': bool(has_access(request.user, 'staff', course)),
+        'threads': threads,
+        'thread_pages': query_params['num_pages'],
+        'user_info': user_info,
+        'can_create_comment': has_permission(request.user, "create_comment", course.id),
+        'can_create_subcomment': has_permission(request.user, "create_sub_comment", course.id),
+        'can_create_thread': has_permission(request.user, "create_thread", course.id),
+        'flag_moderator': bool(
+            has_permission(request.user, 'openclose_thread', course.id) or
+            has_access(request.user, 'staff', course)
+        ),
+        'annotated_content_info': annotated_content_info,
+        'course_id': course.id.to_deprecated_string(),
+        'roles': utils.get_role_ids(course_key),
+        'is_moderator': has_permission(request.user, "see_all_cohorts", course_key),
+        'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
+        'user_cohort': user_cohort_id,  # read from container in NewPostView
+        'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
+        'sort_preference': user.default_sort_key,
+        'category_map': course_settings["category_map"],
+        'course_settings': course_settings,
+        'disable_courseware_js': True,
+        'uses_pattern_library': True,
+    }
 
 
 @require_GET
@@ -556,3 +599,117 @@ def followed_threads(request, course_key, user_id):
             return render_to_response('discussion/user_profile.html', context)
     except User.DoesNotExist:
         raise Http404
+
+
+class LmsComponentView(ComponentView):
+    """
+    The base class of all edx-platform component views.
+    """
+    @staticmethod
+    def get_css_dependencies(group):
+        """
+        Returns list of CSS dependencies belonging to `group` in settings.PIPELINE_JS.
+
+        Respects `PIPELINE_ENABLED` setting.
+        """
+        if settings.PIPELINE_ENABLED:
+            return [settings.PIPELINE_CSS[group]['output_filename']]
+        else:
+            return settings.PIPELINE_CSS[group]['source_filenames']
+
+    @staticmethod
+    def get_js_dependencies(group):
+        """
+        Returns list of JS dependencies belonging to `group` in settings.PIPELINE_JS.
+
+        Respects `PIPELINE_ENABLED` setting.
+        """
+        if settings.PIPELINE_ENABLED:
+            return [settings.PIPELINE_JS[group]['output_filename']]
+        else:
+            return settings.PIPELINE_JS[group]['source_filenames']
+
+    def add_resource_urls(self, fragment):
+        """
+        Adds URLs for JS and CSS resources that this XBlock depends on to `fragment`.
+        """
+        # Head dependencies
+        for vendor_js_file in self.vendor_js_dependencies():
+            fragment.add_resource_url(static(vendor_js_file), "application/javascript", "head")
+
+        for css_file in self.css_dependencies():
+            fragment.add_css_url(static(css_file))
+
+        # Body dependencies
+        for js_file in self.js_dependencies():
+            fragment.add_javascript_url(static(js_file))
+
+    def render_standalone_html(self, fragment):
+        """
+        """
+        context = {
+            'settings': settings,
+            'fragment': fragment,
+            'uses-pattern-library': True,
+        }
+        return render_to_response('component-chromeless.html', context)
+
+
+class DiscussionBoardComponentView(LmsComponentView):
+    """
+    Component implementation of the discussion board.
+    """
+    def render_component(self, request, course_id=None):
+        """
+        Render the component
+        """
+        nr_transaction = newrelic.agent.current_transaction()
+
+        course_key = CourseKey.from_string(course_id)
+        context = _create_discussion_board_context(request, course_key, nr_transaction)
+        html = render_to_string('discussion/discussion_board_component.html', context)
+        inline_js = render_to_string('discussion/discussion_board_js.template', context)
+
+        fragment = Fragment(html)
+        self.add_resource_urls(fragment)
+        fragment.add_javascript(inline_js)
+        return fragment
+
+    def vendor_js_dependencies(self):
+        """
+        Returns list of vendor JS files that this XBlock depends on.
+
+        The helper function that it uses to obtain the list of vendor JS files
+        works in conjunction with the Django pipeline to ensure that in development mode
+        the files are loaded individually, but in production just the single bundle is loaded.
+        """
+        dependencies = Set()
+        # TODO: how can we get the base dependencies when not rendered within a page?
+        # dependencies.update(self.get_js_dependencies('base_vendor'))
+        # dependencies.update(self.get_js_dependencies('base_application'))
+        dependencies.update(self.get_js_dependencies('discussion_vendor'))
+        return list(dependencies)
+
+    def js_dependencies(self):
+        """
+        Returns list of JS files that this XBlock depends on.
+
+        The helper function that it uses to obtain the list of JS files
+        works in conjunction with the Django pipeline to ensure that in development mode
+        the files are loaded individually, but in production just the single bundle is loaded.
+        """
+        return self.get_js_dependencies('discussion')
+
+
+    def css_dependencies(self):
+        """
+        Returns list of CSS files that this XBlock depends on.
+
+        The helper function that it uses to obtain the list of CSS files
+        works in conjunction with the Django pipeline to ensure that in development mode
+        the files are loaded individually, but in production just the single bundle is loaded.
+        """
+        if get_language_bidi():
+            return self.get_css_dependencies('style-discussion-main-rtl')
+        else:
+            return self.get_css_dependencies('style-discussion-main')
