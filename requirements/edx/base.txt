@@ -108,7 +108,7 @@ sympy==0.7.1
 xmltodict==0.4.1
 django-ratelimit-backend==1.0
 unicodecsv==0.9.4
-django-require==1.0.6
+django-require==1.0.11
 pyuca==1.1
 wrapt==1.10.5
 zendesk==1.1.1
