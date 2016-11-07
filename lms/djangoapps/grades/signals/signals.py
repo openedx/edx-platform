@@ -44,7 +44,7 @@ SCORE_PUBLISHED = Signal(
 # subsection.
 SUBSECTION_SCORE_CHANGED = Signal(
     providing_args=[
-        'course',  # Course object
+        'course_structure',  # BlockStructure object
         'user',  # User object
         'subsection_grade',  # SubsectionGrade object
     ]

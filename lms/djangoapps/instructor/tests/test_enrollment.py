@@ -542,7 +542,6 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         """
         subsection_grade_factory = SubsectionGradeFactory(
             self.user,
-            self.course,
             get_course_blocks(self.user, self.course.location)
         )
         grade = subsection_grade_factory.create(self.sequence)

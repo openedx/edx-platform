@@ -11,6 +11,7 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from xmodule import block_metadata_utils
+from xmodule.modulestore.django import modulestore
 
 from ..models import PersistentCourseGrade
 from .subsection_grade import SubsectionGradeFactory
@@ -32,7 +33,7 @@ class CourseGrade(object):
         self.course_structure = course_structure
         self._percent = None
         self._letter_grade = None
-        self._subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, self.course_structure)
+        self._subsection_grade_factory = SubsectionGradeFactory(self.student, self.course_structure)
 
     @lazy
     def subsection_grade_totals_by_format(self):
@@ -340,11 +341,11 @@ class CourseGradeFactory(object):
             self._compute_and_update_grade(course, course_structure, read_only)
         )
 
-    def update(self, course):
+    def update(self, course_structure):
         """
         Updates the CourseGrade for this Factory's student.
         """
-        course_structure = get_course_blocks(self.student, course.location)
+        course = modulestore().get_course(course_structure.root_block_usage_key.course_key, depth=0)
         self._compute_and_update_grade(course, course_structure)
 
     def get_persisted(self, course):
@@ -367,7 +368,7 @@ class CourseGradeFactory(object):
         return CourseGrade.load_persisted_grade(
             self.student,
             course,
-            course_structure
+            course_structure,
         )
 
     def _compute_and_update_grade(self, course, course_structure, read_only=False):
