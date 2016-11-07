@@ -56,6 +56,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
     LogoutViewConfiguration, RegistrationCookieConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
@@ -1812,21 +1813,11 @@ def create_account_with_params(request, params):
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
-        try:
-            if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-                message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                           '-' * 80 + '\n\n' + message)
-                mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
-            else:
-                user.email_user(subject, message, from_address)
-        except Exception:  # pylint: disable=broad-except
-            log.error(
-                u'Unable to send activation email to user from "%s" to "%s"',
-                from_address,
-                dest_addr,
-                exc_info=True
-            )
+        if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+            dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
+            message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                       '-' * 80 + '\n\n' + message)
+        send_activation_email.delay(subject, message, from_address, dest_addr)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
