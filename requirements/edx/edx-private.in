@@ -1,0 +1,38 @@
+# Requirements for edx.org that aren't necessarily needed for Open edX.
+#
+# ***                                                                   ***
+# *** PLEASE READ THE INSTRUCTIONS in github.txt about how to properly  ***
+# *** write these references. Thanks.                                   ***
+# ***                                                                   ***
+
+
+# For Harvard courses:
+-e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
+git+https://github.com/open-craft/problem-builder.git@v2.0.4#egg=xblock-problem-builder==2.0.4
+
+# Oppia XBlock
+-e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
+
+# Microsoft's Office Mix XBlock:
+-e git+https://github.com/OfficeDev/xblock-officemix.git@3f876b5f0267b017812620239533a29c7d562d24#egg=officemix
+
+# This repository contains schoolyourself-xblock, which is used in
+# edX's "AlgebraX" and "GeometryX" courses.
+-e git+https://github.com/schoolyourself/schoolyourself-xblock.git@5e4d37716e3e72640e832e961f7cc0d38d4ec47b#egg=schoolyourself-xblock
+
+# Prototype XBlocks from edX learning sciences limited roll-outs and user testing.
+# Concept XBlock, in particular, is nowhere near finished and an early prototype.
+# Profile XBlock is there so we can play with XBlock arguments in the platform, but isn't ready for use outside of
+# edX.
+
+-e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
+-e git+https://github.com/pmitros/AudioXBlock.git@1fbf19cc21613aead62799469e1593adb037fdd9#egg=audio-xblock
+-e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
+-e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
+
+# Peer instruction XBlock
+ubcpi-xblock==0.5.3
+
+# Vector Drawing and ActiveTable XBlocks (Davidson)
+-e git+https://github.com/open-craft/xblock-vectordraw.git@v0.2#egg=xblock-vectordraw==0.2
+-e git+https://github.com/open-craft/xblock-activetable.git@1786a2c8fc06ca3ecfac1972464048982bd486ff#egg=xblock-activetable

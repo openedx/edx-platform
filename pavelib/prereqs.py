@@ -10,6 +10,7 @@ import sys
 
 from paver.easy import sh, task
 
+from pavelib.utils.passthrough_opts import PassthroughTask
 from .utils.envs import Env
 from .utils.timer import timed
 
@@ -29,6 +30,12 @@ PYTHON_REQ_FILES = [
     'requirements/edx/base.txt',
     'requirements/edx/paver.txt',
     'requirements/edx/post.txt',
+]
+
+PYTHON_SANDBOX_REQ_FILES = [
+    'requirements/edx-sandbox/base.txt',
+    'requirements/edx-sandbox/local.txt',
+    'requirements/edx-sandbox/post.txt',
 ]
 
 # Developers can have private requirements, for local copies of github repos,
@@ -142,14 +149,40 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
-    for req_file in PYTHON_REQ_FILES:
-        pip_install_req_file(req_file)
+    pip_sync_req_files(PYTHON_REQ_FILES)
 
 
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
     pip_cmd = 'pip install -q --disable-pip-version-check --exists-action w'
     sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
+
+def pip_sync_req_files(req_files):
+    """Use pip-sync to install requirements files."""
+    sh("pip-sync --phased {}".format(" ".join(req_files)))
+
+def pip_compile_req_files(files, options):
+    """Use pip-compile to install requirements files."""
+    command = ["pip-compile", "--phased"]
+    command.extend(options)
+    command.extend(files)
+    sh(command)
+
+
+@PassthroughTask
+@timed
+def compile_python_req_files(passthrough_options):
+    """
+    Builds a consistent set of pinned requirement files using pip-compile.
+    """
+    pip_compile_req_files(
+        files=[outfile.replace(".txt", ".in") for outfile in PYTHON_REQ_FILES],
+        options=passthrough_options
+    )
+    pip_compile_req_files(
+        files=[outfile.replace(".txt", ".in") for outfile in PYTHON_SANDBOX_REQ_FILES],
+        options=passthrough_options
+    )
 
 
 @task
@@ -163,85 +196,6 @@ def install_node_prereqs():
         return
 
     prereq_cache("Node prereqs", ["package.json"], node_prereqs_installation)
-
-
-# To add a package to the uninstall list, just add it to this list! No need
-# to touch any other part of this file.
-PACKAGES_TO_UNINSTALL = [
-    "South",                        # Because it interferes with Django 1.8 migrations.
-    "edxval",                       # Because it was bork-installed somehow.
-    "django-storages",
-    "django-oauth2-provider",       # Because now it's called edx-django-oauth2-provider.
-    "edx-oauth2-provider",          # Because it moved from github to pypi
-]
-
-
-@task
-@timed
-def uninstall_python_packages():
-    """
-    Uninstall Python packages that need explicit uninstallation.
-
-    Some Python packages that we no longer want need to be explicitly
-    uninstalled, notably, South.  Some other packages were once installed in
-    ways that were resistant to being upgraded, like edxval.  Also uninstall
-    them.
-
-    """
-    # So that we don't constantly uninstall things, use a hash of the packages
-    # to be uninstalled.  Check it, and skip this if we're up to date.
-    hasher = hashlib.sha1()
-    hasher.update(repr(PACKAGES_TO_UNINSTALL))
-    expected_version = hasher.hexdigest()
-    state_file_path = os.path.join(PREREQS_STATE_DIR, "Python_uninstall.sha1")
-    create_prereqs_cache_dir()
-
-    if os.path.isfile(state_file_path):
-        with open(state_file_path) as state_file:
-            version = state_file.read()
-        if version == expected_version:
-            print 'Python uninstalls unchanged, skipping...'
-            return
-
-    # Run pip to find the packages we need to get rid of.  Believe it or not,
-    # edx-val is installed in a way that it is present twice, so we have a loop
-    # to really really get rid of it.
-    for _ in range(3):
-        uninstalled = False
-        frozen = sh("pip freeze", capture=True)
-
-        for package_name in PACKAGES_TO_UNINSTALL:
-            if package_in_frozen(package_name, frozen):
-                # Uninstall the pacakge
-                sh("pip uninstall --disable-pip-version-check -y {}".format(package_name))
-                uninstalled = True
-        if not uninstalled:
-            break
-    else:
-        # We tried three times and didn't manage to get rid of the pests.
-        print "Couldn't uninstall unwanted Python packages!"
-        return
-
-    # Write our version.
-    with open(state_file_path, "w") as state_file:
-        state_file.write(expected_version)
-
-
-def package_in_frozen(package_name, frozen_output):
-    """Is this package in the output of 'pip freeze'?"""
-    # Look for either:
-    #
-    #   PACKAGE-NAME==
-    #
-    # or:
-    #
-    #   blah_blah#egg=package_name-version
-    #
-    pattern = r"(?mi)^{pkg}==|#egg={pkg_under}-".format(
-        pkg=re.escape(package_name),
-        pkg_under=re.escape(package_name.replace("-", "_")),
-    )
-    return bool(re.search(pattern, frozen_output))
 
 
 @task
@@ -263,8 +217,6 @@ def install_python_prereqs():
     if no_prereq_install():
         print NO_PREREQ_MESSAGE
         return
-
-    uninstall_python_packages()
 
     # Include all of the requirements files in the fingerprint.
     files_to_fingerprint = list(PYTHON_REQ_FILES)

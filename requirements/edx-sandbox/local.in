@@ -1,0 +1,13 @@
+# DON'T JUST ADD NEW DEPENDENCIES!!!
+#
+# If you open a pull request that adds a new dependency, you should notify:
+#   * @edx/ospr - to check licensing
+#   * @edx/devops - to check system requirements
+
+# Install these packages from the edx-platform working tree
+# NOTE: if you change code in these packages, you MUST change the version
+# number in its setup.py or the code WILL NOT be installed during deploy.
+-e common/lib/calc
+-e common/lib/chem
+-e common/lib/sandbox-packages
+-e common/lib/symmath

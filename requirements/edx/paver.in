@@ -1,0 +1,9 @@
+# Requirements to run Paver
+Paver==1.2.4
+psutil==1.2.1
+lazy==1.1
+path.py==8.2.1
+watchdog==0.8.3
+python-memcached
+libsass==0.10.0
+git+https://github.com/edx/pip-tools@handle-local-relative-paths#egg=pip-tools==1.7.1dev0
