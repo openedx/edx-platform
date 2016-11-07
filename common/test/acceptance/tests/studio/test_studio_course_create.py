@@ -2,8 +2,9 @@
 Acceptance tests for course creation.
 """
 import uuid
-from bok_choy.web_app_test import WebAppTest
 from nose.plugins.attrib import attr
+
+from common.test.acceptance.tests.helpers import AcceptanceTest
 
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.studio.index import DashboardPage
@@ -11,7 +12,7 @@ from common.test.acceptance.pages.studio.overview import CourseOutlinePage
 
 
 @attr(shard=8)
-class CreateCourseTest(WebAppTest):
+class CreateCourseTest(AcceptanceTest):
     """
     Test that we can create a new course the studio home page.
     """

@@ -4,8 +4,7 @@ Test dashboard search
 import os
 import json
 
-from bok_choy.web_app_test import WebAppTest
-from common.test.acceptance.tests.helpers import generate_course_key
+from common.test.acceptance.tests.helpers import AcceptanceTest, generate_course_key
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.utils import add_html_component, type_in_codemirror
@@ -16,7 +15,7 @@ from common.test.acceptance.pages.lms.dashboard_search import DashboardSearchPag
 from common.test.acceptance.fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
-class DashboardSearchTest(WebAppTest):
+class DashboardSearchTest(AcceptanceTest):
     """
     Test dashboard search.
     """

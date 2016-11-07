@@ -1,7 +1,6 @@
 """
 Acceptance tests for Home Page (My Courses / My Libraries).
 """
-from bok_choy.web_app_test import WebAppTest
 from flaky import flaky
 from opaque_keys.edx.locator import LibraryLocator
 from uuid import uuid4
@@ -13,13 +12,14 @@ from common.test.acceptance.pages.studio.library import LibraryEditPage
 from common.test.acceptance.pages.studio.index import DashboardPage, DashboardPageWithPrograms
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.tests.helpers import (
+    AcceptanceTest,
     select_option_by_text,
     get_selected_option_text
 )
 from openedx.core.djangoapps.programs.tests import factories
 
 
-class CreateLibraryTest(WebAppTest):
+class CreateLibraryTest(AcceptanceTest):
     """
     Test that we can create a new content library on the studio home page.
     """
@@ -68,7 +68,7 @@ class CreateLibraryTest(WebAppTest):
         self.assertTrue(self.dashboard_page.has_library(name=name, org=org, number=number))
 
 
-class DashboardProgramsTabTest(ProgramsConfigMixin, CatalogConfigMixin, WebAppTest):
+class DashboardProgramsTabTest(ProgramsConfigMixin, CatalogConfigMixin, AcceptanceTest):
     """
     Test the programs tab on the studio home page.
     """
@@ -160,7 +160,7 @@ class DashboardProgramsTabTest(ProgramsConfigMixin, CatalogConfigMixin, WebAppTe
         self.assertFalse(self.dashboard_page.is_new_program_button_present())
 
 
-class StudioLanguageTest(WebAppTest):
+class StudioLanguageTest(AcceptanceTest):
     """ Test suite for the Studio Language """
     def setUp(self):
         super(StudioLanguageTest, self).setUp()
