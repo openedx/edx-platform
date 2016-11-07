@@ -82,6 +82,23 @@ class TestCourseGradeFactory(GradeTestBase):
     """
     Test that CourseGrades are calculated properly
     """
+    def setUp(self):
+        super(TestCourseGradeFactory, self).setUp()
+        grading_policy = {
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": 1.0,
+                },
+            ],
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5,
+            },
+        }
+        self.course.set_grading_policy(grading_policy)
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(
@@ -106,7 +123,26 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(mock_save_grades.called, feature_flag and course_setting)
 
     def test_course_grade_creation(self):
-        grading_policy = {
+        grade_factory = CourseGradeFactory(self.request.user)
+        with mock_get_score(1, 2):
+            course_grade = grade_factory.create(self.course)
+        self.assertEqual(course_grade.letter_grade, u'Pass')
+        self.assertEqual(course_grade.percent, 0.5)
+
+    def test_get_persisted(self):
+        grade_factory = CourseGradeFactory(self.request.user)
+        # first, create a grade in the database
+        with mock_get_score(1, 2):
+            grade_factory.create(self.course, read_only=False)
+
+        # retrieve the grade, ensuring it is as expected and take just one query
+        with self.assertNumQueries(1):
+            course_grade = grade_factory.get_persisted(self.course)
+        self.assertEqual(course_grade.letter_grade, u'Pass')
+        self.assertEqual(course_grade.percent, 0.5)
+
+        # update the grading policy
+        new_grading_policy = {
             "GRADER": [
                 {
                     "type": "Homework",
@@ -117,13 +153,15 @@ class TestCourseGradeFactory(GradeTestBase):
                 },
             ],
             "GRADE_CUTOFFS": {
-                "Pass": 0.5,
+                "Pass": 0.9,
             },
         }
-        self.course.set_grading_policy(grading_policy)
-        grade_factory = CourseGradeFactory(self.request.user)
-        with mock_get_score(1, 2):
-            course_grade = grade_factory.create(self.course)
+        self.course.set_grading_policy(new_grading_policy)
+
+        # ensure the grade can still be retrieved via get_persisted
+        # despite its outdated grading policy
+        with self.assertNumQueries(1):
+            course_grade = grade_factory.get_persisted(self.course)
         self.assertEqual(course_grade.letter_grade, u'Pass')
         self.assertEqual(course_grade.percent, 0.5)
 
@@ -168,18 +206,18 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             with patch(
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_bulk_cached_grade',
                 wraps=self.subsection_grade_factory._get_bulk_cached_grade
-            ) as mock_get_saved_grade:
+            ) as mock_get_bulk_cached_grade:
                 with self.assertNumQueries(14):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
-                self.assertTrue(mock_get_saved_grade.called)
+                self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertTrue(mock_create_grade.called)
 
-                mock_get_saved_grade.reset_mock()
+                mock_get_bulk_cached_grade.reset_mock()
                 mock_create_grade.reset_mock()
 
                 with self.assertNumQueries(0):
                     grade_b = self.subsection_grade_factory.create(self.sequence)
-                self.assertTrue(mock_get_saved_grade.called)
+                self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertFalse(mock_create_grade.called)
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
