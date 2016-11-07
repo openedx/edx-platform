@@ -19,21 +19,13 @@
             <%
               label_class = 'response-label field-label label-inline'
             %>
+
             <label id="${id}-${choice_id}-label"
                 ## If the student has selected this choice...
                 % if is_radio_input(choice_id):
-                <%
-                    if status == 'correct':
-                        correctness = 'correct'
-                    elif status == 'partially-correct':
-                        correctness = 'partially-correct'
-                    elif status == 'incorrect':
-                        correctness = 'incorrect'
-                    else:
-                        correctness = None
-                %>
-                    % if correctness and not show_correctness == 'never':
-                        <% label_class += ' choicegroup_' + correctness %>
+
+                    % if status.classname and not show_correctness == 'never':
+                        <% label_class += ' choicegroup_' + status.classname %>
                     % endif
                 % endif
                 class="${label_class}"
@@ -47,7 +39,6 @@
                 checked="true"
                 % endif
                 /> ${HTML(choice_label)}
-
                 % if is_radio_input(choice_id):
                   % if not show_correctness == 'never' and status.classname != 'unanswered':
                     <%include file="status_span.html" args="status=status, status_id=id"/>

@@ -764,14 +764,16 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         self.problem_page.wait_for_save_notification()
 
         # Save problem 1's content state as we're about to switch units in the sequence.
-        problem1_content_before_switch = self.problem_page.problem_content
+        problem1_content_before_switch = self.problem_page.problem_input_content
 
         # Go to sequential position 2 and assert that we are on problem 2.
         self.go_to_tab_and_assert_problem(2, self.problem2_name)
 
+        self.problem_page.wait_for_expected_status('span.unanswered', 'unanswered')
+
         # Come back to our original unit in the sequence and assert that the content hasn't changed.
         self.go_to_tab_and_assert_problem(1, self.problem1_name)
-        problem1_content_after_coming_back = self.problem_page.problem_content
+        problem1_content_after_coming_back = self.problem_page.problem_input_content
         self.assertIn(problem1_content_after_coming_back, problem1_content_before_switch)
 
     def test_perform_problem_reset_and_navigate(self):

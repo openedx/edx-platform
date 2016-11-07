@@ -1084,7 +1084,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         conditions = [
             {'input_type': 'radio', 'value': self.VALUE_DICT}]
 
-        self.context['status'] = 'correct'
+        self.context['status'] = Status('correct')
 
         for test_conditions in conditions:
             self.context.update(test_conditions)
@@ -1104,7 +1104,7 @@ class ChoiceTextGroupTemplateTest(TemplateTestCase):
         conditions = [
             {'input_type': 'radio', 'value': self.VALUE_DICT}]
 
-        self.context['status'] = 'incorrect'
+        self.context['status'] = Status('incorrect')
 
         for test_conditions in conditions:
             self.context.update(test_conditions)

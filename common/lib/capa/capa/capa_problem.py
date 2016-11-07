@@ -143,6 +143,7 @@ class LoncapaProblem(object):
             state (dict): containing the following keys:
                 - `seed` (int) random number generator seed
                 - `student_answers` (dict) maps input id to the stored answer for that input
+                - 'has_saved_answers' (Boolean) True if the answer has been saved since last submit.
                 - `correct_map` (CorrectMap) a map of each input to their 'correctness'
                 - `done` (bool) indicates whether or not this problem is considered done
                 - `input_state` (dict) maps input_id to a dictionary that holds the state for that input
@@ -165,6 +166,7 @@ class LoncapaProblem(object):
         assert self.seed is not None, "Seed must be provided for LoncapaProblem."
 
         self.student_answers = state.get('student_answers', {})
+        self.has_saved_answers = state.get('has_saved_answers', False)
         if 'correct_map' in state:
             self.correct_map.set_dict(state['correct_map'])
         self.done = state.get('done', False)
@@ -257,6 +259,7 @@ class LoncapaProblem(object):
         Reset internal state to unfinished, with no answers
         """
         self.student_answers = dict()
+        self.has_saved_answers = False
         self.correct_map = CorrectMap()
         self.done = False
 
@@ -283,6 +286,7 @@ class LoncapaProblem(object):
 
         return {'seed': self.seed,
                 'student_answers': self.student_answers,
+                'has_saved_answers': self.has_saved_answers,
                 'correct_map': self.correct_map.get_dict(),
                 'input_state': self.input_state,
                 'done': self.done}
@@ -789,8 +793,14 @@ class LoncapaProblem(object):
             answervariable = None
             if problemid in self.correct_map:
                 pid = input_id
-                status = self.correct_map.get_correctness(pid)
-                msg = self.correct_map.get_msg(pid)
+
+                # If the the problem has not been saved since the last submit set the status to the
+                # current correctness value and set the message as expected. Otherwise we do not want to
+                # display correctness because the answer may have changed since the problem was graded.
+                if not self.has_saved_answers:
+                    status = self.correct_map.get_correctness(pid)
+                    msg = self.correct_map.get_msg(pid)
+
                 hint = self.correct_map.get_hint(pid)
                 hintmode = self.correct_map.get_hintmode(pid)
                 answervariable = self.correct_map.get_property(pid, 'answervariable')
@@ -810,6 +820,7 @@ class LoncapaProblem(object):
                 'input_state': self.input_state[input_id],
                 'answervariable': answervariable,
                 'response_data': response_data,
+                'has_saved_answers': self.has_saved_answers,
                 'feedback': {
                     'message': msg,
                     'hint': hint,
