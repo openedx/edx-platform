@@ -1,0 +1,70 @@
+## mako
+
+<%! main_css = "style-main-v2" %>
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+
+<%!
+import json
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from django.core.urlresolvers import reverse
+from pipeline_mako import render_require_js_path_overrides
+
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+%>
+
+<!DOCTYPE html>
+<html lang="${LANGUAGE_CODE}">
+<head dir="${static.dir_rtl()}">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <title></title>
+    <%
+    jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    %>
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+
+    <%static:css group='style-vendor'/>
+    <%static:css group='${self.attr.main_css}'/>
+
+    % if not uses_pattern_library:
+        % if disable_courseware_js:
+            <%static:js group='base_vendor'/>
+            <%static:js group='base_application'/>
+        % else:
+            <%static:js group='main_vendor'/>
+            <%static:js group='application'/>
+        % endif
+    % else:
+        ## TODO: Update to only bring in RequireJS
+        ## https://openedx.atlassian.net/browse/FEDX-140
+        <%static:js group='base_vendor'/>
+        <%static:js group='base_application'/>
+    % endif
+
+    <script>
+        window.baseUrl = "${settings.STATIC_URL}";
+        (function (require) {
+            require.config({
+                baseUrl: window.baseUrl
+            });
+        }).call(this, require || RequireJS.require);
+    </script>
+    <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
+
+    ${HTML(render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES))}
+
+    ${HTML(fragment.head_html())}
+</head>
+<body>
+    <div class="content-wrapper" id="container">
+        ${HTML(fragment.body_html())}
+    </div>
+    ${HTML(fragment.foot_html())}
+</body>
+</html>

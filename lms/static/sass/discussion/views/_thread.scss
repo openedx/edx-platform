@@ -94,49 +94,46 @@
 }
 
 // +thread - elements - shared styles
-body.discussion {
+.discussion-post, .discussion-response, .discussion-comment {
+    @include clearfix();
 
-    .discussion-post, .discussion-response, .discussion-comment {
-        @include clearfix();
+    // thread - images
+    .author-image {
+        @include margin-right($baseline/2);
+        display: inline-block;
+        vertical-align: top;
 
-        // thread - images
-        .author-image {
-            @include margin-right($baseline/2);
-            display: inline-block;
-            vertical-align: top;
+        // STATE: No profile image
+        &:empty {
+            display: none;
+        }
 
-            // STATE: No profile image
-            &:empty {
-                display: none;
-            }
+        // CASE: post image
+        &.level-post {
+            height: $post-image-dimension;
+            width: $post-image-dimension;
+        }
 
-            // CASE: post image
-            &.level-post {
-                height: $post-image-dimension;
-                width: $post-image-dimension;
-            }
+        // CASE: response image
+        &.level-response {
+            height: $response-image-dimension;
+            width: $response-image-dimension;
+        }
 
-            // CASE: response image
-            &.level-response {
-                height: $response-image-dimension;
-                width: $response-image-dimension;
-            }
+        // CASE: comment image
+        &.level-comment {
+            height: $comment-image-dimension;
+            width: $comment-image-dimension;
+        }
 
-            // CASE: comment image
-            &.level-comment {
-                height: $comment-image-dimension;
-                width: $comment-image-dimension;
-            }
-
-            img {
-                border-radius: $forum-border-radius;
-            }
+        img {
+            border-radius: $forum-border-radius;
         }
     }
+}
 
-    .discussion-response .response-body {
-        @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
-    }
+.discussion-response .response-body {
+    @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
 }
 
 // +post - individual element styling

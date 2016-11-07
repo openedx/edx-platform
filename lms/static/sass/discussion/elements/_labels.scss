@@ -1,7 +1,7 @@
 // discussion - elements - labels
 // ====================
 
-body.discussion, .discussion-module {
+.discussion-body, .discussion-module {
   .post-label {
     @include margin($baseline/4, $baseline/2, 0, 0);
     @extend %t-weight4;
