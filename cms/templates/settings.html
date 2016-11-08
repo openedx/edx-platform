@@ -333,6 +333,9 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url | n, js_escaped_string}'
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
                   <textarea class="tinymce text-editor" id="course-overview"></textarea>
+                  <label class="sr" for="course-overview-cm-textarea">
+                    ${_('HTML Code Editor')}
+                  </label>
                   <span class="tip tip-stacked">${
                     Text(_("Introductions, prerequisites, FAQs that are used on {a_link_start}your course summary page{a_link_end} (formatted in HTML)")).format(
                       a_link_start=HTML("<a class='link-courseURL' rel='external' href='{lms_link_for_about_page}'>").format(lms_link_for_about_page=lms_link_for_about_page),

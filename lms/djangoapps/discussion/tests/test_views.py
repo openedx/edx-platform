@@ -10,6 +10,7 @@ from django.utils import translation
 from lms.lib.comment_client.utils import CommentClientPaginatedResult
 
 from django_comment_common.utils import ThreadContext
+from django_comment_common.models import ForumsConfig
 from django_comment_client.permissions import get_team
 from django_comment_client.tests.group_id import (
     GroupIdAssertionMixin,
@@ -17,7 +18,7 @@ from django_comment_client.tests.group_id import (
     NonCohortedTopicGroupIdTestMixin,
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import CohortedTestCase
+from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_client.utils import strip_none
 from lms.djangoapps.discussion import views
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -75,6 +76,10 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
             # Log the student in
             self.client = Client()
             assert_true(self.client.login(username=uname, password=password))
+
+        config = ForumsConfig.current()
+        config.enabled = True
+        config.save()
 
     @patch('student.models.cc.User.from_django_user')
     @patch('student.models.cc.User.active_threads')
@@ -220,7 +225,7 @@ class PartialDictMatcher(object):
 
 
 @patch('requests.request', autospec=True)
-class SingleThreadTestCase(ModuleStoreTestCase):
+class SingleThreadTestCase(ForumsEnableMixin, ModuleStoreTestCase):
 
     CREATE_USER = False
 
@@ -334,12 +339,15 @@ class SingleThreadTestCase(ModuleStoreTestCase):
 
 @ddt.ddt
 @patch('requests.request', autospec=True)
-class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
+class SingleThreadQueryCountTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     """
     Ensures the number of modulestore queries and number of sql queries are
     independent of the number of responses retrieved for a given discussion thread.
     """
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+
+    def setUp(self):
+        super(SingleThreadQueryCountTestCase, self).setUp()
 
     @ddt.data(
         # Old mongo with cache. There is an additional SQL query for old mongo
@@ -598,7 +606,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, GroupIdAssertionMixin):
 
 
 @patch('requests.request', autospec=True)
-class SingleThreadContentGroupTestCase(UrlResetMixin, ContentGroupTestCase):
+class SingleThreadContentGroupTestCase(ForumsEnableMixin, UrlResetMixin, ContentGroupTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -708,7 +716,7 @@ class SingleThreadContentGroupTestCase(UrlResetMixin, ContentGroupTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class InlineDiscussionContextTestCase(ModuleStoreTestCase):
+class InlineDiscussionContextTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionContextTestCase, self).setUp()
         self.course = CourseFactory.create()
@@ -1039,7 +1047,7 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
 
 
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class InlineDiscussionTestCase(ModuleStoreTestCase):
+class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
 
@@ -1097,7 +1105,7 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
 
 
 @patch('requests.request', autospec=True)
-class UserProfileTestCase(UrlResetMixin, ModuleStoreTestCase):
+class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
 
     TEST_THREAD_TEXT = 'userprofile-test-text'
     TEST_THREAD_ID = 'userprofile-test-thread-id'
@@ -1216,7 +1224,7 @@ class UserProfileTestCase(UrlResetMixin, ModuleStoreTestCase):
 
 
 @patch('requests.request', autospec=True)
-class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
+class CommentsServiceRequestHeadersTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
 
     CREATE_USER = False
 
@@ -1282,7 +1290,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-class InlineDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
+class InlineDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1296,6 +1304,9 @@ class InlineDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(InlineDiscussionUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1312,7 +1323,7 @@ class InlineDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-class ForumFormDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
+class ForumFormDiscussionUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
     @classmethod
     def setUpClass(cls):
         # pylint: disable=super-method-not-called
@@ -1325,6 +1336,9 @@ class ForumFormDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestM
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(ForumFormDiscussionUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1342,7 +1356,7 @@ class ForumFormDiscussionUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestM
 
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
-class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
+class ForumDiscussionXSSTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
         super(ForumDiscussionXSSTestCase, self).setUp()
@@ -1391,7 +1405,7 @@ class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertNotIn(malicious_code, resp.content)
 
 
-class ForumDiscussionSearchUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
+class ForumDiscussionSearchUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1405,6 +1419,9 @@ class ForumDiscussionSearchUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTes
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(ForumDiscussionSearchUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1424,7 +1441,7 @@ class ForumDiscussionSearchUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTes
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-class SingleThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
+class SingleThreadUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1438,6 +1455,9 @@ class SingleThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(SingleThreadUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1454,7 +1474,7 @@ class SingleThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["content"]["body"], text)
 
 
-class UserProfileUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
+class UserProfileUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1468,6 +1488,9 @@ class UserProfileUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(UserProfileUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1483,7 +1506,7 @@ class UserProfileUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-class FollowedThreadsUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin):
+class FollowedThreadsUnicodeTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, UnicodeTestMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1497,6 +1520,9 @@ class FollowedThreadsUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin
 
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(FollowedThreadsUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1512,7 +1538,7 @@ class FollowedThreadsUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-class EnrollmentTestCase(ModuleStoreTestCase):
+class EnrollmentTestCase(ForumsEnableMixin, ModuleStoreTestCase):
     """
     Tests for the behavior of views depending on if the student is enrolled
     in the course

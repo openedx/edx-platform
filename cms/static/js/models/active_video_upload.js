@@ -19,6 +19,7 @@ define(
         var ActiveVideoUpload = Backbone.Model.extend(
             {
                 defaults: {
+                    videoId: null,
                     status: statusStrings.STATUS_QUEUED,
                     progress: 0
                 }

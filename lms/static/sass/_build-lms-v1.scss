@@ -12,6 +12,10 @@
 // base - starter
 @import 'base/base';
 
+// Pattern Library shims
+@import 'edx-pattern-library-shims/base/variables';
+@import 'edx-pattern-library-shims/buttons';
+
 // base - elements
 @import 'elements/controls';
 @import 'elements/creative-commons';
@@ -74,6 +78,3 @@
 // overrides
 @import 'developer'; // used for any developer-created scss that needs further polish/refactoring
 @import 'shame';     // used for any bad-form/orphaned scss
-
-// CAPA Problem Feedback
-@import 'edx-pattern-library-shims/buttons';

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-27 14:45+0000\n"
-"PO-Revision-Date: 2016-10-27 14:45:24.494944\n"
+"POT-Creation-Date: 2016-11-03 15:28+0000\n"
+"PO-Revision-Date: 2016-11-03 15:28:41.551415\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3142,6 +3142,22 @@ msgstr ""
 "ثطشوس."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Opting Out of Proctored Exams"
+msgstr "شممخص خحفهرل خعف خب حقخذفخقثي ثطشوس"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, learners can choose to take "
+"proctored exams without proctoring. If this value is false, all learners "
+"must take the exam with proctoring. This setting only applies if proctored "
+"exams are enabled for the course."
+msgstr ""
+"ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, مثشقرثقس ذشر ذاخخسث فخ فشنث "
+"حقخذفخقثي ثطشوس صهفاخعف حقخذفخقهرل. هب فاهس دشمعث هس بشمسث, شمم مثشقرثقس "
+"وعسف فشنث فاث ثطشو صهفا حقخذفخقهرل. فاهس سثففهرل خرمغ شححمهثس هب حقخذفخقثي "
+"ثطشوس شقث ثرشزمثي بخق فاث ذخعقسث."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr "ذقثشفث ظثريثسن فهذنثفس بخق سعسحهذهخعس حقخذفخقثي ثطشو شففثوحفس"
 
@@ -3160,10 +3176,12 @@ msgstr "ثرشزمث فهوثي ثطشوس"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
-"course."
+"course. Regardless of this setting, timed exams are enabled if Enable "
+"Proctored Exams is set to true."
 msgstr ""
 "ثرفثق فقعث خق بشمسث. هب فاهس دشمعث هس فقعث, فهوثي ثطشوس شقث ثرشزمثي هر غخعق "
-"ذخعقسث."
+"ذخعقسث. قثلشقيمثسس خب فاهس سثففهرل, فهوثي ثطشوس شقث ثرشزمثي هب ثرشزمث "
+"حقخذفخقثي ثطشوس هس سثف فخ فقعث."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -19073,13 +19091,17 @@ msgstr "هسسعهرل ذثقفهبهذشفثس فخ مثشقرثقس"
 
 #: cms/templates/certificates.html
 msgid ""
-"To begin issuing certificates, a course team member with the Admin role "
-"selects {em_start}Activate{em_end}. Course team members without the Admin "
-"role cannot edit or delete an activated certificate."
+"After you have configured and previewed your certificate, ask your edX "
+"partner manager to activate your certificate. When your certificate has been"
+" activated, you can begin issuing certificates to learners. Course team "
+"members without the Admin role cannot edit or delete an activated "
+"certificate."
 msgstr ""
-"فخ زثلهر هسسعهرل ذثقفهبهذشفثس, ش ذخعقسث فثشو وثوزثق صهفا فاث شيوهر قخمث "
-"سثمثذفس {em_start}شذفهدشفث{em_end}. ذخعقسث فثشو وثوزثقس صهفاخعف فاث شيوهر "
-"قخمث ذشررخف ثيهف خق يثمثفث شر شذفهدشفثي ذثقفهبهذشفث."
+"شبفثق غخع اشدث ذخربهلعقثي شري حقثدهثصثي غخعق ذثقفهبهذشفث, شسن غخعق ثيط "
+"حشقفرثق وشرشلثق فخ شذفهدشفث غخعق ذثقفهبهذشفث. صاثر غخعق ذثقفهبهذشفث اشس زثثر"
+" شذفهدشفثي, غخع ذشر زثلهر هسسعهرل ذثقفهبهذشفثس فخ مثشقرثقس. ذخعقسث فثشو "
+"وثوزثقس صهفاخعف فاث شيوهر قخمث ذشررخف ثيهف خق يثمثفث شر شذفهدشفثي "
+"ذثقفهبهذشفث."
 
 #: cms/templates/certificates.html
 msgid ""

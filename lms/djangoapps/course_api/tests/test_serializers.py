@@ -68,6 +68,7 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
             'effort': u'6 hours',
             'pacing': 'instructor',
             'mobile_available': False,
+            'hidden': False,
 
             # 'course_id' is a deprecated field, please use 'id' instead.
             'course_id': u'edX/toy/2012_Fall',
@@ -96,6 +97,15 @@ class TestCourseSerializer(CourseApiFactoryMixin, ModuleStoreTestCase):
         with check_mongo_calls(self.expected_mongo_calls):
             result = self._get_result(course)
         self.assertDictEqual(result, self.expected_data)
+
+    def test_hidden(self):
+        course = self.create_course(
+            course=u'custom',
+            start=datetime(2015, 3, 15),
+            catalog_visibility=u'none'
+        )
+        result = self._get_result(course)
+        self.assertEqual(result['hidden'], True)
 
     def test_advertised_start(self):
         course = self.create_course(

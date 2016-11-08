@@ -3,6 +3,7 @@ import datetime
 import json
 import ddt
 import mock
+from mock import patch, Mock
 from nose.plugins.attrib import attr
 from pytz import UTC
 from django.utils.timezone import UTC as django_utc
@@ -14,6 +15,8 @@ from edxmako import add_lookup
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 import django_comment_client.utils as utils
+from lms.lib.comment_client.utils import perform_request, CommentClientMaintenanceError
+from django_comment_common.models import ForumsConfig
 
 from courseware.tests.factories import InstructorFactory
 from courseware.tabs import get_course_tab_list
@@ -1417,3 +1420,32 @@ class PermissionsTestCase(ModuleStoreTestCase):
         # content has no known author
         del content['user_id']
         self.assertFalse(utils.is_content_authored_by(content, user))
+
+
+class ClientConfigurationTestCase(TestCase):
+    """Simple test cases to ensure enabling/disabling the use of the comment service works as intended."""
+
+    def test_disabled(self):
+        """Ensures that an exception is raised when forums are disabled."""
+        config = ForumsConfig.current()
+        config.enabled = False
+        config.save()
+
+        with self.assertRaises(CommentClientMaintenanceError):
+            perform_request('GET', 'http://www.google.com')
+
+    @patch('requests.request')
+    def test_enabled(self, mock_request):
+        """Ensures that requests proceed normally when forums are enabled."""
+        config = ForumsConfig.current()
+        config.enabled = True
+        config.save()
+
+        response = Mock()
+        response.status_code = 200
+        response.json = lambda: {}
+
+        mock_request.return_value = response
+
+        result = perform_request('GET', 'http://www.google.com')
+        self.assertEqual(result, {})

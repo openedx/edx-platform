@@ -1,4 +1,4 @@
-/* globals _, Logger, Slick, tinyMCE, InstructorDashboard */
+/* globals _, Logger, Slick, tinyMCE, InstructorDashboard, PendingInstructorTasks, createTaskListTable */
 
 (function() {
     'use strict';
@@ -379,7 +379,7 @@
                 url: listEndpoint,
                 success: function(data) {
                     if (data.tasks.length) {
-                        ths.createTaskListTable(ths.$table_running_tasks, data.tasks);
+                        createTaskListTable(ths.$table_running_tasks, data.tasks);
                         ths.$no_tasks_message.hide();
                         return ths.$running_tasks_section.show();
                     } else {
@@ -526,10 +526,10 @@
             plantInterval: plantInterval,
             statusAjaxError: this.statusAjaxError,
             IntervalManager: IntervalManager,
-            createTaskListTable: this.createTaskListTable,
+            createTaskListTable: createTaskListTable,
             createEmailContentTable: createEmailContentTable,
             createEmailMessageViews: createEmailMessageViews,
-            PendingInstructorTasks: this.PendingInstructorTasks,
+            PendingInstructorTasks: PendingInstructorTasks,
             KeywordValidator: KeywordValidator,
             ReportDownloads: this.ReportDownloads
         };

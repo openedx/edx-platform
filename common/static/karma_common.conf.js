@@ -28,7 +28,6 @@ var options = {
         {pattern: 'js/vendor/URI.min.js', included: true},
         {pattern: 'js/test/add_ajax_prefix.js', included: true},
         {pattern: 'js/test/i18n.js', included: true},
-        {pattern: 'js/lib/pretty-print.js', included: true},
 
         {pattern: 'common/js/vendor/underscore.js', included: true},
         {pattern: 'common/js/vendor/underscore.string.js', included: true},

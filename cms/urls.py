@@ -199,6 +199,7 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
     )
 
 # Custom error pages
+# These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'

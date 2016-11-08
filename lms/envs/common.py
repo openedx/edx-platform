@@ -1096,6 +1096,7 @@ MIDDLEWARE_CLASSES = (
     'crum.CurrentRequestUserMiddleware',
 
     'request_cache.middleware.RequestCache',
+    'newrelic_custom_metrics.middleware.NewRelicCustomMetrics',
 
     'mobile_api.middleware.AppVersionUpgrade',
     'openedx.core.djangoapps.header_control.middleware.HeaderControlMiddleware',

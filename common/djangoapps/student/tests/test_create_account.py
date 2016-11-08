@@ -21,6 +21,7 @@ from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import student
 from student.models import UserAttribute
 from student.views import REGISTRATION_AFFILIATE_ID, REGISTRATION_UTM_PARAMETERS, REGISTRATION_UTM_CREATED_AT
+from django_comment_common.models import ForumsConfig
 
 TEST_CS_URL = 'https://comments.service.test:123/'
 
@@ -693,6 +694,10 @@ class TestCreateCommentsServiceUser(TransactionTestCase):
             "honor_code": "true",
             "terms_of_service": "true",
         }
+
+        config = ForumsConfig.current()
+        config.enabled = True
+        config.save()
 
     def test_cs_user_created(self, request):
         "If user account creation succeeds, we should create a comments service user"

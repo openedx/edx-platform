@@ -27,13 +27,14 @@ from discussion_api.tests.utils import (
     make_minimal_cs_thread,
     make_paginated_api_response,
     ProfileImageTestMixin)
+from django_comment_client.tests.utils import ForumsEnableMixin
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin, PatchMediaTypeMixin
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls, ItemFactory
 
 
-class DiscussionAPIViewTestMixin(CommentsServiceMockMixin, UrlResetMixin):
+class DiscussionAPIViewTestMixin(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMixin):
     """
     Mixin for common code in tests of Discussion API views. This includes
     creation of common structures (e.g. a course, user, and enrollment), logging

@@ -1,8 +1,14 @@
-define(['js/views/validation', 'codemirror', 'js/models/course_update',
-        'common/js/components/views/feedback_prompt', 'common/js/components/views/feedback_notification',
-        'js/views/course_info_helper', 'js/utils/modal', 'js/utils/date_utils'],
-    function(ValidatingView, CodeMirror, CourseUpdateModel, PromptView, NotificationView,
-        CourseInfoHelper, ModalUtils, DateUtils) {
+define(['codemirror',
+        'js/utils/modal',
+        'js/utils/date_utils',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'js/views/course_info_helper',
+        'js/views/validation',
+        'js/models/course_update',
+        'common/js/components/views/feedback_prompt',
+        'common/js/components/views/feedback_notification'],
+    function(CodeMirror, ModalUtils, DateUtils, HtmlUtils, CourseInfoHelper, ValidatingView, CourseUpdateModel,
+             PromptView, NotificationView) {
         'use strict';
         var CourseInfoUpdateView = ValidatingView.extend({
 
@@ -17,32 +23,51 @@ define(['js/views/validation', 'codemirror', 'js/models/course_update',
 
             initialize: function() {
                 this.template = this.loadTemplate('course_info_update');
-                this.render();
-            // when the client refetches the updates as a whole, re-render them
+
+                // when the client refetches the updates as a whole, re-render them
                 this.listenTo(this.collection, 'reset', this.render);
                 this.listenTo(this.collection, 'invalid', this.handleValidationError);
             },
 
             render: function() {
-            // iterate over updates and create views for each using the template
-                var updateEle = this.$el.find('#course-update-list');
-            // remove and then add all children
-                $(updateEle).empty();
-                var self = this;
-                this.collection.each(function(update, index) {
-                    try {
-                        CourseInfoHelper.changeContentToPreview(
-                        update, 'content', self.options['base_asset_url']);
-                    // push notification is always disabled for existing updates
-                        var newEle = self.template({updateModel: update, push_notification_enabled: false});
-                        $(updateEle).append(newEle);
-                        DateUtils.setupDatePicker('date', self, index);
-                        update.isValid();
-                    } catch (e) {
-                    // ignore
+                // iterate over updates and create views for each using the template
+                var updateList = this.$el.find('#course-update-list'),
+                    self = this;
+                $(updateList).empty();
+                if (this.collection.length > 0) {
+                    this.collection.each(function(update, index) {
+                        try {
+                            CourseInfoHelper.changeContentToPreview(
+                                update, 'content', self.options.base_asset_url);
+                            // push notification is always disabled for existing updates
+                            HtmlUtils.append(
+                                updateList,
+                                HtmlUtils.HTML(self.template({updateModel: update, push_notification_enabled: false}))
+                            );
+                            DateUtils.setupDatePicker('date', self, index);
+                            update.isValid();
+                        } catch (e) {
+                            // ignore
+                        } finally {
+                            if (index === self.collection.length - 1) {
+                                // Once the collection is loaded enable the button.
+                                self.$el.find('.new-update-button').removeAttr('disabled');
+                            }
+                        }
+                    });
+                } else {
+                    // If the collection is empty enable the New update button
+                    self.$el.find('.new-update-button').removeAttr('disabled');
+                }
+
+                // Hide Update forms that are not for new updates with the editing class
+                updateList.children().each(function(index, updateElement) {
+                    var $updateElement = $(updateElement);
+                    var updateForm = $updateElement.find('.new-update-form');
+                    if ($updateElement.length > 0 && !$updateElement.hasClass('editing')) {
+                        $(updateForm).hide();
                     }
                 });
-                this.$el.find('.new-update-form').hide();
                 return this;
             },
 
@@ -70,32 +95,39 @@ define(['js/views/validation', 'codemirror', 'js/models/course_update',
             },
 
             handleValidationError: function(model, error) {
-                var ele = this.$el.find('#course-update-list li[name=\"' + model.cid + '\"]');
-                $(ele).find('.message-error').remove();
-                for (var field in error) {
+                var self = this,
+                    $validationElement = this.$el.find('#course-update-list li[name="' + model.cid + '"]');
+
+                $validationElement.find('.message-error').remove();
+                Object.keys(error).forEach(function(field) {
                     if (error.hasOwnProperty(field)) {
-                        $(ele).find('#update-date-' + model.cid).parent().append(
-                        this.errorTemplate({message: error[field]})
-                    );
-                        $(ele).find('.date-display').parent().append(this.errorTemplate({message: error[field]}));
+                        HtmlUtils.append(
+                            $validationElement.find('#update-date-' + model.cid).parent(),
+                            self.errorTemplate({message: error[field]})
+                        );
+                        HtmlUtils.append(
+                            $validationElement.find('.date-display').parent(),
+                            self.errorTemplate({message: error[field]})
+                        );
                     }
-                }
-                $(ele).find('.save-button').addClass('is-disabled');
+                });
+
+                $validationElement.find('.save-button').addClass('is-disabled');
             },
 
             validateModel: function(model) {
+                var $validationElement = this.$el.find('#course-update-list li[name="' + model.cid + '"]');
                 if (model.isValid()) {
-                    var ele = this.$el.find('#course-update-list li[name=\"' + model.cid + '\"]');
-                    $(ele).find('.message-error').remove();
-                    $(ele).find('.save-button').removeClass('is-disabled');
+                    $validationElement.find('.message-error').remove();
+                    $validationElement.find('.save-button').removeClass('is-disabled');
                 }
             },
 
             onNew: function(event) {
-                event.preventDefault();
-                var self = this;
-            // create new obj, insert into collection, and render this one ele overriding the hidden attr
+                // create new obj, insert into collection, and render this one ele overriding the hidden attr
                 var newModel = new CourseUpdateModel();
+                event.preventDefault();
+
                 this.collection.add(newModel, {at: 0});
 
                 var $newForm = $(
@@ -103,7 +135,7 @@ define(['js/views/validation', 'codemirror', 'js/models/course_update',
                     updateModel: newModel,
                     push_notification_enabled: this.options.push_notification_enabled
                 })
-            );
+                );
 
                 var updateEle = this.$el.find('#course-update-list');
                 $(updateEle).prepend($newForm);
@@ -118,7 +150,7 @@ define(['js/views/validation', 'codemirror', 'js/models/course_update',
                 $newForm.addClass('editing');
                 this.$currentPost = $newForm.closest('li');
 
-            // Variable stored for unit test.
+                // Variable stored for unit test.
                 this.$modalCover = ModalUtils.showModalCover(false, function() {
                 // Binding empty function to prevent default hideModal.
                 });
@@ -187,7 +219,7 @@ define(['js/views/validation', 'codemirror', 'js/models/course_update',
                     $(this.dateEntry(event)).val('MM/DD/YY');
                 }
                 this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
-                targetModel, 'content', self.options['base_asset_url'], $textArea.get(0));
+                targetModel, 'content', self.options.base_asset_url, $textArea.get(0));
 
             // Variable stored for unit test.
                 this.$modalCover = ModalUtils.showModalCover(false,
@@ -222,12 +254,12 @@ define(['js/views/validation', 'codemirror', 'js/models/course_update',
                                 });
                                 deleting.show();
                                 targetModel.destroy({
-                                    success: function(model, response) {
+                                    success: function() {
                                         self.collection.fetch({
                                             success: function() {
-                                            self.render();
-                                            deleting.hide();
-                                        },
+                                                self.render();
+                                                deleting.hide();
+                                            },
                                             reset: true
                                         });
                                     }
@@ -247,24 +279,25 @@ define(['js/views/validation', 'codemirror', 'js/models/course_update',
             },
 
             closeEditor: function(removePost) {
-                var targetModel = this.collection.get(this.$currentPost.attr('name'));
+                var content,
+                    targetModel = this.collection.get(this.$currentPost.attr('name'));
 
             // If the model was never created (user created a new update, then pressed Cancel),
             // we wish to remove it from the DOM.
                 if (removePost) {
                     this.$currentPost.remove();
-                }
-                else {
+                } else {
                 // close the modal and insert the appropriate data
                     this.$currentPost.removeClass('editing');
-                    this.$currentPost.find('.date-display').html(targetModel.get('date'));
+                    this.$currentPost.find('.date-display').text(targetModel.get('date'));
                     this.$currentPost.find('.date').val(targetModel.get('date'));
 
-                    var content = CourseInfoHelper.changeContentToPreview(
-                    targetModel, 'content', this.options['base_asset_url']);
+                    content = HtmlUtils.HTML(CourseInfoHelper.changeContentToPreview(
+                        targetModel, 'content', this.options.base_asset_url
+                    ));
                     try {
                     // just in case the content causes an error (embedded js errors)
-                        this.$currentPost.find('.update-contents').html(content);
+                        HtmlUtils.setHtml(this.$currentPost.find('.update-contents'), content);
                         this.$currentPost.find('.new-update-content').val(content);
                     } catch (e) {
                     // ignore but handle rest of page

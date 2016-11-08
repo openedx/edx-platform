@@ -180,7 +180,8 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
         self.assertFalse(self.thread_page.has_add_response_button())
 
 
-class DiscussionHomePageTest(UniqueCourseTest):
+@attr(shard=2)
+class DiscussionHomePageTest(BaseDiscussionTestCase):
     """
     Tests for the discussion home page.
     """
@@ -189,7 +190,6 @@ class DiscussionHomePageTest(UniqueCourseTest):
 
     def setUp(self):
         super(DiscussionHomePageTest, self).setUp()
-        CourseFixture(**self.course_info).install()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.page = DiscussionTabHomePage(self.browser, self.course_id)
         self.page.visit()

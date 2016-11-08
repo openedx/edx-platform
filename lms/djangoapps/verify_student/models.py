@@ -721,8 +721,11 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 self.status = "must_retry"
                 self.error_msg = response.text
                 self.save()
-        except Exception as error:
-            log.exception(error)
+        except Exception:       # pylint: disable=broad-except
+            log.exception(
+                'Software Secure submission failed for user %s, setting status to must_retry',
+                self.user.username
+            )
             self.status = "must_retry"
             self.save()
 

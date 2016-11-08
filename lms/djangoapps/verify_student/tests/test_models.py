@@ -12,6 +12,7 @@ from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=no-name-in-module
 import pytz
 import requests.exceptions
+from testfixtures import LogCapture
 
 from common.test.utils import MockS3Mixin
 from student.tests.factories import UserFactory
@@ -27,6 +28,7 @@ from lms.djangoapps.verify_student.models import (
     VerificationStatus, SkippedReverification,
     VerificationDeadline
 )
+
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {
@@ -204,10 +206,15 @@ class TestPhotoVerification(MockS3Mixin, ModuleStoreTestCase):
             attempt = self.create_and_submit()
             assert_equals(attempt.status, "must_retry")
 
-        # We try to post, but run into an error (in this case a newtork connection error)
+        # We try to post, but run into an error (in this case a network connection error)
         with patch('lms.djangoapps.verify_student.models.requests.post', new=mock_software_secure_post_unavailable):
-            attempt = self.create_and_submit()
-            assert_equals(attempt.status, "must_retry")
+            with LogCapture('lms.djangoapps.verify_student.models') as logger:
+                attempt = self.create_and_submit()
+                assert_equals(attempt.status, "must_retry")
+                logger.check(
+                    ('lms.djangoapps.verify_student.models', 'ERROR',
+                     'Software Secure submission failed for user %s, setting status to must_retry'
+                     % attempt.user.username))
 
     @mock.patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_submission_while_testing_flag_is_true(self):
