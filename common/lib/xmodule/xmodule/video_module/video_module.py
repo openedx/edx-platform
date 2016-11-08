@@ -217,7 +217,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if self.edx_video_id and edxval_api:
             try:
                 val_profiles = ["youtube", "desktop_webm", "desktop_mp4"]
-                val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id, val_profiles)
+
+                # strip edx_video_id to prevent ValVideoNotFoundError error if unwanted spaces are there. TNL-5769
+                val_video_urls = edxval_api.get_urls_for_profiles(self.edx_video_id.strip(), val_profiles)
 
                 # VAL will always give us the keys for the profiles we asked for, but
                 # if it doesn't have an encoded video entry for that Video + Profile, the
