@@ -17,9 +17,11 @@ class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
     """
     Admin for the SoftwareSecurePhotoVerification table.
     """
-    list_display = ('id', 'user', 'status', 'receipt_id', 'submitted_at', 'updated_at',)
-    raw_id_fields = ('user', 'reviewing_user', 'id_copy_id_photo_from',)
-    search_fields = ('receipt_id', 'user__username',)
+    list_display = ('id', 'user', 'status', 'receipt_id', 'submitted_at', 'updated_at')
+    raw_id_fields = ('user', 'reviewing_user')
+    search_fields = (
+        'receipt_id', 'user__username'
+    )
 
 
 class VerificationStatusAdmin(admin.ModelAdmin):
