@@ -52,7 +52,6 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         """
         Test that you can specify which courses you want to dump.
         """
-
         mock_graph = mock_graph_class.return_value
         mock_transaction = mock.Mock()
         mock_graph.begin.return_value = mock_transaction
@@ -71,12 +70,56 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    def test_dump_skip_course(self, mock_graph_class):
+        """
+        Test that you can skip courses.
+        """
+        mock_graph = mock_graph_class.return_value
+        mock_transaction = mock.Mock()
+        mock_graph.begin.return_value = mock_transaction
+
+        call_command(
+            'dump_to_neo4j',
+            skip=self.course_strings[:1],
+            host='mock_host',
+            http_port=7474,
+            user='mock_user',
+            password='mock_password',
+        )
+
+        self.assertEqual(mock_graph.begin.call_count, 1)
+        self.assertEqual(mock_transaction.commit.call_count, 1)
+        self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
+
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    def test_dump_skip_beats_specifying(self, mock_graph_class):
+        """
+        Test that if you skip and specify the same course, you'll skip it.
+        """
+        mock_graph = mock_graph_class.return_value
+        mock_transaction = mock.Mock()
+        mock_graph.begin.return_value = mock_transaction
+
+        call_command(
+            'dump_to_neo4j',
+            skip=self.course_strings[:1],
+            courses=self.course_strings[:1],
+            host='mock_host',
+            http_port=7474,
+            user='mock_user',
+            password='mock_password',
+        )
+
+        self.assertEqual(mock_graph.begin.call_count, 0)
+        self.assertEqual(mock_transaction.commit.call_count, 0)
+        self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
+
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
     def test_dump_all_courses(self, mock_graph_class):
         """
         Test if you don't specify which courses to dump, then you'll dump
         all of them.
         """
-
         mock_graph = mock_graph_class.return_value
         mock_transaction = mock.Mock()
         mock_graph.begin.return_value = mock_transaction
