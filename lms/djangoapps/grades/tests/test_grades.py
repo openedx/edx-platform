@@ -205,7 +205,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
 
         # get grade
         subsection_grade = SubsectionGradeFactory(
-            self.request.user, self.course, course_structure
+            self.request.user, course_structure
         ).update(self.sequential)
 
         # verify all problem grades
@@ -465,7 +465,7 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         # then stored in the request).
         with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
-        new_score = SubsectionGradeFactory(self.request.user, self.course, self.course_structure).create(self.seq1)
+        new_score = SubsectionGradeFactory(self.request.user, self.course_structure).create(self.seq1)
         self.assertEqual(score, 0)
         self.assertEqual(new_score.all_total.earned, 0)
 
@@ -474,7 +474,7 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
         with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
-        new_score = SubsectionGradeFactory(self.request.user, self.course, self.course_structure).create(self.seq1)
+        new_score = SubsectionGradeFactory(self.request.user, self.course_structure).create(self.seq1)
         self.assertEqual(score, 1.0)
         self.assertEqual(new_score.all_total.earned, 2.0)
         # These differ because get_module_score normalizes the subsection score
@@ -486,7 +486,7 @@ class TestGetModuleScore(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
 
         with self.assertNumQueries(1):
             score = get_module_score(self.request.user, self.course, self.seq1)
-        new_score = SubsectionGradeFactory(self.request.user, self.course, self.course_structure).create(self.seq1)
+        new_score = SubsectionGradeFactory(self.request.user, self.course_structure).create(self.seq1)
         self.assertEqual(score, .5)
         self.assertEqual(new_score.all_total.earned, 1.0)
 

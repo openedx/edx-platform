@@ -64,8 +64,13 @@ def get_course_blocks(
         transformers = BlockStructureTransformers(COURSE_BLOCK_ACCESS_TRANSFORMERS)
     transformers.usage_info = CourseUsageInfo(starting_block_usage_key.course_key, user)
 
-    return get_block_structure_manager(starting_block_usage_key.course_key).get_transformed(
+    course_key = starting_block_usage_key.course_key
+    block_structure = get_block_structure_manager(course_key).get_transformed(
         transformers,
         starting_block_usage_key,
         collected_block_structure,
     )
+    # store the course_key on the block_structure
+    # to make it readily available for all clients.
+    block_structure.course_key = course_key
+    return block_structure
