@@ -8,7 +8,7 @@ file and check it in at the same time as your model changes. To do that,
 
 1. Go to the edx-platform dir
 2. ./manage.py lms schemamigration embargo --auto description_of_your_change
-3. Add the migration file created in edx-platform/common/djangoapps/embargo/migrations/
+3. Add the migration file created in edx-platform/openedx/core/djangoapps/embargo/migrations/
 """
 
 import ipaddr
@@ -27,8 +27,8 @@ from django_countries import countries
 from config_models.models import ConfigurationModel
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
-from embargo.exceptions import InvalidAccessPoint
-from embargo.messages import ENROLL_MESSAGES, COURSEWARE_MESSAGES
+from .exceptions import InvalidAccessPoint
+from .messages import ENROLL_MESSAGES, COURSEWARE_MESSAGES
 
 
 log = logging.getLogger(__name__)
@@ -89,6 +89,9 @@ class EmbargoedState(ConfigurationModel):
         if self.embargoed_countries == '':
             return []
         return [country.strip().upper() for country in self.embargoed_countries.split(',')]
+
+    def __unicode__(self):
+        return self.embargoed_countries
 
 
 class RestrictedCourse(models.Model):
@@ -575,6 +578,7 @@ post_delete.connect(invalidate_country_rule_cache, sender=RestrictedCourse)
 
 class CourseAccessRuleHistory(models.Model):
     """History of course access rule changes. """
+    # pylint: disable=model-missing-unicode
 
     timestamp = models.DateTimeField(db_index=True, auto_now_add=True)
     course_key = CourseKeyField(max_length=255, db_index=True)
@@ -684,14 +688,14 @@ class IPFilter(ConfigurationModel):
             for network in self.networks:
                 yield network
 
-        def __contains__(self, ip):
+        def __contains__(self, ip_addr):
             try:
-                ip = ipaddr.IPAddress(ip)
+                ip_addr = ipaddr.IPAddress(ip_addr)
             except ValueError:
                 return False
 
             for network in self.networks:
-                if network.Contains(ip):
+                if network.Contains(ip_addr):
                     return True
 
             return False
@@ -713,3 +717,6 @@ class IPFilter(ConfigurationModel):
         if self.blacklist == '':
             return []
         return self.IPFilterList([addr.strip() for addr in self.blacklist.split(',')])
+
+    def __unicode__(self):
+        return "Whitelist: {} - Blacklist: {}".format(self.whitelist_ips, self.blacklist_ips)

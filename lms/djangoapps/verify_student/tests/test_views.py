@@ -37,7 +37,7 @@ from courseware.url_helpers import get_redirect_url
 from common.test.utils import XssTestMixin
 from commerce.models import CommerceConfiguration
 from commerce.tests import TEST_PAYMENT_DATA, TEST_API_URL, TEST_API_SIGNING_KEY, TEST_PUBLIC_URL_ROOT
-from embargo.test_utils import restrict_course
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 from shoppingcart.models import Order, CertificateItem
@@ -104,7 +104,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
     YESTERDAY = NOW - timedelta(days=1)
     TOMORROW = NOW + timedelta(days=1)
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

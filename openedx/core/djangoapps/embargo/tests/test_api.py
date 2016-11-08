@@ -25,13 +25,13 @@ from student.roles import (
     OrgStaffRole, OrgInstructorRole
 )
 
-from embargo.models import (
+from ..models import (
     RestrictedCourse, Country, CountryAccessRule,
 )
 
 from util.testing import UrlResetMixin
-from embargo import api as embargo_api
-from embargo.exceptions import InvalidAccessPoint
+from .. import api as embargo_api
+from ..exceptions import InvalidAccessPoint
 from mock import patch
 
 
@@ -229,6 +229,9 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 
     @contextmanager
     def _mock_geoip(self, country_code):
+        """
+        Mock for the GeoIP module.
+        """
         with mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr') as mock_ip:
             mock_ip.return_value = country_code
             yield
@@ -240,7 +243,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})

@@ -11,7 +11,7 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from embargo.models import IPFilter, RestrictedCourse
+from .models import IPFilter, RestrictedCourse
 
 
 class RestrictedCourseForm(forms.ModelForm):
