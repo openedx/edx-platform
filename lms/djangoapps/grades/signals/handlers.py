@@ -2,7 +2,6 @@
 Grades related signals.
 """
 
-from celery import Task
 from django.dispatch import receiver
 from logging import getLogger
 
@@ -12,7 +11,8 @@ from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
 from .signals import PROBLEM_SCORE_CHANGED, SUBSECTION_SCORE_CHANGED, SCORE_PUBLISHED
-from ..tasks import recalculate_subsection_grade, recalculate_course_grade
+from ..new.course_grade import CourseGradeFactory
+from ..tasks import recalculate_subsection_grade
 
 
 log = getLogger(__name__)
@@ -92,7 +92,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
     if only_if_higher:
         previous_score = get_score(user.id, block.location)
 
-        if previous_score:
+        if previous_score is not None:
             prev_raw_earned, prev_raw_possible = previous_score  # pylint: disable=unpacking-non-sequence
 
             if not is_score_higher(prev_raw_earned, prev_raw_possible, raw_earned, raw_possible):
@@ -136,11 +136,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
 
 
 @receiver(SUBSECTION_SCORE_CHANGED)
-def enqueue_course_update(sender, **kwargs):  # pylint: disable=unused-argument
+def recalculate_course_grade(sender, course, course_structure, user, **kwargs):  # pylint: disable=unused-argument
     """
-    Handles the SUBSECTION_SCORE_CHANGED signal by enqueueing a course update operation to occur asynchronously.
+    Updates a saved course grade.
     """
-    if isinstance(sender, Task):  # We're already in a async worker, just do the task
-        recalculate_course_grade.apply(args=(kwargs['user'].id, unicode(kwargs['course'].id)))
-    else:  # Otherwise, queue the work to be done asynchronously
-        recalculate_course_grade.apply_async(args=(kwargs['user'].id, unicode(kwargs['course'].id)))
+    CourseGradeFactory(user).update(course, course_structure)

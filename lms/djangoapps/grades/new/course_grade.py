@@ -340,11 +340,10 @@ class CourseGradeFactory(object):
             self._compute_and_update_grade(course, course_structure, read_only)
         )
 
-    def update(self, course):
+    def update(self, course, course_structure):
         """
         Updates the CourseGrade for this Factory's student.
         """
-        course_structure = get_course_blocks(self.student, course.location)
         self._compute_and_update_grade(course, course_structure)
 
     def get_persisted(self, course):
