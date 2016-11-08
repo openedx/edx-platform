@@ -3,10 +3,12 @@ CourseGrade Class
 """
 
 from collections import defaultdict
+from logging import getLogger
+
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from lazy import lazy
-from logging import getLogger
+
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
@@ -163,6 +165,7 @@ class CourseGrade(object):
                 grading_policy_hash=grading_policy_hash,
                 percent_grade=self.percent,
                 letter_grade=self.letter_grade or "",
+                passed=self.passed,
             )
 
         self._signal_listeners_when_grade_computed()
