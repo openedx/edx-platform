@@ -72,7 +72,7 @@ oauthlib==1.0.3
 paramiko==1.9.0
 path.py==8.2.1
 piexif==1.0.2
-Pillow==3.1.1
+Pillow==3.4
 polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
