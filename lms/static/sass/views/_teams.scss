@@ -337,10 +337,6 @@
 
   .team-profile {
 
-    .new-post-btn {
-      @include float(right);
-    }
-
     .page-content-main {
       display: inline-block;
       width: flex-grid(8, 12);
