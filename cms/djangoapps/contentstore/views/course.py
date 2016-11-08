@@ -467,7 +467,10 @@ def course_listing(request):
     List all courses available to the logged in user
     """
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
-    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED and request.user.is_staff else []
+    user = request.user
+    user_has_permission =\
+        user.is_active and (user.is_staff or CourseCreatorRole().has_user(user))
+    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED and user_has_permission else []
 
     programs_config = ProgramsApiConfig.current()
     raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
@@ -518,7 +521,7 @@ def course_listing(request):
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
         'libraries': [format_library_for_view(lib) for lib in libraries],
-        'show_new_library_button': _get_library_creation_status(request.user),
+        'show_new_library_button': _get_library_creation_status(user),
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
@@ -1657,9 +1660,12 @@ def _get_library_creation_status(user):
     """
 
     if LIBRARIES_ENABLED:
-        if user.is_active and user.is_staff:
-            if not settings.FEATURES.get('DISABLE_LIBRARY_CREATION', False):
-                return True
+        if user.is_active:
+            if user.is_staff or CourseCreatorRole().has_user(user):
+                if not settings.FEATURES.get('DISABLE_LIBRARY_CREATION', False):
+                    return True
+                else:
+                    return False
             else:
                 return False
         else:
