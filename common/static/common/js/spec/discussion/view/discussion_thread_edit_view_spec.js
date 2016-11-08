@@ -16,7 +16,7 @@
                 'title': 'test thread title'
             });
             this.thread = new Thread(this.threadData);
-            this.course_settings = DiscussionSpecHelper.makeCourseSettings();
+            this.course_settings = DiscussionSpecHelper.createTestCourseSettings();
 
             this.createEditView = function(options) {
                 options = _.extend({
