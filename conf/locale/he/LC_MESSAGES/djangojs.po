@@ -4261,7 +4261,7 @@ msgid ""
 "Success! Problem attempts reset for problem '<%- problem_id %>' and student "
 "'<%- student_id %>'."
 msgstr ""
-"הצלחה! נסיונות איפוס עבור בעיה  '<%= problem_id %>' וסטודנט '<%= student_id "
+"הצלחה! נסיונות איפוס עבור בעיה  '<%- problem_id %>' וסטודנט '<%- student_id "
 "%>'."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4270,14 +4270,14 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"שגיאת איפוס נסיונות עבור בעיה '<%= problem_id %>'  וסטודנט '<%= student_id "
+"שגיאת איפוס נסיונות עבור בעיה '<%= problem_id %>'  וסטודנט '<%- student_id "
 "%>'. ודא שמזהה הבעיה והתלמיד הם מלאים ונכונים."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
-"האם למחוק את מצב הסטודנט  '<%= student_id %>' לבעיה '<%= problem_id %>'?"
+"האם למחוק את מצב הסטודנט  '<%- student_id %>' לבעיה '<%- problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4285,7 +4285,7 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
-"טעות במחיקת מצב הבעיה של הסטודנט '<%= student_id %>' בבעיה '<%= problem_id "
+"טעות במחיקת מצב הבעיה של הסטודנט '<%- student_id %>' בבעיה '<%- problem_id "
 "%>'. ודא כי מזהי הבעיה והסטודנט שלמים ומדויקים. "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4294,19 +4294,19 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
-"שגיאה בזמן קבלת היסטוריית משימות עבור הבעיה '<%= problem_id %>' והסטודנט  "
-"'<%= student_id %>'. ודא שמזהה הבעיה והסטודנט הם מלאים ונכונים."
+"שגיאה בזמן קבלת היסטוריית משימות עבור הבעיה '<%- problem_id %>' והסטודנט  "
+"'<%- student_id %>'. ודא שמזהה הבעיה והסטודנט הם מלאים ונכונים."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
-msgstr "אפס ניסיונות עבור כל הסטודנטים בבעיה  '<%= problem_id %>'? "
+msgstr "אפס ניסיונות עבור כל הסטודנטים בבעיה  '<%- problem_id %>'? "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to reset attempts for problem '<%- problem_id %>'."
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"הותחלה בהצלחה המשימה לאיפוס נסיונות עבור בעיה '<%= problem_id %>'. לחץ על "
+"הותחלה בהצלחה המשימה לאיפוס נסיונות עבור בעיה '<%- problem_id %>'. לחץ על "
 "לחצן 'הצג סטטוס ניסיונות' כדי לראות את סטטוס המשימה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4315,7 +4315,7 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
-"שגיאה בהתחלת משימה לאיפוס ניסיונות לכל הסטודנטים בבעיה '<%= problem_id %>'. "
+"שגיאה בהתחלת משימה לאיפוס ניסיונות לכל הסטודנטים בבעיה '<%- problem_id %>'. "
 "ודא כי מזהה הבעיה מושלם ונכון."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4324,7 +4324,7 @@ msgid ""
 "'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
 "of the task."
 msgstr ""
-"הופעלה משימה לחישוב ציונים מחדש עבור בעיה  '<%= problem_id %>' וסטודנט  '<%="
+"הופעלה משימה לחישוב ציונים מחדש עבור בעיה  '<%- problem_id %>' וסטודנט  '<%-"
 " student_id %>'. לחץ על לחצן 'הצג סטטוס משימות' כדי לראות את סטטוס המשימה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4333,8 +4333,8 @@ msgid ""
 "'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
-"שגיאה בזמן הפעלת משימה לחישוב ציונים מחדש עבור בעיה  '<%= problem_id %>' של "
-"סטודנט '<%= student_id %>'. ודא שמזהה הבעיה והתלמיד הם מלאים ונכונים."
+"שגיאה בזמן הפעלת משימה לחישוב ציונים מחדש עבור בעיה  '<%- problem_id %>' של "
+"סטודנט '<%- student_id %>'. ודא שמזהה הבעיה והתלמיד הם מלאים ונכונים."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4346,14 +4346,14 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
-msgstr "לתת ציון מחדש עבור בעיה '<%= problem_id %>' לכלל הסטודנטים? "
+msgstr "לתת ציון מחדש עבור בעיה '<%- problem_id %>' לכלל הסטודנטים? "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"הותחלה בהצלחה המשימה לתת ציון מחדש לבעיה '<%= problem_id %>' עבור כלל "
+"הותחלה בהצלחה המשימה לתת ציון מחדש לבעיה '<%- problem_id %>' עבור כלל "
 "הסטודנטים. לחץ על לחצן 'הצג סטטוס ניסיונות' כדי לראות את סטטוס המשימה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4361,7 +4361,7 @@ msgid ""
 "Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
 msgstr ""
-"שגיאה בהתחלת משימה לתת ציון מחדש לבעיה  '<%= problem_id %>'. ודא שמזהה הבעיה"
+"שגיאה בהתחלת משימה לתת ציון מחדש לבעיה  '<%- problem_id %>'. ודא שמזהה הבעיה"
 " מושלם ונכון. "
 
 #: lms/static/js/search/base/views/search_results_view.js

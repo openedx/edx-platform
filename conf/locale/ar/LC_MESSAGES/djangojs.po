@@ -106,6 +106,7 @@
 # Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
+# Ned Batchelder <ned@edx.org>, 2016
 # omarithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
@@ -115,8 +116,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2016-11-03 15:57+0000\n"
-"PO-Revision-Date: 2016-11-08 08:16+0000\n"
-"Last-Translator: shefaa abu jabel <shefaa.aj@gmail.com>\n"
+"PO-Revision-Date: 2016-11-09 21:21+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4489,8 +4490,8 @@ msgid ""
 "Success! Problem attempts reset for problem '<%- problem_id %>' and student "
 "'<%- student_id %>'."
 msgstr ""
-"رائع! تمت إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%= problem_id %>‘ والطالب "
-"’<%= student_id %>‘."
+"رائع! تمت إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%- problem_id %>‘ والطالب "
+"’<%- student_id %>‘."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4498,14 +4499,14 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"نأسف لحدوث خطأ في إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%= problem_id %>‘ "
-"للطالب ’<%= student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح."
+"نأسف لحدوث خطأ في إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%- problem_id %>‘ "
+"للطالب ’<%- student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
-"حذف حالة الطالب ’<%= student_id %>‘ في المسألة رقم ’<%= problem_id %>‘؟"
+"حذف حالة الطالب ’<%- student_id %>‘ في المسألة رقم ’<%- problem_id %>‘؟"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4513,7 +4514,7 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
-"خطأ في حذف حالة الطالب ’<%= student_id %>‘ في المسألة رقم ’<%= problem_id "
+"خطأ في حذف حالة الطالب ’<%- student_id %>‘ في المسألة رقم ’<%- problem_id "
 "%>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4522,19 +4523,19 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
-"خطأ في الحصول على سجل المهمّات الخاصة بالمسألة رقم ’<%= problem_id %>‘ "
-"للطالب ’<%= student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح. "
+"خطأ في الحصول على سجل المهمّات الخاصة بالمسألة رقم ’<%- problem_id %>‘ "
+"للطالب ’<%- student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح. "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
-msgstr "إعادة ضبط عدد محاولات حلّ الطلّاب للمسألة رقم ’<%= problem_id %>‘؟"
+msgstr "إعادة ضبط عدد محاولات حلّ الطلّاب للمسألة رقم ’<%- problem_id %>‘؟"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to reset attempts for problem '<%- problem_id %>'."
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"تم بنجاح بدء مهمة إعادة ضبط عدد محاولات حلّ المسألة ’<%= problem_id "
+"تم بنجاح بدء مهمة إعادة ضبط عدد محاولات حلّ المسألة ’<%- problem_id "
 "%>‘.يُرجى النقر على زر ’عرض حالة المهمة‘ للاطّلاع على حالة المهمة."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4544,7 +4545,7 @@ msgid ""
 "correct."
 msgstr ""
 "نأسف لحدوث خطأ في بدء مهمة إعادة ضبط عدد محاولات حلّ جميع الطلّاب للمسألة "
-"’<%= problem_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح."
+"’<%- problem_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4552,7 +4553,7 @@ msgid ""
 "'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
 "of the task."
 msgstr ""
-"تم بدء مهمّة إعادة تقييم المسألة رقم ’<%= problem_id %>‘ للطالب ’<%= "
+"تم بدء مهمّة إعادة تقييم المسألة رقم ’<%- problem_id %>‘ للطالب ’<%- "
 "student_id %>‘. يُرجى النقر على زر ’عرض حالة المهمة‘ للاطّلاع على حالة "
 "المهمة."
 
@@ -4562,8 +4563,8 @@ msgid ""
 "'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
-"نأسف لحدوث خطأ في بدء مهمة إعادة تقييم المسألة رقم ’<%= problem_id %>‘ "
-"للطالب صاحب الرقم ’<%= student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل "
+"نأسف لحدوث خطأ في بدء مهمة إعادة تقييم المسألة رقم ’<%- problem_id %>‘ "
+"للطالب صاحب الرقم ’<%- student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل "
 "صحيح"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4576,14 +4577,14 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
-msgstr "إعادة تقييم المسألة رقم ’<%= problem_id %>‘ لكافة الطلاب؟"
+msgstr "إعادة تقييم المسألة رقم ’<%- problem_id %>‘ لكافة الطلاب؟"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
-"تم بنجاح بدء مهمة إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%= problem_id %>‘ "
+"تم بنجاح بدء مهمة إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%- problem_id %>‘ "
 "لكافة الطلاب. يُرجى النقر على زر ’عرض حالة المهمة‘ للاطّلاع على حالة المهمة."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
@@ -4591,7 +4592,7 @@ msgid ""
 "Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
 msgstr ""
-"ناسف لحدوث خطأ في بدء مهمة إعادة تقييم المسألة رقم ’<%= problem_id %>‘. تأكد"
+"ناسف لحدوث خطأ في بدء مهمة إعادة تقييم المسألة رقم ’<%- problem_id %>‘. تأكد"
 " من إدخال هذان المُعطيان بشكل صحيح."
 
 #: lms/static/js/search/base/views/search_results_view.js
@@ -10111,7 +10112,7 @@ msgstr "اسم الفصل"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter {order}"
-msgstr "فصل  {أمر}"
+msgstr "فصل  {order}"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
@@ -10711,8 +10712,6 @@ msgid ""
 "The published branch version, {published}, was reset to the draft branch "
 "version, {draft}."
 msgstr ""
-"تم إعادة تعيين الإصدار الفرعي المنشور {المنشور} على مسودة الإصدار الفرعي، "
-"{المسودة}. "
 
 #: cms/templates/js/programs/course_details.underscore
 msgid "Delete course"
