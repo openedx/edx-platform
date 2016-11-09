@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs" expression_filter="h"/>
+<%page args="course_overview, enrollment, show_courseware_link, cert_status, can_unenroll, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, related_programs, display_course_modes_on_dashboard" expression_filter="h"/>
 
 <%!
 import urllib
@@ -36,7 +36,7 @@ from student.helpers import (
 <%namespace name='static' file='../static_content.html'/>
 
 <li class="course-item">
-  % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
+  % if display_course_modes_on_dashboard:
     <%
         course_verified_certs = enrollment_mode_display(
             enrollment.mode,
@@ -73,7 +73,7 @@ from student.helpers import (
           <img src="${course_overview.image_urls['small']}" class="course-image" alt="${_('{course_number} {course_name} Cover Image').format(course_number=course_overview.number, course_name=course_overview.display_name_with_default)}" />
         </a>
       % endif
-      % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES') and course_verified_certs.get('display_mode') != 'audit':
+      % if display_course_modes_on_dashboard and course_verified_certs.get('display_mode') != 'audit':
         <span class="sts-enrollment" title="${course_verified_certs.get('enrollment_title')}">
           <span class="label">${_("Enrolled as: ")}</span>
           % if course_verified_certs.get('show_image'):

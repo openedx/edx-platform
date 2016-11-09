@@ -34,6 +34,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories as programs_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 import shoppingcart  # pylint: disable=import-error
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
@@ -546,6 +547,64 @@ class DashboardTest(ModuleStoreTestCase):
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode=enrollment_mode)
         return complete_course_mode_info(self.course.id, enrollment)
+
+
+@ddt.ddt
+class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
+    """
+    Tests for site settings overrides used when rendering the dashboard view
+    """
+
+    def setUp(self):
+        super(DashboardTestsWithSiteOverrides, self).setUp()
+        self.org = 'fakeX'
+        self.course = CourseFactory.create(org=self.org)
+        self.user = UserFactory.create(username='jack', email='jack@fake.edx.org', password='test')
+        CourseModeFactory.create(mode_slug='no-id-professional', course_id=self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.location.course_key, mode='no-id-professional')
+        cache.clear()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    @ddt.data(
+        ('testserver1.com', {'ENABLE_VERIFIED_CERTIFICATES': True}),
+        ('testserver2.com', {'ENABLE_VERIFIED_CERTIFICATES': True, 'DISPLAY_COURSE_MODES_ON_DASHBOARD': True}),
+    )
+    @ddt.unpack
+    def test_course_mode_visible(self, site_domain, site_configuration_values):
+        """
+        Test that the course mode for courses is visible on the dashboard
+        when settings have been overridden by site configuration.
+        """
+        site_configuration_values.update({
+            'SITE_NAME': site_domain,
+            'course_org_filter': self.org
+        })
+        self.set_up_site(site_domain, site_configuration_values)
+        self.client.login(username='jack', password='test')
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'class="course professional"')
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    @ddt.data(
+        ('testserver3.com', {'ENABLE_VERIFIED_CERTIFICATES': False}),
+        ('testserver4.com', {'DISPLAY_COURSE_MODES_ON_DASHBOARD': False}),
+    )
+    @ddt.unpack
+    def test_course_mode_invisible(self, site_domain, site_configuration_values):
+        """
+        Test that the course mode for courses is invisible on the dashboard
+        when settings have been overridden by site configuration.
+        """
+        site_configuration_values.update({
+            'SITE_NAME': site_domain,
+            'course_org_filter': self.org
+        })
+        self.set_up_site(site_domain, site_configuration_values)
+        self.client.login(username='jack', password='test')
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotContains(response, 'class="course professional"')
 
 
 class UserSettingsEventTestMixin(EventTestMixin):

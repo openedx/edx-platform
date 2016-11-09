@@ -575,6 +575,14 @@ def dashboard(request):
     user = request.user
 
     platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
+    enable_verified_certificates = configuration_helpers.get_value(
+        'ENABLE_VERIFIED_CERTIFICATES',
+        settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES')
+    )
+    display_course_modes_on_dashboard = configuration_helpers.get_value(
+        'DISPLAY_COURSE_MODES_ON_DASHBOARD',
+        settings.FEATURES.get('DISPLAY_COURSE_MODES_ON_DASHBOARD', True)
+    )
 
     # we want to filter and only show enrollments for courses within
     # the 'ORG' defined in configuration.
@@ -767,6 +775,7 @@ def dashboard(request):
         'programs_by_run': programs_by_run,
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
         'disable_courseware_js': True,
+        'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,
     }
 
     ecommerce_service = EcommerceService()
