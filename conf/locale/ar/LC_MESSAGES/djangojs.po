@@ -4499,7 +4499,7 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
-"نأسف لحدوث خطأ في إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%- problem_id %>‘ "
+"نأسف لحدوث خطأ في إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%= problem_id %>‘ "
 "للطالب ’<%- student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
