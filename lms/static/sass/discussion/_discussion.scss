@@ -325,12 +325,17 @@ body.discussion {
   .add_post_btn_container {
     @include text-align(right);
     position: relative;
-    top: -45px;
+    top: -25px;
   }
 
   .discussion {
     &.inline-discussion {
-      padding-top: $baseline * 3;
+      padding-top: $baseline * 1.5;
+
+      section.threads {
+        border: 1px solid $forum-color-border;
+        border-radius: $forum-border-radius;
+      }
     }
   }
 
