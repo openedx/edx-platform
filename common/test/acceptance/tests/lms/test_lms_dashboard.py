@@ -10,8 +10,8 @@ from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
-DEFAULT_SHORT_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year}'
-TEST_DATE_FORMAT = '{dt:%b} {dt.day}, {dt.year} {dt.hour:02}:{dt.minute:02}'
+DEFAULT_SHORT_DATE_FORMAT = "%b %d, %Y"
+DEFAULT_DAY_AND_TIME_FORMAT = "%A at %-I%P"
 
 
 class BaseLmsDashboardTest(UniqueCourseTest):
@@ -193,7 +193,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        end_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_end_date)
+        end_date = course_end_date.strftime(DEFAULT_SHORT_DATE_FORMAT)
         expected_course_date = "Ended - {end_date}".format(end_date=end_date)
 
         # reload the page for changes to course date changes to appear in dashboard
@@ -226,7 +226,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
+        start_date = course_start_date.strftime(DEFAULT_SHORT_DATE_FORMAT)
         expected_course_date = "Started - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
@@ -259,7 +259,7 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        start_date = DEFAULT_SHORT_DATE_FORMAT.format(dt=course_start_date)
+        start_date = course_start_date.strftime(DEFAULT_SHORT_DATE_FORMAT)
         expected_course_date = "Starts - {start_date}".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
@@ -293,8 +293,8 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         })
         self.course_fixture.configure_course()
 
-        start_date = TEST_DATE_FORMAT.format(dt=course_start_date)
-        expected_course_date = "Starts - {start_date} GMT".format(start_date=start_date)
+        start_date = course_start_date.strftime(DEFAULT_DAY_AND_TIME_FORMAT)
+        expected_course_date = "Starts - {start_date} UTC".format(start_date=start_date)
 
         # reload the page for changes to course date changes to appear in dashboard
         self.dashboard_page.visit()

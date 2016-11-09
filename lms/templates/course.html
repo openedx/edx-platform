@@ -19,31 +19,14 @@ from django.core.urlresolvers import reverse
         <span class="course-code">${course.display_number_with_default}</span>
         <span class="course-title">${course.display_name_with_default}</span>
       </h2>
-        <%
-            if course.start is not None:
-                course_date_string = course.start.strftime('%Y-%m-%dT%H:%M:%S%z')
-            else:
-                course_date_string = ''
-        %>
-      % if isinstance(course_start_date, str):
-        <div class="course-date" aria-hidden="true">${_("Starts")}: ${course_start_date}</div>
-      % else:
-          <div class="course-date localized_datetime" aria-hidden="true" data-format="shortDate" data-datetime="${course_date_string}" data-string="${_("Starts: {date}")}"></div>
-      % endif
-      </div>
+      <div class="course-date" aria-hidden="true">${_("Starts")}: ${course.start_datetime_text()}</div>
+    </div>
     <div class="sr">
       <ul>
       <li>${course.display_org_with_default}</li>
       <li>${course.display_number_with_default}</li>
-      %if isinstance(course_start_date, str):
-          <li>${_("Starts")}: <time itemprop="startDate" datetime="${course_start_date}">${course_start_date}</time></li>
-      %else:
-          <li>${_("Starts")}: <time class="localized_datetime" itemprop="startDate" data-format="shortDate" data-datetime="${course_date_string}"></time></li>
-      %endif
-      </ul>
+      <li>${_("Starts")}: <time itemprop="startDate" datetime="${course.start_datetime_text()}">${course.start_datetime_text()}</time></li>
+    </ul>
     </div>
   </a>
 </article>
-<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
-    DateUtilFactory.transform(iterationKey=".localized_datetime");
-</%static:require_module_async>
