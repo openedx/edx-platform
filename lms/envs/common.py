@@ -521,9 +521,6 @@ TEMPLATES = [
                 # Shoppingcart processor (detects if request.user has a cart)
                 'shoppingcart.context_processor.user_has_cart_context_processor',
 
-                # Timezone processor (sends language and time_zone preference)
-                'courseware.context_processor.user_timezone_locale_prefs',
-
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.footer_context_processor',
 

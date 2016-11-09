@@ -6,6 +6,7 @@ from course_modes.models import CourseMode
 from certificates.models import CertificateStatuses
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
 from django.conf import settings
 from django.utils.http import urlquote_plus
 %>
@@ -120,7 +121,7 @@ from django.utils.http import urlquote_plus
                                         <span>${_("Verification Declined" )}</span>
                                         %elif requirement['status'] == 'satisfied':
                                         <span class="fa fa-check" aria-hidden="true"></span>
-                                        <span class="localized-datetime" data-datetime="${requirement['status_date']}" data-string="${_('Completed by {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></span>
+                                        <span>${_("Completed by")} ${get_time_display(requirement['status_date'], DEFAULT_SHORT_DATE_FORMAT, settings.TIME_ZONE)}</span>
                                         %endif
                                     %else:
                                     <span class="not-achieve">${_("Upcoming")}</span>
@@ -167,7 +168,11 @@ from django.utils.http import urlquote_plus
                                         </h5>
                                         %if section.due is not None:
                                         <p>
-                                            <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
+                                            <%
+                                            formatted_string = get_time_display(section.due, course.due_date_display_format, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
+                                            due_date = '' if len(formatted_string)==0 else _(u'due {date}').format(date=formatted_string)
+                                            %>
+                                            <em>${due_date | h}</em>
                                         </p>
                                         %endif
                                         %if len(section.scores) > 0:
@@ -192,6 +197,3 @@ from django.utils.http import urlquote_plus
         </div>
     </div>
 </main>
-<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
-    DateUtilFactory.transform(iterationKey=".localized-datetime");
-</%static:require_module_async>

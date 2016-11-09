@@ -209,7 +209,6 @@ class ViewsTestCase(ModuleStoreTestCase):
             parent_location=self.chapter.location,
             due=datetime(2013, 9, 18, 11, 30, 00),
             display_name='Sequential 1',
-            format='Homework'
         )
         self.vertical = ItemFactory.create(
             category='vertical',
@@ -908,22 +907,33 @@ class ViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_accordion(self):
-        """
-        This needs a response_context, which is not included in the render_accordion's main method
-        returning a render_to_string, so we will render via the courseware URL in order to include
-        the needed context
-        """
-        course_id = quote(unicode(self.course.id).encode("utf-8"))
-        response = self.client.get(
-            reverse('courseware', args=[unicode(course_id)]),
-            follow=True
+        request = RequestFactory().get('foo')
+        request.user = self.user
+        table_of_contents = toc_for_course(
+            request.user,
+            request,
+            self.course,
+            unicode(self.course.get_children()[0].scope_ids.usage_id),
+            None,
+            None
         )
-        test_responses = [
-            '<p class="accordion-display-name">Sequential 1 <span class="sr">current section</span></p>',
-            '<p class="accordion-display-name">Sequential 2 </p>'
-        ]
-        for test in test_responses:
-            self.assertContains(response, test)
+
+        # removes newlines and whitespace from the returned view string
+        view = ''.join(render_accordion(request, self.course, table_of_contents['chapters'], 'en').split())
+        # the course id unicode is re-encoded here because the quote function does not accept unicode
+        course_id = quote(unicode(self.course.id).encode("utf-8"))
+
+        self.assertIn(
+            u'href="/courses/{}/courseware/Chapter_1/Sequential_1/"><pclass="accordion-display-name">Sequential1</p>'
+            .format(course_id.decode("utf-8")),
+            view
+        )
+
+        self.assertIn(
+            u'href="/courses/{}/courseware/Chapter_1/Sequential_2/"><pclass="accordion-display-name">Sequential2</p>'
+            .format(course_id.decode("utf-8")),
+            view
+        )
 
 
 @attr(shard=1)
@@ -950,8 +960,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         section = ItemFactory.create(
             category='sequential',
             parent_location=chapter.location,
-            due=datetime(2013, 9, 18, 11, 30, 00),
-            format='homework'
+            due=datetime(2013, 9, 18, 11, 30, 00)
         )
         vertical = ItemFactory.create(category='vertical', parent_location=section.location)
         ItemFactory.create(category='problem', parent_location=vertical.location)
@@ -966,7 +975,8 @@ class BaseDueDateTests(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
 
-        self.time_with_tz = "2013-09-18 11:30:00+00:00"
+        self.time_with_tz = "due Sep 18, 2013 at 11:30 UTC"
+        self.time_without_tz = "due Sep 18, 2013 at 11:30"
 
     def test_backwards_compatability(self):
         # The test course being used has show_timezone = False in the policy file
@@ -975,7 +985,8 @@ class BaseDueDateTests(ModuleStoreTestCase):
         # remove the timezone.
         course = self.set_up_course(due_date_display_format=None, show_timezone=False)
         response = self.get_response(course)
-        self.assertContains(response, self.time_with_tz)
+        self.assertContains(response, self.time_without_tz)
+        self.assertNotContains(response, self.time_with_tz)
         # Test that show_timezone has been cleared (which means you get the default value of True).
         self.assertTrue(course.show_timezone)
 
@@ -990,11 +1001,25 @@ class BaseDueDateTests(ModuleStoreTestCase):
         response = self.get_response(course)
         self.assertContains(response, self.time_with_tz)
 
+    def test_format_plain_text(self):
+        # plain text due date
+        course = self.set_up_course(due_date_display_format="foobar")
+        response = self.get_response(course)
+        self.assertNotContains(response, self.time_with_tz)
+        self.assertContains(response, "due foobar")
+
     def test_format_date(self):
         # due date with no time
         course = self.set_up_course(due_date_display_format=u"%b %d %y")
         response = self.get_response(course)
-        self.assertContains(response, self.time_with_tz)
+        self.assertNotContains(response, self.time_with_tz)
+        self.assertContains(response, "due Sep 18 13")
+
+    def test_format_hidden(self):
+        # hide due date completely
+        course = self.set_up_course(due_date_display_format=u"")
+        response = self.get_response(course)
+        self.assertNotContains(response, "due ")
 
     def test_format_invalid(self):
         # improperly formatted due_date_display_format falls through to default
@@ -1024,10 +1049,7 @@ class TestAccordionDueDate(BaseDueDateTests):
 
     def get_response(self, course):
         """ Returns the HTML for the accordion """
-        return self.client.get(
-            reverse('courseware', args=[unicode(course.id)]),
-            follow=True
-        )
+        return self.client.get(reverse('courseware', args=[unicode(course.id)]), follow=True)
 
 
 @attr(shard=1)
@@ -1067,17 +1089,14 @@ class StartDateTests(ModuleStoreTestCase):
         course = self.set_up_course()
         response = self.get_about_response(course.id)
         # The start date is set in the set_up_course function above.
-        # This should return in the format '%Y-%m-%dT%H:%M:%S%z'
-        self.assertContains(response, "2013-09-16T07:17:28+0000")
+        self.assertContains(response, "2013-SEPTEMBER-16")
 
-    @patch(
-        'util.date_utils.pgettext',
-        fake_pgettext(translations={("abbreviated month name", "Jul"): "JULY", })
-    )
-    @patch(
-        'util.date_utils.ugettext',
-        fake_ugettext(translations={"SHORT_DATE_FORMAT": "%Y-%b-%d", })
-    )
+    @patch('util.date_utils.pgettext', fake_pgettext(translations={
+        ("abbreviated month name", "Jul"): "JULY",
+    }))
+    @patch('util.date_utils.ugettext', fake_ugettext(translations={
+        "SHORT_DATE_FORMAT": "%Y-%b-%d",
+    }))
     @unittest.skip
     def test_format_localized_in_xml_course(self):
         response = self.get_about_response(SlashSeparatedCourseKey('edX', 'toy', 'TT_2012_Fall'))
@@ -1326,17 +1345,17 @@ class ProgressPageTests(ModuleStoreTestCase):
         """Test that query counts remain the same for self-paced and instructor-paced courses."""
         SelfPacedConfiguration(enabled=self_paced_enabled).save()
         self.setup_course(self_paced=self_paced)
-        with self.assertNumQueries(38), check_mongo_calls(4):
+        with self.assertNumQueries(35), check_mongo_calls(4):
             self._get_progress_page()
 
     def test_progress_queries(self):
         self.setup_course()
-        with self.assertNumQueries(38), check_mongo_calls(4):
+        with self.assertNumQueries(35), check_mongo_calls(4):
             self._get_progress_page()
 
         # subsequent accesses to the progress page require fewer queries.
         for _ in range(2):
-            with self.assertNumQueries(24), check_mongo_calls(4):
+            with self.assertNumQueries(21), check_mongo_calls(4):
                 self._get_progress_page()
 
     @patch(
