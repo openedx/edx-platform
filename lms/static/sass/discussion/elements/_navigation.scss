@@ -187,6 +187,12 @@
     }
 }
 
+// Overrides underspecific style from courseware css:
+// https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L402
+.course-wrapper .course-content .forum-nav-thread-list li {
+    margin: 0;
+}
+
 .forum-nav-thread {
     border-bottom: 1px solid $forum-color-border;
     background-color: $forum-color-background;
