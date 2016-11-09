@@ -35,7 +35,7 @@
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
                     category_map: {
-                        children: ['Topic', 'General', 'Not Cohorted'],
+                        children: [['Topic', 'entry'], ['General', 'entry'], ['Not Cohorted', 'entry']],
                         entries: {
                             Topic: {
                                 is_cohorted: true,
@@ -172,7 +172,9 @@
                         'subcategories': {
                             'Week 1': {
                                 'subcategories': {},
-                                'children': ['Topic-Level Student-Visible Label'],
+                                'children': [ // eslint-disable-line quote-props
+                                    ['Topic-Level Student-Visible Label', 'entry']
+                                ],
                                 'entries': {
                                     'Topic-Level Student-Visible Label': {
                                         'sort_key': null,
@@ -182,7 +184,10 @@
                                 }
                             }
                         },
-                        'children': ['General', 'Week 1'],
+                        'children': [ // eslint-disable-line quote-props
+                            ['General', 'entry'],
+                            ['Week 1', 'subcategory']
+                        ],
                         'entries': {
                             'General': {
                                 'sort_key': 'General',

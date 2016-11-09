@@ -97,7 +97,11 @@
             beforeEach(function() {
                 this.course_settings = new DiscussionCourseSettings({
                     'category_map': {
-                        'children': ['Topic', 'General', 'Basic Question'],
+                        'children': [ // eslint-disable-line quote-props
+                            ['Topic', 'entry'],
+                            ['General', 'entry'],
+                            ['Basic Question', 'entry']
+                        ],
                         'entries': {
                             'Topic': {
                                 'is_cohorted': true,
