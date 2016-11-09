@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-03 15:28+0000\n"
-"PO-Revision-Date: 2016-11-03 15:28:41.551415\n"
+"POT-Creation-Date: 2016-11-09 15:49+0000\n"
+"PO-Revision-Date: 2016-11-09 15:49:59.693058\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -291,57 +291,6 @@ msgstr ""
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 #: lms/templates/courseware/course_navigation.html
 msgid "Student"
-msgstr ""
-
-#: common/djangoapps/embargo/forms.py
-#: lms/djangoapps/verified_track_content/forms.py
-msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "The course key for the restricted course."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from enrollment."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from accessing a course."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Allow users who enrolled in an allowed country to access restricted courses "
-"from excluded countries."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "Two character ISO country code."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Whether to include or exclude the given course. If whitelist countries are "
-"specified, then ONLY users from whitelisted countries will be able to access"
-" the course.  If blacklist countries are specified, then users from "
-"blacklisted countries will NOT be able to access the course."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "The course to which this rule applies."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "The country to which this rule applies."
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "Whitelist {country} for {course}"
-msgstr ""
-
-#: common/djangoapps/embargo/models.py
-msgid "Blacklist {country} for {course}"
 msgstr ""
 
 #: common/djangoapps/student/admin.py
@@ -7649,6 +7598,11 @@ msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr ""
 
+#: lms/djangoapps/verified_track_content/forms.py
+#: openedx/core/djangoapps/embargo/forms.py
+msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
+msgstr ""
+
 #: lms/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr ""
@@ -8644,6 +8598,52 @@ msgstr ""
 
 #: openedx/core/djangoapps/dark_lang/views.py
 msgid "Language reset to user's preference: {preview_language_code}"
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course key for the restricted course."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from enrollment."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from accessing a course."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Allow users who enrolled in an allowed country to access restricted courses "
+"from excluded countries."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Two character ISO country code."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Whether to include or exclude the given course. If whitelist countries are "
+"specified, then ONLY users from whitelisted countries will be able to access"
+" the course.  If blacklist countries are specified, then users from "
+"blacklisted countries will NOT be able to access the course."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course to which this rule applies."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The country to which this rule applies."
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Whitelist {country} for {course}"
+msgstr ""
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Blacklist {country} for {course}"
 msgstr ""
 
 #: openedx/core/djangoapps/external_auth/views.py
@@ -9754,6 +9754,10 @@ msgstr ""
 msgid "Sign Out"
 msgstr ""
 
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr ""
+
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr ""
@@ -9853,6 +9857,10 @@ msgstr ""
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "Starts"
+msgstr ""
+
+#: lms/templates/course.html
+msgid "Starts: {date}"
 msgstr ""
 
 #: lms/templates/courses_list.html
@@ -12723,7 +12731,7 @@ msgid "Verification Declined"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
-msgid "Completed by"
+msgid "Completed by {date}"
 msgstr ""
 
 #: lms/templates/courseware/progress.html
@@ -12943,19 +12951,19 @@ msgid "Enrolled as: "
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
+msgid "Ended - {date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {date}"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -19191,6 +19199,10 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Course Overview"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid "HTML Code Editor"
 msgstr ""
 
 #: cms/templates/settings.html

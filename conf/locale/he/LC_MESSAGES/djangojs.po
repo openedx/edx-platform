@@ -63,9 +63,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-27 14:58+0000\n"
-"PO-Revision-Date: 2016-10-30 18:39+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"POT-Creation-Date: 2016-11-03 15:57+0000\n"
+"PO-Revision-Date: 2016-11-06 12:42+0000\n"
+"Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -337,16 +337,16 @@ msgstr "השב להסבר"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נקודה %(num_points)s אפשרית (שדורגה)"
+msgstr[1] "%(num_points)s נקודות אפשריות (שדורגו)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (ungraded)"
 msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נקודה %(num_points)s אפשרית (שלא דורגה)"
+msgstr[1] "%(num_points)s נקודות אפשריות (שלא דורגו)"
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -355,8 +355,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נקודה %(earned)s/%(possible)s (שדורגה)"
+msgstr[1] "%(earned)s/%(possible)s נקודות (שדורגו)"
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -365,8 +365,8 @@ msgstr[1] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נקודה %(earned)s/%(possible)s (שלא דורגה)"
+msgstr[1] "%(earned)s/%(possible)s נקודות (שלא דורגו)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -374,7 +374,7 @@ msgstr "תהליך הדירוג ממשיך לפעול. רענן את הדף כד
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
-msgstr ""
+msgstr "לא ניתן לדרג את התשובה. ההגשה בוטלה."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
@@ -382,42 +382,46 @@ msgid ""
 "you can, please use Chrome or Safari which have been verified to support "
 "file uploads."
 msgstr ""
+"ההגשה בוטלה! מצטערים, הדפדפן שלך אינו תומך בהעלאות קבצים. אם ניתן, השתמש "
+"בדפדפן Chrome או Safari שניתן בוודאות להעלות דרכם קבצים."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
-msgstr ""
+msgstr "הגשת את {filename}; מותרים רק {allowedFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr ""
+msgstr "הקובץ {filename} גדול מדי (גודל מרבי: {maxSize}MB)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."
-msgstr ""
+msgstr "לא הגשת את הקבצים הדרושים: {requiredFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not select any files to submit."
-msgstr ""
+msgstr "לא בחרת אף קובץ להגשה."
 
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
-msgstr ""
+msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
-msgstr ""
+msgstr "הבעיה לא אותחלה."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
 "Answers to this problem are now shown. Navigate through the problem to "
 "review it with answers inline."
 msgstr ""
+"התשובות לבעיה זו מוצגות כעת. נווט דרך הבעיה כדי להציג אותה יחד עם כל "
+"התשובות."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unsubmitted"
-msgstr ""
+msgstr "לא הוגש"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -2190,8 +2194,8 @@ msgstr "מראה את כל התגובות "
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first {numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "מציג תגובה ראשונה"
+msgstr[1] "מציג {numResponses} תגובות ראשונות"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -2530,10 +2534,6 @@ msgid "open slots"
 msgstr "משבצות פתוחות"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
-#: lms/templates/edxnotes/tab-item.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/edxnotes/tab-item.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 msgid "name"
 msgstr "שם"
 
@@ -3791,7 +3791,7 @@ msgstr "לחץ להוספה"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmark this page"
-msgstr ""
+msgstr "סמן עמוד זה"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
@@ -4253,12 +4253,16 @@ msgid ""
 "Error getting student progress url for '<%- student_id %>'. Make sure that "
 "the student identifier is spelled correctly."
 msgstr ""
+"שגיאה בקבלת כתובת URL של התקדמות הסטודנט עבור '<%- student_id %>'. ודא שמזהה"
+" הסטודנט מאוית כהלכה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Success! Problem attempts reset for problem '<%- problem_id %>' and student "
 "'<%- student_id %>'."
 msgstr ""
+"הצלחה! נסיונות איפוס עבור בעיה  '<%= problem_id %>' וסטודנט '<%= student_id "
+"%>'."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4266,11 +4270,14 @@ msgid ""
 " '<%- student_id %>'. Make sure that the problem and student identifiers are"
 " complete and correct."
 msgstr ""
+"שגיאת איפוס נסיונות עבור בעיה '<%= problem_id %>'  וסטודנט '<%= student_id "
+"%>'. ודא שמזהה הבעיה והתלמיד הם מלאים ונכונים."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
 msgstr ""
+"האם למחוק את מצב הסטודנט  '<%= student_id %>' לבעיה '<%= problem_id %>'?"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4278,6 +4285,8 @@ msgid ""
 " %>'. Make sure that the problem and student identifiers are complete and "
 "correct."
 msgstr ""
+"טעות במחיקת מצב הבעיה של הסטודנט '<%= student_id %>' בבעיה '<%= problem_id "
+"%>'. ודא כי מזהי הבעיה והסטודנט שלמים ומדויקים. "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4285,16 +4294,20 @@ msgid ""
 "student_id %>'. Make sure that the problem and student identifiers are "
 "complete and correct."
 msgstr ""
+"שגיאה בזמן קבלת היסטוריית משימות עבור הבעיה '<%= problem_id %>' והסטודנט  "
+"'<%= student_id %>'. ודא שמזהה הבעיה והסטודנט הם מלאים ונכונים."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
-msgstr ""
+msgstr "אפס ניסיונות עבור כל הסטודנטים בבעיה  '<%= problem_id %>'? "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to reset attempts for problem '<%- problem_id %>'."
 " Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
+"הותחלה בהצלחה המשימה לאיפוס נסיונות עבור בעיה '<%= problem_id %>'. לחץ על "
+"לחצן 'הצג סטטוס ניסיונות' כדי לראות את סטטוס המשימה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4302,6 +4315,8 @@ msgid ""
 "problem_id %>'. Make sure that the problem identifier is complete and "
 "correct."
 msgstr ""
+"שגיאה בהתחלת משימה לאיפוס ניסיונות לכל הסטודנטים בבעיה '<%= problem_id %>'. "
+"ודא כי מזהה הבעיה מושלם ונכון."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4309,6 +4324,8 @@ msgid ""
 "'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
 "of the task."
 msgstr ""
+"הופעלה משימה לחישוב ציונים מחדש עבור בעיה  '<%= problem_id %>' וסטודנט  '<%="
+" student_id %>'. לחץ על לחצן 'הצג סטטוס משימות' כדי לראות את סטטוס המשימה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -4316,28 +4333,36 @@ msgid ""
 "'<%- student_id %>'. Make sure that the the problem and student identifiers "
 "are complete and correct."
 msgstr ""
+"שגיאה בזמן הפעלת משימה לחישוב ציונים מחדש עבור בעיה  '<%= problem_id %>' של "
+"סטודנט '<%= student_id %>'. ודא שמזהה הבעיה והתלמיד הם מלאים ונכונים."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Started entrance exam rescore task for student '{student_id}'. Click the "
 "'Show Task Status' button to see the status of the task."
 msgstr ""
+"החל תהליך ציון מחדש עבור מבחן כניסה לסטודנט '{student_id}'. לחץ על לחצן 'הצג"
+" סטטוס משימות' כדי להציג את סטטוס המשימה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Rescore problem '<%- problem_id %>' for all students?"
-msgstr ""
+msgstr "לתת ציון מחדש עבור בעיה '<%= problem_id %>' לכלל הסטודנטים? "
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Successfully started task to rescore problem '<%- problem_id %>' for all "
 "students. Click the 'Show Task Status' button to see the status of the task."
 msgstr ""
+"הותחלה בהצלחה המשימה לתת ציון מחדש לבעיה '<%= problem_id %>' עבור כלל "
+"הסטודנטים. לחץ על לחצן 'הצג סטטוס ניסיונות' כדי לראות את סטטוס המשימה."
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
 " the problem identifier is complete and correct."
 msgstr ""
+"שגיאה בהתחלת משימה לתת ציון מחדש לבעיה  '<%= problem_id %>'. ודא שמזהה הבעיה"
+" מושלם ונכון. "
 
 #: lms/static/js/search/base/views/search_results_view.js
 #, c-format
@@ -4356,7 +4381,7 @@ msgstr "ניסיונות אופסו בהצלחה עבור משתמש  {user}"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to reset attempts for user."
-msgstr ""
+msgstr "נכשל איפוס הניסיונות למשתמש."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully deleted student state for user {user}"
@@ -4364,7 +4389,7 @@ msgstr "הושלמה בהצלחה מחיקת מצב הסטודנט עבור מש
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to delete student state for user."
-msgstr ""
+msgstr "נכשלה מחיקת מצב הסטודנט עבור המשתמש."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem for user {user}"
@@ -4372,15 +4397,15 @@ msgstr "הושלם בהצלחה מתן ציון מחדש עבור משתמש  {u
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem for user."
-msgstr ""
+msgstr "נכשל תהליך מתן הציון מחדש עבור בעיה למשתמש."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem to improve score for user {user}"
-msgstr ""
+msgstr "הושלם בהצלחה מתן ציון מחדש לבעיה עבור משתמש  {user}"
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Failed to rescore problem to improve score for user."
-msgstr ""
+msgstr "נכשל מתן ציון מחדש לבעיה על מנת לשפר ציון משתמש."
 
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."
@@ -4432,6 +4457,9 @@ msgid ""
 "address is associated with an edX account, we will send a message with "
 "password reset instructions to this email address.{paragraphEnd}"
 msgstr ""
+"{paragraphStart}הזנת את כתובת הדואר האלקטרוני {boldStart}{email}{boldEnd}. "
+"אם כתובת דואר אלקטרוני זו משויכת לחשבון edX, נשלח לך הודעה עם הוראות לאיפוס "
+"סיסמה לכתובת דוא\"ל זו.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5473,6 +5501,14 @@ msgstr "שם הסלאג לשיווק הוא שדה חובה."
 msgid "Your video uploads are not complete."
 msgstr "העלאות סרטוני הווידאו לא הושלמו."
 
+#: cms/static/js/views/active_video_upload_list.js
+msgid ": video upload complete."
+msgstr ": העלאת סרטון הווידאו הושלמה."
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Previous Uploads table has been updated."
+msgstr "טבלת העלאות קודמות עודכנה."
+
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "אישור למחיקת הקובץ"
@@ -6194,20 +6230,6 @@ msgstr "לא נקבע"
 msgid "Date"
 msgstr "תאריך"
 
-#: cms/templates/js/edit-chapter.underscore
-#: lms/templates/ccx/schedule.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/learner_dashboard/course_card.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
-msgid "gettext("
-msgstr "gettext("
-
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -6226,14 +6248,6 @@ msgstr "הקודם"
 #: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "סטטוס"
-
-#: cms/templates/js/publish-history.underscore
-#: cms/templates/js/staff-lock-editor.underscore
-#: common/static/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
-msgid "message"
-msgstr "הודעה"
 
 #: common/static/common/templates/image-modal.underscore
 #: test_root/staticfiles/common/templates/image-modal.underscore
@@ -6630,15 +6644,6 @@ msgid "Following"
 msgstr "עוקב"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
-msgid "fmt"
-msgstr "fmt"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -6710,12 +6715,6 @@ msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
 msgstr[0] "הצג תגובה (%(num_comments)s)"
 msgstr[1] "הצג תגובות (%(num_comments)s)"
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
-msgid "fmts"
-msgstr "fmts"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response.underscore
@@ -7106,16 +7105,6 @@ msgstr "קיבולת צוות"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "country"
-msgstr "ארץ"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "language"
-msgstr "שפה"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Leave Team"
 msgstr "עזוב צוות"
 
@@ -7200,6 +7189,12 @@ msgstr "הסר הכל"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "toggle chapter %(displayName)s"
+msgstr "החלף פרק %(displayName)s"
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "פרק"
 
@@ -7213,6 +7208,12 @@ msgstr "הסר את פרק %(chapterDisplayName)s"
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "הסר"
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "toggle subsection %(displayName)s"
+msgstr "החלף תת-פרק %(displayName)s"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
@@ -7250,22 +7251,6 @@ msgid ""
 msgstr ""
 "כדי להשלים את קבלת נקודות הזכות של הקורס, %(display_name)s דורש מהתלמידים של"
 " %(platform_name)s, יש לשלוח בקשה לקבלת נקודות זכות."
-
-#: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
-#, python-format
-msgid "<img src='%s' alt='%s'></image>"
-msgstr "<img src='%s' alt='%s'></image>"
-
-#: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
-"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
-msgstr ""
-"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
-"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
 
 #: lms/templates/commerce/provider.underscore
 #: test_root/staticfiles/templates/commerce/provider.underscore
@@ -7349,16 +7334,21 @@ msgid "Go to Dashboard"
 msgstr "עבור ללוח הבקרה"
 
 #: lms/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from {platformName}"
+" to verify your identity."
+msgstr ""
+"אם אינך מאמת את זהותך כעת, תוכל עדיין לעיין בקורס מלוח הבקרה שלך. אתה תקבל "
+"תזכורות תקופתיות מ{platformName} על מנת לאמת את זהותך."
+
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
 msgstr "רוצה לאמת את זהותך מאוחר יותר?"
-
-#: lms/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-msgid "/verify_student/verify-now/{courseKey}/"
-msgstr "/verify_student/verify-now/{courseKey}/"
 
 #: lms/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/commerce/receipt.underscore
@@ -7380,6 +7370,8 @@ msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
 msgstr ""
+"כדי לקבל נקודת זכות על בעיות, עליך לבחור \"הגש\"' עבור כל בעיה לפני שתבחר "
+"ב\"סיום המבחן שלי\"."
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
@@ -7450,11 +7442,6 @@ msgstr "לחץ לערוך"
 #: test_root/staticfiles/templates/fields/field_order_history.underscore
 msgid "Order Details"
 msgstr "פרטי הזמנה"
-
-#: lms/templates/fields/field_text.underscore
-#: test_root/staticfiles/templates/fields/field_text.underscore
-msgid "title"
-msgstr "כותרת"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
@@ -7843,7 +7830,7 @@ msgstr "{screen_reader_start}אזהרה:{screen_reader_end} לא קיימות ק
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Only the parent course staff of a CCX can create content groups."
-msgstr ""
+msgstr "רק צוות קורס הבסיס של CCX יכול ליצור קבוצות תוכן."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -7934,16 +7921,6 @@ msgstr "חוקי"
 msgid "Program Certificates"
 msgstr "תעודות התכנית"
 
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "certificate.credential_url"
-msgstr "certificate.credential_url"
-
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "certificate.display_name"
-msgstr "certificate.display_name"
-
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
@@ -7953,6 +7930,12 @@ msgstr "ברכות! הרווחת תעודה עבור קורס זה."
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"
 msgstr "הצג תעודה"
+
+#: lms/templates/learner_dashboard/course_card.underscore
+#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
+#, python-format
+msgid "%(courseName)s Home Page."
+msgstr "עמוד הבית של %(courseName)s"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
@@ -8039,17 +8022,18 @@ msgstr "בחן תכניות חדשות"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
-msgid "category"
-msgstr "קטגוריה"
-
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid ""
 "You have earned certificates in %(completed_courses)s of the "
 "%(total_courses)s courses so far."
 msgstr ""
 "עד כה השגת תעודות ב-%(completed_courses)s קורסים מתוך %(total_courses)s."
+
+#: lms/templates/learner_dashboard/program_card.underscore
+#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
+#, python-format
+msgid "%(programName)s Home Page."
+msgstr "עמוד הבית של %(programName)s"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
@@ -8124,11 +8108,6 @@ msgstr "איפוס סיסמה"
 #: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "הגדרות חשבון"
-
-#: lms/templates/student_account/account_settings_section.underscore
-#: test_root/staticfiles/templates/student_account/account_settings_section.underscore
-msgid "section.title"
-msgstr "section.title"
 
 #: lms/templates/student_account/account_settings_section.underscore
 #: test_root/staticfiles/templates/student_account/account_settings_section.underscore
@@ -9119,6 +9098,12 @@ msgid "Special Exam"
 msgstr "מבחן מיוחד"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(exam_display_name)s "
+msgstr "%(exam_display_name)s"
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Exam Type"
 msgstr "סוג המבחן"
 
@@ -9171,6 +9156,11 @@ msgstr "התחיל ב"
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
 msgstr "הושלם ב"
+
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(username)s "
+msgstr "%(username)s "
 
 #: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Add a Post"
@@ -9231,10 +9221,6 @@ msgstr "גרור ושחרר או לחץ כאן על מנת להעלות קבצי
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
 msgstr "העלאות פעילות"
-
-#: cms/templates/js/active-video-upload.underscore
-msgid "status"
-msgstr "דוח מצב"
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"
@@ -9374,13 +9360,6 @@ msgstr ""
 "מומלץ בחום שתכלול ארבע חתימות או פחות. אם תכלול חתימות נוספות, הצג בתצוגה "
 "מוקדמת את התעודה במצב 'תצוגת הדפסה' כדי להבטיח שהתעודה תודפס כהלכה על דף "
 "אחד."
-
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "error.message"
-msgstr "error.message"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Information"
@@ -9787,12 +9766,20 @@ msgid "Chapter Name"
 msgstr "שם הפרק"
 
 #: cms/templates/js/edit-chapter.underscore
+msgid "Chapter {order}"
+msgstr "פרק {order}"
+
+#: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr "ספק את הכותרת/שם הפרק שייעשה בו שימוש בניווט"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
 msgstr "נכס הפרק"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "path/to/introductionToCookieBaking-CH{order}.pdf"
+msgstr "path/to/introductionToCookieBaking-CH{order}.pdf"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
@@ -10359,10 +10346,6 @@ msgstr "ערוך את השם"
 #, python-format
 msgid "Edit %(display_name)s (required)"
 msgstr "ערוך %(display_name)s (חובה)"
-
-#: cms/templates/js/xblock-string-field-editor.underscore
-msgid "formLabel"
-msgstr "תווית טופס"
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
 msgid ""

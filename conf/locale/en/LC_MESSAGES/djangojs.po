@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-03 15:27+0000\n"
-"PO-Revision-Date: 2016-11-03 15:28:42.064529\n"
+"POT-Creation-Date: 2016-11-09 15:48+0000\n"
+"PO-Revision-Date: 2016-11-09 15:50:00.129831\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4343,8 +4343,7 @@ msgid "Time Zone"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"Select the time zone for displaying course dates. If you do not specify a "
+msgid "Select the time zone for displaying course dates. "
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -6020,89 +6019,6 @@ msgstr ""
 msgid "Clear search"
 msgstr ""
 
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Discussion Home"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-#, python-format
-msgid "How to use %(platform_name)s discussions"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Find discussions"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Use the All Topics menu to find specific topics."
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/discussion/templates/search.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Search all posts"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Filter and sort topics"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Engage with posts"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Vote for good posts and responses"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Report abuse, topics, and responses"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Follow or unfollow posts"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Receive updates"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Toggle Notifications Setting"
-msgstr ""
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid ""
-"Check this box to receive an email digest once a day notifying you about "
-"new, unread activity from posts you are following."
-msgstr ""
-
 #: common/static/common/templates/discussion/forum-action-answer.underscore
 #: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
@@ -6548,6 +6464,89 @@ msgstr ""
 #: test_root/staticfiles/common/templates/discussion/topic.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Discussion Home"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+#, python-format
+msgid "How to use %(platform_name)s discussions"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Find discussions"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Use the All Topics menu to find specific topics."
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/discussion/templates/search.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Search all posts"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Filter and sort topics"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Engage with posts"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Vote for good posts and responses"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Report abuse, topics, and responses"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Follow or unfollow posts"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Receive updates"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid "Toggle Notifications Setting"
+msgstr ""
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
+#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
+msgid ""
+"Check this box to receive an email digest once a day notifying you about "
+"new, unread activity from posts you are following."
 msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore

@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-03 15:28+0000\n"
-"PO-Revision-Date: 2016-11-03 15:28:41.551415\n"
+"POT-Creation-Date: 2016-11-09 15:49+0000\n"
+"PO-Revision-Date: 2016-11-09 15:49:59.693058\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -331,78 +331,6 @@ msgstr "Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr "Stüdént Ⱡ'σяєм ιρѕυм #"
-
-#: common/djangoapps/embargo/forms.py
-#: lms/djangoapps/verified_track_content/forms.py
-msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
-msgstr ""
-"ÇÖÛRSÉ NÖT FÖÛND.  Pléäsé çhéçk thät thé çöürsé ÌD ïs välïd. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/embargo/models.py
-msgid "The course key for the restricted course."
-msgstr ""
-"Thé çöürsé kéý för thé réstrïçtéd çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from enrollment."
-msgstr ""
-"Thé méssägé tö shöw whén ä üsér ïs ßlöçkéd fröm énröllmént. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from accessing a course."
-msgstr ""
-"Thé méssägé tö shöw whén ä üsér ïs ßlöçkéd fröm äççéssïng ä çöürsé. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Allow users who enrolled in an allowed country to access restricted courses "
-"from excluded countries."
-msgstr ""
-"Àllöw üsérs whö énrölléd ïn än ällöwéd çöüntrý tö äççéss réstrïçtéd çöürsés "
-"fröm éxçlüdéd çöüntrïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: common/djangoapps/embargo/models.py
-msgid "Two character ISO country code."
-msgstr "Twö çhäräçtér ÌSÖ çöüntrý çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Whether to include or exclude the given course. If whitelist countries are "
-"specified, then ONLY users from whitelisted countries will be able to access"
-" the course.  If blacklist countries are specified, then users from "
-"blacklisted countries will NOT be able to access the course."
-msgstr ""
-"Whéthér tö ïnçlüdé ör éxçlüdé thé gïvén çöürsé. Ìf whïtélïst çöüntrïés äré "
-"spéçïfïéd, thén ÖNLÝ üsérs fröm whïtélïstéd çöüntrïés wïll ßé äßlé tö äççéss"
-" thé çöürsé.  Ìf ßläçklïst çöüntrïés äré spéçïfïéd, thén üsérs fröm "
-"ßläçklïstéd çöüntrïés wïll NÖT ßé äßlé tö äççéss thé çöürsé. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σ#"
-
-#: common/djangoapps/embargo/models.py
-msgid "The course to which this rule applies."
-msgstr ""
-"Thé çöürsé tö whïçh thïs rülé äpplïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/embargo/models.py
-msgid "The country to which this rule applies."
-msgstr ""
-"Thé çöüntrý tö whïçh thïs rülé äpplïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя#"
-
-#: common/djangoapps/embargo/models.py
-msgid "Whitelist {country} for {course}"
-msgstr "Whïtélïst {country} för {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/djangoapps/embargo/models.py
-msgid "Blacklist {country} for {course}"
-msgstr "Bläçklïst {country} för {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -9996,6 +9924,13 @@ msgstr ""
 "Thé üsér {username} ïs nöt énrölléd ïn thé çöürsé ässöçïätéd wïth thïs téäm."
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
+#: lms/djangoapps/verified_track_content/forms.py
+#: openedx/core/djangoapps/embargo/forms.py
+msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
+msgstr ""
+"ÇÖÛRSÉ NÖT FÖÛND.  Pléäsé çhéçk thät thé çöürsé ÌD ïs välïd. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
 #: lms/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr ""
@@ -11238,6 +11173,71 @@ msgid "Language reset to user's preference: {preview_language_code}"
 msgstr ""
 "Längüägé rését tö üsér's préférénçé: {preview_language_code} Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course key for the restricted course."
+msgstr ""
+"Thé çöürsé kéý för thé réstrïçtéd çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from enrollment."
+msgstr ""
+"Thé méssägé tö shöw whén ä üsér ïs ßlöçkéd fröm énröllmént. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from accessing a course."
+msgstr ""
+"Thé méssägé tö shöw whén ä üsér ïs ßlöçkéd fröm äççéssïng ä çöürsé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Allow users who enrolled in an allowed country to access restricted courses "
+"from excluded countries."
+msgstr ""
+"Àllöw üsérs whö énrölléd ïn än ällöwéd çöüntrý tö äççéss réstrïçtéd çöürsés "
+"fröm éxçlüdéd çöüntrïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Two character ISO country code."
+msgstr "Twö çhäräçtér ÌSÖ çöüntrý çödé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Whether to include or exclude the given course. If whitelist countries are "
+"specified, then ONLY users from whitelisted countries will be able to access"
+" the course.  If blacklist countries are specified, then users from "
+"blacklisted countries will NOT be able to access the course."
+msgstr ""
+"Whéthér tö ïnçlüdé ör éxçlüdé thé gïvén çöürsé. Ìf whïtélïst çöüntrïés äré "
+"spéçïfïéd, thén ÖNLÝ üsérs fröm whïtélïstéd çöüntrïés wïll ßé äßlé tö äççéss"
+" thé çöürsé.  Ìf ßläçklïst çöüntrïés äré spéçïfïéd, thén üsérs fröm "
+"ßläçklïstéd çöüntrïés wïll NÖT ßé äßlé tö äççéss thé çöürsé. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σ#"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course to which this rule applies."
+msgstr ""
+"Thé çöürsé tö whïçh thïs rülé äpplïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The country to which this rule applies."
+msgstr ""
+"Thé çöüntrý tö whïçh thïs rülé äpplïés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя#"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Whitelist {country} for {course}"
+msgstr "Whïtélïst {country} för {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Blacklist {country} for {course}"
+msgstr "Bläçklïst {country} för {course} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -12552,6 +12552,10 @@ msgstr "Ûsérménü dröpdöwn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм�
 msgid "Sign Out"
 msgstr "Sïgn Öüt Ⱡ'σяєм ιρѕυм ∂#"
 
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "Çödé Édïtör Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr "Àll Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
@@ -12656,6 +12660,10 @@ msgstr "LÉÀRN MÖRÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "Starts"
 msgstr "Stärts Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/course.html
+msgid "Starts: {date}"
+msgstr "Stärts: {date} Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -16315,8 +16323,8 @@ msgid "Verification Declined"
 msgstr "Vérïfïçätïön Déçlïnéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/courseware/progress.html
-msgid "Completed by"
-msgstr "Çömplétéd ßý Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "Completed by {date}"
+msgstr "Çömplétéd ßý {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -16613,20 +16621,20 @@ msgid "Enrolled as: "
 msgstr "Énrölléd äs:  Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr "Éndéd - {end_date} Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr "Stärtéd - {start_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr "Çömïng Söön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr "Stärts - {start_date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+msgid "Ended - {date}"
+msgstr "Éndéd - {date} Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {date}"
+msgstr "Stärtéd - {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {date}"
+msgstr "Stärts - {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -24936,6 +24944,10 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Course Overview"
 msgstr "Çöürsé Övérvïéw Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: cms/templates/settings.html
+msgid "HTML Code Editor"
+msgstr "HTML Çödé Édïtör Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/settings.html
 msgid ""

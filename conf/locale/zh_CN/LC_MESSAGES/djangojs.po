@@ -181,8 +181,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-27 14:58+0000\n"
-"PO-Revision-Date: 2016-09-29 14:26+0000\n"
+"POT-Creation-Date: 2016-11-03 15:57+0000\n"
+"PO-Revision-Date: 2016-11-03 16:06+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -2584,10 +2584,6 @@ msgid "open slots"
 msgstr "开放的时段"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
-#: lms/templates/edxnotes/tab-item.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/edxnotes/tab-item.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 msgid "name"
 msgstr "名称"
 
@@ -5390,6 +5386,14 @@ msgstr ""
 msgid "Your video uploads are not complete."
 msgstr ""
 
+#: cms/static/js/views/active_video_upload_list.js
+msgid ": video upload complete."
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Previous Uploads table has been updated."
+msgstr ""
+
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
 msgstr "删除文件确认"
@@ -6069,20 +6073,6 @@ msgstr "尚未计划"
 msgid "Date"
 msgstr "日期"
 
-#: cms/templates/js/edit-chapter.underscore
-#: lms/templates/ccx/schedule.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/learner_dashboard/course_card.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
-msgid "gettext("
-msgstr "gettext("
-
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
@@ -6101,14 +6091,6 @@ msgstr "上一步"
 #: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "状态"
-
-#: cms/templates/js/publish-history.underscore
-#: cms/templates/js/staff-lock-editor.underscore
-#: common/static/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
-msgid "message"
-msgstr ""
 
 #: common/static/common/templates/image-modal.underscore
 #: test_root/staticfiles/common/templates/image-modal.underscore
@@ -6501,15 +6483,6 @@ msgid "Following"
 msgstr "关注"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
-msgid "fmt"
-msgstr "fmt"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
@@ -6580,12 +6553,6 @@ msgstr "%(time_ago)s前获得支持"
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
 msgstr[0] "显示评论 (%(num_comments)s)"
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
-msgid "fmts"
-msgstr "fmts"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response.underscore
@@ -6969,16 +6936,6 @@ msgstr "团队容量"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "country"
-msgstr "国家"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "language"
-msgstr "语言"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Leave Team"
 msgstr "离开团队"
 
@@ -7058,6 +7015,12 @@ msgstr "全部移除"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "toggle chapter %(displayName)s"
+msgstr ""
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "章"
 
@@ -7071,6 +7034,12 @@ msgstr "删除章节 %(chapterDisplayName)s"
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "移除"
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "toggle subsection %(displayName)s"
+msgstr ""
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
@@ -7104,22 +7073,6 @@ msgid ""
 "To finalize course credit, %(display_name)s requires %(platform_name)s "
 "learners to submit a credit request."
 msgstr "要完成课程学分，%(display_name)s 要求 %(platform_name)s 学员提交一份学分申请。"
-
-#: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
-#, python-format
-msgid "<img src='%s' alt='%s'></image>"
-msgstr "<img src='%s' alt='%s'></image>"
-
-#: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
-"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
-msgstr ""
-"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
-"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
 
 #: lms/templates/commerce/provider.underscore
 #: test_root/staticfiles/templates/commerce/provider.underscore
@@ -7201,16 +7154,19 @@ msgid "Go to Dashboard"
 msgstr "前往课程面板"
 
 #: lms/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from {platformName}"
+" to verify your identity."
+msgstr ""
+
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
 msgstr "希望稍后再验证你的身份？"
-
-#: lms/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-msgid "/verify_student/verify-now/{courseKey}/"
-msgstr "/verify_student/立即验证/{courseKey}/"
 
 #: lms/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/commerce/receipt.underscore
@@ -7302,11 +7258,6 @@ msgstr "点击以编辑"
 #: test_root/staticfiles/templates/fields/field_order_history.underscore
 msgid "Order Details"
 msgstr "订单细节"
-
-#: lms/templates/fields/field_text.underscore
-#: test_root/staticfiles/templates/fields/field_text.underscore
-msgid "title"
-msgstr "标题"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
@@ -7764,16 +7715,6 @@ msgstr "有效"
 msgid "Program Certificates"
 msgstr ""
 
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "certificate.credential_url"
-msgstr "certificate.credential_url"
-
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "certificate.display_name"
-msgstr "certificate.display_name"
-
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
@@ -7782,6 +7723,12 @@ msgstr "恭喜！您已经获得了这门课程的证书。"
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"
+msgstr ""
+
+#: lms/templates/learner_dashboard/course_card.underscore
+#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
+#, python-format
+msgid "%(courseName)s Home Page."
 msgstr ""
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
@@ -7869,16 +7816,17 @@ msgstr ""
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
-msgid "category"
-msgstr ""
-
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid ""
 "You have earned certificates in %(completed_courses)s of the "
 "%(total_courses)s courses so far."
 msgstr "在 %(total_courses)s 个课程中，您到目前为止已获得 %(completed_courses)s 个课程的证书。"
+
+#: lms/templates/learner_dashboard/program_card.underscore
+#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
+#, python-format
+msgid "%(programName)s Home Page."
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
@@ -7952,11 +7900,6 @@ msgstr "重设密码"
 #: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "账户设置"
-
-#: lms/templates/student_account/account_settings_section.underscore
-#: test_root/staticfiles/templates/student_account/account_settings_section.underscore
-msgid "section.title"
-msgstr "section.title"
 
 #: lms/templates/student_account/account_settings_section.underscore
 #: test_root/staticfiles/templates/student_account/account_settings_section.underscore
@@ -8895,6 +8838,12 @@ msgid "Special Exam"
 msgstr ""
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(exam_display_name)s "
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Exam Type"
 msgstr ""
 
@@ -8946,6 +8895,11 @@ msgstr ""
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
+msgstr ""
+
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(username)s "
 msgstr ""
 
 #: test_root/staticfiles/teams/templates/team-profile.underscore
@@ -9002,10 +8956,6 @@ msgstr ""
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
-msgstr ""
-
-#: cms/templates/js/active-video-upload.underscore
-msgid "status"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-button.underscore
@@ -9142,13 +9092,6 @@ msgid ""
 "It is strongly recommended that you include four or fewer signatories. If "
 "you include additional signatories, preview the certificate in Print View to"
 " ensure the certificate will print correctly on one page."
-msgstr ""
-
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "error.message"
 msgstr ""
 
 #: cms/templates/js/certificate-editor.underscore
@@ -9537,11 +9480,19 @@ msgid "Chapter Name"
 msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
+msgid "Chapter {order}"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
+msgstr ""
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "path/to/introductionToCookieBaking-CH{order}.pdf"
 msgstr ""
 
 #: cms/templates/js/edit-chapter.underscore
@@ -10081,10 +10032,6 @@ msgstr ""
 #: cms/templates/js/xblock-string-field-editor.underscore
 #, python-format
 msgid "Edit %(display_name)s (required)"
-msgstr ""
-
-#: cms/templates/js/xblock-string-field-editor.underscore
-msgid "formLabel"
 msgstr ""
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore

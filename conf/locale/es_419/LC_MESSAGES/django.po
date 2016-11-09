@@ -189,7 +189,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-27 14:59+0000\n"
+"POT-Creation-Date: 2016-11-03 15:59+0000\n"
 "PO-Revision-Date: 2016-10-22 05:21+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -3367,6 +3367,18 @@ msgstr ""
 "exámenes cronometrados."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Opting Out of Proctored Exams"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, learners can choose to take "
+"proctored exams without proctoring. If this value is false, all learners "
+"must take the exam with proctoring. This setting only applies if proctored "
+"exams are enabled for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr ""
 "Crear tickets de Zendesk para los intentos sospechosos de examen supervisado"
@@ -3386,10 +3398,9 @@ msgstr "Habilitar examenes cronometrados"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
-"course."
+"course. Regardless of this setting, timed exams are enabled if Enable "
+"Proctored Exams is set to true."
 msgstr ""
-"Ingrese true o false. Cuando ingrese true, los examenes cronometrados "
-"estarán habilitados en su curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -19531,14 +19542,12 @@ msgstr "Generación de certificados para los estudiantes"
 
 #: cms/templates/certificates.html
 msgid ""
-"To begin issuing certificates, a course team member with the Admin role "
-"selects {em_start}Activate{em_end}. Course team members without the Admin "
-"role cannot edit or delete an activated certificate."
+"After you have configured and previewed your certificate, ask your edX "
+"partner manager to activate your certificate. When your certificate has been"
+" activated, you can begin issuing certificates to learners. Course team "
+"members without the Admin role cannot edit or delete an activated "
+"certificate."
 msgstr ""
-"Para comenzar a emitir el certificado, un miembro del curso con el rol de "
-"administrador debe seleccionar {em_start}Activar{em_end}.  Los miembros del "
-"equipo del curso que no tengan el rol de administrador no podrán editar o "
-"borrar un certificado activado."
 
 #: cms/templates/certificates.html
 msgid ""
