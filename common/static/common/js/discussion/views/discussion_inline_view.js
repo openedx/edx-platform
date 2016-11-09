@@ -8,15 +8,24 @@
 
     this.DiscussionInlineView = Backbone.View.extend({
         events: {
-            'click .discussion-show': 'toggleDiscussion'
+            'click .discussion-show': 'toggleDiscussion',
+            'keydown .discussion-show': function(event) {
+                return DiscussionUtil.activateOnSpace(event, this.toggleDiscussion);
+            },
+            'click .new-post-btn': 'toggleNewPost',
+            'keydown .new-post-btn': function(event) {
+                return DiscussionUtil.activateOnSpace(event, this.toggleNewPost);
+            }
         },
 
         initialize: function(options) {
             this.$el = options.el;
             this.toggleDiscussionBtn = this.$('.discussion-show');
+            this.newPostForm = this.$el.find('.new-post-article');
+            this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
         },
 
-        loadPage: function($elem, error) {
+        loadDiscussions: function($elem, error) {
             var discussionId = this.$el.data('discussion-id'),
                 url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page),
                 self = this;
@@ -111,7 +120,7 @@
                     this.$('section.discussion').slideDown();
                     this.showed = true;
                 } else {
-                    this.loadPage(this.$el, function() {
+                    this.loadDiscussions(this.$el, function() {
                         self.hideDiscussion();
                         DiscussionUtil.discussionAlert(
                             gettext('Sorry'),
@@ -127,6 +136,28 @@
             this.toggleDiscussionBtn.removeClass('shown');
             this.toggleDiscussionBtn.find('.button-text').html(gettext('Show Discussion'));
             this.showed = false;
+        },
+
+        toggleNewPost: function(event) {
+            event.preventDefault();
+            if (!this.newPostForm) {
+                this.toggleDiscussion();
+                this.isWaitingOnNewPost = true;
+                return;
+            }
+            if (this.showed) {
+                this.newPostForm.slideDown(300);
+            } else {
+                this.newPostForm.show().focus();
+            }
+            this.toggleDiscussionBtn.addClass('shown');
+            this.toggleDiscussionBtn.find('.button-text').html(gettext('Hide Discussion'));
+            this.$('section.discussion').slideDown();
+            this.showed = true;
+        },
+
+        hideNewPost: function() {
+            return this.newPostForm.slideUp(300);
         }
     });
 }).call(window);
