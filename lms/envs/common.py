@@ -2659,6 +2659,7 @@ OPTIONAL_APPS = (
 
     # Enterprise App (http://github.com/edx/edx-enterprise)
     'enterprise',
+    'django_object_actions',  # Enterprise App dependency
 )
 
 for app_name in OPTIONAL_APPS:
