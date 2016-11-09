@@ -1020,8 +1020,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "hs", "name": "Secondary/high school"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school"},
                     {"value": "el", "name": "Elementary/primary school"},
-                    {"value": "none", "name": "No Formal Education"},
-                    {"value": "other", "name": "Other Education"},
+                    {"value": "none", "name": "No formal education"},
+                    {"value": "other", "name": "Other education"},
                 ],
             }
         )
@@ -1046,8 +1046,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
                     {"value": "hs", "name": "Secondary/high school TRANSLATED"},
                     {"value": "jhs", "name": "Junior secondary/junior high/middle school TRANSLATED"},
                     {"value": "el", "name": "Elementary/primary school TRANSLATED"},
-                    {"value": "none", "name": "No Formal Education TRANSLATED"},
-                    {"value": "other", "name": "Other Education TRANSLATED"},
+                    {"value": "none", "name": "No formal education TRANSLATED"},
+                    {"value": "other", "name": "Other education TRANSLATED"},
                 ],
             }
         )
