@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-03 15:27+0000\n"
-"PO-Revision-Date: 2016-11-03 15:28:42.064529\n"
+"POT-Creation-Date: 2016-11-09 22:13+0000\n"
+"PO-Revision-Date: 2016-11-09 22:14:56.807821\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -72,8 +72,6 @@ msgstr "Sävïng Ⱡ'σяєм ιρѕυ#"
 #: cms/templates/js/signatory-editor.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: common/static/common/templates/discussion/forum-action-delete.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-delete.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-delete.underscore
 msgid "Delete"
 msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 
@@ -111,17 +109,6 @@ msgstr "Délété Ⱡ'σяєм ιρѕυ#"
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
-#: test_root/staticfiles/support/templates/enrollment-modal.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Cancel"
 msgstr "Çänçél Ⱡ'σяєм ιρѕυ#"
 
@@ -143,7 +130,6 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/programs/program_creator_form.underscore
 #: cms/templates/js/programs/program_details.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Name"
 msgstr "Nämé Ⱡ'σяєм ι#"
 
@@ -159,8 +145,6 @@ msgstr "Çhöösé Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/static/js/Markdown.Editor.js
 #: common/static/common/templates/discussion/alert-popup.underscore
-#: test_root/staticfiles/common/templates/discussion/alert-popup.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
 msgstr "ÖK Ⱡ'σя#"
 
@@ -182,7 +166,6 @@ msgstr "Ûnknöwn Ⱡ'σяєм ιρѕυм #"
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
 #: lms/djangoapps/teams/static/teams/templates/edit-team-member.underscore
-#: test_root/staticfiles/teams/templates/edit-team-member.underscore
 msgid "Remove"
 msgstr "Rémövé Ⱡ'σяєм ιρѕυ#"
 
@@ -206,9 +189,6 @@ msgstr "Ûplöäd Fïlé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Save"
 msgstr "Sävé Ⱡ'σяєм ι#"
 
@@ -231,15 +211,6 @@ msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 #: common/static/common/templates/discussion/forum-action-close.underscore
 #: common/static/common/templates/discussion/search-alert.underscore
 #: lms/templates/student_profile/share_modal.underscore
-#: test_root/staticfiles/common/templates/image-modal.underscore
-#: test_root/staticfiles/common/templates/discussion/alert-popup.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-close.underscore
-#: test_root/staticfiles/common/templates/discussion/search-alert.underscore
-#: test_root/staticfiles/templates/student_profile/share_modal.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/alert-popup.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-close.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/search-alert.underscore
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
@@ -624,7 +595,6 @@ msgstr "Çödé ßlöçk Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Code"
 msgstr "Çödé Ⱡ'σяєм ι#"
 
@@ -740,8 +710,6 @@ msgstr "Délété täßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 #: cms/templates/js/group-configuration-editor.underscore
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr "Désçrïptïön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
@@ -789,8 +757,6 @@ msgstr "Édït HTML Ⱡ'σяєм ιρѕυм ∂σł#"
 #: cms/templates/js/signatory-details.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: common/static/common/templates/discussion/forum-action-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-edit.underscore
 msgid "Edit"
 msgstr "Édït Ⱡ'σяєм ι#"
 
@@ -883,8 +849,6 @@ msgstr "Förmäts Ⱡ'σяєм ιρѕυм #"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/static/common/templates/image-modal.underscore
-#: test_root/staticfiles/common/templates/image-modal.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Fullscreen"
 msgstr "Füllsçréén Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -1196,10 +1160,6 @@ msgstr "Néw wïndöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
-#: test_root/staticfiles/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/common/templates/discussion/pagination.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "Next"
 msgstr "Néxt Ⱡ'σяєм ι#"
 
@@ -1621,9 +1581,6 @@ msgstr "Vértïçäl späçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/templates/bookmarks/bookmarks-list.underscore
 #: lms/templates/search/course_search_item.underscore
 #: lms/templates/search/dashboard_search_item.underscore
-#: test_root/staticfiles/templates/bookmarks/bookmarks-list.underscore
-#: test_root/staticfiles/templates/search/course_search_item.underscore
-#: test_root/staticfiles/templates/search/dashboard_search_item.underscore
 msgid "View"
 msgstr "Vïéw Ⱡ'σяєм ι#"
 
@@ -2096,8 +2053,6 @@ msgstr ""
 
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/templates/discussion/pagination.underscore
-#: test_root/staticfiles/common/templates/discussion/pagination.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "…"
 msgstr "… Ⱡ#"
 
@@ -2301,10 +2256,6 @@ msgstr "Ýöür pöst wïll ßé dïsçärdéd. Ⱡ'σяєм ιρѕυм ∂σł�
 #: common/static/common/js/discussion/views/response_comment_show_view.js
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/profile-thread.underscore
-#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
-#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
 msgid "anonymous"
 msgstr "änönýmöüs Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -2468,10 +2419,6 @@ msgstr "Däté pöstéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: common/static/common/templates/discussion/forum-actions.underscore
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-actions.underscore
-#: test_root/staticfiles/templates/discovery/facet.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-actions.underscore
 msgid "More"
 msgstr "Möré Ⱡ'σяєм ι#"
 
@@ -2492,11 +2439,6 @@ msgstr "Püßlïç Ⱡ'σяєм ιρѕυ#"
 #: lms/djangoapps/discussion/static/discussion/templates/search.underscore
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/common/templates/components/search-field.underscore
-#: test_root/staticfiles/discussion/templates/search.underscore
-#: test_root/staticfiles/support/templates/certificates.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/search-field.underscore
 msgid "Search"
 msgstr "Séärçh Ⱡ'σяєм ιρѕυ#"
 
@@ -2550,7 +2492,6 @@ msgstr "Réplý Ⱡ'σяєм ιρѕ#"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Tags:"
 msgstr "Tägs: Ⱡ'σяєм ιρѕ#"
 
@@ -2709,7 +2650,6 @@ msgstr "Längüägé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid ""
 "The language that team members primarily use to communicate with each other."
 msgstr ""
@@ -2723,7 +2663,6 @@ msgstr "Çöüntrý Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "The country that team members primarily identify with."
 msgstr ""
 "Thé çöüntrý thät téäm mémßérs prïmärïlý ïdéntïfý wïth. Ⱡ'σяєм ιρѕυм ∂σłσя "
@@ -2864,7 +2803,6 @@ msgstr ""
 #: lms/djangoapps/teams/static/teams/js/views/team_profile.js
 #: lms/static/js/verify_student/views/reverify_view.js
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Confirm"
 msgstr "Çönfïrm Ⱡ'σяєм ιρѕυм #"
 
@@ -2917,7 +2855,6 @@ msgstr "Mý Téäm Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Browse"
 msgstr "Bröwsé Ⱡ'σяєм ιρѕυ#"
 
@@ -2956,7 +2893,6 @@ msgstr ""
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
-#: test_root/staticfiles/teams/templates/team-profile-header-actions.underscore
 msgid "Edit Team"
 msgstr "Édït Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -2986,7 +2922,6 @@ msgstr "Séärçh téäms Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 #: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
-#: test_root/staticfiles/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "Àll Töpïçs Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -3105,7 +3040,6 @@ msgstr ""
 #: lms/static/js/bookmarks/views/bookmarks_list.js
 #: lms/static/js/instructor_dashboard/data_download.js
 #: lms/templates/search/search_loading.underscore
-#: test_root/staticfiles/templates/search/search_loading.underscore
 msgid "Loading"
 msgstr "Löädïng Ⱡ'σяєм ιρѕυм #"
 
@@ -3154,15 +3088,11 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Username"
 msgstr "Ûsérnämé Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/instructor_dashboard/membership.js
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "Émäïl Ⱡ'σяєм ιρѕ#"
 
@@ -4166,7 +4096,6 @@ msgstr "Àll ünïts Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/js/ccx/schedule.js lms/static/js/ccx/schedule.js.c
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Click to change"
 msgstr "Çlïçk tö çhängé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -4345,8 +4274,6 @@ msgstr ""
 #: lms/static/js/courseware/credit_progress.js
 #: lms/templates/discovery/facet.underscore
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/templates/discovery/facet.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Less"
 msgstr "Léss Ⱡ'σяєм ι#"
 
@@ -4384,7 +4311,6 @@ msgstr ""
 
 #: lms/static/js/discovery/views/search_form.js
 #: lms/templates/search/search_error.underscore
-#: test_root/staticfiles/templates/search/search_error.underscore
 msgid "There was an error, try searching again."
 msgstr ""
 "Théré wäs än érrör, trý séärçhïng ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -4442,8 +4368,6 @@ msgstr ""
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
-#: test_root/staticfiles/templates/search/course_search_results.underscore
-#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 msgid "Search Results"
 msgstr "Séärçh Résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
@@ -4478,7 +4402,6 @@ msgstr ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Selected tab"
 msgstr "Séléçtéd täß Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
@@ -4575,7 +4498,6 @@ msgstr ""
 
 #: lms/static/js/groups/views/cohorts.js
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Add Cohort"
 msgstr "Àdd Çöhört Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
@@ -5080,7 +5002,6 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
-#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "Password"
 msgstr "Pässwörd Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -5120,11 +5041,10 @@ msgid "Time Zone"
 msgstr "Tïmé Zöné Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid ""
-"Select the time zone for displaying course dates. If you do not specify a "
+msgid "Select the time zone for displaying course dates. "
 msgstr ""
-"Séléçt thé tïmé zöné för dïspläýïng çöürsé dätés. Ìf ýöü dö nöt spéçïfý ä  "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+"Séléçt thé tïmé zöné för dïspläýïng çöürsé dätés.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
@@ -5884,10 +5804,6 @@ msgstr ""
 #: cms/static/js/factories/manage_users_lib.js
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "Staff"
 msgstr "Stäff Ⱡ'σяєм ιρѕ#"
 
@@ -6112,9 +6028,6 @@ msgstr ""
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
-#: test_root/staticfiles/templates/student_account/hinted_login.underscore
-#: test_root/staticfiles/templates/student_account/institution_login.underscore
-#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "or"
 msgstr "ör Ⱡ'σя#"
 
@@ -6282,8 +6195,6 @@ msgstr "Däté Àddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Type"
 msgstr "Týpé Ⱡ'σяєм ι#"
 
@@ -7028,7 +6939,6 @@ msgstr "Édïtör Ⱡ'σяєм ιρѕυ#"
 
 #: cms/static/js/views/xblock_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Settings"
 msgstr "Séttïngs Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -7051,291 +6961,133 @@ msgstr "Ûpdätïng Tägs Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: cms/templates/js/basic-modal.underscore
 #: cms/templates/js/programs/confirm_modal.underscore
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Actions"
 msgstr "Àçtïöns Ⱡ'σяєм ιρѕυм #"
 
 #: cms/templates/js/course-outline.underscore
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "Timed Exam"
-msgstr "Tïméd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Unscheduled"
 msgstr "Ûnsçhédüléd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/js/course_info_update.underscore
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "Däté Ⱡ'σяєм ι#"
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
 #: common/static/common/templates/discussion/pagination.underscore
-#: test_root/staticfiles/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/common/templates/discussion/pagination.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/pagination.underscore
 msgid "Previous"
 msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "Stätüs Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/image-modal.underscore
-#: test_root/staticfiles/common/templates/image-modal.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Large"
 msgstr "Lärgé Ⱡ'σяєм ιρѕ#"
 
 #: common/static/common/templates/image-modal.underscore
-#: test_root/staticfiles/common/templates/image-modal.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Zoom In"
 msgstr "Zööm Ìn Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/common/templates/image-modal.underscore
-#: test_root/staticfiles/common/templates/image-modal.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/image-modal.underscore
 msgid "Zoom Out"
 msgstr "Zööm Öüt Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
 #, python-format
 msgid "Page number out of %(total_pages)s"
 msgstr "Pägé nümßér öüt öf %(total_pages)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: common/static/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/common/templates/components/paging-footer.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-footer.underscore
 msgid "Enter the page number you'd like to quickly navigate to."
 msgstr ""
 "Éntér thé pägé nümßér ýöü'd lïké tö qüïçklý nävïgäté tö. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/common/templates/components/paging-header.underscore
-#: test_root/staticfiles/common/templates/components/paging-header.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/paging-header.underscore
 msgid "Sorted by"
 msgstr "Sörtéd ßý Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/common/templates/components/search-field.underscore
-#: test_root/staticfiles/common/templates/components/search-field.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/components/search-field.underscore
 msgid "Clear search"
 msgstr "Çléär séärçh Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Discussion Home"
-msgstr "Dïsçüssïön Hömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-#, python-format
-msgid "How to use %(platform_name)s discussions"
-msgstr ""
-"Höw tö üsé %(platform_name)s dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Find discussions"
-msgstr "Fïnd dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Use the All Topics menu to find specific topics."
-msgstr ""
-"Ûsé thé Àll Töpïçs ménü tö fïnd spéçïfïç töpïçs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/discussion/templates/search.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Search all posts"
-msgstr "Séärçh äll pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Filter and sort topics"
-msgstr "Fïltér änd sört töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Engage with posts"
-msgstr "Éngägé wïth pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Vote for good posts and responses"
-msgstr ""
-"Vöté för gööd pösts änd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Report abuse, topics, and responses"
-msgstr ""
-"Répört äßüsé, töpïçs, änd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Follow or unfollow posts"
-msgstr "Föllöw ör ünföllöw pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Receive updates"
-msgstr "Réçéïvé üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid "Toggle Notifications Setting"
-msgstr "Tögglé Nötïfïçätïöns Séttïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
-
-#: common/static/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/common/templates/discussion/discussion-home.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/discussion-home.underscore
-msgid ""
-"Check this box to receive an email digest once a day notifying you about "
-"new, unread activity from posts you are following."
-msgstr ""
-"Çhéçk thïs ßöx tö réçéïvé än émäïl dïgést önçé ä däý nötïfýïng ýöü äßöüt "
-"néw, ünréäd äçtïvïtý fröm pösts ýöü äré föllöwïng. Ⱡ'σяєм ιρ#"
-
 #: common/static/common/templates/discussion/forum-action-answer.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
 msgid "Mark as Answer"
 msgstr "Märk äs Ànswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/static/common/templates/discussion/forum-action-answer.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-answer.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-answer.underscore
 msgid "Unmark as Answer"
 msgstr "Ûnmärk äs Ànswér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/forum-action-close.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-close.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-close.underscore
 msgid "Open"
 msgstr "Öpén Ⱡ'σяєм ι#"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Endorse"
 msgstr "Éndörsé Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/common/templates/discussion/forum-action-endorse.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-endorse.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-endorse.underscore
 msgid "Unendorse"
 msgstr "Ûnéndörsé Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
 msgid "Follow"
 msgstr "Föllöw Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/forum-action-follow.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-follow.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-follow.underscore
 msgid "Unfollow"
 msgstr "Ûnföllöw Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
 msgid "Pin"
 msgstr "Pïn Ⱡ'σяєм#"
 
 #: common/static/common/templates/discussion/forum-action-pin.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-pin.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-pin.underscore
 msgid "Unpin"
 msgstr "Ûnpïn Ⱡ'σяєм ιρѕ#"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report abuse"
 msgstr "Répört äßüsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Report"
 msgstr "Répört Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/forum-action-report.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-report.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-report.underscore
 msgid "Unreport"
 msgstr "Ûnrépört Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/discussion/forum-action-vote.underscore
-#: test_root/staticfiles/common/templates/discussion/forum-action-vote.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/forum-action-vote.underscore
 msgid "Vote for this post,"
 msgstr "Vöté för thïs pöst, Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/static/common/templates/discussion/nav-load-more-link.underscore
-#: test_root/staticfiles/common/templates/discussion/nav-load-more-link.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/nav-load-more-link.underscore
 msgid "Load more"
 msgstr "Löäd möré Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
 msgid "Error posting your message."
 msgstr "Érrör pöstïng ýöür méssägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Visible To:"
 msgstr "Vïsïßlé Tö: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "All Groups"
 msgstr "Àll Gröüps Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid ""
 "Discussion admins, moderators, and TAs can make their posts visible to all "
 "students or specify a single cohort."
@@ -7345,93 +7097,59 @@ msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Title:"
 msgstr "Tïtlé: Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Add a clear and descriptive title to encourage participation."
 msgstr ""
 "Àdd ä çléär änd désçrïptïvé tïtlé tö énçöürägé pärtïçïpätïön. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Enter your question or comment."
 msgstr "Éntér ýöür qüéstïön ör çömmént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
 msgstr "föllöw thïs pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "post anonymously"
 msgstr "pöst änönýmöüslý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "post anonymously to classmates"
 msgstr "pöst änönýmöüslý tö çlässmätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Add Post"
 msgstr "Àdd Pöst Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/post-user-display.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/post-user-display.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "Community TA"
 msgstr "Çömmünïtý TÀ Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
 #: common/static/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
-#: test_root/staticfiles/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "This thread is closed."
 msgstr "Thïs thréäd ïs çlöséd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: common/static/common/templates/discussion/profile-thread.underscore
-#: test_root/staticfiles/common/templates/discussion/profile-thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/profile-thread.underscore
 msgid "View discussion"
 msgstr "Vïéw dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
 msgid "Editing comment"
 msgstr "Édïtïng çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/response-comment-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/response-comment-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-edit.underscore
 msgid "Update comment"
 msgstr "Ûpdäté çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/static/common/templates/discussion/response-comment-show.underscore
-#: test_root/staticfiles/common/templates/discussion/response-comment-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-show.underscore
 #, python-format
 msgid "posted %(time_ago)s by %(author)s"
 msgstr "pöstéd %(time_ago)s ßý %(author)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -7439,75 +7157,47 @@ msgstr "pöstéd %(time_ago)s ßý %(author)s Ⱡ'σяєм ιρѕυм ∂σłσ�
 #: common/static/common/templates/discussion/response-comment-show.underscore
 #: common/static/common/templates/discussion/thread-response-show.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/common/templates/discussion/response-comment-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/response-comment-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Reported"
 msgstr "Répörtéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Editing post"
 msgstr "Édïtïng pöst Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
 msgstr "Édït ýöür pöst ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/static/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Update post"
 msgstr "Ûpdäté pöst Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "discussion"
 msgstr "dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "answered question"
 msgstr "änswéréd qüéstïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "unanswered question"
 msgstr "ünänswéréd qüéstïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: common/static/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Pinned"
 msgstr "Pïnnéd Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "Föllöwïng Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "{unread_comments_count} new"
 msgstr "{unread_comments_count} néw Ⱡ'σяєм ιρѕυм #"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 #, python-format
 msgid ""
 "%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s "
@@ -7517,8 +7207,6 @@ msgstr ""
 "ünréäd çömménts)%(span_close)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 #, python-format
 msgid "%(comments_count)s %(span_sr_open)scomments %(span_close)s"
 msgstr ""
@@ -7526,20 +7214,14 @@ msgstr ""
 "∂σłσя ѕιт αмєт,#"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Editing response"
 msgstr "Édïtïng réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: common/static/common/templates/discussion/thread-response-edit.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-edit.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-edit.underscore
 msgid "Update response"
 msgstr "Ûpdäté réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s by %(user)s"
 msgstr ""
@@ -7547,29 +7229,21 @@ msgstr ""
 "¢σηѕє#"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "marked as answer %(time_ago)s"
 msgstr "märkéd äs änswér %(time_ago)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s by %(user)s"
 msgstr "éndörséd %(time_ago)s ßý %(user)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
 #, python-format
 msgid "endorsed %(time_ago)s"
 msgstr "éndörséd %(time_ago)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: common/static/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
 #, python-format
 msgid "Show Comment (%(num_comments)s)"
 msgid_plural "Show Comments (%(num_comments)s)"
@@ -7577,25 +7251,16 @@ msgstr[0] "Shöw Çömmént (%(num_comments)s) Ⱡ'σяєм ιρѕυм ∂σłσ
 msgstr[1] "Shöw Çömménts (%(num_comments)s) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/static/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
 msgid "Add a comment"
 msgstr "Àdd ä çömmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: common/static/common/templates/discussion/thread.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Submit"
 msgstr "Süßmït Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
 msgstr ""
@@ -7603,21 +7268,15 @@ msgstr ""
 " #"
 
 #: common/static/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "Closed"
 msgstr "Çlöséd Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "Related to: %(courseware_title_linked)s"
 msgstr "Rélätéd tö: %(courseware_title_linked)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "This post is visible only to %(group_name)s."
 msgstr ""
@@ -7625,33 +7284,23 @@ msgstr ""
 "¢σηѕє¢тє#"
 
 #: common/static/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-show.underscore
 msgid "This post is visible to everyone."
 msgstr ""
 "Thïs pöst ïs vïsïßlé tö évérýöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: common/static/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Post type:"
 msgstr "Pöst týpé: Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/static/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Question"
 msgstr "Qüéstïön Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/static/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid "Discussion"
 msgstr "Dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: common/static/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-type.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-type.underscore
 msgid ""
 "Questions raise issues that need answers. Discussions share ideas and start "
 "conversations."
@@ -7660,229 +7309,240 @@ msgstr ""
 "çönvérsätïöns. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: common/static/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
 msgstr "Àdd ä Réspönsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/static/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Add a response:"
 msgstr "Àdd ä réspönsé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/static/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Expand discussion"
 msgstr "Éxpänd dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: common/static/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/common/templates/discussion/thread.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread.underscore
 msgid "Collapse discussion"
 msgstr "Çölläpsé dïsçüssïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/static/common/templates/discussion/topic.underscore
-#: test_root/staticfiles/common/templates/discussion/topic.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Topic Area:"
 msgstr "Töpïç Àréä: Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: common/static/common/templates/discussion/topic.underscore
-#: test_root/staticfiles/common/templates/discussion/topic.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
 msgstr ""
 "Àdd ýöür pöst tö ä rélévänt töpïç tö hélp öthérs fïnd ït. Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Discussion Home"
+msgstr "Dïsçüssïön Hömé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#, python-format
+msgid "How to use %(platform_name)s discussions"
+msgstr ""
+"Höw tö üsé %(platform_name)s dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Find discussions"
+msgstr "Fïnd dïsçüssïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Use the All Topics menu to find specific topics."
+msgstr ""
+"Ûsé thé Àll Töpïçs ménü tö fïnd spéçïfïç töpïçs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+#: lms/djangoapps/discussion/static/discussion/templates/search.underscore
+msgid "Search all posts"
+msgstr "Séärçh äll pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Filter and sort topics"
+msgstr "Fïltér änd sört töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Engage with posts"
+msgstr "Éngägé wïth pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Vote for good posts and responses"
+msgstr ""
+"Vöté för gööd pösts änd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Report abuse, topics, and responses"
+msgstr ""
+"Répört äßüsé, töpïçs, änd réspönsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Follow or unfollow posts"
+msgstr "Föllöw ör ünföllöw pösts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Receive updates"
+msgstr "Réçéïvé üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid "Toggle Notifications Setting"
+msgstr "Tögglé Nötïfïçätïöns Séttïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: lms/djangoapps/discussion/static/discussion/templates/discussion-home.underscore
+msgid ""
+"Check this box to receive an email digest once a day notifying you about "
+"new, unread activity from posts you are following."
+msgstr ""
+"Çhéçk thïs ßöx tö réçéïvé än émäïl dïgést önçé ä däý nötïfýïng ýöü äßöüt "
+"néw, ünréäd äçtïvïtý fröm pösts ýöü äré föllöwïng. Ⱡ'σяєм ιρ#"
+
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-#: test_root/staticfiles/discussion/templates/user-profile.underscore
 msgid "Active Threads"
 msgstr "Àçtïvé Thréäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
-#: test_root/staticfiles/support/templates/certificates.underscore
 msgid "username or email"
 msgstr "üsérnämé ör émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
-#: test_root/staticfiles/support/templates/certificates.underscore
 msgid "course id"
 msgstr "çöürsé ïd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "No results"
 msgstr "Nö résülts Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Course Key"
 msgstr "Çöürsé Kéý Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Download URL"
 msgstr "Döwnlöäd ÛRL Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Grade"
 msgstr "Grädé Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Last Updated"
 msgstr "Läst Ûpdätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Download the user's certificate"
 msgstr "Döwnlöäd thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Not available"
 msgstr "Nöt äväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Regenerate"
 msgstr "Régénéräté Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Regenerate the user's certificate"
 msgstr ""
 "Régénéräté thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Generate"
 msgstr "Généräté Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: test_root/staticfiles/support/templates/certificates_results.underscore
 msgid "Generate the user's certificate"
 msgstr "Généräté thé üsér's çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-#: test_root/staticfiles/support/templates/enrollment-modal.underscore
 msgid "Current enrollment mode:"
 msgstr "Çürrént énröllmént mödé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-#: test_root/staticfiles/support/templates/enrollment-modal.underscore
 msgid "New enrollment mode:"
 msgstr "Néw énröllmént mödé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-#: test_root/staticfiles/support/templates/enrollment-modal.underscore
 msgid "Reason for change:"
 msgstr "Réäsön för çhängé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-#: test_root/staticfiles/support/templates/enrollment-modal.underscore
 msgid "Choose One"
 msgstr "Çhöösé Öné Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-#: test_root/staticfiles/support/templates/enrollment-modal.underscore
 msgid "Explain if other."
 msgstr "Éxpläïn ïf öthér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment-modal.underscore
-#: test_root/staticfiles/support/templates/enrollment-modal.underscore
 msgid "Submit enrollment change"
 msgstr "Süßmït énröllmént çhängé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Username or email address"
 msgstr "Ûsérnämé ör émäïl äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Course ID"
 msgstr "Çöürsé ÌD Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Course Start"
 msgstr "Çöürsé Stärt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Course End"
 msgstr "Çöürsé Énd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Upgrade Deadline"
 msgstr "Ûpgrädé Déädlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Verification Deadline"
 msgstr "Vérïfïçätïön Déädlïné Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Enrollment Date"
 msgstr "Énröllmént Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Enrollment Mode"
 msgstr "Énröllmént Mödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Verified mode price"
 msgstr "Vérïfïéd mödé prïçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Reason"
 msgstr "Réäsön Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Last modified by"
 msgstr "Läst mödïfïéd ßý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "N/A"
 msgstr "N/À Ⱡ'σяєм#"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
-#: test_root/staticfiles/support/templates/enrollment.underscore
 msgid "Change Enrollment"
 msgstr "Çhängé Énröllmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Your team could not be created."
 msgstr "Ýöür téäm çöüld nöt ßé çréätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Your team could not be updated."
 msgstr "Ýöür téäm çöüld nöt ßé üpdätéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid ""
 "Enter information to describe your team. You cannot change these details "
 "after you create the team."
@@ -7891,12 +7551,10 @@ msgstr ""
 "äftér ýöü çréäté thé téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Optional Characteristics"
 msgstr "Öptïönäl Çhäräçtérïstïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid ""
 "Help other learners decide whether to join your team by specifying some "
 "characteristics for your team. Choose carefully, because fewer people might "
@@ -7912,86 +7570,69 @@ msgstr ""
 "¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρт#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Create team."
 msgstr "Çréäté téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Update team."
 msgstr "Ûpdäté téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Cancel team creating."
 msgstr "Çänçél téäm çréätïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/teams/static/teams/templates/edit-team.underscore
-#: test_root/staticfiles/teams/templates/edit-team.underscore
 msgid "Cancel team updating."
 msgstr "Çänçél téäm üpdätïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
-#: test_root/staticfiles/teams/templates/instructor-tools.underscore
 msgid "Instructor tools"
 msgstr "Ìnstrüçtör tööls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
-#: test_root/staticfiles/teams/templates/instructor-tools.underscore
 msgid "Delete Team"
 msgstr "Délété Téäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/djangoapps/teams/static/teams/templates/instructor-tools.underscore
-#: test_root/staticfiles/teams/templates/instructor-tools.underscore
 msgid "Edit Membership"
 msgstr "Édït Mémßérshïp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-actions.underscore
-#: test_root/staticfiles/teams/templates/team-actions.underscore
 msgid "Are you having trouble finding a team to join?"
 msgstr ""
 "Àré ýöü hävïng tröüßlé fïndïng ä téäm tö jöïn? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile-header-actions.underscore
-#: test_root/staticfiles/teams/templates/team-profile-header-actions.underscore
 msgid "Join Team"
 msgstr "Jöïn Téäm Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team Details"
 msgstr "Téäm Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "You are a member of this team."
 msgstr "Ýöü äré ä mémßér öf thïs téäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team member profiles"
 msgstr "Téäm mémßér pröfïlés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Team capacity"
 msgstr "Téäm çäpäçïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Leave Team"
 msgstr "Léävé Téäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/static/js/fixtures/donation.underscore
 #: lms/templates/dashboard/donation.underscore
-#: test_root/staticfiles/js/fixtures/donation.underscore
-#: test_root/staticfiles/templates/dashboard/donation.underscore
 msgid "Donate"
 msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/api_admin/catalog-error.underscore
-#: test_root/staticfiles/templates/api_admin/catalog-error.underscore
 msgid ""
 "There was an error retrieving preview results for this catalog. Please check"
 " that your query is correct and try again."
@@ -8000,29 +7641,24 @@ msgstr ""
 " thät ýöür qüérý ïs çörréçt änd trý ägäïn. Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/api_admin/catalog-results.underscore
-#: test_root/staticfiles/templates/api_admin/catalog-results.underscore
 msgid "This catalog's courses:"
 msgstr "Thïs çätälög's çöürsés: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
-#: test_root/staticfiles/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
 msgstr "Mý Böökmärks Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
-#: test_root/staticfiles/templates/bookmarks/bookmarks-list.underscore
 msgid "Bookmarked on"
 msgstr "Böökmärkéd ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
-#: test_root/staticfiles/templates/bookmarks/bookmarks-list.underscore
 msgid "You have not bookmarked any courseware pages yet."
 msgstr ""
 "Ýöü hävé nöt ßöökmärkéd äný çöürséwäré pägés ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
-#: test_root/staticfiles/templates/bookmarks/bookmarks-list.underscore
 msgid ""
 "Use bookmarks to help you easily return to courseware pages. To bookmark a "
 "page, select Bookmark in the upper right corner of that page. To see a list "
@@ -8039,83 +7675,68 @@ msgstr ""
 " νєłιт єѕ#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Expand All"
 msgstr "Éxpänd Àll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Collapse All"
 msgstr "Çölläpsé Àll Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Unit"
 msgstr "Ûnït Ⱡ'σяєм ι#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Start Date"
 msgstr "Stärt Däté Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Due Date"
 msgstr "Düé Däté Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove all"
 msgstr "rémövé äll Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 #, python-format
 msgid "toggle chapter %(displayName)s"
 msgstr "tögglé çhäptér %(displayName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "Séçtïön Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove chapter %(chapterDisplayName)s"
 msgstr "Rémövé çhäptér %(chapterDisplayName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "rémövé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 #, python-format
 msgid "toggle subsection %(displayName)s"
 msgstr "tögglé süßséçtïön %(displayName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Subsection"
 msgstr "Süßséçtïön Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove subsection %(subsectionDisplayName)s"
 msgstr ""
 "Rémövé süßséçtïön %(subsectionDisplayName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
 #, python-format
 msgid "Remove unit %(unitName)s"
 msgstr "Rémövé ünït %(unitName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
 #, python-format
 msgid ""
 "You still need to visit the %(display_name)s website to complete the credit "
@@ -8125,7 +7746,6 @@ msgstr ""
 "pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
 #, python-format
 msgid ""
 "To finalize course credit, %(display_name)s requires %(platform_name)s "
@@ -8135,12 +7755,10 @@ msgstr ""
 "léärnérs tö süßmït ä çrédït réqüést. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
 msgid "Get Credit"
 msgstr "Gét Çrédït Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
 #, python-format
 msgid ""
 "Thank you %(full_name)s! We have received your payment for %(course_name)s."
@@ -8150,8 +7768,6 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "Please print this page for your records; it serves as your receipt. You will"
 " also receive an email with the same information."
@@ -8161,38 +7777,27 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Order No."
 msgstr "Ördér Nö. Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Amount"
 msgstr "Àmöünt Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr "Tötäl Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Please Note"
 msgstr "Pléäsé Nöté Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Crossed out items have been refunded."
 msgstr ""
 "Çrösséd öüt ïtéms hävé ßéén réfündéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -8200,27 +7805,20 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Billed to"
 msgstr "Bïlléd tö Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "No receipt available"
 msgstr "Nö réçéïpt äväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Go to Dashboard"
 msgstr "Gö tö Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
 msgid ""
 "If you don't verify your identity now, you can still explore your course "
 "from your dashboard. You will receive periodic reminders from {platformName}"
@@ -8238,25 +7836,20 @@ msgstr ""
 
 #: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
 msgstr ""
 "Wänt tö çönfïrm ýöür ïdéntïtý lätér? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
 #: lms/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
 msgid "Verify Now"
 msgstr "Vérïfý Nöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/courseware/proctored-exam-controls.underscore
-#: test_root/staticfiles/templates/courseware/proctored-exam-controls.underscore
 msgid "Mark Exam As Completed"
 msgstr "Märk Éxäm Às Çömplétéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid "timed"
 msgstr "tïméd Ⱡ'σяєм ιρѕ#"
 
@@ -8269,95 +7862,75 @@ msgstr ""
 "ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/courseware/proctored-exam-status.underscore
-#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
 msgid "End My Exam"
 msgstr "Énd Mý Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/discovery/course_card.underscore
-#: test_root/staticfiles/templates/discovery/course_card.underscore
 msgid "LEARN MORE"
 msgstr "LÉÀRN MÖRÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/discovery/course_card.underscore
-#: test_root/staticfiles/templates/discovery/course_card.underscore
 #, python-format
 msgid "Starts: %(start_date)s"
 msgstr "Stärts: %(start_date)s Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/discovery/course_card.underscore
-#: test_root/staticfiles/templates/discovery/course_card.underscore
 msgid "Starts"
 msgstr "Stärts Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/discovery/filter_bar.underscore
-#: test_root/staticfiles/templates/discovery/filter_bar.underscore
 msgid "Clear All"
 msgstr "Çléär Àll Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
 msgstr "Hïghlïghtéd téxt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Note"
 msgstr "Nöté Ⱡ'σяєм ι#"
 
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "You commented..."
 msgstr "Ýöü çömméntéd... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Noted in:"
 msgstr "Nötéd ïn: Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/edxnotes/note-item.underscore
-#: test_root/staticfiles/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
 msgstr "Läst Édïtéd: Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/edxnotes/tab-item.underscore
-#: test_root/staticfiles/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
 msgstr "Çléär séärçh résülts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/fields/field_dropdown.underscore
 #: lms/templates/fields/field_dropdown_account.underscore
 #: lms/templates/fields/field_textarea.underscore
-#: test_root/staticfiles/templates/fields/field_dropdown.underscore
-#: test_root/staticfiles/templates/fields/field_dropdown_account.underscore
-#: test_root/staticfiles/templates/fields/field_textarea.underscore
 msgid "Click to edit"
 msgstr "Çlïçk tö édït Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/fields/field_order_history.underscore
-#: test_root/staticfiles/templates/fields/field_order_history.underscore
 msgid "Order Details"
 msgstr "Ördér Détäïls Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
 msgstr ""
 "Fïnänçïäl Àssïstänçé Àpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Unable to submit application"
 msgstr "Ûnäßlé tö süßmït äpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
 msgstr "Àßöüt Ýöü Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid ""
 "The following information is already a part of your {platform} profile. "
 "We\\'ve included it here for your application."
@@ -8366,32 +7939,26 @@ msgstr ""
 "Wé\\'vé ïnçlüdéd ït héré för ýöür äpplïçätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Email address"
 msgstr "Émäïl äddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Legal name"
 msgstr "Légäl nämé Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Country of residence"
 msgstr "Çöüntrý öf résïdénçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Back to {platform} FAQs"
 msgstr "Bäçk tö {platform} FÀQs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_form.underscore
 msgid "Submit Application"
 msgstr "Süßmït Àpplïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
-#: test_root/staticfiles/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid ""
 "Thank you for submitting your financial assistance application for "
 "{course_name}! You can expect a response in 2-4 business days."
@@ -8400,12 +7967,10 @@ msgstr ""
 "{course_name}! Ýöü çän éxpéçt ä réspönsé ïn 2-4 ßüsïnéss däýs. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Bulk Exceptions"
 msgstr "Bülk Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid ""
 "Upload a comma separated values (.csv) file that contains the usernames or "
 "email addresses of learners who have been given exceptions. Include the "
@@ -8422,19 +7987,15 @@ msgstr ""
 " αłιqυα. υт єηι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 msgid "Upload a CSV file"
 msgstr "Ûplöäd ä ÇSV fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-bulk-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Add to Exception List"
 msgstr "Àdd tö Éxçéptïön Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid ""
 "To invalidate a certificate for a particular learner, add the username or "
 "email address below."
@@ -8443,56 +8004,44 @@ msgstr ""
 "émäïl äddréss ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Add notes about this learner"
 msgstr "Àdd nötés äßöüt thïs léärnér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidate Certificate"
 msgstr "Ìnvälïdäté Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Student"
 msgstr "Stüdént Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidated By"
 msgstr "Ìnvälïdätéd Bý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Invalidated"
 msgstr "Ìnvälïdätéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
 msgstr "Nötés Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Action"
 msgstr "Àçtïön Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
 msgstr "Rémövé fröm Ìnvälïdätïön Täßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Individual Exceptions"
 msgstr "Ìndïvïdüäl Éxçéptïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid ""
 "Enter the username or email address of each learner that you want to add as "
 "an exception."
@@ -8501,68 +8050,55 @@ msgstr ""
 "än éxçéptïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
 msgstr "Stüdént émäïl ör üsérnämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
 msgstr "Fréé téxt nötés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Generate Exception Certificates"
 msgstr "Généräté Éxçéptïön Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list who do not yet have a certificate"
 msgstr ""
 "Àll üsérs ön thé Éxçéptïön lïst whö dö nöt ýét hävé ä çértïfïçäté Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "All users on the Exception list"
 msgstr "Àll üsérs ön thé Éxçéptïön lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
 msgstr "Ûsér Émäïl Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Exception Granted"
 msgstr "Éxçéptïön Gräntéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Certificate Generated"
 msgstr "Çértïfïçäté Générätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Remove from List"
 msgstr "Rémövé fröm Lïst Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Specify whether discussion topics are divided by cohort"
 msgstr ""
 "Spéçïfý whéthér dïsçüssïön töpïçs äré dïvïdéd ßý çöhört Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 msgid "Course-Wide Discussion Topics"
 msgstr "Çöürsé-Wïdé Dïsçüssïön Töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide.underscore
 msgid ""
 "Select the course-wide discussion topics that you want to divide by cohort."
 msgstr ""
@@ -8570,13 +8106,11 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Content-Specific Discussion Topics"
 msgstr ""
 "Çöntént-Spéçïfïç Dïsçüssïön Töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid ""
 "Specify whether content-specific discussion topics are divided by cohort."
 msgstr ""
@@ -8584,43 +8118,36 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Always cohort content-specific discussion topics"
 msgstr ""
 "Àlwäýs çöhört çöntént-spéçïfïç dïsçüssïön töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "Cohort selected content-specific discussion topics"
 msgstr ""
 "Çöhört séléçtéd çöntént-spéçïfïç dïsçüssïön töpïçs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-inline.underscore
 msgid "No content-specific discussion topics exist."
 msgstr ""
 "Nö çöntént-spéçïfïç dïsçüssïön töpïçs éxïst. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory.underscore
 msgid "Cohorted"
 msgstr "Çöhörtéd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Students"
 msgstr "Mänägé Stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add students to this cohort"
 msgstr "Àdd stüdénts tö thïs çöhört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Note: Students can be in only one cohort. Adding students to this group "
 "overrides any previous group assignment."
@@ -8629,7 +8156,6 @@ msgstr ""
 "övérrïdés äný prévïöüs gröüp ässïgnmént. Ⱡ'σяєм ιρѕυм ∂σłσя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Enter email addresses and/or usernames, separated by new lines or commas, "
 "for the students you want to add. *"
@@ -8639,20 +8165,16 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "(Required Field)"
 msgstr "(Réqüïréd Fïéld) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
 msgstr ""
 "é.g. jöhndöé@éxämplé.çöm, JänéDöé, jöéýdöé@éxämplé.çöm Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "You will not receive notification for emails that bounce, so double-check "
 "your spelling."
@@ -8661,42 +8183,34 @@ msgstr ""
 "ýöür spéllïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add Students"
 msgstr "Àdd Stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Add a New Cohort"
 msgstr "Àdd ä Néw Çöhört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Enter the name of the cohort"
 msgstr "Éntér thé nämé öf thé çöhört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Name"
 msgstr "Çöhört Nämé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Cohort Assignment Method"
 msgstr "Çöhört Àssïgnmént Méthöd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Automatic"
 msgstr "Àütömätïç Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Manual"
 msgstr "Mänüäl Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
 "There must be one cohort to which students can automatically be assigned."
 msgstr ""
@@ -8704,38 +8218,31 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Associated Content Group"
 msgstr "Àssöçïätéd Çöntént Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "No Content Group"
 msgstr "Nö Çöntént Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Select a Content Group"
 msgstr "Séléçt ä Çöntént Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Choose a content group to associate"
 msgstr ""
 "Çhöösé ä çöntént gröüp tö ässöçïäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Not selected"
 msgstr "Nöt séléçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Deleted Content Group"
 msgstr "Délétéd Çöntént Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} The previously selected "
 "content group was deleted. Select another content group."
@@ -8745,7 +8252,6 @@ msgstr ""
 "ѕιт αмєт, ¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid ""
 "{screen_reader_start}Warning:{screen_reader_end} No content groups exist."
 msgstr ""
@@ -8759,12 +8265,10 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Create a content group"
 msgstr "Çréäté ä çöntént gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 #, python-format
 msgid "(contains %(student_count)s student)"
 msgid_plural "(contains %(student_count)s students)"
@@ -8774,7 +8278,6 @@ msgstr[1] ""
 "(çöntäïns %(student_count)s stüdénts) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid ""
 "Learners are added to this cohort only when you provide their email "
 "addresses or usernames on this page."
@@ -8783,52 +8286,43 @@ msgstr ""
 "äddréssés ör üsérnämés ön thïs pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid "What does this mean?"
 msgstr "Whät döés thïs méän? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-group-header.underscore
 msgid "Learners are added to this cohort automatically."
 msgstr ""
 "Léärnérs äré äddéd tö thïs çöhört äütömätïçällý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 msgid "Select a cohort"
 msgstr "Séléçt ä çöhört Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-selector.underscore
 #, python-format
 msgid "%(cohort_name)s (%(user_count)s)"
 msgstr "%(cohort_name)s (%(user_count)s) Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Enable Cohorts"
 msgstr "Énäßlé Çöhörts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Select a cohort to manage"
 msgstr "Séléçt ä çöhört tö mänägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "View Cohort"
 msgstr "Vïéw Çöhört Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Assign students to cohorts by uploading a CSV file"
 msgstr ""
 "Àssïgn stüdénts tö çöhörts ßý üplöädïng ä ÇSV fïlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
 "file, download course profile information or cohort results on the "
@@ -8845,113 +8339,92 @@ msgstr ""
 " σƒƒι¢#"
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Used"
 msgstr "Ûséd Ⱡ'σяєм ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
-#: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 msgid "Valid"
 msgstr "Välïd Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
 msgid "Program Certificates"
 msgstr "Prögräm Çértïfïçätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
 msgstr ""
 "Çöngrätülätïöns! Ýöü hävé éärnéd ä çértïfïçäté för thïs çöürsé. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"
 msgstr "Vïéw Çértïfïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/learner_dashboard/course_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
 #, python-format
 msgid "%(courseName)s Home Page."
 msgstr "%(courseName)s Hömé Pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "enrolled"
 msgstr "énrölléd Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "View Course"
 msgstr "Vïéw Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "View Archived Course"
 msgstr "Vïéw Àrçhïvéd Çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "not enrolled"
 msgstr "nöt énrölléd Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Please select a course date"
 msgstr "Pléäsé séléçt ä çöürsé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Select Course Run"
 msgstr "Séléçt Çöürsé Rün Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Choose Course Date"
 msgstr "Çhöösé Çöürsé Däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 #, python-format
 msgid "Starts %(start)s"
 msgstr "Stärts %(start)s Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Enroll Now"
 msgstr "Énröll Nöw Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Coming Soon"
 msgstr "Çömïng Söön Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Enrollment Opens on"
 msgstr "Énröllmént Öpéns ön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
 msgid "Not Currently Available"
 msgstr "Nöt Çürréntlý Àväïläßlé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-#: test_root/staticfiles/templates/learner_dashboard/empty_programs_list.underscore
 msgid "You are not enrolled in any programs yet."
 msgstr ""
 "Ýöü äré nöt énrölléd ïn äný prögräms ýét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/learner_dashboard/empty_programs_list.underscore
-#: test_root/staticfiles/templates/learner_dashboard/empty_programs_list.underscore
 msgid "Explore Programs"
 msgstr "Éxplöré Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-#: test_root/staticfiles/templates/learner_dashboard/explore_new_programs.underscore
 msgid ""
 "Browse recently launched courses and see what\\'s new in your favorite "
 "subjects"
@@ -8960,12 +8433,10 @@ msgstr ""
 "süßjéçts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/learner_dashboard/explore_new_programs.underscore
-#: test_root/staticfiles/templates/learner_dashboard/explore_new_programs.underscore
 msgid "Explore New Programs"
 msgstr "Éxplöré Néw Prögräms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid ""
 "You have earned certificates in %(completed_courses)s of the "
@@ -8976,33 +8447,27 @@ msgstr ""
 "α#"
 
 #: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid "%(programName)s Home Page."
 msgstr "%(programName)s Hömé Pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
 msgid "{organization}\\'s logo"
 msgstr "{organization}\\'s lögö Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
 msgid "You are here"
 msgstr "Ýöü äré héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
 msgid "Dashboard"
 msgstr "Däshßöärd Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
 msgid "Programs"
 msgstr "Prögräms Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
-#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
 msgid ""
 "You need a certificate in this course to be eligible for a program "
 "certificate."
@@ -9011,14 +8476,11 @@ msgstr ""
 "çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/learner_dashboard/upgrade_message.underscore
-#: test_root/staticfiles/templates/learner_dashboard/upgrade_message.underscore
 msgid "Upgrade Now"
 msgstr "Ûpgrädé Nöw Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
-#: test_root/staticfiles/templates/search/course_search_results.underscore
-#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 #, python-format
 msgid "Load next %(num_items)s result"
 msgid_plural "Load next %(num_items)s results"
@@ -9027,59 +8489,46 @@ msgstr[1] "Löäd néxt %(num_items)s résülts Ⱡ'σяєм ιρѕυм ∂σł�
 
 #: lms/templates/search/course_search_results.underscore
 #: lms/templates/search/dashboard_search_results.underscore
-#: test_root/staticfiles/templates/search/course_search_results.underscore
-#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 msgid "Sorry, no results were found."
 msgstr "Sörrý, nö résülts wéré föünd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/search/dashboard_search_results.underscore
-#: test_root/staticfiles/templates/search/dashboard_search_results.underscore
 msgid "Back to Dashboard"
 msgstr "Bäçk tö Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/student_account/account.underscore
-#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "New Address"
 msgstr "Néw Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/student_account/account.underscore
-#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "Change My Email Address"
 msgstr "Çhängé Mý Émäïl Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/student_account/account.underscore
-#: test_root/staticfiles/templates/student_account/account.underscore
 msgid "Reset Password"
 msgstr "Rését Pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/student_account/account_settings.underscore
-#: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "Àççöünt Séttïngs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/student_account/account_settings_section.underscore
-#: test_root/staticfiles/templates/student_account/account_settings_section.underscore
 msgid "An error occurred. Please reload the page."
 msgstr ""
 "Àn érrör öççürréd. Pléäsé rélöäd thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/form_field.underscore
-#: test_root/staticfiles/templates/student_account/form_field.underscore
 msgid "Forgot password?"
 msgstr "Förgöt pässwörd? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/student_account/hinted_login.underscore
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/hinted_login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/student_account/hinted_login.underscore
-#: test_root/staticfiles/templates/student_account/hinted_login.underscore
 #, python-format
 msgid "Would you like to sign in using your %(providerName)s credentials?"
 msgstr ""
@@ -9087,20 +8536,17 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/student_account/hinted_login.underscore
-#: test_root/staticfiles/templates/student_account/hinted_login.underscore
 #, python-format
 msgid "Sign in using %(providerName)s"
 msgstr "Sïgn ïn üsïng %(providerName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/student_account/hinted_login.underscore
-#: test_root/staticfiles/templates/student_account/hinted_login.underscore
 msgid "Show me other ways to sign in or register"
 msgstr ""
 "Shöw mé öthér wäýs tö sïgn ïn ör régïstér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/institution_login.underscore
-#: test_root/staticfiles/templates/student_account/institution_login.underscore
 msgid "Sign in with Institution/Campus Credentials"
 msgstr ""
 "Sïgn ïn wïth Ìnstïtütïön/Çämpüs Çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -9108,32 +8554,26 @@ msgstr ""
 
 #: lms/templates/student_account/institution_login.underscore
 #: lms/templates/student_account/institution_register.underscore
-#: test_root/staticfiles/templates/student_account/institution_login.underscore
-#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "Choose your institution from the list below:"
 msgstr ""
 "Çhöösé ýöür ïnstïtütïön fröm thé lïst ßélöw: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/institution_login.underscore
-#: test_root/staticfiles/templates/student_account/institution_login.underscore
 msgid "Back to sign in"
 msgstr "Bäçk tö sïgn ïn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/student_account/institution_register.underscore
-#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "Register with Institution/Campus Credentials"
 msgstr ""
 "Régïstér wïth Ìnstïtütïön/Çämpüs Çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/institution_register.underscore
-#: test_root/staticfiles/templates/student_account/institution_register.underscore
 msgid "Register through edX"
 msgstr "Régïstér thröügh édX Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid ""
 "You have successfully signed into %(currentProvider)s, but your "
@@ -9152,17 +8592,14 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
 msgid "Check Your Email"
 msgstr "Çhéçk Ýöür Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "We couldn't sign you in."
 msgstr "Wé çöüldn't sïgn ýöü ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid "An error occurred when signing you in to %(platformName)s."
 msgstr ""
@@ -9170,7 +8607,6 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -9179,64 +8615,52 @@ msgstr ""
 "prövïdérs lïstéd ßélöw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Sign in here using your email address and password."
 msgstr ""
 "Sïgn ïn héré üsïng ýöür émäïl äddréss änd pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "If you do not yet have an account, use the button below to register."
 msgstr ""
 "Ìf ýöü dö nöt ýét hävé än äççöünt, üsé thé ßüttön ßélöw tö régïstér. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "or sign in with"
 msgstr "ör sïgn ïn wïth Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid "Sign in with %(providerName)s"
 msgstr "Sïgn ïn wïth %(providerName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Use my institution/campus credentials"
 msgstr ""
 "Ûsé mý ïnstïtütïön/çämpüs çrédéntïäls Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυ#"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 #, python-format
 msgid "New to %(platformName)s?"
 msgstr "Néw tö %(platformName)s? Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/student_account/login.underscore
-#: test_root/staticfiles/templates/student_account/login.underscore
 msgid "Create an account"
 msgstr "Çréäté än äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/student_account/password_reset.underscore
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/password_reset.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "An error occurred."
 msgstr "Àn érrör öççürréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/student_account/password_reset.underscore
-#: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid "Password assistance"
 msgstr "Pässwörd ässïstänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/student_account/password_reset.underscore
-#: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid ""
 "Please enter your email address below and we will send you instructions for "
 "setting a new password."
@@ -9245,18 +8669,15 @@ msgstr ""
 "séttïng ä néw pässwörd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/student_account/password_reset.underscore
-#: test_root/staticfiles/templates/student_account/password_reset.underscore
 msgid "Reset my password"
 msgstr "Rését mý pässwörd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "We couldn't create your account."
 msgstr ""
 "Wé çöüldn't çréäté ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 #, python-format
 msgid "You've successfully signed into %(currentProvider)s."
 msgstr ""
@@ -9264,7 +8685,6 @@ msgstr ""
 "αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 #, python-format
 msgid ""
 "We just need a little more information before you start learning with "
@@ -9274,105 +8694,87 @@ msgstr ""
 "%(platformName)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create an account using"
 msgstr "Çréäté än äççöünt üsïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 #, python-format
 msgid "Create account using %(providerName)s."
 msgstr ""
 "Çréäté äççöünt üsïng %(providerName)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "or create a new one here"
 msgstr "ör çréäté ä néw öné héré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create a new account"
 msgstr "Çréäté ä néw äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Create your account"
 msgstr "Çréäté ýöür äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Required field"
 msgstr "Réqüïréd fïéld Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/student_account/register.underscore
-#: test_root/staticfiles/templates/student_account/register.underscore
 msgid "Already have an account?"
 msgstr "Àlréädý hävé än äççöünt? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/student_profile/badge.underscore
-#: test_root/staticfiles/templates/student_profile/badge.underscore
 #, python-format
 msgid "Share your \"%(display_name)s\" award"
 msgstr "Shäré ýöür \"%(display_name)s\" äwärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/student_profile/badge.underscore
-#: test_root/staticfiles/templates/student_profile/badge.underscore
 msgid "Share"
 msgstr "Shäré Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/student_profile/badge.underscore
-#: test_root/staticfiles/templates/student_profile/badge.underscore
 #, python-format
 msgid "Earned %(created)s."
 msgstr "Éärnéd %(created)s. Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/student_profile/badge_placeholder.underscore
-#: test_root/staticfiles/templates/student_profile/badge_placeholder.underscore
 msgid "What's Your Next Accomplishment?"
 msgstr ""
 "Whät's Ýöür Néxt Àççömplïshmént? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/student_profile/badge_placeholder.underscore
-#: test_root/staticfiles/templates/student_profile/badge_placeholder.underscore
 msgid "Start working toward your next learning goal."
 msgstr ""
 "Stärt wörkïng töwärd ýöür néxt léärnïng göäl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_profile/badge_placeholder.underscore
-#: test_root/staticfiles/templates/student_profile/badge_placeholder.underscore
 msgid "Find a course"
 msgstr "Fïnd ä çöürsé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/student_profile/learner_profile.underscore
-#: test_root/staticfiles/templates/student_profile/learner_profile.underscore
 msgid "An error occurred. Try loading the page again."
 msgstr ""
 "Àn érrör öççürréd. Trý löädïng thé pägé ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя α#"
 
 #: lms/templates/student_profile/section_two.underscore
-#: test_root/staticfiles/templates/student_profile/section_two.underscore
 msgid "You are currently sharing a limited profile."
 msgstr ""
 "Ýöü äré çürréntlý shärïng ä lïmïtéd pröfïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/student_profile/section_two.underscore
-#: test_root/staticfiles/templates/student_profile/section_two.underscore
 msgid "This learner is currently sharing a limited profile."
 msgstr ""
 "Thïs léärnér ïs çürréntlý shärïng ä lïmïtéd pröfïlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/student_profile/share_modal.underscore
-#: test_root/staticfiles/templates/student_profile/share_modal.underscore
 msgid "Share on Mozilla Backpack"
 msgstr "Shäré ön Mözïllä Bäçkpäçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/student_profile/share_modal.underscore
-#: test_root/staticfiles/templates/student_profile/share_modal.underscore
 msgid ""
 "To share your certificate on Mozilla Backpack, you must first have a "
 "Backpack account. Complete the following steps to add your certificate to "
@@ -9388,7 +8790,6 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт#"
 
 #: lms/templates/student_profile/share_modal.underscore
-#: test_root/staticfiles/templates/student_profile/share_modal.underscore
 #, python-format
 msgid ""
 "Create a %(link_start)sMozilla Backpack%(link_end)s account, or log in to "
@@ -9398,7 +8799,6 @@ msgstr ""
 "ýöür éxïstïng äççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/student_profile/share_modal.underscore
-#: test_root/staticfiles/templates/student_profile/share_modal.underscore
 #, python-format
 msgid ""
 "%(download_link_start)sDownload this image (right-click or option-click, "
@@ -9410,7 +8810,6 @@ msgstr ""
 "ýöür ßäçkpäçk.</li> Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Congratulations! You are now verified on %(platformName)s!"
 msgstr ""
@@ -9418,47 +8817,39 @@ msgstr ""
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "You are now enrolled as a verified student for:"
 msgstr ""
 "Ýöü äré nöw énrölléd äs ä vérïfïéd stüdént för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
 " ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "A list of courses you have just enrolled in as a verified student"
 msgstr ""
 "À lïst öf çöürsés ýöü hävé jüst énrölléd ïn äs ä vérïfïéd stüdént Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgstr "Çöürsé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid "Starts: %(start)s"
 msgstr "Stärts: %(start)s Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
 msgstr "Éxplöré ýöür çöürsé! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Go to your Dashboard"
 msgstr "Gö tö ýöür Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Verified Status"
 msgstr "Vérïfïéd Stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 #, python-format
 msgid ""
 "Thank you for submitting your photos. We will review them shortly. You can "
@@ -9476,12 +8867,10 @@ msgstr ""
 "∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє#"
 
 #: lms/templates/verify_student/error.underscore
-#: test_root/staticfiles/templates/verify_student/error.underscore
 msgid "Error:"
 msgstr "Érrör: Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "What You Need for Verification"
 msgstr "Whät Ýöü Nééd för Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
@@ -9490,16 +8879,10 @@ msgstr "Whät Ýöü Nééd för Vérïfïçätïön Ⱡ'σяєм ιρѕυм ∂
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Webcam"
 msgstr "Wéßçäm Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid ""
 "You need a computer that has a webcam. When you receive a browser prompt, "
 "make sure that you allow access to the camera."
@@ -9508,12 +8891,10 @@ msgstr ""
 "mäké süré thät ýöü ällöw äççéss tö thé çämérä. Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Photo Identification"
 msgstr "Phötö Ìdéntïfïçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid ""
 "You need a driver's license, passport, or other government-issued ID that "
 "has your name and photo."
@@ -9523,13 +8904,10 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Take Your Photo"
 msgstr "Täké Ýöür Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid ""
 "When your face is in position, use the camera button {icon} below to take "
 "your photo."
@@ -9538,33 +8916,28 @@ msgstr ""
 "ýöür phötö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "To take a successful photo, make sure that:"
 msgstr ""
 "Tö täké ä süççéssfül phötö, mäké süré thät: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Your face is well-lit."
 msgstr "Ýöür fäçé ïs wéll-lït. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "Your entire face fits inside the frame."
 msgstr ""
 "Ýöür éntïré fäçé fïts ïnsïdé thé främé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid "The photo of your face matches the photo on your ID."
 msgstr ""
 "Thé phötö öf ýöür fäçé mätçhés thé phötö ön ýöür ÌD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
 msgid ""
 "To use the current photo, select the camera button {icon}. To take another "
 "photo, select the retake button {icon}."
@@ -9575,18 +8948,12 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Frequently Asked Questions"
 msgstr "Fréqüéntlý Àskéd Qüéstïöns Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "Why does %(platformName)s need my photo?"
 msgstr ""
@@ -9595,9 +8962,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "As part of the verification process, you take a photo of both your face and "
 "a government-issued photo ID. Our authorization service confirms your "
@@ -9615,9 +8979,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid "What does %(platformName)s do with this photo?"
 msgstr ""
@@ -9627,9 +8988,6 @@ msgstr ""
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 #, python-format
 msgid ""
 "We use the highest levels of security available to encrypt your photo and "
@@ -9650,21 +9008,15 @@ msgstr ""
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/face_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid "Next: %(nextStepTitle)s"
 msgstr "Néxt: %(nextStepTitle)s Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid "Take a Photo of Your ID"
 msgstr "Täké ä Phötö öf Ýöür ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid ""
 "Use your webcam to take a photo of your ID. We will match this photo with "
 "the photo of your face and the name on your account."
@@ -9673,7 +9025,6 @@ msgstr ""
 "thé phötö öf ýöür fäçé änd thé nämé ön ýöür äççöünt. Ⱡ'σяєм#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid ""
 "You need an ID with your name and photo. A driver's license, passport, or "
 "other government-issued IDs are all acceptable."
@@ -9683,26 +9034,21 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Tips on taking a successful photo"
 msgstr ""
 "Tïps ön täkïng ä süççéssfül phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid "Ensure that you can see your photo and read your name"
 msgstr ""
 "Énsüré thät ýöü çän séé ýöür phötö änd réäd ýöür nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт"
 " αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid "Make sure your ID is well-lit"
 msgstr "Mäké süré ýöür ÌD ïs wéll-lït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
 msgid "Once in position, use the camera button {icon} to capture your ID"
 msgstr ""
 "Önçé ïn pösïtïön, üsé thé çämérä ßüttön {icon} tö çäptüré ýöür ÌD Ⱡ'σяєм "
@@ -9710,27 +9056,22 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/id_photo_step.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Use the retake photo button if you are not pleased with your photo"
 msgstr ""
 "Ûsé thé rétäké phötö ßüttön ïf ýöü äré nöt pléäséd wïth ýöür phötö Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/image_input.underscore
-#: test_root/staticfiles/templates/verify_student/image_input.underscore
 msgid "Preview of uploaded image"
 msgstr "Prévïéw öf üplöädéd ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/verify_student/image_input.underscore
-#: test_root/staticfiles/templates/verify_student/image_input.underscore
 msgid "Upload an image or capture one with your web or phone camera."
 msgstr ""
 "Ûplöäd än ïmägé ör çäptüré öné wïth ýöür wéß ör phöné çämérä. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid ""
 "Use your webcam to take a photo of your face. We will match this photo with "
 "the photo on your ID."
@@ -9739,40 +9080,34 @@ msgstr ""
 "thé phötö ön ýöür ÌD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Make sure your face is well-lit"
 msgstr "Mäké süré ýöür fäçé ïs wéll-lït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Be sure your entire face is inside the frame"
 msgstr ""
 "Bé süré ýöür éntïré fäçé ïs ïnsïdé thé främé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Once in position, use the camera button {icon} to capture your photo"
 msgstr ""
 "Önçé ïn pösïtïön, üsé thé çämérä ßüttön {icon} tö çäptüré ýöür phötö Ⱡ'σяєм "
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/incourse_reverify.underscore
-#: test_root/staticfiles/templates/verify_student/incourse_reverify.underscore
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
 "Çän wé mätçh thé phötö ýöü töök wïth thé öné ön ýöür ÌD? Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: {courseName}"
 msgstr ""
 "Thänks för rétürnïng tö vérïfý ýöür ÌD ïn: {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
 msgid ""
 "You need to activate your account before you can enroll in courses. Check "
 "your inbox for an activation email. After you complete activation you can "
@@ -9789,22 +9124,16 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Activate Your Account"
 msgstr "Àçtïväté Ýöür Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Photo ID"
 msgstr "Phötö ÌD Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/verify_student/intro_step.underscore
-#: test_root/staticfiles/templates/verify_student/intro_step.underscore
 msgid ""
 "A driver's license, passport, or other government-issued ID with your name "
 "and photo"
@@ -9814,20 +9143,16 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "You are enrolling in: {courseName}"
 msgstr "Ýöü äré énröllïng ïn: {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "You are upgrading your enrollment for: {courseName}"
 msgstr ""
 "Ýöü äré üpgrädïng ýöür énröllmént för: {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can now enter your payment information and complete your enrollment."
 msgstr ""
@@ -9835,7 +9160,6 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 #, python-format
 msgid ""
 "You can pay now even if you don't have the following items available, but "
@@ -9852,7 +9176,6 @@ msgstr ""
 "¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт α#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "An email has been sent to {userEmail} with a link for you to activate your "
 "account."
@@ -9861,12 +9184,10 @@ msgstr ""
 "äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "Why activate?"
 msgstr "Whý äçtïväté? Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "We ask you to activate your account to ensure it is really you creating the "
 "account and to prevent fraud."
@@ -9875,7 +9196,6 @@ msgstr ""
 "äççöünt änd tö prévént fräüd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "You can pay now even if you don't have the following items available, but "
 "you will need to have these to qualify to earn a Verified Certificate."
@@ -9890,12 +9210,10 @@ msgstr ""
 "ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ є#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "Government-Issued Photo ID"
 msgstr "Gövérnmént-Ìssüéd Phötö ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "ID-Verification is not required for this Professional Education course."
 msgstr ""
@@ -9903,7 +9221,6 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid ""
 "All professional education courses are fee-based, and require payment to "
 "complete the enrollment process."
@@ -9912,37 +9229,31 @@ msgstr ""
 "çömplété thé énröllmént pröçéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "You have already verified your ID!"
 msgstr ""
 "Ýöü hävé älréädý vérïfïéd ýöür ÌD! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "Your verification status is good until {verificationGoodUntil}."
 msgstr ""
 "Ýöür vérïfïçätïön stätüs ïs gööd üntïl {verificationGoodUntil}. Ⱡ'σяєм ιρѕυм"
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step.underscore
 msgid "price"
 msgstr "prïçé Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Account Not Activated"
 msgstr "Àççöünt Nöt Àçtïvätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Upgrade to a Verified Certificate for {courseName}"
 msgstr ""
 "Ûpgrädé tö ä Vérïfïéd Çértïfïçäté för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "Before you upgrade to a certificate track, you must activate your account."
 msgstr ""
@@ -9950,27 +9261,23 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Check your email for an activation message."
 msgstr ""
 "Çhéçk ýöür émäïl för än äçtïvätïön méssägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Professional Certificate for {courseName}"
 msgstr ""
 "Pröféssïönäl Çértïfïçäté för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "Verified Certificate for {courseName}"
 msgstr ""
 "Vérïfïéd Çértïfïçäté för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 #, python-format
 msgid ""
 "To receive a certificate, you must also verify your identity before "
@@ -9980,14 +9287,12 @@ msgstr ""
 "%(date)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
 msgstr ""
 "Tö réçéïvé ä çértïfïçäté, ýöü müst älsö vérïfý ýöür ïdéntïtý. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "To verify your identity, you need a webcam and a government-issued photo ID."
 msgstr ""
@@ -9995,7 +9300,6 @@ msgstr ""
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "Your ID must be a government-issued photo ID that clearly shows your face."
 msgstr ""
@@ -10003,7 +9307,6 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#: test_root/staticfiles/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid ""
 "You will use your webcam to take a picture of your face and of your "
 "government-issued photo ID."
@@ -10012,25 +9315,21 @@ msgstr ""
 "gövérnmént-ïssüéd phötö ÌD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Thank you! We have received your payment for {courseName}."
 msgstr ""
 "Thänk ýöü! Wé hävé réçéïvéd ýöür päýmént för {courseName}. Ⱡ'σяєм ιρѕυм "
 "∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Next Step: Confirm your identity"
 msgstr ""
 "Néxt Stép: Çönfïrm ýöür ïdéntïtý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Check your email"
 msgstr "Çhéçk ýöür émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "You need to activate your account before you can enroll in courses. Check "
 "your inbox for an activation email."
@@ -10039,7 +9338,6 @@ msgstr ""
 "ýöür ïnßöx för än äçtïvätïön émäïl. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "A driver's license, passport, or government-issued ID with your name and "
 "photo."
@@ -10048,7 +9346,6 @@ msgstr ""
 "phötö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-#: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 #, python-format
 msgid ""
 "If you don't verify your identity now, you can still explore your course "
@@ -10066,13 +9363,11 @@ msgstr ""
 " σƒƒι¢ια ∂є#"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
-#: test_root/staticfiles/templates/verify_student/reverify_success_step.underscore
 msgid "Identity Verification In Progress"
 msgstr ""
 "Ìdéntïtý Vérïfïçätïön Ìn Prögréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
-#: test_root/staticfiles/templates/verify_student/reverify_success_step.underscore
 msgid ""
 "We have received your information and are verifying your identity. You will "
 "see a message on your dashboard when the verification process is complete "
@@ -10089,17 +9384,14 @@ msgstr ""
 "яєρяєнєη∂єяιт ιη νσłυρтαтє#"
 
 #: lms/templates/verify_student/reverify_success_step.underscore
-#: test_root/staticfiles/templates/verify_student/reverify_success_step.underscore
 msgid "Return to Your Dashboard"
 msgstr "Rétürn tö Ýöür Däshßöärd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Review Your Photos"
 msgstr "Révïéw Ýöür Phötös Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid ""
 "Make sure we can verify your identity with the photos and information you "
 "have provided."
@@ -10108,44 +9400,37 @@ msgstr ""
 "hävé prövïdéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Photo of %(fullName)s"
 msgstr "Phötö öf %(fullName)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Photo of %(fullName)s's ID"
 msgstr "Phötö öf %(fullName)s's ÌD Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Photo requirements:"
 msgstr "Phötö réqüïréménts: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you show your whole face?"
 msgstr ""
 "Döés thé phötö öf ýöü shöw ýöür whölé fäçé? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Does the photo of you match your ID photo?"
 msgstr ""
 "Döés thé phötö öf ýöü mätçh ýöür ÌD phötö? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Is your name on your ID readable?"
 msgstr ""
 "Ìs ýöür nämé ön ýöür ÌD réädäßlé? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 #, python-format
 msgid "Does the name on your ID match your account name: %(fullName)s?"
 msgstr ""
@@ -10153,12 +9438,10 @@ msgstr ""
 " ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Edit Your Name"
 msgstr "Édït Ýöür Nämé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid ""
 "Make sure that the full name on your account matches the name on your ID."
 msgstr ""
@@ -10166,25 +9449,21 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Photos don't meet the requirements?"
 msgstr ""
 "Phötös dön't méét thé réqüïréménts? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Retake Your Photos"
 msgstr "Rétäké Ýöür Phötös Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/verify_student/review_photos_step.underscore
-#: test_root/staticfiles/templates/verify_student/review_photos_step.underscore
 msgid "Before proceeding, please confirm that your details match"
 msgstr ""
 "Béföré pröçéédïng, pléäsé çönfïrm thät ýöür détäïls mätçh Ⱡ'σяєм ιρѕυм ∂σłσя"
 " ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: lms/templates/verify_student/webcam_photo.underscore
-#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid ""
 "Don't see your picture? Make sure to allow your browser to use your camera "
 "when it asks for permission."
@@ -10193,108 +9472,16 @@ msgstr ""
 "whén ït äsks för pérmïssïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/templates/verify_student/webcam_photo.underscore
-#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid "Live view of webcam"
 msgstr "Lïvé vïéw öf wéßçäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/verify_student/webcam_photo.underscore
-#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid "Retake Photo"
 msgstr "Rétäké Phötö Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/verify_student/webcam_photo.underscore
-#: test_root/staticfiles/templates/verify_student/webcam_photo.underscore
 msgid "Take Photo"
 msgstr "Täké Phötö Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "Add a New Allowance"
-msgstr "Àdd ä Néw Àllöwänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "Special Exam"
-msgstr "Spéçïäl Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#, python-format
-msgid " %(exam_display_name)s "
-msgstr " %(exam_display_name)s  Ⱡ'σяєм ιρѕ#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "Exam Type"
-msgstr "Éxäm Týpé Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-msgid "Allowance Type"
-msgstr "Àllöwänçé Týpé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "Additional Time (minutes)"
-msgstr "Àddïtïönäl Tïmé (mïnütés) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "Value"
-msgstr "Välüé Ⱡ'σяєм ιρѕ#"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "minutes"
-msgstr "mïnütés Ⱡ'σяєм ιρѕυм #"
-
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-msgid "Username or Email"
-msgstr "Ûsérnämé ör Émäïl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-msgid "Allowances"
-msgstr "Àllöwänçés Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-msgid "Add Allowance"
-msgstr "Àdd Àllöwänçé Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Exam Name"
-msgstr "Éxäm Nämé Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
-msgid "Allowance Value"
-msgstr "Àllöwänçé Välüé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Time Limit"
-msgstr "Tïmé Lïmït Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Started At"
-msgstr "Stärtéd Àt Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-msgid "Completed At"
-msgstr "Çömplétéd Àt Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#, python-format
-msgid " %(username)s "
-msgstr " %(username)s  Ⱡ'σяєм ιρѕ#"
-
-#: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "Add a Post"
-msgstr "Àdd ä Pöst Ⱡ'σяєм ιρѕυм ∂σłσ#"
-
-#: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
-msgid ""
-"To receive credit on a problem, you must click \"Check\" or \"Final Check\" "
-"on it before you select \"End My Exam\"."
-msgstr ""
-"Tö réçéïvé çrédït ön ä prößlém, ýöü müst çlïçk \"Çhéçk\" ör \"Fïnäl Çhéçk\" "
-"ön ït ßéföré ýöü séléçt \"Énd Mý Éxäm\". Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: test_root/staticfiles/templates/student_account/login.underscore
-msgid "Password Reset Email Sent"
-msgstr "Pässwörd Rését Émäïl Sént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/templates/js/access-editor.underscore
 msgid "Limit Access"
@@ -10765,6 +9952,10 @@ msgstr "Präçtïçé pröçtöréd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя �
 #: cms/templates/js/course-outline.underscore
 msgid "Proctored Exam"
 msgstr "Pröçtöréd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Timed Exam"
+msgstr "Tïméd Éxäm Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
