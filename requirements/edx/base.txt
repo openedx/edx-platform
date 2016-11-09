@@ -35,7 +35,7 @@ django-statici18n==1.1.5
 django-storages==1.4.1
 django-method-override==0.1.0
 django-user-tasks==0.1.1
-djangorestframework>=3.2,<3.3
+djangorestframework>=3.3,<3.4
 django==1.8.16
 djangorestframework-jwt==1.8.0
 djangorestframework-oauth==1.1.0
