@@ -353,6 +353,7 @@ def _has_access_course(user, action, courselike):
         NOTE: this is not checking whether user is actually enrolled in the course.
         """
         response = (
+            user.is_active and   # prevent not active student account from accessing course
             _visible_to_nonstaff_users(courselike) and
             _can_access_descriptor_with_start_date(user, courselike, courselike.id)
         )
