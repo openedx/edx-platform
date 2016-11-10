@@ -1,26 +1,30 @@
 // discussion - utilities - variables
 // ====================
 
-// color variables
+// base color variables
+$forum-color-primary: $blue !default;
+
+// contextual color variables
 $forum-color-background: $white;
-$forum-color-active-thread: $blue !default;
+$forum-color-active-thread: $forum-color-primary !default;
 $forum-color-hover: $action-primary-bg !default;
 $forum-color-active-text: $white !default;
 $forum-color-pinned: $pink !default;
 $forum-color-reported: $pink !default;
 $forum-color-closed: $black !default;
-$forum-color-following: $blue !default;
-$forum-color-staff: $blue !default;
+$forum-color-following: $forum-color-primary !default;
+$forum-color-staff: $forum-color-primary !default;
 $forum-color-community-ta: $green-d1 !default;
 $forum-color-marked-answer: $green-d1 !default;
 $forum-color-border: $gray-l3 !default;
 $forum-color-error: $red !default;
 $forum-color-hover-thread: #f6f6f6 !default;
 $forum-color-reading-thread: $gray-d3 !default;
-$forum-color-read-post: $blue !default;
+$forum-color-read-post: $forum-color-primary !default;
 $forum-color-never-read-post: $gray-d3 !default;
 $forum-color-editor-preview-label: $gray-d2 !default;
 $forum-color-response-count: $gray-d2 !default;
+$forum-color-navigation-bar: $forum-color-primary !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin

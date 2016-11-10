@@ -122,6 +122,7 @@
 // -------------------
 // Sort and filter bar
 // -------------------
+
 .forum-nav-refine-bar {
     @include clearfix();
     @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
