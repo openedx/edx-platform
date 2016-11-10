@@ -7,20 +7,17 @@
 }
 
 .program-card {
-  @include span(12);
+  @include span(12);  
   border: 1px solid $border-color-l3;
   border-bottom: none;
   margin-bottom: $baseline;
   position: relative;
 
-  @media(min-width: $bp-screen-md) {
+  @include susy-media($bp-screen-md) {
     @include span(6);
 
     &:nth-child(2n) {
-      @include span(6, before);
-    }
-    &:nth-child(2n+1) {
-      @include span(6, after);
+      @include margin-right(0);
     }
   }
 
@@ -33,7 +30,7 @@
     border: 0;
     z-index: 1;
     opacity: 0.8;
-
+    
     &:active,
     &:hover,
     &:focus {
@@ -45,9 +42,9 @@
       overflow: hidden;
       height: 166px;
 
-      @media(min-width: $bp-screen-sm) { height: 242px; }
-      @media(min-width: $bp-screen-md) { height: 116px; }
-      @media(min-width: $bp-screen-lg) { height: 145px; }
+      @include susy-media($bp-screen-sm) { height: 242px; }
+      @include susy-media($bp-screen-md) { height: 116px; }
+      @include susy-media($bp-screen-lg) { height: 145px; }
 
       .banner-image {
         @include left(50%);
@@ -65,9 +62,9 @@
     position: relative;
     margin-top: 156px;
 
-    @media(min-width: $bp-screen-sm) { margin-top: 232px; }
-    @media(min-width: $bp-screen-md) { margin-top: 106px; }
-    @media(min-width: $bp-screen-lg) { margin-top: 135px; }
+    @include susy-media($bp-screen-sm) { margin-top: 232px; }
+    @include susy-media($bp-screen-md) { margin-top: 106px; }
+    @include susy-media($bp-screen-lg) { margin-top: 135px; }
   }
 
   .meta-info {
@@ -79,13 +76,13 @@
   }
 
   .organization {
-    @include span(6, none);
+    @include span(6);
     white-space: nowrap;
     overflow: hidden;
   }
 
   .category {
-    @include span(6, none);
+    @include span(6);
     @include text-align(right);
 
     .category-text {
@@ -116,7 +113,7 @@
       color: palette(grayscale, dark);
       line-height: 1;
     }
-
+ 
     .secondary {
       @extend %hide-until-focus;
     }

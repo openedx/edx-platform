@@ -10,7 +10,7 @@
 }
 
 .content-wrapper {
-    @include span(12, none);
+    width: span(12);
     margin: 0 auto;
 
     @media print {

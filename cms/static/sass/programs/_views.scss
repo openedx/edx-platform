@@ -28,13 +28,8 @@
 
 .app-header {
   @include clearfix();
-  @include grid-row;
   border-bottom: 1px solid palette(grayscale, base);
   margin-bottom: 20px;
-
-  form {
-    @include span(12);
-  }
 }
 
 .course-container {
