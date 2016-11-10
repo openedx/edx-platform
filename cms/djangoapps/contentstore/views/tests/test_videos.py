@@ -25,9 +25,9 @@ class VideoUploadTestMixin(object):
     """
     Test cases for the video upload feature
     """
-    def get_url_for_course_key(self, course_key):
+    def get_url_for_course_key(self, course_key, kwargs=None):
         """Return video handler URL for the given course"""
-        return reverse_course_url(self.VIEW_NAME, course_key)
+        return reverse_course_url(self.VIEW_NAME, course_key, kwargs)
 
     def setUp(self):
         super(VideoUploadTestMixin, self).setUp()
@@ -37,6 +37,18 @@ class VideoUploadTestMixin(object):
             "course_video_upload_token": self.test_token,
         }
         self.save_course()
+
+        # create another course for videos belonging to multiple courses
+        self.course2 = CourseFactory.create()
+        self.course2.video_upload_pipeline = {
+            "course_video_upload_token": self.test_token,
+        }
+        self.course2.save()
+        self.store.update_item(self.course2, self.user.id)
+
+        # course ids for videos
+        course_ids = [unicode(self.course.id), unicode(self.course2.id)]
+
         self.profiles = ["profile1", "profile2"]
         self.previous_uploads = [
             {
@@ -44,7 +56,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "test1.mp4",
                 "duration": 42.0,
                 "status": "upload",
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
                 "encoded_videos": [],
             },
             {
@@ -52,7 +64,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "test2.mp4",
                 "duration": 128.0,
                 "status": "file_complete",
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -73,7 +85,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": u"nón-ascii-näme.mp4",
                 "duration": 256.0,
                 "status": "transcode_active",
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -91,7 +103,7 @@ class VideoUploadTestMixin(object):
                 "client_video_id": "status_test.mp4",
                 "duration": 3.14,
                 "status": status,
-                "courses": [unicode(self.course.id)],
+                "courses": course_ids,
                 "encoded_videos": [],
             }
             for status in (
@@ -296,6 +308,52 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             response_file = response_obj["files"][i]
             self.assertEqual(response_file["file_name"], file_info["file_name"])
             self.assertEqual(response_file["upload_url"], mock_key_instance.generate_url())
+
+    def _assert_video_removal(self, url, edx_video_id, deleted_videos):
+        """
+        Verify that if correct video is removed from a particular course.
+
+        Arguments:
+            url (str): URL to get uploaded videos
+            edx_video_id (str): video id
+            deleted_videos (int): how many videos are deleted
+        """
+        response = self.client.get_json(url)
+        self.assertEqual(response.status_code, 200)
+        response_videos = json.loads(response.content)["videos"]
+        self.assertEqual(len(response_videos), len(self.previous_uploads) - deleted_videos)
+
+        if deleted_videos:
+            self.assertNotIn(edx_video_id, [video.get('edx_video_id') for video in response_videos])
+        else:
+            self.assertIn(edx_video_id, [video.get('edx_video_id') for video in response_videos])
+
+    def test_video_removal(self):
+        """
+        Verifies that video removal is working as expected.
+        """
+        edx_video_id = 'test1'
+        remove_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
+        response = self.client.delete(remove_url, HTTP_ACCEPT="application/json")
+        self.assertEqual(response.status_code, 204)
+
+        self._assert_video_removal(self.url, edx_video_id, 1)
+
+    def test_video_removal_multiple_courses(self):
+        """
+        Verifies that video removal is working as expected for multiple courses.
+
+        If a video is used by multiple courses then removal from one course shouldn't effect the other course.
+        """
+        # remove video from course1
+        edx_video_id = 'test1'
+        remove_url = self.get_url_for_course_key(self.course.id, {'edx_video_id': edx_video_id})
+        response = self.client.delete(remove_url, HTTP_ACCEPT="application/json")
+        self.assertEqual(response.status_code, 204)
+
+        # verify that video is only deleted from course1 only
+        self._assert_video_removal(self.url, edx_video_id, 1)
+        self._assert_video_removal(self.get_url_for_course_key(self.course2.id), edx_video_id, 0)
 
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
