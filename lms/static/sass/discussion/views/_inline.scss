@@ -1,0 +1,30 @@
+// forums - inline discussion styling
+// ====================
+
+.inline-discussion {
+    padding-top: $baseline * 1.5;
+
+    .inline-threads {
+        border: 1px solid $forum-color-border;
+        border-radius: $forum-border-radius;
+    }
+
+    .inline-thread {
+        border: 1px solid $forum-color-border;
+        border-radius: $forum-border-radius;
+
+        .forum-nav-bar {
+            background-color: $forum-color-navigation-bar;
+
+            .btn-link {
+                color: $forum-color-active-text;
+            }
+        }
+
+        .forum-content {
+            padding: $baseline / 2;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    }
+}
