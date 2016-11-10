@@ -23,7 +23,7 @@ from lms.djangoapps.commerce.utils import EcommerceService
 from course_modes.models import CourseMode
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 from student.models import CourseEnrollment
 from util.db import outer_atomic
 

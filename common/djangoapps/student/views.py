@@ -56,6 +56,7 @@ from student.models import (
     DashboardConfiguration, LinkedInAddToProfileConfiguration, ManualEnrollmentAudit, ALLOWEDTOENROLL_TO_ENROLLED,
     LogoutViewConfiguration, RegistrationCookieConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive, get_registration_extension_form
+from student.tasks import send_activation_email
 from lms.djangoapps.commerce.utils import EcommerceService  # pylint: disable=import-error
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=import-error
 from bulk_email.models import Optout, BulkEmailFlag  # pylint: disable=import-error
@@ -64,6 +65,7 @@ from certificates.api import (  # pylint: disable=import-error
     get_certificate_url,
     has_html_certificates_enabled,
 )
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
@@ -109,7 +111,7 @@ from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 
 import analytics
 from eventtracking import tracker
@@ -401,14 +403,17 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                     cert_status['download_url']
                 )
 
-    if status in ('generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'):
-        if 'grade' not in cert_status:
+    if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
+        persisted_grade = CourseGradeFactory(user).get_persisted(course_overview)
+        if persisted_grade is not None:
+            status_dict['grade'] = unicode(persisted_grade.percent)
+        elif 'grade' in cert_status:
+            status_dict['grade'] = cert_status['grade']
+        else:
             # Note: as of 11/20/2012, we know there are students in this state-- cs169.1x,
             # who need to be regraded (we weren't tracking 'notpassing' at first).
             # We can add a log.warning here once we think it shouldn't happen.
             return default_info
-        else:
-            status_dict['grade'] = cert_status['grade']
 
     return status_dict
 
@@ -1821,21 +1826,11 @@ def create_account_with_params(request, params):
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
-        try:
-            if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
-                message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
-                           '-' * 80 + '\n\n' + message)
-                mail.send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
-            else:
-                user.email_user(subject, message, from_address)
-        except Exception:  # pylint: disable=broad-except
-            log.error(
-                u'Unable to send activation email to user from "%s" to "%s"',
-                from_address,
-                dest_addr,
-                exc_info=True
-            )
+        if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+            dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
+            message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
+                       '-' * 80 + '\n\n' + message)
+        send_activation_email.delay(subject, message, from_address, dest_addr)
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses

@@ -35,8 +35,8 @@ from django.shortcuts import redirect
 from ipware.ip import get_ip
 from util.request import course_id_from_url
 
-from embargo.models import IPFilter
-from embargo import api as embargo_api
+from .models import IPFilter
+from . import api as embargo_api
 
 
 log = logging.getLogger(__name__)

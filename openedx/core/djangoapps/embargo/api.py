@@ -15,7 +15,7 @@ from rest_framework import status
 from ipware.ip import get_ip
 
 from student.auth import has_course_author_access
-from embargo.models import CountryAccessRule, RestrictedCourse
+from .models import CountryAccessRule, RestrictedCourse
 
 
 log = logging.getLogger(__name__)

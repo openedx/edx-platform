@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from opaque_keys.edx.locator import CourseLocator
-from embargo.models import (
+from ..models import (
     EmbargoedCourse, EmbargoedState, IPFilter, RestrictedCourse,
     Country, CountryAccessRule, CourseAccessRuleHistory
 )

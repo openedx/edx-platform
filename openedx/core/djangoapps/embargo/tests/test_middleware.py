@@ -17,8 +17,8 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from config_models.models import cache as config_cache
 
-from embargo.models import RestrictedCourse, IPFilter
-from embargo.test_utils import restrict_course
+from ..models import RestrictedCourse, IPFilter
+from ..test_utils import restrict_course
 
 
 @attr(shard=3)
@@ -35,7 +35,7 @@ class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     USERNAME = 'fred'
     PASSWORD = 'secret'
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

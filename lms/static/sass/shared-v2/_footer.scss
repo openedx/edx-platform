@@ -38,7 +38,7 @@
         .colophon {
             @include span(12);
 
-            @include susy-media($bp-screen-sm) {
+            @media(min-width: $bp-screen-sm) {
                 @include span(8);
             }
 
@@ -168,7 +168,7 @@
             @include text-align(right);
             vertical-align: bottom;
 
-            @include susy-media($bp-screen-sm) {
+            @media(min-width: $bp-screen-sm) {
                 @include span(4);
                 @include margin-right(0);
             }

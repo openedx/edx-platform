@@ -5,19 +5,17 @@ End-to-end tests for the Account Settings page.
 from datetime import datetime
 from unittest import skip
 
-from bok_choy.web_app_test import WebAppTest
 from bok_choy.page_object import XSS_INJECTION
-from flaky import flaky
 from nose.plugins.attrib import attr
 from pytz import timezone, utc
 
 from common.test.acceptance.pages.lms.account_settings import AccountSettingsPage
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
-from common.test.acceptance.tests.helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
 
-class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
+class AccountSettingsTestMixin(EventsTestMixin, AcceptanceTest):
     """
     Mixin with helper methods to test the account settings page.
     """
@@ -91,7 +89,7 @@ class AccountSettingsTestMixin(EventsTestMixin, WebAppTest):
 
 
 @attr(shard=8)
-class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
+class DashboardMenuTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that the dashboard menu works correctly with the account settings page.
     """
@@ -114,7 +112,7 @@ class DashboardMenuTest(AccountSettingsTestMixin, WebAppTest):
 
 
 @attr(shard=8)
-class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
+class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Tests that verify behaviour of the Account Settings page.
     """
@@ -503,7 +501,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, WebAppTest):
 
 
 @attr('a11y')
-class AccountSettingsA11yTest(AccountSettingsTestMixin, WebAppTest):
+class AccountSettingsA11yTest(AccountSettingsTestMixin, AcceptanceTest):
     """
     Class to test account settings accessibility.
     """

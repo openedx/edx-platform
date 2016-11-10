@@ -7,7 +7,7 @@ from django.conf import settings
 import ddt
 
 from util.testing import UrlResetMixin
-from embargo import messages
+from .. import messages
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
@@ -34,7 +34,7 @@ class CourseAccessMessageViewTest(CacheIsolationTestCase, UrlResetMixin):
 
     ENABLED_CACHES = ['default']
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
