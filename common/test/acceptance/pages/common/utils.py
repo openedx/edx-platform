@@ -17,8 +17,18 @@ def wait_for_notification(page):
         """Whether or not the notification is finished showing."""
         return page.q(css='.wrapper-notification-mini.is-hiding').present
 
-    EmptyPromise(_is_saving, 'Notification should have been shown.', timeout=60).fulfill()
-    EmptyPromise(_is_saving_done, 'Notification should have been hidden.', timeout=60).fulfill()
+    EmptyPromise(
+        _is_saving,
+        'Notification should have been shown.',
+        try_interval=0.1,
+        timeout=60,
+    ).fulfill()
+    EmptyPromise(
+        _is_saving_done,
+        'Notification should have been hidden.',
+        try_interval=0.1,
+        timeout=60,
+    ).fulfill()
 
 
 def click_css(page, css, source_index=0, require_notification=True):
