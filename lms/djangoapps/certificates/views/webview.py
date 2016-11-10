@@ -6,6 +6,7 @@ from datetime import datetime
 from uuid import uuid4
 import logging
 import urllib
+from urlparse import urljoin
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -267,7 +268,11 @@ def _update_social_context(request, context, course, user, user_certificate, pla
         )
     )
 
-    share_url = request.build_absolute_uri(get_certificate_url(course_id=course.id, uuid=user_certificate.verify_uuid))
+    url_root = '{protocol}://{domain}'.format(
+        protocol=request.scheme,
+        domain=request.site.domain
+    )
+    share_url = urljoin(url_root, get_certificate_url(course_id=course.id, uuid=user_certificate.verify_uuid))
     context['share_url'] = share_url
     twitter_url = ''
     if context.get('twitter_share_enabled', False):
