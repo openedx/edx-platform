@@ -212,7 +212,7 @@
 
         .accomplishment-statement {
             @extend %print-rendering-section;
-            @include span(8);
+            width: span(8);
             margin: 0 auto;
         }
 
@@ -244,7 +244,7 @@
 
         .accomplishment-signatories {
             @extend %print-rendering-section;
-            @include span(12, before);
+            @include span(12 last);
 
             .signatory-credentials {
                 font-size: 8pt;
@@ -271,7 +271,7 @@
             &.has-many {
 
                 .signatory {
-                    @include span(2);
+                    @include gallery(2);
                 }
             }
         }

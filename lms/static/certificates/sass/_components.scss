@@ -228,7 +228,7 @@
     }
 
     .accomplishment-type-label {
-        @include span(10);
+        width: span(10);
         margin: 0 auto;
         font-weight: font-weight(semi-bold);
     }
