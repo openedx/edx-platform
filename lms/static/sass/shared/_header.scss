@@ -16,6 +16,7 @@
     margin: 0 auto;
     padding: 18px ($baseline/2) 0;
     max-width: grid-width(12);
+    width: 100%;
   }
 
   h1.logo {
@@ -323,6 +324,7 @@
 
   .nav-courseware {
     @include float(right);
+    margin-top: ($baseline/4);
     list-style: none;
 
     li, div {

@@ -177,6 +177,7 @@ body.discussion {
 
 .container .discussion-body {
   @include clearfix();
+  display: block;
   border: none;
   background: transparent;
   box-shadow: none;
@@ -294,7 +295,7 @@ body.discussion {
 // inline discussion module
 .discussion-module {
   @extend .discussion-body;
-  display: block;
+
   position: relative;
   margin: $baseline 0;
   padding: $baseline;
