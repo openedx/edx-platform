@@ -176,11 +176,19 @@ def compile_python_req_files(passthrough_options):
     Builds a consistent set of pinned requirement files using pip-compile.
     """
     pip_compile_req_files(
-        files=[outfile.replace(".txt", ".in") for outfile in PYTHON_REQ_FILES],
+        files=[
+            outfile.replace(".txt", ".in")
+            for outfile in PYTHON_REQ_FILES
+            if os.path.exists(outfile.replace(".txt", ".in"))
+        ],
         options=passthrough_options
     )
     pip_compile_req_files(
-        files=[outfile.replace(".txt", ".in") for outfile in PYTHON_SANDBOX_REQ_FILES],
+        files=[
+            outfile.replace(".txt", ".in")
+            for outfile in PYTHON_SANDBOX_REQ_FILES
+            if os.path.exists(outfile.replace(".txt", ".in"))
+        ],
         options=passthrough_options
     )
 
