@@ -11,6 +11,7 @@ from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+
 @ddt.ddt
 class TestRepairUsersRolesOnAllCourses(ModuleStoreTestCase):
     """Tests for transferring students between courses."""
@@ -18,22 +19,25 @@ class TestRepairUsersRolesOnAllCourses(ModuleStoreTestCase):
     PASSWORD = "test"
     TEST_USERS = 10
     TEST_COURSES = 10
+
     def setUp(self, **kwargs):
         super(TestRepairUsersRolesOnAllCourses, self).setUp()
 
     def test_user_repair(self):
         """ Verify the role cleanup script"""
-        
+
         username_list = []
         student_list = []
         course_list = []
         for index in range(0, self.TEST_COURSES):
-            original_course_location = locator.CourseLocator('Org0'+str(index), 'Course0'+str(index), 'Run0'+str(index))
+            original_course_location = locator.CourseLocator(
+                'Org0' + str(index), 'Course0' + str(index), 'Run0' + str(index)
+            )
             course = self._create_course(original_course_location)
             course_list.append(course)
 
         for index in range(0, self.TEST_USERS):
-            username_list.append("test_repair_user_"+str(index))
+            username_list.append("test_repair_user_" + str(index))
             student = UserFactory.create()
             student.set_password(self.PASSWORD)  # pylint: disable=no-member
             student.save()   # pylint: disable=no-member
@@ -45,7 +49,6 @@ class TestRepairUsersRolesOnAllCourses(ModuleStoreTestCase):
                 CourseAccessRole.objects.create(user=student, role="assistant", course_id=course.id)
 
             student_list.append(student)
-
 
         # Run the actual management command
         repair_users_roles_on_all_courses.Command().handle("repair", "createlog")
@@ -63,4 +66,3 @@ class TestRepairUsersRolesOnAllCourses(ModuleStoreTestCase):
             number=course_location.course,
             run=course_location.run
         )
-
