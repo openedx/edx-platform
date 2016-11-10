@@ -31,14 +31,13 @@ case `uname -s` in
         distro=`lsb_release -cs`
         case $distro in
             #Tries to install the same
-            squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|quantal|raring)
+            squeeze|wheezy|jessie|maya|lisa|olivia|nadia|natty|oneiric|precise|trusty|quantal|raring)
                 output "Installing Debian family requirements"
 
                 # add repositories
                 cat $APT_REPOS_FILE | xargs -n 1 sudo add-apt-repository -y
                 sudo apt-get -yq update
-                sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install gfortran graphviz \
-                            libgraphviz-dev graphviz-dev libatlas-dev libblas-dev
+
                 # install packages listed in APT_PKGS_FILE
                 cat $APT_PKGS_FILE | xargs sudo DEBIAN_FRONTEND=noninteractive apt-get -yq install
                 ;;

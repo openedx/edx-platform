@@ -8,6 +8,9 @@ general:
     - "test_root/log"
 
 dependencies:
+  pre:
+    - gem install bundler
+    - bash ./scripts/install-system-req.sh
   override:
     - npm install
     - bundle install
