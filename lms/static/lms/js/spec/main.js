@@ -712,6 +712,7 @@
         'js/spec/edxnotes/plugins/scroller_spec.js',
         'js/spec/edxnotes/plugins/store_error_handler_spec.js',
         'js/spec/edxnotes/utils/logger_spec.js',
+        'js/spec/edxnotes/utils/notes_collector_spec.js',
         'js/spec/edxnotes/views/note_item_spec.js',
         'js/spec/edxnotes/views/notes_factory_spec.js',
         'js/spec/edxnotes/views/notes_page_spec.js',
