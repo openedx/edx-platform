@@ -327,17 +327,6 @@ body.discussion {
     top: -25px;
   }
 
-  .discussion {
-    &.inline-discussion {
-      padding-top: $baseline * 1.5;
-
-      section.threads {
-        border: 1px solid $forum-color-border;
-        border-radius: $forum-border-radius;
-      }
-    }
-  }
-
   div.add-response.post-extended-content {
     margin-top: $baseline;
     margin-bottom: $baseline;

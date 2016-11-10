@@ -1,7 +1,7 @@
 /* globals
-    _, Backbone, Content, Discussion, DiscussionUtil, DiscussionUser, DiscussionCourseSettings,
-    DiscussionThreadListView, NewPostView
-*/
+ _, Backbone, Content, Discussion, DiscussionUtil, DiscussionUser, DiscussionCourseSettings,
+ DiscussionThreadListView, DiscussionThreadView, NewPostView
+ */
 
 (function() {
     'use strict';
@@ -13,6 +13,7 @@
                 return DiscussionUtil.activateOnSpace(event, this.toggleDiscussion);
             },
             'click .new-post-btn': 'toggleNewPost',
+            'click .all-posts-btn': 'navigateToAllPosts',
             'keydown .new-post-btn': function(event) {
                 return DiscussionUtil.activateOnSpace(event, this.toggleNewPost);
             }
@@ -76,12 +77,14 @@
             }
 
             this.threadListView = new DiscussionThreadListView({
-                el: this.$('section.threads'),
+                el: this.$('.inline-threads'),
                 collection: self.discussion,
                 courseSettings: self.course_settings
             });
 
             this.threadListView.render();
+
+            this.threadListView.on('thread:selected', _.bind(this.navigateToThread, this));
 
             DiscussionUtil.bulkUpdateContentInfo(window.$$annotated_content_info);
 
@@ -106,6 +109,35 @@
             if (this.isWaitingOnNewPost) {
                 this.newPostForm.show().focus();
             }
+
+            // Hide the thread view initially
+            this.$('.inline-thread').addClass('is-hidden');
+        },
+
+        navigateToThread: function(threadId) {
+            var thread = this.discussion.get(threadId);
+            this.threadView = new DiscussionThreadView({
+                el: this.$('.forum-content'),
+                model: thread,
+                mode: 'tab',
+                course_settings: this.course_settings
+            });
+            this.threadView.render();
+            this.threadListView.$el.addClass('is-hidden');
+            this.$('.inline-thread').removeClass('is-hidden');
+        },
+
+        navigateToAllPosts: function() {
+            // Hide the inline thread section
+            this.$('.inline-thread').addClass('is-hidden');
+
+            // Delete the thread view
+            this.threadView.$el.empty().off();
+            this.threadView.stopListening();
+            this.threadView = null;
+
+            // Show the thread list view
+            this.threadListView.$el.removeClass('is-hidden');
         },
 
         toggleDiscussion: function() {

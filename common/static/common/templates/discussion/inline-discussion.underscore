@@ -5,6 +5,17 @@
 
     <article class="new-post-article"></article>
 
-    <section class="threads">
+    <section class="inline-threads">
     </section>
+
+    <div class="inline-thread">
+        <div class="forum-nav-bar">
+            <button class="btn-link all-posts-btn">
+                <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+                <span><%- gettext('All Posts') %></span>
+            </button>
+        </div>
+        <div class="forum-content">
+        </div>
+    </div>
 </section>
