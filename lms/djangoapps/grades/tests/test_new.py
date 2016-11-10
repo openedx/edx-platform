@@ -129,6 +129,13 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(course_grade.letter_grade, u'Pass')
         self.assertEqual(course_grade.percent, 0.5)
 
+    def test_zero_course_grade(self):
+        grade_factory = CourseGradeFactory(self.request.user)
+        with mock_get_score(0, 2):
+            course_grade = grade_factory.create(self.course)
+        self.assertIsNone(course_grade.letter_grade)
+        self.assertEqual(course_grade.percent, 0.0)
+
     def test_get_persisted(self):
         grade_factory = CourseGradeFactory(self.request.user)
         # first, create a grade in the database

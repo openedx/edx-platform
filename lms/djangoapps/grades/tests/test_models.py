@@ -10,6 +10,8 @@ import json
 
 from django.db.utils import IntegrityError
 from django.test import TestCase
+from django.utils.timezone import now
+from freezegun import freeze_time
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
 
 from lms.djangoapps.grades.models import (
@@ -271,10 +273,11 @@ class PersistentCourseGradesTest(GradesModelTestCase):
             ),
             "percent_grade": 77.7,
             "letter_grade": "Great job",
+            "passed": True
         }
 
     def test_update(self):
-        created_grade = PersistentCourseGrade.objects.create(**self.params)
+        created_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
         self.params["percent_grade"] = 88.8
         self.params["letter_grade"] = "Better job"
         updated_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
@@ -282,11 +285,61 @@ class PersistentCourseGradesTest(GradesModelTestCase):
         self.assertEqual(updated_grade.letter_grade, "Better job")
         self.assertEqual(created_grade.id, updated_grade.id)
 
+    def test_passed_timestamp(self):
+        # When the user has not passed, passed_timestamp is None
+        self.params.update({
+            u'percent_grade': 25.0,
+            u'letter_grade': u'',
+            u'passed': False,
+        })
+        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        self.assertIsNone(grade.passed_timestamp)
+
+        # After the user earns a passing grade, the passed_timestamp is set
+        self.params.update({
+            u'percent_grade': 75.0,
+            u'letter_grade': u'C',
+            u'passed': True,
+        })
+        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        passed_timestamp = grade.passed_timestamp
+        self.assertEqual(grade.letter_grade, u'C')
+        self.assertIsInstance(passed_timestamp, datetime)
+
+        # After the user improves their score, the new grade is reflected, but
+        # the passed_timestamp remains the same.
+        self.params.update({
+            u'percent_grade': 95.0,
+            u'letter_grade': u'A',
+            u'passed': True,
+        })
+        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        self.assertEqual(grade.letter_grade, u'A')
+        self.assertEqual(grade.passed_timestamp, passed_timestamp)
+
+        # If the grade later reverts to a failing grade, they keep their passed_timestamp
+        self.params.update({
+            u'percent_grade': 20.0,
+            u'letter_grade': u'',
+            u'passed': False,
+        })
+        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        self.assertEqual(grade.letter_grade, u'')
+        self.assertEqual(grade.passed_timestamp, passed_timestamp)
+
+    @freeze_time(now())
+    def test_passed_timestamp_is_now(self):
+        grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
+        self.assertEqual(now(), grade.passed_timestamp)
+
     def test_create_and_read_grade(self):
         created_grade = PersistentCourseGrade.update_or_create_course_grade(**self.params)
         read_grade = PersistentCourseGrade.read_course_grade(self.params["user_id"], self.params["course_id"])
         for param in self.params:
+            if param == u'passed':
+                continue  # passed/passed_timestamp takes special handling, and is tested separately
             self.assertEqual(self.params[param], getattr(created_grade, param))
+        self.assertIsInstance(created_grade.passed_timestamp, datetime)
         self.assertEqual(created_grade, read_grade)
 
     def test_course_version_optional(self):

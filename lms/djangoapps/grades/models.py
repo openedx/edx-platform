@@ -16,6 +16,7 @@ from lazy import lazy
 import logging
 
 from django.db import models
+from django.utils.timezone import now
 from model_utils.models import TimeStampedModel
 
 from coursewarehistoryextended.fields import UnsignedBigIntAutoField
@@ -378,8 +379,12 @@ class PersistentCourseGrade(TimeStampedModel):
         # (course_id, user_id) for individual grades
         # (course_id) for instructors to see all course grades, implicitly created via the unique_together constraint
         # (user_id) for course dashboard; explicitly declared as an index below
+        # (passed_timestamp, course_id) for tracking when users first earned a passing grade.
         unique_together = [
             ('course_id', 'user_id'),
+        ]
+        index_together = [
+            ('passed_timestamp', 'course_id'),
         ]
 
     # primary key will need to be large for this table
@@ -396,18 +401,21 @@ class PersistentCourseGrade(TimeStampedModel):
     percent_grade = models.FloatField(blank=False)
     letter_grade = models.CharField(u'Letter grade for course', blank=False, max_length=255)
 
+    # Information related to course completion
+    passed_timestamp = models.DateTimeField(u'Date learner earned a passing grade', blank=True, null=True)
+
     def __unicode__(self):
         """
         Returns a string representation of this model.
         """
-        return u"{} user: {}, course version: {}, grading policy: {}, percent grade {}%, letter grade {}".format(
-            type(self).__name__,
-            self.user_id,
-            self.course_version,
-            self.grading_policy_hash,
-            self.percent_grade,
-            self.letter_grade,
-        )
+        return u', '.join([
+            u"{} user: {}".format(type(self).__name__, self.user_id),
+            u"course version: {}".format(self.course_version),
+            u"grading policy: {}".format(self.grading_policy_hash),
+            u"percent grade: {}%".format(self.percent_grade),
+            u"letter grade: {}".format(self.letter_grade),
+            u"passed_timestamp: {}".format(self.passed_timestamp),
+        ])
 
     @classmethod
     def read_course_grade(cls, user_id, course_id):
@@ -428,6 +436,7 @@ class PersistentCourseGrade(TimeStampedModel):
         Creates a course grade in the database.
         Returns a PersistedCourseGrade object.
         """
+        passed = kwargs.pop('passed')
         if kwargs.get('course_version', None) is None:
             kwargs['course_version'] = ""
 
@@ -436,4 +445,7 @@ class PersistentCourseGrade(TimeStampedModel):
             course_id=course_id,
             defaults=kwargs
         )
+        if passed and not grade.passed_timestamp:
+            grade.passed_timestamp = now()
+            grade.save()
         return grade
