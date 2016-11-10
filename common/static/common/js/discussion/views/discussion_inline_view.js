@@ -19,11 +19,28 @@
             }
         },
 
+        page_re: /\?discussion_page=(\d+)/,
+
         initialize: function(options) {
+            var match;
+
             this.$el = options.el;
+            this.showByDefault = options.showByDefault || false;
             this.toggleDiscussionBtn = this.$('.discussion-show');
-            this.newPostForm = this.$el.find('.new-post-article');
-            this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
+            this.listenTo(this.model, 'change', this.render);
+
+            match = this.page_re.exec(window.location.href);
+            if (match) {
+                this.page = parseInt(match[1], 10);
+            } else {
+                this.page = 1;
+            }
+
+            // By default the view is displayed in a hidden state. If you want it to be shown by default (e.g. in Teams)
+            // pass showByDefault as an option. This code will open it on initialization.
+            if (this.showByDefault) {
+                this.toggleDiscussion();
+            }
         },
 
         loadDiscussions: function($elem, error) {
@@ -46,7 +63,7 @@
         },
 
         renderDiscussion: function($elem, response, textStatus, discussionId) {
-            var $discussion,
+            var discussionHtml,
                 user = new DiscussionUser(response.user_info),
                 self = this;
 
@@ -59,21 +76,21 @@
 
             this.course_settings = new DiscussionCourseSettings(response.course_settings);
 
-            this.discussion = new Discussion();
+            this.discussion = new Discussion(undefined, {pages: response.num_pages});
             this.discussion.reset(response.discussion_data, {
                 silent: false
             });
 
-            $discussion = _.template($('#inline-discussion-template').html())({
+            discussionHtml = edx.HtmlUtils.template($('#inline-discussion-template').html())({
                 threads: response.discussion_data,
                 read_only: this.readOnly,
                 discussionId: discussionId
             });
 
             if (this.$('section.discussion').length) {
-                this.$('section.discussion').replaceWith($discussion);
+                edx.HtmlUtils.setHtml(this.$el, discussionHtml);
             } else {
-                this.$el.append($discussion);
+                edx.HtmlUtils.append(this.$el, discussionHtml);
             }
 
             this.threadListView = new DiscussionThreadListView({
@@ -138,6 +155,9 @@
 
             // Show the thread list view
             this.threadListView.$el.removeClass('is-hidden');
+
+            // Set focus to thread list item that was saved as active
+            this.threadListView.$('.is-active').focus();
         },
 
         toggleDiscussion: function() {
@@ -147,9 +167,10 @@
                 this.hideDiscussion();
             } else {
                 this.toggleDiscussionBtn.addClass('shown');
-                this.toggleDiscussionBtn.find('.button-text').html(gettext('Hide Discussion'));
+                this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
                 if (this.retrieved) {
                     this.$('section.discussion').slideDown();
+                    this.$('section.discussion').removeClass('is-hidden');
                     this.showed = true;
                 } else {
                     this.loadDiscussions(this.$el, function() {
@@ -165,8 +186,9 @@
 
         hideDiscussion: function() {
             this.$('section.discussion').slideUp();
+            this.$('section.discussion').addClass('is-hidden');
             this.toggleDiscussionBtn.removeClass('shown');
-            this.toggleDiscussionBtn.find('.button-text').html(gettext('Show Discussion'));
+            this.toggleDiscussionBtn.find('.button-text').text(gettext('Show Discussion'));
             this.showed = false;
         },
 
@@ -182,13 +204,15 @@
             } else {
                 this.newPostForm.show().focus();
             }
+            this.newPostView.$el.removeClass('is-hidden');
             this.toggleDiscussionBtn.addClass('shown');
-            this.toggleDiscussionBtn.find('.button-text').html(gettext('Hide Discussion'));
+            this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
             this.$('section.discussion').slideDown();
             this.showed = true;
         },
 
         hideNewPost: function() {
+            this.newPostView.$el.addClass('is-hidden');
             return this.newPostForm.slideUp(300);
         }
     });
