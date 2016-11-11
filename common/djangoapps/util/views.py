@@ -1,30 +1,36 @@
 import json
 import logging
+from smtplib import SMTPException
 import sys
 from functools import wraps
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.cache import caches
+from django.core.mail import send_mail
 from django.core.validators import ValidationError, validate_email
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError, HttpResponseForbidden)
 import dogstats_wrapper as dog_stats_api
-from edxmako.shortcuts import render_to_response
 import zendesk
-from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
-
 import calc
-import track.views
 
 from opaque_keys import InvalidKeyError
+
 from opaque_keys.edx.keys import CourseKey
 
+from edxmako.shortcuts import render_to_response, render_to_string
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+import track.views
 from student.roles import GlobalStaff
 
 log = logging.getLogger(__name__)
+
+DATADOG_FEEDBACK_METRIC = "lms_feedback_submissions"
+SUPPORT_BACKEND_ZENDESK = "support_ticket"
+SUPPORT_BACKEND_EMAIL = "email"
 
 
 def ensure_valid_course_key(view_func):
@@ -281,17 +287,47 @@ def _record_feedback_in_zendesk(
     return True
 
 
-DATADOG_FEEDBACK_METRIC = "lms_feedback_submissions"
-
-
 def _record_feedback_in_datadog(tags):
     datadog_tags = [u"{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
     dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
 
 
+def get_feedback_form_context(request):
+    """
+    Extract the submitted form fields to be used as a context for
+    feedback submission.
+    """
+    context = {}
+
+    context["subject"] = request.POST["subject"]
+    context["details"] = request.POST["details"]
+    context["tags"] = dict(
+        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
+    )
+
+    context["additional_info"] = {}
+
+    if request.user.is_authenticated():
+        context["realname"] = request.user.profile.name
+        context["email"] = request.user.email
+        context["additional_info"]["username"] = request.user.username
+    else:
+        context["realname"] = request.POST["name"]
+        context["email"] = request.POST["email"]
+
+    for header, pretty in [("HTTP_REFERER", "Page"), ("HTTP_USER_AGENT", "Browser"), ("REMOTE_ADDR", "Client IP"),
+                           ("SERVER_NAME", "Host")]:
+        context["additional_info"][pretty] = request.META.get(header)
+
+    context["support_email"] = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+
+    return context
+
+
 def submit_feedback(request):
     """
-    Create a new user-requested ticket, currently implemented with Zendesk.
+    Create a Zendesk ticket or if not available, send an email with the
+    feedback form fields.
 
     If feedback submission is not enabled, any request will raise `Http404`.
     If any configuration parameter (`ZENDESK_URL`, `ZENDESK_USER`, or
@@ -309,74 +345,71 @@ def submit_feedback(request):
         raise Http404()
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
-    if (
-        not settings.ZENDESK_URL or
-        not settings.ZENDESK_USER or
-        not settings.ZENDESK_API_KEY
-    ):
-        raise Exception("Zendesk enabled but not configured")
 
     def build_error_response(status_code, field, err_msg):
         return HttpResponse(json.dumps({"field": field, "error": err_msg}), status=status_code)
 
-    additional_info = {}
-
     required_fields = ["subject", "details"]
+
     if not request.user.is_authenticated():
         required_fields += ["name", "email"]
+
     required_field_errs = {
         "subject": "Please provide a subject.",
         "details": "Please provide details.",
         "name": "Please provide your name.",
         "email": "Please provide a valid e-mail.",
     }
-
     for field in required_fields:
         if field not in request.POST or not request.POST[field]:
             return build_error_response(400, field, required_field_errs[field])
 
-    subject = request.POST["subject"]
-    details = request.POST["details"]
-    tags = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
-    )
-
-    if request.user.is_authenticated():
-        realname = request.user.profile.name
-        email = request.user.email
-        additional_info["username"] = request.user.username
-    else:
-        realname = request.POST["name"]
-        email = request.POST["email"]
+    if not request.user.is_authenticated():
         try:
-            validate_email(email)
+            validate_email(request.POST["email"])
         except ValidationError:
             return build_error_response(400, "email", required_field_errs["email"])
 
-    for header, pretty in [
-        ("HTTP_REFERER", "Page"),
-        ("HTTP_USER_AGENT", "Browser"),
-        ("REMOTE_ADDR", "Client IP"),
-        ("SERVER_NAME", "Host")
-    ]:
-        additional_info[pretty] = request.META.get(header)
+    success = False
+    context = get_feedback_form_context(request)
+    support_backend = configuration_helpers.get_value('CONTACT_FORM_SUBMISSION_BACKEND', SUPPORT_BACKEND_ZENDESK)
 
-    success = _record_feedback_in_zendesk(
-        realname,
-        email,
-        subject,
-        details,
-        tags,
-        additional_info,
-        support_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-    )
-    _record_feedback_in_datadog(tags)
+    if support_backend == SUPPORT_BACKEND_EMAIL:
+        try:
+            send_mail(
+                subject=render_to_string('emails/contact_us_feedback_email_subject.txt', context),
+                message=render_to_string('emails/contact_us_feedback_email_body.txt', context),
+                from_email=context["support_email"],
+                recipient_list=[context["support_email"]],
+                fail_silently=False
+            )
+            success = True
+        except SMTPException:
+            log.exception('Error sending feedback to contact_us email address.')
+            success = False
+
+    else:
+        if not settings.ZENDESK_URL or not settings.ZENDESK_USER or not settings.ZENDESK_API_KEY:
+            raise Exception("Zendesk enabled but not configured")
+
+        success = _record_feedback_in_zendesk(
+            context["realname"],
+            context["email"],
+            context["subject"],
+            context["details"],
+            context["tags"],
+            context["additional_info"],
+            support_email=context["support_email"]
+        )
+
+    _record_feedback_in_datadog(context["tags"])
 
     return HttpResponse(status=(200 if success else 500))
 
 
 def info(request):
     ''' Info page (link from main header) '''
+    # pylint: disable=unused-argument
     return render_to_response("info.html", {})
 
 
