@@ -5,15 +5,14 @@ import datetime
 import json
 import uuid
 
-from bok_choy.web_app_test import WebAppTest
-from common.test.acceptance.tests.helpers import remove_file
+from common.test.acceptance.tests.helpers import AcceptanceTest, remove_file
 from common.test.acceptance.pages.common.logout import LogoutPage
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.discovery import CourseDiscoveryPage
 from common.test.acceptance.fixtures.course import CourseFixture
 
 
-class CourseDiscoveryTest(WebAppTest):
+class CourseDiscoveryTest(AcceptanceTest):
     """
     Test searching for courses.
     """

@@ -5,11 +5,11 @@ what students see @ edx.org because we redirect requests to a separate web appli
 """
 import datetime
 
-from bok_choy.web_app_test import WebAppTest
 from common.test.acceptance.pages.lms.index import IndexPage
+from common.test.acceptance.tests.helpers import AcceptanceTest
 
 
-class BaseLmsIndexTest(WebAppTest):
+class BaseLmsIndexTest(AcceptanceTest):
     """ Base test suite for the LMS Index (Home) page """
 
     def setUp(self):

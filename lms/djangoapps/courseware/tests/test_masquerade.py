@@ -8,7 +8,7 @@ from nose.plugins.attrib import attr
 from datetime import datetime
 
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.utils.timezone import UTC
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
@@ -20,7 +20,7 @@ from courseware.masquerade import (
     get_masquerading_group_info
 )
 from courseware.tests.factories import StaffFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
+from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from student.tests.factories import UserFactory
 from xblock.runtime import DictKeyValueStore
@@ -107,14 +107,13 @@ class MasqueradeTestCase(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         return self.client.get(url)
 
-    def _create_mock_json_request(self, user, body, method='POST', session=None):
+    def _create_mock_json_request(self, user, data, method='POST', session=None):
         """
         Returns a mock JSON request for the specified user
         """
-        request = get_request_for_user(user)
-        request.method = method
-        request.META = {'CONTENT_TYPE': ['application/json']}
-        request.body = body
+        factory = RequestFactory()
+        request = factory.generic(method, '/', content_type='application/json', data=json.dumps(data))
+        request.user = user
         request.session = session or {}
         return request
 
@@ -408,10 +407,11 @@ class TestGetMasqueradingGroupId(StaffMasqueradeTestCase):
         # Install a masquerading group
         request = self._create_mock_json_request(
             self.test_user,
-            body='{"role": "student", "user_partition_id": 0, "group_id": 1}'
+            data={"role": "student", "user_partition_id": 0, "group_id": 1}
         )
-        handle_ajax(request, unicode(self.course.id))
-        setup_masquerade(request, self.test_user, True)
+        response = handle_ajax(request, unicode(self.course.id))
+        self.assertEquals(response.status_code, 200)
+        setup_masquerade(request, self.course.id, True)
 
         # Verify that the masquerading group is returned
         group_id, user_partition_id = get_masquerading_group_info(self.test_user, self.course.id)

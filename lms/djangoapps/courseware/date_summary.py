@@ -4,6 +4,7 @@ page. Each block gives information about a particular
 course-run-specific date which will be displayed to the user.
 """
 from datetime import datetime
+from pytz import timezone, utc
 
 from babel.dates import format_timedelta
 from django.core.urlresolvers import reverse
@@ -12,13 +13,12 @@ from django.utils.translation import ugettext_lazy
 from django.utils.translation import to_locale, get_language
 from edxmako.shortcuts import render_to_string
 from lazy import lazy
-from pytz import utc
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
-from openedx.core.lib.time_zone_utils import get_time_zone_abbr, get_user_time_zone
 from student.models import CourseEnrollment
+from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 
 
 class DateSummary(object):
@@ -67,8 +67,12 @@ class DateSummary(object):
 
     @property
     def time_zone(self):
-        """The time zone to display in"""
-        return get_user_time_zone(self.user)
+        """
+        The time zone in which to display -- defaults to UTC
+        """
+        return timezone(
+            self.user.preferences.model.get_value(self.user, "time_zone", "UTC")
+        )
 
     def __init__(self, course, user):
         self.course = course

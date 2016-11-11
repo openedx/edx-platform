@@ -5,7 +5,7 @@
     var $$course_id = '$$course_id';
     describe('DiscussionThreadShowView', function() {
         beforeEach(function() {
-            DiscussionSpecHelper.setUpGlobals();
+            DiscussionSpecHelper.setUpGlobals({});
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.user = DiscussionUtil.getUser();
             this.threadData = {

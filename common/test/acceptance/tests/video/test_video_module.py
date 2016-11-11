@@ -49,6 +49,7 @@ class VideoBaseTest(UniqueCourseTest):
         Initialization of pages and course fixture for video tests
         """
         super(VideoBaseTest, self).setUp()
+        self.longMessage = True  # pylint: disable=invalid-name
 
         self.video = VideoPage(self.browser)
         self.tab_nav = TabNavPage(self.browser)
@@ -1223,7 +1224,7 @@ class DragAndDropTest(VideoBaseTest):
             )
         else:
             self.assertEqual(
-                captions_end.get('y') + 15,
+                captions_end.get('y') + 16,
                 captions_start.get('y'),
                 'Closed captions did not get dragged.'
             )

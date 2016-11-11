@@ -189,7 +189,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:57+0000\n"
+"POT-Creation-Date: 2016-11-03 15:59+0000\n"
 "PO-Revision-Date: 2016-10-22 05:21+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -564,11 +564,9 @@ msgstr "Su nombre legal debe tener por lo menos dos caracteres"
 
 #: common/djangoapps/student/forms.py
 msgid ""
-"Usernames must contain only letters, numbers, underscores (_), and hyphens "
-"(-)."
+"Usernames can only contain Roman letters, western numerals (0-9), "
+"underscores (_), and hyphens (-)."
 msgstr ""
-"Los nombres de usuario solo deben contener letras, números, guiones bajos "
-"(_) y guiones (-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -3369,6 +3367,18 @@ msgstr ""
 "exámenes cronometrados."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Opting Out of Proctored Exams"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, learners can choose to take "
+"proctored exams without proctoring. If this value is false, all learners "
+"must take the exam with proctoring. This setting only applies if proctored "
+"exams are enabled for the course."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr ""
 "Crear tickets de Zendesk para los intentos sospechosos de examen supervisado"
@@ -3388,10 +3398,9 @@ msgstr "Habilitar examenes cronometrados"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
-"course."
+"course. Regardless of this setting, timed exams are enabled if Enable "
+"Proctored Exams is set to true."
 msgstr ""
-"Ingrese true o false. Cuando ingrese true, los examenes cronometrados "
-"estarán habilitados en su curso."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -12032,8 +12041,10 @@ msgid "Submit your answer"
 msgstr ""
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempts"
-msgstr ""
+msgid "You have used {num_used} of {num_total} attempt"
+msgid_plural "You have used {num_used} of {num_total} attempts"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
@@ -12429,18 +12440,23 @@ msgid "Actions"
 msgstr "Acciones"
 
 #: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "Reiniciar los intentos del estudiante"
-
-#: lms/templates/staff_problem_info.html
-msgid "Delete Student State"
-msgstr "Borrar estado de estudiante"
+msgid "Reset Learner's Attempts to Zero"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "Re puntuar el envío del estudiante"
+msgid "Delete Learner's State"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Learner's Submission"
+msgstr ""
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Score Improves"
+msgstr ""
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -14498,10 +14514,6 @@ msgid "{course_number} Progress"
 msgstr "Progreso del curso {course_number} "
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress"
-msgstr "Progreso en el Curso"
-
-#: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
 msgstr "Ver las calificaciones en Studio"
 
@@ -14510,16 +14522,12 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Progreso del curso para el estudiante '{username}' ({email})"
 
 #: lms/templates/courseware/progress.html
-msgid "View certificate in a new browser window or tab."
-msgstr "Ver el certificado en un nueva ventana o pestaña del navegador."
-
-#: lms/templates/courseware/progress.html
 msgid "View Certificate"
 msgstr "Ver certificado"
 
 #: lms/templates/courseware/progress.html
-msgid "PDF will open in a new browser window or tab."
-msgstr "El PDF se abrirá en una nueva ventana o pestaña del navegador."
+msgid "Opens in a new browser window"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -14587,6 +14595,10 @@ msgstr "Próximo"
 #: lms/templates/courseware/progress.html
 msgid "Less"
 msgstr "Menos"
+
+#: lms/templates/courseware/progress.html
+msgid "Details for each chapter"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
@@ -16289,6 +16301,14 @@ msgstr ""
 "certificado. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit passing state. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit not passing state. ({count})"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
 msgstr "Regenerar certificados para los estudiantes con error. ({count})"
 
@@ -17001,7 +17021,6 @@ msgstr ""
 " tenga una fecha límite anterior para cierto estudiante."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
@@ -17009,7 +17028,6 @@ msgstr ""
 "estudiante aquí:"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
 msgstr "Correo electrónico o nombre de usuario del estudiante"
 
@@ -17702,161 +17720,175 @@ msgid "Student Special Exam Attempts"
 msgstr "Intentos de estudiantes para examenes especiales."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Gradebook"
-msgstr "Libro de calificaciones de estudiantes"
+msgid "View gradebook for enrolled learners"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Click here to view the gradebook for enrolled students. This feature is only"
-" visible to courses with a small number of total enrolled students."
+"Note: This feature is available only to courses with a small number of "
+"enrolled learners."
 msgstr ""
-"Haga clic para ver el libro de calificaciones para los estudiantes "
-"inscritos. Esta funcionalidad solo está disponible en cursos con un número "
-"total de inscritos bajo."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
 msgstr "Ver libro de calificaciones"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade inspection"
-msgstr "Inspección de las calificaciones específicas al estudiante"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Click this link to view the student's progress page:"
+msgid "View a specific learner's grades and progress"
 msgstr ""
-"Haga clic en esté vínculo para ver la página de progreso del estudiante:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Progress Page"
-msgstr "Página de progreso del estudiante"
+msgid "Learner's {platform_name} email address or username *"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade adjustment"
-msgstr "Ajustes de calificaciones específicos al estudiante"
+msgid "Learner email address or username"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Specify a problem in the course here with its complete location:"
-msgstr "Especifique aquí un problema, con su localizacion completa:"
+msgid "View Progress Page"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's grade for a specific problem"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Location of problem in course *"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Example"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
 msgstr "Localización del problema"
 
-#. Translators: A location (string of text) follows this sentence.
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You must provide the complete location of the problem. In the Staff Debug "
-"viewer, the location looks like this:"
+msgid "Attempts"
 msgstr ""
-"Usted debe proporcionar la ubicación completa del problema. En el visor de "
-"depuración de personal, la ubicación es la siguiente:"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Next, select an action to perform for the given user and problem:"
-msgstr ""
-"A continuación, seleccione una acción para el usuario y problema elegido:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You may also delete the entire state of a student for the specified problem:"
+"Allow a learner who has used up all attempts to work on the problem again."
 msgstr ""
-"También puede borrar todo el estado de un estudiante para el problema "
-"específicado"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student State for Problem"
-msgstr "Borrar el estado del estudiante para el problema"
+msgid "Reset Attempts to Zero"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Tasks' table. To see status for all tasks submitted for this "
-"problem and student, click on this button:"
+"For the specified problem, rescore the learner's responses. The 'Rescore "
+"Only If Score Improves' option updates the learner's score only if it "
+"improves in the learner's favor."
 msgstr ""
-"Las tareas de re puntuación en segundo plano y el estado de las tareas "
-"activas aparecerán en la tabla de 'Tareas pendientes'. Para ver el estado de"
-" todas las tareas enviadas para este problema y estudiante, haga clic en "
-"este botón:"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Student"
-msgstr "Mostrar Antecedentes Historia Tarea para Estudiante"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Entrance Exam Adjustment"
-msgstr "Ajustes del examen de ingreso"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student's {platform_name} email address or username:"
-msgstr "Dirección de email {platform_name} o nombre de usuario del estudiante"
+msgid "Problem History"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Select an action for the student's entrance exam. This action will affect "
-"every problem in the student's exam."
+"For the specified problem, permanently and completely delete the learner's "
+"answers and scores from the database."
 msgstr ""
-"Seleccionar una acción para el examen de ingreso del estudiante. Esta acción"
-" afectará a todos los problemas en el examen del estudiante."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Number of Student Attempts"
-msgstr "Reinicia el Número de Intentos del Estudiante"
+msgid "Task Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and problem."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Task Status"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's entrance exam results"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow the learner to take the exam again."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow Skip"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Waive the requirement for the learner to take the exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Let Learner Skip Entrance Exam"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore any responses that have been submitted. The 'Rescore All Problems "
+"Only If Score Improves' option updates the learner's scores only if it "
+"improves in the learner's favor."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
 msgstr "Reevalúa Todos los Problemas"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Let Student Skip Entrance Exam"
-msgstr "Permitir que el estudiante salte el examen de ingreso"
+msgid "Rescore All Problems Only If Score Improves"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Entrance Exam History"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You can also delete all of the student's answers and scores for the entire "
-"entrance exam."
+"For the entire entrance exam, permanently and completely delete the "
+"learner's answers and scores from the database."
 msgstr ""
-"También puede eliminar todas las respuestas y puntuaciones del estudiante en"
-" el examen de ingreso."
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student's Answers and Scores"
-msgstr "Elimina las respuestas y calificaciones del estudiante"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Student's Exam Adjustment History"
-msgstr "Mostrar el histórico de ajustes de exámenes del estudiante "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Course-specific grade adjustment"
-msgstr "Ajustes de calificaciones específicos al curso"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Then select an action"
-msgstr "Ahora seleccione una acción"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset ALL students' attempts"
-msgstr "Reiniciar TODOS los intentos de los estudiantes"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore ALL students' problem submissions"
-msgstr "Repuntuar TODOS los envíos de problemas de los estudiantes"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"The above actions run in the background, and status for active tasks will "
-"appear in a table on the Course Info tab. To see status for all tasks "
-"submitted for this problem, click on this button"
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and entrance exam."
 msgstr ""
-"Las acciones listadas arriba corren en segundo plano y el estado de las "
-"tareas activas aparecerá en una tabla en la pestaña de Información del "
-"Curso. Para ver el estado de todas las tareas enviadas para este problema, "
-"haga clic en este botón"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Problem"
-msgstr "Mostrar la historia de la tarea en modo oculto para el problema"
+msgid "Adjust all enrolled learners' grades for a specific problem"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allows all learners to work on the problem again."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
+"updates a learner's score only if it improves in the learner's favor."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Learners' Submissions"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Scores Improve"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show the status for the tasks that you submitted for this problem."
+msgstr ""
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
@@ -19510,14 +19542,12 @@ msgstr "Generación de certificados para los estudiantes"
 
 #: cms/templates/certificates.html
 msgid ""
-"To begin issuing certificates, a course team member with the Admin role "
-"selects {em_start}Activate{em_end}. Course team members without the Admin "
-"role cannot edit or delete an activated certificate."
+"After you have configured and previewed your certificate, ask your edX "
+"partner manager to activate your certificate. When your certificate has been"
+" activated, you can begin issuing certificates to learners. Course team "
+"members without the Admin role cannot edit or delete an activated "
+"certificate."
 msgstr ""
-"Para comenzar a emitir el certificado, un miembro del curso con el rol de "
-"administrador debe seleccionar {em_start}Activar{em_end}.  Los miembros del "
-"equipo del curso que no tengan el rol de administrador no podrán editar o "
-"borrar un certificado activado."
 
 #: cms/templates/certificates.html
 msgid ""

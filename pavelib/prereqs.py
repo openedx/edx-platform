@@ -15,7 +15,7 @@ from .utils.timer import timed
 
 
 PREREQS_STATE_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
-NPM_REGISTRY = "http://registry.npmjs.org/"
+NPM_REGISTRY = "https://registry.npmjs.org/"
 NO_PREREQ_MESSAGE = "NO_PREREQ_INSTALL is set, not installing prereqs"
 COVERAGE_REQ_FILE = 'requirements/edx/coverage.txt'
 
@@ -300,3 +300,10 @@ def install_prereqs():
 
     install_node_prereqs()
     install_python_prereqs()
+    log_installed_python_prereqs()
+
+
+def log_installed_python_prereqs():
+    """  Logs output of pip freeze for debugging. """
+    sh("pip freeze > {}".format(Env.GEN_LOG_DIR + "/pip_freeze.log"))
+    return

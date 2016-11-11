@@ -37,6 +37,14 @@ class CourseUpdatesPage(CoursePage):
         """
         Clicks the new-update button.
         """
+        def is_update_button_enabled():
+            """
+            Checks if the New Update button is enabled
+            """
+            return self.q(css='.new-update-button').attrs('disabled')[0] is None
+
+        self.wait_for(promise_check_func=is_update_button_enabled,
+                      description='Waiting for the New update button to be enabled.')
         click_css(self, '.new-update-button', require_notification=False)
         self.wait_for_element_visibility('.CodeMirror', 'Waiting for .CodeMirror')
 

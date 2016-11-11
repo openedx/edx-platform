@@ -34,6 +34,7 @@
 # Ned Batchelder <ned@edx.org>, 2015-2016
 # omarithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # SiddigSami <siddigsami@live.com>, 2014-2015
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # Tariq Hamid <ou63@outlook.com>, 2015
@@ -61,6 +62,7 @@
 # Nashwan Naji <nashwanameen@gmail.com>, 2016
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # RaghadG <raghad_g@yahoo.com>, 2014
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
@@ -85,6 +87,7 @@
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2016
 # omarithawi <oithawi@qrf.org>, 2015-2016
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -103,15 +106,17 @@
 # Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
+# Ned Batchelder <ned@edx.org>, 2016
 # omarithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
+# shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:55+0000\n"
-"PO-Revision-Date: 2016-09-29 14:26+0000\n"
+"POT-Creation-Date: 2016-11-03 15:57+0000\n"
+"PO-Revision-Date: 2016-11-09 21:21+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -232,6 +237,7 @@ msgid "Name"
 msgstr "الاسم"
 
 #: cms/static/js/views/assets.js lms/static/js/Markdown.Editor.js
+#: cms/templates/js/asset-upload-modal.underscore
 msgid "Choose File"
 msgstr "اختر الملف"
 
@@ -256,6 +262,7 @@ msgstr "موافق"
 
 #: cms/static/js/views/manage_users_and_roles.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Unknown"
 msgstr "غير معروف "
 
@@ -377,6 +384,30 @@ msgstr "التعليق"
 msgid "Reply to Annotation"
 msgstr "الردّ على الملاحظات التوضيحية"
 
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (graded)"
+msgid_plural "%(num_points)s points possible (graded)"
+msgstr[0] "%(num_points)s  نقاط محتملة (مقيمة)"
+msgstr[1] " %(num_points)s  نقاط محتملة (مقيمة)"
+msgstr[2] "  %(num_points)s  نقاط محتملة (مقيمة)"
+msgstr[3] "   %(num_points)s  نقاط محتملة (مقيمة)"
+msgstr[4] "   %(num_points)s  نقاط محتملة (مقيمة)"
+msgstr[5] "  %(num_points)s عدد النقاط الممكنة (مع علامة)"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10).;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "%(num_points)s point possible (ungraded)"
+msgid_plural "%(num_points)s points possible (ungraded)"
+msgstr[0] "%(num_points)s  نقاط محتملة (غير مقيمة)"
+msgstr[1] "%(num_points)s  نقاط محتملة (غير مقيمة)"
+msgstr[2] "%(num_points)s  نقاط محتملة (غير مقيمة)"
+msgstr[3] "%(num_points)s  نقاط محتملة (غير مقيمة)"
+msgstr[4] "%(num_points)s  نقاط محتملة (غير مقيمة)"
+msgstr[5] "%(num_points)s عدد النقاط الممكنة (دون علامة)"
+
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
 #. points will always be at least 1. We pluralize based on the total number of
@@ -384,12 +415,12 @@ msgstr "الردّ على الملاحظات التوضيحية"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (graded)"
 msgid_plural "%(earned)s/%(possible)s points (graded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%(earned)s/%(possible)s  نقاط (مقيمة)"
+msgstr[1] "%(earned)s/%(possible)s  نقاط (مقيمة)"
+msgstr[2] "%(earned)s/%(possible)s  نقاط (مقيمة)"
+msgstr[3] "%(earned)s/%(possible)s  نقاط (مقيمة)"
+msgstr[4] "%(earned)s/%(possible)s  نقاط (مقيمة)"
+msgstr[5] "%(earned)s/%(possible)s نقاط (مع علامة)"
 
 #. Translators: %(earned)s is the number of points earned. %(possible)s is the
 #. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
@@ -398,36 +429,12 @@ msgstr[5] ""
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(earned)s/%(possible)s point (ungraded)"
 msgid_plural "%(earned)s/%(possible)s points (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
-
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (graded)"
-msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
-
-#. Translators: %(num_points)s is the number of points possible (examples: 1,
-#. 3, 10).;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "%(num_points)s point possible (ungraded)"
-msgid_plural "%(num_points)s points possible (ungraded)"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "%(earned)s/%(possible)s  نقاط (غير مقيمة)"
+msgstr[1] "%(earned)s/%(possible)s  نقاط (غير مقيمة)"
+msgstr[2] "%(earned)s/%(possible)s  نقاط (غير مقيمة)"
+msgstr[3] "%(earned)s/%(possible)s  نقاط (غير مقيمة)"
+msgstr[4] "%(earned)s/%(possible)s  نقاط (غير مقيمة)"
+msgstr[5] "%(earned)s/%(possible)s نقاط (دون علامة)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "The grading process is still running. Refresh the page to see updates."
@@ -435,7 +442,7 @@ msgstr "عملية التقييم ما زالت جارية. حدِّث الصف�
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
-msgstr ""
+msgstr "لم نتمكن من تقييم إجابتك. تم إيقاف عملية التقديم قبل إكمالها."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
@@ -443,42 +450,46 @@ msgid ""
 "you can, please use Chrome or Safari which have been verified to support "
 "file uploads."
 msgstr ""
+"تم إيقاف عملية التقديم قبل إكمالها! عفوًا لا يدعم متصفحك تحميل الملفات. "
+"يمكنك استخدام متصفح Chrome أو Safari واللذان تم التحقق من دعمهما لعملية "
+"تحميل الملفات."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You submitted {filename}; only {allowedFiles} are allowed."
-msgstr ""
+msgstr "قمت بتقديم  {filename}؛ يسمح بتقديم ملفات {allowedFiles} فقط."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Your file {filename} is too large (max size: {maxSize}MB)."
-msgstr ""
+msgstr "حجم الملف {filename} كبير للغاية (الحجم الأقصى: {maxSize} ميغابايت)."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not submit the required files: {requiredFiles}."
-msgstr ""
+msgstr "لم تقدم الملفات المطلوبة: {requiredFiles}."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "You did not select any files to submit."
-msgstr ""
+msgstr "لم تحدد أي ملفات لتقديمها."
 
 #. Translators: This is only translated to allow for reordering of label and
 #. associated status.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "{label}: {status}"
-msgstr ""
+msgstr "{label}: {status}"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "This problem has been reset."
-msgstr ""
+msgstr "تمت إعادة تعيين هذه المسألة."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
 "Answers to this problem are now shown. Navigate through the problem to "
 "review it with answers inline."
 msgstr ""
+"تم عرض إجابات هذه المسألة الآن. تصفح المسألة لمراجعتها مع الإجابات المُضمنة."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-msgid "Status: unsubmitted"
-msgstr "الحالة: لم يتم التقديم"
+msgid "unsubmitted"
+msgstr "لم يتم التقديم"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1613,9 +1624,12 @@ msgstr ""
 "يبدو أن الرابط الذي أدخلته عبارة عن رابط خارجي، هل تريد إضافة البادئة "
 "http:// اللازمة؟"
 
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: cms/templates/js/course-instructor-details.underscore
+#: cms/templates/js/signatory-details.underscore
 msgid "Title"
 msgstr "العنوان"
 
@@ -2042,19 +2056,19 @@ msgstr "إخفاء النص"
 
 #: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
 msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr ""
+msgstr "إجمالي عدد الكلمات التي تم ارسالها {start_strong}{total}{end_strong}."
 
 #: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
 msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId} title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
 msgid "title_word_{uniqueId}"
-msgstr ""
+msgstr "title_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
 msgid "text_word_{uniqueId}"
-msgstr ""
+msgstr "text_word_{uniqueId}"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -2292,12 +2306,12 @@ msgstr "إظهار كافة الردود"
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Showing first response"
 msgid_plural "Showing first {numResponses} responses"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
-msgstr[4] ""
-msgstr[5] ""
+msgstr[0] "عرض أول {numResponses} إجابات"
+msgstr[1] " عرض أول {numResponses} إجابات"
+msgstr[2] " عرض أول {numResponses} إجابات"
+msgstr[3] " عرض أول {numResponses} إجابات"
+msgstr[4] "عرض أول {numResponses} إجابات"
+msgstr[5] "عرض أول {numResponses} إجابات"
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "Load all responses"
@@ -2670,10 +2684,6 @@ msgid "open slots"
 msgstr "الشواغر المتاحة"
 
 #: lms/djangoapps/teams/static/teams/js/collections/topic.js
-#: lms/templates/edxnotes/tab-item.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/edxnotes/tab-item.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 msgid "name"
 msgstr "الاسم  "
 
@@ -2970,6 +2980,8 @@ msgid "Search teams"
 msgstr "بحث في الفرق"
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
+#: lms/djangoapps/discussion/static/discussion/templates/fake-breadcrumbs.underscore
+#: test_root/staticfiles/discussion/templates/fake-breadcrumbs.underscore
 msgid "All Topics"
 msgstr "كافّة المواضيع"
 
@@ -3037,30 +3049,35 @@ msgstr "إغلاق الآلة الحاسبة "
 
 #: lms/static/coffee/src/customwmd.js
 msgid "HTML preview of post"
-msgstr ""
+msgstr "استعراض المنشور في HTML"
 
 #: lms/static/coffee/src/customwmd.js
 msgid "Post body"
 msgstr "محتوى المنشور"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Loading data..."
 msgstr "جاري تحميل البيانات..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting issued certificates list."
 msgstr "نأسف لحدوث خطأ أثناء إعداد قائمة الشهادات الممنوحة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating proctored exam results. Please try again."
 msgstr ""
 "نأسف لحدوث خطأ أثناء إعداد نتائج الامتحانات المراقبة. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating survey results. Please try again."
 msgstr "نأسف لحدوث خطأ أثناء إعداد نتائج الاستبيان. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
 msgstr ""
 "نأسف لحدوث خطأ في استحداث معلومات الملف الشخصي للطالب. يُرجى إعادة المحاولة."
@@ -3068,39 +3085,47 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
+#: lms/static/js/instructor_dashboard/data_download.js
 #: lms/templates/search/search_loading.underscore
 #: test_root/staticfiles/templates/search/search_loading.underscore
 msgid "Loading"
 msgstr "جاري التحميل"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error getting student list."
 msgstr "نأسف لحدوث خطأ في الحصول على قائمة الطلّاب."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating list of students who may enroll. Please try again."
 msgstr ""
 "نأسف لحدوث خطأ في إنشاء لائحة الطلّاب الذين قد يسجّلون. يُرجى إعادة "
 "المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error retrieving grading configuration."
 msgstr "نأسف لحدوث خطأ في استرجاع طريقة ضبط إعدادات التقييم."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
 msgstr "نأسف لحدوث خطأ في استحداث الدرجات. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
 msgstr "نأسف لحدوث خطأ في إنشاء تقرير درجات المسائل. يُرجى إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating ORA data report. Please try again."
 msgstr ""
 "نأسف لحدوث خطأ أثناء إنشاء تقرير ORA. يُرجى إعادة المحاولة في وقتٍ لاحق."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/static/js/student_profile/views/learner_profile_factory.js
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -3111,26 +3136,33 @@ msgid "Username"
 msgstr "اسم المستخدم"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
+#: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Email"
 msgstr "البريد الإلكتروني"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Revoke access"
 msgstr "إلغاء صلاحيات الوصول"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Enter username or email"
 msgstr "أدخل اسم المستخدم أو البريد الإلكتروني"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Please enter a username or email."
 msgstr "يُرجى إدخال اسم مستخدم او عنوان بريد إلكتروني."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
 msgstr "نأسف لحدوث خطأ في تغيير صلاحيات المستخدم."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Could not find a user with username or email address '<%- identifier %>'."
 msgstr ""
@@ -3138,6 +3170,7 @@ msgstr ""
 "%>'."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Error: User '<%- username %>' has not yet activated their account. Users "
 "must create and activate their accounts before they can be assigned a role."
@@ -3146,35 +3179,43 @@ msgstr ""
 "حساباتهم قبل أن يُسند إليهم أي دور في الدورة التدريبية."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error: You cannot remove yourself from the Instructor group!"
 msgstr "خطأ: لا يمكنك حذف نفسك من مجموعة أستاذ المساق!"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Errors"
 msgstr "أخطاء"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following errors were generated:"
 msgstr "نتجت الأخطاء التالية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Warnings"
 msgstr "تحذيرات"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following warnings were generated:"
 msgstr "نتجت التحذيرات التالية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 #: lms/static/js/views/fields.js
 msgid "Success"
 msgstr "جرت العملية بنجاح"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "All accounts were created successfully."
 msgstr "استُكمل إنشاء جميع الحسابات بنجاح."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
 msgstr ""
 "نأسف لحدوث خطأ في إضافة/حذف بعض المستخدمين كأعضاء في مختبري النسخة "
@@ -3182,27 +3223,32 @@ msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully added as beta testers:"
 msgstr ""
 "نجحت عملية إضافة هؤلاء المستخدمين إلى قائمة أعضاء مختبري النسخة التجريبية:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were successfully removed as beta testers:"
 msgstr ""
 "نجحت عملية حذف هؤلاء المستخدمين من قائمة أعضاء مختبري النسخة التجريبية:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not added as beta testers:"
 msgstr "لم يُضَف هؤلاء المستخدمون إلى قائمة أعضاء مختبري النسخة التجريبية:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users were not removed as beta testers:"
 msgstr "لم يُحذَف هؤلاء المستخدمين من قائمة أعضاء مختبري النسخة التجريبية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Users must create and activate their account before they can be promoted to "
 "beta tester."
@@ -3213,32 +3259,39 @@ msgstr ""
 #. Translators: A list of identifiers (which are email addresses and/or
 #. usernames) appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Could not find users associated with the following identifiers:"
 msgstr "نأسف لتعذّر إيجاد مستخدمين يحملون الأرقام التالية:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Reason field should not be left blank."
 msgstr "لا يمكن ترك حقل السبب فارغًا."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Error enrolling/unenrolling users."
 msgstr "نأسف لحدوث خطأ في تسجيل/إلغاء تسجيل المستخدمين."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following email addresses and/or usernames are invalid:"
 msgstr "إنّ عناوين البريد الإلكتروني و/أو أسماء المستخدمين التالية غير صحيحة:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled and sent email to the following users:"
 msgstr "جرى بنجاح تسجيل المستخدمين التالين ومراسلتهم عبر البريد الإلكتروني:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "Successfully enrolled the following users:"
 msgstr "جرى بنجاح تسجيل المستخدمين التالين:"
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "allowed to enroll once they register:"
@@ -3248,11 +3301,13 @@ msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be allowed to enroll once they register:"
 msgstr "سيُسمح للمستخدمين التالين بالالتحاق بالمساق حالما يسجّلون أنفسهم: "
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Successfully sent enrollment emails to the following users. They will be "
 "enrolled once they register:"
@@ -3262,11 +3317,13 @@ msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "These users will be enrolled once they register:"
 msgstr "سيجري إلحاق المستخدمين التالين بالمساق حالما يسجّلون أنفسهم: "
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "Emails successfully sent. The following users are no longer enrolled in the "
 "course:"
@@ -3276,6 +3333,7 @@ msgstr ""
 
 #. Translators: A list of users appears after this sentence;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid "The following users are no longer enrolled in the course:"
 msgstr "لم يعد المستخدمون التالون مسجّلين بالمساق:"
 
@@ -3283,24 +3341,29 @@ msgstr "لم يعد المستخدمون التالون مسجّلين بالم�
 #. arises when a staff member tries to unenroll a user who is not currently
 #. enrolled in this course.;
 #: lms/static/coffee/src/instructor_dashboard/membership.js
+#: lms/static/js/instructor_dashboard/membership.js
 msgid ""
 "These users were not affiliated with the course so could not be unenrolled:"
 msgstr ""
 "لم يكن هؤلاء المستخدمون منتسبين إلى المساق وبالتالي تعذّر إلغاء تسجيلهم:"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Your message must have a subject."
 msgstr "يجب ملء خانة الموضوع في رسالتك عبر البريد الإلكتروني."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
 msgstr "لا يمكن لرسالتك عبر البريد الإلكتروني أن تكون فارغة."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Your message must have at least one target."
 msgstr "يجب أن يكون لرسالتك مستلم واحد على الأقل."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
 "There are invalid keywords in your email. Check the following keywords and "
 "try again."
@@ -3309,22 +3372,27 @@ msgstr ""
 "مرة آخرى."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Yourself"
 msgstr "نفسك"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Everyone who has staff privileges in this course"
 msgstr "كل فرد لديه مزايا الموظفين في هذه الدورة التدريبية"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "All learners who are enrolled in this course"
 msgstr "كل المتعلمين المنضمين إلى هذه الدورة التدريبية ."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "All learners in the {cohort_name} cohort"
 msgstr "كل المتعلمين في شعبة {cohort_name}"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
 "Your email message was successfully queued for sending. In courses with a "
 "large number of learners, email messages to learners might take up to an "
@@ -3334,6 +3402,7 @@ msgstr ""
 "التدريبية ساعة كاملة، ويعتمد ذلك على عدد المتعلمين في الدورة التدريبية."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid ""
 "You are sending an email message with the subject {subject} to the following"
 " recipients."
@@ -3341,34 +3410,41 @@ msgstr ""
 "أنت على وشك إرسال هذه الرسالة وعنوانها \"{subject}\" إلى المستلمين التالين."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Is this OK?"
 msgstr "موافق؟"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Error sending email."
 msgstr "نأسف لحدوث خطأ في إرسال الرسالة."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
 msgstr "لا يوجد سجلّ لرسائل البريد الإلكتروني الخاصة بهذا المساق."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email task history for this course."
 msgstr ""
 "نأسف لحدوث خطأ أثناء محاولة الحصول على سجل المهامّ الخاصة برسائل البريد "
 "الإلكتروني لهذا المساق."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "There was an error obtaining email content history for this course."
 msgstr ""
 "نأسف لحدوث خطأ أثناء محاولة الحصول على سجل محتوى رسائل البريد الإلكتروني "
 "لهذا المساق."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+#: lms/static/js/instructor_dashboard/send_email.js
 msgid "Send to:"
 msgstr "أرسل إلى: "
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
 msgstr "يُرجى إدخال اسم المستخدم الخاص بالطالب أو عنوان بريده الإلكتروني."
 
@@ -3381,6 +3457,7 @@ msgstr ""
 "’<%= student_id %>‘. يُرجى التحقّق من صحّة رقم الطالب."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
 msgstr "يُرجى إدخال الموقع الخاص بالمسألة."
 
@@ -3419,6 +3496,7 @@ msgstr ""
 "للمسألة رقم ’<%= problem_id %>‘. يُرجى التحقّق من صحّة إدخال هذين الرقمين. "
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Module state successfully deleted."
 msgstr "جرى بنجاح حذف حالة الوحدة التعليمية."
 
@@ -3452,10 +3530,12 @@ msgstr ""
 "إدخال هذين الرقمين. "
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Entrance exam attempts is being reset for student '{student_id}'."
 msgstr "جاري إعادة ضبط محاولات امتحان الدخول للطالب '{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error resetting entrance exam attempts for student '{student_id}'. Make sure"
 " student identifier is correct."
@@ -3473,6 +3553,7 @@ msgstr ""
 "زر ’عرض تاريخ المهامّ السابقة للطالب‘ للاطّلاع على حالة المهمة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error starting a task to rescore entrance exam for student '{student_id}'. "
 "Make sure that entrance exam has problems in it and student identifier is "
@@ -3482,16 +3563,19 @@ msgstr ""
 "يُرجى التأكّد من وجود مسائل في امتحان الدخول ومن صحّة رقم الطالب."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Enter a student's username or email address."
 msgstr "يُرجى إدخال اسم الطالب أو عنوان بريده الإلكتروني."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Do you want to allow this student ('{student_id}') to skip the entrance "
 "exam?"
 msgstr "هل تريد السماح لهذا الطالب ('{student_id}') بتجاوز امتحان الدخول؟"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "An error occurred. Make sure that the student's username or email address is"
 " correct and try again."
@@ -3500,10 +3584,12 @@ msgstr ""
 "الإلكتروني ثمّ إعادة المحاولة."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Entrance exam state is being deleted for student '{student_id}'."
 msgstr "جاري حذف حالة امتحان الدخول للطالب '{student_id}'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error deleting entrance exam state for student '{student_id}'. Make sure "
 "student identifier is correct."
@@ -3512,6 +3598,7 @@ msgstr ""
 "التأكّد من صحّة رقم الطالب."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
 "Error getting entrance exam task history for student '{student_id}'. Make "
 "sure student identifier is correct."
@@ -3565,6 +3652,7 @@ msgstr ""
 "يُرجى التحقق من صحّة إدخال هذين الرقمين. "
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/instructor_dashboard/student_admin.js
 msgid "Error listing task history for this student and problem."
 msgstr ""
 "نأسف لحدوث خطأ في إعداد قائمة بالمهمّات السابقة لهذا الطالب والخاصة بهذه "
@@ -3573,58 +3661,68 @@ msgstr ""
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task Type"
 msgstr "نوع المهمة "
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task inputs"
 msgstr "مدخلات المهمة "
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task ID"
 msgstr "رمز المهمّة"
 
 #. Translators: a "Requester" is a username that requested a task such as
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Requester"
 msgstr "مقدّم الطلب "
 
 #. Translators: A timestamp of when a task (eg, sending email) was submitted
 #. appears after this
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Submitted"
 msgstr "جرى التقديم"
 
 #. Translators: The length of a task (eg, sending email) in seconds appears
 #. this
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Duration (sec)"
 msgstr "مدّة المهمة (بالثواني) "
 
 #. Translators: The state (eg, "In progress") of a task (eg, sending email)
 #. appears after this.
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "State"
 msgstr "الحالة"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task Status"
 msgstr "حالة المهمة"
 
 #. Translators: a "Task" is a background process such as grading students or
 #. sending email
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Task Progress"
 msgstr "تطوّر المهمة "
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
@@ -3633,58 +3731,72 @@ msgstr ""
 "لاحقًا، والاتّصال بفريق الدعم الفنّي في حال استمرّت المشكلة."
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Subject"
 msgstr "الموضوع"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By"
 msgstr "المرسِل"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent To"
 msgstr "مُرسل إلى"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Time Sent"
 msgstr "وقت الإرسال"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Number Sent"
 msgstr "العدد المرسَل"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Copy Email To Editor"
 msgstr "إرسال نسخة من رسالة البريد الإلكتروني إلى المحرّر"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Subject:"
 msgstr "الموضوع:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent By:"
 msgstr "المرسِل:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Time Sent:"
 msgstr "وقت الإرسال:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Sent To:"
 msgstr "المرسَل إليه:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "Message:"
 msgstr "الرسالة:"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "No tasks currently running."
 msgstr "لا توجد مهام جارية حاليًّا."
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid "File Name"
 msgstr "اسم الملف"
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
+#: lms/static/js/instructor_dashboard/util.js
 msgid ""
 "Links are generated on demand and expire within 5 minutes due to the "
 "sensitive nature of student information."
@@ -3873,7 +3985,7 @@ msgstr "اضغط للإضافة"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmark this page"
-msgstr ""
+msgstr "إضافة الصفحة للمفضلة "
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
@@ -4365,6 +4477,124 @@ msgstr "استعادة رمز التسجيل"
 msgid "Mark enrollment code as unused"
 msgstr "وسم رمز التسجيل على أنّه غير مستخدم"
 
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting student progress url for '<%- student_id %>'. Make sure that "
+"the student identifier is spelled correctly."
+msgstr ""
+"حدث خطأ في الحصول على عنوان url لتقدم الطالب '<%- student_id %>'. تأكد من "
+"تهجئة معرف الطالب."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Success! Problem attempts reset for problem '<%- problem_id %>' and student "
+"'<%- student_id %>'."
+msgstr ""
+"رائع! تمت إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%- problem_id %>‘ والطالب "
+"’<%- student_id %>‘."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+" '<%- student_id %>'. Make sure that the problem and student identifiers are"
+" complete and correct."
+msgstr ""
+"نأسف لحدوث خطأ في إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%= problem_id %>‘ "
+"للطالب ’<%- student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Delete student '<%- student_id %>'s state on problem '<%- problem_id %>'?"
+msgstr ""
+"حذف حالة الطالب ’<%- student_id %>‘ في المسألة رقم ’<%- problem_id %>‘؟"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error deleting student '<%- student_id %>'s state on problem '<%- problem_id"
+" %>'. Make sure that the problem and student identifiers are complete and "
+"correct."
+msgstr ""
+"خطأ في حذف حالة الطالب ’<%- student_id %>‘ في المسألة رقم ’<%- problem_id "
+"%>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting task history for problem '<%- problem_id %>' and student '<%- "
+"student_id %>'. Make sure that the problem and student identifiers are "
+"complete and correct."
+msgstr ""
+"خطأ في الحصول على سجل المهمّات الخاصة بالمسألة رقم ’<%- problem_id %>‘ "
+"للطالب ’<%- student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح. "
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Reset attempts for all students on problem '<%- problem_id %>'?"
+msgstr "إعادة ضبط عدد محاولات حلّ الطلّاب للمسألة رقم ’<%- problem_id %>‘؟"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Successfully started task to reset attempts for problem '<%- problem_id %>'."
+" Click the 'Show Task Status' button to see the status of the task."
+msgstr ""
+"تم بنجاح بدء مهمة إعادة ضبط عدد محاولات حلّ المسألة ’<%- problem_id "
+"%>‘.يُرجى النقر على زر ’عرض حالة المهمة‘ للاطّلاع على حالة المهمة."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to reset attempts for all students on problem '<%- "
+"problem_id %>'. Make sure that the problem identifier is complete and "
+"correct."
+msgstr ""
+"نأسف لحدوث خطأ في بدء مهمة إعادة ضبط عدد محاولات حلّ جميع الطلّاب للمسألة "
+"’<%- problem_id %>‘. تأكد من إدخال هذان المُعطيان بشكل صحيح."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Started rescore problem task for problem '<%- problem_id %>' and student "
+"'<%- student_id %>'. Click the 'Show Task Status' button to see the status "
+"of the task."
+msgstr ""
+"تم بدء مهمّة إعادة تقييم المسألة رقم ’<%- problem_id %>‘ للطالب ’<%- "
+"student_id %>‘. يُرجى النقر على زر ’عرض حالة المهمة‘ للاطّلاع على حالة "
+"المهمة."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore problem '<%- problem_id %>' for student "
+"'<%- student_id %>'. Make sure that the the problem and student identifiers "
+"are complete and correct."
+msgstr ""
+"نأسف لحدوث خطأ في بدء مهمة إعادة تقييم المسألة رقم ’<%- problem_id %>‘ "
+"للطالب صاحب الرقم ’<%- student_id %>‘. تأكد من إدخال هذان المُعطيان بشكل "
+"صحيح"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Started entrance exam rescore task for student '{student_id}'. Click the "
+"'Show Task Status' button to see the status of the task."
+msgstr ""
+"تم بدء مهمّة إعادة تقييم امتحان الدخول للطالب '{student_id}'. يُرجى النقر "
+"على زر ’عرض حالة المهمة‘ للاطّلاع على حالة المهمة."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid "Rescore problem '<%- problem_id %>' for all students?"
+msgstr "إعادة تقييم المسألة رقم ’<%- problem_id %>‘ لكافة الطلاب؟"
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Successfully started task to rescore problem '<%- problem_id %>' for all "
+"students. Click the 'Show Task Status' button to see the status of the task."
+msgstr ""
+"تم بنجاح بدء مهمة إعادة ضبط عدد محاولات حلّ المسألة رقم ’<%- problem_id %>‘ "
+"لكافة الطلاب. يُرجى النقر على زر ’عرض حالة المهمة‘ للاطّلاع على حالة المهمة."
+
+#: lms/static/js/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore problem '<%- problem_id %>'. Make sure that"
+" the problem identifier is complete and correct."
+msgstr ""
+"ناسف لحدوث خطأ في بدء مهمة إعادة تقييم المسألة رقم ’<%- problem_id %>‘. تأكد"
+" من إدخال هذان المُعطيان بشكل صحيح."
+
 #: lms/static/js/search/base/views/search_results_view.js
 #, c-format
 msgid "%s result"
@@ -4385,24 +4615,32 @@ msgid "Successfully reset the attempts for user {user}"
 msgstr "جرى بنجاح إعادة ضبط عدد محاولات المستخدم {user}."
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Failed to reset attempts."
-msgstr "عذرًا، لم تنجح عملية إعادة ضبط المحاولات."
+msgid "Failed to reset attempts for user."
+msgstr "فشلت عملية إعادة ضبط المحاولات للمستخدم."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully deleted student state for user {user}"
 msgstr "جرى بنجاح حذف حالة الطالب للمستخدم {user}."
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Failed to delete student state."
-msgstr "نأسف لتعذّر إجراء عملية حذف حالة الطالب."
+msgid "Failed to delete student state for user."
+msgstr "عذراً، لم تنجح عملية حذف حالة الطالب لهذا المستخدم."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Successfully rescored problem for user {user}"
 msgstr "جرى بنجاح إعادة تقييم المسألة للمستخدم {user}."
 
 #: lms/static/js/staff_debug_actions.js
-msgid "Failed to rescore problem."
-msgstr "نأسف لتعذّر إجراء عملية إعادة تقييم المسألة."
+msgid "Failed to rescore problem for user."
+msgstr "عذراً، لم تنجح عملية إعادة تقييم المسألة لهذا المستخدم."
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Successfully rescored problem to improve score for user {user}"
+msgstr "تمت بنجاح عملية إعادة تقييم المسألة لتحسين نتيجة المستخدم {user}"
+
+#: lms/static/js/staff_debug_actions.js
+msgid "Failed to rescore problem to improve score for user."
+msgstr "عذراً، لم تنجح عملية إعادة تقييم المسألة بهدف تحسين نتيجة المستخدم."
 
 #: lms/static/js/student_account/account.js
 msgid "The data could not be saved."
@@ -4455,6 +4693,9 @@ msgid ""
 "address is associated with an edX account, we will send a message with "
 "password reset instructions to this email address.{paragraphEnd}"
 msgstr ""
+"{paragraphStart}قمت بإدخال {boldStart}{email}{boldEnd}. إذا كان عنوان البريد"
+" الإلكتروني مرتبط بحساب edX، فسنرسل إليك رسالة بتعليمات إعادة تعيين كلمة "
+"المرور لهذا البريد الإلكتروني.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5430,11 +5671,12 @@ msgstr "هناك إشكالات في المصادقة على هذا المكوّ
 msgid "Course Code"
 msgstr "رمز الدورة التدريبية"
 
+#: cms/static/js/programs/models/course_model.js
 #: cms/templates/js/certificate-details.underscore
 #: cms/templates/js/certificate-editor.underscore
 #: cms/templates/js/programs/course_details.underscore
 msgid "Course Title"
-msgstr "عنوان المساق"
+msgstr "عنوان الدورة"
 
 #: cms/static/js/programs/models/program_model.js
 msgid "Please select a valid organization."
@@ -5506,7 +5748,7 @@ msgstr "{0} غير صالح"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "confirm"
-msgstr ""
+msgstr "تأكيد"
 
 #: cms/static/js/programs/views/program_details_view.js
 msgid "Publish this program?"
@@ -5535,6 +5777,14 @@ msgstr "الشارة التسويقية مطلوبة."
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
 msgstr "عمليات تحميل ملف الفيديو الخاص بك غير مكتملة."
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid ": video upload complete."
+msgstr "تم تحميل الفيديو:"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Previous Uploads table has been updated."
+msgstr "تم تحديث قائمة التحميلات السابقة."
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
@@ -6264,7 +6514,7 @@ msgstr "الإجراءات"
 #: cms/templates/js/course-outline.underscore
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Timed Exam"
-msgstr ""
+msgstr "امتحان موقوت"
 
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
@@ -6280,20 +6530,6 @@ msgstr "غير مجدوَل"
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Date"
 msgstr "التاريخ "
-
-#: cms/templates/js/edit-chapter.underscore
-#: lms/templates/ccx/schedule.underscore
-#: lms/templates/commerce/receipt.underscore
-#: lms/templates/learner_dashboard/course_card.underscore
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
-#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
-#: test_root/staticfiles/templates/ccx/schedule.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
-msgid "gettext("
-msgstr "وظيفة gettext("
 
 #: cms/templates/js/paging-header.underscore
 #: common/static/common/templates/components/paging-footer.underscore
@@ -6313,14 +6549,6 @@ msgstr "السابق"
 #: test_root/staticfiles/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "الحالة"
-
-#: cms/templates/js/publish-history.underscore
-#: cms/templates/js/staff-lock-editor.underscore
-#: common/static/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
-msgid "message"
-msgstr ""
 
 #: common/static/common/templates/image-modal.underscore
 #: test_root/staticfiles/common/templates/image-modal.underscore
@@ -6538,7 +6766,7 @@ msgstr "تحميل المزيد"
 #: test_root/staticfiles/common/templates/discussion/new-post-alert.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post-alert.underscore
 msgid "Error posting your message."
-msgstr ""
+msgstr "حدث خطأ في نشر رسالتك."
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6584,7 +6812,7 @@ msgstr "أضِف عنوانًا واضحًا ومعبّرًا لتشجيع ال�
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/new-post.underscore
 msgid "Enter your question or comment."
-msgstr ""
+msgstr "أَدخِل سؤالك أو تعليقك."
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: test_root/staticfiles/common/templates/discussion/new-post.underscore
@@ -6675,7 +6903,7 @@ msgstr "تعديل المنشور "
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-edit.underscore
 msgid "Edit your post below."
-msgstr ""
+msgstr "تعديل المنشور أدناه."
 
 #: common/static/common/templates/discussion/thread-edit.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-edit.underscore
@@ -6715,15 +6943,6 @@ msgstr "مُثَبَّت"
 #: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
 msgid "Following"
 msgstr "جاري المتابعة"
-
-#: common/static/common/templates/discussion/thread-list-item.underscore
-#: common/static/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response-show.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-list-item.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response-show.underscore
-msgid "fmt"
-msgstr "fmt"
 
 #: common/static/common/templates/discussion/thread-list-item.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-list-item.underscore
@@ -6801,12 +7020,6 @@ msgstr[2] "إظهار التعليقات (%(num_comments)s)"
 msgstr[3] "إظهار التعليقات (%(num_comments)s)"
 msgstr[4] "إظهار التعليقات (%(num_comments)s)"
 msgstr[5] "إظهار التعليقات (%(num_comments)s)"
-
-#: common/static/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/common/templates/discussion/thread-response.underscore
-#: test_root/staticfiles/xmodule_js/common_static/common/templates/discussion/thread-response.underscore
-msgid "fmts"
-msgstr "fmts"
 
 #: common/static/common/templates/discussion/thread-response.underscore
 #: test_root/staticfiles/common/templates/discussion/thread-response.underscore
@@ -7197,16 +7410,6 @@ msgstr "سعة استيعاب الفريق"
 
 #: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
 #: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "country"
-msgstr "الدولة"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
-msgid "language"
-msgstr "اللغة"
-
-#: lms/djangoapps/teams/static/teams/templates/team-profile.underscore
-#: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Leave Team"
 msgstr "أترك الفريق"
 
@@ -7292,6 +7495,12 @@ msgstr "حذف الكل"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "toggle chapter %(displayName)s"
+msgstr "تبديل الفصل %(displayName)s"
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "Section"
 msgstr "قسم"
 
@@ -7305,6 +7514,12 @@ msgstr "إزالة الفصل %(chapterDisplayName)s"
 #: test_root/staticfiles/templates/ccx/schedule.underscore
 msgid "remove"
 msgstr "حذف"
+
+#: lms/templates/ccx/schedule.underscore
+#: test_root/staticfiles/templates/ccx/schedule.underscore
+#, python-format
+msgid "toggle subsection %(displayName)s"
+msgstr "تبديل القسم الفرعي %(displayName)s"
 
 #: lms/templates/ccx/schedule.underscore
 #: test_root/staticfiles/templates/ccx/schedule.underscore
@@ -7342,22 +7557,6 @@ msgid ""
 msgstr ""
 "لاستكمال عملية الحصول على مادة دراسية بشكل نهائي، يُوجب %(display_name)s على"
 " متعلّمي %(platform_name)s التقدّم بطلب حصول على مادّة دراسية"
-
-#: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
-#, python-format
-msgid "<img src='%s' alt='%s'></image>"
-msgstr "<img src='%s' alt='%s'></image>"
-
-#: lms/templates/commerce/provider.underscore
-#: test_root/staticfiles/templates/commerce/provider.underscore
-#, python-format
-msgid ""
-"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
-"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
-msgstr ""
-"<button data-provider=\"%s\" data-course-key=\"%s\" data-username=\"%s\" "
-"class=\"complete-course\" onClick=completeOrder(this)>%s</button>"
 
 #: lms/templates/commerce/provider.underscore
 #: test_root/staticfiles/templates/commerce/provider.underscore
@@ -7443,16 +7642,22 @@ msgid "Go to Dashboard"
 msgstr "الذهاب إلى لوحة المعلومات"
 
 #: lms/templates/commerce/receipt.underscore
+#: test_root/staticfiles/templates/commerce/receipt.underscore
+msgid ""
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from {platformName}"
+" to verify your identity."
+msgstr ""
+"إذا لن تقم بالتحقق من هويتك الآن، لا يزال بإمكانك استكشاف الدورة من خلال "
+"لوحة المعلومات الخاصة بك. سوف تتلقى رسائل تذكير دورية من {platformName} "
+"للتحقق من هويتك."
+
+#: lms/templates/commerce/receipt.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 #: test_root/staticfiles/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/verify_student/payment_confirmation_step.underscore
 msgid "Want to confirm your identity later?"
 msgstr "هل تريد تأكيد هويّتك لاحقًا؟"
-
-#: lms/templates/commerce/receipt.underscore
-#: test_root/staticfiles/templates/commerce/receipt.underscore
-msgid "/verify_student/verify-now/{courseKey}/"
-msgstr "/verify_student/verify-now/{courseKey}/"
 
 #: lms/templates/commerce/receipt.underscore
 #: test_root/staticfiles/templates/commerce/receipt.underscore
@@ -7474,6 +7679,8 @@ msgid ""
 "To receive credit for problems, you must select \"Submit\" for each problem "
 "before you select \"End My Exam\"."
 msgstr ""
+"من أجل الحصول على نقاط في مسألة معينة عليك اختيار \"إرسال\" لكل مسألة قبل "
+"احتيار \"انه الامتحان\"."
 
 #: lms/templates/courseware/proctored-exam-status.underscore
 #: test_root/staticfiles/templates/courseware/proctored-exam-status.underscore
@@ -7544,11 +7751,6 @@ msgstr "يُرجى النقر للتعديل"
 #: test_root/staticfiles/templates/fields/field_order_history.underscore
 msgid "Order Details"
 msgstr "تفاصيل الطلبية"
-
-#: lms/templates/fields/field_text.underscore
-#: test_root/staticfiles/templates/fields/field_text.underscore
-msgid "title"
-msgstr "العنوان"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
@@ -7942,7 +8144,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 msgid "Only the parent course staff of a CCX can create content groups."
-msgstr ""
+msgstr "يمكن فقط لطاقم الدورة الأم لـ CCX إنشاء مجموعات المحتوى."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-form.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/cohort-form.underscore
@@ -8018,6 +8220,9 @@ msgid ""
 "file, download course profile information or cohort results on the "
 "{link_start}Data Download{link_end} page."
 msgstr ""
+"لمراجعة كل الواجبات المسندة إلى الطلّاب في كل مجموعة أو رؤية نتائج تحميل ملف"
+" CSV، قم بتنزيل معلومات ملف الدورة أو نتائج المجموعات عن طريق صفحة "
+"{link_start} تنزيل البيانات{link_end}."
 
 #: lms/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
 #: test_root/staticfiles/templates/instructor/instructor_dashboard_2/enrollment-code-lookup-links.underscore
@@ -8034,16 +8239,6 @@ msgstr "صالح"
 msgid "Program Certificates"
 msgstr "شهادات برنامج "
 
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "certificate.credential_url"
-msgstr "certificate.credential_url"
-
-#: lms/templates/learner_dashboard/certificate.underscore
-#: test_root/staticfiles/templates/learner_dashboard/certificate.underscore
-msgid "certificate.display_name"
-msgstr "certificate.display_name"
-
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
@@ -8052,7 +8247,13 @@ msgstr "تهانينا، لقد حصلت على شهادة إتمام هذه ا�
 #: lms/templates/learner_dashboard/certificate_status.underscore
 #: test_root/staticfiles/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"
-msgstr ""
+msgstr "معاينة الشهادة"
+
+#: lms/templates/learner_dashboard/course_card.underscore
+#: test_root/staticfiles/templates/learner_dashboard/course_card.underscore
+#, python-format
+msgid "%(courseName)s Home Page."
+msgstr "%(courseName)s الصفحة الرئيسية."
 
 #: lms/templates/learner_dashboard/course_enroll.underscore
 #: test_root/staticfiles/templates/learner_dashboard/course_enroll.underscore
@@ -8139,11 +8340,6 @@ msgstr "استكشاف برامج جديدة"
 
 #: lms/templates/learner_dashboard/program_card.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
-msgid "category"
-msgstr "فئة"
-
-#: lms/templates/learner_dashboard/program_card.underscore
-#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
 #, python-format
 msgid ""
 "You have earned certificates in %(completed_courses)s of the "
@@ -8151,6 +8347,12 @@ msgid ""
 msgstr ""
 "لقد حصلت على شهادات في %(completed_courses)s من %(total_courses)s مساقات حتى"
 " الآن."
+
+#: lms/templates/learner_dashboard/program_card.underscore
+#: test_root/staticfiles/templates/learner_dashboard/program_card.underscore
+#, python-format
+msgid "%(programName)s Home Page."
+msgstr "%(programName)s  الصفحة الرئيسية."
 
 #: lms/templates/learner_dashboard/program_header_view.underscore
 #: test_root/staticfiles/templates/learner_dashboard/program_header_view.underscore
@@ -8230,11 +8432,6 @@ msgstr "تغيير كلمة المرور"
 #: test_root/staticfiles/templates/student_account/account_settings.underscore
 msgid "Account Settings"
 msgstr "إعدادات الحساب"
-
-#: lms/templates/student_account/account_settings_section.underscore
-#: test_root/staticfiles/templates/student_account/account_settings_section.underscore
-msgid "section.title"
-msgstr "section.title"
 
 #: lms/templates/student_account/account_settings_section.underscore
 #: test_root/staticfiles/templates/student_account/account_settings_section.underscore
@@ -9231,65 +9428,76 @@ msgstr "التقاط صورة "
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Add a New Allowance"
-msgstr ""
+msgstr "أضف ترخيص جديدة"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Special Exam"
-msgstr ""
+msgstr "امتحان خاص"
+
+#: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(exam_display_name)s "
+msgstr "%(exam_display_name)s"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Exam Type"
-msgstr ""
+msgstr "نوع الامتحان"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowance Type"
-msgstr ""
+msgstr "نوع الترخيص"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Additional Time (minutes)"
-msgstr ""
+msgstr "الوقت الإضافي (بالدقائق)"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Value"
-msgstr ""
+msgstr "قيمة"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "minutes"
-msgstr ""
+msgstr "دقائق"
 
 #: test_root/staticfiles/proctoring/templates/add-new-allowance.underscore
 msgid "Username or Email"
-msgstr ""
+msgstr "اسم المستخدم أو البريد الإلكتروني"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowances"
-msgstr ""
+msgstr "التراخيص"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Add Allowance"
-msgstr ""
+msgstr "أضف ترخيص"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Exam Name"
-msgstr ""
+msgstr "اسم الامتحان"
 
 #: test_root/staticfiles/proctoring/templates/course_allowances.underscore
 msgid "Allowance Value"
-msgstr ""
+msgstr "قيمة الترخيص"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Time Limit"
-msgstr ""
+msgstr "المهلة الزمنية"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Started At"
-msgstr ""
+msgstr "بدأ في"
 
 #: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
 msgid "Completed At"
-msgstr ""
+msgstr "تم اكماله في"
+
+#: test_root/staticfiles/proctoring/templates/student-proctored-exam-attempts.underscore
+#, python-format
+msgid " %(username)s "
+msgstr "%(username)s"
 
 #: test_root/staticfiles/teams/templates/team-profile.underscore
 msgid "Add a Post"
@@ -9350,10 +9558,6 @@ msgstr "استخدم خاصية السحب والإفلات أو اضغط هنا
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
 msgstr "التحميلات النشطة"
-
-#: cms/templates/js/active-video-upload.underscore
-msgid "status"
-msgstr "الحالة"
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"
@@ -9493,13 +9697,6 @@ msgstr ""
 "يُوصى بشدة بتضمين 4 موقعيّن على الأكثر. راجع الشهادة في وضع ’مراجعة "
 "الطباعة‘، في حال إضافتك للمزيد من الموقعّين، لضمان طباعة الشهادة بالشكل "
 "الصحيح على صفحة واحدة. "
-
-#: cms/templates/js/certificate-editor.underscore
-#: cms/templates/js/content-group-editor.underscore
-#: cms/templates/js/edit-textbook.underscore
-#: cms/templates/js/group-configuration-editor.underscore
-msgid "error.message"
-msgstr "رسالة خطأ error.message"
 
 #: cms/templates/js/certificate-editor.underscore
 msgid "Certificate Information"
@@ -9914,12 +10111,20 @@ msgid "Chapter Name"
 msgstr "اسم الفصل"
 
 #: cms/templates/js/edit-chapter.underscore
+msgid "Chapter {order}"
+msgstr "فصل  {order}"
+
+#: cms/templates/js/edit-chapter.underscore
 msgid "provide the title/name of the chapter that will be used in navigating"
 msgstr "حدّد عنوان/ اسم الفصل الذي سيُستخدم في التصفّح "
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "Chapter Asset"
 msgstr "مادة ملحقة بفصل"
+
+#: cms/templates/js/edit-chapter.underscore
+msgid "path/to/introductionToCookieBaking-CH{order}.pdf"
+msgstr "path/to/introductionToCookieBaking-CH{order}.pdf"
 
 #: cms/templates/js/edit-chapter.underscore
 msgid "upload a PDF file or provide the path to a Studio asset file"
@@ -10111,7 +10316,7 @@ msgstr "مسح القيمة"
 
 #: cms/templates/js/metadata-editor.underscore
 msgid "Component Location ID"
-msgstr ""
+msgstr "معرف موقع العناصر"
 
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -10493,10 +10698,6 @@ msgstr "تعديل الاسم"
 #, python-format
 msgid "Edit %(display_name)s (required)"
 msgstr "تعديل %(display_name)s (مطلوب)"
-
-#: cms/templates/js/xblock-string-field-editor.underscore
-msgid "formLabel"
-msgstr "عنوان النموذج formLabel"
 
 #: cms/templates/js/maintenance/force-published-course-response.underscore
 msgid ""

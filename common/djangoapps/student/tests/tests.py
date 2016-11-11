@@ -19,7 +19,7 @@ import httpretty
 from markupsafe import escape
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, CourseLocator
 from provider.constants import CONFIDENTIAL
 from pyquery import PyQuery as pq
 import pytz
@@ -34,6 +34,7 @@ from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories as programs_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.site_configuration.tests.mixins import SiteMixin
 import shoppingcart  # pylint: disable=import-error
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
@@ -58,6 +59,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 log = logging.getLogger(__name__)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
@@ -75,9 +77,13 @@ class CourseEndingTest(TestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_info(self):
-        user = Mock(username="fred")
+        user = Mock(username="fred", id="1")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url, certificates_display_behavior='end')
+        course = Mock(
+            end_of_course_survey_url=survey_url,
+            certificates_display_behavior='end',
+            id=CourseLocator(org="x", course="y", run="z"),
+        )
         course_mode = 'honor'
 
         self.assertEqual(
@@ -104,6 +110,24 @@ class CourseEndingTest(TestCase):
                 'can_unenroll': True,
             }
         )
+
+        cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
+        with patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.get_persisted') as patch_persisted_grade:
+            patch_persisted_grade.return_value = Mock(percent=100)
+            self.assertEqual(
+                _cert_info(user, course, cert_status, course_mode),
+                {
+                    'status': 'generating',
+                    'show_disabled_download_button': True,
+                    'show_download_url': False,
+                    'show_survey_button': True,
+                    'survey_url': survey_url,
+                    'grade': '100',
+                    'mode': 'honor',
+                    'linked_in_url': None,
+                    'can_unenroll': False,
+                }
+            )
 
         cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
         self.assertEqual(
@@ -165,7 +189,7 @@ class CourseEndingTest(TestCase):
         )
 
         # Test a course that doesn't have a survey specified
-        course2 = Mock(end_of_course_survey_url=None)
+        course2 = Mock(end_of_course_survey_url=None, id=CourseLocator(org="a", course="b", run="c"))
         cert_status = {
             'status': 'notpassing', 'grade': '67',
             'download_url': download_url, 'mode': 'honor'
@@ -523,6 +547,64 @@ class DashboardTest(ModuleStoreTestCase):
         )
         enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode=enrollment_mode)
         return complete_course_mode_info(self.course.id, enrollment)
+
+
+@ddt.ddt
+class DashboardTestsWithSiteOverrides(SiteMixin, ModuleStoreTestCase):
+    """
+    Tests for site settings overrides used when rendering the dashboard view
+    """
+
+    def setUp(self):
+        super(DashboardTestsWithSiteOverrides, self).setUp()
+        self.org = 'fakeX'
+        self.course = CourseFactory.create(org=self.org)
+        self.user = UserFactory.create(username='jack', email='jack@fake.edx.org', password='test')
+        CourseModeFactory.create(mode_slug='no-id-professional', course_id=self.course.id)
+        CourseEnrollment.enroll(self.user, self.course.location.course_key, mode='no-id-professional')
+        cache.clear()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    @ddt.data(
+        ('testserver1.com', {'ENABLE_VERIFIED_CERTIFICATES': True}),
+        ('testserver2.com', {'ENABLE_VERIFIED_CERTIFICATES': True, 'DISPLAY_COURSE_MODES_ON_DASHBOARD': True}),
+    )
+    @ddt.unpack
+    def test_course_mode_visible(self, site_domain, site_configuration_values):
+        """
+        Test that the course mode for courses is visible on the dashboard
+        when settings have been overridden by site configuration.
+        """
+        site_configuration_values.update({
+            'SITE_NAME': site_domain,
+            'course_org_filter': self.org
+        })
+        self.set_up_site(site_domain, site_configuration_values)
+        self.client.login(username='jack', password='test')
+        response = self.client.get(reverse('dashboard'))
+        self.assertContains(response, 'class="course professional"')
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
+    @ddt.data(
+        ('testserver3.com', {'ENABLE_VERIFIED_CERTIFICATES': False}),
+        ('testserver4.com', {'DISPLAY_COURSE_MODES_ON_DASHBOARD': False}),
+    )
+    @ddt.unpack
+    def test_course_mode_invisible(self, site_domain, site_configuration_values):
+        """
+        Test that the course mode for courses is invisible on the dashboard
+        when settings have been overridden by site configuration.
+        """
+        site_configuration_values.update({
+            'SITE_NAME': site_domain,
+            'course_org_filter': self.org
+        })
+        self.set_up_site(site_domain, site_configuration_values)
+        self.client.login(username='jack', password='test')
+        response = self.client.get(reverse('dashboard'))
+        self.assertNotContains(response, 'class="course professional"')
 
 
 class UserSettingsEventTestMixin(EventTestMixin):

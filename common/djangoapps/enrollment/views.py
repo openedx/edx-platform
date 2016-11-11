@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
-from embargo import api as embargo_api
+from openedx.core.djangoapps.embargo import api as embargo_api
 from openedx.core.djangoapps.cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from openedx.core.djangoapps.cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from openedx.core.lib.api.authentication import (

@@ -4,7 +4,6 @@ End-to-end tests for Student's Profile Page.
 """
 from contextlib import contextmanager
 
-from bok_choy.web_app_test import WebAppTest
 from datetime import datetime
 from nose.plugins.attrib import attr
 
@@ -14,7 +13,7 @@ from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.learner_profile import LearnerProfilePage
 from common.test.acceptance.pages.lms.dashboard import DashboardPage
 
-from common.test.acceptance.tests.helpers import EventsTestMixin
+from common.test.acceptance.tests.helpers import AcceptanceTest, EventsTestMixin
 
 
 class LearnerProfileTestMixin(EventsTestMixin):
@@ -181,7 +180,7 @@ class LearnerProfileTestMixin(EventsTestMixin):
 
 
 @attr(shard=4)
-class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
+class OwnLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Tests that verify a student's own profile page.
     """
@@ -696,7 +695,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
 
 @attr(shard=4)
-class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
+class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Tests that verify viewing the profile page of a different user.
     """
@@ -763,7 +762,7 @@ class DifferentUserLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
 
 @attr('a11y')
-class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
+class LearnerProfileA11yTest(LearnerProfileTestMixin, AcceptanceTest):
     """
     Class to test learner profile accessibility.
     """

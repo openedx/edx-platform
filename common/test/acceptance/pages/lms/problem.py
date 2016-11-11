@@ -3,6 +3,7 @@ Problem Page.
 """
 from bok_choy.page_object import PageObject
 from common.test.acceptance.pages.common.utils import click_css
+from common.test.acceptance.tests.helpers import is_focused_on_element
 from selenium.webdriver.common.keys import Keys
 
 
@@ -191,7 +192,7 @@ class ProblemPage(PageObject):
         """
         Check for focus problem meta.
         """
-        return self.q(css='.problem-header').focused
+        return is_focused_on_element(self.browser, '.problem-header')
 
     def is_submit_disabled(self):
         """

@@ -39,9 +39,12 @@ When refering to XBlocks, we use the entry-point name. For example,
 # want to import all variables from base settings files
 # pylint: disable=unused-import
 
+from __future__ import absolute_import
+
 import imp
 import os
 import sys
+from datetime import timedelta
 import lms.envs.common
 # Although this module itself may not use these imported variables, other dependent modules may.
 from lms.envs.common import (
@@ -300,6 +303,7 @@ LOGIN_URL = EDX_ROOT_URL + '/signin'
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = (
+    'rules.permissions.ObjectPermissionBackend',
     'ratelimitbackend.backends.RateLimitModelBackend',
 )
 
@@ -368,7 +372,7 @@ MIDDLEWARE_CLASSES = (
     # Allows us to dark-launch particular languages
     'openedx.core.djangoapps.dark_lang.middleware.DarkLangMiddleware',
 
-    'embargo.middleware.EmbargoMiddleware',
+    'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -866,7 +870,7 @@ INSTALLED_APPS = (
     'django_openid_auth',
 
     # Country embargo support
-    'embargo',
+    'openedx.core.djangoapps.embargo',
 
     # Monitoring signals
     'openedx.core.djangoapps.monitoring',
@@ -933,7 +937,13 @@ INSTALLED_APPS = (
     'django_sites_extensions',
 
     # additional release utilities to ease automation
-    'release_util'
+    'release_util',
+
+    # rule-based authorization
+    'rules.apps.AutodiscoverRulesConfig',
+
+    # management of user-triggered async tasks (course import/export, etc.)
+    'user_tasks',
 )
 
 
@@ -1208,3 +1218,12 @@ COMPREHENSIVE_THEME_LOCALE_PATHS = []
 # to generating test databases will discover and try to create all tables
 # and this setting needs to be present
 OAUTH2_PROVIDER_APPLICATION_MODEL = 'oauth2_provider.Application'
+
+# Used with Email sending
+RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
+RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
+
+############## DJANGO-USER-TASKS ##############
+
+# How long until database records about the outcome of a task and its artifacts get deleted?
+USER_TASKS_MAX_AGE = timedelta(days=7)

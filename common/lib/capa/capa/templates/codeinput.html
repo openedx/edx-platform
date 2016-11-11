@@ -5,7 +5,9 @@ from openedx.core.djangolib.markup import HTML
 %>
 <div id="textbox_${id}" class="capa_inputtype textbox cminput">
   % if response_data['label']:
-      <label class="problem-group-label" for="cm-textarea-${id}">${response_data['label']}</label>
+    <label class="problem-group-label" for="cm-textarea-${id}">${response_data['label']}</label>
+  % else:
+    <label class="sr problem-group-label" for="cm-textarea-${id}">${_('Code Editor')}</label>
   % endif
   <textarea rows="${rows}" cols="${cols}" name="input_${id}"
             aria-label="${aria_label}"

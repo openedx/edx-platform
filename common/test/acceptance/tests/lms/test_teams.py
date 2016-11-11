@@ -16,7 +16,8 @@ from common.test.acceptance.fixtures import LMS_BASE_URL
 from common.test.acceptance.fixtures.course import CourseFixture
 from common.test.acceptance.fixtures.discussion import (
     Thread,
-    MultipleThreadFixture
+    MultipleThreadFixture,
+    ForumsConfigMixin,
 )
 from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
 from common.test.acceptance.pages.lms.course_info import CourseInfoPage
@@ -37,7 +38,7 @@ from common.test.acceptance.pages.common.utils import confirm_prompt
 TOPICS_PER_PAGE = 12
 
 
-class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
+class TeamsTabBase(EventsTestMixin, ForumsConfigMixin, UniqueCourseTest):
     """Base class for Teams Tab tests"""
     def setUp(self):
         super(TeamsTabBase, self).setUp()
@@ -46,6 +47,8 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
         self.teams_page = TeamsPage(self.browser, self.course_id)
         # TODO: Refactor so resetting events database is not necessary
         self.reset_event_tracking()
+
+        self.enable_forums()
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""

@@ -1,8 +1,7 @@
 <%page expression_filter="h"/>
 <%! from django.utils.translation import ugettext as _ %>
 <script type="text/template" id="thread-list-template">
-    <%include file="_filter_dropdown.html" />
-    <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1">
+    <div class="forum-nav-thread-list-wrapper" id="sort-filter-wrapper" tabindex="-1" style="display:none">
         <div class="forum-nav-refine-bar">
             <label class="forum-nav-filter-main">
                 ## Translators: This labels a filter menu in forum navigation

@@ -17,7 +17,7 @@ from lms.lib.comment_client import Thread
 from common.test.utils import MockSignalHandlerMixin, disable_signal
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
-from django_comment_client.tests.utils import CohortedTestCase
+from django_comment_client.tests.utils import CohortedTestCase, ForumsEnableMixin
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles, ThreadContext
@@ -346,7 +346,13 @@ class ViewsTestCaseMixin(object):
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 @disable_signal(views, 'thread_created')
 @disable_signal(views, 'thread_edited')
-class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin, ViewsTestCaseMixin):
+class ViewsQueryCountTestCase(
+        ForumsEnableMixin,
+        UrlResetMixin,
+        ModuleStoreTestCase,
+        MockRequestSetupMixin,
+        ViewsTestCaseMixin
+):
 
     CREATE_USER = False
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
@@ -392,6 +398,7 @@ class ViewsQueryCountTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
 @ddt.ddt
 @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ViewsTestCase(
+        ForumsEnableMixin,
         UrlResetMixin,
         SharedModuleStoreTestCase,
         MockRequestSetupMixin,
@@ -1019,7 +1026,7 @@ class ViewsTestCase(
 @attr(shard=2)
 @patch("lms.lib.comment_client.utils.requests.request", autospec=True)
 @disable_signal(views, 'comment_endorsed')
-class ViewPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
+class ViewPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1127,7 +1134,11 @@ class ViewPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequ
 
 
 @attr(shard=2)
-class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class CreateThreadUnicodeTestCase(
+        ForumsEnableMixin,
+        SharedModuleStoreTestCase,
+        UnicodeTestMixin,
+        MockRequestSetupMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1142,6 +1153,9 @@ class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, M
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(CreateThreadUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request,):
@@ -1164,7 +1178,12 @@ class CreateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, M
 
 @attr(shard=2)
 @disable_signal(views, 'thread_edited')
-class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class UpdateThreadUnicodeTestCase(
+        ForumsEnableMixin,
+        SharedModuleStoreTestCase,
+        UnicodeTestMixin,
+        MockRequestSetupMixin
+):
 
     @classmethod
     def setUpClass(cls):
@@ -1179,6 +1198,9 @@ class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, M
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(UpdateThreadUnicodeTestCase, self).setUp()
 
     @patch('django_comment_client.utils.get_discussion_categories_ids', return_value=["test_commentable"])
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -1202,7 +1224,12 @@ class UpdateThreadUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, M
 
 @attr(shard=2)
 @disable_signal(views, 'comment_created')
-class CreateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class CreateCommentUnicodeTestCase(
+        ForumsEnableMixin,
+        SharedModuleStoreTestCase,
+        UnicodeTestMixin,
+        MockRequestSetupMixin
+):
 
     @classmethod
     def setUpClass(cls):
@@ -1217,6 +1244,9 @@ class CreateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, 
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(CreateCommentUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1245,7 +1275,12 @@ class CreateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, 
 
 @attr(shard=2)
 @disable_signal(views, 'comment_edited')
-class UpdateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class UpdateCommentUnicodeTestCase(
+        ForumsEnableMixin,
+        SharedModuleStoreTestCase,
+        UnicodeTestMixin,
+        MockRequestSetupMixin
+):
 
     @classmethod
     def setUpClass(cls):
@@ -1260,6 +1295,9 @@ class UpdateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, 
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(UpdateCommentUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1279,7 +1317,12 @@ class UpdateCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, 
 
 @attr(shard=2)
 @disable_signal(views, 'comment_created')
-class CreateSubCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
+class CreateSubCommentUnicodeTestCase(
+        ForumsEnableMixin,
+        SharedModuleStoreTestCase,
+        UnicodeTestMixin,
+        MockRequestSetupMixin
+):
     """
     Make sure comments under a response can handle unicode.
     """
@@ -1296,6 +1339,9 @@ class CreateSubCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
         seed_permissions_roles(cls.course.id)
         cls.student = UserFactory.create()
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
+
+    def setUp(self):
+        super(CreateSubCommentUnicodeTestCase, self).setUp()
 
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
@@ -1332,7 +1378,7 @@ class CreateSubCommentUnicodeTestCase(SharedModuleStoreTestCase, UnicodeTestMixi
 @disable_signal(views, 'comment_created')
 @disable_signal(views, 'comment_voted')
 @disable_signal(views, 'comment_deleted')
-class TeamsPermissionsTestCase(UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
+class TeamsPermissionsTestCase(ForumsEnableMixin, UrlResetMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
     # Most of the test points use the same ddt data.
     # args: user, commentable_id, status_code
     ddt_permissions_args = [
@@ -1599,7 +1645,7 @@ TEAM_COMMENTABLE_ID = 'test-team-discussion'
 @attr(shard=2)
 @disable_signal(views, 'comment_created')
 @ddt.ddt
-class ForumEventTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
+class ForumEventTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
     """
     Forum actions are expected to launch analytics events. Test these here.
     """
@@ -1619,6 +1665,9 @@ class ForumEventTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
         CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
         cls.student.roles.add(Role.objects.get(name="Student", course_id=cls.course.id))
         CourseAccessRoleFactory(course_id=cls.course.id, user=cls.student, role='Wizard')
+
+    def setUp(self):
+        super(ForumEventTestCase, self).setUp()
 
     @patch('eventtracking.tracker.emit')
     @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
@@ -1783,7 +1832,7 @@ class ForumEventTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
 
 
 @attr(shard=2)
-class UsersEndpointTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
+class UsersEndpointTestCase(ForumsEnableMixin, SharedModuleStoreTestCase, MockRequestSetupMixin):
 
     @classmethod
     def setUpClass(cls):
@@ -1801,6 +1850,9 @@ class UsersEndpointTestCase(SharedModuleStoreTestCase, MockRequestSetupMixin):
         cls.enrollment = CourseEnrollmentFactory(user=cls.student, course_id=cls.course.id)
         cls.other_user = UserFactory.create(username="other")
         CourseEnrollmentFactory(user=cls.other_user, course_id=cls.course.id)
+
+    def setUp(self):
+        super(UsersEndpointTestCase, self).setUp()
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
         """

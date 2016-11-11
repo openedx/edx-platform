@@ -52,7 +52,7 @@ class ConditionalFactory(object):
     to allow for testing.
     """
     @staticmethod
-    def create(system, source_is_error_module=False):
+    def create(system, source_is_error_module=False, source_visible_to_staff_only=False):
         """
         return a dict of modules: the conditional with a single source and a single child.
         Keys are 'cond_module', 'source_module', and 'child_module'.
@@ -75,11 +75,13 @@ class ConditionalFactory(object):
             source_descriptor = Mock(name='source_descriptor')
             source_descriptor.location = source_location
 
+        source_descriptor.visible_to_staff_only = source_visible_to_staff_only
         source_descriptor.runtime = descriptor_system
         source_descriptor.render = lambda view, context=None: descriptor_system.render(source_descriptor, view, context)
 
         # construct other descriptors:
         child_descriptor = Mock(name='child_descriptor')
+        child_descriptor.visible_to_staff_only = False
         child_descriptor._xmodule.student_view.return_value.content = u'<p>This is a secret</p>'
         child_descriptor.student_view = child_descriptor._xmodule.student_view
         child_descriptor.displayable_items.return_value = [child_descriptor]
@@ -87,6 +89,12 @@ class ConditionalFactory(object):
         child_descriptor.xmodule_runtime = get_test_system()
         child_descriptor.render = lambda view, context=None: descriptor_system.render(child_descriptor, view, context)
         child_descriptor.location = source_location.replace(category='html', name='child')
+
+        def visible_to_nonstaff_users(desc):
+            """
+            Returns if the object is visible to nonstaff users.
+            """
+            return not desc.visible_to_staff_only
 
         def load_item(usage_id, for_parent=None):  # pylint: disable=unused-argument
             """Test-only implementation of load_item that simply returns static xblocks."""
@@ -115,8 +123,12 @@ class ConditionalFactory(object):
             ScopeIds(None, None, cond_location, cond_location)
         )
         cond_descriptor.xmodule_runtime = system
-        system.get_module = lambda desc: desc
+        system.get_module = lambda desc: desc if visible_to_nonstaff_users(desc) else None
         cond_descriptor.get_required_module_descriptors = Mock(return_value=[source_descriptor])
+        cond_descriptor.required_modules = [
+            system.get_module(descriptor)
+            for descriptor in cond_descriptor.get_required_module_descriptors()
+        ]
 
         # return dict:
         return {'cond_module': cond_descriptor,
@@ -182,6 +194,19 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         ajax = json.loads(modules['cond_module'].handle_ajax('', ''))
         html = ajax['html']
         self.assertFalse(any(['This is a secret' in item for item in html]))
+
+    @patch('xmodule.conditional_module.log')
+    def test_conditional_with_staff_only_source_module(self, mock_log):
+        modules = ConditionalFactory.create(
+            self.test_system,
+            source_visible_to_staff_only=True,
+        )
+        cond_module = modules['cond_module']
+        cond_module.save()
+        cond_module.is_attempted = "false"
+        cond_module.handle_ajax('', '')
+        self.assertFalse(mock_log.warn.called)
+        self.assertIn(None, cond_module.required_modules)
 
 
 class ConditionalModuleXmlTest(unittest.TestCase):

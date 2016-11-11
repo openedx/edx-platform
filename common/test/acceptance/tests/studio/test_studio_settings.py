@@ -502,15 +502,6 @@ class StudioSettingsA11yTest(StudioCourseTest):
             ],
         })
 
-        # TODO: Figure out how to get CodeMirror to pass accessibility testing
-        # We use the CodeMirror Javascript library to
-        # add code editing to a number of textarea elements
-        # on this page. CodeMirror generates markup that does
-        # not pass our accessibility testing rules.
-        self.settings_page.a11y_audit.config.set_scope(
-            exclude=['.CodeMirror textarea']  # TODO: TNL-5831
-        )
-
         self.settings_page.a11y_audit.check_for_accessibility_errors()
 
 

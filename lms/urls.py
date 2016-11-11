@@ -15,6 +15,7 @@ from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 # Uncomment the next two lines to enable the admin:
@@ -754,7 +755,7 @@ urlpatterns += (
 # Embargo
 if settings.FEATURES.get('EMBARGO'):
     urlpatterns += (
-        url(r'^embargo/', include('embargo.urls')),
+        url(r'^embargo/', include('openedx.core.djangoapps.embargo.urls')),
     )
 
 # Survey Djangoapp
@@ -905,6 +906,7 @@ urlpatterns += (
     url(r'config/self_paced', ConfigurationModelCurrentAPIView.as_view(model=SelfPacedConfiguration)),
     url(r'config/programs', ConfigurationModelCurrentAPIView.as_view(model=ProgramsApiConfig)),
     url(r'config/catalog', ConfigurationModelCurrentAPIView.as_view(model=CatalogIntegration)),
+    url(r'config/forums', ConfigurationModelCurrentAPIView.as_view(model=ForumsConfig)),
 )
 
 urlpatterns = patterns(*urlpatterns)
@@ -924,6 +926,13 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
     urlpatterns += (
         url(r'^__debug__/', include(debug_toolbar.urls)),
     )
+
+
+# Custom error pages
+# These are used by Django to render these error codes. Do not remove.
+# pylint: disable=invalid-name
+handler404 = 'static_template_view.views.render_404'
+handler500 = 'static_template_view.views.render_500'
 
 # include into our URL patterns the HTTP REST API that comes with edx-proctoring.
 urlpatterns += (

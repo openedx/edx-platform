@@ -903,7 +903,7 @@ def update_thread(request, thread_id, update_data):
         The updated thread; see discussion_api.views.ThreadViewSet for more
         detail.
     """
-    cc_thread, context = _get_thread_and_context(request, thread_id)
+    cc_thread, context = _get_thread_and_context(request, thread_id, retrieve_kwargs={"with_responses": True})
     _check_editable_fields(cc_thread, update_data, context)
     serializer = ThreadSerializer(cc_thread, data=update_data, partial=True, context=context)
     actions_form = ThreadActionsForm(update_data)
