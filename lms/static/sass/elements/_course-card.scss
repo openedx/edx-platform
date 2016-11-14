@@ -1,7 +1,5 @@
 .course-card {
-  @include span(10);
-  @include pre(1);
-  @include post(1);
+  width: 85%;
   margin: {
     left: auto;
     right: auto;
@@ -10,7 +8,9 @@
   padding: $baseline/2 0;
 
   .section {
+    @extend .grid-container;
     @extend .grid-manual;
+
     padding: $baseline/2 $baseline;
   }
 
@@ -19,7 +19,7 @@
 
     .header-img {
       max-width: 100%;
-      @media(min-width: $bp-screen-sm) {
+      @include susy-media($bp-screen-sm) {
         max-width: 191px;
       }
     }
@@ -28,7 +28,7 @@
   .course-details {
     @include float(right);
     width: 100%;
-    @media(min-width: $bp-screen-sm) { width: calc(100% - 191px); }
+    @include susy-media($bp-screen-sm) { width: calc(100% - 191px); }
     padding-left: $baseline*1.5;
 
     .course-title {
@@ -131,17 +131,17 @@
   .message {
     margin-bottom: $baseline;
 
-    @media(min-width: $bp-screen-md) {
+    @include susy-media($bp-screen-md) {
       margin-bottom: 0;
     }
   }
-
+  
   .upgrade-message,
   .certificate-status {
     border-top: 1px solid palette(grayscale, back);
     padding-top: $baseline;
 
-    @media(min-width: $bp-screen-md) {
+    @include susy-media($bp-screen-md) {
       display: flex;
       align-items: center;
     }

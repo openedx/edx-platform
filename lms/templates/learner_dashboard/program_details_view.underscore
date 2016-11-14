@@ -1,6 +1,6 @@
 <header class="js-program-header program-header full-width-banner"></header>
 <div class="program-details-content grid-container">
 	<div class="js-program-progress-view"></div>
-	<div class="js-course-list row"></div>
+	<div class="js-course-list"></div>
 	<aside class="js-course-sidebar"></aside>
 </div>
