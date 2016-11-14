@@ -352,7 +352,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
 
     SCORED_BLOCK_COUNT = 7
-    ACTUAL_TOTAL_POSSIBLE = 16.0
+    ACTUAL_TOTAL_POSSIBLE = 17.0
 
     @classmethod
     def setUpClass(cls):
