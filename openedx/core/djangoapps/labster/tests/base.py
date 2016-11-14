@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 import mock
 from django.test.utils import override_settings
+from django.utils.timezone import UTC
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
@@ -18,7 +19,9 @@ from request_cache.middleware import RequestCache
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 
 
-@override_settings(FIELD_OVERRIDE_PROVIDERS=('ccx.overrides.CustomCoursesForEdxOverrideProvider',))
+@override_settings(
+    FIELD_OVERRIDE_PROVIDERS=('ccx.overrides.CustomCoursesForEdxOverrideProvider',),
+)
 class CCXCourseTestBase(ModuleStoreTestCase):
 
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
@@ -32,8 +35,8 @@ class CCXCourseTestBase(ModuleStoreTestCase):
         self.consumer_keys = ['123', '789']
         self.lti_passports = self.make_lti_passports(self.consumer_keys)
 
-        start_datetime = datetime.now() - timedelta(days=1)
-        end_datetime = datetime.now() + timedelta(days=1)
+        start_datetime = datetime.now(UTC()) - timedelta(days=1)
+        end_datetime = datetime.now(UTC()) + timedelta(days=1)
 
         self.course = CourseFactory.create(
             enable_ccx=True,

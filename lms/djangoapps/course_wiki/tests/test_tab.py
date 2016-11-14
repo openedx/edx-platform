@@ -12,7 +12,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class WikiTabTestCase(ModuleStoreTestCase):
-    """Test cases for Theory Tab."""
+    """Test cases for Wiki Tab."""
 
     def setUp(self):
         super(WikiTabTestCase, self).setUp()
@@ -21,11 +21,11 @@ class WikiTabTestCase(ModuleStoreTestCase):
         self.user = UserFactory()
 
     def get_wiki_tab(self, user, course):
-        """Returns true if the "Theory" tab is shown."""
+        """Returns true if the "Wiki" tab is shown."""
         request = RequestFactory().request()
         request.user = user
         all_tabs = get_course_tab_list(request, course)
-        wiki_tabs = [tab for tab in all_tabs if tab.name == 'Theory']
+        wiki_tabs = [tab for tab in all_tabs if tab.name == 'Wiki']
         return wiki_tabs[0] if len(wiki_tabs) == 1 else None
 
     def test_wiki_enabled_and_public(self):

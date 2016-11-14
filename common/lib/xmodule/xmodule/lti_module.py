@@ -522,10 +522,16 @@ class LTIModule(LTIFields, LTI20ModuleMixin, XModule):
         """
         Return course by course id.
         """
-        course_descriptor = modulestore().get_course(self.course_id)
-        course_module = self.system.get_module(course_descriptor)
-        course_module._field_data_cache = {}  # pylint: disable=protected-access
-        return course_module
+        # To make lti work with CCX overrides we should use `modulestore()`.
+        try:
+            course_descriptor = modulestore().get_course(self.course_id)
+            course_module = self.system.get_module(course_descriptor)
+            course_module._field_data_cache = {}  # pylint: disable=protected-access
+            return course_module
+        except:
+            # return course using modulestore from runtime if `modulestore()`
+            # unavailable like in tests.
+            return self.descriptor.runtime.modulestore.get_course(self.course_id)
 
     @property
     def context_id(self):

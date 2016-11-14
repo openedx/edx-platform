@@ -9,6 +9,7 @@ import mock
 import httpretty
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test import override_settings
 from rest_framework import status
 
 from student.models import CourseEnrollment
@@ -21,6 +22,7 @@ from openedx.core.djangoapps.labster.tests.base import CCXCourseTestBase
 
 @ddt
 @httpretty.activate
+@override_settings(LABSTER_FEATURES={"ENABLE_VOUCHERS": True})
 class TestActivateVouchers(CCXCourseTestBase):
     """
     Tests for set_license method.
@@ -173,4 +175,3 @@ class TestActivateVouchers(CCXCourseTestBase):
 
         last_request = httpretty.last_request()
         self.assertItemsEqual(last_request.parsed_body.keys(), ['context_id', 'voucher', 'email', 'user_id'])
-
