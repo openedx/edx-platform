@@ -452,7 +452,7 @@ def compile_sass(options):
     force = options.get('force')
     systems = getattr(options, 'system', ALL_SYSTEMS)
     themes = getattr(options, 'themes', [])
-    theme_dirs = getattr(options, 'theme-dirs', [])
+    theme_dirs = getattr(options, 'theme_dirs', [])
 
     if not theme_dirs and themes:
         # We can not compile a theme sass without knowing the directory that contains the theme.
