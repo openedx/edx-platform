@@ -123,7 +123,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     """
     Handles the PROBLEM_SCORE_CHANGED signal by enqueueing a subsection update operation to occur asynchronously.
     """
-    recalculate_subsection_grade.apply_async(
+    result = recalculate_subsection_grade.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
             course_id=kwargs['course_id'],
@@ -132,6 +132,12 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             raw_earned=kwargs.get('points_earned'),
             raw_possible=kwargs.get('points_possible'),
             score_deleted=kwargs.get('score_deleted', False),
+        )
+    )
+    log.info(
+        u'Grades: Request async calculation of subsection grades with args: {}. Task [{}]'.format(
+            ', '.join('{}:{}'.format(arg, kwargs[arg]) for arg in sorted(kwargs)),
+            getattr(result, 'id', 'N/A'),
         )
     )
 
