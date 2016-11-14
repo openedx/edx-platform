@@ -100,14 +100,7 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
     <div class="wrapper-content-supplementary">
       <aside class="content-supplementary">
           <ul class="list-help">
-              <li class="help-item help-item-questions">
-                  <h3 class="title">${_("Have questions?")}</h3>
-                  <div class="copy">
-                      <p>${Text(_("Please read {a_start}our FAQs to view common questions about our certificates{a_end}.")).format(
-                              a_start=HTML('<a rel="external" href="{}">').format(marketing_link('WHAT_IS_VERIFIED_CERT')),
-                              a_end=HTML('</a>'))}</p>
-                  </div>
-              </li>
+              <%include file="${static.get_template_path('_verification_help.html')}" />
 
               % if PayAndVerifyView.WEBCAM_REQ in requirements:
               <li class="help-item help-item-technical">
