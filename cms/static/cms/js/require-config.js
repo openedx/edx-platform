@@ -305,6 +305,14 @@
                     'openseadragon', 'jquery-Watch', 'catch', 'handlebars', 'URI']
             }
             // end of annotation tool files
+            'moment': {
+                exports: 'moment'
+            },
+            'moment-timezone': {
+                exports: 'moment',
+                deps: ['moment']
+            },
+
         }
     });
 }).call(this, require, define);
