@@ -7,18 +7,14 @@ from __future__ import unicode_literals, print_function
 import logging
 
 from django.core.management.base import BaseCommand
-from django.utils import six
+from django.utils import six, timezone
 from opaque_keys.edx.keys import CourseKey
-from py2neo import Graph, Node, Relationship, authenticate
+from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
 from request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
 
-from openedx.core.djangoapps.coursegraph.utils import (
-    CommandLastRunCache,
-    CourseLastPublishedCache,
-)
-
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 
 log = logging.getLogger(__name__)
 
@@ -28,9 +24,6 @@ bolt_log = logging.getLogger('neo4j.bolt')  # pylint: disable=invalid-name
 bolt_log.setLevel(logging.ERROR)
 
 PRIMITIVE_NEO4J_TYPES = (integer, string, neo4j_unicode, float, bool)
-
-COMMAND_LAST_RUN_CACHE = CommandLastRunCache()
-COURSE_LAST_PUBLISHED_CACHE = CourseLastPublishedCache()
 
 
 class ModuleStoreSerializer(object):
@@ -45,8 +38,10 @@ class ModuleStoreSerializer(object):
         If that parameter isn't furnished, loads all course_keys from the
         modulestore.
         Filters out course_keys in the `skip` parameter, if provided.
-        :param courses: string serialization of course keys
-        :param skip: string serialization of course keys
+        Args:
+            courses: A list of string serializations of course keys.
+                For example, ["course-v1:org+course+run"].
+            skip: Also a list of string serializations of course keys.
         """
         if courses:
             course_keys = [CourseKey.from_string(course.strip()) for course in courses]
@@ -67,7 +62,7 @@ class ModuleStoreSerializer(object):
 
         Returns:
             fields: a dictionary of an XBlock's field names and values
-            label: the name of the XBlock's type (i.e. 'course'
+            block_type: the name of the XBlock's type (i.e. 'course'
             or 'problem')
         """
         # convert all fields to a dict and filter out parent and children field
@@ -88,25 +83,27 @@ class ModuleStoreSerializer(object):
         fields['course_key'] = six.text_type(course_key)
         fields['location'] = six.text_type(item.location)
 
-        label = item.scope_ids.block_type
+        block_type = item.scope_ids.block_type
 
-        # prune some fields
-        if label == 'course':
+        if block_type == 'course':
+            # prune the checklists field
             if 'checklists' in fields:
                 del fields['checklists']
 
-        return fields, label
+            # record the time this command was run
+            fields['time_last_dumped_to_neo4j'] = six.text_type(timezone.now())
+
+        return fields, block_type
 
     def serialize_course(self, course_id):
         """
+        Serializes a course into py2neo Nodes and Relationships
         Args:
             course_id: CourseKey of the course we want to serialize
 
         Returns:
             nodes: a list of py2neo Node objects
             relationships: a list of py2neo Relationships objects
-
-        Serializes a course into Nodes and Relationships
         """
         # create a location to node mapping we'll need later for
         # writing relationships
@@ -116,12 +113,12 @@ class ModuleStoreSerializer(object):
         # create nodes
         nodes = []
         for item in items:
-            fields, label = self.serialize_item(item)
+            fields, block_type = self.serialize_item(item)
 
             for field_name, value in six.iteritems(fields):
                 fields[field_name] = self.coerce_types(value)
 
-            node = Node(label, 'item', **fields)
+            node = Node(block_type, 'item', **fields)
             nodes.append(node)
             location_to_node[item.location] = node
 
@@ -144,7 +141,7 @@ class ModuleStoreSerializer(object):
             value: the value of an xblock's field
 
         Returns: either the value, a text version of the value, or, if the
-        value is a list, a list where each element is converted to text.
+            value is a list, a list where each element is converted to text.
         """
         coerced_value = value
         if isinstance(value, list):
@@ -168,44 +165,92 @@ class ModuleStoreSerializer(object):
             transaction.create(entity)
 
     @staticmethod
-    def should_dump_course(course_key):
+    def get_command_last_run(course_key, graph):
+        """
+        This information is stored on the course node of a course in neo4j
+        Args:
+            course_key: a CourseKey
+            graph: a py2neo Graph
+
+        Returns: The datetime that the command was last run, converted into
+            text, or None, if there's no record of this command last being run.
+
+        """
+        selector = NodeSelector(graph)
+        course_node = selector.select(
+            "course",
+            course_key=six.text_type(course_key)
+        ).first()
+
+        last_this_command_was_run = None
+        if course_node:
+            last_this_command_was_run = course_node['time_last_dumped_to_neo4j']
+
+        return last_this_command_was_run
+
+    @staticmethod
+    def get_course_last_published(course_key):
+        """
+        We use the CourseStructure table to get when this course was last
+        published.
+        Args:
+            course_key: a CourseKey
+
+        Returns: The datetime the course was last published at, converted into
+            text, or None, if there's no record of the last time this course
+            was published.
+        """
+        try:
+            structure = CourseStructure.objects.get(course_id=course_key)
+            course_last_published_date = six.text_type(structure.modified)
+        except CourseStructure.DoesNotExist:
+            course_last_published_date = None
+
+        return course_last_published_date
+
+    def should_dump_course(self, course_key, graph):
         """
         Only dump the course if it's been changed since the last time it's been
         dumped.
-        :param course_key: a CourseKey object.
-        :return: bool. Whether or not this course should be dumped to neo4j.
+        Args:
+            course_key: a CourseKey object.
+            graph: a py2neo Graph object.
+
+        Returns: bool of whether this course should be dumped to neo4j.
         """
 
-        last_this_command_was_run = COMMAND_LAST_RUN_CACHE.get(course_key)
-        last_course_had_published_event = COURSE_LAST_PUBLISHED_CACHE.get(
-            course_key
-        )
+        last_this_command_was_run = self.get_command_last_run(course_key, graph)
 
-        # if we have no record of this course being serialized, serialize it
+        course_last_published_date = self.get_course_last_published(course_key)
+
+        # if we don't have a record of the last time this command was run,
+        # we should serialize the course and dump it
         if last_this_command_was_run is None:
             return True
 
         # if we've serialized the course recently and we have no published
-        # events, we can skip re-serializing it
-        if last_this_command_was_run and last_course_had_published_event is None:
+        # events, we will not dump it, and so we can skip serializing it
+        # again here
+        if last_this_command_was_run and course_last_published_date is None:
             return False
 
-        # otherwise, serialize if the command was run before the course's last
-        # published event
-        return last_this_command_was_run < last_course_had_published_event
+        # otherwise, serialize and dump the course if the command was run
+        # before the course's last published event
+        return last_this_command_was_run < course_last_published_date
 
     def dump_courses_to_neo4j(self, graph, override_cache=False):
         """
-        Parameters
-        ----------
-        graph: py2neo graph object
-        override_cache: serialize the courses even if they'be been recently
-            serialized
+        Method that iterates through a list of courses in a modulestore,
+        serializes them, then writes them to neo4j
+        Args:
+            graph: py2neo graph object
+            override_cache: serialize the courses even if they'be been recently
+                serialized
 
-        Returns two lists: one of the courses that were successfully written
-          to neo4j, and one of courses that were not.
-        -------
+        Returns: two lists--one of the courses that were successfully written
+            to neo4j and one of courses that were not.
         """
+
         total_number_of_courses = len(self.course_keys)
 
         successful_courses = []
@@ -222,7 +267,7 @@ class ModuleStoreSerializer(object):
                 total_number_of_courses,
             )
 
-            if not (override_cache or self.should_dump_course(course_key)):
+            if not (override_cache or self.should_dump_course(course_key, graph)):
                 log.info("skipping dumping %s, since it hasn't changed", course_key)
                 continue
 
@@ -258,7 +303,6 @@ class ModuleStoreSerializer(object):
                 unsuccessful_courses.append(course_string)
 
             else:
-                COMMAND_LAST_RUN_CACHE.set(course_key)
                 successful_courses.append(course_string)
 
         return successful_courses, unsuccessful_courses
