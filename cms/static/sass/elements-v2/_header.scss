@@ -11,7 +11,7 @@
 
   header.primary {
     @include clearfix();
-    @include span(12);
+    @include grid-container();
     @include float(none);
     box-sizing: border-box;
     max-width: $fg-max-width;
@@ -31,7 +31,7 @@
   }
 
   .wrapper-r {
-    @include span(4 last);
+    @include span(4, before);
     @include text-align(right);
   }
 
