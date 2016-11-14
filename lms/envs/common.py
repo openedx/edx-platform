@@ -1777,6 +1777,7 @@ HIGH_PRIORITY_QUEUE = 'edx.core.high'
 DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
 LOW_PRIORITY_QUEUE = 'edx.core.low'
 HIGH_MEM_QUEUE = 'edx.core.high_mem'
+GRADES_QUEUE = 'edx.core.grades'
 
 CELERY_QUEUE_HA_POLICY = 'all'
 
@@ -1790,6 +1791,7 @@ CELERY_QUEUES = {
     LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {},
     HIGH_MEM_QUEUE: {},
+    GRADES_QUEUE: {},
 }
 
 # let logging work as configured:
