@@ -300,6 +300,10 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         mongoengine.connect(TEST_MONGODB_LOG['db'])
 
+        # Clean import logs to ensure courses fall within 2 page limit
+        import_logs = CourseImportLog.objects.all()
+        import_logs.delete()
+
         for _ in xrange(15):
             CourseImportLog(
                 course_id=SlashSeparatedCourseKey("test", "test", "test"),
