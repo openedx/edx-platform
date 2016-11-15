@@ -15,8 +15,13 @@ class TestWordCloud(BaseTestXmodule):
     CATEGORY = "word_cloud"
 
     def _get_resource_url(self, item):
+        """
+        Creates a resource URL for a given asset that is compatible with this old XModule testing stuff.
+        """
         display_name = self.item_descriptor.display_name.replace(' ', '_')
-        return "resource/i4x://{}/{}/word_cloud/{}/{}".format(self.course.id.org, self.course.id.course, display_name, item)
+        return "resource/i4x://{}/{}/word_cloud/{}/{}".format(
+            self.course.id.org, self.course.id.course, display_name, item
+        )
 
     def _get_users_state(self):
         """Return current state for each user:
