@@ -77,6 +77,8 @@ DiscussionBoardFactory({
     <div class="page-content">
         <div class="discussion-body layout layout-1t2t">
             <aside class="forum-nav layout-col layout-col-a" role="complementary" aria-label="${_("Discussion thread list")}">
+                <%include file="_filter_dropdown.html" />
+                <div class="discussion-thread-list-container"></div>
             </aside>
 
             <main id="main" aria-label="Content" tabindex="-1" class="discussion-column layout-col layout-col-b">
