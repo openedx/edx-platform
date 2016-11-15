@@ -21,9 +21,16 @@
 
         initialize: function(options) {
             this.$el = options.el;
+            this.showByDefault = options.showByDefault || false;
             this.toggleDiscussionBtn = this.$('.discussion-show');
             this.newPostForm = this.$el.find('.new-post-article');
             this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
+
+            // By default the view is displayed in a hidden state. If you want it to be shown by default (e.g. in Teams)
+            // pass showByDefault as an option. This code will open it on initialization.
+            if (this.showByDefault) {
+                this.toggleDiscussion();
+            }
         },
 
         loadDiscussions: function($elem, error) {
