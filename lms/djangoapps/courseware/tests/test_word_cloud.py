@@ -245,8 +245,6 @@ class TestWordCloud(BaseTestXmodule):
             )
 
     def test_word_cloud_constructor(self):
-        self.maxDiff = None
-
         """Make sure that all parameters extracted correctly from xml"""
 
         js_includes = [
@@ -267,6 +265,5 @@ class TestWordCloud(BaseTestXmodule):
             'submitted': False,  # default value,
             'js_includes': js_includes,
         }
-
 
         self.assertEqual(fragment.content, self.runtime.render_template('word_cloud.html', expected_context))
