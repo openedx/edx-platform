@@ -288,11 +288,11 @@
                 deps: ['jquery', 'underscore', 'slick.core', 'slick.grid'],
                 init: function() {
                     // Set global variables that the util code is expecting to be defined
-                    require([  // eslint-disable-line global-require
+                    require([
                         'edx-ui-toolkit/js/utils/html-utils',
                         'edx-ui-toolkit/js/utils/string-utils'
                     ], function(HtmlUtils, StringUtils) {
-                        window.edx = window.edx || {};
+                        window.edx = edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
@@ -383,7 +383,7 @@
                 deps: ['jquery', 'underscore', 'underscore.string', 'backbone', 'gettext'],
                 init: function() {
                     // Set global variables that the payment code is expecting to be defined
-                    require([  // eslint-disable-line global-require
+                    require([
                         'underscore',
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
@@ -391,7 +391,7 @@
                     ], function(_, str, HtmlUtils, StringUtils) {
                         window._ = _;
                         window._.str = str;
-                        window.edx = window.edx || {};
+                        window.edx = edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
                     });
@@ -527,21 +527,10 @@
                 exports: 'DiscussionUtil',
                 init: function() {
                     // Set global variables that the discussion code is expecting to be defined
-                    require(  // eslint-disable-line global-require
-                        [
-                            'backbone',
-                            'URI',
-                            'edx-ui-toolkit/js/utils/html-utils',
-                            'edx-ui-toolkit/js/utils/string-utils'
-                        ],
-                        function(Backbone, URI, HtmlUtils, StringUtils) {
-                            window.Backbone = Backbone;
-                            window.URI = URI;
-                            window.edx = window.edx || {};
-                            window.edx.HtmlUtils = HtmlUtils;
-                            window.edx.StringUtils = StringUtils;
-                        }
-                    );
+                    require(['backbone', 'URI'], function(Backbone, URI) {
+                        window.Backbone = Backbone;
+                        window.URI = URI;
+                    });
                 }
             },
             'common/js/discussion/content': {
@@ -553,11 +542,11 @@
             'common/js/discussion/discussion': {
                 deps: [
                     'common/js/discussion/utils',
-                    'common/js/discussion/content'
+                    'xmodule_js/common_static/common/js/discussion/content'
                 ],
                 exports: 'Discussion'
             },
-            'common/js/discussion/models/discussion_course_settings': {
+            'common/js/discussion/discussion_course_settings': {
                 deps: [
                     'common/js/discussion/utils'
                 ],
@@ -675,7 +664,7 @@
     var testFiles = [
         'discussion/js/spec/discussion_board_factory_spec.js',
         'discussion/js/spec/discussion_profile_page_factory_spec.js',
-        'discussion/js/spec/discussion_board_view_spec.js',
+        'discussion/js/spec/views/discussion_search_view_spec.js',
         'discussion/js/spec/views/discussion_user_profile_view_spec.js',
         'lms/js/spec/preview/preview_factory_spec.js',
         'js/spec/api_admin/catalog_preview_spec.js',

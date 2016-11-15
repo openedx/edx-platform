@@ -511,7 +511,6 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
@@ -521,7 +520,6 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
-                'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
