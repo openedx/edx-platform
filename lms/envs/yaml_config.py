@@ -102,6 +102,21 @@ LOCAL_LOGLEVEL = 'INFO'
 
 ##############################################################
 #
+# ENV TOKEN IMPORT
+#
+# Currently non-secure and secure settings are managed
+# in two yaml files. This section imports the non-secure
+# settings and modifies them in code if necessary.
+#
+
+with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
+    ENV_TOKENS = yaml.safe_load(env_file)
+
+# Works around an Ansible bug
+ENV_TOKENS = convert_tokens(ENV_TOKENS)
+
+##############################################################
+#
 # DEFAULT SETTINGS FOR CELERY
 #
 
@@ -135,12 +150,16 @@ HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_QUEUES = {
-    HIGH_PRIORITY_QUEUE: {},
-    LOW_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {},
-    HIGH_MEM_QUEUE: {},
-}
+ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
+if ENV_CELERY_QUEUES:
+    CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
+else:
+    CELERY_QUEUES = {
+        HIGH_PRIORITY_QUEUE: {},
+        LOW_PRIORITY_QUEUE: {},
+        DEFAULT_PRIORITY_QUEUE: {},
+        HIGH_MEM_QUEUE: {},
+    }
 
 # If we're a worker on the high_mem queue, set ourselves to die after processing
 # one request to avoid having memory leaks take down the worker server. This env
@@ -149,22 +168,6 @@ CELERY_QUEUES = {
 # don't know what that call is or if it's active at this point in the code.
 if os.environ.get('QUEUE') == 'high_mem':
     CELERYD_MAX_TASKS_PER_CHILD = 1
-
-
-##############################################################
-#
-# ENV TOKEN IMPORT
-#
-# Currently non-secure and secure settings are managed
-# in two yaml files. This section imports the non-secure
-# settings and modifies them in code if necessary.
-#
-
-with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
-    ENV_TOKENS = yaml.safe_load(env_file)
-
-# Works around an Ansible bug
-ENV_TOKENS = convert_tokens(ENV_TOKENS)
 
 ##########################################
 # Merge settings from common.py
