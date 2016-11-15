@@ -12,7 +12,8 @@
 
                 render: function() {
                     var discussionInlineView = new DiscussionInlineView({
-                        el: this.$el
+                        el: this.$el,
+                        showByDefault: true
                     });
                     discussionInlineView.render();
                     return this;

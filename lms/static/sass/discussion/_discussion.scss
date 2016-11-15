@@ -323,8 +323,8 @@ body.discussion {
 
   .add_post_btn_container {
     @include text-align(right);
-    position: relative;
-    top: -25px;
+    width: flex-grid(12);
+    height: (2 * $baseline);
   }
 
   div.add-response.post-extended-content {
