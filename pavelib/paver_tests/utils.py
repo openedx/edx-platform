@@ -1,8 +1,11 @@
 """Unit tests for the Paver server tasks."""
 
 import os
+import paver.easy
 from paver import tasks
 from unittest import TestCase
+
+from paver.easy import BuildFailure
 
 
 class PaverTestCase(TestCase):
@@ -58,3 +61,52 @@ class MockEnvironment(tasks.Environment):
             output = message
         if not output.startswith("--->"):
             self.messages.append(unicode(output))
+
+
+class CustomShMock(object):
+    """
+    Diff-quality makes a number of sh calls. None of those calls should be made during tests; however, some
+    of them need to have certain responses.
+    """
+
+    def fail_on_pylint(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        if "pylint" in arg:
+            # Essentially mock diff-quality exiting with 1
+            paver.easy.sh("exit 1")
+        else:
+            return
+
+    def fail_on_eslint(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        if "eslint" in arg:
+            # Essentially mock diff-quality exiting with 1
+            paver.easy.sh("exit 1")
+        else:
+            return
+
+    def fail_on_npm_install(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        if "npm install" in arg:
+            raise BuildFailure('Subprocess return code: 1')
+        else:
+            return
+
+    def unexpected_fail_on_npm_install(self, arg):
+        """
+        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
+        is going to fail when we pass in a percentage ("p") requirement.
+        """
+        if "npm install" in arg:
+            raise BuildFailure('Subprocess return code: 50')
+        else:
+            return

@@ -138,13 +138,16 @@ def node_prereqs_installation():
        " {reg})".format(reg=NPM_REGISTRY))
 
     # Error handling around a race condition that produces "cb() never called" error. This
-    # ought to disappear when we upgrade npm to 3 or higher. TODO: clean this up when we do that.
+    # evinces itself as `cb_error_text` and it ought to disappear when we upgrade
+    # npm to 3 or higher. TODO: clean this up when we do that.
     try:
         sh('npm install')
     except BuildFailure, error_text:
         if cb_error_text in error_text:
             print "npm install error detected. Retrying..."
             sh('npm install')
+        else:
+            raise BuildFailure(error_text)
 
 
 def python_prereqs_installation():
