@@ -1,0 +1,15 @@
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<li class="help-item help-item-questions">
+  <h3 class="title">${_("Have questions?")}</h3>
+  <div class="copy">
+    <p>${Text(_("Please read {a_start}our FAQs to view common questions about our certificates{a_end}.")).format(
+        a_start=HTML('<a rel="external" href="{}">').format(marketing_link('WHAT_IS_VERIFIED_CERT')),
+        a_end=HTML('</a>'))}
+    </p>
+  </div>
+</li>
