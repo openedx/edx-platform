@@ -126,7 +126,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course()
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(22 + added_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(20 + added_queries):
                 self._apply_recalculate_subsection_grade()
 
     def test_single_call_to_create_block_structure(self):
@@ -150,7 +150,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(22 + added_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(20 + added_queries):
                 self._apply_recalculate_subsection_grade()
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
