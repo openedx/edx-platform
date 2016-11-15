@@ -937,7 +937,7 @@ class ScoresClient(object):
     Eventually, this should read and write scores, but at the moment it only
     handles the read side of things.
     """
-    Score = namedtuple('Score', 'correct total')
+    Score = namedtuple('Score', 'correct total modified')
 
     def __init__(self, course_key, user_id):
         self.course_key = course_key
@@ -960,9 +960,9 @@ class ScoresClient(object):
         # attached to them (since old mongo identifiers don't include runs).
         # So we have to add that info back in before we put it into our lookup.
         self._locations_to_scores.update({
-            UsageKey.from_string(location).map_into_course(self.course_key): self.Score(correct, total)
-            for location, correct, total
-            in scores_qset.values_list('module_state_key', 'grade', 'max_grade')
+            UsageKey.from_string(location).map_into_course(self.course_key): self.Score(correct, total, modified)
+            for location, correct, total, modified
+            in scores_qset.values_list('module_state_key', 'grade', 'max_grade', 'modified')
         })
         self._has_fetched = True
 
