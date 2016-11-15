@@ -51,7 +51,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
         """
         Return the REST resource id: {username,usage_id}.
         """
-        return "{0},{1}".format(bookmark.user.username, bookmark.usage_key)
+        return u"{0},{1}".format(bookmark.user.username, bookmark.usage_key)
 
     def get_path(self, bookmark):
         """

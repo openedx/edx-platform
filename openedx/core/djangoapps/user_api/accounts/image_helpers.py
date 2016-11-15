@@ -38,7 +38,8 @@ def _make_profile_image_name(username):
     Returns the user-specific part of the image filename, based on a hash of
     the username.
     """
-    return hashlib.md5(settings.PROFILE_IMAGE_SECRET_KEY + username).hexdigest()
+    hash_input = settings.PROFILE_IMAGE_SECRET_KEY + username
+    return hashlib.md5(hash_input.encode('utf-8')).hexdigest()
 
 
 def _get_profile_image_filename(name, size, file_extension=PROFILE_IMAGE_FILE_EXTENSION):
