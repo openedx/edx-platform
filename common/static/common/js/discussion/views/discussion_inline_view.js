@@ -26,6 +26,9 @@
             this.newPostForm = this.$el.find('.new-post-article');
             this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
 
+            // @TODO: Must implement pagination
+            this.page = 1;
+
             // By default the view is displayed in a hidden state. If you want it to be shown by default (e.g. in Teams)
             // pass showByDefault as an option. This code will open it on initialization.
             if (this.showByDefault) {
