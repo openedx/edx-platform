@@ -1,15 +1,16 @@
-/* global DiscussionCourseSettings, DiscussionUtil, DiscussionUser */
+/* global Content, Discussion, DiscussionCourseSettings, DiscussionUtil, DiscussionUser */
 (function() {
     'use strict';
     this.DiscussionSpecHelper = (function() {
         function DiscussionSpecHelper() {
         }
 
-        DiscussionSpecHelper.setUpGlobals = function() {
-            DiscussionUtil.loadRoles(DiscussionSpecHelper.getTestRoleInfo());
-            window.$$course_id = 'edX/999/test';
-            window.user = new DiscussionUser(DiscussionSpecHelper.getTestUserInfo());
-            return DiscussionUtil.setUser(window.user);
+        DiscussionSpecHelper.setUpGlobals = function(opts) {
+            var options = opts || {};
+            DiscussionUtil.loadRoles(options.roles || DiscussionSpecHelper.getTestRoleInfo());
+            window.$$course_id = options.courseName || 'edX/999/test';
+            window.user = new DiscussionUser(options.userInfo || DiscussionSpecHelper.getTestUserInfo());
+            DiscussionUtil.setUser(window.user);
         };
 
         DiscussionSpecHelper.getTestUserInfo = function() {
@@ -50,7 +51,7 @@
             return jasmine.createSpyObj('event', ['preventDefault', 'target']);
         };
 
-        DiscussionSpecHelper.makeCourseSettings = function() {
+        DiscussionSpecHelper.createTestCourseSettings = function() {
             return new DiscussionCourseSettings({
                 category_map: {
                     children: [['Test Topic', 'entry'], ['Other Topic', 'entry']],
@@ -69,12 +70,24 @@
             });
         };
 
+        DiscussionSpecHelper.createTestDiscussion = function(options) {
+            var sortPreference = options.sort_preference,
+                threads = options.threads || [],
+                threadPages = options.thread_pages || 1,
+                contentInfo = options.content_info;
+            DiscussionSpecHelper.setUpGlobals(options);
+            if (contentInfo) {
+                Content.loadContentInfos(contentInfo);
+            }
+            return new Discussion(threads, {pages: threadPages, sort: sortPreference});
+        };
+
         DiscussionSpecHelper.setUnderscoreFixtures = function() {
             var templateFixture, templateName, templateNames, templateNamesNoTrailingTemplate, i, j, len;
             templateNames = [
                 'thread', 'thread-show', 'thread-edit', 'thread-response', 'thread-response-show',
                 'thread-response-edit', 'response-comment-show', 'response-comment-edit', 'thread-list-item',
-                'discussion-home', 'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-alert',
+                'search-alert', 'new-post', 'thread-type', 'new-post-menu-entry', 'new-post-alert',
                 'new-post-menu-category', 'topic', 'post-user-display', 'inline-discussion', 'pagination',
                 'profile-thread', 'customwmd-prompt', 'nav-loading'
             ];

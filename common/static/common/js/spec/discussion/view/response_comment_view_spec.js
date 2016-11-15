@@ -5,7 +5,7 @@
 
     describe('ResponseCommentView', function() {
         beforeEach(function() {
-            DiscussionSpecHelper.setUpGlobals();
+            DiscussionSpecHelper.setUpGlobals({});
             this.comment = new Comment({
                 id: '01234567',
                 user_id: user.id,
