@@ -14,6 +14,10 @@ class TestWordCloud(BaseTestXmodule):
     """Integration test for word cloud xmodule."""
     CATEGORY = "word_cloud"
 
+    def _get_resource_url(self, item):
+        display_name = self.item_descriptor.display_name.replace(' ', '_')
+        return "resource/i4x://{}/{}/word_cloud/{}/{}".format(self.course.id.org, self.course.id.course, display_name, item)
+
     def _get_users_state(self):
         """Return current state for each user:
 
@@ -241,7 +245,17 @@ class TestWordCloud(BaseTestXmodule):
             )
 
     def test_word_cloud_constructor(self):
+        self.maxDiff = None
+
         """Make sure that all parameters extracted correctly from xml"""
+
+        js_includes = [
+            self._get_resource_url('public/js/d3.min.js'),
+            self._get_resource_url('public/js/d3.layout.cloud.js'),
+            self._get_resource_url('public/js/word_cloud.js'),
+            self._get_resource_url('public/js/word_cloud_main.js'),
+        ]
+
         fragment = self.runtime.render(self.item_descriptor, STUDENT_VIEW)
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url,
@@ -250,6 +264,9 @@ class TestWordCloud(BaseTestXmodule):
             'element_class': self.item_descriptor.location.category,
             'element_id': self.item_descriptor.location.html_id(),
             'num_inputs': 5,  # default value
-            'submitted': False,  # default value
+            'submitted': False,  # default value,
+            'js_includes': js_includes,
         }
+
+
         self.assertEqual(fragment.content, self.runtime.render_template('word_cloud.html', expected_context))
