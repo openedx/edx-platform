@@ -129,7 +129,7 @@
                     model: thread,
                     el: $('#fixture-element'),
                     mode: mode,
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.makeCourseSettings()
                 });
                 renderWithTestResponses(view, 1);
                 if (mode === 'inline') {
@@ -185,7 +185,7 @@
                     model: this.thread,
                     el: $('#fixture-element'),
                     mode: 'tab',
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.makeCourseSettings()
                 });
             });
             describe('responses', function() {
@@ -282,7 +282,7 @@
                     model: this.thread,
                     el: $('#fixture-element'),
                     mode: 'inline',
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.makeCourseSettings()
                 });
             });
             describe('render', function() {
@@ -397,7 +397,7 @@
                     model: this.thread,
                     el: $('#fixture-element'),
                     mode: 'tab',
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.makeCourseSettings()
                 });
             });
             generateContent = function(idStart, idEnd) {
@@ -465,7 +465,7 @@
                     model: this.thread,
                     el: $('#fixture-element'),
                     mode: 'tab',
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
+                    course_settings: DiscussionSpecHelper.makeCourseSettings()
                 });
             });
             it("doesn't show report option if can_report ability is disabled", function() {
