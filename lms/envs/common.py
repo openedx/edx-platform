@@ -1724,6 +1724,7 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'moment-timezone': 'common/js/vendor/moment-timezone-with-data.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
+    'js/dateutil_factory': 'js/dateutil_factory.js',
     'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events.js',
     'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.js',
     'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
