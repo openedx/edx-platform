@@ -4,34 +4,16 @@ define(
         'backbone',
         'common/js/spec_helpers/page_helpers',
         'common/js/spec_helpers/discussion_spec_helper',
-        'discussion/js/discussion_board_factory',
-        'discussion/js/views/discussion_board_view'
+        'discussion/js/discussion_board_factory'
     ],
-    function($, Backbone, PageHelpers, DiscussionSpecHelper, DiscussionBoardFactory, DiscussionBoardView) {
+    function($, Backbone, PageHelpers, DiscussionSpecHelper, DiscussionBoardFactory) {
         'use strict';
 
         // TODO: re-enable when this doesn't interact badly with other history tests
-        describe('DiscussionBoardFactory', function() {
-            var createDiscussionBoardView = function() {
-                var discussionBoardView,
-                    discussion = DiscussionSpecHelper.createTestDiscussion({}),
-                    courseSettings = DiscussionSpecHelper.createTestCourseSettings();
-
-                setFixtures('<div class="discussion-board"><div class="forum-search"></div></div>');
-                DiscussionSpecHelper.setUnderscoreFixtures();
-
-                discussionBoardView = new DiscussionBoardView({
-                    el: $('.discussion-board'),
-                    discussion: discussion,
-                    courseSettings: courseSettings
-                });
-
-                return discussionBoardView;
-            };
-
+        xdescribe('Discussion Board Factory', function() {
             var initializeDiscussionBoardFactory = function() {
                 DiscussionBoardFactory({
-                    el: $('#discussion-container'),
+                    el: $('.discussion-board'),
                     courseId: 'test_course_id',
                     course_name: 'Test Course',
                     user_info: DiscussionSpecHelper.getTestUserInfo(),
@@ -51,11 +33,14 @@ define(
             };
 
             beforeEach(function() {
+                PageHelpers.preventBackboneChangingUrl();
+
                 // Install the fixtures
                 setFixtures(
-                    '<div id="discussion-container" class="discussion-board"></div></div>'
+                    '<div class="discussion-board">' +
+                    '    <div class="forum-nav"></div>' +
+                    '</div>'
                 );
-                PageHelpers.preventBackboneChangingUrl();
                 DiscussionSpecHelper.setUnderscoreFixtures();
             });
 
@@ -63,11 +48,9 @@ define(
                 Backbone.history.stop();
             });
 
-            xit('can render itself', function() { // this failed Search: navigates to search, and TeamsTab
-                var discussionView = createDiscussionBoardView();
-                discussionView.render();
+            it('can render itself', function() {
                 initializeDiscussionBoardFactory();
-                expect(discussionView.$el.text()).toContain('Search all posts');
+                expect($('.discussion-board').text()).toContain('All Discussions');
             });
         });
     }
