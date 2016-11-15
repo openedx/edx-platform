@@ -93,10 +93,6 @@ class WordCloudModule(WordCloudFields, XModule):
     js = {
         'js': [
             resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
-            resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
-            resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
-            resource_string(__name__, 'js/src/word_cloud/word_cloud_main.js'),
         ],
     }
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
@@ -238,7 +234,17 @@ class WordCloudModule(WordCloudFields, XModule):
             })
 
     def get_html(self):
-        """Template rendering."""
+        """
+        Template rendering.
+        """
+
+        js_includes = [
+            self.runtime.local_resource_url(self, 'public/js/d3.min.js'),
+            self.runtime.local_resource_url(self, 'public/js/d3.layout.cloud.js'),
+            self.runtime.local_resource_url(self, 'public/js/word_cloud.js'),
+            self.runtime.local_resource_url(self, 'public/js/word_cloud_main.js'),
+        ]
+
         context = {
             'ajax_url': self.system.ajax_url,
             'display_name': self.display_name,
@@ -247,6 +253,7 @@ class WordCloudModule(WordCloudFields, XModule):
             'element_id': self.location.html_id(),
             'num_inputs': self.num_inputs,
             'submitted': self.submitted,
+            'js_includes': js_includes,
         }
         self.content = self.system.render_template('word_cloud.html', context)
         return self.content
@@ -255,5 +262,5 @@ class WordCloudModule(WordCloudFields, XModule):
 class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
-    resources_dir = None
+    resources_dir = 'assets/word_cloud'
     template_dir_name = 'word_cloud'
