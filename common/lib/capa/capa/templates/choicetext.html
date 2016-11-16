@@ -19,19 +19,9 @@ from openedx.core.djangolib.markup import HTML
         <% choice_id = choice_id %>
         <section id="forinput${choice_id}"
             % if input_type == 'radio' and choice_id in value :
-            <%
-                if status == 'correct':
-                    correctness = 'correct'
-                elif status == 'incorrect':
-                    correctness = 'incorrect'
-                elif status == 'partially-correct':
-                    correctness = 'partially-correct'
-                else:
-                    correctness = None
-            %>
-            % if correctness:
-                class="choicetextgroup_${correctness}"
-            % endif
+                % if status.classname:
+                    class="choicetextgroup_${status.classname}"
+                % endif
             % endif
             >
             <input class="ctinput" type="${input_type}" name="choiceinput_${id}" id="${choice_id}" value="${choice_id}"
