@@ -1015,6 +1015,38 @@ def _order_problems(blocks):
     return problems
 
 
+def parse_student_data(student_data):
+    """
+    Parses student data to output a more easily-readable version of the 'state', which includes last submission time,
+    number of attempts and the students' answers for a specific problem. We have 2 cases:
+    1) for students with field 'student_answers', we output all the fields as they are (maintaining JSON format if
+        applicable
+    2) for students with field 'student_answer' (note singular), we only output columns for student username and that
+        answer
+
+    :param student_data: dict with 2 keys: 'username' and state'. The value of 'state' is a string version of a dict
+
+    :return: 2-d array, where a row is the username and state data for a student. First row is the headers. Only
+        includes students that have submitted an answer to the problem
+    """
+    header = ['username', 'state']
+    rows = []
+
+    for student in student_data:
+        state = student['state']
+        row = [student['username']]
+        try:
+            student_data_dict = json.loads(state)
+        except ValueError:
+            row_field = state
+        else:
+            row_field = student_data_dict.get('student_answer', state)
+        row.append(row_field)
+        rows.append(row)
+
+    return header, rows
+
+
 def upload_problem_responses_csv(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
     """
     For a given `course_id`, generate a CSV file containing
@@ -1030,8 +1062,7 @@ def upload_problem_responses_csv(_xmodule_instance_args, _entry_id, course_id, t
     # Compute result table and format it
     problem_location = task_input.get('problem_location')
     student_data = list_problem_responses(course_id, problem_location)
-    features = ['username', 'state']
-    header, rows = format_dictlist(student_data, features)
+    header, rows = parse_student_data(student_data)
 
     task_progress.attempted = task_progress.succeeded = len(rows)
     task_progress.skipped = task_progress.total - task_progress.attempted
