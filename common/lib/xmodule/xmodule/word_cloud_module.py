@@ -15,6 +15,7 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
 from xblock.fields import Scope, Dict, Boolean, List, Integer, String
+from xblock.fragment import Fragment
 
 log = logging.getLogger(__name__)
 
@@ -233,19 +234,14 @@ class WordCloudModule(WordCloudFields, XModule):
                 'error': 'Unknown Command!'
             })
 
-    def get_html(self):
+    def student_view(self, context):
         """
         Template rendering.
         """
 
-        js_includes = [
-            self.runtime.local_resource_url(self, 'public/js/d3.min.js'),
-            self.runtime.local_resource_url(self, 'public/js/d3.layout.cloud.js'),
-            self.runtime.local_resource_url(self, 'public/js/word_cloud.js'),
-            self.runtime.local_resource_url(self, 'public/js/word_cloud_main.js'),
-        ]
+        fragment = Fragment()
 
-        context = {
+        fragment.add_content(self.system.render_template('word_cloud.html', {
             'ajax_url': self.system.ajax_url,
             'display_name': self.display_name,
             'instructions': self.instructions,
@@ -253,10 +249,17 @@ class WordCloudModule(WordCloudFields, XModule):
             'element_id': self.location.html_id(),
             'num_inputs': self.num_inputs,
             'submitted': self.submitted,
-            'js_includes': js_includes,
-        }
-        self.content = self.system.render_template('word_cloud.html', context)
-        return self.content
+        }))
+
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.min.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.layout.cloud.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud_main.js'))
+
+        return fragment
+
+    def author_view(self, context):
+        return self.student_view(context)
 
 
 class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
