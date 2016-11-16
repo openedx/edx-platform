@@ -107,6 +107,7 @@
                 this.boardName = null;
                 this.current_search = '';
                 this.mode = 'all';
+                this.showThreadPreview = options.showThreadPreview;
                 this.searchAlertCollection = new Backbone.Collection([], {
                     model: Backbone.Model
                 });
@@ -316,14 +317,26 @@
                 }, error);
             };
 
+            DiscussionThreadListView.prototype.containsMarkup = function(threadBody) {
+                var imagePostSearchString = '![',
+                    mathJaxSearchString = /\$/g,
+                    containsImages = threadBody.indexOf(imagePostSearchString) !== -1,
+                    // mathJax has to have at least 2 dollar signs
+                    containsMathJax = (threadBody.match(mathJaxSearchString) || []).length > 1;
+                return containsImages || containsMathJax;
+            };
+
             DiscussionThreadListView.prototype.renderThread = function(thread) {
                 var threadCommentCount = thread.get('comments_count'),
                     threadUnreadCommentCount = thread.get('unread_comments_count'),
                     neverRead = !thread.get('read') && threadUnreadCommentCount === threadCommentCount,
+                    threadPreview = this.containsMarkup(thread.get('body')) ? '' : thread.get('body'),
                     context = _.extend(
                         {
                             neverRead: neverRead,
-                            threadUrl: thread.urlFor('retrieve')
+                            threadUrl: thread.urlFor('retrieve'),
+                            threadPreview: threadPreview,
+                            showThreadPreview: this.showThreadPreview
                         },
                         thread.toJSON()
                     );

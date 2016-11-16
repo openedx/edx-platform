@@ -176,6 +176,15 @@
     .forum-nav-thread-labels {
         margin: 5px 0 0;
     }
+
+    .thread-preview-body {
+        margin-top: $baseline / 4;
+        color: $forum-color-response-count;
+        font-size: $forum-small-font-size;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 }
 
 .forum-nav-thread {
@@ -191,7 +200,7 @@
     .forum-nav-thread-link {
         @include border-left(3px solid transparent);
         display: flex;
-        padding: ($baseline/4) ($baseline/2);
+        padding: $baseline / 2;
         transition: none;
         align-items: center;
         justify-content: space-between;
@@ -229,6 +238,10 @@
             }
 
             span.icon {
+                color: $forum-color-background;
+            }
+
+            .thread-preview-body {
                 color: $forum-color-background;
             }
         }
@@ -273,7 +286,8 @@
 
 .forum-nav-thread-wrapper-1 {
     @extend %forum-nav-thread-wrapper;
-    margin: 0 ($baseline/2);
+    margin: 0 ($baseline / 4);
+    width: 80%;
     flex-grow: 1;  // This column should consume all the available space
 }
 
