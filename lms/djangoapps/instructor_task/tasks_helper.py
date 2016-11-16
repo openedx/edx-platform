@@ -4,53 +4,47 @@ running state of a course.
 
 """
 import json
-import re
+import logging
+from StringIO import StringIO
 from collections import OrderedDict
 from datetime import datetime
-from django.conf import settings
-from eventtracking import tracker
 from itertools import chain
 from time import time
-import unicodecsv
-import logging
 
+import dogstats_wrapper as dog_stats_api
+import re
+import unicodecsv
 from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
 from django.db import reset_queries
 from django.db.models import Q
-import dogstats_wrapper as dog_stats_api
-from pytz import UTC
-from StringIO import StringIO
-from edxmako.shortcuts import render_to_string
+from django.utils.translation import ugettext as _
+from eventtracking import tracker
+from lms.djangoapps.grades.scores import weighted_score
 from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnrollmentReportProvider
-from shoppingcart.models import (
-    PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
-    Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
-)
-from survey.models import SurveyAnswer
-
-from track.views import task_track
-from util.db import outer_atomic
-from util.file import course_filename_prefix_generator, UniversalNewlineIterator
-from xblock.runtime import KvsFieldData
+from lms.djangoapps.teams.models import CourseTeamMembership
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from pytz import UTC
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
-from django.utils.translation import ugettext as _
+
+from certificates.api import generate_user_certificates
 from certificates.models import (
     CertificateWhitelist,
     certificate_info_for_user,
     CertificateStatuses,
     GeneratedCertificate
 )
-from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
 from lms.djangoapps.grades.context import grading_context_for_course
 from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
-from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
+from courseware.models import StudentModule
 from courseware.module_render import get_module_for_descriptor_internal
+from edxmako.shortcuts import render_to_string
 from instructor_analytics.basic import (
     enrolled_students_features,
     get_proctored_exam_results,
@@ -58,6 +52,10 @@ from instructor_analytics.basic import (
     list_problem_responses
 )
 from instructor_analytics.csvs import format_dictlist
+from shoppingcart.models import (
+    PaidCourseRegistration, CourseRegCodeItem, InvoiceTransaction,
+    Invoice, CouponRedemption, RegistrationCodeRedemption, CourseRegistrationCode
+)
 from openassessment.data import OraAggregateData
 from lms.djangoapps.instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
@@ -66,8 +64,12 @@ from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment, CourseAccessRole
-from lms.djangoapps.teams.models import CourseTeamMembership
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from survey.models import SurveyAnswer
+from track.event_transaction_utils import set_event_transaction_type, create_new_event_transaction_id
+from track.views import task_track
+from util.db import outer_atomic
+from util.file import course_filename_prefix_generator, UniversalNewlineIterator
+from xblock.runtime import KvsFieldData
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = logging.getLogger('edx.celery.task')
@@ -79,6 +81,9 @@ FILTERED_OUT_ROLES = ['staff', 'instructor', 'finance_admin', 'sales_admin']
 UPDATE_STATUS_SUCCEEDED = 'succeeded'
 UPDATE_STATUS_FAILED = 'failed'
 UPDATE_STATUS_SKIPPED = 'skipped'
+
+# define value to be used in grading events
+GRADES_RESCORE_EVENT_TYPE = 'edx.grades.problem.rescored'
 
 # The setting name used for events when "settings" (account settings, preferences, profile information) change.
 REPORT_REQUESTED_EVENT_NAME = u'edx.instructor.report.requested'
@@ -517,8 +522,16 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
             msg = "Specified problem does not support rescoring."
             raise UpdateProblemModuleStateError(msg)
 
+        # Set the tracking info before this call, because
+        # it makes downstream calls that create events.
+        # We retrieve and store the id here because
+        # the request cache will be erased during downstream calls.
+        event_transaction_id = create_new_event_transaction_id()
+        set_event_transaction_type(GRADES_RESCORE_EVENT_TYPE)
+
         result = instance.rescore_problem(only_if_higher=task_input['only_if_higher'])
         instance.save()
+
         if 'success' not in result:
             # don't consider these fatal, but false means that the individual call didn't complete:
             TASK_LOG.warning(
@@ -555,7 +568,27 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
                     student=student
                 )
             )
-            return UPDATE_STATUS_SUCCEEDED
+            new_weighted_earned, new_weighted_possible = weighted_score(
+                result['new_raw_earned'],
+                result['new_raw_possible'],
+                module_descriptor.weight,
+            )
+            tracker.emit(
+                unicode(GRADES_RESCORE_EVENT_TYPE),
+                {
+                    'course_id': unicode(course_id),
+                    'user_id': unicode(student.id),
+                    'problem_id': unicode(usage_key),
+                    'new_weighted_earned': new_weighted_earned,
+                    'new_weighted_possible': new_weighted_possible,
+                    'only_if_higher': task_input['only_if_higher'],
+                    'instructor_id': unicode(xmodule_instance_args['request_info']['user_id']),
+                    'event_transaction_id': unicode(event_transaction_id),
+                    'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
+                }
+            )
+
+        return UPDATE_STATUS_SUCCEEDED
 
 
 @outer_atomic
