@@ -1,10 +1,24 @@
 .instructor-dashboard-wrapper-2 section.idash-section#data_download {
   .reports-download-container {
-    .graph-forums {
-      padding-left: 25px;
-      padding-right: 10px;
+    .delete-report, .graph-forums {
+      position: absolute;
+      top: 0;
+      padding-bottom: 25px;
+      color: $blue;
       cursor: pointer;
-      float:right;
+
+      i {
+        padding-right: 5px;
+      }
+    }
+
+    .delete-report {
+      right: 0;
+      margin-right: 10px;
+    }
+
+    .graph-forums{
+      right: 85px;
     }
   }
   .report-downloads-graph-block {
