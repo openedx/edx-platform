@@ -7,7 +7,6 @@ import random
 import textwrap
 
 from abc import ABCMeta, abstractmethod
-from flaky import flaky
 from nose import SkipTest
 from nose.plugins.attrib import attr
 from selenium.webdriver import ActionChains
@@ -166,9 +165,8 @@ class ProblemTypeTestMixin(object):
         self.wait_for_status('correct')
         self.problem_page.wait_success_notification()
         # Check that clicking on "Review" goes to the problem meta location
-        self.problem_page.click_review_in_notification()
-        # TODO: determine why the focus is not being set
-        # self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.click_review_in_notification(notification_type='submit')
+        self.problem_page.wait_for_focus_on_problem_meta()
 
         # Check for corresponding tracking event
         expected_events = [
@@ -257,7 +255,7 @@ class ProblemTypeTestMixin(object):
         And I should see the problem title is focused
         """
         self.problem_page.click_show()
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.wait_for_focus_on_problem_meta()
 
     @attr(shard=7)
     def test_save_reaction(self):
@@ -285,16 +283,14 @@ class ProblemTypeTestMixin(object):
         self.assertTrue(self.problem_page.is_save_button_enabled())
         self.problem_page.wait_for_save_notification()
         # Check that clicking on "Review" goes to the problem meta location
-        self.problem_page.click_review_in_notification()
-        # TODO: determine why the focus is not being set
-        # self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.click_review_in_notification(notification_type='save')
+        self.problem_page.wait_for_focus_on_problem_meta()
 
         # Not all problems will detect the change and remove the save notification
         if self.can_update_save_notification:
             self.answer_problem(correctness='incorrect')
             self.assertFalse(self.problem_page.is_save_notification_visible())
 
-    @flaky  # TNL-5774
     @attr(shard=7)
     def test_reset_clears_answer_and_focus(self):
         """
@@ -316,7 +312,7 @@ class ProblemTypeTestMixin(object):
         # clear the answers
         self.problem_page.click_reset()
         # Focus should change to meta
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.wait_for_focus_on_problem_meta()
         # Answer should be reset
         self.wait_for_status('unanswered')
 
@@ -493,7 +489,7 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.click_show()
         self.assertTrue(self.problem_page.is_solution_tag_present())
         self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.wait_for_focus_on_problem_meta()
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -706,8 +702,8 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.click_submit()
         self.problem_page.wait_for_gentle_alert_notification()
         # Check that clicking on "Review" goes to the problem meta location
-        self.problem_page.click_review_in_notification()
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.click_review_in_notification(notification_type='gentle-alert')
+        self.problem_page.wait_for_focus_on_problem_meta()
 
 
 class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
