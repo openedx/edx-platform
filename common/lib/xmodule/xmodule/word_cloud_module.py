@@ -236,9 +236,8 @@ class WordCloudModule(WordCloudFields, XModule):
 
     def student_view(self, context):
         """
-        Template rendering.
+        Renders the output that a student will see.
         """
-
         fragment = Fragment()
 
         fragment.add_content(self.system.render_template('word_cloud.html', {
@@ -259,6 +258,9 @@ class WordCloudModule(WordCloudFields, XModule):
         return fragment
 
     def author_view(self, context):
+        """
+        Renders the output that an author will see.
+        """
         return self.student_view(context)
 
 
