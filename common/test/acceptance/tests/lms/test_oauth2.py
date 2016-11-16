@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """Tests for OAuth2 permission delegation."""
-from common.test.acceptance.pages.lms.oauth2_confirmation import OAuth2Confirmation
-from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
-from bok_choy.web_app_test import WebAppTest
 
 from urlparse import urlparse, parse_qsl
 
+from common.test.acceptance.pages.lms.oauth2_confirmation import OAuth2Confirmation
+from common.test.acceptance.pages.lms.auto_auth import AutoAuthPage
+from common.test.acceptance.tests.helpers import AcceptanceTest
 
-class OAuth2PermissionDelegationTests(WebAppTest):
+
+class OAuth2PermissionDelegationTests(AcceptanceTest):
     """
     Tests for acceptance/denial of permission delegation requests.
     """

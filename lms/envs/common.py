@@ -375,6 +375,9 @@ GENERATE_PROFILE_SCORES = False
 # Used with XQueue
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
+# Used with Email sending
+RETRY_ACTIVATION_EMAIL_MAX_ATTEMPTS = 5
+RETRY_ACTIVATION_EMAIL_TIMEOUT = 0.5
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
@@ -517,6 +520,9 @@ TEMPLATES = [
 
                 # Shoppingcart processor (detects if request.user has a cart)
                 'shoppingcart.context_processor.user_has_cart_context_processor',
+
+                # Timezone processor (sends language and time_zone preference)
+                'courseware.context_processor.user_timezone_locale_prefs',
 
                 # Allows the open edX footer to be leveraged in Django Templates.
                 'edxmako.shortcuts.footer_context_processor',
@@ -1137,9 +1143,8 @@ MIDDLEWARE_CLASSES = (
 
     'splash.middleware.SplashMiddleware',
 
-
     'openedx.core.djangoapps.geoinfo.middleware.CountryMiddleware',
-    'embargo.middleware.EmbargoMiddleware',
+    'openedx.core.djangoapps.embargo.middleware.EmbargoMiddleware',
 
     # Allows us to set user preferences
     'openedx.core.djangoapps.lang_pref.middleware.LanguagePreferenceMiddleware',
@@ -1567,6 +1572,7 @@ PIPELINE_JS = {
                 'js/sticky_filter.js',
                 'js/query-params.js',
                 'common/js/vendor/moment-with-locales.js',
+                'common/js/vendor/moment-timezone-with-data.js',
             ]
         ),
         'output_filename': 'js/lms-application.js',
@@ -1715,8 +1721,10 @@ REQUIRE_JS_PATH_OVERRIDES = {
     'js/bookmarks/views/bookmark_button': 'js/bookmarks/views/bookmark_button.js',
     'js/views/message_banner': 'js/views/message_banner.js',
     'moment': 'common/js/vendor/moment-with-locales.js',
+    'moment-timezone': 'common/js/vendor/moment-timezone-with-data.js',
     'js/courseware/course_home_events': 'js/courseware/course_home_events.js',
     'js/courseware/accordion_events': 'js/courseware/accordion_events.js',
+    'js/dateutil_factory': 'js/dateutil_factory.js',
     'js/courseware/link_clicked_events': 'js/courseware/link_clicked_events.js',
     'js/courseware/toggle_element_visibility': 'js/courseware/toggle_element_visibility.js',
     'js/student_account/logistration_factory': 'js/student_account/logistration_factory.js',
@@ -2036,7 +2044,7 @@ INSTALLED_APPS = (
     'rss_proxy',
 
     # Country embargo support
-    'embargo',
+    'openedx.core.djangoapps.embargo',
 
     # Monitoring functionality
     'openedx.core.djangoapps.monitoring',

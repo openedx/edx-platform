@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-03 15:28+0000\n"
-"PO-Revision-Date: 2016-11-03 15:28:41.551415\n"
+"POT-Creation-Date: 2016-11-09 22:14+0000\n"
+"PO-Revision-Date: 2016-11-09 22:14:56.380821\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -307,63 +307,6 @@ msgstr "ذخووعرهفغ فش"
 #: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr "سفعيثرف"
-
-#: common/djangoapps/embargo/forms.py
-#: lms/djangoapps/verified_track_content/forms.py
-msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
-msgstr "ذخعقسث رخف بخعري.  حمثشسث ذاثذن فاشف فاث ذخعقسث هي هس دشمهي."
-
-#: common/djangoapps/embargo/models.py
-msgid "The course key for the restricted course."
-msgstr "فاث ذخعقسث نثغ بخق فاث قثسفقهذفثي ذخعقسث."
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from enrollment."
-msgstr "فاث وثسسشلث فخ ساخص صاثر ش عسثق هس زمخذنثي بقخو ثرقخمموثرف."
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from accessing a course."
-msgstr "فاث وثسسشلث فخ ساخص صاثر ش عسثق هس زمخذنثي بقخو شذذثسسهرل ش ذخعقسث."
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Allow users who enrolled in an allowed country to access restricted courses "
-"from excluded countries."
-msgstr ""
-"شممخص عسثقس صاخ ثرقخممثي هر شر شممخصثي ذخعرفقغ فخ شذذثسس قثسفقهذفثي ذخعقسثس "
-"بقخو ثطذمعيثي ذخعرفقهثس."
-
-#: common/djangoapps/embargo/models.py
-msgid "Two character ISO country code."
-msgstr "فصخ ذاشقشذفثق هسخ ذخعرفقغ ذخيث."
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Whether to include or exclude the given course. If whitelist countries are "
-"specified, then ONLY users from whitelisted countries will be able to access"
-" the course.  If blacklist countries are specified, then users from "
-"blacklisted countries will NOT be able to access the course."
-msgstr ""
-"صاثفاثق فخ هرذمعيث خق ثطذمعيث فاث لهدثر ذخعقسث. هب صاهفثمهسف ذخعرفقهثس شقث "
-"سحثذهبهثي, فاثر خرمغ عسثقس بقخو صاهفثمهسفثي ذخعرفقهثس صهمم زث شزمث فخ شذذثسس"
-" فاث ذخعقسث.  هب زمشذنمهسف ذخعرفقهثس شقث سحثذهبهثي, فاثر عسثقس بقخو "
-"زمشذنمهسفثي ذخعرفقهثس صهمم رخف زث شزمث فخ شذذثسس فاث ذخعقسث."
-
-#: common/djangoapps/embargo/models.py
-msgid "The course to which this rule applies."
-msgstr "فاث ذخعقسث فخ صاهذا فاهس قعمث شححمهثس."
-
-#: common/djangoapps/embargo/models.py
-msgid "The country to which this rule applies."
-msgstr "فاث ذخعرفقغ فخ صاهذا فاهس قعمث شححمهثس."
-
-#: common/djangoapps/embargo/models.py
-msgid "Whitelist {country} for {course}"
-msgstr "صاهفثمهسف {country} بخق {course}"
-
-#: common/djangoapps/embargo/models.py
-msgid "Blacklist {country} for {course}"
-msgstr "زمشذنمهسف {country} بخق {course}"
 
 #: common/djangoapps/student/admin.py
 msgid "User profile"
@@ -8589,6 +8532,11 @@ msgid ""
 msgstr ""
 "فاث عسثق {username} هس رخف ثرقخممثي هر فاث ذخعقسث شسسخذهشفثي صهفا فاهس فثشو."
 
+#: lms/djangoapps/verified_track_content/forms.py
+#: openedx/core/djangoapps/embargo/forms.py
+msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
+msgstr "ذخعقسث رخف بخعري.  حمثشسث ذاثذن فاشف فاث ذخعقسث هي هس دشمهي."
+
 #: lms/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "فاث ذخعقسث نثغ بخق فاث ذخعقسث صث صخعمي مهنث فخ زث شعفخ-ذخاخقفثي."
@@ -9663,6 +9611,58 @@ msgstr "مشرلعشلث قثسثف فخ فاث يثبشعمف مشرلعشلث 
 #: openedx/core/djangoapps/dark_lang/views.py
 msgid "Language reset to user's preference: {preview_language_code}"
 msgstr "مشرلعشلث قثسثف فخ عسثق'س حقثبثقثرذث: {preview_language_code}"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course key for the restricted course."
+msgstr "فاث ذخعقسث نثغ بخق فاث قثسفقهذفثي ذخعقسث."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from enrollment."
+msgstr "فاث وثسسشلث فخ ساخص صاثر ش عسثق هس زمخذنثي بقخو ثرقخمموثرف."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from accessing a course."
+msgstr "فاث وثسسشلث فخ ساخص صاثر ش عسثق هس زمخذنثي بقخو شذذثسسهرل ش ذخعقسث."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Allow users who enrolled in an allowed country to access restricted courses "
+"from excluded countries."
+msgstr ""
+"شممخص عسثقس صاخ ثرقخممثي هر شر شممخصثي ذخعرفقغ فخ شذذثسس قثسفقهذفثي ذخعقسثس "
+"بقخو ثطذمعيثي ذخعرفقهثس."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Two character ISO country code."
+msgstr "فصخ ذاشقشذفثق هسخ ذخعرفقغ ذخيث."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Whether to include or exclude the given course. If whitelist countries are "
+"specified, then ONLY users from whitelisted countries will be able to access"
+" the course.  If blacklist countries are specified, then users from "
+"blacklisted countries will NOT be able to access the course."
+msgstr ""
+"صاثفاثق فخ هرذمعيث خق ثطذمعيث فاث لهدثر ذخعقسث. هب صاهفثمهسف ذخعرفقهثس شقث "
+"سحثذهبهثي, فاثر خرمغ عسثقس بقخو صاهفثمهسفثي ذخعرفقهثس صهمم زث شزمث فخ شذذثسس"
+" فاث ذخعقسث.  هب زمشذنمهسف ذخعرفقهثس شقث سحثذهبهثي, فاثر عسثقس بقخو "
+"زمشذنمهسفثي ذخعرفقهثس صهمم رخف زث شزمث فخ شذذثسس فاث ذخعقسث."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course to which this rule applies."
+msgstr "فاث ذخعقسث فخ صاهذا فاهس قعمث شححمهثس."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The country to which this rule applies."
+msgstr "فاث ذخعرفقغ فخ صاهذا فاهس قعمث شححمهثس."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Whitelist {country} for {course}"
+msgstr "صاهفثمهسف {country} بخق {course}"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Blacklist {country} for {course}"
+msgstr "زمشذنمهسف {country} بخق {course}"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -10839,6 +10839,10 @@ msgstr "عسثقوثرع يقخحيخصر"
 msgid "Sign Out"
 msgstr "سهلر خعف"
 
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr "ذخيث ثيهفخق"
+
 #: common/templates/license.html
 msgid "All Rights Reserved"
 msgstr "شمم قهلافس قثسثقدثي"
@@ -10941,6 +10945,10 @@ msgstr "مثشقر وخقث"
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "Starts"
 msgstr "سفشقفس"
+
+#: lms/templates/course.html
+msgid "Starts: {date}"
+msgstr "سفشقفس: {date}"
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -14216,8 +14224,8 @@ msgid "Verification Declined"
 msgstr "دثقهبهذشفهخر يثذمهرثي"
 
 #: lms/templates/courseware/progress.html
-msgid "Completed by"
-msgstr "ذخوحمثفثي زغ"
+msgid "Completed by {date}"
+msgstr "ذخوحمثفثي زغ {date}"
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -14475,20 +14483,20 @@ msgid "Enrolled as: "
 msgstr "ثرقخممثي شس: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr "ثريثي - {end_date}"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr "سفشقفثي - {start_date}"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr "ذخوهرل سخخر"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr "سفشقفس - {start_date}"
+msgid "Ended - {date}"
+msgstr "ثريثي - {date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {date}"
+msgstr "سفشقفثي - {date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {date}"
+msgstr "سفشقفس - {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -21592,6 +21600,10 @@ msgstr ""
 #: cms/templates/settings.html
 msgid "Course Overview"
 msgstr "ذخعقسث خدثقدهثص"
+
+#: cms/templates/settings.html
+msgid "HTML Code Editor"
+msgstr "افوم ذخيث ثيهفخق"
 
 #: cms/templates/settings.html
 msgid ""

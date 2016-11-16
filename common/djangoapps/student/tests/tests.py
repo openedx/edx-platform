@@ -19,7 +19,7 @@ import httpretty
 from markupsafe import escape
 from mock import Mock, patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey, CourseLocator
 from provider.constants import CONFIDENTIAL
 from pyquery import PyQuery as pq
 import pytz
@@ -59,6 +59,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 log = logging.getLogger(__name__)
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
@@ -76,9 +77,13 @@ class CourseEndingTest(TestCase):
 
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     def test_cert_info(self):
-        user = Mock(username="fred")
+        user = Mock(username="fred", id="1")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url, certificates_display_behavior='end')
+        course = Mock(
+            end_of_course_survey_url=survey_url,
+            certificates_display_behavior='end',
+            id=CourseLocator(org="x", course="y", run="z"),
+        )
         course_mode = 'honor'
 
         self.assertEqual(
@@ -105,6 +110,24 @@ class CourseEndingTest(TestCase):
                 'can_unenroll': True,
             }
         )
+
+        cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
+        with patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.get_persisted') as patch_persisted_grade:
+            patch_persisted_grade.return_value = Mock(percent=100)
+            self.assertEqual(
+                _cert_info(user, course, cert_status, course_mode),
+                {
+                    'status': 'generating',
+                    'show_disabled_download_button': True,
+                    'show_download_url': False,
+                    'show_survey_button': True,
+                    'survey_url': survey_url,
+                    'grade': '100',
+                    'mode': 'honor',
+                    'linked_in_url': None,
+                    'can_unenroll': False,
+                }
+            )
 
         cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
         self.assertEqual(
@@ -166,7 +189,7 @@ class CourseEndingTest(TestCase):
         )
 
         # Test a course that doesn't have a survey specified
-        course2 = Mock(end_of_course_survey_url=None)
+        course2 = Mock(end_of_course_survey_url=None, id=CourseLocator(org="a", course="b", run="c"))
         cert_status = {
             'status': 'notpassing', 'grade': '67',
             'download_url': download_url, 'mode': 'honor'

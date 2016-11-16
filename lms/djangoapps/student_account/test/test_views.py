@@ -281,7 +281,7 @@ class StudentAccountLoginAndRegistrationTest(ThirdPartyAuthTestMixin, UrlResetMi
     EMAIL = "bob@example.com"
     PASSWORD = "password"
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

@@ -40,7 +40,8 @@
             'lms/js/preview/preview_factory',
             'support/js/certificates_factory',
             'support/js/enrollment_factory',
-            'teams/js/teams_tab_factory'
+            'teams/js/teams_tab_factory',
+            'js/dateutil_factory'
         ]),
 
         /**

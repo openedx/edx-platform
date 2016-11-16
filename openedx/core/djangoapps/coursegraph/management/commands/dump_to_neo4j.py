@@ -27,7 +27,6 @@ log = logging.getLogger(__name__)
 bolt_log = logging.getLogger('neo4j.bolt')  # pylint: disable=invalid-name
 bolt_log.setLevel(logging.ERROR)
 
-ITERABLE_NEO4J_TYPES = (tuple, list, set, frozenset)
 PRIMITIVE_NEO4J_TYPES = (integer, string, neo4j_unicode, float, bool)
 
 COMMAND_LAST_RUN_CACHE = CommandLastRunCache()
@@ -145,16 +144,11 @@ class ModuleStoreSerializer(object):
             value: the value of an xblock's field
 
         Returns: either the value, a text version of the value, or, if the
-        value is iterable, the value with each element being converted to text
+        value is a list, a list where each element is converted to text.
         """
-
         coerced_value = value
-        if isinstance(value, ITERABLE_NEO4J_TYPES):
-            coerced_value = []
-            for element in value:
-                coerced_value.append(six.text_type(element))
-            # convert coerced_value back to its original type
-            coerced_value = type(value)(coerced_value)
+        if isinstance(value, list):
+            coerced_value = [six.text_type(element) for element in coerced_value]
 
         # if it's not one of the types that neo4j accepts,
         # just convert it to text

@@ -10,7 +10,6 @@ from course_modes.models import CourseMode
 from course_modes.helpers import enrollment_mode_display
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from openedx.core.djangolib.markup import HTML, Text
-from openedx.core.lib.time_zone_utils import get_user_time_zone
 from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
@@ -99,20 +98,37 @@ from student.helpers import (
         <div class="course-info">
           <span class="info-university">${course_overview.display_org_with_default} - </span>
           <span class="info-course-id">${course_overview.display_number_with_default}</span>
-          <span class="info-date-block" data-tooltip="Hi">
-          <% time_zone = get_user_time_zone(user) %>
-          % if course_overview.has_ended():
-            ${_("Ended - {end_date}").format(end_date=course_overview.end_datetime_text("SHORT_DATE", time_zone))}
-          % elif course_overview.has_started():
-            ${_("Started - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
-          % elif course_overview.start_date_is_still_default: # Course start date TBD
-            ${_("Coming Soon")}
-          % elif course_overview.starts_within(days=5):   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("DAY_AND_TIME", time_zone))}
-          % else:   # hasn't started yet
-            ${_("Starts - {start_date}").format(start_date=course_overview.start_datetime_text("SHORT_DATE", time_zone))}
-          % endif
-          </span>
+          <%
+            if course_overview.start_date_is_still_default:
+                container_string = _("Coming Soon")
+                course_date = None
+            else:
+                format = 'shortDate'
+                if course_overview.has_ended():
+                    container_string = _("Ended - {date}")
+                    course_date = course_overview.end
+                elif course_overview.has_started():
+                    container_string = _("Started - {date}")
+                    course_date = course_overview.start
+                elif course_overview.starts_within(days=5):
+                    container_string = _("Starts - {date}")
+                    course_date = course_overview.start
+                    format = 'defaultFormat'
+                else: ## hasn't started yet
+                    container_string = _("Starts - {date}")
+                    course_date = course_overview.start
+                endif
+            endif
+          %>
+
+                % if isinstance(course_date, str):
+                    <span class="info-date-block" data-tooltip="Hi">${_(container_string).format(date=course_date)}</span>
+                % elif course_date is not None:
+                    <%
+                        course_date_string = course_date.strftime('%Y-%m-%dT%H:%M:%S%z')
+                    %>
+                    <span class="info-date-block localized-datetime" data-language="${user_language}" data-tooltip="Hi" data-timezone="${user_timezone}" data-datetime="${course_date_string}" data-format=${format} data-string="${container_string}"></span>
+                % endif
         </div>
         <div class="wrapper-course-actions">
           <div class="course-actions">
@@ -439,3 +455,7 @@ from student.helpers import (
                }
            });
 </script>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

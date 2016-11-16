@@ -91,7 +91,6 @@ class TestGetXBlockParent(GatingTestCase):
 
     def test_get_parent_with_category(self):
         """ Test test_get_parent_of_category """
-
         result = _get_xblock_parent(self.vert1, 'sequential')
         self.assertEqual(result.location, self.seq1.location)
         result = _get_xblock_parent(self.vert1, 'chapter')

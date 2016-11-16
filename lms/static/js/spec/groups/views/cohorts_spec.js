@@ -89,7 +89,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
             createMockCohortDiscussionsJson = function(allCohorted) {
                 return {
                     course_wide_discussions: {
-                        children: ['Topic_C_1', 'Topic_C_2'],
+                        children: [['Topic_C_1', 'entry'], ['Topic_C_2', 'entry']],
                         entries: {
                             Topic_C_1: {
                                 sort_key: null,
@@ -107,7 +107,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                         subcategories: {
                             Topic_I_1: {
                                 subcategories: {},
-                                children: ['Inline_Discussion_1', 'Inline_Discussion_2'],
+                                children: [['Inline_Discussion_1', 'entry'], ['Inline_Discussion_2', 'entry']],
                                 entries: {
                                     Inline_Discussion_1: {
                                         sort_key: null,
@@ -122,7 +122,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
                                 }
                             }
                         },
-                        children: ['Topic_I_1']
+                        children: [['Topic_I_1', 'subcategory']]
                     }
                 };
             };
@@ -1488,7 +1488,7 @@ define(['backbone', 'jquery', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers
 
                         topicsJson = {
                             course_wide_discussions: {
-                                children: ['Topic_C_1'],
+                                children: [['Topic_C_1', 'entry']],
                                 entries: {
                                     Topic_C_1: {
                                         sort_key: null,

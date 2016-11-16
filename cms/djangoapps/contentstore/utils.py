@@ -123,11 +123,14 @@ def get_lms_link_for_certificate_web_view(user_id, course_key, mode):
     """
     assert isinstance(course_key, CourseKey)
 
-    if settings.LMS_BASE is None:
+    # checks LMS_BASE value in SiteConfiguration against course_org_filter if not found returns settings.LMS_BASE
+    lms_base = SiteConfiguration.get_value_for_org(course_key.org, "LMS_BASE", settings.LMS_BASE)
+
+    if lms_base is None:
         return None
 
     return u"//{certificate_web_base}/certificates/user/{user_id}/course/{course_id}?preview={mode}".format(
-        certificate_web_base=settings.LMS_BASE,
+        certificate_web_base=lms_base,
         user_id=user_id,
         course_id=unicode(course_key),
         mode=mode

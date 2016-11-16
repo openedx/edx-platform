@@ -511,6 +511,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
@@ -520,6 +521,7 @@ class DiscussionOpenClosedThreadTest(BaseDiscussionTestCase):
         page.a11y_audit.config.set_rules({
             'ignore': [
                 'section',  # TODO: AC-491
+                'aria-required-children',  # TODO: AC-534
                 'color-contrast',  # Commented out for now because they reproducibly fail on Jenkins but not locally
             ]
         })
@@ -1143,21 +1145,29 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
     def setUp(self):
         super(DiscussionUserProfileTest, self).setUp()
-        CourseFixture(**self.course_info).install()
+        self.setup_course()
         # The following line creates a user enrolled in our course, whose
         # threads will be viewed, but not the one who will view the page.
         # It isn't necessary to log them in, but using the AutoAuthPage
         # saves a lot of code.
-        self.profiled_user_id = AutoAuthPage(
-            self.browser,
-            username=self.PROFILED_USERNAME,
-            course_id=self.course_id
-        ).visit().get_user_id()
+        self.profiled_user_id = self.setup_user(username=self.PROFILED_USERNAME)
         # now create a second user who will view the profile.
-        self.user_id = AutoAuthPage(
-            self.browser,
-            course_id=self.course_id
-        ).visit().get_user_id()
+        self.user_id = self.setup_user()
+
+    def setup_course(self):
+        """
+        Set up the for the course discussion user-profile tests.
+        """
+        return CourseFixture(**self.course_info).install()
+
+    def setup_user(self, roles=None, **user_info):
+        """
+        Helper method to create and authenticate a user.
+        """
+        roles_str = ''
+        if roles:
+            roles_str = ','.join(roles)
+        return AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str, **user_info).visit().get_user_id()
 
     def check_pages(self, num_threads):
         # set up the stub server to return the desired amount of thread results
@@ -1259,6 +1269,41 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
         learner_profile_page.wait_for_page()
         self.assertTrue(learner_profile_page.field_is_visible('username'))
+
+    def test_learner_profile_roles(self):
+        """
+        Test that on the learner profile page user roles are correctly listed according to the course.
+        """
+        # Setup a learner with roles in a Course-A.
+        expected_student_roles = ['Administrator', 'Community TA', 'Moderator', 'Student']
+        self.profiled_user_id = self.setup_user(
+            roles=expected_student_roles,
+            username=self.PROFILED_USERNAME
+        )
+
+        # Visit the page and verify the roles are listed correctly.
+        page = self.check_pages(1)
+        student_roles = page.get_user_roles()
+        self.assertEqual(student_roles, ', '.join(expected_student_roles))
+
+        # Save the course_id of Course-A before setting up a new course.
+        old_course_id = self.course_id
+
+        # Setup Course-B and set user do not have additional roles and test roles are displayed correctly.
+        self.course_info['number'] = self.unique_id
+        self.setup_course()
+        new_course_id = self.course_id
+
+        # Set the user to have no extra role in the Course-B and verify the existing
+        # user is updated.
+        profiled_student_user_id = self.setup_user(roles=None, username=self.PROFILED_USERNAME)
+        self.assertEqual(self.profiled_user_id, profiled_student_user_id)
+        self.assertNotEqual(old_course_id, new_course_id)
+
+        # Visit the user profile in course discussion page of Course-B. Make sure the
+        # roles are listed correctly.
+        page = self.check_pages(1)
+        self.assertEqual(page.get_user_roles(), u'Student')
 
 
 class DiscussionSearchAlertTest(UniqueCourseTest):
