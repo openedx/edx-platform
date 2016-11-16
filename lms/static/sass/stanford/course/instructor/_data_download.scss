@@ -1,3 +1,12 @@
+.instructor-dashboard-wrapper-2 {
+  .file-download-link a.report-link {
+    display:inline-block;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 200px;
+  }
+}
+
 .instructor-dashboard-wrapper-2 section.idash-section#data_download {
   .reports-download-container {
     .delete-report, .graph-forums {
@@ -11,12 +20,10 @@
         padding-right: 5px;
       }
     }
-
     .delete-report {
       right: 0;
       margin-right: 10px;
     }
-
     .graph-forums{
       right: 85px;
     }
