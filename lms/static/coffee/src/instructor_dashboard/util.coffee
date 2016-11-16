@@ -366,7 +366,7 @@ class ReportDownloads
     options =
       enableCellNavigation: true
       enableColumnReorder: false
-      rowHeight: 30
+      rowHeight: 45
       forceFitColumns: true
 
     columns = [
@@ -378,15 +378,15 @@ class ReportDownloads
       minWidth: 150
       cssClass: "file-download-link"
       formatter: (row, cell, value, columnDef, dataContext) ->
-        data_link ='<a class="course-forums-data" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
+        data_link ='<a class="report-link" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
         if dataContext['name'].indexOf("course_forums") > -1
-          graph_button = _.template('<a class="graph-forums"><i class="fa fa-bar-chart"></i> <%= label %></a>',
+          graph_button = _.template('<a class="graph-forums"><i class="fa fa-bar-chart"></i><%= label %></a>',
               {label: 'Graph This'})
         else
           graph_button = ""
-        delete_button = _.template('<a class="delete-report"><i class="fa fa-times-circle"></i> <%= label %></a>',
-            {label: 'Delete Report'})
-        return data_link +  delete_button+ graph_button
+        delete_button = _.template('<a class="delete-report"><i class="fa fa-times-circle"></i><%= label %></a>',
+            {label: 'Delete'})
+        return data_link + graph_button + delete_button
     ]
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
@@ -406,7 +406,7 @@ class ReportDownloads
     $graph_btns = @$section.find(".graph-forums")
     $graph_btns.click (e) =>
       parent = jQuery(e.target.parentElement.parentElement)
-      table_row = parent.find(".course-forums-data")
+      table_row = parent.find(".report-link")
       @$clicked_name = table_row.text()
       @$graph_element = @$section.find ".report-downloads-graph"
       @$graphEndpoint = @$graph_element.data 'endpoint'
@@ -415,7 +415,7 @@ class ReportDownloads
     $delete_btns = @$section.find('.delete-report')
     $delete_btns.click (e) =>
       table_row = jQuery(e.target.parentElement.parentElement)
-      filename_cell = table_row.find('.course-forums-data')
+      filename_cell = table_row.find('.report-link')
       file_to_delete = filename_cell.text()
       delete_text = gettext('Are you sure you want to delete the file <%= file %>? This cannot be undone.')
       full_delete_text = _.template(delete_text, {file: file_to_delete})
