@@ -5,30 +5,31 @@ Tests for credit app views.
 # pylint: disable=no-member
 
 from __future__ import unicode_literals
+
 import datetime
 import json
-from nose.plugins.attrib import attr
 import unittest
 
 import ddt
+import pytz
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from django.test.utils import override_settings
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
+from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
-import pytz
 
-from openedx.core.djangoapps.credit.signature import signature
-from openedx.core.djangoapps.credit.serializers import CreditProviderSerializer, CreditEligibilitySerializer
-from openedx.core.djangoapps.credit.tests.factories import (
-    CreditProviderFactory,
-    CreditEligibilityFactory,
-    CreditCourseFactory, CreditRequestFactory)
-from student.tests.factories import UserFactory, AdminFactory
 from openedx.core.djangoapps.credit.models import (
-    CreditCourse,
-    CreditProvider, CreditRequest, CreditRequirement, CreditRequirementStatus)
+    CreditCourse, CreditProvider, CreditRequest, CreditRequirement, CreditRequirementStatus,
+)
+from openedx.core.djangoapps.credit.serializers import CreditProviderSerializer, CreditEligibilitySerializer
+from openedx.core.djangoapps.credit.signature import signature
+from openedx.core.djangoapps.credit.tests.factories import (
+    CreditProviderFactory, CreditEligibilityFactory, CreditCourseFactory, CreditRequestFactory,
+)
+from openedx.core.lib.token_utils import JwtBuilder
+from student.tests.factories import UserFactory, AdminFactory
 from util.date_utils import to_timestamp
 
 JSON = 'application/json'
@@ -87,6 +88,18 @@ class AuthMixin(object):
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 200)
 
+    def test_jwt_auth(self):
+        """ verify the endpoints JWT authentication. """
+        scopes = ['email', 'profile']
+        expires_in = settings.OAUTH_ID_TOKEN_EXPIRATION
+        token = JwtBuilder(self.user).build_token(scopes, expires_in)
+        headers = {
+            'HTTP_AUTHORIZATION': 'JWT ' + token
+        }
+        self.client.logout()
+        response = self.client.get(self.path, **headers)
+        self.assertEqual(response.status_code, 200)
+
 
 @ddt.ddt
 class ReadOnlyMixin(object):
@@ -101,7 +114,7 @@ class ReadOnlyMixin(object):
 
 @attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class CreditCourseViewSetTests(UserMixin, TestCase):
+class CreditCourseViewSetTests(AuthMixin, UserMixin, TestCase):
     """ Tests for the CreditCourse endpoints.
 
      GET/POST /api/v1/credit/creditcourse/
