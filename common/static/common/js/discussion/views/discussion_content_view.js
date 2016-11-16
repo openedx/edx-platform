@@ -413,7 +413,7 @@
                 updates = {
                     upvoted_ids: (is_voting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id])
                 };
-                if (!$(event.target.closest('.actions-item')).hasClass('is-disabled')) {
+                if (!$(event.target).closest('.actions-item').hasClass('is-disabled')) {
                     return DiscussionUtil.updateWithUndo(user, updates, {
                         url: url,
                         type: 'POST',
