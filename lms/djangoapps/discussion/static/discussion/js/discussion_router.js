@@ -6,10 +6,9 @@
             'underscore',
             'backbone',
             'common/js/discussion/utils',
-            'common/js/discussion/models/discussion_course_settings',
             'common/js/discussion/views/discussion_thread_view'
         ],
-        function(_, Backbone, DiscussionUtil, DiscussionCourseSettings, DiscussionThreadView) {
+        function(_, Backbone, DiscussionUtil, DiscussionThreadView) {
             var DiscussionRouter = Backbone.Router.extend({
                 routes: {
                     '': 'allThreads',
@@ -21,7 +20,7 @@
                     _.bindAll(this, 'allThreads', 'showThread');
                     this.courseId = options.courseId;
                     this.discussion = options.discussion;
-                    this.course_settings = new DiscussionCourseSettings(options.course_settings);
+                    this.course_settings = options.courseSettings;
                     this.discussionBoardView = options.discussionBoardView;
                     this.newPostView = options.newPostView;
                 },
