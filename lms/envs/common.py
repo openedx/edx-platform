@@ -1275,7 +1275,7 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/html-utils.js',
 
     # Finally load RequireJS and dependent vendor libraries
-    'js/vendor/requirejs/require.js',
+    'common/js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
     'common/js/vendor/backbone.js'
@@ -1690,7 +1690,7 @@ REQUIRE_BASE_URL = "./"
 REQUIRE_BUILD_PROFILE = "lms/js/build.js"
 
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
-REQUIRE_JS = "js/vendor/requirejs/require.js"
+REQUIRE_JS = "common/js/vendor/require.js"
 
 # A dictionary of standalone modules to build with almond.js.
 REQUIRE_STANDALONE_MODULES = {}

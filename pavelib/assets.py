@@ -8,6 +8,7 @@ from functools import wraps
 from threading import Timer
 import argparse
 import glob
+import os
 import traceback
 
 from paver import tasks
@@ -46,17 +47,25 @@ COMMON_LOOKUP_PATHS = [
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
-    'jquery/dist/jquery.js',
-    'jquery-migrate/dist/jquery-migrate.js',
-    'jquery.scrollto/jquery.scrollTo.js',
-    'underscore/underscore.js',
-    'underscore.string/dist/underscore.string.js',
-    'picturefill/dist/picturefill.js',
+    'backbone-validation/dist/backbone-validation-min.js',
     'backbone/backbone.js',
     'edx-ui-toolkit/node_modules/backbone.paginator/lib/backbone.paginator.js',
-    'backbone-validation/dist/backbone-validation-min.js',
     'edx-ui-toolkit/node_modules/moment-timezone/builds/moment-timezone-with-data.js',
     'edx-ui-toolkit/node_modules/moment/min/moment-with-locales.js',
+    'jquery-migrate/dist/jquery-migrate.js',
+    'jquery.scrollto/jquery.scrollTo.js',
+    'jquery/dist/jquery.js',
+    'picturefill/dist/picturefill.js',
+    'requirejs/require.js',
+    'underscore.string/dist/underscore.string.js',
+    'underscore/underscore.js',
+]
+
+# A list of NPM installed developer libraries that should be copied into the common
+# static directory only in development mode.
+NPM_INSTALLED_DEVELOPER_LIBRARIES = [
+    'edx-ui-toolkit/node_modules/sinon/pkg/sinon.js',
+    'squirejs/src/Squire.js',
 ]
 
 # Directory to install static vendor files
@@ -597,6 +606,19 @@ def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
     """
+    def copy_vendor_library(library, skip_if_missing=False):
+        """
+        Copies a vendor library to the shared vendor directory.
+        """
+        library_path = 'node_modules/{library}'.format(library=library)
+        if os.path.exists(library_path):
+            sh('/bin/cp -rf {library_path} {vendor_dir}'.format(
+                library_path=library_path,
+                vendor_dir=NPM_VENDOR_DIRECTORY,
+            ))
+        elif not skip_if_missing:
+            raise Exception('Missing vendor file {library_path}'.format(library_path=library_path))
+
     # Skip processing of the libraries if this is just a dry run
     if tasks.environment.dry_run:
         tasks.environment.info("install npm_assets")
@@ -606,11 +628,14 @@ def process_npm_assets():
     NPM_VENDOR_DIRECTORY.mkdir_p()
 
     # Copy each file to the vendor directory, overwriting any existing file.
+    print("Copying vendor files into static directory")
     for library in NPM_INSTALLED_LIBRARIES:
-        sh('/bin/cp -rf node_modules/{library} {vendor_dir}'.format(
-            library=library,
-            vendor_dir=NPM_VENDOR_DIRECTORY,
-        ))
+        copy_vendor_library(library)
+
+    # Copy over each developer library too if they have been installed
+    print("Copying developer vendor files into static directory")
+    for library in NPM_INSTALLED_DEVELOPER_LIBRARIES:
+        copy_vendor_library(library, skip_if_missing=True)
 
 
 def process_xmodule_assets():
