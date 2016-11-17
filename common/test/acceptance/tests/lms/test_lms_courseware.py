@@ -743,6 +743,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         self.go_to_tab_and_assert_problem(1, self.problem1_name)
         problem1_content_after_coming_back = self.problem_page.problem_content
         self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
+        self.assertFalse(True)
 
     def test_perform_problem_save_and_navigate(self):
         """
@@ -807,6 +808,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         self.go_to_tab_and_assert_problem(1, self.problem1_name)
         problem1_content_after_coming_back = self.problem_page.problem_content
         self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
+        self.assertFalse(True)
 
 
 class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
