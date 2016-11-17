@@ -45,23 +45,24 @@ class @Sequence
   hookUpContentStateChangeEvent: ->
     $('.problems-wrapper').bind(
       'contentChanged',
-      (event, problem_id, new_content_state) =>
-        @addToUpdatedProblems problem_id, new_content_state
+      (event, problem_id, new_content_state, new_state) =>
+        @addToUpdatedProblems problem_id, new_content_state, new_state
     )
 
-  addToUpdatedProblems: (problem_id, new_content_state) =>
+  addToUpdatedProblems: (problem_id, new_content_state, new_state) =>
     # Used to keep updated problem's state temporarily.
     # params:
     #   'problem_id' is problem id.
-    #   'new_content_state' is updated problem's state.
+    #   'new_content_state' is the updated content of the problem.
+    #   'new_state' is the updated state of the problem.
 
     # initialize for the current sequence if there isn't any updated problem
     # for this position.
     if not @anyUpdatedProblems @position
       @updatedProblems[@position] = {}
 
-    # Now, put problem content against problem id for current active sequence.
-    @updatedProblems[@position][problem_id] = new_content_state
+    # Now, put problem content and score against problem id for current active sequence.
+    @updatedProblems[@position][problem_id] = [new_content_state, new_state]
 
   anyUpdatedProblems:(position) ->
     # check for the updated problems for given sequence position.
@@ -161,10 +162,15 @@ class @Sequence
 
       # update the data-attributes with latest contents only for updated problems.
       if @anyUpdatedProblems new_position
-        $.each @updatedProblems[new_position], (problem_id, latest_content) =>
+        $.each @updatedProblems[new_position], (problem_id, latest_data) =>
+          latest_content = latest_data[0]
+          latest_response = latest_data[1]
           @content_container
           .find("[data-problem-id='#{ problem_id }']")
           .data('content', latest_content)
+          .data('problem-score', latest_response.current_score)
+          .data('problem-total-possible', latest_response.total_possible)
+          .data('attempts-used', latest_response.attempts_used)
 
       XBlock.initializeBlocks(@content_container, @requestToken)
 
