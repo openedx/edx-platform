@@ -188,10 +188,14 @@
     }
 }
 
-// Overrides underspecific style from courseware css:
-// https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L402
-.course-wrapper .course-content .forum-nav-thread-list li {
-    margin: 0;
+// Overrides underspecific styles from courseware css
+.course-wrapper .course-content .forum-nav-thread-list {
+    @include padding-left(0);
+    list-style: none;
+
+    li {
+        margin: 0;
+    }
 }
 
 .forum-nav-thread {

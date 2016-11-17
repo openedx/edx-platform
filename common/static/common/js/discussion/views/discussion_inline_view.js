@@ -19,15 +19,24 @@
             }
         },
 
+        page_re: /\?discussion_page=(\d+)/,
+
         initialize: function(options) {
+            var match;
+
             this.$el = options.el;
             this.showByDefault = options.showByDefault || false;
             this.toggleDiscussionBtn = this.$('.discussion-show');
             this.newPostForm = this.$el.find('.new-post-article');
             this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
+            this.listenTo(this.model, 'change', this.render);
 
-            // @TODO: Must implement pagination
-            this.page = 1;
+            match = this.page_re.exec(window.location.href);
+            if (match) {
+                this.page = parseInt(match[1], 10);
+            } else {
+                this.page = 1;
+            }
 
             // By default the view is displayed in a hidden state. If you want it to be shown by default (e.g. in Teams)
             // pass showByDefault as an option. This code will open it on initialization.
@@ -116,12 +125,24 @@
             this.retrieved = true;
             this.showed = true;
 
+            this.renderPagination(response.num_pages);
+
             if (this.isWaitingOnNewPost) {
                 this.newPostForm.show().focus();
             }
 
             // Hide the thread view initially
             this.$('.inline-thread').addClass('is-hidden');
+        },
+
+        renderPagination: function(numPages) {
+            var pageUrl, pagination, params;
+            pageUrl = function(number) {
+                return '?discussion_page=' + number;
+            };
+            params = DiscussionUtil.getPaginationParams(this.page, numPages, pageUrl);
+            pagination = _.template($('#pagination-template').html())(params);
+            return this.$('section.discussion-pagination').html(pagination);
         },
 
         navigateToThread: function(threadId) {
