@@ -248,6 +248,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
             graded=expected_graded,
             display_name=None,  # problem-specific, filled in by _verify_grades
             module_id=None,  # problem-specific, filled in by _verify_grades
+            attempted=True,
         )
         self._verify_grades(raw_earned, raw_possible, weight, expected_score)
 

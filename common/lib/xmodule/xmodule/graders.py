@@ -21,13 +21,15 @@ class ScoreBase(object):
         display_name (string) - the display name of the module
         module_id (UsageKey) - the location of the module
         graded (boolean) - whether or not this module is graded
+        attempted (boolean) - whether the module was attempted
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, graded, display_name, module_id):
+    def __init__(self, graded, display_name, module_id, attempted):
         self.graded = graded
         self.display_name = display_name
         self.module_id = module_id
+        self.attempted = attempted
 
     def __eq__(self, other):
         if type(other) is type(self):
@@ -91,15 +93,19 @@ def aggregate_scores(scores, display_name="summary", location=None):
     """
     total_correct_graded = float_sum(score.earned for score in scores if score.graded)
     total_possible_graded = float_sum(score.possible for score in scores if score.graded)
+    any_attempted_graded = any(score.attempted for score in scores if score.graded)
 
     total_correct = float_sum(score.earned for score in scores)
     total_possible = float_sum(score.possible for score in scores)
+    any_attempted = any(score.attempted for score in scores)
 
-    #regardless of whether it is graded
-    all_total = AggregatedScore(total_correct, total_possible, False, display_name, location)
+    # regardless of whether it is graded
+    all_total = AggregatedScore(total_correct, total_possible, False, display_name, location, any_attempted)
 
-    #selecting only graded things
-    graded_total = AggregatedScore(total_correct_graded, total_possible_graded, True, display_name, location)
+    # selecting only graded things
+    graded_total = AggregatedScore(
+        total_correct_graded, total_possible_graded, True, display_name, location, any_attempted_graded,
+    )
 
     return all_total, graded_total
 
