@@ -121,24 +121,13 @@ from xmodule.tabs import CourseTabList
           <hr>
         </header>
 
-        <%
-          dst = datetime.now(pytz.utc).astimezone(pytz.timezone("America/New_York")).dst()
-          if dst:
-            open_time = "13:00"
-            close_time = "21:00"
-          else:
-            open_time = "14:00"
-            close_time = "22:00"
-        %>
         <p>
         ${Text(_(
             'Thank you for your inquiry or feedback.  We typically respond to a request '
-            'within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please '
+            'within one business day, Monday to Friday.  In the meantime, please '
             'review our {link_start}detailed FAQs{link_end} where most questions have '
             'already been answered.'
         )).format(
-            open_time=open_time,
-            close_time=close_time,
             link_start=HTML('<a href="{}" target="_blank" id="success-feedback-faq-link">').format(marketing_link('FAQ')),
             link_end=HTML('</a>')
         )}
