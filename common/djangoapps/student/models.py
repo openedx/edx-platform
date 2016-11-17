@@ -10,55 +10,53 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
+import hashlib
+import json
+import logging
+import uuid
 from collections import defaultdict, OrderedDict, namedtuple
 from datetime import datetime, timedelta
 from functools import total_ordering
-import hashlib
 from importlib import import_module
-import json
-import logging
-from pytz import UTC
 from urllib import urlencode
-import uuid
 
 import analytics
-
+import dogstats_wrapper as dog_stats_api
 from config_models.models import ConfigurationModel
-from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.utils import timezone
-from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models, IntegrityError, transaction
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext_noop
-from django.core.cache import cache
 from django_countries.fields import CountryField
-import dogstats_wrapper as dog_stats_api
 from eventtracking import tracker
 from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pytz import UTC
 from simple_history.models import HistoricalRecords
-from track import contexts
-from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
+import lms.lib.comment_client as cc
+import request_cache
 from certificates.models import GeneratedCertificate
 from course_modes.models import CourseMode
 from enrollment.api import _default_course_mode
-import lms.lib.comment_client as cc
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client, ECOMMERCE_DATE_FORMAT
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-import request_cache
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from track import contexts
+from util.milestones_helpers import is_entrance_exams_enabled
 from util.model_utils import emit_field_changed_events, get_changed_fields_dict
 from util.query import use_read_replica_if_available
-from util.milestones_helpers import is_entrance_exams_enabled
-
 
 UNENROLL_DONE = Signal(providing_args=["course_enrollment", "skip_refund"])
 ENROLL_STATUS_CHANGE = Signal(providing_args=["event", "user", "course_id", "mode", "cost", "currency"])
@@ -1030,6 +1028,13 @@ class CourseEnrollment(models.Model):
             "[CourseEnrollment] {}: {} ({}); active: ({})"
         ).format(self.user, self.course_id, self.created, self.is_active)
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        super(CourseEnrollment, self).save(force_insert=force_insert, force_update=force_update, using=using,
+                                           update_fields=update_fields)
+
+        # Delete the cached status hash, forcing the value to be recalculated the next time it is needed.
+        cache.delete(self.enrollment_status_hash_cache_key(self.user))
+
     @classmethod
     @transaction.atomic
     def get_or_create_enrollment(cls, user, course_key):
@@ -1448,6 +1453,47 @@ class CourseEnrollment(models.Model):
     @classmethod
     def enrollments_for_user(cls, user):
         return cls.objects.filter(user=user, is_active=1)
+
+    @classmethod
+    def enrollment_status_hash_cache_key(cls, user):
+        """ Returns the cache key for the cached enrollment status hash.
+
+        Args:
+            user (User): User whose cache key should be returned.
+
+        Returns:
+            str: Cache key.
+        """
+        return 'enrollment_status_hash_' + user.username
+
+    @classmethod
+    def generate_enrollment_status_hash(cls, user):
+        """ Generates a hash encoding the given user's *active* enrollments.
+
+         Args:
+             user (User): User whose enrollments should be hashed.
+
+        Returns:
+            str: Hash of the user's active enrollments. If the user is anonymous, `None` is returned.
+        """
+        if user.is_anonymous():
+            return None
+
+        cache_key = cls.enrollment_status_hash_cache_key(user)
+        status_hash = cache.get(cache_key)
+
+        if not status_hash:
+            enrollments = cls.enrollments_for_user(user).values_list('course_id', 'mode')
+            enrollments = [(e[0].lower(), e[1].lower()) for e in enrollments]
+            enrollments = sorted(enrollments, key=lambda e: e[0])
+            hash_elements = [user.username]
+            hash_elements += ['{course_id}={mode}'.format(course_id=e[0], mode=e[1]) for e in enrollments]
+            status_hash = hashlib.md5('&'.join(hash_elements).encode('utf-8')).hexdigest()
+
+            # The hash is cached indefinitely. It will be invalidated when the user enrolls/unenrolls.
+            cache.set(cache_key, status_hash, None)
+
+        return status_hash
 
     def is_paid_course(self):
         """
