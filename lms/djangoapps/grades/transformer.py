@@ -118,8 +118,10 @@ class GradesTransformer(BlockStructureTransformer):
         """
         Collect the `max_score` for every block in the provided `block_structure`.
         """
-        for module in cls._iter_scorable_xmodules(block_structure):
-            cls._collect_max_score(block_structure, module)
+        for block_locator in block_structure.post_order_traversal():
+            block = block_structure.get_xblock(block_locator)
+            if getattr(block, 'has_score', False):
+                cls._collect_max_score(block_structure, block)
 
     @classmethod
     def _collect_max_score(cls, block_structure, module):
@@ -171,20 +173,7 @@ class GradesTransformer(BlockStructureTransformer):
         XModule, even though the data is not user specific.  Here we bind the
         data to a SystemUser.
         """
-        request = RequestFactory().get('/dummy-collect-max-grades')
-        user = SystemUser()
-        request.user = user
-        request.session = {}
-        root_block = block_structure.get_xblock(block_structure.root_block_usage_key)
-        course_key = block_structure.root_block_usage_key.course_key
-        cache = FieldDataCache.cache_for_descriptor_descendents(
-            course_id=course_key,
-            user=request.user,
-            descriptor=root_block,
-            descriptor_filter=lambda descriptor: descriptor.has_score,
-        )
         for block_locator in block_structure.post_order_traversal():
             block = block_structure.get_xblock(block_locator)
             if getattr(block, 'has_score', False):
-                module = courseware.module_render.get_module_for_descriptor(user, request, block, cache, course_key)
-                yield module
+                yield block

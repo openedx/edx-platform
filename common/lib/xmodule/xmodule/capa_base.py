@@ -357,12 +357,6 @@ class CapaMixin(CapaFields):
         """
         return self.lcp.get_score()
 
-    def max_score(self):
-        """
-        Access the problem's max score
-        """
-        return self.lcp.get_max_score()
-
     def get_progress(self):
         """
         For now, just return score / max_score
