@@ -65,6 +65,34 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
+GIT_REPO_EXPORT_DIR = '/edx/var/edxapp/export_course_repos'
+SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
+EMAIL_FILE_PATH = None
+STATIC_URL_BASE = None
+STATIC_ROOT_BASE = None
+SESSION_COOKIE_NAME = None
+ADDL_INSTALLED_APPS = []
+AUTH_USE_CAS = False
+CAS_ATTRIBUTE_CALLBACK = None
+MICROSITE_ROOT_DIR = ''
+CMS_SEGMENT_KEY = None
+DATADOG = {}
+ADDL_INSTALLED_APPS = []
+LOCAL_LOGLEVEL = 'INFO'
+##############################################################
+#
+# ENV TOKEN IMPORT
+#
+# Currently non-secure and secure settings are managed
+# in two yaml files. This section imports the non-secure
+# settings and modifies them in code if necessary.
+#
+
+with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
+    ENV_TOKENS = yaml.safe_load(env_file)
+
+ENV_TOKENS = convert_tokens(ENV_TOKENS)
+
 ##############################################################
 #
 # DEFAULT SETTINGS FOR CELERY
@@ -98,40 +126,17 @@ LOW_PRIORITY_QUEUE = 'edx.{0}core.low'.format(QUEUE_VARIANT)
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 
-CELERY_QUEUES = {
-    HIGH_PRIORITY_QUEUE: {},
-    LOW_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {}
-}
+ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
+if ENV_CELERY_QUEUES:
+    CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
+else:
+    CELERY_QUEUES = {
+        HIGH_PRIORITY_QUEUE: {},
+        LOW_PRIORITY_QUEUE: {},
+        DEFAULT_PRIORITY_QUEUE: {}
+    }
 
 CELERY_ALWAYS_EAGER = False
-GIT_REPO_EXPORT_DIR = '/edx/var/edxapp/export_course_repos'
-SESSION_INACTIVITY_TIMEOUT_IN_SECONDS = None
-EMAIL_FILE_PATH = None
-STATIC_URL_BASE = None
-STATIC_ROOT_BASE = None
-SESSION_COOKIE_NAME = None
-ADDL_INSTALLED_APPS = []
-AUTH_USE_CAS = False
-CAS_ATTRIBUTE_CALLBACK = None
-MICROSITE_ROOT_DIR = ''
-CMS_SEGMENT_KEY = None
-DATADOG = {}
-ADDL_INSTALLED_APPS = []
-LOCAL_LOGLEVEL = 'INFO'
-##############################################################
-#
-# ENV TOKEN IMPORT
-#
-# Currently non-secure and secure settings are managed
-# in two yaml files. This section imports the non-secure
-# settings and modifies them in code if necessary.
-#
-
-with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
-    ENV_TOKENS = yaml.safe_load(env_file)
-
-ENV_TOKENS = convert_tokens(ENV_TOKENS)
 
 ##########################################
 # Merge settings from common.py
