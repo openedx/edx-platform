@@ -7,8 +7,9 @@ import unittest
 from mock import call, patch
 from paver.easy import BuildFailure
 from pavelib.prereqs import no_prereq_install, node_prereqs_installation
-from pavelib.paver_tests.utils import PaverTestCase, CustomShMock
-from pavelib.paver_tests.test_paver_quality import CustomShMock
+from pavelib.paver_tests.utils import (
+    PaverTestCase, unexpected_fail_on_npm_install, fail_on_npm_install
+)
 
 
 class TestPaverPrereqInstall(unittest.TestCase):
@@ -81,17 +82,21 @@ class TestPaverNodeInstall(PaverTestCase):
 
     def setUp(self):
         super(TestPaverNodeInstall, self).setUp()
+
+        # Ensure prereqs will be run
         os.environ['NO_PREREQ_INSTALL'] = 'false'
+
         patcher = patch('pavelib.prereqs.sh', return_value=True)
         self._mock_paver_sh = patcher.start()
         self.addCleanup(patcher.stop)
 
     def test_npm_install_with_subprocess_error(self):
         """
-        Test that we handle a subprocess 1 (proxy for cb() never called error)
-        TE-1767
+        An exit with subprocess exit 1 is what paver receives when there is
+        an npm install error ("cb() never called!"). Test that we can handle
+        this kind of failure. For more info see TE-1767.
         """
-        self._mock_paver_sh.side_effect = CustomShMock().fail_on_npm_install
+        self._mock_paver_sh.side_effect = fail_on_npm_install
         with self.assertRaises(BuildFailure):
             node_prereqs_installation()
         actual_calls = self._mock_paver_sh.mock_calls
@@ -113,7 +118,7 @@ class TestPaverNodeInstall(PaverTestCase):
         """
         If there's some other error, only call npm install once, and raise a failure
         """
-        self._mock_paver_sh.side_effect = CustomShMock().unexpected_fail_on_npm_install
+        self._mock_paver_sh.side_effect = unexpected_fail_on_npm_install
         with self.assertRaises(BuildFailure):
             node_prereqs_installation()
         actual_calls = self._mock_paver_sh.mock_calls

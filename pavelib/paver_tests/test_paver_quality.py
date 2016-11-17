@@ -14,7 +14,7 @@ from path import Path as path
 from paver.easy import BuildFailure
 
 import pavelib.quality
-from pavelib.paver_tests.utils import CustomShMock
+from pavelib.paver_tests.utils import fail_on_pylint, fail_on_eslint
 
 
 @ddt
@@ -298,7 +298,7 @@ class TestPaverRunQuality(unittest.TestCase):
         """
 
         # Underlying sh call must fail when it is running the pylint diff-quality task
-        self._mock_paver_sh.side_effect = CustomShMock().fail_on_pylint
+        self._mock_paver_sh.side_effect = fail_on_pylint
         _mock_pep8_violations = MagicMock(return_value=(0, []))
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
@@ -318,7 +318,7 @@ class TestPaverRunQuality(unittest.TestCase):
         """
 
         # Underlying sh call must fail when it is running the eslint diff-quality task
-        self._mock_paver_sh.side_effect = CustomShMock().fail_on_eslint
+        self._mock_paver_sh.side_effect = fail_on_eslint
         _mock_pep8_violations = MagicMock(return_value=(0, []))
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
