@@ -1,6 +1,8 @@
 import json
 import logging
 import sys
+import requests
+
 from functools import wraps
 
 from django.conf import settings
@@ -133,6 +135,196 @@ def calculate(request):
     return HttpResponse(json.dumps({'result': str(result)}))
 
 
+class FreshdeskError(Exception):
+    """
+    Error to be raised for Freshdesk related failures (Equivalent of ZendeskError)
+    """
+    def __init__(self, msg, error_code):
+        super(FreshdeskError, self).__init__(msg)
+        self.error_code = error_code
+        self.msg = msg
+
+    def __str__(self):
+        return repr('%s: %s' % (self.error_code, self.msg))
+
+
+class _FreshdeskApi(object):
+    """
+    Freshdesk API functions (Equivalent of _ZendeskApi)
+    """
+    CACHE_PREFIX = 'FRESHDESK_API_CACHE'
+    CACHE_TIMEOUT = 60 * 60
+
+    def __init__(self):
+        """
+        Instantiate the Freshdesk API.
+
+        `HELPDESK_URL` and `HELPDESK_API_KEY` must be set
+        Set `HELPDESK` = 'Freshdesk'
+        in `django.conf.settings`.
+        """
+
+    def create_ticket(self, subject, desc, name, email, priority=1, status=2, group_id=''):
+        """
+        Create the given `ticket` in Freshdesk.
+
+        The ticket should have the format specified by the freshdesk api.
+        https://freshdesk.com/api#create_ticket
+        """
+        headers = {'Content-Type': 'application/json'}
+        payload = {
+            'helpdesk_ticket': {
+                'subject': subject,
+                'description': desc,
+                'name': name,
+                'email': email,
+                'priority': priority,
+                'status': status,
+                'group_id': group_id
+            }
+        }
+
+        response = requests.post(settings.HELPDESK_URL + '/helpdesk/tickets.json',
+                                 auth=(settings.HELPDESK_API_KEY, "unused_but_required"),
+                                 headers=headers,
+                                 data=json.dumps(payload),
+                                 allow_redirects=False)
+
+        if 200 <= response.status_code <= 299:
+            message = json.loads(response.content)
+            return message['helpdesk_ticket']['display_id']
+        else:
+            raise FreshdeskError(response.content, response.status_code, response)
+
+    def update_ticket(self, ticket_id, note):
+        """
+        Update the Freshdeck ticket with id `ticket_id` using the given `note`.
+
+        The update should have the format specified by the freshdesk api.
+        https://freshdesk.com/api#add_note_to_a_ticket
+        """
+        headers = {'Content-Type': 'application/json'}
+        payload = {
+            'helpdesk_note': {
+                "body": note,
+                "private": True
+            }
+        }
+
+        uri = '/helpdesk/tickets/{}/conversations/note.json'.format(str(ticket_id))
+        response = requests.post(settings.HELPDESK_URL + uri,
+                                 auth=(settings.HELPDESK_API_KEY, "unused_but_required"),
+                                 headers=headers,
+                                 data=json.dumps(payload),
+                                 allow_redirects=False)
+
+        if 200 <= response.status_code <= 299:
+            return json.loads(response.content)
+        else:
+            raise FreshdeskError(response.content, response.status_code, response)
+
+    def get_group(self, name):
+        """
+        Find the Freshdesk group named `name`. Groups are cached for
+        CACHE_TIMEOUT seconds.
+
+        If a matching group exists, it is returned as a dictionary
+        with the format specifed by the freshdesk api.
+
+        Otherwise, returns None.
+        """
+        cache = caches['default']
+        cache_key = '{prefix}_group_{name}'.format(prefix=self.CACHE_PREFIX, name=name)
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+
+        headers = {'Content-Type': 'application/json'}
+        response = requests.get(settings.HELPDESK_URL + '/groups.json',
+                                auth=(settings.HELPDESK_API_KEY, "unused_but_required"),
+                                headers=headers,
+                                allow_redirects=False)
+
+        groups = json.loads(response.content)
+
+        if 200 <= response.status_code <= 299:
+            for group in groups:
+                if group['group']['name'] == name:
+                    cache.set(cache_key, group, self.CACHE_TIMEOUT)
+                    return group
+        else:
+            raise FreshdeskError(groups, response.status_code, response)
+
+        return None
+
+
+def _record_feedback_in_freshdesk(
+        realname,
+        email,
+        subject,
+        details,
+        tags,
+        additional_info={},
+        group_name=None,
+        require_update=False
+):
+    """
+    Create a new user-requested Freshdesk ticket.
+
+    Once created, the ticket will be updated with a private comment containing
+    additional information from the browser and server, such as HTTP headers
+    and user state. Returns a boolean value indicating whether ticket creation
+    was successful, regardless of whether the private comment update succeeded.
+
+    If `group_name` is provided, attaches the ticket to the matching Freshdesk group.
+
+    If `require_update` is provided, returns False when the update does not
+    succeed. This allows using the private comment to add necessary information
+    which the user will not see in followup emails from support.
+    """
+    freshdesk_api = _FreshdeskApi()
+
+    additional_info_string = (
+        u"Additional information:\n\n" +
+        u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
+    )
+
+    # Tag all issues with LMS to distinguish channel in Freshdesk; requested by student support team
+    freshdesk_tags = list(tags.values()) + ["LMS"]
+
+    # Per edX support, we would like to be able to route white label feedback items
+    # via tagging
+    white_label_org = configuration_helpers.get_value('course_org_filter')
+    if white_label_org:
+        freshdesk_tags = freshdesk_tags + ["whitelabel_{org}".format(org=white_label_org)]
+
+    group_id = ''
+    if group_name is not None:
+        try:
+            group = freshdesk_api.get_group(group_name)
+            group_id = group['id']
+        except FreshdeskError:
+            log.warning("Cannot find Freshdesk group named: " + group_name)
+
+    try:
+        ticket_id = freshdesk_api.create_ticket(subject, details, realname, email, 1, 2, group_id)
+    except FreshdeskError:
+        log.exception("Error creating Freshdesk ticket")
+        return False
+
+    # Additional information is provided as a private update so the information
+    # is not visible to the user. https://freshdesk.com/api#add_note_to_a_ticket
+    try:
+        freshdesk_api.update_ticket(ticket_id, additional_info_string)
+    except FreshdeskError:
+        log.exception("Error updating Freshdesk ticket with ID %s.", ticket_id)
+        # The update is not strictly necessary, so do not indicate failure
+        # to the user unless it has been requested with `require_update`.
+        if require_update:
+            return False
+    return True
+
+
 class _ZendeskApi(object):
 
     CACHE_PREFIX = 'ZENDESK_API_CACHE'
@@ -142,13 +334,13 @@ class _ZendeskApi(object):
         """
         Instantiate the Zendesk API.
 
-        All of `ZENDESK_URL`, `ZENDESK_USER`, and `ZENDESK_API_KEY` must be set
+        All of `HELPDESK_URL`, `HELPDESK_USER`, and `HELPDESK_API_KEY` must be set
         in `django.conf.settings`.
         """
         self._zendesk_instance = zendesk.Zendesk(
-            settings.ZENDESK_URL,
-            settings.ZENDESK_USER,
-            settings.ZENDESK_API_KEY,
+            settings.HELPDESK_URL,
+            settings.HELPDESK_USER,
+            settings.HELPDESK_API_KEY,
             use_api_token=True,
             api_version=2,
             # As of 2012-05-08, Zendesk is using a CA that is not
@@ -202,7 +394,7 @@ def _record_feedback_in_zendesk(
         subject,
         details,
         tags,
-        additional_info,
+        additional_info={},
         group_name=None,
         require_update=False,
         support_email=None
@@ -291,30 +483,44 @@ def _record_feedback_in_datadog(tags):
 
 def submit_feedback(request):
     """
-    Create a new user-requested ticket, currently implemented with Zendesk.
+    Create a new user-requested ticket, currently implemented with Zendesk/Freshdesk.
 
     If feedback submission is not enabled, any request will raise `Http404`.
-    If any configuration parameter (`ZENDESK_URL`, `ZENDESK_USER`, or
-    `ZENDESK_API_KEY`) is missing, any request will raise an `Exception`.
+    If any configuration parameter is missing, any request will raise an `Exception`.
     The request must be a POST request specifying `subject` and `details`.
     If the user is not authenticated, the request must also specify `name` and
     `email`. If the user is authenticated, the `name` and `email` will be
     populated from the user's information. If any required parameter is
     missing, a 400 error will be returned indicating which field is missing and
-    providing an error message. If Zendesk ticket creation fails, 500 error
+    providing an error message. If ticket creation fails, 500 error
     will be returned with no body; if ticket creation succeeds, an empty
     successful response (200) will be returned.
     """
-    if not settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
-        raise Http404()
+
+    # Support for legacy ZENDESK settings (probably don't need this)
+    if not settings.HELPDESK and settings.ZENDESK_URL:
+        settings.HELPDESK = 'Zendesk'
+        settings.HELPDESK_URL = settings.ZENDESK_URL
+        settings.HELPDESK_USER = settings.ZENDESK_USER
+        settings.HELPDESK_API_KEY = settings.ZENDESK_API_KEY
+
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])
-    if (
-        not settings.ZENDESK_URL or
-        not settings.ZENDESK_USER or
-        not settings.ZENDESK_API_KEY
-    ):
-        raise Exception("Zendesk enabled but not configured")
+
+    if not settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
+        raise Http404()
+    else:
+        if not settings.HELPDESK:
+            raise Exception("Helpdesk enabled but not configured")
+        elif settings.HELPDESK.lower() == 'zendesk' and (not settings.HELPDESK_URL or
+                                                         not settings.HELPDESK_USER or
+                                                         not settings.HELPDESK_API_KEY):
+            raise Exception("Zendesk enabled but not configured")
+        elif settings.HELPDESK.lower() == 'freshdesk' and (not settings.HELPDESK_URL or
+                                                           not settings.HELPDESK_API_KEY):
+            raise Exception("Freshdesk enabled but not configured")
+        elif settings.HELPDESK.lower() != 'zendesk' and settings.HELPDESK.lower() != 'freshdesk':
+            raise Exception("Helpdesk enabled but not configured")
 
     def build_error_response(status_code, field, err_msg):
         return HttpResponse(json.dumps({"field": field, "error": err_msg}), status=status_code)
@@ -361,18 +567,44 @@ def submit_feedback(request):
     ]:
         additional_info[pretty] = request.META.get(header)
 
-    success = _record_feedback_in_zendesk(
-        realname,
-        email,
-        subject,
-        details,
-        tags,
-        additional_info,
-        support_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
-    )
+    success = False
+    if settings.HELPDESK.lower() == 'zendesk':
+        success = _record_feedback_in_zendesk(
+            realname,
+            email,
+            subject,
+            details,
+            tags,
+            additional_info,
+            support_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        )
+    elif settings.HELPDESK.lower() == 'freshdesk':
+        success = _record_feedback_in_freshdesk(realname, email, subject, details, tags, additional_info)
+
     _record_feedback_in_datadog(tags)
 
     return HttpResponse(status=(200 if success else 500))
+
+
+def create_helpdesk_ticket(name, email, subject, body, tags):
+    """ Generic create helpdesk function. """
+
+    tags = list(tags or [])
+    tags.append('LMS')
+    # Remove duplicates
+    tags = list(set(tags))
+
+    if settings.HELPDESK.lower() == 'zendesk':
+        return _record_feedback_in_zendesk(
+            name,
+            email,
+            subject,
+            body,
+            tags,
+            support_email=configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+        )
+    elif settings.HELPDESK.lower() == 'freshdesk':
+        return _record_feedback_in_freshdesk(name, email, subject, body, tags)
 
 
 def info(request):
