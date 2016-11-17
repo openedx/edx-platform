@@ -78,7 +78,7 @@
 
             this.course_settings = new DiscussionCourseSettings(response.course_settings);
 
-            this.discussion = new Discussion();
+            this.discussion = new Discussion(undefined, {pages: response.num_pages});
             this.discussion.reset(response.discussion_data, {
                 silent: false
             });
@@ -125,24 +125,12 @@
             this.retrieved = true;
             this.showed = true;
 
-            this.renderPagination(response.num_pages);
-
             if (this.isWaitingOnNewPost) {
                 this.newPostForm.show().focus();
             }
 
             // Hide the thread view initially
             this.$('.inline-thread').addClass('is-hidden');
-        },
-
-        renderPagination: function(numPages) {
-            var pageUrl, pagination, params;
-            pageUrl = function(number) {
-                return '?discussion_page=' + number;
-            };
-            params = DiscussionUtil.getPaginationParams(this.page, numPages, pageUrl);
-            pagination = _.template($('#pagination-template').html())(params);
-            return this.$('section.discussion-pagination').html(pagination);
         },
 
         navigateToThread: function(threadId) {
