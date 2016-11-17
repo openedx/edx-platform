@@ -48,6 +48,13 @@ class ProblemPage(PageObject):
         return self.q(css="div.problems-wrapper").text[0]
 
     @property
+    def problem_meta(self):
+        """
+        Return the problem meta text
+        """
+        return self.q(css=".problems-wrapper .problem-progress").text[0]
+
+    @property
     def message_text(self):
         """
         Return the "message" text of the question of the problem.

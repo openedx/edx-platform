@@ -663,7 +663,7 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
 
 class ProblemStateOnNavigationTest(UniqueCourseTest):
     """
-    Test courseware with problems in multiple verticals
+    Test courseware with problems in multiple verticals.
     """
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"
@@ -713,6 +713,36 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
             'wait for problem header'
         )
         self.assertEqual(self.problem_page.problem_name, problem_name)
+
+    def test_problem_meta_after_submit_and_navigate(self):
+        """
+        Scenario:
+        I go to sequential position 1
+        Facing problem1, I select 'choice_1'
+        Then I click submit button
+        Then I go to sequential position 2
+        Then I came back to sequential position 1 again
+        Facing problem1, I observe the problem1 meta and score data is not
+        altered before and after sequence navigation
+        """
+        # Go to sequential position 1 and assert that we are on problem 1.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+
+        # Update problem 1's content state by clicking check button.
+        self.problem_page.click_choice('choice_choice_1')
+        self.problem_page.click_submit()
+        self.problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
+
+        before_meta = self.problem_page.problem_meta
+
+        # Go to sequential position 2 and assert that we are on problem 2.
+        self.go_to_tab_and_assert_problem(2, self.problem2_name)
+
+        # Come back to our original unit in the sequence and assert that the content hasn't changed.
+        self.go_to_tab_and_assert_problem(1, self.problem1_name)
+
+        after_meta = self.problem_page.problem_meta
+        self.assertEqual(before_meta, after_meta)
 
     def test_perform_problem_submit_and_navigate(self):
         """
