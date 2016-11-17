@@ -18,4 +18,8 @@
         <div class="forum-content">
         </div>
     </div>
+
+    <section class="discussion-pagination">
+    </section>
 </section>
+
