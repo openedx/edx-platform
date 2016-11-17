@@ -23,50 +23,40 @@ log = getLogger(__name__)
 
 
 @task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
-def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible):
+def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, **kwargs):
     """
     Updates a saved subsection grade.
-    This method expects the following parameters:
-        - user_id: serialized id of applicable User object
-        - course_id: Unicode string identifying the course
-        - usage_id: Unicode string identifying the course block
-        - only_if_higher: boolean indicating whether grades should
-        be updated only if the new raw_earned is higher than the previous
-        value.
-        - raw_earned: the raw points the learner earned on the problem that
-        triggered the update
-        - raw_possible: the max raw points the leaner could have earned
-        on the problem
+
+    Arguments:
+        user_id (int): id of applicable User object
+        course_id (string): identifying the course
+        usage_id (string): identifying the course block
+        only_if_higher (boolean): indicating whether grades should
+            be updated only if the new raw_earned is higher than the
+            previous value.
+        raw_earned (float): the raw points the learner earned on the
+            problem that triggered the update.
+        raw_possible (float): the max raw points the leaner could have
+            earned on the problem.
+        score_deleted (boolean): indicating whether the grade change is
+            a result of the problem's score being deleted.
     """
     course_key = CourseLocator.from_string(course_id)
     if not PersistentGradesEnabledFlag.feature_enabled(course_key):
         return
 
+    score_deleted = kwargs['score_deleted']
     scored_block_usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
-    score = get_score(user_id, scored_block_usage_key)
 
-    # If the score is None, it has not been saved at all yet
-    # and we need to retry until it has been saved.
-    if score is None:
+    # Verify the database has been updated with the scores when the task was
+    # created. This race condition occurs if the transaction in the task
+    # creator's process hasn't committed before the task initiates in the worker
+    # process.
+    if not _has_database_updated_with_new_score(
+            user_id, scored_block_usage_key, raw_earned, raw_possible, score_deleted,
+    ):
         raise _retry_recalculate_subsection_grade(
-            user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible,
-        )
-    else:
-        module_raw_earned, module_raw_possible = score  # pylint: disable=unpacking-non-sequence
-
-    # Validate that the retrieved scores match the scores when the task was created.
-    # This race condition occurs if the transaction in the task creator's process hasn't
-    # committed before the task initiates in the worker process.
-    grades_match = module_raw_earned == raw_earned and module_raw_possible == raw_possible
-
-    # We have to account for the situation where a student's state
-    # has been deleted- in this case, get_score returns (None, None), but
-    # the score change signal will contain 0 for raw_earned.
-    state_deleted = module_raw_earned is None and module_raw_possible is None and raw_earned == 0
-
-    if not (state_deleted or grades_match):
-        raise _retry_recalculate_subsection_grade(
-            user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible,
+            user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, score_deleted,
         )
 
     _update_subsection_grades(
@@ -78,6 +68,28 @@ def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, r
         usage_id,
         raw_earned,
         raw_possible,
+        score_deleted,
+    )
+
+
+def _has_database_updated_with_new_score(
+        user_id, scored_block_usage_key, expected_raw_earned, expected_raw_possible, score_deleted,
+):
+    """
+    Returns whether the database has been updated with the
+    expected new score values for the given problem and user.
+    """
+    score = get_score(user_id, scored_block_usage_key)
+
+    if score is None:
+        # score should be None only if it was deleted.
+        # Otherwise, it hasn't yet been saved.
+        return score_deleted
+
+    found_raw_earned, found_raw_possible = score  # pylint: disable=unpacking-non-sequence
+    return (
+        found_raw_earned == expected_raw_earned and
+        found_raw_possible == expected_raw_possible
     )
 
 
@@ -90,6 +102,7 @@ def _update_subsection_grades(
         usage_id,
         raw_earned,
         raw_possible,
+        score_deleted,
 ):
     """
     A helper function to update subsection grades in the database
@@ -124,23 +137,26 @@ def _update_subsection_grades(
 
     except IntegrityError as exc:
         raise _retry_recalculate_subsection_grade(
-            user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, exc,
+            user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, score_deleted, exc,
         )
 
 
-def _retry_recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, grade, max_grade, exc=None):
+def _retry_recalculate_subsection_grade(
+        user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, score_deleted, exc=None,
+):
     """
     Calls retry for the recalculate_subsection_grade task with the
     given inputs.
     """
     recalculate_subsection_grade.retry(
-        args=[
-            user_id,
-            course_id,
-            usage_id,
-            only_if_higher,
-            grade,
-            max_grade,
-        ],
-        exc=exc
+        kwargs=dict(
+            user_id=user_id,
+            course_id=course_id,
+            usage_id=usage_id,
+            only_if_higher=only_if_higher,
+            raw_earned=raw_earned,
+            raw_possible=raw_possible,
+            score_deleted=score_deleted,
+        ),
+        exc=exc,
     )
