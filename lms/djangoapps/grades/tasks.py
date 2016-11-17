@@ -5,7 +5,7 @@ This module contains tasks for asynchronous execution of grade updates.
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.db.utils import IntegrityError
+from django.db.utils import DatabaseError
 from logging import getLogger
 
 from courseware.model_data import get_score
@@ -122,7 +122,7 @@ def _update_subsection_grades(
                 subsection_grade=subsection_grade,
             )
 
-    except IntegrityError as exc:
+    except DatabaseError as exc:
         raise _retry_recalculate_subsection_grade(
             user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, exc,
         )

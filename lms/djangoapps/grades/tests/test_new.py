@@ -214,7 +214,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_bulk_cached_grade',
                 wraps=self.subsection_grade_factory._get_bulk_cached_grade
             ) as mock_get_bulk_cached_grade:
-                with self.assertNumQueries(14):
+                with self.assertNumQueries(12):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
                 self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertTrue(mock_create_grade.called)
@@ -254,31 +254,6 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         verify_update_if_higher((1, 4), (1, 2))  # previous value was greater
         verify_update_if_higher((3, 4), (3, 4))  # previous value was less
 
-    @ddt.data(
-        (
-            'lms.djangoapps.grades.new.subsection_grade.SubsectionGrade.create_model',
-            lambda self: self.subsection_grade_factory.create(self.sequence)
-        ),
-        (
-            'lms.djangoapps.grades.new.subsection_grade.SubsectionGrade.bulk_create_models',
-            lambda self: self.subsection_grade_factory.bulk_create_unsaved()
-        ),
-    )
-    @ddt.unpack
-    def test_fallback_handling(self, underlying_method, method_to_test):
-        """
-        Tests that the persistent grades fallback handler functions as expected.
-        """
-        with patch('lms.djangoapps.grades.new.subsection_grade.log') as log_mock:
-            with patch(underlying_method) as underlying:
-                underlying.side_effect = DatabaseError("I'm afraid I can't do that")
-                method_to_test(self)
-                # By making it this far, we implicitly assert
-                # "the factory method swallowed the exception correctly"
-                self.assertTrue(
-                    log_mock.warning.call_args_list[0].startswith("Persistent Grades: Persistence Error, falling back.")
-                )
-
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(
         (True, True),
@@ -314,7 +289,7 @@ class SubsectionGradeTest(GradeTestBase):
         and that loading saved grades returns the same data.
         """
         # Create a grade that *isn't* saved to the database
-        input_grade = SubsectionGrade(self.sequence, self.course)
+        input_grade = SubsectionGrade(self.sequence)
         input_grade.init_from_structure(
             self.request.user,
             self.course_structure,
@@ -328,7 +303,7 @@ class SubsectionGradeTest(GradeTestBase):
         self.assertEqual(PersistentSubsectionGrade.objects.count(), 1)
 
         # load from db, and ensure output matches input
-        loaded_grade = SubsectionGrade(self.sequence, self.course)
+        loaded_grade = SubsectionGrade(self.sequence)
         saved_model = PersistentSubsectionGrade.read_grade(
             user_id=self.request.user.id,
             usage_key=self.sequence.location,
