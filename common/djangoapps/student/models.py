@@ -2019,11 +2019,25 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         )
 
     def _cert_name(self, course_name, cert_mode):
-        """Name of the certification, for display on LinkedIn. """
-        return self.MODE_TO_CERT_NAME.get(
+        """
+        Name of the certification, for display on LinkedIn.
+
+        Arguments:
+            course_name (unicode): The display name of the course.
+            cert_mode (str): The course mode of the user's certificate (e.g. "verified", "honor", "professional")
+
+        Returns:
+            str: The formatted string to display for the name field on the LinkedIn Add to Profile dialog.
+        """
+        default_cert_name = self.MODE_TO_CERT_NAME.get(
             cert_mode,
             _(u"{platform_name} Certificate for {course_name}")
-        ).format(
+        )
+        # Look for an override of the certificate name in the SOCIAL_SHARING_SETTINGS setting
+        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
+        cert_name = share_settings.get('CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME', {}).get(cert_mode, default_cert_name)
+
+        return cert_name.format(
             platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             course_name=course_name
         )
