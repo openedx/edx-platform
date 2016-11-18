@@ -12,7 +12,7 @@ sessions. Assumes structure:
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-from .common import *
+from openedx.stanford.lms.envs.common import *
 
 DEBUG = True
 TEMPLATE_DEBUG = True

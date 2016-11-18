@@ -18,7 +18,7 @@ sessions. Assumes structure:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-from .common import *
+from openedx.stanford.lms.envs.common import *
 import os
 from path import Path as path
 from uuid import uuid4
@@ -130,8 +130,6 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
-
-TIME_ZONE = 'UTC'
 
 # Don't rely on a real staff grading backend
 MOCK_STAFF_GRADING = True
@@ -405,7 +403,7 @@ PASSWORD_HASHERS = (
     # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
-########################## CLASS DASHBOARD ########################
+### This enables the Metrics tab for the Instructor dashboard ###########
 FEATURES['CLASS_DASHBOARD'] = True
 
 ################### Make tests quieter

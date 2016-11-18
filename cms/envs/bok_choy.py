@@ -23,7 +23,7 @@ from path import Path as path
 os.environ['SERVICE_VARIANT'] = 'bok_choy'
 os.environ['CONFIG_ROOT'] = path(__file__).abspath().dirname()
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from openedx.stanford.cms.envs.aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 ######################### Testing overrides ####################################
 

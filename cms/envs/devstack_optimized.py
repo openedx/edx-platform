@@ -20,7 +20,7 @@ invoked each time that changes have been made.
 
 ########################## Devstack settings ###################################
 
-from .devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from openedx.stanford.cms.envs.devstack import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 TEST_ROOT = REPO_ROOT / "test_root"
 

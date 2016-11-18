@@ -18,7 +18,7 @@ sessions. Assumes structure:
 # and throws spurious errors. Therefore, we disable invalid-name checking.
 # pylint: disable=invalid-name
 
-from .common import *
+from openedx.stanford.cms.envs.common import *
 import os
 from path import Path as path
 from warnings import filterwarnings, simplefilter
@@ -41,12 +41,6 @@ from lms.envs.test import (
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
-
-# Remove sneakpeek during tests to prevent unwanted redirect
-MIDDLEWARE_CLASSES = tuple([
-    mwc for mwc in MIDDLEWARE_CLASSES
-    if mwc != 'sneakpeek.middleware.SneakPeekLogoutMiddleware'
-])
 
 THIS_UUID = uuid4().hex[:5]
 

@@ -4,9 +4,7 @@ Specific overrides to the base prod settings to make development easier.
 
 from os.path import abspath, dirname, join
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
-
-FEATURES['USE_DJANGO_PIPELINE'] = False
+from openedx.stanford.cms.envs.aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Don't use S3 in devstack, fall back to filesystem
 del DEFAULT_FILE_STORAGE
