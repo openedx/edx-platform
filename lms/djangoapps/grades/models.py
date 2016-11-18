@@ -244,6 +244,35 @@ class PersistentSubsectionGrade(TimeStampedModel):
     # track which blocks were visible at the time of grade calculation
     visible_blocks = models.ForeignKey(VisibleBlocks, db_column='visible_blocks_hash', to_field='hashed')
 
+    def _is_unattempted_with_score(self):
+        """
+        Return True if the object has a non-zero score, but has not been
+        attempted.  This is an inconsistent state, and needs to be cleaned up.
+        """
+        return self.first_attempted is None and any(field != 0.0 for field in (self.earned_all, self.earned_graded))
+
+    def enforce_unattempted(self, save=True):
+        """
+        If an grade has not been attempted, but was given a non-zero score,
+        reset the score to 0.0.
+
+        Params:
+
+        save (bool, default: True):
+            By default, this method saves the model if and only if there was an
+            inconsistency.  If the caller needs to save the model regardless of
+            the result, or will be saving the model later after making other
+            changes, this may be an unwanted database request.  It can be
+            disabled by passing ``save=False``.
+
+        Return value: None
+        """
+        if self._is_unattempted_with_score():
+            self.earned_all = 0.0
+            self.earned_graded = 0.0
+            if save:
+                self.save()
+
     @property
     def full_usage_key(self):
         """
@@ -313,6 +342,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
 
         user_id = kwargs.pop('user_id')
         usage_key = kwargs.pop('usage_key')
+        attempted = kwargs.pop('attempted')
 
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
@@ -320,6 +350,11 @@ class PersistentSubsectionGrade(TimeStampedModel):
             usage_key=usage_key,
             defaults=kwargs,
         )
+        if attempted and not grade.first_attempted:
+            grade.first_attempted = now()
+            grade.save()
+        else:
+            grade.enforce_unattempted()
         return grade
 
     @classmethod
@@ -328,7 +363,15 @@ class PersistentSubsectionGrade(TimeStampedModel):
         Wrapper for objects.create.
         """
         cls._prepare_params_and_visible_blocks(kwargs)
-        return cls.objects.create(**kwargs)
+
+        attempted = kwargs.pop('attempted')
+
+        grade = cls(**kwargs)
+        if attempted:
+            grade.first_attempted = now()
+        grade.enforce_unattempted(save=False)
+        grade.save()
+        return grade
 
     @classmethod
     def bulk_create_grades(cls, grade_params_iter, course_key):
@@ -342,6 +385,10 @@ class PersistentSubsectionGrade(TimeStampedModel):
         VisibleBlocks.bulk_get_or_create([params['visible_blocks'] for params in grade_params_iter], course_key)
         map(cls._prepare_params_visible_blocks_id, grade_params_iter)
 
+        first_attempt_timestamp = now()
+        for params in grade_params_iter:
+            if params.pop('attempted'):
+                params['first_attempted'] = first_attempt_timestamp
         return cls.objects.bulk_create([PersistentSubsectionGrade(**params) for params in grade_params_iter])
 
     @classmethod
@@ -375,6 +422,14 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         params['visible_blocks_id'] = params['visible_blocks'].hash_value
         del params['visible_blocks']
+
+    def remove_attempts(self):
+        """
+        Explicitly mark a subsection as unattempted
+        """
+        self.first_attempted = None
+        self.enforce_unattempted(save=False)
+        self.save()
 
 
 class PersistentCourseGrade(TimeStampedModel):
@@ -422,7 +477,7 @@ class PersistentCourseGrade(TimeStampedModel):
             u"grading policy: {}".format(self.grading_policy_hash),
             u"percent grade: {}%".format(self.percent_grade),
             u"letter grade: {}".format(self.letter_grade),
-            u"passed_timestamp: {}".format(self.passed_timestamp),
+            u"passed timestamp: {}".format(self.passed_timestamp),
         ])
 
     @classmethod
