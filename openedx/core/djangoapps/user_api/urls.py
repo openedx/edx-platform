@@ -8,6 +8,7 @@ from django.conf.urls import patterns, url
 from ..profile_images.views import ProfileImageView
 from .accounts.views import AccountViewSet
 from .preferences.views import PreferencesView, PreferencesDetailView
+from .verification_api.views import PhotoVerificationStatusView
 
 
 ACCOUNT_LIST = AccountViewSet.as_view({
@@ -26,16 +27,21 @@ urlpatterns = patterns(
     url(
         r'^v1/accounts/{}/image$'.format(settings.USERNAME_PATTERN),
         ProfileImageView.as_view(),
-        name="accounts_profile_image_api"
+        name='accounts_profile_image_api'
+    ),
+    url(
+        r'^v1/accounts/{}/verification_status/$'.format(settings.USERNAME_PATTERN),
+        PhotoVerificationStatusView.as_view(),
+        name='verification_status'
     ),
     url(
         r'^v1/preferences/{}$'.format(settings.USERNAME_PATTERN),
         PreferencesView.as_view(),
-        name="preferences_api"
+        name='preferences_api'
     ),
     url(
         r'^v1/preferences/{}/(?P<preference_key>[a-zA-Z0-9_]+)$'.format(settings.USERNAME_PATTERN),
         PreferencesDetailView.as_view(),
-        name="preferences_detail_api"
+        name='preferences_detail_api'
     ),
 )

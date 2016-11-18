@@ -5,6 +5,7 @@ Admin site configurations for verify_student.
 
 from config_models.admin import ConfigurationModelAdmin
 from ratelimitbackend import admin
+
 from lms.djangoapps.verify_student.models import (
     IcrvStatusEmailsConfiguration,
     SkippedReverification,
@@ -13,17 +14,17 @@ from lms.djangoapps.verify_student.models import (
 )
 
 
+@admin.register(SoftwareSecurePhotoVerification)
 class SoftwareSecurePhotoVerificationAdmin(admin.ModelAdmin):
     """
     Admin for the SoftwareSecurePhotoVerification table.
     """
-    list_display = ('id', 'user', 'status', 'receipt_id', 'submitted_at', 'updated_at')
-    raw_id_fields = ('user', 'reviewing_user')
-    search_fields = (
-        'receipt_id', 'user__username'
-    )
+    list_display = ('id', 'user', 'status', 'receipt_id', 'submitted_at', 'updated_at',)
+    raw_id_fields = ('user', 'reviewing_user', 'copy_id_photo_from',)
+    search_fields = ('receipt_id', 'user__username',)
 
 
+@admin.register(VerificationStatus)
 class VerificationStatusAdmin(admin.ModelAdmin):
     """
     Admin for the VerificationStatus table.
@@ -46,6 +47,7 @@ class VerificationStatusAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
+@admin.register(SkippedReverification)
 class SkippedReverificationAdmin(admin.ModelAdmin):
     """Admin for the SkippedReverification table. """
     list_display = ('created_at', 'user', 'course_id', 'checkpoint')
@@ -58,7 +60,4 @@ class SkippedReverificationAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(SoftwareSecurePhotoVerification, SoftwareSecurePhotoVerificationAdmin)
-admin.site.register(SkippedReverification, SkippedReverificationAdmin)
-admin.site.register(VerificationStatus, VerificationStatusAdmin)
 admin.site.register(IcrvStatusEmailsConfiguration, ConfigurationModelAdmin)

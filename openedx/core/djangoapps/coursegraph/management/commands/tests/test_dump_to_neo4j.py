@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j import (
     ModuleStoreSerializer,
-    ITERABLE_NEO4J_TYPES,
 )
 from openedx.core.djangoapps.coursegraph.signals import _listen_for_course_publish
 
@@ -53,7 +52,6 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         """
         Test that you can specify which courses you want to dump.
         """
-
         mock_graph = mock_graph_class.return_value
         mock_transaction = mock.Mock()
         mock_graph.begin.return_value = mock_transaction
@@ -72,12 +70,56 @@ class TestDumpToNeo4jCommand(TestDumpToNeo4jCommandBase):
         self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
 
     @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    def test_dump_skip_course(self, mock_graph_class):
+        """
+        Test that you can skip courses.
+        """
+        mock_graph = mock_graph_class.return_value
+        mock_transaction = mock.Mock()
+        mock_graph.begin.return_value = mock_transaction
+
+        call_command(
+            'dump_to_neo4j',
+            skip=self.course_strings[:1],
+            host='mock_host',
+            http_port=7474,
+            user='mock_user',
+            password='mock_password',
+        )
+
+        self.assertEqual(mock_graph.begin.call_count, 1)
+        self.assertEqual(mock_transaction.commit.call_count, 1)
+        self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
+
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
+    def test_dump_skip_beats_specifying(self, mock_graph_class):
+        """
+        Test that if you skip and specify the same course, you'll skip it.
+        """
+        mock_graph = mock_graph_class.return_value
+        mock_transaction = mock.Mock()
+        mock_graph.begin.return_value = mock_transaction
+
+        call_command(
+            'dump_to_neo4j',
+            skip=self.course_strings[:1],
+            courses=self.course_strings[:1],
+            host='mock_host',
+            http_port=7474,
+            user='mock_user',
+            password='mock_password',
+        )
+
+        self.assertEqual(mock_graph.begin.call_count, 0)
+        self.assertEqual(mock_transaction.commit.call_count, 0)
+        self.assertEqual(mock_transaction.commit.rollback.call_count, 0)
+
+    @mock.patch('openedx.core.djangoapps.coursegraph.management.commands.dump_to_neo4j.Graph')
     def test_dump_all_courses(self, mock_graph_class):
         """
         Test if you don't specify which courses to dump, then you'll dump
         all of them.
         """
-
         mock_graph = mock_graph_class.return_value
         mock_transaction = mock.Mock()
         mock_graph.begin.return_value = mock_transaction
@@ -131,21 +173,6 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         self.assertEqual(len(nodes), 9)
         self.assertEqual(len(relationships), 7)
 
-    @ddt.data(*ITERABLE_NEO4J_TYPES)
-    def test_coerce_types_iterable(self, iterable_type):
-        """
-        Tests the coerce_types helper method for iterable types
-        """
-        example_iterable = iterable_type([object, object, object])
-
-        # each element in the iterable is not unicode:
-        self.assertFalse(any(isinstance(tab, six.text_type) for tab in example_iterable))
-        # but after they are coerced, they are:
-        coerced = ModuleStoreSerializer().coerce_types(example_iterable)
-        self.assertTrue(all(isinstance(tab, six.text_type) for tab in coerced))
-        # finally, make sure we haven't changed the type:
-        self.assertEqual(type(coerced), iterable_type)
-
     @ddt.data(
         (1, 1),
         (object, "<type 'object'>"),
@@ -154,11 +181,15 @@ class TestModuleStoreSerializer(TestDumpToNeo4jCommandBase):
         (b"plain string", b"plain string"),
         (True, True),
         (None, "None"),
+        ((1,), "(1,)"),
+        # list of elements should be coerced into a list of the
+        # string representations of those elements
+        ([object, object], ["<type 'object'>", "<type 'object'>"])
     )
     @ddt.unpack
-    def test_coerce_types_base(self, original_value, coerced_expected):
+    def test_coerce_types(self, original_value, coerced_expected):
         """
-        Tests the coerce_types helper for the neo4j base types
+        Tests the coerce_types helper
         """
         coerced_value = self.mss.coerce_types(original_value)
         self.assertEqual(coerced_value, coerced_expected)

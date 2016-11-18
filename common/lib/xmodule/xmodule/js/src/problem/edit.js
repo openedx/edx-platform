@@ -1,4 +1,4 @@
-/* global CodeMirror, _, XModule, PrettyPrint */
+/* global CodeMirror, _, XModule */
 // no-useless-escape disabled because of warnings in regexp expressions within the
 // "toXML" code. When the "useless escapes" were removed, some of the unit tests
 // failed, but only in Jenkins, indicating browser-specific behavior.
@@ -819,8 +819,8 @@
             }
             // make all responsetypes descendants of a single problem element
             // safe-lint: disable=javascript-concat-html
-            finalXml = '<problem>' + responseTypesXML.join('\n\n') + finalDemandHints + '</problem>';
-            return PrettyPrint.xml(finalXml);
+            finalXml = '<problem>\n' + responseTypesXML.join('\n\n') + finalDemandHints + '\n</problem>';
+            return finalXml;
         };
 
         return MarkdownEditingDescriptor;

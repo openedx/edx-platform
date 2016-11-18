@@ -3,31 +3,24 @@
 Unit tests for instructor.enrollment methods.
 """
 
-import json
-import mock
-from mock import patch
 from abc import ABCMeta
-from courseware.models import StudentModule
-from courseware.tests.helpers import get_request_for_user
+import json
+
 from django.conf import settings
 from django.utils.translation import get_language
 from django.utils.translation import override as override_language
+import mock
+from mock import patch
 from nose.plugins.attrib import attr
-from ccx_keys.locator import CCXLocator
-from student.tests.factories import UserFactory
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
+from ccx_keys.locator import CCXLocator
+from courseware.models import StudentModule
 from grades.new.subsection_grade import SubsectionGradeFactory
 from grades.tests.utils import answer_problem
 from lms.djangoapps.ccx.tests.factories import CcxFactory
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import (
-    AdminFactory
-)
 from lms.djangoapps.instructor.enrollment import (
     EmailEnrollmentState,
     enroll_email,
@@ -37,11 +30,14 @@ from lms.djangoapps.instructor.enrollment import (
     unenroll_email,
     render_message_to_string,
 )
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, get_mock_request
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.roles import CourseCcxCoachRole
+from student.tests.factories import AdminFactory, UserFactory
 from submissions import api as sub_api
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, TEST_DATA_SPLIT_MODULESTORE
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
 @attr(shard=1)
@@ -536,7 +532,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
             display_name="Test Problem",
             data=problem_xml
         )
-        cls.request = get_request_for_user(UserFactory())
+        cls.request = get_mock_request(UserFactory())
         cls.user = cls.request.user
 
     def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):

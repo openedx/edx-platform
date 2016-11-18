@@ -128,7 +128,7 @@ MOCK_MODULES = [
     'celery',
     'celery.task',
     'student.roles',
-    'embargo.models',
+    'openedx.core.djangoapps.embargo.models',
     'xmodule.vertical_block',
     'xmodule.course_module',
     'user_api.accounts.api',

@@ -22,7 +22,6 @@ from django.test.utils import override_settings
 import pytz
 
 from course_modes.models import CourseMode
-from embargo.models import CountryAccessRule, Country, RestrictedCourse
 from enrollment.views import EnrollmentUserThrottle
 from util.models import RateLimitConfiguration
 from util.testing import UrlResetMixin
@@ -34,7 +33,8 @@ from openedx.core.lib.django_test_client_utils import get_absolute_url
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import AdminFactory, CourseModeFactory, UserFactory
-from embargo.test_utils import restrict_course
+from openedx.core.djangoapps.embargo.models import CountryAccessRule, Country, RestrictedCourse
+from openedx.core.djangoapps.embargo.test_utils import restrict_course
 
 
 class EnrollmentTestMixin(object):
@@ -925,7 +925,7 @@ class EnrollmentEmbargoTest(EnrollmentTestMixin, UrlResetMixin, ModuleStoreTestC
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
-    URLCONF_MODULES = ['embargo']
+    URLCONF_MODULES = ['openedx.core.djangoapps.embargo']
 
     @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):

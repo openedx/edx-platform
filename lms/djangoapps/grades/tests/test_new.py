@@ -14,10 +14,10 @@ from mock import patch
 import pytz
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
-from courseware.tests.helpers import get_request_for_user
 from courseware.tests.test_submitting_problems import ProblemSubmissionTestMixin
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.tests.utils import persistent_grades_feature_flags
+from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, SharedModuleStoreTestCase
@@ -70,7 +70,7 @@ class GradeTestBase(SharedModuleStoreTestCase):
 
     def setUp(self):
         super(GradeTestBase, self).setUp()
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)
@@ -82,6 +82,23 @@ class TestCourseGradeFactory(GradeTestBase):
     """
     Test that CourseGrades are calculated properly
     """
+    def setUp(self):
+        super(TestCourseGradeFactory, self).setUp()
+        grading_policy = {
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": 1.0,
+                },
+            ],
+            "GRADE_CUTOFFS": {
+                "Pass": 0.5,
+            },
+        }
+        self.course.set_grading_policy(grading_policy)
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(
@@ -106,7 +123,33 @@ class TestCourseGradeFactory(GradeTestBase):
         self.assertEqual(mock_save_grades.called, feature_flag and course_setting)
 
     def test_course_grade_creation(self):
-        grading_policy = {
+        grade_factory = CourseGradeFactory(self.request.user)
+        with mock_get_score(1, 2):
+            course_grade = grade_factory.create(self.course)
+        self.assertEqual(course_grade.letter_grade, u'Pass')
+        self.assertEqual(course_grade.percent, 0.5)
+
+    def test_zero_course_grade(self):
+        grade_factory = CourseGradeFactory(self.request.user)
+        with mock_get_score(0, 2):
+            course_grade = grade_factory.create(self.course)
+        self.assertIsNone(course_grade.letter_grade)
+        self.assertEqual(course_grade.percent, 0.0)
+
+    def test_get_persisted(self):
+        grade_factory = CourseGradeFactory(self.request.user)
+        # first, create a grade in the database
+        with mock_get_score(1, 2):
+            grade_factory.create(self.course, read_only=False)
+
+        # retrieve the grade, ensuring it is as expected and take just one query
+        with self.assertNumQueries(1):
+            course_grade = grade_factory.get_persisted(self.course)
+        self.assertEqual(course_grade.letter_grade, u'Pass')
+        self.assertEqual(course_grade.percent, 0.5)
+
+        # update the grading policy
+        new_grading_policy = {
             "GRADER": [
                 {
                     "type": "Homework",
@@ -117,13 +160,15 @@ class TestCourseGradeFactory(GradeTestBase):
                 },
             ],
             "GRADE_CUTOFFS": {
-                "Pass": 0.5,
+                "Pass": 0.9,
             },
         }
-        self.course.set_grading_policy(grading_policy)
-        grade_factory = CourseGradeFactory(self.request.user)
-        with mock_get_score(1, 2):
-            course_grade = grade_factory.create(self.course)
+        self.course.set_grading_policy(new_grading_policy)
+
+        # ensure the grade can still be retrieved via get_persisted
+        # despite its outdated grading policy
+        with self.assertNumQueries(1):
+            course_grade = grade_factory.get_persisted(self.course)
         self.assertEqual(course_grade.letter_grade, u'Pass')
         self.assertEqual(course_grade.percent, 0.5)
 
@@ -168,18 +213,18 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
             with patch(
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_bulk_cached_grade',
                 wraps=self.subsection_grade_factory._get_bulk_cached_grade
-            ) as mock_get_saved_grade:
+            ) as mock_get_bulk_cached_grade:
                 with self.assertNumQueries(14):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
-                self.assertTrue(mock_get_saved_grade.called)
+                self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertTrue(mock_create_grade.called)
 
-                mock_get_saved_grade.reset_mock()
+                mock_get_bulk_cached_grade.reset_mock()
                 mock_create_grade.reset_mock()
 
                 with self.assertNumQueries(0):
                     grade_b = self.subsection_grade_factory.create(self.sequence)
-                self.assertTrue(mock_get_saved_grade.called)
+                self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertFalse(mock_create_grade.called)
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
@@ -307,7 +352,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
 
     SCORED_BLOCK_COUNT = 7
-    ACTUAL_TOTAL_POSSIBLE = 16.0
+    ACTUAL_TOTAL_POSSIBLE = 17.0
 
     @classmethod
     def setUpClass(cls):
@@ -321,7 +366,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
         password = u'test'
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
-        self.request = get_request_for_user(self.student)
+        self.request = get_mock_request(self.student)
         self.course_structure = get_course_blocks(self.student, self.course.location)
 
     @classmethod
@@ -411,7 +456,7 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
               </optionresponse>
             </problem>
         '''
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
         course_structure = get_course_blocks(self.request.user, self.course.location)
@@ -549,7 +594,7 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
             display_name="test_problem_3",
             data=problem_xml
         )
-        self.request = get_request_for_user(UserFactory())
+        self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         self.course_structure = get_course_blocks(self.request.user, self.course.location)
         self.subsection_grade_factory = SubsectionGradeFactory(self.request.user, self.course, self.course_structure)

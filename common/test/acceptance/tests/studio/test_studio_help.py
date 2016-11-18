@@ -3,7 +3,6 @@ Test the Studio help links.
 """
 
 from flaky import flaky
-from bok_choy.web_app_test import WebAppTest
 from unittest import skip
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -29,6 +28,7 @@ from common.test.acceptance.pages.studio.import_export import ExportCoursePage, 
 from common.test.acceptance.pages.studio.users import CourseTeamPage
 from common.test.acceptance.fixtures.programs import ProgramsConfigMixin
 from common.test.acceptance.tests.helpers import (
+    AcceptanceTest,
     assert_nav_help_link,
     assert_side_bar_help_link
 )
@@ -75,7 +75,7 @@ class StudioHelpTest(StudioCourseTest):
             )
 
 
-class SignInHelpTest(WebAppTest):
+class SignInHelpTest(AcceptanceTest):
     """
     Tests help links on 'Sign In' page
     """
@@ -107,7 +107,7 @@ class SignInHelpTest(WebAppTest):
         )
 
 
-class SignUpHelpTest(WebAppTest):
+class SignUpHelpTest(AcceptanceTest):
     """
     Tests help links on 'Sign Up' page.
     """
@@ -191,7 +191,7 @@ class HomeHelpTest(StudioCourseTest):
         )
 
 
-class NewCourseHelpTest(WebAppTest):
+class NewCourseHelpTest(AcceptanceTest):
     """
     Test help links while creating a new course.
     """
@@ -247,7 +247,7 @@ class NewCourseHelpTest(WebAppTest):
         )
 
 
-class NewLibraryHelpTest(WebAppTest):
+class NewLibraryHelpTest(AcceptanceTest):
     """
     Test help links while creating a new library
     """
@@ -303,7 +303,7 @@ class NewLibraryHelpTest(WebAppTest):
         )
 
 
-class LibraryTabHelpTest(WebAppTest):
+class LibraryTabHelpTest(AcceptanceTest):
     """
     Test help links on the library tab present at dashboard.
     """
@@ -517,7 +517,7 @@ class LibraryExportHelpTest(StudioLibraryTest):
         )
 
 
-class NewProgramHelpTest(ProgramsConfigMixin, WebAppTest):
+class NewProgramHelpTest(ProgramsConfigMixin, AcceptanceTest):
     """
     Test help links on a 'New Program' page
     """
@@ -1251,7 +1251,7 @@ class ToolsExportHelpTest(StudioCourseTest):
         )
 
 
-class StudioWelcomeHelpTest(WebAppTest):
+class StudioWelcomeHelpTest(AcceptanceTest):
     """
     Tests help link on 'Welcome' page ( User not logged in)
     """

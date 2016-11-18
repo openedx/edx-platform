@@ -13,6 +13,7 @@
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # shay nativ, 2015
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2015
+# Yoav Caspin <yoavc@pmo.gov.il>, 2016
 # yuval zana, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -75,8 +76,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-10-20 15:57+0000\n"
-"PO-Revision-Date: 2016-09-29 12:24+0000\n"
+"POT-Creation-Date: 2016-11-03 15:59+0000\n"
+"PO-Revision-Date: 2016-10-30 14:15+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -433,10 +434,11 @@ msgstr "שמך צריך להכיל לפחות שני תווים"
 
 #: common/djangoapps/student/forms.py
 msgid ""
-"Usernames must contain only letters, numbers, underscores (_), and hyphens "
-"(-)."
+"Usernames can only contain Roman letters, western numerals (0-9), "
+"underscores (_), and hyphens (-)."
 msgstr ""
-"שמות המשתמשים חייבים לכלול רק אותיות, מספרים, קווים תחתונים (_) ומקף (-)."
+"שמות המשתמשים יכולים לכלול רק אותיות באנגלית, מספרים (0-9), קווים תחתונים "
+"(_) ומקפים (-)."
 
 #: common/djangoapps/student/forms.py
 #, python-format
@@ -719,11 +721,11 @@ msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "Name of the UTM cookie"
-msgstr ""
+msgstr "שם קובץ ה-cookie של UTM"
 
 #: common/djangoapps/student/models.py
 msgid "Name of the affiliate cookie"
-msgstr ""
+msgstr "שם קובץ ה-cookie הקשור"
 
 #: common/djangoapps/student/models.py
 msgid "Name of this user attribute."
@@ -1555,11 +1557,11 @@ msgstr "תשובתך התקבלה. מיד לאחר קבלת ציון, תוחלף
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "{programming_language} editor"
-msgstr ""
+msgstr "עורך {programming_language}"
 
 #: common/lib/capa/capa/inputtypes.py
 msgid "Press ESC then TAB or click outside of the code editor to exit"
-msgstr ""
+msgstr "כדי לצאת, הקש ESC ולאחר מכן TAB או לחץ מחוץ לעורך הקוד."
 
 #: common/lib/capa/capa/inputtypes.py
 msgid ""
@@ -1611,15 +1613,15 @@ msgstr "שאלה  {index}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Correct:"
-msgstr ""
+msgstr "נכון:"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Incorrect:"
-msgstr ""
+msgstr "לא נכון:"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Answer"
-msgstr ""
+msgstr "תשובה"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Error {err} in evaluating hint function {hintfn}."
@@ -2093,8 +2095,8 @@ msgstr ""
 " בו שימוש לרעה. כדי להשיג מפתח עבור הקורס שלך או כדי לדווח על בעיה, צור קשר "
 "עם moocsupport@mathworks.com"
 
-#: lms/templates/help_modal.html lms/templates/manage_user_standing.html
-#: lms/templates/register-shib.html
+#: common/lib/xmodule/xmodule/capa_base.py lms/templates/help_modal.html
+#: lms/templates/manage_user_standing.html lms/templates/register-shib.html
 #: lms/templates/peer_grading/peer_grading_problem.html
 #: lms/templates/survey/survey.html
 #: themes/stanford-style/lms/templates/register-shib.html
@@ -2103,7 +2105,7 @@ msgstr "הגש"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Submitting"
-msgstr ""
+msgstr "מגיש"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Warning: The problem has been reset to its initial state!"
@@ -2130,6 +2132,7 @@ msgstr "אם שגיאה זו ממשיכה, אנא צור קשר עם צוות ה
 msgid ""
 "{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 msgstr ""
+"{previous_hints}<li><strong>{hint_number_prefix}</strong>{hint_text}</li>"
 
 #. Translators: e.g. "Hint 1 of 3: " meaning we are showing the first of three
 #. hints.
@@ -2141,24 +2144,24 @@ msgstr "רמז ({hint_num} מתוך {hints_count}):"
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect ({progress} point)"
 msgid_plural "Incorrect ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "(נקודה שגויה {progress})"
+msgstr[1] "({progress} נקודות שגויות)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Correct ({progress} point)"
 msgid_plural "Correct ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "(נקודה נכונה {progress})"
+msgstr[1] "({progress} נקודות נכונות)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially correct ({progress} point)"
 msgid_plural "Partially correct ({progress} points)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "נקודה נכונה חלקית ({progress})"
+msgstr[1] " ({progress} נקודות נכונות חלקית)"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Partially Correct"
-msgstr ""
+msgstr "נכון חלקית"
 
 #. Translators: 'closed' means the problem's due date has passed. You may no
 #. longer attempt to solve the problem.
@@ -2168,7 +2171,7 @@ msgstr "הבעיה סגורה."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Problem must be reset before it can be submitted again."
-msgstr ""
+msgstr "על הבעיה להיות מאותחלת בטרם ניתן יהיה לשלוח אותה שוב."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must wait at least {wait} seconds between submissions."
@@ -2233,11 +2236,11 @@ msgstr ""
 #. longer attempt to solve the problem.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You cannot select Reset for a problem that is closed."
-msgstr ""
+msgstr "לא ניתן לבחור 'אתחול' לבעיה סגורה."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "You must submit an answer before you can select Reset."
-msgstr ""
+msgstr "עליך לשלוח תשובה בטרם תוכל לבחור 'אתחול'."
 
 #: common/lib/xmodule/xmodule/capa_module.py
 msgid ""
@@ -2255,15 +2258,15 @@ msgstr "מצב הבעיה השתנה מאז שטענת עמוד זה. נא רע�
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional"
-msgstr ""
+msgstr "מותנה"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "List of urls of children that are references to external modules"
-msgstr ""
+msgstr "רשימת כתובות מִשנה של URL שהן אזכורים למודלים חיצוניים"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Source Components"
-msgstr ""
+msgstr "רכיבי מקור"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
@@ -2272,30 +2275,36 @@ msgid ""
 " Copy the component location ID of a component from its Settings dialog in "
 "Studio."
 msgstr ""
+"מזהי מיקום הרכיב של כל רכיבי המקור הקובעים אם בפני הלומד הוצג התוכן של מודול"
+" מותנה זה. העתק את מזהה מיקום הרכיב של רכיב מתיבת הדו-שיח  שלו 'הגדרות' "
+"ב'סטודיו'."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional Attribute"
-msgstr ""
+msgstr "מאפיין מותנה"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
 "The attribute of the source components that determines whether a learner is "
 "shown the content of this conditional module."
 msgstr ""
+"המאפיין של רכיבי המקור הקובע אם בפני לומד הוצג התוכן של מודול מותנה זה."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Conditional Value"
-msgstr ""
+msgstr "ערך מותנה"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
 "The value that the conditional attribute of the source components must match"
 " before a learner is shown the content of this conditional module."
 msgstr ""
+"הערך שהמאפיין המותנה של רכיבי המקור חייב להתאים אליו לפני הצגת תוכן מודול "
+"מותנה זה ללומד"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Blocked Content Message"
-msgstr ""
+msgstr "הודעה על תוכן חסום"
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid ""
@@ -2304,18 +2313,21 @@ msgid ""
 "your message to give learners a direct link to required units. For example, "
 "'You must complete {link} before you can access this unit'."
 msgstr ""
+"ההודעה המוצגת ללומדים כאשר לא כל התנאים מולאו להצגת תוכן מודול מותנה זה. "
+"כלול {link} בטקסט ההודעה כדי שהתלמידים יקבלו קישור ישיר ליחידות הדרושות. "
+"לדוגמה, 'עליך להשלים את {link} לפני שתוכל לגשת ליחידה זו'."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "You must complete {link} before you can access this unit."
-msgstr ""
+msgstr "עליך להשלים את {link} לפני שתוכל לגשת ליחידה זו."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "This component has no source components configured yet."
-msgstr ""
+msgstr "לרכיב זה אין עדיין רכיבי מקור מוגדרים."
 
 #: common/lib/xmodule/xmodule/conditional_module.py
 msgid "Configure list of sources"
-msgstr ""
+msgstr "הגדר רשימת מקורות"
 
 #. Translators: TBD stands for 'To Be Determined' and is used when a course
 #. does not yet have an announced start date.
@@ -3094,6 +3106,21 @@ msgstr ""
 "שאיפשור מבחנים תחת פיקוח יאפשר גם מבחנים מתוזמנים."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Allow Opting Out of Proctored Exams"
+msgstr "אפשר הסכמה למבחני חוץ"
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter true or false. If this value is true, learners can choose to take "
+"proctored exams without proctoring. If this value is false, all learners "
+"must take the exam with proctoring. This setting only applies if proctored "
+"exams are enabled for the course."
+msgstr ""
+"רשום נכון או לא נכון. אם ערך זה נכון, יוכלו הלומדים לבחור במבחני חוץ ללא "
+"השגחה. אם ערך זה לא נכון, כל הלומדים יהיו חייבים להיבחן תחת השגחה. הגדרה זו "
+"חלה במידה ומבחני החוץ מותאמים עבור הקורס."
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Create Zendesk Tickets For Suspicious Proctored Exam Attempts"
 msgstr "צור כרטיסי Zendesk לניסיונות חשודים של מבחן תחת פיקוח"
 
@@ -3110,8 +3137,12 @@ msgstr "אפשר מבחנים מתוזמנים"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Enter true or false. If this value is true, timed exams are enabled in your "
-"course."
-msgstr "הזן כן או לא. אם הערך הוא כן, מבחנים מתוזמנים מאופשרים בקורס שלך."
+"course. Regardless of this setting, timed exams are enabled if Enable "
+"Proctored Exams is set to true."
+msgstr ""
+"רשום נכון או לא נכון. אם ערך זה נכון, מבחנים מתוזמנים יותאמו עבור הקורס שלך."
+" ללא קשר להגדרה זו, מבחנים מתוזמנים מותאמים במידה ו'אפשר מבחני חוץ' מוגדר "
+"כנכון."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Minimum Grade for Credit"
@@ -3236,13 +3267,15 @@ msgstr "גולמי"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "Hide Page From Learners"
-msgstr ""
+msgstr "הסתר את העמוד מהלומדים"
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid ""
 "If you select this option, only course team members with the Staff or Admin "
 "role see this page."
 msgstr ""
+"אם תבחר באפשרות זו, רק חברי צוות הקורס בתפקיד צוות או מנהל מערכת יראו את "
+"העמוד."
 
 #: common/lib/xmodule/xmodule/html_module.py
 msgid "HTML for the additional pages"
@@ -4150,8 +4183,8 @@ msgstr "בסיסי"
 msgid "There is no transcript file associated with the {lang} language."
 msgid_plural ""
 "There are no transcript files associated with the {lang} languages."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "אין קובצי תמלול המשויכים לשפה {lang}."
+msgstr[1] "אין קבצי תמלול המשוייכים ל- {lang} שפות."
 
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid ""
@@ -8572,12 +8605,12 @@ msgstr "דלג לתוכן ראשי"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid "Authorize"
-msgstr ""
+msgstr "אשר"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
 "The above application requests the following permissions from your account:"
-msgstr ""
+msgstr "האפליקציה שלעיל מבקשת את ההרשאות הבאות מחשבונך:"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid ""
@@ -8585,7 +8618,10 @@ msgid ""
 "application. Otherwise, to withhold these permissions, please click the "
 "'Cancel' button."
 msgstr ""
+"כדי להעניק את ההרשאות האלו לאפליקציה שלעיל, אנא לחץ על לחצן 'אפשר'. כדי לעכב"
+" את ההרשאות האלה, אנא לחץ על לחצן 'ביטול'."
 
+#: lms/templates/oauth2_provider/authorize.html
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/manage_users.html cms/templates/manage_users_lib.html
 #: lms/templates/modal/accessible_confirm.html
@@ -8594,8 +8630,9 @@ msgstr "ביטול"
 
 #: lms/templates/oauth2_provider/authorize.html
 msgid "Allow"
-msgstr ""
+msgstr "אפשר"
 
+#: lms/templates/oauth2_provider/authorize.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/ccx/schedule.html
 msgid "Error"
@@ -10639,7 +10676,7 @@ msgstr "מסומן בסימניה"
 
 #: lms/templates/bookmark_button.html
 msgid "Bookmark this page"
-msgstr ""
+msgstr "סמן עמוד זה"
 
 #: lms/templates/course.html themes/example/lms/templates/course.html
 msgid "LEARN MORE"
@@ -10844,7 +10881,7 @@ msgstr "תמיכה"
 
 #: lms/templates/help_modal.html
 msgid "{platform_name} Support"
-msgstr ""
+msgstr "תמיכה ב{platform_name}"
 
 #: lms/templates/help_modal.html
 msgid ""
@@ -10907,6 +10944,8 @@ msgid ""
 "details that will help us to troubleshoot, including error messages that you"
 " saw."
 msgstr ""
+"תאר מה היה מצבך כשאיתרת את הבעיה. כלול כל פרט שיעזור לנו לפתור את הבעיה, "
+"כולל הודעות שגיאה שראית."
 
 #: lms/templates/help_modal.html
 msgid "Thank You!"
@@ -10936,7 +10975,7 @@ msgstr "תיאור קצר של הבעיה"
 
 #: lms/templates/help_modal.html
 msgid "Details of the problem you are encountering{asterisk}"
-msgstr ""
+msgstr "פרטים על הבעיה בה נתקלת{asterisk}"
 
 #: lms/templates/help_modal.html
 msgid "suggestion"
@@ -11322,23 +11361,25 @@ msgstr "שמור"
 
 #: lms/templates/problem.html
 msgid "Save your answer"
-msgstr ""
+msgstr "שמור את תשובתך"
 
 #: lms/templates/problem.html
 msgid "Reset your answer"
-msgstr ""
+msgstr "אפס את תשובתך"
 
 #: lms/templates/problem.html
 msgid "Submit your answer"
-msgstr ""
+msgstr "שלח את תושבתך"
 
 #: lms/templates/problem.html
-msgid "You have used {num_used} of {num_total} attempts"
-msgstr ""
+msgid "You have used {num_used} of {num_total} attempt"
+msgid_plural "You have used {num_used} of {num_total} attempts"
+msgstr[0] "השתמשת בניסיון {num_used} מתוך {num_total}"
+msgstr[1] "השתמשת ב-{num_used} מתוך {num_total} ניסיונות"
 
 #: lms/templates/problem_notifications.html
 msgid "Next Hint"
-msgstr ""
+msgstr "הרמז הבא"
 
 #: lms/templates/problem_notifications.html
 #: lms/templates/shoppingcart/shopping_cart_flow.html
@@ -11716,18 +11757,23 @@ msgid "Actions"
 msgstr "פעולות"
 
 #: lms/templates/staff_problem_info.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Student Attempts"
-msgstr "אתחל נסיונות סטודנט"
-
-#: lms/templates/staff_problem_info.html
-msgid "Delete Student State"
-msgstr "מחק מדינת סטודנט"
+msgid "Reset Learner's Attempts to Zero"
+msgstr "אפס את ניסיונות הלומד"
 
 #: lms/templates/staff_problem_info.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore Student Submission"
-msgstr "חשב מחדש את ציון הסטודנט "
+msgid "Delete Learner's State"
+msgstr "מחק את מדינת הלומד"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Learner's Submission"
+msgstr "תן ציון מחדש להגשות הלומד"
+
+#: lms/templates/staff_problem_info.html
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Score Improves"
+msgstr "תן ציון מחדש רק אם הציון משתפר"
 
 #: lms/templates/staff_problem_info.html
 msgid "Module Fields"
@@ -13751,10 +13797,6 @@ msgid "{course_number} Progress"
 msgstr "{course_number} התקדמות"
 
 #: lms/templates/courseware/progress.html
-msgid "Course Progress"
-msgstr "התקדמות בקורס"
-
-#: lms/templates/courseware/progress.html
 msgid "View Grading in studio"
 msgstr "צפה בתהליך מתן הציונים בסטודיו"
 
@@ -13763,16 +13805,12 @@ msgid "Course Progress for Student '{username}' ({email})"
 msgstr "התקדמות בקורס לסטודנט {username} ({email})&lrm;"
 
 #: lms/templates/courseware/progress.html
-msgid "View certificate in a new browser window or tab."
-msgstr "הצג תעודה בחלון חדש או כרטיסיית דפדפן חדשה."
-
-#: lms/templates/courseware/progress.html
 msgid "View Certificate"
 msgstr "הצג תעודה"
 
 #: lms/templates/courseware/progress.html
-msgid "PDF will open in a new browser window or tab."
-msgstr "קובץ PDF יפתח בחלון חדש או בכרטיסיית דפדפן חדשה."
+msgid "Opens in a new browser window"
+msgstr " נפתח בחלון דפדפן חדש. "
 
 #: lms/templates/courseware/progress.html
 msgid "Download Your Certificate"
@@ -13834,6 +13872,10 @@ msgstr "בקרוב"
 #: lms/templates/courseware/progress.html
 msgid "Less"
 msgstr "פחות"
+
+#: lms/templates/courseware/progress.html
+msgid "Details for each chapter"
+msgstr "פרטים על כל פרק"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned} of {total} possible points"
@@ -14174,17 +14216,18 @@ msgstr "אמת את זהותך עכשיו"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have submitted your verification information."
-msgstr ""
+msgstr "הגשת את פרטי האימות."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You will see a message on your dashboard when the verification process is "
 "complete (usually within 1-2 days)."
 msgstr ""
+"הודעה תופיע בלוח הבקרה כאשר תהליך האימות יושלם (בדרך כלל תוך יום או יומיים)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon!"
-msgstr ""
+msgstr "בקרוב יפוג תוקפו של האימות הנוכחי שלך!"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14192,18 +14235,20 @@ msgid ""
 "on your dashboard when the verification process is complete (usually within "
 "1-2 days)."
 msgstr ""
+"הגשת את פרטי האימות מחדש. הודעה תופיע לוח הבקרה כאשר תהליך האימות יושלם "
+"(בדרך כלל בתוך יום או יומיים)."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You have successfully verified your ID with edX"
-msgstr ""
+msgstr "כבר אימתת  בהצלחה את זהותך עם edX"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification is effective until {date}."
-msgstr ""
+msgstr "האימות הנוכחי שלך תקף עד {date}."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your current verification will expire soon."
-msgstr ""
+msgstr "בקרוב יפוג תוקפו של האימות הנוכחי שלך."
 
 #. Translators: start_link and end_link will be replaced with HTML tags;
 #. please do not translate these.
@@ -14212,6 +14257,8 @@ msgid ""
 "Your current verification will expire in {days} days. {start_link}Re-verify "
 "your identity now{end_link} using a webcam and a government-issued photo ID."
 msgstr ""
+"האימות הנוכחי שלך יפוג בעוד {days} ימים. {start_link}אמת מחדש את זהותך "
+"כעת{end_link} באמצעות מצלמת רשת ותעודה מזהה בעלת תמונה שהונפקה בידי הממשלה. "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
@@ -14326,27 +14373,27 @@ msgstr "אירעה שגיאה בעסקה זו. לקבלת עזרה, צור קש�
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Approved"
-msgstr ""
+msgstr "מצב אימות נוכחי: מאושר"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
 "Your edX verification has been approved. Your verification is effective for "
 "one year after submission."
-msgstr ""
+msgstr "האימות שלך ב-edX אושר. האימות שלך תקף לשנה אחת לאחר הגשתו."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Pending"
-msgstr ""
+msgstr "מצב אימות נוכחי: בהמתנה"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
 "Your edX ID verification is pending. Your verification information has been "
 "submitted and will be reviewed shortly."
-msgstr ""
+msgstr "האימות שלך ב-edX נמצא בהמתנה. פרטי האימות שלך הוגשו והם יבדקו בקרוב."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Current Verification Status: Expired"
-msgstr ""
+msgstr "מצב אימות נוכחי: פג תוקף"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
@@ -14354,6 +14401,9 @@ msgid ""
 "submit a new photo of yourself and your government-issued photo ID before "
 "the verification deadline for your course."
 msgstr ""
+"תוקף האימות שלך ב-edX פג. כדי לקבל תעודה מאומתת, עליך להגיש תמונה חדשה שלך "
+"ותעודה מזהה בעלת תמונה, שהונפקה בידי הממשלה, לפני מועד סיום האימות של הקורס."
+"   "
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "Resubmit Verification"
@@ -14382,7 +14432,7 @@ msgstr "תוצאות:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Topic:"
-msgstr ""
+msgstr "נושא:"
 
 #: lms/templates/discussion/_discussion_inline.html
 msgid "Show Discussion"
@@ -14399,7 +14449,7 @@ msgstr "מספר מזהה לדיון: {discussion_id}"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Discussion topics list"
-msgstr ""
+msgstr "רשימת נושאים לדיון"
 
 #: lms/templates/discussion/_filter_dropdown.html
 msgid "Filter Topics"
@@ -15439,6 +15489,14 @@ msgid "Regenerate for learners who have not received certificates. ({count})"
 msgstr "יצירה מחדש ללומדים שלא קיבלו תעודות. ({count})"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit passing state. ({count})"
+msgstr "יצירה מחדש ללומדים במעמד שומע חופשי, שעברו. ({count})"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
+msgid "Regenerate for learners with audit not passing state. ({count})"
+msgstr "יצירה מחדש ללומדים במעמד שומע חופשי, שלא עברו.({count})"
+
+#: lms/templates/instructor/instructor_dashboard_2/certificates.html
 msgid "Regenerate for learners in an error state. ({count})"
 msgstr "יצירה מחדש ללומדים במצב שגיאה. ({count})"
 
@@ -16102,14 +16160,12 @@ msgstr ""
 "להקדים את תאריך היעד של משימה לסטודנט מסוים."
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
 "פרט את כתובת הדואר האלקטרוני או את שם משתמש {platform_name} של הסטודנט כאן:"
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
 msgstr "כתובת דואר אלקטרוני או שם משתמש של הסטודנט"
 
@@ -16764,151 +16820,186 @@ msgid "Student Special Exam Attempts"
 msgstr "נסיונות לקבלת מבחן מיוחד לסטודנט"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Gradebook"
-msgstr "יומן הציונים של הסטודנט"
+msgid "View gradebook for enrolled learners"
+msgstr "הצג את יומן הציונים ללומדים שנרשמו"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Click here to view the gradebook for enrolled students. This feature is only"
-" visible to courses with a small number of total enrolled students."
-msgstr ""
-"לחץ כאן לצפייה ביומן הציונים של הסטודנטים שנרשמו. תכונה זו גלויה רק לקורסים "
-"בעלי מספר קטן של סטודנטים שנרשמו."
+"Note: This feature is available only to courses with a small number of "
+"enrolled learners."
+msgstr "הערה: תכונה זו זמינה רק לקורסים בעלי מספר קטן של לומדים  רשומים."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Gradebook"
 msgstr "צפה בספר הציונים"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade inspection"
-msgstr "בדיקת ציונים לסטודנט מסוים"
+msgid "View a specific learner's grades and progress"
+msgstr "הצג ציונים והתקדמות של לומד ספציפי"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Click this link to view the student's progress page:"
-msgstr "לחץ על קישור על מנת לצפות בעמוד ההתקדמות של הסטודנט:"
+msgid "Learner's {platform_name} email address or username *"
+msgstr "כתובת דואר אלקטרוני או שם משתמש {platform_name} של הלומד"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student Progress Page"
-msgstr "עמוד ההתקדמות של הסטודנט"
+msgid "Learner email address or username"
+msgstr "כתובת הדואר האלקטרוני או שם המשתמש של הלומד"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student-specific grade adjustment"
-msgstr "תיקוני ציון לסטודנט מסוים"
+msgid "View Progress Page"
+msgstr "הצג עמוד התקדמות"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Specify a problem in the course here with its complete location:"
-msgstr "ציין כאן בעיה בקורס וכלול מידע על מיקום מדויק:"
+msgid "Adjust a learner's grade for a specific problem"
+msgstr "התאם ציון של תלמיד לבעיה ספציפית"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Location of problem in course *"
+msgstr "מיקום של בעיה בקורס *"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Example"
+msgstr "דוגמה"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Problem location"
 msgstr "מיקום הבעיה"
 
-#. Translators: A location (string of text) follows this sentence.
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Attempts"
+msgstr "נסיונות"
+
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You must provide the complete location of the problem. In the Staff Debug "
-"viewer, the location looks like this:"
+"Allow a learner who has used up all attempts to work on the problem again."
+msgstr "אפשר ללומד שהשתמש בכל הניסיונות שלו לעבוד שוב על בעיה."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Attempts to Zero"
+msgstr "אפס ניסיונות"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore"
+msgstr "תן ציון מחדש"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"For the specified problem, rescore the learner's responses. The 'Rescore "
+"Only If Score Improves' option updates the learner's score only if it "
+"improves in the learner's favor."
 msgstr ""
-"עליך לספק מידע מלא עבור מיקום הבעיה. במערכת איתור הבאגים של צוות הקורס, "
-"המיקום נראה ככה:  "
+"תן ציון מחדש לתשובות הלומד, עבור הבעיה שצוינה. האפשרות 'תן ציון מחדש רק אם "
+"הציון משתפר' מעדכנת את ציון הלומד רק אם היא משפרת את הציון לטובתו."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Next, select an action to perform for the given user and problem:"
-msgstr "כעת, בחר פעולה לבצע למשתמש ובעיה נתונים:"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"You may also delete the entire state of a student for the specified problem:"
-msgstr "יש באפשרותך למחוק גם את כלל מצבו של הסטודנט במערכת עבור בעיה נתונה:  "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student State for Problem"
-msgstr "מחק את מצב הסטודנט במערכת עבור בעיה"
+msgid "Problem History"
+msgstr "הסטוריית בעיות"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Rescoring runs in the background, and status for active tasks will appear in"
-" the 'Pending Tasks' table. To see status for all tasks submitted for this "
-"problem and student, click on this button:"
+"For the specified problem, permanently and completely delete the learner's "
+"answers and scores from the database."
 msgstr ""
-"הציון מחדש מופיע ברקע והסטטוס למשימות פעילות יופיע בטבלת 'משימות בהמתנה'. על"
-" מנת לראות את הסטטוס עבור כל המשימות שנשלחו לפתרון בעיה זו ועבור הסטודנט, "
-"לחץ על מקש זה:"
+"מחק לצמיתות ולחלוטין את תשובות הלומד ואת הציונים ממסד הנתונים, עבור הבעיה "
+"שצוינה."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Student"
-msgstr "הצג היסטורית משימות רקע עבור סטודנט "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Entrance Exam Adjustment"
-msgstr "התאמת מבחן כניסה"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Student's {platform_name} email address or username:"
-msgstr "כתובת דואר אלקטרוני  או שם משתמש {platform_name} של הסטודנט:"
+msgid "Task Status"
+msgstr "מצב המשימה"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"Select an action for the student's entrance exam. This action will affect "
-"every problem in the student's exam."
-msgstr ""
-"בחר פעולה עבור מבחן הכניסה של הסטודנט. פעולה זו תשפיע על כל הבעיות במבחן "
-"הסטודנט. "
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and problem."
+msgstr "הצג את סטטוס המשימות שניתן להן ציון מחדש ושהגשת עבור הלומד והבעיה."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset Number of Student Attempts"
-msgstr "אפס את מספר ניסיונות הסטודנט"
+msgid "Show Task Status"
+msgstr "הצג סטטוס משימה"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust a learner's entrance exam results"
+msgstr "התאם את תוצאות מבחן הכניסה של הלומד"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow the learner to take the exam again."
+msgstr "אפשר ללומד לבצע שוב את המבחן"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allow Skip"
+msgstr "אפשר דילוג"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Waive the requirement for the learner to take the exam."
+msgstr "ותר על הדרישה מהלומד לענות על המבחן."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Let Learner Skip Entrance Exam"
+msgstr "אפשר ללומד לדלג על מבחן הכניסה"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore any responses that have been submitted. The 'Rescore All Problems "
+"Only If Score Improves' option updates the learner's scores only if it "
+"improves in the learner's favor."
+msgstr ""
+"תן ציון מחדש לכל תשובה שהוגשה. האפשרות 'תן ציון מחדש רק אם הציון משתפר' "
+"מעדכנת את ציון הלומד רק אם היא משפרת את ציונו  לטובתו."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Rescore All Problems"
 msgstr "תן ציון מחדש לכל הבעיות"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Let Student Skip Entrance Exam"
-msgstr "אפשר לסטודנט לדלג על מבחן הכניסה"
+msgid "Rescore All Problems Only If Score Improves"
+msgstr "תן ציון מחדש לכל הבעיות רק אם הציון משתפר"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Entrance Exam History"
+msgstr "הסטוריית מבחן כניסה"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid ""
-"You can also delete all of the student's answers and scores for the entire "
-"entrance exam."
-msgstr "ניתן למחוק גם את כלל התשובות וציוני מבחן הכניסה של הסטודנט."
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Delete Student's Answers and Scores"
-msgstr "מחק את התשובות והציונים של הסטודנט"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Student's Exam Adjustment History"
-msgstr "הראה את היסטוריית תיקוני הציון בבחינת סטודנט זה"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Course-specific grade adjustment"
-msgstr "שינוי ציונים מותאם קורס"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Then select an action"
-msgstr "לאחר מכן בחר פעולה"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Reset ALL students' attempts"
-msgstr "אפס את כלל ניסיונות הסטודנטים"
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Rescore ALL students' problem submissions"
-msgstr "תן ציון מחדש לכלל הפתרונות שהוגשו לכל הסטודנטים. "
-
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid ""
-"The above actions run in the background, and status for active tasks will "
-"appear in a table on the Course Info tab. To see status for all tasks "
-"submitted for this problem, click on this button"
+"For the entire entrance exam, permanently and completely delete the "
+"learner's answers and scores from the database."
 msgstr ""
-"הפעולות לעיל מופיעות ברקע ודוח מצב משימות פעילות יופיע בטבלה בלשונית מידע "
-"הקורס. על מנת לצפות בדוח מצב עבור משימות שהוגשו לבעיה זו, לחץ על מקש זה.  "
+"עבור מבחן הכניסה כולו, מחק לצמיתות ולחלוטין את תשובות הלומד ואת הציונים ממסד"
+" הנתונים."
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
-msgid "Show Background Task History for Problem"
-msgstr "הצג היסטוריית משימות רקע עבור בעיה"
+msgid ""
+"Show the status for the rescoring tasks that you submitted for this learner "
+"and entrance exam."
+msgstr ""
+"הצג את סטטוס המשימות שניתן להן ציון מחדש ושהגשת עבור הלומד ומבחן הכניסה."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Adjust all enrolled learners' grades for a specific problem"
+msgstr "התאם את כל ציוני הלומד שנרשם לבעיה מסוימת"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Allows all learners to work on the problem again."
+msgstr "מאפשר לכל הלומדים לעבוד שוב על בעיה."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Rescore submitted responses. The 'Rescore Only If Scores Improve' option "
+"updates a learner's score only if it improves in the learner's favor."
+msgstr ""
+"תן ציון מחדש לתשובות שנשלחו. האפשרות 'תן ציון מחדש רק אם הציון משתפר' מעדכנת"
+" את ציון הלומד רק אם היא משפרת את הציון לטובתו."
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Learners' Submissions"
+msgstr "חשב מחדש את ציון כל הלומדים"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore Only If Scores Improve"
+msgstr "חשב ציון מחדש רק אם הציון משתפר"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show the status for the tasks that you submitted for this problem."
+msgstr "הצג את סטטוס המשימות שהגשת לגבי בעיה זו."
 
 #: lms/templates/learner_dashboard/program_details.html
 msgid "Program Details"
@@ -18497,13 +18588,15 @@ msgstr "הנפקת תעודות ללומדים"
 
 #: cms/templates/certificates.html
 msgid ""
-"To begin issuing certificates, a course team member with the Admin role "
-"selects {em_start}Activate{em_end}. Course team members without the Admin "
-"role cannot edit or delete an activated certificate."
+"After you have configured and previewed your certificate, ask your edX "
+"partner manager to activate your certificate. When your certificate has been"
+" activated, you can begin issuing certificates to learners. Course team "
+"members without the Admin role cannot edit or delete an activated "
+"certificate."
 msgstr ""
-"על מנת להתחיל בהנפקת תעודות, בוחר חבר בצוות הקורס המשמש בתפקיד מנהל "
-"ב{em_start}הפעל{em_end}. חבר צוות הקורס שאינו בעל תפקיד מנהל אינו יכול לערוך"
-" או למחוק תעודה מופעלת."
+"לאחר שהגדרת את תעודתך וצפית בתצוגה המקדימה שלה, בקש מהמנהל שותף ב-edX להפעיל"
+" אותה. לאחר שהופעלה התעודה, יש באפשרותך להתחיל לשלוח תעודות ללומדים. חברי "
+"צוות בקורס שאינם בעלי תפקיד מינהלי  אינם יכולים למחוק תעודה מופעלת."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -20814,7 +20907,7 @@ msgstr "היום האחרון שבו הסטודנטים יכולים להירש�
 
 #: cms/templates/settings.html
 msgid "Contact your edX partner manager to update these settings."
-msgstr ""
+msgstr "צור קשר עם המנהל השותף ב-edX כדי לעדכן את ההגדרות הללו."
 
 #: cms/templates/settings.html
 msgid "Enrollment End Time"

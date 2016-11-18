@@ -160,8 +160,11 @@ class ConditionalModule(ConditionalFields, XModule, StudioEditableModule):
                     # the descriptor of a required module to have a property but
                     # for the resulting module to be a (flavor of) ErrorModule.
                     # So just log and return false.
-                    log.warn('Error in conditional module: \
-                        required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
+                    if module is not None:
+                        # We do not want to log when module is None, and it is when requester
+                        # does not have access to the requested required module.
+                        log.warn('Error in conditional module: \
+                            required module {module} has no {module_attr}'.format(module=module, module_attr=attr_name))
                     return False
 
                 attr = getattr(module, attr_name)

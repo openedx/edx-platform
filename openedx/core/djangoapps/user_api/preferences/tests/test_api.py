@@ -11,10 +11,10 @@ from pytz import common_timezones, utc
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.test.utils import override_settings
 from dateutil.parser import parse as parse_datetime
 
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from openedx.core.lib.time_zone_utils import get_display_time_zone
 from student.tests.factories import UserFactory
 
@@ -43,7 +43,7 @@ from ...preferences.api import (
 
 @attr(shard=2)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-class TestPreferenceAPI(TestCase):
+class TestPreferenceAPI(CacheIsolationTestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
     This includes the specific types of error raised, and default behavior when optional arguments
@@ -441,7 +441,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
 
 @ddt.ddt
-class CountryTimeZoneTest(TestCase):
+class CountryTimeZoneTest(CacheIsolationTestCase):
     """
     Test cases to validate country code api functionality
     """

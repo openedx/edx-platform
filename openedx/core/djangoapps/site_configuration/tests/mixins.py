@@ -42,8 +42,22 @@ class SiteMixin(object):
         # Initialize client with default site domain
         self.use_site(self.site)
 
+    def set_up_site(self, domain, site_configuration_values):
+        """
+        Create Site and SiteConfiguration models and initialize test client with the created site
+        """
+        site = SiteFactory.create(
+            domain=domain,
+            name=domain
+        )
+        __ = SiteConfigurationFactory.create(
+            site=site,
+            values=site_configuration_values
+        )
+        self.use_site(site)
+
     def use_site(self, site):
         """
-        # Initializes the test client with the domain of the given site
+        Initializes the test client with the domain of the given site
         """
         self.client = self.client_class(SERVER_NAME=site.domain)

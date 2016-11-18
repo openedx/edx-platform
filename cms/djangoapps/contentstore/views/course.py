@@ -530,7 +530,7 @@ def course_listing(request):
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
         'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
         'programs': programs,
-        'program_authoring_url': reverse('programs'),
+        'program_authoring_url': reverse('programs')
     })
 
 

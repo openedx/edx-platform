@@ -113,6 +113,7 @@ urlpatterns += patterns(
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)(/)?(?P<group_id>\d+)?$'.format(
         settings.COURSE_KEY_PATTERN), 'group_configurations_detail_handler'),
     url(r'^api/val/v0/', include('edxval.urls')),
+    url(r'^api/tasks/v0/', include('user_tasks.urls')),
 )
 
 JS_INFO_DICT = {
@@ -199,6 +200,7 @@ if 'debug_toolbar' in settings.INSTALLED_APPS:
     )
 
 # Custom error pages
+# These are used by Django to render these error codes. Do not remove.
 # pylint: disable=invalid-name
 handler404 = 'contentstore.views.render_404'
 handler500 = 'contentstore.views.render_500'

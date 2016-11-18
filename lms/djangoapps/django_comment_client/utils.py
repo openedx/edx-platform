@@ -18,6 +18,7 @@ from xmodule.modulestore.django import modulestore
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
 from django_comment_client.settings import MAX_COMMENT_DEPTH
+from django_comment_client.constants import TYPE_ENTRY, TYPE_SUBCATEGORY
 from edxmako import lookup_template
 
 from courseware import courses
@@ -221,10 +222,10 @@ def _filter_unstarted_categories(category_map, course):
         filtered_map["entries"] = {}
         filtered_map["subcategories"] = {}
 
-        for child in unfiltered_map["children"]:
-            if child in unfiltered_map["entries"]:
+        for child, c_type in unfiltered_map["children"]:
+            if child in unfiltered_map["entries"] and c_type == TYPE_ENTRY:
                 if course.self_paced or unfiltered_map["entries"][child]["start_date"] <= now:
-                    filtered_map["children"].append(child)
+                    filtered_map["children"].append((child, c_type))
                     filtered_map["entries"][child] = {}
                     for key in unfiltered_map["entries"][child]:
                         if key != "start_date":
@@ -233,7 +234,7 @@ def _filter_unstarted_categories(category_map, course):
                     log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
             else:
                 if course.self_paced or unfiltered_map["subcategories"][child]["start_date"] < now:
-                    filtered_map["children"].append(child)
+                    filtered_map["children"].append((child, c_type))
                     filtered_map["subcategories"][child] = {}
                     unfiltered_queue.append(unfiltered_map["subcategories"][child])
                     filtered_queue.append(filtered_map["subcategories"][child])
@@ -249,11 +250,11 @@ def _sort_map_entries(category_map, sort_alpha):
     for title, entry in category_map["entries"].items():
         if entry["sort_key"] is None and sort_alpha:
             entry["sort_key"] = title
-        things.append((title, entry))
+        things.append((title, entry, TYPE_ENTRY))
     for title, category in category_map["subcategories"].items():
-        things.append((title, category))
+        things.append((title, category, TYPE_SUBCATEGORY))
         _sort_map_entries(category_map["subcategories"][title], sort_alpha)
-    category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
+    category_map["children"] = [(x[0], x[2]) for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
 def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude_unstarted=True):
@@ -276,13 +277,16 @@ def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude
         >>>                       "id": "i4x-edx-eiorguegnru-course-foobarbaz"
         >>>                   }
         >>>               },
-        >>>               "children": ["General", "Getting Started"],
+        >>>               "children": [
+        >>>                     ["General", "entry"],
+        >>>                     ["Getting Started", "subcategory"]
+        >>>               ],
         >>>               "subcategories": {
         >>>                   "Getting Started": {
         >>>                       "subcategories": {},
         >>>                       "children": [
-        >>>                           "Working with Videos",
-        >>>                           "Videos on edX"
+        >>>                           ["Working with Videos", "entry"],
+        >>>                           ["Videos on edX", "entry"]
         >>>                       ],
         >>>                       "entries": {
         >>>                           "Working with Videos": {
