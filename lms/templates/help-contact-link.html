@@ -1,0 +1,12 @@
+<%!
+    from django.utils.translation import ugettext as _
+    from microsite_configuration.templatetags.microsite import platform_name
+%>
+
+<p>
+    ${_("Can't find an answer to your question? You can contact the {platform_name} general support team directly {link_start}by clicking here{link_end}.").format(
+        platform_name=platform_name(),
+        link_start='<a href="#" id="feedback_link_question">',
+        link_end='</a>',
+      )}
+</p>
