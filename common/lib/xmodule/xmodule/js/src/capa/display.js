@@ -604,7 +604,7 @@
                 case 'incorrect':
                 case 'correct':
                     window.SR.readTexts(that.get_sr_status(response.contents));
-                    that.el.trigger('contentChanged', [that.id, response.contents]);
+                    that.el.trigger('contentChanged', [that.id, response.contents, response]);
                     that.render(response.contents, that.focus_on_submit_notification);
                     that.updateProgress(response);
                     break;
@@ -662,7 +662,7 @@
                 id: this.id
             }, function(response) {
                 if (response.success) {
-                    that.el.trigger('contentChanged', [that.id, response.html]);
+                    that.el.trigger('contentChanged', [that.id, response.html, response]);
                     that.render(response.html, that.scroll_to_problem_meta);
                     that.updateProgress(response);
                     return window.SR.readText(gettext('This problem has been reset.'));
@@ -773,7 +773,7 @@
                 var saveMessage;
                 saveMessage = response.msg;
                 if (response.success) {
-                    that.el.trigger('contentChanged', [that.id, response.html]);
+                    that.el.trigger('contentChanged', [that.id, response.html, response]);
                     edx.HtmlUtils.setHtml(
                         that.el.find('.notification-save .notification-message'),
                         edx.HtmlUtils.HTML(saveMessage)

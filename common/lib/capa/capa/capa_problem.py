@@ -129,7 +129,7 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     """
     def __init__(self, problem_text, id, capa_system, capa_module,  # pylint: disable=redefined-builtin
-                 state=None, seed=None):
+                 state=None, seed=None, minimal_init=False):
         """
         Initializes capa Problem.
 
@@ -186,7 +186,10 @@ class LoncapaProblem(object):
         self._process_includes()
 
         # construct script processor context (eg for customresponse problems)
-        self.context = self._extract_context(self.tree)
+        if minimal_init:
+            self.context = {'script_code': ""}
+        else:
+            self.context = self._extract_context(self.tree)
 
         # Pre-parse the XML tree: modifies it to add ID's and perform some in-place
         # transformations.  This also creates the dict (self.responders) of Response
@@ -209,7 +212,8 @@ class LoncapaProblem(object):
             if hasattr(response, 'late_transforms'):
                 response.late_transforms(self)
 
-        self.extracted_tree = self._extract_html(self.tree)
+        if not minimal_init:
+            self.extracted_tree = self._extract_html(self.tree)
 
     def make_xml_compatible(self, tree):
         """

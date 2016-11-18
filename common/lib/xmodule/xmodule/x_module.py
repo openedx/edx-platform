@@ -806,6 +806,7 @@ class XModule(HTMLSnippet, XModuleMixin):
     entry_point = "xmodule.v1"
 
     has_score = descriptor_attr('has_score')
+    max_score = descriptor_attr('max_score')
     show_in_read_only_mode = descriptor_attr('show_in_read_only_mode')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
@@ -1201,7 +1202,6 @@ class XModuleDescriptor(HTMLSnippet, ResourceTemplates, XModuleMixin):
     get_progress = module_attr('get_progress')
     get_score = module_attr('get_score')
     handle_ajax = module_attr('handle_ajax')
-    max_score = module_attr('max_score')
     student_view = module_attr(STUDENT_VIEW)
     get_child_descriptors = module_attr('get_child_descriptors')
     xmodule_handler = module_attr('xmodule_handler')
