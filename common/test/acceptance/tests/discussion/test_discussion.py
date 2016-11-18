@@ -1067,6 +1067,20 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         # Check if 'thread-wrapper' is focused after expanding thread
         self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
 
+    @attr('a11y')
+    def test_inline_a11y(self):
+        """
+        Tests Inline Discussion for accessibility issues.
+        """
+        self.setup_multiple_inline_threads(thread_count=3)
+        self.discussion_page.expand_discussion()
+        self.discussion_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section'
+            ]
+        })
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
+
     def test_add_a_post_is_present_if_can_create_thread_when_expanded(self):
         self.discussion_page.expand_discussion()
         # Add a Post link is present
