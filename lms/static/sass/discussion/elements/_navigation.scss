@@ -1,6 +1,8 @@
 // discussion - elements - navigation
 // ====================
 
+@import '../../edx-pattern-library-shims/base/variables';
+
 .forum-nav {
     border: 1px solid #aaa;
     border-radius: $forum-border-radius;
@@ -141,8 +143,11 @@
 .forum-nav-filter-cohort, .forum-nav-sort {
     box-sizing: border-box;
     display: inline-block;
-    width: 50%;
     @include text-align(right);
+
+    @media (min-width: $bp-screen-md) {
+        width: 50%;
+    }
 }
 
 %forum-nav-select {
@@ -157,6 +162,7 @@
 
 .forum-nav-filter-cohort-control {
     @extend %forum-nav-select;
+    max-width: 60%;
 }
 
 .forum-nav-sort-control {
