@@ -49,8 +49,8 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             PersistentGradesEnabledFlag.objects.create(enabled=False)
 
         self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
-        self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
-        self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='problem')
+        self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
+        self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='Problem')
 
         self.problem_score_changed_kwargs = OrderedDict([
             ('points_earned', 1.0),
@@ -109,13 +109,13 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             mock_task_apply.assert_called_once_with(args=expected_args)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
-    def test_subsection_update_triggers_course_update(self, mock_course_signal):
+    def test_subsection_update_triggers_signal(self, mock_subsection_signal):
         """
-        Ensures that the subsection update operation also updates the course grade.
+        Ensures that the subsection update operation triggers a signal.
         """
         self.set_up_course()
         self._apply_recalculate_subsection_grade()
-        self.assertTrue(mock_course_signal.called)
+        self.assertTrue(mock_subsection_signal.called)
 
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, 1),
@@ -128,6 +128,30 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             with check_mongo_calls(2) and self.assertNumQueries(20 + added_queries):
                 self._apply_recalculate_subsection_grade()
+
+    @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
+    def test_other_inaccessible_subsection(self, mock_subsection_signal):
+        self.set_up_course()
+        accessible_seq = ItemFactory.create(parent=self.chapter, category='sequential')
+        inaccessible_seq = ItemFactory.create(parent=self.chapter, category='sequential', visible_to_staff_only=True)
+
+        # Update problem to have 2 additional sequential parents.
+        # So in total, 3 sequential parents, with one inaccessible.
+        for sequential in (accessible_seq, inaccessible_seq):
+            sequential.children = [self.problem.location]
+            modulestore().update_item(sequential, self.user.id)  # pylint: disable=no-member
+
+        # Make sure the signal is sent for only the 2 accessible sequentials.
+        self._apply_recalculate_subsection_grade()
+        self.assertEquals(mock_subsection_signal.call_count, 2)
+        sequentials_signalled = {
+            args[1]['subsection_grade'].location
+            for args in mock_subsection_signal.call_args_list
+        }
+        self.assertSetEqual(
+            sequentials_signalled,
+            {self.sequential.location, accessible_seq.location},
+        )
 
     def test_single_call_to_create_block_structure(self):
         self.set_up_course()

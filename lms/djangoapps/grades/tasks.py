@@ -110,17 +110,18 @@ def _update_subsection_grades(
 
     try:
         for subsection_usage_key in subsections_to_update:
-            subsection_grade = subsection_grade_factory.update(
-                course_structure[subsection_usage_key],
-                only_if_higher,
-            )
-            SUBSECTION_SCORE_CHANGED.send(
-                sender=recalculate_subsection_grade,
-                course=course,
-                course_structure=course_structure,
-                user=student,
-                subsection_grade=subsection_grade,
-            )
+            if subsection_usage_key in course_structure:
+                subsection_grade = subsection_grade_factory.update(
+                    course_structure[subsection_usage_key],
+                    only_if_higher,
+                )
+                SUBSECTION_SCORE_CHANGED.send(
+                    sender=recalculate_subsection_grade,
+                    course=course,
+                    course_structure=course_structure,
+                    user=student,
+                    subsection_grade=subsection_grade,
+                )
 
     except DatabaseError as exc:
         raise _retry_recalculate_subsection_grade(
