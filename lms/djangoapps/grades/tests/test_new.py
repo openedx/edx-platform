@@ -436,12 +436,6 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
-        course_structure = get_course_blocks(self.request.user, self.course.location)
-        self.subsection_factory = SubsectionGradeFactory(
-            self.request.user,
-            course_structure=course_structure,
-            course=self.course,
-        )
 
     def _get_altered_metadata(self, alterations):
         """
@@ -473,7 +467,13 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         """
 
         self.submit_question_answer(u'problem', {u'2_1': u'Correct'})
-        return self.subsection_factory.create(self.sequence)
+        course_structure = get_course_blocks(self.request.user, self.course.location)
+        subsection_factory = SubsectionGradeFactory(
+            self.request.user,
+            course_structure=course_structure,
+            course=self.course,
+        )
+        return subsection_factory.create(self.sequence)
 
     @ddt.data(
         ({}, 1.25, 2.5),
