@@ -1,20 +1,28 @@
 <%
 var summaryMessage = validation.get("summary");
 var aggregateMessageType = summaryMessage.type;
-var aggregateValidationClass = aggregateMessageType === "error"? "has-errors" : "has-warnings";
+var aggregateValidationClass = aggregateMessageType === "error" ? "has-errors" : "has-warnings";
+var actionLink = (summaryMessage.action_class === 'external-link' && summaryMessage.action_link) ?
+  summaryMessage.action_link : '#';
 %>
     <div class="xblock-message validation <%= aggregateValidationClass %> <%= additionalClasses %>">
         <p class="<%= aggregateMessageType %>"><i class="icon fa <%= getIcon(aggregateMessageType) %>"></i>
         <%- summaryMessage.text %>
-        <% if (summaryMessage.action_class) { %>
+          <% if (summaryMessage.action_class && actionLink === '#') { %>
             <a href="#" class="button action-button <%- summaryMessage.action_class %>">
-                <span class="action-button-text"><%- summaryMessage.action_label %></span>
+              <span class="action-button-text"><%- summaryMessage.action_label %></span>
             </a>
-        <% } else if (summaryMessage.action_runtime_event) {%>
-            <a href="#" class="button action-button notification-action-button" data-notification-action="<%- summaryMessage.action_runtime_event %>">
-                <span class="action-button-text"><%- summaryMessage.action_label %></span>
+          <% } else if (actionLink !== '#') { %>
+            <a href="<%= actionLink %>" target="_blank" class="button action-button <%- summaryMessage.action_class %>">
+              <span class="action-button-text"><%- summaryMessage.action_label %></span>
+              <i class="fa fa-external-link-square" aria-hidden="true"></i>
             </a>
-        <% } %>
+          <% } else if (summaryMessage.action_runtime_event) { %>
+            <a href="#" class="button action-button notification-action-button"
+               data-notification-action="<%- summaryMessage.action_runtime_event %>">
+              <span class="action-button-text"><%- summaryMessage.action_label %></span>
+            </a>
+          <% } %>
         </p>
         <% var detailedMessages = validation.get("messages"); %>
         <% if (detailedMessages.length > 0) { %>
