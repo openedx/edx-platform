@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
+import logging
 
 from opaque_keys import InvalidKeyError
 from django.conf import settings
@@ -41,6 +42,7 @@ from .accounts import (
 from .accounts.api import check_account_exists
 from .serializers import CountryTimeZoneSerializer, UserSerializer, UserPreferenceSerializer
 
+log = logging.getLogger(__name__)
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -64,6 +66,7 @@ class LoginSessionView(APIView):
             HttpResponse
 
         """
+        log.info("PasswordResetView has been hit. Unique tag for searching: elephants pursue diplomas in genomics")
         form_desc = FormDescription("post", reverse("user_api_login_session"))
 
         # Translators: This label appears above a field on the login form
