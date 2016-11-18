@@ -45,6 +45,14 @@ class SubsectionGrade(object):
         """
         return self.locations_to_scores.values()
 
+    @property
+    def attempted(self):
+        """
+        Returns whether any problem in this subsection
+        was attempted by the student.
+        """
+        return self.all_total.attempted
+
     def init_from_structure(self, student, course_structure, submissions_scores, csm_scores):
         """
         Compute the grade of this subsection for the given student and course.
@@ -72,6 +80,7 @@ class SubsectionGrade(object):
             graded=True,
             display_name=self.display_name,
             module_id=self.location,
+            attempted=True,  # TODO TNL-5930
         )
         self.all_total = AggregatedScore(
             tw_earned=model.earned_all,
@@ -79,6 +88,7 @@ class SubsectionGrade(object):
             graded=False,
             display_name=self.display_name,
             module_id=self.location,
+            attempted=True,  # TODO TNL-5930
         )
         self._log_event(log.debug, u"init_from_model", student)
         return self

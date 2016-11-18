@@ -228,6 +228,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.assertFalse(mock_create_grade.called)
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
+        grade_b.all_total.attempted = False  # TODO TNL-5930
         self.assertEqual(grade_a.all_total, grade_b.all_total)
 
     def test_update(self):
@@ -317,6 +318,7 @@ class SubsectionGradeTest(GradeTestBase):
         )
 
         self.assertEqual(input_grade.url_name, loaded_grade.url_name)
+        loaded_grade.all_total.attempted = False  # TODO TNL-5930
         self.assertEqual(input_grade.all_total, loaded_grade.all_total)
 
 
@@ -384,7 +386,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
             # Configure one block to return no possible score, the rest to return 3.0 earned / 7.0 possible
             block_count = self.SCORED_BLOCK_COUNT - 1
             mock_score.side_effect = itertools.chain(
-                [(earned_per_block, None, earned_per_block, None)],
+                [(earned_per_block, None, earned_per_block, None, True)],
                 itertools.repeat(mock_score.return_value)
             )
             score = subsection_factory.update(self.seq1)

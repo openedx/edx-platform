@@ -12,9 +12,12 @@ class GradesheetTest(unittest.TestCase):
 
     def test_weighted_grading(self):
         scores = []
-        agg_fields = dict(display_name="aggregated_score", module_id=None)
-        prob_fields = dict(display_name="problem_score", module_id=None, raw_earned=0, raw_possible=0, weight=0)
+        agg_fields = dict(display_name="aggregated_score", module_id=None, attempted=False)
+        prob_fields = dict(
+            display_name="problem_score", module_id=None, raw_earned=0, raw_possible=0, weight=0, attempted=False,
+        )
 
+        # No scores
         all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
         self.assertEqual(
             all_total,
@@ -25,6 +28,7 @@ class GradesheetTest(unittest.TestCase):
             AggregatedScore(tw_earned=0, tw_possible=0, graded=True, **agg_fields),
         )
 
+        # (0/5 non-graded)
         scores.append(ProblemScore(weighted_earned=0, weighted_possible=5, graded=False, **prob_fields))
         all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
         self.assertEqual(
@@ -36,6 +40,9 @@ class GradesheetTest(unittest.TestCase):
             AggregatedScore(tw_earned=0, tw_possible=0, graded=True, **agg_fields),
         )
 
+        # (0/5 non-graded) + (3/5 graded) = 3/10 total, 3/5 graded
+        prob_fields['attempted'] = True
+        agg_fields['attempted'] = True
         scores.append(ProblemScore(weighted_earned=3, weighted_possible=5, graded=True, **prob_fields))
         all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
         self.assertAlmostEqual(
@@ -47,6 +54,7 @@ class GradesheetTest(unittest.TestCase):
             AggregatedScore(tw_earned=3, tw_possible=5, graded=True, **agg_fields),
         )
 
+        # (0/5 non-graded) + (3/5 graded) + (2/5 graded) = 5/15 total, 5/10 graded
         scores.append(ProblemScore(weighted_earned=2, weighted_possible=5, graded=True, **prob_fields))
         all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
         self.assertAlmostEqual(
@@ -73,25 +81,26 @@ class GraderTest(unittest.TestCase):
         'Midterm': [],
     }
 
+    common_fields = dict(graded=True, module_id=None, attempted=True)
     test_gradesheet = {
         'Homework': [
-            AggregatedScore(tw_earned=2, tw_possible=20.0, graded=True, display_name='hw1', module_id=None),
-            AggregatedScore(tw_earned=16, tw_possible=16.0, graded=True, display_name='hw2', module_id=None)
+            AggregatedScore(tw_earned=2, tw_possible=20.0, display_name='hw1', **common_fields),
+            AggregatedScore(tw_earned=16, tw_possible=16.0, display_name='hw2', **common_fields),
         ],
 
         # The dropped scores should be from the assignments that don't exist yet
         'Lab': [
-            AggregatedScore(tw_earned=1, tw_possible=2.0, graded=True, display_name='lab1', module_id=None),  # Dropped
-            AggregatedScore(tw_earned=1, tw_possible=1.0, graded=True, display_name='lab2', module_id=None),
-            AggregatedScore(tw_earned=1, tw_possible=1.0, graded=True, display_name='lab3', module_id=None),
-            AggregatedScore(tw_earned=5, tw_possible=25.0, graded=True, display_name='lab4', module_id=None),  # Dropped
-            AggregatedScore(tw_earned=3, tw_possible=4.0, graded=True, display_name='lab5', module_id=None),  # Dropped
-            AggregatedScore(tw_earned=6, tw_possible=7.0, graded=True, display_name='lab6', module_id=None),
-            AggregatedScore(tw_earned=5, tw_possible=6.0, graded=True, display_name='lab7', module_id=None),
+            AggregatedScore(tw_earned=1, tw_possible=2.0, display_name='lab1', **common_fields),  # Dropped
+            AggregatedScore(tw_earned=1, tw_possible=1.0, display_name='lab2', **common_fields),
+            AggregatedScore(tw_earned=1, tw_possible=1.0, display_name='lab3', **common_fields),
+            AggregatedScore(tw_earned=5, tw_possible=25.0, display_name='lab4', **common_fields),  # Dropped
+            AggregatedScore(tw_earned=3, tw_possible=4.0, display_name='lab5', **common_fields),  # Dropped
+            AggregatedScore(tw_earned=6, tw_possible=7.0, display_name='lab6', **common_fields),
+            AggregatedScore(tw_earned=5, tw_possible=6.0, display_name='lab7', **common_fields),
         ],
 
         'Midterm': [
-            AggregatedScore(tw_earned=50.5, tw_possible=100, graded=True, display_name="Midterm Exam", module_id=None),
+            AggregatedScore(tw_earned=50.5, tw_possible=100, display_name="Midterm Exam", **common_fields),
         ],
     }
 

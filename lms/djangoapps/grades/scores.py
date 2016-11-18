@@ -102,7 +102,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
 
     # Priority order for retrieving the scores:
     # submissions API -> CSM -> grades persisted block -> latest block content
-    raw_earned, raw_possible, weighted_earned, weighted_possible = (
+    raw_earned, raw_possible, weighted_earned, weighted_possible, attempted = (
         _get_score_from_submissions(submissions_scores, block) or
         _get_score_from_csm(csm_scores, block, weight) or
         _get_score_from_persisted_or_latest_block(persisted_block, block, weight)
@@ -124,6 +124,7 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
             graded,
             display_name=display_name_with_default_escaped(block),
             module_id=block.location,
+            attempted=attempted,
         )
 
 
@@ -151,9 +152,10 @@ def _get_score_from_submissions(submissions_scores, block):
     if submissions_scores:
         submission_value = submissions_scores.get(unicode(block.location))
         if submission_value:
+            attempted = True
             weighted_earned, weighted_possible = submission_value
             assert weighted_earned >= 0.0 and weighted_possible > 0.0  # per contract from submissions API
-            return (None, None) + (weighted_earned, weighted_possible)
+            return (None, None) + (weighted_earned, weighted_possible) + (attempted,)
 
 
 def _get_score_from_csm(csm_scores, block, weight):
@@ -175,9 +177,14 @@ def _get_score_from_csm(csm_scores, block, weight):
     score = csm_scores.get(block.location)
     has_valid_score = score and score.total is not None
     if has_valid_score:
-        raw_earned = score.correct if score.correct is not None else 0.0
+        if score.correct is not None:
+            attempted = True
+            raw_earned = score.correct
+        else:
+            attempted = False
+            raw_earned = 0.0
         raw_possible = score.total
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight)
+        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight) + (attempted,)
 
 
 def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
@@ -188,16 +195,20 @@ def _get_score_from_persisted_or_latest_block(persisted_block, block, weight):
     the latest block content.
     """
     raw_earned = 0.0
+    attempted = False
 
     if persisted_block:
         raw_possible = persisted_block.raw_possible
     else:
         raw_possible = block.transformer_data[GradesTransformer].max_score
 
+    # TODO TNL-5982 remove defensive code for scorables without max_score
     if raw_possible is None:
-        return (raw_earned, raw_possible) + (None, None)
+        weighted_scores = (None, None)
     else:
-        return (raw_earned, raw_possible) + weighted_score(raw_earned, raw_possible, weight)
+        weighted_scores = weighted_score(raw_earned, raw_possible, weight)
+
+    return (raw_earned, raw_possible) + weighted_scores + (attempted,)
 
 
 def _get_weight_from_block(persisted_block, block):
