@@ -51,23 +51,29 @@
             return jasmine.createSpyObj('event', ['preventDefault', 'target']);
         };
 
-        DiscussionSpecHelper.createTestCourseSettings = function() {
-            return new DiscussionCourseSettings({
-                category_map: {
-                    children: [['Test Topic', 'entry'], ['Other Topic', 'entry']],
-                    entries: {
-                        'Test Topic': {
-                            is_cohorted: true,
-                            id: 'test_topic'
-                        },
-                        'Other Topic': {
-                            is_cohorted: true,
-                            id: 'other_topic'
+        DiscussionSpecHelper.createTestCourseSettings = function(options) {
+            var context = _.extend(
+                {
+                    category_map: {
+                        children: [['Test Topic', 'entry'], ['Other Topic', 'entry']],
+                        entries: {
+                            'Test Topic': {
+                                is_cohorted: true,
+                                id: 'test_topic'
+                            },
+                            'Other Topic': {
+                                is_cohorted: true,
+                                id: 'other_topic'
+                            }
                         }
-                    }
+                    },
+                    is_cohorted: true,
+                    allow_anonymous: false,
+                    allow_anonymous_to_peers: false
                 },
-                is_cohorted: true
-            });
+                options || {}
+            );
+            return new DiscussionCourseSettings(context);
         };
 
         DiscussionSpecHelper.createTestDiscussion = function(options) {
