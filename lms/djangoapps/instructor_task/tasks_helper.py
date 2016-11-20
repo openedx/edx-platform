@@ -46,7 +46,8 @@ from certificates.models import (
 )
 from certificates.api import generate_user_certificates
 from courseware.courses import get_course_by_id, get_problems_in_section
-from lms.djangoapps.grades.course_grades import iterate_grades_for
+from lms.djangoapps.grades.context import grading_context_for_course
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from courseware.models import StudentModule
 from courseware.model_data import DjangoKeyValueStore, FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
@@ -62,7 +63,6 @@ from lms.djangoapps.instructor_task.models import ReportStore, InstructorTask, P
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment, CourseAccessRole
@@ -670,7 +670,8 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     start_date = datetime.now(UTC)
     status_interval = 100
     enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
-    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+    total_enrolled_students = enrolled_students.count()
+    task_progress = TaskProgress(action_name, total_enrolled_students, start_time)
 
     fmt = u'Task: {task_id}, InstructorTask ID: {entry_id}, Course: {course_id}, Input: {task_input}'
     task_info_string = fmt.format(
@@ -700,17 +701,16 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     err_rows = [["id", "username", "error_msg"]]
     current_step = {'step': 'Calculating Grades'}
 
-    total_enrolled_students = enrolled_students.count()
     student_counter = 0
     TASK_LOG.info(
         u'%s, Task type: %s, Current step: %s, Starting grade calculation for total students: %s',
         task_info_string,
         action_name,
         current_step,
-
-        total_enrolled_students
+        total_enrolled_students,
     )
-    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
+    # NAA TODO - Get the list of ALL subsections to put in the header
+    for student, course_grade, err_msg in CourseGradeFactory().iter(course, enrolled_students):
         # Periodically update task status (this is a cache write)
         if task_progress.attempted % status_interval == 0:
             task_progress.update_task_state(extra_meta=current_step)
@@ -728,11 +728,11 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             total_enrolled_students
         )
 
-        if gradeset:
+        if course_grade:
             # We were able to successfully grade this student for this course.
             task_progress.succeeded += 1
             if not header:
-                header = [section['label'] for section in gradeset[u'section_breakdown']]
+                header = [section['label'] for section in course_grade.summary[u'section_breakdown']]
                 rows.append(
                     ["id", "email", "username", "grade"] + header + cohorts_header +
                     group_configs_header + teams_header +
@@ -741,7 +741,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
             percents = {
                 section['label']: section.get('percent', 0.0)
-                for section in gradeset[u'section_breakdown']
+                for section in course_grade.summary[u'section_breakdown']
                 if 'label' in section
             }
 
@@ -772,7 +772,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             certificate_info = certificate_info_for_user(
                 student,
                 course_id,
-                gradeset['grade'],
+                course_grade.letter_grade,
                 student.id in whitelisted_user_ids
             )
 
@@ -784,7 +784,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # still have 100% for the course.
             row_percents = [percents.get(label, 0.0) for label in header]
             rows.append(
-                [student.id, student.email, student.username, gradeset['percent']] +
+                [student.id, student.email, student.username, course_grade.percent] +
                 row_percents + cohorts_group_name + group_configs_group_names + team_name +
                 [enrollment_mode] + [verification_status] + certificate_info
             )
@@ -819,54 +819,33 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def _order_problems(blocks):
+def _order_graded_scorable_blocks(course_key):
     """
-    Sort the problems by the assignment type and assignment that it belongs to.
-
-    Args:
-        blocks (OrderedDict) - A course structure containing blocks that have been ordered
-                              (i.e. when we iterate over them, we will see them in the order
-                              that they appear in the course).
+    Sort each graded scorable block by the assignment type and
+    subsection that it belongs to.
 
     Returns:
-        an OrderedDict that maps a problem id to its headers in the final report.
+        an OrderedDict that maps a scorable block's id to its
+        headers in the final report.
     """
-    problems = OrderedDict()
-    assignments = OrderedDict()
-    # First, sort out all the blocks into their correct assignments and all the
-    # assignments into their correct types.
-    for block in blocks:
-        # Put the assignments in order into the assignments list.
-        if blocks[block]['block_type'] == 'sequential':
-            block_format = blocks[block]['format']
-            if block_format not in assignments:
-                assignments[block_format] = OrderedDict()
-            assignments[block_format][block] = list()
-
-        # Put the problems into the correct order within their assignment.
-        if blocks[block]['block_type'] == 'problem' and blocks[block]['graded'] is True:
-            current = blocks[block]['parent']
-            # crawl up the tree for the sequential block
-            while blocks[current]['block_type'] != 'sequential':
-                current = blocks[current]['parent']
-
-            current_format = blocks[current]['format']
-            assignments[current_format][current].append(block)
-
-    # Now that we have a sorting and an order for the assignments and problems,
-    # iterate through them in order to generate the header row.
-    for assignment_type in assignments:
-        for assignment_index, assignment in enumerate(assignments[assignment_type].keys(), start=1):
-            for problem in assignments[assignment_type][assignment]:
-                header_name = u"{assignment_type} {assignment_index}: {assignment_name} - {block}".format(
-                    block=blocks[problem]['display_name'],
-                    assignment_type=assignment_type,
-                    assignment_index=assignment_index,
-                    assignment_name=blocks[assignment]['display_name']
-                )
-                problems[problem] = [header_name + " (Earned)", header_name + " (Possible)"]
-
-    return problems
+    scorable_blocks = OrderedDict()
+    grading_context = grading_context_for_course(course_key)
+    for assignment_type_name, subsection_infos in grading_context['all_graded_subsections_by_type'].iteritems():
+        for subsection_index, subsection_info in enumerate(subsection_infos, start=1):
+            subsection = subsection_info['subsection_block']
+            if subsection.graded:
+                for scorable_block in subsection_info['scored_descendants']:
+                    header_name = (
+                        u"{assignment_type} {subsection_index}: "
+                        u"{subsection_name} - {scorable_block_name}"
+                    ).format(
+                        scorable_block_name=scorable_block.display_name,
+                        assignment_type=assignment_type_name,
+                        subsection_index=subsection_index,
+                        subsection_name=subsection.display_name,
+                    )
+                    scorable_blocks[scorable_block.location] = [header_name + " (Earned)", header_name + " (Possible)"]
+    return scorable_blocks
 
 
 def upload_problem_responses_csv(_xmodule_instance_args, _entry_id, course_id, task_input, action_name):
@@ -919,49 +898,39 @@ def upload_problem_grade_report(_xmodule_instance_args, _entry_id, course_id, _t
     # as the keys.  It is structured in this way to keep the values related.
     header_row = OrderedDict([('id', 'Student ID'), ('email', 'Email'), ('username', 'Username')])
 
-    try:
-        course_structure = CourseStructure.objects.get(course_id=course_id)
-        blocks = course_structure.ordered_blocks
-        problems = _order_problems(blocks)
-    except CourseStructure.DoesNotExist:
-        return task_progress.update_task_state(
-            extra_meta={'step': 'Generating course structure. Please refresh and try again.'}
-        )
+    graded_scorable_blocks = _order_graded_scorable_blocks(course_id)
 
     # Just generate the static fields for now.
-    rows = [list(header_row.values()) + ['Final Grade'] + list(chain.from_iterable(problems.values()))]
+    rows = [list(header_row.values()) + ['Final Grade'] + list(chain.from_iterable(graded_scorable_blocks.values()))]
     error_rows = [list(header_row.values()) + ['error_msg']]
     current_step = {'step': 'Calculating Grades'}
 
-    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
+    course = get_course_by_id(course_id)
+    for student, course_grade, err_msg in CourseGradeFactory().iter(course, enrolled_students):
         student_fields = [getattr(student, field_name) for field_name in header_row]
         task_progress.attempted += 1
 
-        if 'percent' not in gradeset or 'raw_scores' not in gradeset:
+        if not course_grade:
             # There was an error grading this student.
-            # Generally there will be a non-empty err_msg, but that is not always the case.
             if not err_msg:
-                err_msg = u"Unknown error"
+                err_msg = 'Unknown error'
             error_rows.append(student_fields + [err_msg])
             task_progress.failed += 1
             continue
 
-        final_grade = gradeset['percent']
-        # Only consider graded problems
-        problem_scores = {unicode(score.module_id): score for score in gradeset['raw_scores'] if score.graded}
         earned_possible_values = list()
-        for problem_id in problems:
+        for block_location in graded_scorable_blocks:
             try:
-                problem_score = problem_scores[problem_id]
-                earned_possible_values.append([problem_score.earned, problem_score.possible])
+                problem_score = course_grade.locations_to_scores[block_location]
             except KeyError:
-                # The student has not been graded on this problem.  For example,
-                # iterate_grades_for skips problems that students have never
-                # seen in order to speed up report generation.  It could also be
-                # the case that the student does not have access to it (e.g. A/B
-                # test or cohorted courseware).
-                earned_possible_values.append(['N/A', 'N/A'])
-        rows.append(student_fields + [final_grade] + list(chain.from_iterable(earned_possible_values)))
+                earned_possible_values.append(['Not Accessible', 'Not Accessible'])
+            else:
+                if problem_score.attempted:
+                    earned_possible_values.append([problem_score.earned, problem_score.possible])
+                else:
+                    earned_possible_values.append(['Not Attempted', problem_score.possible])
+
+        rows.append(student_fields + [course_grade.percent] + list(chain.from_iterable(earned_possible_values)))
 
         task_progress.succeeded += 1
         if task_progress.attempted % status_interval == 0:
