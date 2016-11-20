@@ -3,15 +3,17 @@ CourseGrade Class
 """
 
 from collections import defaultdict
+from collections import namedtuple
 from logging import getLogger
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+import dogstats_wrapper as dog_stats_api
 from lazy import lazy
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
+from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 from xmodule import block_metadata_utils
 
 from ..models import PersistentCourseGrade
@@ -37,7 +39,7 @@ class CourseGrade(object):
         self._subsection_grade_factory = SubsectionGradeFactory(self.student, self.course, self.course_structure)
 
     @lazy
-    def subsection_grade_totals_by_format(self):
+    def graded_subsections_by_format(self):
         """
         Returns grades for the subsections in the course in
         a dict keyed by subsection format types.
@@ -48,7 +50,7 @@ class CourseGrade(object):
                 if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
                     if graded_total.possible > 0:
-                        subsections_by_format[subsection_grade.format].append(graded_total)
+                        subsections_by_format[subsection_grade.format].append(subsection_grade)
         return subsections_by_format
 
     @lazy
@@ -70,7 +72,7 @@ class CourseGrade(object):
         # Grading policy might be overriden by a CCX, need to reset it
         self.course.set_grading_policy(self.course.grading_policy)
         grade_value = self.course.grader.grade(
-            self.subsection_grade_totals_by_format,
+            self.graded_subsections_by_format,
             generate_random_scores=settings.GENERATE_PROFILE_SCORES
         )
         # can't use the existing properties due to recursion issues caused by referencing self.grade_value
@@ -137,8 +139,6 @@ class CourseGrade(object):
         grade_summary = self.grade_value
         grade_summary['percent'] = self.percent
         grade_summary['grade'] = self.letter_grade
-        grade_summary['totaled_scores'] = self.subsection_grade_totals_by_format
-        grade_summary['raw_scores'] = list(self.locations_to_scores.itervalues())
 
         return grade_summary
 
@@ -150,7 +150,7 @@ class CourseGrade(object):
         """
         subsections_total = sum(len(chapter['sections']) for chapter in self.chapter_grades)
 
-        total_graded_subsections = sum(len(x) for x in self.subsection_grade_totals_by_format.itervalues())
+        total_graded_subsections = sum(len(x) for x in self.graded_subsections_by_format.itervalues())
         subsections_created = len(self._subsection_grade_factory._unsaved_subsection_grades)  # pylint: disable=protected-access
         subsections_read = subsections_total - subsections_created
         blocks_total = len(self.locations_to_scores)
@@ -295,10 +295,10 @@ class CourseGrade(object):
         """
         Signal all listeners when grades are computed.
         """
-        responses = GRADES_UPDATED.send_robust(
+        responses = COURSE_GRADE_CHANGED.send_robust(
             sender=None,
             user=self.student,
-            grade_summary=self.summary,
+            course_grade=self,
             course_key=self.course.id,
             deadline=self.course.end
         )
@@ -324,32 +324,60 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects
     """
-    def __init__(self, student):
-        self.student = student
-
-    def create(self, course, read_only=True):
+    def create(self, student, course, read_only=True):
         """
         Returns the CourseGrade object for the given student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         Raises a PermissionDenied if the user does not have course access.
         """
-        course_structure = get_course_blocks(self.student, course.location)
+        course_structure = get_course_blocks(student, course.location)
         # if user does not have access to this course, throw an exception
         if not self._user_has_access_to_course(course_structure):
             raise PermissionDenied("User does not have access to this course")
         return (
-            self._get_saved_grade(course, course_structure) or
-            self._compute_and_update_grade(course, course_structure, read_only)
+            self._get_saved_grade(student, course, course_structure) or
+            self._compute_and_update_grade(student, course, course_structure, read_only)
         )
 
-    def update(self, course, course_structure):
+    GradeResult = namedtuple('GradeResult', ['student', 'course_grade', 'err_msg'])
+
+    def iter(self, course, students):
+        """
+        Given a course and an iterable of students (User), yield a GradeResult
+        for every student enrolled in the course.  GradeResult is a named tuple of:
+
+            (student, course_grade, err_msg)
+
+        If an error occurred, course_grade will be None and err_msg will be an
+        exception message. If there was no error, err_msg is an empty string.
+        """
+        for student in students:
+            with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=[u'action:{}'.format(course.id)]):
+
+                try:
+                    course_grade = CourseGradeFactory().create(student, course)
+                    yield self.GradeResult(student, course_grade, "")
+
+                except Exception as exc:  # pylint: disable=broad-except
+                    # Keep marching on even if this student couldn't be graded for
+                    # some reason, but log it for future reference.
+                    log.exception(
+                        'Cannot grade student %s (%s) in course %s because of exception: %s',
+                        student.username,
+                        student.id,
+                        course.id,
+                        exc.message
+                    )
+                    yield self.GradeResult(student, None, exc.message)
+
+    def update(self, student, course, course_structure):
         """
         Updates the CourseGrade for this Factory's student.
         """
-        self._compute_and_update_grade(course, course_structure)
+        self._compute_and_update_grade(student, course, course_structure)
 
-    def get_persisted(self, course):
+    def get_persisted(self, student, course):
         """
         Returns the saved grade for the given course and student,
         irrespective of whether the saved grade is up-to-date.
@@ -357,9 +385,9 @@ class CourseGradeFactory(object):
         if not PersistentGradesEnabledFlag.feature_enabled(course.id):
             return None
 
-        return CourseGrade.get_persisted_grade(self.student, course)
+        return CourseGrade.get_persisted_grade(student, course)
 
-    def _get_saved_grade(self, course, course_structure):
+    def _get_saved_grade(self, student, course, course_structure):
         """
         Returns the saved grade for the given course and student.
         """
@@ -367,18 +395,18 @@ class CourseGradeFactory(object):
             return None
 
         return CourseGrade.load_persisted_grade(
-            self.student,
+            student,
             course,
             course_structure
         )
 
-    def _compute_and_update_grade(self, course, course_structure, read_only=False):
+    def _compute_and_update_grade(self, student, course, course_structure, read_only=False):
         """
         Freshly computes and updates the grade for the student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         """
-        course_grade = CourseGrade(self.student, course, course_structure)
+        course_grade = CourseGrade(student, course, course_structure)
         course_grade.compute_and_update(read_only)
         return course_grade
 

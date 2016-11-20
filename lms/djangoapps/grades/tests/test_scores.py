@@ -175,9 +175,7 @@ class TestGetScore(TestCase):
             self._create_persisted_block(persisted_block_value),
             self._create_block(block_value),
         )
-        expected_score = ProblemScore(
-            display_name=self.display_name, module_id=self.location, **expected_result._asdict()
-        )
+        expected_score = ProblemScore(**expected_result._asdict())
         self.assertEquals(score, expected_score)
 
 

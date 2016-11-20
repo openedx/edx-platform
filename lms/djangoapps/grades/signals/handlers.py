@@ -182,4 +182,4 @@ def recalculate_course_grade(sender, course, course_structure, user, **kwargs): 
     """
     Updates a saved course grade.
     """
-    CourseGradeFactory(user).update(course, course_structure)
+    CourseGradeFactory().update(user, course, course_structure)

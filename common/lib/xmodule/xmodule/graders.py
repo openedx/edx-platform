@@ -18,17 +18,13 @@ class ScoreBase(object):
     """
     Abstract base class for encapsulating fields of values scores.
     Field common to all scores include:
-        display_name (string) - the display name of the module
-        module_id (UsageKey) - the location of the module
         graded (boolean) - whether or not this module is graded
         attempted (boolean) - whether the module was attempted
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, graded, display_name, module_id, attempted):
+    def __init__(self, graded, attempted):
         self.graded = graded
-        self.display_name = display_name
-        self.module_id = module_id
         self.attempted = attempted
 
     def __eq__(self, other):
@@ -55,10 +51,10 @@ class ProblemScore(ScoreBase):
     """
     def __init__(self, raw_earned, raw_possible, weighted_earned, weighted_possible, weight, *args, **kwargs):
         super(ProblemScore, self).__init__(*args, **kwargs)
-        self.raw_earned = raw_earned
-        self.raw_possible = raw_possible
-        self.earned = weighted_earned
-        self.possible = weighted_possible
+        self.raw_earned = float(raw_earned) if raw_earned is not None else None
+        self.raw_possible = float(raw_possible) if raw_possible is not None else None
+        self.earned = float(weighted_earned) if weighted_earned is not None else None
+        self.possible = float(weighted_possible) if weighted_possible is not None else None
         self.weight = weight
 
 
@@ -71,8 +67,8 @@ class AggregatedScore(ScoreBase):
     """
     def __init__(self, tw_earned, tw_possible, *args, **kwargs):
         super(AggregatedScore, self).__init__(*args, **kwargs)
-        self.earned = tw_earned
-        self.possible = tw_possible
+        self.earned = float(tw_earned) if tw_earned is not None else None
+        self.possible = float(tw_possible) if tw_possible is not None else None
 
 
 def float_sum(iterable):
@@ -82,11 +78,9 @@ def float_sum(iterable):
     return float(sum(iterable))
 
 
-def aggregate_scores(scores, display_name="summary", location=None):
+def aggregate_scores(scores):
     """
     scores: A list of ScoreBase objects
-    display_name: The display name for the score object
-    location: The location under which all objects in scores are located
     returns: A tuple (all_total, graded_total).
         all_total: A ScoreBase representing the total score summed over all input scores
         graded_total: A ScoreBase representing the score summed over all graded input scores
@@ -100,11 +94,11 @@ def aggregate_scores(scores, display_name="summary", location=None):
     any_attempted = any(score.attempted for score in scores)
 
     # regardless of whether it is graded
-    all_total = AggregatedScore(total_correct, total_possible, False, display_name, location, any_attempted)
+    all_total = AggregatedScore(total_correct, total_possible, False, any_attempted)
 
     # selecting only graded things
     graded_total = AggregatedScore(
-        total_correct_graded, total_possible_graded, True, display_name, location, any_attempted_graded,
+        total_correct_graded, total_possible_graded, True, any_attempted_graded,
     )
 
     return all_total, graded_total
@@ -126,9 +120,8 @@ def grader_from_conf(conf):
     This creates a CourseGrader from a configuration (such as in course_settings.py).
     The conf can simply be an instance of CourseGrader, in which case no work is done.
     More commonly, the conf is a list of dictionaries. A WeightedSubsectionsGrader
-    with AssignmentFormatGrader's or SingleSectionGrader's as subsections will be
-    generated. Every dictionary should contain the parameters for making either a
-    AssignmentFormatGrader or SingleSectionGrader, in addition to a 'weight' key.
+    with AssignmentFormatGrader's will be generated. Every dictionary should contain
+    the parameters for making an AssignmentFormatGrader, in addition to a 'weight' key.
     """
     if isinstance(conf, CourseGrader):
         return conf
@@ -137,27 +130,14 @@ def grader_from_conf(conf):
     for subgraderconf in conf:
         subgraderconf = subgraderconf.copy()
         weight = subgraderconf.pop("weight", 0)
-        # NOTE: 'name' used to exist in SingleSectionGrader. We are deprecating SingleSectionGrader
-        # and converting everything into an AssignmentFormatGrader by adding 'min_count' and
-        # 'drop_count'. AssignmentFormatGrader does not expect 'name', so if it appears
-        # in bad_args, go ahead remove it (this causes no errors). Eventually, SingleSectionGrader
-        # should be completely removed.
-        name = 'name'
         try:
             if 'min_count' in subgraderconf:
                 #This is an AssignmentFormatGrader
                 subgrader_class = AssignmentFormatGrader
-            elif name in subgraderconf:
-                #This is an SingleSectionGrader
-                subgrader_class = SingleSectionGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
 
             bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
-            # See note above concerning 'name'.
-            if bad_args.issuperset({name}):
-                bad_args = bad_args - {name}
-                del subgraderconf[name]
             if len(bad_args) > 0:
                 log.warning("Invalid arguments for a subgrader: %s", bad_args)
                 for key in bad_args:
@@ -264,57 +244,6 @@ class WeightedSubsectionsGrader(CourseGrader):
                 'grade_breakdown': grade_breakdown}
 
 
-class SingleSectionGrader(CourseGrader):
-    """
-    This grades a single section with the format 'type' and the name 'name'.
-
-    If the name is not appropriate for the short short_label or category, they each may
-    be specified individually.
-    """
-    def __init__(self, type, name, short_label=None, category=None):  # pylint: disable=redefined-builtin
-        self.type = type
-        self.name = name
-        self.short_label = short_label or name
-        self.category = category or name
-
-    def grade(self, grade_sheet, generate_random_scores=False):
-        found_score = None
-        if self.type in grade_sheet:
-            for score in grade_sheet[self.type]:
-                if score.display_name == self.name:
-                    found_score = score
-                    break
-
-        if found_score or generate_random_scores:
-            if generate_random_scores:  	# for debugging!
-                earned = random.randint(2, 15)
-                possible = random.randint(earned, 15)
-            else:   # We found the score
-                earned = found_score.earned
-                possible = found_score.possible
-
-            percent = earned / possible
-            detail = u"{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(
-                name=self.name,
-                percent=percent,
-                earned=float(earned),
-                possible=float(possible)
-            )
-
-        else:
-            percent = 0.0
-            detail = u"{name} - 0% (?/?)".format(name=self.name)
-
-        breakdown = [{'percent': percent, 'label': self.short_label,
-                      'detail': detail, 'category': self.category, 'prominent': True}]
-
-        return {
-            'percent': percent,
-            'section_breakdown': breakdown,
-            #No grade_breakdown here
-        }
-
-
 class AssignmentFormatGrader(CourseGrader):
     """
     Grades all sections matching the format 'type' with an equal weight. A specified
@@ -332,9 +261,9 @@ class AssignmentFormatGrader(CourseGrader):
     hide_average is to suppress the display of the total score in this grader and instead
     only show each assignment in this grader in the breakdown.
 
-    If there is only a single assignment in this grader, then it acts like a SingleSectionGrader
-    and returns only one entry for the grader.  Since the assignment and the total are the same,
-    the total is returned but is not labeled as an average.
+    If there is only a single assignment in this grader, then it returns only one entry for the
+    grader.  Since the assignment and the total are the same, the total is returned but is not
+    labeled as an average.
 
     category should be presentable to the user, but may not appear. When the grade breakdown is
     displayed, scores from the same category will be similar (for example, by color).
@@ -401,8 +330,8 @@ class AssignmentFormatGrader(CourseGrader):
                     section_name = "Generated"
 
                 else:
-                    earned = scores[i].earned
-                    possible = scores[i].possible
+                    earned = scores[i].graded_total.earned
+                    possible = scores[i].graded_total.possible
                     section_name = scores[i].display_name
 
                 percentage = earned / possible
@@ -442,8 +371,7 @@ class AssignmentFormatGrader(CourseGrader):
 
         if len(breakdown) == 1:
             # if there is only one entry in a section, suppress the existing individual entry and the average,
-            # and just display a single entry for the section.  That way it acts automatically like a
-            # SingleSectionGrader.
+            # and just display a single entry for the section.
             total_detail = u"{section_type} = {percent:.0%}".format(
                 percent=total_percent,
                 section_type=self.section_type,

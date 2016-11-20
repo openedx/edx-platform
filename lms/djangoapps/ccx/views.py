@@ -33,7 +33,7 @@ from courseware.field_overrides import disable_overrides
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR, assign_role
 from django_comment_common.utils import seed_permissions_roles
 from edxmako.shortcuts import render_to_response
-from lms.djangoapps.grades.course_grades import iterate_grades_for
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from opaque_keys.edx.keys import CourseKey
 from ccx_keys.locator import CCXLocator
 from student.roles import CourseCcxCoachRole
@@ -564,30 +564,30 @@ def ccx_grades_csv(request, course, ccx=None):
             courseenrollment__course_id=ccx_key,
             courseenrollment__is_active=1
         ).order_by('username').select_related("profile")
-        grades = iterate_grades_for(course, enrolled_students)
+        grades = CourseGradeFactory().iter(course, enrolled_students)
 
         header = None
         rows = []
-        for student, gradeset, __ in grades:
-            if gradeset:
+        for student, course_grade, __ in grades:
+            if course_grade:
                 # We were able to successfully grade this student for this
                 # course.
                 if not header:
                     # Encode the header row in utf-8 encoding in case there are
                     # unicode characters
                     header = [section['label'].encode('utf-8')
-                              for section in gradeset[u'section_breakdown']]
+                              for section in course_grade.summary[u'section_breakdown']]
                     rows.append(["id", "email", "username", "grade"] + header)
 
                 percents = {
                     section['label']: section.get('percent', 0.0)
-                    for section in gradeset[u'section_breakdown']
+                    for section in course_grade.summary[u'section_breakdown']
                     if 'label' in section
                 }
 
                 row_percents = [percents.get(label, 0.0) for label in header]
                 rows.append([student.id, student.email, student.username,
-                             gradeset['percent']] + row_percents)
+                             course_grade.percent] + row_percents)
 
         buf = StringIO()
         writer = csv.writer(buf)

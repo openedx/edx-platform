@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from lms.djangoapps.instructor.views.api import require_level
-from lms.djangoapps.grades import course_grades
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from xmodule.modulestore.django import modulestore
 
 
@@ -91,7 +91,7 @@ def get_grade_book_page(request, course, course_key):
                 'username': student.username,
                 'id': student.id,
                 'email': student.email,
-                'grade_summary': course_grades.summary(student, course)
+                'grade_summary': CourseGradeFactory().create(student, course).summary
             }
             for student in enrolled_students
         ]
