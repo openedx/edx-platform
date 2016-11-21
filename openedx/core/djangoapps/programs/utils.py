@@ -149,13 +149,8 @@ def attach_program_detail_url(programs):
     marketing_url = get_program_marketing_url(programs_config)
 
     for program in programs:
-        if programs_config.show_program_details:
-            base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
-            slug = slugify(program['name'])
-        else:
-            # TODO: Remove. Learners should always be sent to the LMS' program details page.
-            base = marketing_url
-            slug = program['marketing_slug']
+        base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
+        slug = slugify(program['name'])
 
         program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
 
