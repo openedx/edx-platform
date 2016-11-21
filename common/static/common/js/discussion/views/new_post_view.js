@@ -100,6 +100,7 @@
                 'submit .forum-new-post-form': 'createPost',
                 'change .post-option-input': 'postOptionChange',
                 'click .cancel': 'cancel',
+                'click  .add-post-cancel': 'cancel',
                 'reset .forum-new-post-form': 'updateStyles'
             };
 
@@ -156,17 +157,26 @@
                     success: function(response) {
                         var thread;
                         thread = new Thread(response.content);
-                        self.$el.hide();
+                        self.$el.addClass('is-hidden');
                         self.resetForm();
+                        self.trigger('newPost:createPost');
                         return self.collection.add(thread);
                     }
                 });
             };
 
+            NewPostView.prototype.formModified = function() {
+                var postBodyHasContent = this.$('.js-post-body').find('.wmd-input').val() !== '',
+                    titleHasContent = this.$('.js-post-title').val() !== '';
+                return postBodyHasContent || titleHasContent;
+            };
+
             NewPostView.prototype.cancel = function(event) {
                 event.preventDefault();
-                if (!confirm(gettext('Your post will be discarded.'))) {
-                    return;
+                if (this.formModified()) {
+                    if (!confirm(gettext('Your post will be discarded.'))) {  // eslint-disable-line no-alert
+                        return;
+                    }
                 }
                 this.trigger('newPost:cancel');
                 return this.resetForm();

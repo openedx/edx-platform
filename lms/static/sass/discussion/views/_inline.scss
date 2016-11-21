@@ -39,4 +39,25 @@
     .wmd-preview {
         @include discussion-wmd-preview;
     }
+
+   .new-post-article {
+        position: relative;
+        border: 1px solid $forum-color-border;
+
+        .add-post-cancel {
+          @include right($baseline / 2);
+          top: $baseline / 2;
+          position: absolute;
+          color: $uxpl-primary-blue;
+
+            &:hover,
+            &:focus {
+                border-color: transparent;
+                box-shadow: none;
+                background-color: transparent;
+                background-image: none;
+            }
+        }
+    }
+
 }

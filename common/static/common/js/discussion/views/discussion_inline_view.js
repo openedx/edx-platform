@@ -14,6 +14,7 @@
             },
             'click .new-post-btn': 'toggleNewPost',
             'click .all-posts-btn': 'navigateToAllPosts',
+            keydown: 'handleKeydown',
             'keydown .new-post-btn': function(event) {
                 return DiscussionUtil.activateOnSpace(event, this.toggleNewPost);
             }
@@ -28,6 +29,7 @@
             this.showByDefault = options.showByDefault || false;
             this.toggleDiscussionBtn = this.$('.discussion-show');
             this.listenTo(this.model, 'change', this.render);
+            this.escKey = 27;
 
             match = this.page_re.exec(window.location.href);
             if (match) {
@@ -89,6 +91,7 @@
 
             if (this.$('section.discussion').length) {
                 edx.HtmlUtils.setHtml(this.$el, discussionHtml);
+                this.$('section.discussion').replaceWith(edx.HtmlUtils.ensureHtml(discussionHtml).toString());
             } else {
                 edx.HtmlUtils.append(this.$el, discussionHtml);
             }
@@ -117,6 +120,7 @@
 
             this.newPostView.render();
 
+            this.listenTo(this.newPostView, 'newPost:createPost', this.hideNewPost);
             this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
             this.discussion.on('add', this.addThread);
 
@@ -124,7 +128,7 @@
             this.showed = true;
 
             if (this.isWaitingOnNewPost) {
-                this.newPostForm.show().focus();
+                this.newPostForm.removeClass('is-hidden').focus();
             }
 
             // Hide the thread view initially
@@ -169,7 +173,6 @@
                 this.toggleDiscussionBtn.addClass('shown');
                 this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
                 if (this.retrieved) {
-                    this.$('section.discussion').slideDown();
                     this.$('section.discussion').removeClass('is-hidden');
                     this.showed = true;
                 } else {
@@ -185,7 +188,6 @@
         },
 
         hideDiscussion: function() {
-            this.$('section.discussion').slideUp();
             this.$('section.discussion').addClass('is-hidden');
             this.toggleDiscussionBtn.removeClass('shown');
             this.toggleDiscussionBtn.find('.button-text').text(gettext('Show Discussion'));
@@ -200,20 +202,29 @@
                 return;
             }
             if (this.showed) {
-                this.newPostForm.slideDown(300);
-            } else {
-                this.newPostForm.show().focus();
+                this.$('section.discussion').find('.inline-discussion-thread-container').addClass('is-hidden');
+                this.$('section.discussion').find('.new-post-btn').addClass('is-hidden');
+                this.newPostForm.removeClass('is-hidden').find('.js-post-title').focus();
             }
             this.newPostView.$el.removeClass('is-hidden');
             this.toggleDiscussionBtn.addClass('shown');
             this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
-            this.$('section.discussion').slideDown();
             this.showed = true;
         },
 
         hideNewPost: function() {
-            this.newPostView.$el.addClass('is-hidden');
-            return this.newPostForm.slideUp(300);
+            this.$('section.discussion').find('.inline-discussion-thread-container').removeClass('is-hidden');
+            this.$('section.discussion').find('.new-post-btn')
+                .removeClass('is-hidden')
+                .focus();
+            this.newPostForm.addClass('is-hidden');
+        },
+
+        handleKeydown: function(event) {
+            var keyCode = event.keyCode;
+            if (keyCode === this.escKey) {
+                this.$('section.discussion').find('.cancel').trigger('click');
+            }
         }
     });
 }).call(window);

@@ -1,6 +1,10 @@
 /* globals
  _, Discussion, DiscussionCourseSettings, DiscussionViewSpecHelper, DiscussionSpecHelper,
+<<<<<<< 74c488a710816e519255f2114f5094a8d3466831
  DiscussionInlineView, DiscussionUtil, DiscussionThreadShowView, Thread
+=======
+ DiscussionInlineView, DiscussionUtil, Thread, NewPostView
+>>>>>>> make new post view overlay-ish
  */
 (function() {
     'use strict';
@@ -112,6 +116,14 @@
                 showDiscussion(this, testView);
                 testView.$('.new-post-btn').click();
                 testView.$('.forum-new-post-form .cancel').click();
+                expect(testView.$('.new-post-article')).toHaveClass('is-hidden');
+            });
+
+            it('should be hidden when the "close" button is clicked', function() {
+                var testView = createTestView(this);
+                showDiscussion(this, testView);
+                testView.$('.new-post-btn').click();
+                testView.$('.forum-new-post-form .add-post-cancel').click();
                 expect(testView.$('.new-post-article')).toHaveClass('is-hidden');
             });
         });
