@@ -168,6 +168,9 @@ case "$TEST_SUITE" in
         cp -R $HOME/firefox/ firefox/
         export SELENIUM_FIREFOX_PATH=firefox/firefox
 
+        # If we are using more than one thread at once (represented by the
+        # NUMBER_OF_BOKCHOY_THREADS variable), then we must use xunitmp
+        # in order to be able to represent the test results from multiple threads.
         case "$NUMBER_OF_BOKCHOY_THREADS" in
 
             "1"|1)
