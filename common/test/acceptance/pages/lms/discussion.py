@@ -499,7 +499,7 @@ class InlineDiscussionPage(PageObject):
         ).fulfill()
 
     def get_num_displayed_threads(self):
-        return len(self._find_within(".discussion-thread"))
+        return len(self._find_within(".forum-nav-thread"))
 
     def has_thread(self, thread_id):
         """Returns true if this page is showing the thread with the specified id."""
