@@ -114,6 +114,14 @@
                 testView.$('.forum-new-post-form .cancel').click();
                 expect(testView.$('.new-post-article')).toHaveClass('is-hidden');
             });
+
+            it('should be hidden when the "close" button is clicked', function() {
+                var testView = createTestView(this);
+                showDiscussion(this, testView);
+                testView.$('.new-post-btn').click();
+                testView.$('.forum-new-post-form .add-post-cancel').click();
+                expect(testView.$('.new-post-article')).toHaveClass('is-hidden');
+            });
         });
 
         describe('thread listing', function() {
