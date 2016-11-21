@@ -38,7 +38,7 @@
         <section class="content">
             <article class="content-primary" role="main">
                 <div class="wrapper-dnd">
-                    <article class="outline" data-locator="mock-course" data-course-key="slashes:MockCourse">
+                    <article class="outline outline-course" data-locator="mock-course" data-course-key="slashes:MockCourse">
                         <div class="no-content add-xblock-component">
                             <p>You haven't added any content to this course yet.
                                 <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">

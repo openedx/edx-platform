@@ -112,6 +112,14 @@ if (is_proctored_exam) {
                         </a>
                     </li>
                 <% } %>
+                <% if (xblockInfo.isDuplicable()) { %>
+                    <li class="action-item action-duplicate">
+                        <a href="#" data-tooltip="<%- gettext('Duplicate') %>" class="duplicate-button action-button">
+                            <span class="icon fa fa-copy" aria-hidden="true"></span>
+                            <span class="sr action-button-text"><%- gettext('Duplicate') %></span>
+                        </a>
+                    </li>
+                <% } %>
                 <% if (xblockInfo.isDeletable()) { %>
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="<%- gettext('Delete') %>" class="delete-button action-button">

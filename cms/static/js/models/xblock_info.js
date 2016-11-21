@@ -196,6 +196,10 @@ function(Backbone, _, str, ModuleUtils) {
             return this.isActionRequired('deletable');
         },
 
+        isDuplicable: function() {
+            return this.isActionRequired('duplicable');
+        },
+
         isDraggable: function() {
             return this.isActionRequired('draggable');
         },
