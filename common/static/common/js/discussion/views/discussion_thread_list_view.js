@@ -107,7 +107,7 @@
                 this.boardName = null;
                 this.current_search = '';
                 this.mode = 'all';
-                this.showThreadPreview = options.showThreadPreview;
+                this.showThreadPreview = true;
                 this.searchAlertCollection = new Backbone.Collection([], {
                     model: Backbone.Model
                 });
