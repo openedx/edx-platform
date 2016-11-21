@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods
 import rfc6266
 
-from edxval.api import create_video, get_videos_for_course, SortDirection, VideoSortField
+from edxval.api import create_video, get_videos_for_course, SortDirection, VideoSortField, remove_video_for_course
 from opaque_keys.edx.keys import CourseKey
 
 from contentstore.models import VideoUploadConfig
@@ -77,8 +77,8 @@ class StatusDisplayStrings(object):
 
 @expect_json
 @login_required
-@require_http_methods(("GET", "POST"))
-def videos_handler(request, course_key_string):
+@require_http_methods(("GET", "POST", "DELETE"))
+def videos_handler(request, course_key_string, edx_video_id=None):
     """
     The restful handler for video uploads.
 
@@ -91,6 +91,8 @@ def videos_handler(request, course_key_string):
         json: create a new video upload; the actual files should not be provided
             to this endpoint but rather PUT to the respective upload_url values
             contained in the response
+    DELETE
+        soft deletes a video for particular course
     """
     course = _get_and_validate_course(course_key_string, request.user)
 
@@ -102,6 +104,9 @@ def videos_handler(request, course_key_string):
             return videos_index_json(course)
         else:
             return videos_index_html(course)
+    elif request.method == "DELETE":
+        remove_video_for_course(course_key_string, edx_video_id)
+        return JsonResponse()
     else:
         return videos_post(course, request)
 
@@ -248,7 +253,7 @@ def videos_index_html(course):
         "videos_index.html",
         {
             "context_course": course,
-            "post_url": reverse_course_url("videos_handler", unicode(course.id)),
+            "video_handler_url": reverse_course_url("videos_handler", unicode(course.id)),
             "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
             "previous_uploads": _get_index_videos(course),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),

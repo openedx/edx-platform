@@ -3,3 +3,13 @@
 <td class="date-col"><%- created %></td>
 <td class="video-id-col"><%- edx_video_id %></td>
 <td class="status-col"><%- status %></td>
+<td class="actions-col">
+    <ul class="actions-list">
+        <li class="action-item action-remove">
+            <a href="#" data-tooltip="<%- gettext('Remove this video') %>" class="remove-video-button action-button">
+                <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+                <span class="sr"><%- StringUtils.interpolate(gettext("Remove {video_name} video"), {video_name: client_video_id}) %></span>
+            </a>
+        </li>
+    </ul>
+</td>
