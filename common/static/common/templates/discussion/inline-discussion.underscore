@@ -3,7 +3,7 @@
         <button class="btn-link new-post-btn <%if (read_only) {%>is-hidden<%} %>"><%- gettext("Add a Post") %></button>
     </div>
 
-    <article class="new-post-article"></article>
+    <article class="new-post-article is-hidden"></article>
 
     <section class="inline-threads">
     </section>
