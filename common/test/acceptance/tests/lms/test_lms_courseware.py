@@ -663,7 +663,7 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
 
 class ProblemStateOnNavigationTest(UniqueCourseTest):
     """
-    Test courseware with problems in multiple verticals
+    Test courseware with problems in multiple verticals.
     """
     USERNAME = "STUDENT_TESTER"
     EMAIL = "student101@example.com"
@@ -735,6 +735,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         # Save problem 1's content state as we're about to switch units in the sequence.
         problem1_content_before_switch = self.problem_page.problem_content
+        before_meta = self.problem_page.problem_meta
 
         # Go to sequential position 2 and assert that we are on problem 2.
         self.go_to_tab_and_assert_problem(2, self.problem2_name)
@@ -742,7 +743,10 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         # Come back to our original unit in the sequence and assert that the content hasn't changed.
         self.go_to_tab_and_assert_problem(1, self.problem1_name)
         problem1_content_after_coming_back = self.problem_page.problem_content
+        after_meta = self.problem_page.problem_meta
+
         self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
+        self.assertEqual(before_meta, after_meta)
 
     def test_perform_problem_save_and_navigate(self):
         """
@@ -765,6 +769,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         # Save problem 1's content state as we're about to switch units in the sequence.
         problem1_content_before_switch = self.problem_page.problem_input_content
+        before_meta = self.problem_page.problem_meta
 
         # Go to sequential position 2 and assert that we are on problem 2.
         self.go_to_tab_and_assert_problem(2, self.problem2_name)
@@ -774,7 +779,10 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         # Come back to our original unit in the sequence and assert that the content hasn't changed.
         self.go_to_tab_and_assert_problem(1, self.problem1_name)
         problem1_content_after_coming_back = self.problem_page.problem_input_content
+        after_meta = self.problem_page.problem_meta
+
         self.assertIn(problem1_content_after_coming_back, problem1_content_before_switch)
+        self.assertEqual(before_meta, after_meta)
 
     def test_perform_problem_reset_and_navigate(self):
         """
@@ -799,6 +807,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
 
         # Save problem 1's content state as we're about to switch units in the sequence.
         problem1_content_before_switch = self.problem_page.problem_content
+        before_meta = self.problem_page.problem_meta
 
         # Go to sequential position 2 and assert that we are on problem 2.
         self.go_to_tab_and_assert_problem(2, self.problem2_name)
@@ -806,7 +815,10 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         # Come back to our original unit in the sequence and assert that the content hasn't changed.
         self.go_to_tab_and_assert_problem(1, self.problem1_name)
         problem1_content_after_coming_back = self.problem_page.problem_content
+        after_meta = self.problem_page.problem_meta
+
         self.assertEqual(problem1_content_before_switch, problem1_content_after_coming_back)
+        self.assertEqual(before_meta, after_meta)
 
 
 class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
