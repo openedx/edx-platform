@@ -282,18 +282,18 @@ class GraderTest(unittest.TestCase):
         self.assertEqual(len(graded['section_breakdown']), 12 + 1)
 
     @ddt.data(
-        # empty
         (
+            # empty
             {},
             u"Configuration has no appropriate grader class."
         ),
-        # no min_count
         (
+            # no min_count
             {'type': "Homework", 'drop_count': 0},
             u"Configuration has no appropriate grader class."
         ),
-        # no drop_count
         (
+            # no drop_count
             {'type': "Homework", 'min_count': 0},
             u"__init__() takes at least 4 arguments (3 given)"
         ),

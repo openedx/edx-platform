@@ -120,7 +120,7 @@ def grader_from_conf(conf):
     This creates a CourseGrader from a configuration (such as in course_settings.py).
     The conf can simply be an instance of CourseGrader, in which case no work is done.
     More commonly, the conf is a list of dictionaries. A WeightedSubsectionsGrader
-    with AssignmentFormatGrader's will be generated. Every dictionary should contain
+    with AssignmentFormatGraders will be generated. Every dictionary should contain
     the parameters for making an AssignmentFormatGrader, in addition to a 'weight' key.
     """
     if isinstance(conf, CourseGrader):
