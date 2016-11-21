@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from django.db import transaction
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
@@ -271,7 +271,7 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     with modulestore().bulk_operations(course_key):
         course = get_course_by_id(course_key, depth=2)
         access_response = has_access(request.user, 'load', course, course_key)
@@ -283,8 +283,12 @@ def course_info(request, course_id):
             # redirect to the dashboard page.
             if isinstance(access_response, StartDateError):
                 start_date = strftime_localized(course.start, 'SHORT_DATE')
-                params = urllib.urlencode({'notlive': start_date})
-                return redirect('{0}?{1}'.format(reverse('dashboard'), params))
+                params = QueryDict(mutable=True)
+                params['notlive'] = start_date
+                return redirect('{dashboard_url}?{params}'.format(
+                    dashboard_url=reverse('dashboard'),
+                    params=params.urlencode()
+                ))
             # Otherwise, give a 404 to avoid leaking info about access
             # control.
             raise Http404("Course not found.")
