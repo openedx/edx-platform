@@ -2,10 +2,8 @@
 Django models for site configurations.
 """
 import collections
-from urlparse import urlparse
 
 import os
-import sass
 from django.conf import settings
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import FileSystemStorage
@@ -17,7 +15,8 @@ from django.dispatch import receiver
 from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
 
-from openedx.core.djangoapps.appsembler.sites.utils import get_initial_sass_variables, get_initial_page_elements
+from openedx.core.djangoapps.appsembler.sites.utils import get_initial_sass_variables, get_initial_page_elements, \
+    compile_sass
 
 from logging import getLogger
 logger = getLogger(__name__)  # pylint: disable=invalid-name
@@ -39,7 +38,7 @@ class SiteConfiguration(models.Model):
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
-    sass_variables = models.TextField(blank=True, default=get_initial_sass_variables)
+    sass_variables = JSONField(blank=True, default=get_initial_sass_variables)
     page_elements = JSONField(blank=True, default=get_initial_page_elements)
 
     def __unicode__(self):
@@ -133,24 +132,16 @@ class SiteConfiguration(models.Model):
         return org in cls.get_all_orgs()
 
     def compile_microsite_sass(self):
-        theme_sass_file = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME,
-                                       'lms', 'static', 'sass', 'main.scss')
-        customer_specific_includes = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME,
-                                       'customer_specific', 'lms', 'static', 'sass')
+        css_output = compile_sass('main.scss', custom_branding=self._sass_var_override)
         domain_without_port_number = self.site.domain.split(':')[0]
         output_path = os.path.join(settings.COMPREHENSIVE_THEME_DIRS[0], 'customer_themes', '{}.css'.format(
             domain_without_port_number))
         collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(
             domain_without_port_number))
-        sass_output = sass.compile(
-            filename=theme_sass_file,
-            include_paths=[customer_specific_includes],
-            importers=[(0, self._sass_var_override)]
-        )
         with open(output_path, 'w') as f:
-            f.write(sass_output)
+            f.write(css_output)
         with open(collected_output_path, 'w') as f:
-            f.write(sass_output)
+            f.write(css_output)
 
     def collect_css_file(self):
         path = self.values.get('css_overrides_file')
@@ -171,9 +162,12 @@ class SiteConfiguration(models.Model):
                 if isinstance(processed, Exception):
                     raise processed
 
+    def _formatted_sass_variables(self):
+        return " ".join(["{}: {};".format(var, val[0]) for var, val in self.sass_variables])
+
     def _sass_var_override(self, path):
         if 'branding-basics' in path:
-            return [(path, self.sass_variables)]
+            return [(path, self._formatted_sass_variables())]
         return None
 
     def _get_initial_microsite_values(self):

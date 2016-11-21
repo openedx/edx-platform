@@ -16,7 +16,7 @@ class SASSDictField(serializers.DictField):
 
 class SiteConfigurationSerializer(serializers.ModelSerializer):
     values = serializers.DictField()
-    sassVariables = SASSDictField(source='sass_variables')
+    sassVariables = serializers.ListField(source='sass_variables')
     pageElements = serializers.DictField(source='page_elements')
 
     class Meta:
