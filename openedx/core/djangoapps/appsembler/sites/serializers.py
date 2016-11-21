@@ -36,7 +36,7 @@ class SiteConfigurationListSerializer(SiteConfigurationSerializer):
 
 
 class SiteSerializer(serializers.ModelSerializer):
-    configuration = SiteConfigurationSerializer()
+    configuration = SiteConfigurationSerializer(read_only=True)
 
     class Meta:
         model = Site

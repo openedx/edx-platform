@@ -56,10 +56,12 @@ class SiteConfiguration(models.Model):
         # fix for a bug with some pages requiring uppercase platform_name variable
         self.values['PLATFORM_NAME'] = self.values.get('platform_name', '')
 
+        super(SiteConfiguration, self).save(**kwargs)
+
         # recompile SASS on every save
         self.compile_microsite_sass()
         #self.collect_css_file()
-        return super(SiteConfiguration, self).save(**kwargs)
+        return self
 
     def get_value(self, name, default=None):
         """

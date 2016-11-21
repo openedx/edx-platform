@@ -18,7 +18,7 @@ def get_initial_sass_variables():
     This method loads the SASS variables file from the currently active theme. It is used as a default value
     for the sass_variables field on new Microsite objects.
     """
-    json.dumps(get_full_branding_list())
+    return get_full_branding_list()
 
 
 def get_branding_values_from_file():
