@@ -200,8 +200,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 
     def test_links_to_detail_pages(self):
         """
-        Verify that links to detail pages are present when enabled, instead of
-        links to the marketing site.
+        Verify that links to detail pages are present.
         """
         self.create_programs_config()
         self.mock_programs_api(self.data)
@@ -220,22 +219,6 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
             self.assertEqual(
                 actual_program['detail_url'],
                 '{}/{}'.format(base, slug)
-            )
-
-        # Verify that links to the marketing site are present when detail pages are disabled.
-        self.create_programs_config(program_details_enabled=False, marketing_path='bar')
-        marketing_root = urljoin(settings.MKTG_URLS.get('ROOT'), 'bar').rstrip('/')
-
-        response = self.client.get(self.url)
-        actual = self.load_serialized_data(response, 'programsData')
-        actual = sorted(actual, key=self.program_sort_key)
-
-        for index, actual_program in enumerate(actual):
-            expected_program = self.data[index]
-
-            self.assertEqual(
-                actual_program['detail_url'],
-                '{}/{}'.format(marketing_root, expected_program['marketing_slug'])
             )
 
     def test_certificates_listed(self):
