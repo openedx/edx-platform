@@ -15,6 +15,7 @@ import json
 from lazy import lazy
 import logging
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import now
 from model_utils.models import TimeStampedModel
@@ -244,6 +245,21 @@ class PersistentSubsectionGrade(TimeStampedModel):
     # track which blocks were visible at the time of grade calculation
     visible_blocks = models.ForeignKey(VisibleBlocks, db_column='visible_blocks_hash', to_field='hashed')
 
+    def _is_unattempted_with_score(self):
+        """
+        Return True if the object has a non-zero score, but has not been
+        attempted.  This is an inconsistent state, and needs to be cleaned up.
+        """
+        return self.first_attempted is None and any(field != 0.0 for field in (self.earned_all, self.earned_graded))
+
+    def clean(self):
+        """
+        If an grade has not been attempted, but was given a non-zero score,
+        raise a ValidationError.
+        """
+        if self._is_unattempted_with_score():
+            raise ValidationError("Unattempted problems cannot have a non-zero score.")
+
     @property
     def full_usage_key(self):
         """
@@ -305,30 +321,39 @@ class PersistentSubsectionGrade(TimeStampedModel):
         )
 
     @classmethod
-    def update_or_create_grade(cls, **kwargs):
+    def update_or_create_grade(cls, **params):
         """
         Wrapper for objects.update_or_create.
         """
-        cls._prepare_params_and_visible_blocks(kwargs)
+        cls._prepare_params_and_visible_blocks(params)
 
-        user_id = kwargs.pop('user_id')
-        usage_key = kwargs.pop('usage_key')
+        user_id = params.pop('user_id')
+        usage_key = params.pop('usage_key')
+        attempted = params.pop('attempted')
 
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
             course_id=usage_key.course_key,
             usage_key=usage_key,
-            defaults=kwargs,
+            defaults=params,
         )
+        if attempted and not grade.first_attempted:
+            grade.first_attempted = now()
+            grade.save()
+        grade.full_clean()
         return grade
 
     @classmethod
-    def create_grade(cls, **kwargs):
+    def create_grade(cls, **params):
         """
         Wrapper for objects.create.
         """
-        cls._prepare_params_and_visible_blocks(kwargs)
-        return cls.objects.create(**kwargs)
+        cls._prepare_params_and_visible_blocks(params)
+        cls._prepare_attempted_for_create(params, now())
+        grade = cls(**params)
+        grade.full_clean()
+        grade.save()
+        return grade
 
     @classmethod
     def bulk_create_grades(cls, grade_params_iter, course_key):
@@ -341,8 +366,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
         map(cls._prepare_params, grade_params_iter)
         VisibleBlocks.bulk_get_or_create([params['visible_blocks'] for params in grade_params_iter], course_key)
         map(cls._prepare_params_visible_blocks_id, grade_params_iter)
-
-        return cls.objects.bulk_create([PersistentSubsectionGrade(**params) for params in grade_params_iter])
+        first_attempt_timestamp = now()
+        for params in grade_params_iter:
+            cls._prepare_attempted_for_create(params, first_attempt_timestamp)
+        grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
+        for grade in grades:
+            grade.full_clean()
+        return cls.objects.bulk_create(grades)
 
     @classmethod
     def _prepare_params_and_visible_blocks(cls, params):
@@ -362,6 +392,15 @@ class PersistentSubsectionGrade(TimeStampedModel):
             params['course_id'] = params['usage_key'].course_key
         params['course_version'] = params.get('course_version', None) or ""
         params['visible_blocks'] = BlockRecordList.from_list(params['visible_blocks'], params['course_id'])
+
+    @classmethod
+    def _prepare_attempted_for_create(cls, params, timestamp):
+        """
+        When creating objects, an attempted subsection gets its timestamp set
+        unconditionally.
+        """
+        if params.pop('attempted'):
+            params['first_attempted'] = timestamp
 
     @classmethod
     def _prepare_params_visible_blocks_id(cls, params):
@@ -422,7 +461,7 @@ class PersistentCourseGrade(TimeStampedModel):
             u"grading policy: {}".format(self.grading_policy_hash),
             u"percent grade: {}%".format(self.percent_grade),
             u"letter grade: {}".format(self.letter_grade),
-            u"passed_timestamp: {}".format(self.passed_timestamp),
+            u"passed timestamp: {}".format(self.passed_timestamp),
         ])
 
     @classmethod
