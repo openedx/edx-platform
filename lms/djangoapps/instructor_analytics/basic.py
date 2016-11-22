@@ -483,7 +483,7 @@ def dump_grading_context(course):
     if isinstance(course.grader, xmgraders.WeightedSubsectionsGrader):
         msg += '\n'
         msg += "Graded sections:\n"
-        for subgrader, category, weight in course.grader.sections:
+        for subgrader, category, weight in course.grader.subgraders:
             msg += "  subgrader=%s, type=%s, category=%s, weight=%s\n"\
                 % (subgrader.__class__, subgrader.type, category, weight)
             subgrader.index = 1

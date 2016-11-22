@@ -18,7 +18,7 @@ def grading_context_for_course(course_key):
 def grading_context(course_structure):
     """
     This returns a dictionary with keys necessary for quickly grading
-    a student. They are used by grades.grade()
+    a student.
 
     The grading context has two keys:
     all_graded_subsections_by_type - This contains all subsections that are
@@ -27,7 +27,7 @@ def grading_context(course_structure):
         The values are arrays of dictionaries containing
             "subsection_block" : The subsection block
             "scored_descendants" : An array of usage keys for blocks
-                could possibly be in the subsection, for any student
+                that could possibly be in the subsection, for any student
 
     all_graded_blocks - This contains a list of all blocks that can
         affect grading a student. This is used to efficiently fetch

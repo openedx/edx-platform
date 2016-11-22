@@ -2,8 +2,7 @@
 CourseGrade Class
 """
 
-from collections import defaultdict
-from collections import namedtuple
+from collections import defaultdict, namedtuple, OrderedDict
 from logging import getLogger
 
 from django.conf import settings
@@ -44,13 +43,13 @@ class CourseGrade(object):
         Returns grades for the subsections in the course in
         a dict keyed by subsection format types.
         """
-        subsections_by_format = defaultdict(list)
+        subsections_by_format = defaultdict(OrderedDict)
         for chapter in self.chapter_grades:
             for subsection_grade in chapter['sections']:
                 if subsection_grade.graded:
                     graded_total = subsection_grade.graded_total
                     if graded_total.possible > 0:
-                        subsections_by_format[subsection_grade.format].append(subsection_grade)
+                        subsections_by_format[subsection_grade.format][subsection_grade.location] = subsection_grade
         return subsections_by_format
 
     @lazy

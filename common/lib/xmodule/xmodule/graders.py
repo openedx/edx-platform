@@ -5,6 +5,7 @@ Code used to calculate learner grades.
 from __future__ import division
 
 import abc
+from collections import OrderedDict
 import inspect
 import logging
 import random
@@ -174,10 +175,10 @@ class CourseGrader(object):
     - section_breakdown: This is a list of dictionaries which provide details on sections
     that were graded. These are used for display in a graph or chart. The format for a
     section_breakdown dictionary is explained below.
-    - grade_breakdown: This is a list of dictionaries which provide details on the contributions
-    of the final percentage grade. This is a higher level breakdown, for when the grade is constructed
-    of a few very large sections (such as Homeworks, Labs, a Midterm, and a Final). The format for
-    a grade_breakdown is explained below. This section is optional.
+    - grade_breakdown: This is a dict of dictionaries, keyed by category, which provide details on
+    the contributions of the final percentage grade. This is a higher level breakdown, for when the
+    grade is constructed of a few very large sections (such as Homeworks, Labs, a Midterm, and a Final).
+    The format for a grade_breakdown is explained below. This section is optional.
 
     A dictionary in the section_breakdown list has the following keys:
     percent: A float percentage for the section.
@@ -188,7 +189,7 @@ class CourseGrader(object):
     prominent: A boolean value indicating that this section should be displayed as more prominent
     than other items.
 
-    A dictionary in the grade_breakdown list has the following keys:
+    A dictionary in the grade_breakdown dict has the following keys:
     percent: A float percentage in the breakdown. All percents should add up to the final percentage.
     detail: A string explanation of this breakdown. E.g. "Homework - 10% of a possible 15%"
     category: A string identifying the category. Items with the same category are grouped together
@@ -221,27 +222,33 @@ class WeightedSubsectionsGrader(CourseGrader):
     a value > 1, the student may end up with a percent > 100%. This allows for sections that
     are extra credit.
     """
-    def __init__(self, sections):
-        self.sections = sections
+    def __init__(self, subgraders):
+        self.subgraders = subgraders
 
     def grade(self, grade_sheet, generate_random_scores=False):
         total_percent = 0.0
         section_breakdown = []
-        grade_breakdown = []
+        grade_breakdown = OrderedDict()
 
-        for subgrader, category, weight in self.sections:
+        for subgrader, assignment_type, weight in self.subgraders:
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
 
             weighted_percent = subgrade_result['percent'] * weight
-            section_detail = u"{0} = {1:.2%} of a possible {2:.2%}".format(category, weighted_percent, weight)
+            section_detail = u"{0} = {1:.2%} of a possible {2:.2%}".format(assignment_type, weighted_percent, weight)
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
-            grade_breakdown.append({'percent': weighted_percent, 'detail': section_detail, 'category': category})
+            grade_breakdown[assignment_type] = {
+                'percent': weighted_percent,
+                'detail': section_detail,
+                'category': assignment_type,
+            }
 
-        return {'percent': total_percent,
-                'section_breakdown': section_breakdown,
-                'grade_breakdown': grade_breakdown}
+        return {
+            'percent': total_percent,
+            'section_breakdown': section_breakdown,
+            'grade_breakdown': grade_breakdown
+        }
 
 
 class AssignmentFormatGrader(CourseGrader):
@@ -302,9 +309,12 @@ class AssignmentFormatGrader(CourseGrader):
 
     def grade(self, grade_sheet, generate_random_scores=False):
         def total_with_drops(breakdown, drop_count):
-            '''calculates total score for a section while dropping lowest scores'''
-            #create an array of tuples with (index, mark), sorted by mark['percent'] descending
+            """
+            Calculates total score for a section while dropping lowest scores
+            """
+            # Create an array of tuples with (index, mark), sorted by mark['percent'] descending
             sorted_breakdown = sorted(enumerate(breakdown), key=lambda x: -x[1]['percent'])
+
             # A list of the indices of the dropped scores
             dropped_indices = []
             if drop_count > 0:
@@ -319,8 +329,7 @@ class AssignmentFormatGrader(CourseGrader):
 
             return aggregate_score, dropped_indices
 
-        #Figure the homework scores
-        scores = grade_sheet.get(self.type, [])
+        scores = grade_sheet.get(self.type, {}).values()
         breakdown = []
         for i in range(max(self.min_count, len(scores))):
             if i < len(scores) or generate_random_scores:

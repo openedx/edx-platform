@@ -100,7 +100,7 @@ $(function () {
   extraColorIndex = len(categories) #Keeping track of the next color to use for categories not in categories[]
   
   if show_grade_breakdown:
-    for section in grade_summary['grade_breakdown']:
+    for section in grade_summary['grade_breakdown'].itervalues():
         if section['percent'] > 0:
             if section['category'] in categories:
                 color = categories[ section['category'] ]['color']

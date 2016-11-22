@@ -2,6 +2,7 @@
 Base test classes for LMS instructor-initiated background tasks
 
 """
+# pylint: disable=attribute-defined-outside-init
 import os
 import json
 from mock import Mock, patch
@@ -12,7 +13,6 @@ from uuid import uuid4
 
 from celery.states import SUCCESS, FAILURE
 from django.core.urlresolvers import reverse
-from django.test.testcases import TestCase
 from django.contrib.auth.models import User
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
@@ -37,7 +37,8 @@ TEST_COURSE_ORG = 'edx'
 TEST_COURSE_NAME = 'test_course'
 TEST_COURSE_NUMBER = '1.23x'
 TEST_COURSE_KEY = SlashSeparatedCourseKey(TEST_COURSE_ORG, TEST_COURSE_NUMBER, TEST_COURSE_NAME)
-TEST_SECTION_NAME = "Problem"
+TEST_CHAPTER_NAME = "Section"
+TEST_SECTION_NAME = "Subsection"
 
 TEST_FAILURE_MESSAGE = 'task failed horribly'
 TEST_FAILURE_EXCEPTION = 'RandomCauseError'
@@ -135,14 +136,18 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         Add a chapter and a sequential to the current course.
         """
         # Add a chapter to the course
-        chapter = ItemFactory.create(parent_location=self.course.location,
-                                     display_name=TEST_SECTION_NAME)
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            display_name=TEST_CHAPTER_NAME,
+        )
 
         # add a sequence to the course to which the problems can be added
-        self.problem_section = ItemFactory.create(parent_location=chapter.location,
-                                                  category='sequential',
-                                                  metadata={'graded': True, 'format': 'Homework'},
-                                                  display_name=TEST_SECTION_NAME)
+        self.problem_section = ItemFactory.create(
+            parent_location=self.chapter.location,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=TEST_SECTION_NAME,
+        )
 
     @staticmethod
     def get_user_email(username):
@@ -335,10 +340,10 @@ class TestReportMixin(object):
             file_index (int): Describes which report store file to
                 open.  Files are ordered by last modified date, and 0
                 corresponds to the most recently modified file.
-            verify_order (boolean): When True, we verify that both the
-                content and order of `expected_rows` matches the
-                actual csv rows.  When False (default), we only verify
-                that the content matches.
+            verify_order (boolean): When True (default), we verify that
+                both the content and order of `expected_rows` matches
+                the actual csv rows.  When False, we only verify that
+                the content matches.
             ignore_other_columns (boolean): When True, we verify that `expected_rows`
                 contain data which is the subset of actual csv rows.
         """

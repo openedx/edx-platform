@@ -590,7 +590,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         # technically possible in openedx.
         self.student_1 = self.create_student(u'üser_1')
         self.student_2 = self.create_student(u'üser_2')
-        self.csv_header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        self.csv_header_row = [u'Student ID', u'Email', u'Username', u'Grade']
 
     @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
     def test_no_problems(self, _get_current_task):
@@ -624,7 +624,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
         result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
-        problem_name = u'Homework 1: Problem - Problem1'
+        problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
             dict(zip(
@@ -642,7 +642,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     unicode(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
-                    '0.0', 'Not Attempted', '2.0',
+                    '0.0', u'Not Attempted', '2.0',
                 ]
             ))
         ])
@@ -714,8 +714,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result
             )
 
-        problem_names = [u'Homework 1: Problem - problem_a_url', u'Homework 1: Problem - problem_b_url']
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        problem_names = [u'Homework 1: Subsection - problem_a_url', u'Homework 1: Subsection - problem_b_url']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -796,7 +796,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
             problem_names.append(title)
 
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -861,8 +861,8 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
             )
-        problem_names = [u'Homework 1: Problem - Problem0', u'Homework 1: Problem - Problem1']
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        problem_names = [u'Homework 1: Subsection - Problem0', u'Homework 1: Subsection - Problem1']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -1505,6 +1505,90 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ],
             verify_order=False
         )
+
+
+@patch('lms.djangoapps.instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
+class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
+    """
+    Test that grade report has correct grade values.
+    """
+    def setUp(self):
+        super(TestGradeReport, self).setUp()
+        self.create_course()
+        self.student = self.create_student(u'üser_1')
+
+    def create_course(self):
+        """
+        Creates a course with various subsections for testing
+        """
+        self.course = CourseFactory.create(
+            grading_policy={
+                "GRADER": [
+                    {
+                        "type": "Homework",
+                        "min_count": 4,
+                        "drop_count": 0,
+                        "weight": 1.0
+                    },
+                ],
+            },
+        )
+        self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+
+        self.problem_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Subsection'
+        )
+        self.define_option_problem(u'Problem1', parent=self.problem_section, num_responses=1)
+        self.hidden_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            visible_to_staff_only=True,
+            display_name='Hidden',
+        )
+        self.define_option_problem(u'Problem2', parent=self.hidden_section)
+        self.unattempted_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Unattempted',
+        )
+        self.define_option_problem(u'Problem3', parent=self.unattempted_section)
+        self.empty_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Empty',
+        )
+
+    def test_grade_report(self):
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
+                result,
+            )
+            self.verify_rows_in_csv(
+                [
+                    {
+                        u'Student ID': unicode(self.student.id),
+                        u'Email': self.student.email,
+                        u'Username': self.student.username,
+                        u'Grade': '0.13',
+                        u'Homework 1: Subsection': '0.5',
+                        u'Homework 2: Hidden': u'Not Accessible',
+                        u'Homework 3: Unattempted': u'Not Attempted',
+                        u'Homework 4: Empty': u'Not Accessible',
+                        u'Homework (Avg)': '0.125',
+                    },
+                ],
+                ignore_other_columns=True,
+            )
 
 
 @ddt.ddt

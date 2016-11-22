@@ -76,9 +76,9 @@ class GraderTest(unittest.TestCase):
     }
 
     incomplete_gradesheet = {
-        'Homework': [],
-        'Lab': [],
-        'Midterm': [],
+        'Homework': {},
+        'Lab': {},
+        'Midterm': {},
     }
 
     class MockGrade(object):
@@ -91,25 +91,31 @@ class GraderTest(unittest.TestCase):
 
     common_fields = dict(graded=True, attempted=True)
     test_gradesheet = {
-        'Homework': [
-            MockGrade(AggregatedScore(tw_earned=2, tw_possible=20.0, **common_fields), display_name='hw1'),
-            MockGrade(AggregatedScore(tw_earned=16, tw_possible=16.0, **common_fields), display_name='hw2'),
-        ],
+        'Homework': {
+            'hw1': MockGrade(AggregatedScore(tw_earned=2, tw_possible=20.0, **common_fields), display_name='hw1'),
+            'hw2': MockGrade(AggregatedScore(tw_earned=16, tw_possible=16.0, **common_fields), display_name='hw2'),
+        },
 
         # The dropped scores should be from the assignments that don't exist yet
-        'Lab': [
-            MockGrade(AggregatedScore(tw_earned=1, tw_possible=2.0, **common_fields), display_name='lab1'),  # Dropped
-            MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab2'),
-            MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab3'),
-            MockGrade(AggregatedScore(tw_earned=5, tw_possible=25.0, **common_fields), display_name='lab4'),  # Dropped
-            MockGrade(AggregatedScore(tw_earned=3, tw_possible=4.0, **common_fields), display_name='lab5'),  # Dropped
-            MockGrade(AggregatedScore(tw_earned=6, tw_possible=7.0, **common_fields), display_name='lab6'),
-            MockGrade(AggregatedScore(tw_earned=5, tw_possible=6.0, **common_fields), display_name='lab7'),
-        ],
+        'Lab': {
+            # Dropped
+            'lab1': MockGrade(AggregatedScore(tw_earned=1, tw_possible=2.0, **common_fields), display_name='lab1'),
+            'lab2': MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab2'),
+            'lab3': MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab3'),
+            # Dropped
+            'lab4': MockGrade(AggregatedScore(tw_earned=5, tw_possible=25.0, **common_fields), display_name='lab4'),
+            # Dropped
+            'lab5': MockGrade(AggregatedScore(tw_earned=3, tw_possible=4.0, **common_fields), display_name='lab5'),
+            'lab6': MockGrade(AggregatedScore(tw_earned=6, tw_possible=7.0, **common_fields), display_name='lab6'),
+            'lab7': MockGrade(AggregatedScore(tw_earned=5, tw_possible=6.0, **common_fields), display_name='lab7'),
+        },
 
-        'Midterm': [
-            MockGrade(AggregatedScore(tw_earned=50.5, tw_possible=100, **common_fields), display_name="Midterm Exam"),
-        ],
+        'Midterm': {
+            'midterm': MockGrade(
+                AggregatedScore(tw_earned=50.5, tw_possible=100, **common_fields),
+                display_name="Midterm Exam",
+            ),
+        },
     }
 
     def test_assignment_format_grader(self):
