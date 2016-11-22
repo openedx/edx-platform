@@ -33,7 +33,7 @@ from .models import (
 import logging
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
-from opaque_keys.edx.asides import AsideUsageKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from contracts import contract, new_contract
 
 from django.db import DatabaseError
@@ -67,6 +67,7 @@ def _all_usage_keys(descriptors, aside_types):
 
         for aside_type in aside_types:
             usage_ids.add(AsideUsageKeyV1(descriptor.scope_ids.usage_id, aside_type))
+            usage_ids.add(AsideUsageKeyV2(descriptor.scope_ids.usage_id, aside_type))
 
     return usage_ids
 

@@ -21,7 +21,7 @@ from xmodule.services import SettingsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.mixin import wrap_with_license
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.asides import AsideUsageKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV1, AsideUsageKeyV2
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
@@ -57,7 +57,7 @@ def preview_handler(request, usage_key_string, handler, suffix=''):
     """
     usage_key = UsageKey.from_string(usage_key_string)
 
-    if isinstance(usage_key, AsideUsageKeyV1):
+    if isinstance(usage_key, (AsideUsageKeyV1, AsideUsageKeyV2)):
         descriptor = modulestore().get_item(usage_key.usage_key)
         for aside in descriptor.runtime.get_asides(descriptor):
             if aside.scope_ids.block_type == usage_key.aside_type:
