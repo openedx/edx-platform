@@ -227,36 +227,6 @@
             background-color: $forum-color-hover-thread;
         }
 
-        &.is-active {
-            color: $forum-color-background;
-            background-color: $forum-color-reading-thread;
-
-            .forum-nav-thread-labels > li {
-                border-color: $forum-color-background;
-                color: $forum-color-background;
-            }
-
-            .forum-nav-thread-votes-count {
-                color: $forum-color-background;
-            }
-
-            .forum-nav-thread-comments-count {
-                color: $base-font-color;
-
-                &:after {
-                    @include border-right-color($forum-color-border);
-                }
-            }
-
-            span.icon {
-                color: $forum-color-background;
-            }
-
-            .thread-preview-body {
-                color: $forum-color-background;
-            }
-        }
-
         .forum-nav-thread-unread-comments-count {
             display: inline-block;
             font-size: $forum-small-font-size;
@@ -264,10 +234,44 @@
         }
     }
 
+    .discussion:not(.inline-discussion)
+
     &.never-read {
         .forum-nav-thread-link {
             @include border-left(3px solid $forum-color-never-read-post);
             color: $forum-color-never-read-post;
+        }
+    }
+}
+
+.discussion:not(.inline-discussion) .forum-nav-thread {
+    .forum-nav-thread-link.is-active {
+        color: $forum-color-background;
+        background-color: $forum-color-reading-thread;
+
+        .forum-nav-thread-labels > li {
+            border-color: $forum-color-background;
+            color: $forum-color-background;
+        }
+
+        .forum-nav-thread-votes-count {
+            color: $forum-color-background;
+        }
+
+        .forum-nav-thread-comments-count {
+            color: $base-font-color;
+
+            &:after {
+                @include border-right-color($forum-color-border);
+            }
+        }
+
+        span.icon {
+            color: $forum-color-background;
+        }
+
+        .thread-preview-body {
+            color: $forum-color-background;
         }
     }
 }
