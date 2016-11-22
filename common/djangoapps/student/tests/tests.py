@@ -12,7 +12,7 @@ import ddt
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import Client
 from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
@@ -945,7 +945,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
     def setUp(self):
         super(AnonymousLookupTable, self).setUp()
         self.course = CourseFactory.create()
-        self.user = UserFactory()
+        self.user = UserFactory.create()
         CourseModeFactory.create(
             course_id=self.course.id,
             mode_slug='honor',
@@ -973,6 +973,18 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
+
+    def test_secret_key_changes(self):
+        """Test that a new anonymous id is returned when the secret key changes."""
+        CourseEnrollment.enroll(self.user, self.course.id)
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+        with override_settings(SECRET_KEY='some_new_and_totally_secret_key'):
+            # Recreate user object to clear cached anonymous id.
+            self.user = User.objects.get(pk=self.user.id)
+            new_anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+            self.assertNotEqual(anonymous_id, new_anonymous_id)
+            self.assertEqual(self.user, user_by_anonymous_id(anonymous_id))
+            self.assertEqual(self.user, user_by_anonymous_id(new_anonymous_id))
 
 
 @attr(shard=3)
