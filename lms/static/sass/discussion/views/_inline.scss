@@ -23,8 +23,20 @@
 
         .forum-content {
             padding: $baseline / 2;
-            max-height: 500px;
             overflow-y: auto;
         }
+    }
+
+    .wmd-preview-container {
+        @include discussion-new-post-wmd-preview-container;
+        margin-bottom: $baseline;
+    }
+
+    .wmd-preview-label {
+        @include discussion-wmd-preview-label;
+    }
+
+    .wmd-preview {
+        @include discussion-wmd-preview;
     }
 }
