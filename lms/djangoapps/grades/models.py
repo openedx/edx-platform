@@ -16,7 +16,7 @@ from lazy import lazy
 import logging
 
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import models
 from django.utils.timezone import now
 from model_utils.models import TimeStampedModel
 
@@ -321,40 +321,36 @@ class PersistentSubsectionGrade(TimeStampedModel):
         )
 
     @classmethod
-    def update_or_create_grade(cls, **kwargs):
+    def update_or_create_grade(cls, **params):
         """
         Wrapper for objects.update_or_create.
         """
-        cls._prepare_params_and_visible_blocks(kwargs)
+        cls._prepare_params_and_visible_blocks(params)
 
-        user_id = kwargs.pop('user_id')
-        usage_key = kwargs.pop('usage_key')
-        attempted = kwargs.pop('attempted')
-        with transaction.atomic():
-            grade, _ = cls.objects.update_or_create(
-                user_id=user_id,
-                course_id=usage_key.course_key,
-                usage_key=usage_key,
-                defaults=kwargs,
-            )
-            if attempted and not grade.first_attempted:
-                grade.first_attempted = now()
-                grade.save()
-            grade.full_clean()
+        user_id = params.pop('user_id')
+        usage_key = params.pop('usage_key')
+        attempted = params.pop('attempted')
+
+        grade, _ = cls.objects.update_or_create(
+            user_id=user_id,
+            course_id=usage_key.course_key,
+            usage_key=usage_key,
+            defaults=params,
+        )
+        if attempted and not grade.first_attempted:
+            grade.first_attempted = now()
+            grade.save()
+        grade.full_clean()
         return grade
 
     @classmethod
-    def create_grade(cls, **kwargs):
+    def create_grade(cls, **params):
         """
         Wrapper for objects.create.
         """
-        cls._prepare_params_and_visible_blocks(kwargs)
-
-        attempted = kwargs.pop('attempted')
-
-        grade = cls(**kwargs)
-        if attempted:
-            grade.first_attempted = now()
+        cls._prepare_params_and_visible_blocks(params)
+        cls._prepare_attempted_for_create(params, now())
+        grade = cls(**params)
         grade.full_clean()
         grade.save()
         return grade
@@ -370,14 +366,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
         map(cls._prepare_params, grade_params_iter)
         VisibleBlocks.bulk_get_or_create([params['visible_blocks'] for params in grade_params_iter], course_key)
         map(cls._prepare_params_visible_blocks_id, grade_params_iter)
-
         first_attempt_timestamp = now()
         for params in grade_params_iter:
-            if params.pop('attempted'):
-                params['first_attempted'] = first_attempt_timestamp
-            elif params['earned_all'] != 0.0 or params['earned_graded'] != 0.0:
-                raise ValidationError("Unattempted problems cannot have a non-zero score.")
-        return cls.objects.bulk_create([PersistentSubsectionGrade(**params) for params in grade_params_iter])
+            cls._prepare_attempted_for_create(params, first_attempt_timestamp)
+        grades = [PersistentSubsectionGrade(**params) for params in grade_params_iter]
+        for grade in grades:
+            grade.full_clean()
+        return cls.objects.bulk_create(grades)
 
     @classmethod
     def _prepare_params_and_visible_blocks(cls, params):
@@ -397,6 +392,15 @@ class PersistentSubsectionGrade(TimeStampedModel):
             params['course_id'] = params['usage_key'].course_key
         params['course_version'] = params.get('course_version', None) or ""
         params['visible_blocks'] = BlockRecordList.from_list(params['visible_blocks'], params['course_id'])
+
+    @classmethod
+    def _prepare_attempted_for_create(cls, params, timestamp):
+        """
+        When creating objects, an attempted subsection gets its timestamp set
+        unconditionally.
+        """
+        if params.pop('attempted'):
+            params['first_attempted'] = timestamp
 
     @classmethod
     def _prepare_params_visible_blocks_id(cls, params):
