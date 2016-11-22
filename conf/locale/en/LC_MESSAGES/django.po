@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-09 22:14+0000\n"
-"PO-Revision-Date: 2016-11-09 22:14:56.380821\n"
+"POT-Creation-Date: 2016-11-22 15:44+0000\n"
+"PO-Revision-Date: 2016-11-22 15:44:56.953763\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -167,7 +167,6 @@ msgstr ""
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -538,12 +537,12 @@ msgstr ""
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "No Formal Education"
+msgid "No formal education"
 msgstr ""
 
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other Education"
+msgid "Other education"
 msgstr ""
 
 #: common/djangoapps/student/models.py
@@ -1852,6 +1851,10 @@ msgid "Dictionary with the current student responses"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Whether or not the answers have been saved since last submit"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether the student has answered the problem"
 msgstr ""
 
@@ -1955,6 +1958,11 @@ msgstr ""
 #. This text is shown in bold before the accompanying hint text.
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Your answers were previously saved. Click '{button_name}' to grade them."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
@@ -4228,7 +4236,6 @@ msgstr ""
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -4244,7 +4251,6 @@ msgstr ""
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
-#: themes/example/lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -4825,10 +4831,6 @@ msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
@@ -6080,10 +6082,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -9538,7 +9536,6 @@ msgstr ""
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr ""
@@ -9673,7 +9670,6 @@ msgid "Choose Language"
 msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: themes/example/lms/templates/header.html
 msgid "Account"
 msgstr ""
 
@@ -9735,7 +9731,6 @@ msgstr ""
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
-#: themes/example/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr ""
@@ -9749,7 +9744,6 @@ msgid "Usermenu dropdown"
 msgstr ""
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr ""
@@ -9784,6 +9778,38 @@ msgstr ""
 
 #: common/templates/license.html
 msgid "Some Rights Reserved"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Feedback Form"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Email: {email}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Full Name: {realname}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Inquiry Type: {inquiry_type}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Message: {message}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Tags: {tags}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Additional Info:"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_subject.txt
+msgid "Feedback from user"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
@@ -9851,11 +9877,15 @@ msgstr ""
 msgid "Bookmark this page"
 msgstr ""
 
-#: lms/templates/course.html themes/example/lms/templates/course.html
+#: lms/templates/conditional_module.html
+msgid "You do not have access to this dependency module."
+msgstr ""
+
+#: lms/templates/course.html
 msgid "LEARN MORE"
 msgstr ""
 
-#: lms/templates/course.html themes/example/lms/templates/course.html
+#: lms/templates/course.html
 msgid "Starts"
 msgstr ""
 
@@ -9869,7 +9899,6 @@ msgstr ""
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
-#: themes/example/lms/templates/header.html
 msgid "Dashboard"
 msgstr ""
 
@@ -9964,7 +9993,6 @@ msgstr ""
 #: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "Enroll"
 msgstr ""
 
@@ -10117,9 +10145,9 @@ msgstr ""
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
 
 #: lms/templates/help_modal.html
@@ -10437,8 +10465,7 @@ msgstr ""
 msgid "Raw data:"
 msgstr ""
 
-#: lms/templates/navigation.html themes/example/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr ""
 
@@ -10478,7 +10505,6 @@ msgid "Register"
 msgstr ""
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr ""
@@ -11113,7 +11139,7 @@ msgstr ""
 msgid "Dashboard for:"
 msgstr ""
 
-#: lms/templates/user_dropdown.html themes/example/lms/templates/header.html
+#: lms/templates/user_dropdown.html
 msgid "Profile"
 msgstr ""
 
@@ -12388,12 +12414,10 @@ msgid "This content is graded"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -12467,7 +12491,6 @@ msgid "Additional Resources"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr ""
 
@@ -12651,6 +12674,10 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Important Course Dates"
+msgstr ""
+
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
 msgstr ""
 
 #: lms/templates/courseware/news.html
@@ -14258,6 +14285,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -16548,6 +16579,16 @@ msgid ""
 "{link_start}{mail_to_link}{link_end}."
 msgstr ""
 
+#: lms/templates/verify_student/_verification_help.html
+msgid "Have questions?"
+msgstr ""
+
+#: lms/templates/verify_student/_verification_help.html
+msgid ""
+"Please read {a_start}our FAQs to view common questions about our "
+"certificates{a_end}."
+msgstr ""
+
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr ""
@@ -16586,16 +16627,6 @@ msgstr ""
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Enroll In {course_name}"
-msgstr ""
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Have questions?"
-msgstr ""
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid ""
-"Please read {a_start}our FAQs to view common questions about our "
-"certificates{a_end}."
 msgstr ""
 
 #: lms/templates/verify_student/pay_and_verify.html
@@ -16697,83 +16728,6 @@ msgstr ""
 msgid ""
 "{b_start}Support our Mission: {b_end} EdX, a non-profit, relies on verified "
 "certificates to help fund free education for everyone globally"
-msgstr ""
-
-#: themes/example/lms/templates/header.html
-msgid "Create Account"
-msgstr ""
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Want to purchase this course for a group?"
-msgstr ""
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid ""
-"You can purchase enrollment codes for this course to distribute to your team"
-msgstr ""
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Purchase for a Group"
-msgstr ""
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid ""
-"Bulk discounts may apply for groups larger than 10. Contact "
-"{link_start}harvardxplus@harvard.edu{link_end} for more information."
-msgstr ""
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Email Us"
-msgstr ""
-
-#: themes/example/lms/templates/courseware/courses.html
-msgid "Lorem ipsum dolor sit amet."
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/about.html
-msgid "About Us"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/contact.html
-msgid "Thank you for your inquiry"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "FAQ's"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "General FAQs"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/faq.html
-#: themes/example/lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/tos.html
-msgid "Lorem ipsum dolor sit amet"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Academic Planning"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/faq.html
-#: themes/example/lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/tos.html
-msgid "Back to top"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Registration"
-msgstr ""
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Finances"
-msgstr ""
-
-#: themes/example/lms/templates/student_account/login_and_register.html
-msgid "Sign in or Create Account"
 msgstr ""
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.

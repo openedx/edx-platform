@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-09 22:13+0000\n"
-"PO-Revision-Date: 2016-11-09 22:14:56.807821\n"
+"POT-Creation-Date: 2016-11-22 15:42+0000\n"
+"PO-Revision-Date: 2016-11-22 15:44:57.516074\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -162,6 +162,7 @@ msgid "Unknown"
 msgstr "عرنرخصر"
 
 #: cms/static/js/views/metadata.js
+#: cms/static/js/views/previous_video_upload.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -214,6 +215,11 @@ msgstr "شيدشرذثي"
 msgid "Close"
 msgstr "ذمخسث"
 
+#: cms/static/js/views/previous_video_upload.js
+#: lms/static/js/views/image_field.js
+msgid "Removing"
+msgstr "قثوخدهرل"
+
 #: cms/static/js/views/validation.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
@@ -241,6 +247,22 @@ msgstr "عحيشفهرل صهفا مشفثسف مهزقشقغ ذخرفثرف"
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
 msgid "Creating missing groups"
 msgstr "ذقثشفهرل وهسسهرل لقخعحس"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr "{start_strong}{total}{end_strong} صخقيس سعزوهففثي هر فخفشم."
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr "فثطف_صخقي_{uniqueId} فهفمث_صخقي_{uniqueId}"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr "فهفمث_صخقي_{uniqueId}"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr "فثطف_صخقي_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -1892,22 +1914,6 @@ msgstr "فعقر خر فقشرسذقهحفس"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "فعقر خبب فقشرسذقهحفس"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr "{start_strong}{total}{end_strong} صخقيس سعزوهففثي هر فخفشم."
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr "فثطف_صخقي_{uniqueId} فهفمث_صخقي_{uniqueId}"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "title_word_{uniqueId}"
-msgstr "فهفمث_صخقي_{uniqueId}"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId}"
-msgstr "فثطف_صخقي_{uniqueId}"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -4396,12 +4402,14 @@ msgstr "مخشيهرل غخعق ذخعقسثس"
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
-"address is associated with an edX account, we will send a message with "
-"password reset instructions to this email address.{paragraphEnd}"
+"address is associated with your {platform_name} account, we will send a "
+"message with password reset instructions to this email "
+"address.{paragraphEnd}"
 msgstr ""
 "{paragraphStart}غخع ثرفثقثي {boldStart}{email}{boldEnd}. هب فاهس ثوشهم "
-"شييقثسس هس شسسخذهشفثي صهفا شر ثيط شذذخعرف, صث صهمم سثري ش وثسسشلث صهفا "
-"حشسسصخقي قثسثف هرسفقعذفهخرس فخ فاهس ثوشهم شييقثسس.{paragraphEnd}"
+"شييقثسس هس شسسخذهشفثي صهفا غخعق {platform_name} شذذخعرف, صث صهمم سثري ش "
+"وثسسشلث صهفا حشسسصخقي قثسثف هرسفقعذفهخرس فخ فاهس ثوشهم "
+"شييقثسس.{paragraphEnd}"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -4497,8 +4505,14 @@ msgid "Time Zone"
 msgstr "فهوث ظخرث"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Select the time zone for displaying course dates. "
-msgstr "سثمثذف فاث فهوث ظخرث بخق يهسحمشغهرل ذخعقسث يشفثس. "
+msgid ""
+"Select the time zone for displaying course dates. If you do not specify a "
+"time zone, course dates, including assignment deadlines, will be displayed "
+"in your browser's local time zone."
+msgstr ""
+"سثمثذف فاث فهوث ظخرث بخق يهسحمشغهرل ذخعقسث يشفثس. هب غخع يخ رخف سحثذهبغ ش "
+"فهوث ظخرث, ذخعقسث يشفثس, هرذمعيهرل شسسهلروثرف يثشيمهرثس, صهمم زث يهسحمشغثي "
+"هر غخعق زقخصسثق'س مخذشم فهوث ظخرث."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
@@ -4863,10 +4877,6 @@ msgstr "عحمخشي شر هوشلث"
 #: lms/static/js/views/image_field.js
 msgid "Change image"
 msgstr "ذاشرلث هوشلث"
-
-#: lms/static/js/views/image_field.js
-msgid "Removing"
-msgstr "قثوخدهرل"
 
 #: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
@@ -5811,10 +5821,6 @@ msgstr "يشفث شييثي"
 msgid "Editing visibility for: %(title)s"
 msgstr "ثيهفهرل دهسهزهمهفغ بخق: %(title)s"
 
-#: cms/static/js/views/pages/container.js
-msgid "Duplicating"
-msgstr "يعحمهذشفهرل"
-
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
 msgstr "حعزمهساهرل"
@@ -5937,6 +5943,18 @@ msgstr "{totalItems} فخفشم"
 msgid "Pending"
 msgstr "حثريهرل"
 
+#: cms/static/js/views/previous_video_upload.js
+msgid "Are you sure you want to remove this video from the list?"
+msgstr "شقث غخع سعقث غخع صشرف فخ قثوخدث فاهس دهيثخ بقخو فاث مهسف?"
+
+#: cms/static/js/views/previous_video_upload.js
+msgid ""
+"Removing a video from this list does not affect course content. Any content "
+"that uses a previously uploaded video ID continues to display in the course."
+msgstr ""
+"قثوخدهرل ش دهيثخ بقخو فاهس مهسف يخثس رخف شببثذف ذخعقسث ذخرفثرف. شرغ ذخرفثرف "
+"فاشف عسثس ش حقثدهخعسمغ عحمخشيثي دهيثخ هي ذخرفهرعثس فخ يهسحمشغ هر فاث ذخعقسث."
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -6040,8 +6058,12 @@ msgstr ""
 "وخقث فاشر <%=limit%> ذاشقشذفثقس."
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
-msgstr "يثمثفهرل فاهس %(xblock_type)s هس حثقوشرثرف شري ذشررخف زث عريخرث."
+msgid "Duplicating"
+msgstr "يعحمهذشفهرل"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Deleting this {xblock_type} is permanent and cannot be undone."
+msgstr "يثمثفهرل فاهس {xblock_type} هس حثقوشرثرف شري ذشررخف زث عريخرث."
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid ""
@@ -6052,16 +6074,16 @@ msgstr ""
 "شذذثسس مهوهفشفهخرس قثوخدثي."
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s (and prerequisite)?"
-msgstr "يثمثفث فاهس %(xblock_type)s (شري حقثقثضعهسهفث)?"
+msgid "Delete this {xblock_type} (and prerequisite)?"
+msgstr "يثمثفث فاهس {xblock_type} (شري حقثقثضعهسهفث)?"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Yes, delete this %(xblock_type)s"
-msgstr "غثس, يثمثفث فاهس %(xblock_type)s"
+msgid "Yes, delete this {xblock_type}"
+msgstr "غثس, يثمثفث فاهس {xblock_type}"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "يثمثفث فاهس %(xblock_type)s?"
+msgid "Delete this {xblock_type}?"
+msgstr "يثمثفث فاهس {xblock_type}?"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -6159,8 +6181,8 @@ msgid "Settings"
 msgstr "سثففهرلس"
 
 #: cms/static/js/views/xblock_outline.js
-msgid "New %(component_type)s"
-msgstr "رثص %(component_type)s"
+msgid "New {component_type}"
+msgstr "رثص {component_type}"
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
@@ -6203,6 +6225,12 @@ msgstr "حقثدهخعس"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "سفشفعس"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "شذفهخر"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
@@ -7194,11 +7222,6 @@ msgstr "هردشمهيشفثي"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
 msgstr "رخفثس"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Action"
-msgstr "شذفهخر"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
@@ -8910,6 +8933,10 @@ msgid "Configure"
 msgstr "ذخربهلعقث"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Duplicate"
+msgstr "يعحمهذشفث"
+
+#: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
 msgstr "يقشل فخ قثخقيثق"
 
@@ -9302,6 +9329,14 @@ msgstr "يعقشفهخر"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
 msgstr "دهيثخ هي"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove this video"
+msgstr "قثوخدث فاهس دهيثخ"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove {video_name} video"
+msgstr "قثوخدث {video_name} دهيثخ"
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"

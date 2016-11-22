@@ -860,7 +860,6 @@
     "Page break": "Quebra de p\u00e1gina", 
     "Paragraph": "Par\u00e1grafo", 
     "Password": "Senha", 
-    "Password Reset Email Sent": "O e-mail para redefinir a senha foi enviado", 
     "Password assistance": "Supporte de Senha", 
     "Password reset email sent. Follow the link in the email to change your password.": "Email de recupera\u00e7\u00e3o de senha enviado. Siga o link no email para mudar sua senha", 
     "Paste": "Colar", 
