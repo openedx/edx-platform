@@ -180,7 +180,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         self.client.login(username='mrrobot', password='test')
 
         html_elements = [
-            '<h1 class="handouts-header">Important Course Dates</h1>',
+            '<h4 class="handouts-header">Important Course Dates</h4>',
             '<div class="date-summary-container">',
             '<div class="date-summary date-summary-todays-date">',
             '<h3 class="heading localized-datetime"',
@@ -202,7 +202,7 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         response = self.client.get(url)
 
         html_elements = [
-            '<h1 class="handouts-header">Important Course Dates</h1>',
+            '<h4 class="handouts-header">Important Course Dates</h4>',
             '<div class="date-summary-container">',
             '<div class="date-summary date-summary-todays-date">',
             '<h3 class="heading localized-datetime"',

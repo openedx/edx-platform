@@ -20,7 +20,7 @@ class CourseInfoPage(CoursePage):
         """
         Return the number of updates on the page.
         """
-        return len(self.q(css='section.updates section article').results)
+        return len(self.q(css='.updates .updates-article').results)
 
     @property
     def handout_links(self):
