@@ -16,7 +16,7 @@ from lazy import lazy
 import logging
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils.timezone import now
 from model_utils.models import TimeStampedModel
 
@@ -330,16 +330,17 @@ class PersistentSubsectionGrade(TimeStampedModel):
         user_id = kwargs.pop('user_id')
         usage_key = kwargs.pop('usage_key')
         attempted = kwargs.pop('attempted')
-        grade, _ = cls.objects.update_or_create(
-            user_id=user_id,
-            course_id=usage_key.course_key,
-            usage_key=usage_key,
-            defaults=kwargs,
-        )
-        if attempted and not grade.first_attempted:
-            grade.first_attempted = now()
-        grade.full_clean()
-        grade.save()
+        with transaction.atomic():
+            grade, _ = cls.objects.update_or_create(
+                user_id=user_id,
+                course_id=usage_key.course_key,
+                usage_key=usage_key,
+                defaults=kwargs,
+            )
+            if attempted and not grade.first_attempted:
+                grade.first_attempted = now()
+                grade.save()
+            grade.full_clean()
         return grade
 
     @classmethod

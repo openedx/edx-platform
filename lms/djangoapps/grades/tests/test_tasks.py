@@ -113,7 +113,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course()
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(23 + added_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(24 + added_queries):
                 self._apply_recalculate_subsection_grade()
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
@@ -161,7 +161,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
             ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(23 + added_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(24 + added_queries):
                 self._apply_recalculate_subsection_grade()
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
@@ -172,7 +172,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             with check_mongo_calls(2) and self.assertNumQueries(0):
                 self._apply_recalculate_subsection_grade()
 
-    #@skip("Pending completion of TNL-5089")
+    @skip("Pending completion of TNL-5089")
     @ddt.data(
         (ModuleStoreEnum.Type.mongo, True),
         (ModuleStoreEnum.Type.split, True),
