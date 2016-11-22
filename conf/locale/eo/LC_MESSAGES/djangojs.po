@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-09 22:13+0000\n"
-"PO-Revision-Date: 2016-11-09 22:14:56.807821\n"
+"POT-Creation-Date: 2016-11-22 15:42+0000\n"
+"PO-Revision-Date: 2016-11-22 15:44:57.516074\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -162,6 +162,7 @@ msgid "Unknown"
 msgstr "Ûnknöwn Ⱡ'σяєм ιρѕυм #"
 
 #: cms/static/js/views/metadata.js
+#: cms/static/js/views/previous_video_upload.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -214,6 +215,11 @@ msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
 msgid "Close"
 msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
+#: cms/static/js/views/previous_video_upload.js
+#: lms/static/js/views/image_field.js
+msgid "Removing"
+msgstr "Rémövïng Ⱡ'σяєм ιρѕυм ∂#"
+
 #: cms/static/js/views/validation.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
@@ -243,6 +249,26 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
 msgid "Creating missing groups"
 msgstr "Çréätïng mïssïng gröüps Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr ""
+"{start_strong}{total}{end_strong} wörds süßmïttéd ïn tötäl. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr ""
+"téxt_wörd_{uniqueId} tïtlé_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢#"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr "tïtlé_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr "téxt_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -1947,26 +1973,6 @@ msgstr "Türn ön tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "Türn öff tränsçrïpts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr ""
-"{start_strong}{total}{end_strong} wörds süßmïttéd ïn tötäl. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr ""
-"téxt_wörd_{uniqueId} tïtlé_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢#"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "title_word_{uniqueId}"
-msgstr "tïtlé_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId}"
-msgstr "téxt_wörd_{uniqueId} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -4920,18 +4926,19 @@ msgstr "Löädïng ýöür çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
-"address is associated with an edX account, we will send a message with "
-"password reset instructions to this email address.{paragraphEnd}"
+"address is associated with your {platform_name} account, we will send a "
+"message with password reset instructions to this email "
+"address.{paragraphEnd}"
 msgstr ""
 "{paragraphStart}Ýöü éntéréd {boldStart}{email}{boldEnd}. Ìf thïs émäïl "
-"äddréss ïs ässöçïätéd wïth än édX äççöünt, wé wïll sénd ä méssägé wïth "
-"pässwörd rését ïnstrüçtïöns tö thïs émäïl äddréss.{paragraphEnd} Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
-"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
-"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
-"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
-"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂#"
+"äddréss ïs ässöçïätéd wïth ýöür {platform_name} äççöünt, wé wïll sénd ä "
+"méssägé wïth pässwörd rését ïnstrüçtïöns tö thïs émäïl "
+"äddréss.{paragraphEnd} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg "
+"єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт "
+"єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт "
+"αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη "
+"νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт "
+"σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ι#"
 
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
@@ -5041,10 +5048,19 @@ msgid "Time Zone"
 msgstr "Tïmé Zöné Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
-msgid "Select the time zone for displaying course dates. "
+msgid ""
+"Select the time zone for displaying course dates. If you do not specify a "
+"time zone, course dates, including assignment deadlines, will be displayed "
+"in your browser's local time zone."
 msgstr ""
-"Séléçt thé tïmé zöné för dïspläýïng çöürsé dätés.  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α#"
+"Séléçt thé tïmé zöné för dïspläýïng çöürsé dätés. Ìf ýöü dö nöt spéçïfý ä "
+"tïmé zöné, çöürsé dätés, ïnçlüdïng ässïgnmént déädlïnés, wïll ßé dïspläýéd "
+"ïn ýöür ßröwsér's löçäl tïmé zöné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα"
+" αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ "
+"ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη "
+"яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα "
+"ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт, ѕ#"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
@@ -5439,10 +5455,6 @@ msgstr "Ûplöäd än ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: lms/static/js/views/image_field.js
 msgid "Change image"
 msgstr "Çhängé ïmägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/static/js/views/image_field.js
-msgid "Removing"
-msgstr "Rémövïng Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
@@ -6557,10 +6569,6 @@ msgstr "Däté äddéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Editing visibility for: %(title)s"
 msgstr "Édïtïng vïsïßïlïtý för: %(title)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
-#: cms/static/js/views/pages/container.js
-msgid "Duplicating"
-msgstr "Düplïçätïng Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
 msgstr "Püßlïshïng Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -6692,6 +6700,26 @@ msgstr "{totalItems} tötäl Ⱡ'σяєм ιρѕυм ∂σł#"
 msgid "Pending"
 msgstr "Péndïng Ⱡ'σяєм ιρѕυм #"
 
+#: cms/static/js/views/previous_video_upload.js
+msgid "Are you sure you want to remove this video from the list?"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö rémövé thïs vïdéö fröm thé lïst? Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: cms/static/js/views/previous_video_upload.js
+msgid ""
+"Removing a video from this list does not affect course content. Any content "
+"that uses a previously uploaded video ID continues to display in the course."
+msgstr ""
+"Rémövïng ä vïdéö fröm thïs lïst döés nöt äfféçt çöürsé çöntént. Àný çöntént "
+"thät üsés ä prévïöüslý üplöädéd vïdéö ÌD çöntïnüés tö dïspläý ïn thé çöürsé."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт#"
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -6811,10 +6839,14 @@ msgstr ""
 "möré thän <%=limit%> çhäräçtérs. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
+msgid "Duplicating"
+msgstr "Düplïçätïng Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Deleting this {xblock_type} is permanent and cannot be undone."
 msgstr ""
-"Délétïng thïs %(xblock_type)s ïs pérmänént änd çännöt ßé ündöné. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+"Délétïng thïs {xblock_type} ïs pérmänént änd çännöt ßé ündöné. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid ""
@@ -6825,18 +6857,18 @@ msgstr ""
 "äççéss lïmïtätïöns rémövéd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s (and prerequisite)?"
+msgid "Delete this {xblock_type} (and prerequisite)?"
 msgstr ""
-"Délété thïs %(xblock_type)s (änd préréqüïsïté)? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
-" ¢σηѕє¢тєт#"
+"Délété thïs {xblock_type} (änd préréqüïsïté)? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєт#"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Yes, delete this %(xblock_type)s"
-msgstr "Ýés, délété thïs %(xblock_type)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+msgid "Yes, delete this {xblock_type}"
+msgstr "Ýés, délété thïs {xblock_type} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "Délété thïs %(xblock_type)s? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+msgid "Delete this {xblock_type}?"
+msgstr "Délété thïs {xblock_type}? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -6943,8 +6975,8 @@ msgid "Settings"
 msgstr "Séttïngs Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/static/js/views/xblock_outline.js
-msgid "New %(component_type)s"
-msgstr "Néw %(component_type)s Ⱡ'σяєм ιρѕυм #"
+msgid "New {component_type}"
+msgstr "Néw {component_type} Ⱡ'σяєм ιρѕυм #"
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
@@ -6987,6 +7019,12 @@ msgstr "Prévïöüs Ⱡ'σяєм ιρѕυм ∂#"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "Stätüs Ⱡ'σяєм ιρѕυ#"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "Àçtïön Ⱡ'σяєм ιρѕυ#"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
@@ -8027,11 +8065,6 @@ msgstr "Ìnvälïdätéd Ⱡ'σяєм ιρѕυм ∂σłσя #"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
 msgstr "Nötés Ⱡ'σяєм ιρѕ#"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Action"
-msgstr "Àçtïön Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
@@ -9973,6 +10006,10 @@ msgid "Configure"
 msgstr "Çönfïgüré Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Duplicate"
+msgstr "Düplïçäté Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
 msgstr "Dräg tö réördér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
@@ -10400,6 +10437,14 @@ msgstr "Dürätïön Ⱡ'σяєм ιρѕυм ∂#"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
 msgstr "Vïdéö ÌD Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove this video"
+msgstr "Rémövé thïs vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove {video_name} video"
+msgstr "Rémövé {video_name} vïdéö Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"
