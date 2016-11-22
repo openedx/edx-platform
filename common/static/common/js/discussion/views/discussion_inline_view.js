@@ -155,6 +155,9 @@
 
             // Show the thread list view
             this.threadListView.$el.removeClass('is-hidden');
+
+            // Set focus to thread list item that was saved as active
+            this.threadListView.$('.is-active').focus();
         },
 
         toggleDiscussion: function() {
