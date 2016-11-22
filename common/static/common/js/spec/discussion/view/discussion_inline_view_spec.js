@@ -1,6 +1,6 @@
 /* globals
  _, Discussion, DiscussionCourseSettings, DiscussionViewSpecHelper, DiscussionSpecHelper,
- DiscussionInlineView, DiscussionUtil, Thread
+ DiscussionInlineView, DiscussionUtil, DiscussionThreadShowView, Thread
  */
 (function() {
     'use strict';
@@ -28,7 +28,10 @@
             );
             DiscussionSpecHelper.setUnderscoreFixtures();
             this.ajaxSpy = spyOn($, 'ajax');
-            spyOn(DiscussionUtil, 'makeWmdEditor');  // Don't attempt to render the markdown editor
+
+            // Don't attempt to render markdown
+            spyOn(DiscussionUtil, 'makeWmdEditor');
+            spyOn(DiscussionThreadShowView.prototype, 'convertMath');
         });
 
         createTestView = function() {
@@ -125,13 +128,26 @@
             it('can drill down to a thread', function() {
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
-                expect(testView.$('.forum-nav-thread-title').text()).toBe(TEST_THREAD_TITLE);
+                testView.$('.forum-nav-thread-link').click();
+
+                // Verify that the list of threads is hidden
+                expect(testView.$('.inline-threads')).toHaveClass('is-hidden');
+
+                // Verify that the individual thread is shown
+                expect(testView.$('.group-visibility-label').text().trim()).toBe('This post is visible to everyone.');
             });
 
             it('can go back to the list of threads', function() {
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
-                expect(testView).toBeTruthy();
+                testView.$('.forum-nav-thread-link').click();
+                testView.$('.all-posts-btn').click();
+
+                // Verify that the list of threads is shown
+                expect(testView.$('.inline-threads')).not.toHaveClass('is-hidden');
+
+                // Verify that the individual thread is no longer shown
+                expect(testView.$('.group-visibility-label').length).toBe(0);
             });
         });
     });
