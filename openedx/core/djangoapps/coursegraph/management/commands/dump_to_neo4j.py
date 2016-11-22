@@ -13,6 +13,7 @@ from py2neo import Graph, Node, Relationship, authenticate, NodeSelector
 from py2neo.compat import integer, string, unicode as neo4j_unicode
 from request_cache.middleware import RequestCache
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 
@@ -73,6 +74,7 @@ class ModuleStoreSerializer(object):
         )
 
         course_key = item.scope_ids.usage_id.course_key
+        block_type = item.scope_ids.block_type
 
         # set or reset some defaults
         fields['edited_on'] = six.text_type(getattr(item, 'edited_on', ''))
@@ -82,8 +84,8 @@ class ModuleStoreSerializer(object):
         fields['run'] = course_key.run
         fields['course_key'] = six.text_type(course_key)
         fields['location'] = six.text_type(item.location)
-
-        block_type = item.scope_ids.block_type
+        fields['block_type'] = block_type
+        fields['detached'] = block_type in DETACHED_XBLOCK_TYPES
 
         if block_type == 'course':
             # prune the checklists field
