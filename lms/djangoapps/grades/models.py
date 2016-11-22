@@ -15,6 +15,7 @@ import json
 from lazy import lazy
 import logging
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.timezone import now
 from model_utils.models import TimeStampedModel
@@ -251,27 +252,13 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         return self.first_attempted is None and any(field != 0.0 for field in (self.earned_all, self.earned_graded))
 
-    def enforce_unattempted(self, save=True):
+    def clean(self):
         """
         If an grade has not been attempted, but was given a non-zero score,
-        reset the score to 0.0.
-
-        Params:
-
-        save (bool, default: True):
-            By default, this method saves the model if and only if there was an
-            inconsistency.  If the caller needs to save the model regardless of
-            the result, or will be saving the model later after making other
-            changes, this may be an unwanted database request.  It can be
-            disabled by passing ``save=False``.
-
-        Return value: None
+        raise a ValidationError.
         """
         if self._is_unattempted_with_score():
-            self.earned_all = 0.0
-            self.earned_graded = 0.0
-            if save:
-                self.save()
+            raise ValidationError("Unattempted problems cannot have a non-zero score.")
 
     @property
     def full_usage_key(self):
@@ -343,7 +330,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
         user_id = kwargs.pop('user_id')
         usage_key = kwargs.pop('usage_key')
         attempted = kwargs.pop('attempted')
-
         grade, _ = cls.objects.update_or_create(
             user_id=user_id,
             course_id=usage_key.course_key,
@@ -352,9 +338,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
         )
         if attempted and not grade.first_attempted:
             grade.first_attempted = now()
-            grade.save()
-        else:
-            grade.enforce_unattempted()
+        grade.full_clean()
+        grade.save()
         return grade
 
     @classmethod
@@ -369,7 +354,7 @@ class PersistentSubsectionGrade(TimeStampedModel):
         grade = cls(**kwargs)
         if attempted:
             grade.first_attempted = now()
-        grade.enforce_unattempted(save=False)
+        grade.full_clean()
         grade.save()
         return grade
 
@@ -389,6 +374,8 @@ class PersistentSubsectionGrade(TimeStampedModel):
         for params in grade_params_iter:
             if params.pop('attempted'):
                 params['first_attempted'] = first_attempt_timestamp
+            elif params['earned_all'] != 0.0 or params['earned_graded'] != 0.0:
+                raise ValidationError("Unattempted problems cannot have a non-zero score.")
         return cls.objects.bulk_create([PersistentSubsectionGrade(**params) for params in grade_params_iter])
 
     @classmethod
@@ -422,14 +409,6 @@ class PersistentSubsectionGrade(TimeStampedModel):
         """
         params['visible_blocks_id'] = params['visible_blocks'].hash_value
         del params['visible_blocks']
-
-    def remove_attempts(self):
-        """
-        Explicitly mark a subsection as unattempted
-        """
-        self.first_attempted = None
-        self.enforce_unattempted(save=False)
-        self.save()
 
 
 class PersistentCourseGrade(TimeStampedModel):

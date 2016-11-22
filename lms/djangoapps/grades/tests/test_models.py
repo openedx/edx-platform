@@ -8,6 +8,7 @@ import ddt
 from hashlib import sha1
 import json
 
+from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
@@ -225,7 +226,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             )
             self.assertEqual(created_grade, read_grade)
             self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValidationError):
             PersistentSubsectionGrade.create_grade(**self.params)
 
     def test_optional_fields(self):
@@ -233,13 +234,13 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         PersistentSubsectionGrade.create_grade(**self.params)
 
     @ddt.data(
-        ("user_id", IntegrityError),
+        ("user_id", ValidationError),
         ("usage_key", KeyError),
-        ("subtree_edited_timestamp", IntegrityError),
-        ("earned_all", IntegrityError),
-        ("possible_all", IntegrityError),
-        ("earned_graded", IntegrityError),
-        ("possible_graded", IntegrityError),
+        ("subtree_edited_timestamp", ValidationError),
+        ("earned_all", ValidationError),
+        ("possible_all", ValidationError),
+        ("earned_graded", ValidationError),
+        ("possible_graded", ValidationError),
         ("visible_blocks", KeyError),
         ("attempted", KeyError),
     )
@@ -260,20 +261,30 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             self.assertEqual(created_grade.id, updated_grade.id)
             self.assertEqual(created_grade.earned_all, 6)
 
-    def test_update_or_create_with_implicit_attempted(self):
+    def test_update_or_create_attempted(self):
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertIsInstance(grade.first_attempted, datetime)
 
+    def test_unattempted(self):
+        self.params['attempted'] = False
+        self.params['earned_all'] = 0.0
+        self.params['earned_graded'] = 0.0
+        grade = PersistentSubsectionGrade.create_grade(**self.params)
+        self.assertIsNone(grade.first_attempted)
+        self.assertEqual(grade.earned_all, 0.0)
+        self.assertEqual(grade.earned_graded, 0.0)
+
     def test_create_inconsistent_unattempted(self):
         self.params['attempted'] = False
-        grade = PersistentSubsectionGrade.create_grade(**self.params)
-        self.assertEqual(grade.earned_all, 0.0)
+        with self.assertRaises(ValidationError):
+            PersistentSubsectionGrade.create_grade(**self.params)
 
-    def test_update_inconsistent_unattempted(self):
+    def test_update_or_create_inconsistent_unattempted(self):
         self.params['attempted'] = False
-        PersistentSubsectionGrade.create_grade(**self.params)
-        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
-        self.assertEqual(grade.earned_all, 0.0)
+        self.params['earned_all'] = 1.0
+        self.params['earned_graded'] = 1.0
+        with self.assertRaises(ValidationError):
+            PersistentSubsectionGrade.update_or_create_grade(**self.params)
 
     def test_first_attempted_not_changed_on_update(self):
         PersistentSubsectionGrade.create_grade(**self.params)
@@ -283,18 +294,10 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
 
     def test_unattempted_save_does_not_remove_attempt(self):
         PersistentSubsectionGrade.create_grade(**self.params)
-        self.params['unattempted'] = False
+        self.params['attempted'] = False
         grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
         self.assertIsInstance(grade.first_attempted, datetime)
         self.assertEqual(grade.earned_all, 6.0)
-
-    def test_explicitly_remove_attempts(self):
-        grade = PersistentSubsectionGrade.create_grade(**self.params)
-        self.assertIsInstance(grade.first_attempted, datetime)
-        self.assertEqual(grade.earned_all, 6.0)
-        grade.remove_attempts()
-        self.assertIsNone(grade.first_attempted)
-        self.assertEqual(grade.earned_all, 0.0)
 
 
 @ddt.ddt
