@@ -26,7 +26,6 @@ __test__ = False  # do not collect
 @cmdopts([
     ("system=", "s", "System to act on"),
     ("test-id=", "t", "Test id"),
-    ("failed", "f", "Run only failed tests"),
     ("fail-fast", "x", "Fail suite on first failed test"),
     ("fasttest", "a", "Run without collectstatic"),
     make_option(
