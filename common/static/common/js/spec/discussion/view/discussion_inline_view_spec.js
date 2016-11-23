@@ -1,10 +1,6 @@
 /* globals
  _, Discussion, DiscussionCourseSettings, DiscussionViewSpecHelper, DiscussionSpecHelper,
-<<<<<<< 74c488a710816e519255f2114f5094a8d3466831
  DiscussionInlineView, DiscussionUtil, DiscussionThreadShowView, Thread
-=======
- DiscussionInlineView, DiscussionUtil, Thread, NewPostView
->>>>>>> make new post view overlay-ish
  */
 (function() {
     'use strict';
