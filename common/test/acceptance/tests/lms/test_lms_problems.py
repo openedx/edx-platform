@@ -154,8 +154,8 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         self.assertEqual(['true', 'true'], problem_page.get_hint_button_disabled_attr())
 
         # Now click on "Review" and make sure the focus goes to the correct place.
-        problem_page.click_review_in_notification()
-        self.assertTrue(problem_page.is_focus_on_problem_meta())
+        problem_page.click_review_in_notification(notification_type='hint')
+        problem_page.wait_for_focus_on_problem_meta()
 
         # Check corresponding tracking events
         actual_events = self.wait_for_events(
