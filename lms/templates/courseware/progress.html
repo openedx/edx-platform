@@ -171,11 +171,14 @@ from django.utils.http import urlquote_plus
                                             <span> ${"({0:.3n}/{1:.3n}) {2}".format( float(earned), float(total), percentageString )}</span>
                                             %endif
                                         </h5>
-                                        %if section.due is not None:
                                         <p>
-                                            <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
+                                            %if section.format is not None:
+                                                ${section.format}
+                                            %endif
+                                            %if section.due is not None:
+                                                <em class="localized-datetime" data-datetime="${section.due}" data-string="${_('due {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></em>
+                                            %endif
                                         </p>
-                                        %endif
                                         %if len(section.scores) > 0:
                                         <dl class="scores">
                                             <dt class="hd hd-6">${ _("Problem Scores: ") if section.graded else _("Practice Scores: ")}</dt>
