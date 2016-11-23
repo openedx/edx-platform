@@ -1,5 +1,10 @@
+/* globals requirejs, requireSerial, MathJax */
+/* eslint-disable quote-props */
+
 (function(requirejs) {
     'use strict';
+
+    var i, specHelpers, testFiles;
 
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
@@ -24,7 +29,7 @@
             'jquery.cookie': 'xmodule_js/common_static/js/vendor/jquery.cookie',
             'jquery.qtip': 'xmodule_js/common_static/js/vendor/jquery.qtip.min',
             'jquery.fileupload': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload',
-            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',
+            'jquery.iframe-transport': 'xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport',  // eslint-disable-line max-len
             'jquery.inputnumber': 'xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill',
             'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
@@ -47,8 +52,8 @@
             'xmodule': 'xmodule_js/src/xmodule',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
-            'squire': 'xmodule_js/common_static/js/vendor/Squire',
+            'sinon': 'common/js/vendor/sinon',
+            'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
             mathjax: '//cdn.mathjax.org/mathjax/2.7-latest/MathJax.js?config=TeX-MML-AM_SVG&delayStartupUntil=configured',  // eslint-disable-line max-len
@@ -672,7 +677,7 @@
         }
     });
 
-    var testFiles = [
+    testFiles = [
         'discussion/js/spec/discussion_board_factory_spec.js',
         'discussion/js/spec/discussion_profile_page_factory_spec.js',
         'discussion/js/spec/discussion_board_view_spec.js',
@@ -804,11 +809,11 @@
         'teams/js/spec/views/topics_spec.js'
     ];
 
-    for (var i = 0; i < testFiles.length; i++) {
+    for (i = 0; i < testFiles.length; i++) {
         testFiles[i] = '/base/' + testFiles[i];
     }
 
-    var specHelpers = [
+    specHelpers = [
         'common/js/spec_helpers/jasmine-extensions',
         'common/js/spec_helpers/jasmine-stealth',
         'common/js/spec_helpers/jasmine-waituntil'
@@ -818,6 +823,6 @@
     // spec files one by one, otherwise some end up getting nested under others.
     window.requireSerial(specHelpers.concat(testFiles), function() {
         // start test run, once Require.js is done
-        window.__karma__.start();
+        window.__karma__.start();  // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs);
