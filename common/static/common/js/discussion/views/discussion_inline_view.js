@@ -88,7 +88,7 @@
             });
 
             if (this.$('section.discussion').length) {
-                this.$('section.discussion').replaceWith(discussionHtml.toString());
+                edx.HtmlUtils.setHtml(this.$el, discussionHtml);
             } else {
                 edx.HtmlUtils.append(this.$el, discussionHtml);
             }
@@ -167,7 +167,7 @@
                 this.hideDiscussion();
             } else {
                 this.toggleDiscussionBtn.addClass('shown');
-                this.toggleDiscussionBtn.find('.button-text').html(gettext('Hide Discussion'));
+                this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
                 if (this.retrieved) {
                     this.$('section.discussion').slideDown();
                     this.$('section.discussion').removeClass('is-hidden');
@@ -188,7 +188,7 @@
             this.$('section.discussion').slideUp();
             this.$('section.discussion').addClass('is-hidden');
             this.toggleDiscussionBtn.removeClass('shown');
-            this.toggleDiscussionBtn.find('.button-text').html(gettext('Show Discussion'));
+            this.toggleDiscussionBtn.find('.button-text').text(gettext('Show Discussion'));
             this.showed = false;
         },
 
@@ -206,7 +206,7 @@
             }
             this.newPostView.$el.removeClass('is-hidden');
             this.toggleDiscussionBtn.addClass('shown');
-            this.toggleDiscussionBtn.find('.button-text').html(gettext('Hide Discussion'));
+            this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
             this.$('section.discussion').slideDown();
             this.showed = true;
         },
