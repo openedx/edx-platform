@@ -436,6 +436,22 @@ class ModuleStoreTestCase(ModuleStoreIsolationMixin, TestCase):
         nonstaff_user.save()
         return nonstaff_user, password
 
+    def create_staff_user(self):
+        """
+        Creates a staff test user.
+        Returns the staff test user and its password.
+        """
+        uname = 'teststaff'
+        password = 'bar'
+        staff_user = User.objects.create_user(uname, 'test+staff@edx.org', password)
+
+        # Note that we do not actually need to do anything
+        # for registration if we directly mark them active.
+        staff_user.is_active = True
+        staff_user.is_staff = True
+        staff_user.save()
+        return staff_user, password
+
     def update_course(self, course, user_id):
         """
         Updates the version of course in the modulestore

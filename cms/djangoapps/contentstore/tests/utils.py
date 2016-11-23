@@ -100,6 +100,18 @@ class CourseTestCase(ProceduralCourseTestMixin, ModuleStoreTestCase):
         nonstaff.is_authenticated = lambda: authenticate
         return client, nonstaff
 
+    def create_staff_authed_user_client(self, authenticate=True):
+        """
+        Create a staff user, log them in (if authenticate=True), and return the client, user to use for testing.
+        """
+        staff, password = self.create_staff_user()
+
+        client = AjaxEnabledTestClient()
+        if authenticate:
+            client.login(username=staff.username, password=password)
+        staff.is_authenticated = lambda: authenticate
+        return client, staff
+
     def reload_course(self):
         """
         Reloads the course object from the database
