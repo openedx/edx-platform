@@ -1689,7 +1689,8 @@ class TeamPageTest(TeamsTabBase):
         thread = Thread(
             id="test_thread_{}".format(uuid4().hex),
             commentable_id=self.teams[0]['discussion_topic_id'],
-            body="Dummy text body."
+            body="Dummy text body.",
+            context="standalone",
         )
         thread_fixture = MultipleThreadFixture([thread])
         thread_fixture.push()
@@ -1718,14 +1719,15 @@ class TeamPageTest(TeamsTabBase):
         thread = self.setup_thread()
         self.team_page.visit()
         self.assertEqual(self.team_page.discussion_id, self.teams[0]['discussion_topic_id'])
-        discussion = self.team_page.discussion_page
-        discussion.wait_for_page()
-        self.assertTrue(discussion.is_discussion_expanded())
-        self.assertEqual(discussion.get_num_displayed_threads(), 1)
-        self.assertTrue(discussion.has_thread(thread['id']))
+        discussion_page = self.team_page.discussion_page
+        discussion_page.wait_for_page()
+        self.assertTrue(discussion_page.is_discussion_expanded())
+        self.assertEqual(discussion_page.get_num_displayed_threads(), 1)
+        discussion_page.show_thread(thread['id'])
+        thread_page = discussion_page.thread_page
         assertion = self.assertTrue if should_have_permission else self.assertFalse
-        assertion(discussion.q(css='.post-header-actions').present)
-        assertion(discussion.q(css='.add-response').present)
+        assertion(thread_page.q(css='.post-header-actions').present)
+        assertion(thread_page.q(css='.add-response').present)
 
     def test_discussion_on_my_team_page(self):
         """

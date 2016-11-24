@@ -14,6 +14,54 @@ class DiscussionPageMixin(object):
     def is_ajax_finished(self):
         return self.browser.execute_script("return jQuery.active") == 0
 
+    def find_visible_element(self, selector):
+        """
+        Finds a single visible element with the specified selector.
+        """
+        full_selector = selector
+        if self.root_selector:
+            full_selector = self.root_selector + " " + full_selector
+        elements = self.q(css=full_selector)
+        return next((element for element in elements if element.is_displayed()), None)
+
+    @property
+    def new_post_button(self):
+        """
+        Returns the new post button if visible, else it returns None.
+        """
+        return self.find_visible_element(".new-post-btn")
+
+    @property
+    def new_post_form(self):
+        """
+        Returns the new post form if visible, else it returns None.
+        """
+        return self.find_visible_element(".forum-new-post-form")
+
+    def click_new_post_button(self):
+        """
+        Clicks the 'New Post' button.
+        """
+        self.wait_for(
+            lambda: self.new_post_button,
+            description="Waiting for new post button"
+        )
+        self.new_post_button.click()
+        self.wait_for(
+            lambda: self.new_post_form,
+            description="Waiting for new post form"
+        )
+
+    def click_cancel_new_post(self):
+        """
+        Clicks the 'Cancel' button from the new post form.
+        """
+        self.click_element(".cancel")
+        self.wait_for(
+            lambda: not self.new_post_form,
+            "Waiting for new post form to close"
+        )
+
 
 class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     url = None
@@ -465,12 +513,15 @@ class DiscussionTabSingleThreadPage(CoursePage):
         return len(self.q(css=".forum-nav-thread").results) == thread_count
 
 
-class InlineDiscussionPage(PageObject):
+class InlineDiscussionPage(PageObject, DiscussionPageMixin):
+    """
+    Acceptance tests for inline discussions.
+    """
     url = None
 
     def __init__(self, browser, discussion_id):
         super(InlineDiscussionPage, self).__init__(browser)
-        self._discussion_selector = (
+        self.root_selector = (
             ".discussion-module[data-discussion-id='{discussion_id}'] ".format(
                 discussion_id=discussion_id
             )
@@ -481,11 +532,11 @@ class InlineDiscussionPage(PageObject):
         Returns a query corresponding to the given CSS selector within the scope
         of this discussion page
         """
-        return self.q(css=self._discussion_selector + " " + selector)
+        return self.q(css=self.root_selector + " " + selector)
 
     def is_browser_on_page(self):
         self.wait_for_ajax()
-        return self.q(css=self._discussion_selector).present
+        return self.q(css=self.root_selector).present
 
     def is_discussion_expanded(self):
         return self._find_within(".discussion").present
@@ -501,57 +552,40 @@ class InlineDiscussionPage(PageObject):
     def get_num_displayed_threads(self):
         return len(self._find_within(".forum-nav-thread"))
 
-    def has_thread(self, thread_id):
-        """Returns true if this page is showing the thread with the specified id."""
-        return self._find_within('.discussion-thread#thread_{}'.format(thread_id)).present
-
     def element_exists(self, selector):
-        return self.q(css=self._discussion_selector + " " + selector).present
-
-    def is_new_post_opened(self):
-        return self._find_within(".new-post-article").visible
+        return self.q(css=self.root_selector + " " + selector).present
 
     def click_element(self, selector):
         self.wait_for_element_presence(
-            "{discussion} {selector}".format(discussion=self._discussion_selector, selector=selector),
+            "{discussion} {selector}".format(discussion=self.root_selector, selector=selector),
             "{selector} is visible".format(selector=selector)
         )
         self._find_within(selector).click()
-
-    def click_cancel_new_post(self):
-        self.click_element(".cancel")
-        EmptyPromise(
-            lambda: not self.is_new_post_opened(),
-            "New post closed"
-        ).fulfill()
-
-    def click_new_post_button(self):
-        self.click_element(".new-post-btn")
-        EmptyPromise(
-            self.is_new_post_opened,
-            "New post opened"
-        ).fulfill()
 
     @wait_for_js
     def _is_element_visible(self, selector):
         query = self._find_within(selector)
         return query.present and query.visible
 
+    def show_thread(self, thread_id):
+        """
+        Clicks the link for the specified thread to show the detailed view.
+        """
+        thread_selector = ".forum-nav-thread[data-id='{thread_id}'] .forum-nav-thread-link".format(thread_id=thread_id)
+        self._find_within(thread_selector).first.click()
+        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
+        self.thread_page.wait_for_page()
+
 
 class InlineDiscussionThreadPage(DiscussionThreadPage):
+    """
+    Page object to manipulate an individual thread view in an inline discussion.
+    """
     def __init__(self, browser, thread_id):
         super(InlineDiscussionThreadPage, self).__init__(
             browser,
-            "body.courseware .discussion-module #thread_{thread_id}".format(thread_id=thread_id)
+            ".discussion-module .discussion-article[data-id='{thread_id}']".format(thread_id=thread_id)
         )
-
-    def expand(self):
-        """Clicks the link to expand the thread"""
-        self._find_within(".forum-thread-expand").first.click()
-        EmptyPromise(
-            lambda: bool(self.get_response_total_text()),
-            "Thread expanded"
-        ).fulfill()
 
     def is_thread_anonymous(self):
         return not self.q(css=".posted-details > .username").present
@@ -677,6 +711,7 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
     def __init__(self, browser, course_id):
         super(DiscussionTabHomePage, self).__init__(browser, course_id)
         self.url_path = "discussion/forum/"
+        self.root_selector = None
 
     def is_browser_on_page(self):
         return self.q(css=".discussion-body section.home-header").present
@@ -728,40 +763,12 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
             "waiting for dismissed alerts to disappear"
         ).fulfill()
 
-    def click_new_post_button(self):
-        """
-        Clicks the 'New Post' button.
-        """
-        self.new_post_button.click()
-        EmptyPromise(
-            lambda: (
-                self.new_post_form
-            ),
-            "New post action succeeded"
-        ).fulfill()
-
     def click_element(self, selector):
         """
          Clicks the element specified by selector
         """
         element = self.q(css=selector)
         return element.click()
-
-    @property
-    def new_post_button(self):
-        """
-        Returns the new post button.
-        """
-        elements = self.q(css=".new-post-btn")
-        return elements.first if elements.visible and len(elements) == 1 else None
-
-    @property
-    def new_post_form(self):
-        """
-        Returns the new post form.
-        """
-        elements = self.q(css=".forum-new-post-form")
-        return elements[0] if elements.visible and len(elements) == 1 else None
 
     def set_new_post_editor_value(self, new_body):
         """
