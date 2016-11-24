@@ -1031,41 +1031,8 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
-        self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
-        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
-        self.thread_page.expand()
-
-    def setup_multiple_inline_threads(self, thread_count):
-        """
-        Set up multiple treads on the page by passing 'thread_count'
-        """
-        threads = []
-        for i in range(thread_count):
-            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
-            threads.append(
-                Thread(id=thread_id, commentable_id=self.discussion_id),
-            )
-            self.thread_ids.append(thread_id)
-        thread_fixture = MultipleThreadFixture(threads)
-        thread_fixture.add_response(
-            Response(id="response1"),
-            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)],
-            threads[0]
-        )
-        thread_fixture.push()
-
-    def test_page_while_expanding_inline_discussion(self):
-        """
-        Tests for the Inline Discussion page with multiple treads. Page should not focus 'thread-wrapper'
-        after loading responses.
-        """
-        self.setup_multiple_inline_threads(thread_count=3)
-        self.discussion_page.expand_discussion()
-        thread_page = InlineDiscussionThreadPage(self.browser, self.thread_ids[0])
-        thread_page.expand()
-
-        # Check if 'thread-wrapper' is focused after expanding thread
-        self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
+        self.discussion_page.show_thread(thread_id)
+        self.thread_page = self.discussion_page.thread_page  # pylint: disable=attribute-defined-outside-init
 
     @attr('a11y')
     def test_inline_a11y(self):
@@ -1097,7 +1064,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         thread = Thread(id=uuid4().hex, anonymous_to_peers=True, commentable_id=self.discussion_id)
         thread_fixture = SingleThreadViewFixture(thread)
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
         self.assertEqual(self.thread_page.is_thread_anonymous(), not is_staff)
 
     def test_anonymous_to_peers_threads_as_staff(self):
@@ -1130,41 +1097,66 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
             Response(id="response1"),
             [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)])
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
         self.assertFalse(self.thread_page.has_add_response_button())
         self.assertFalse(self.thread_page.is_element_visible("action-more"))
 
     def test_dual_discussion_xblock(self):
         """
         Scenario: Two discussion xblocks in one unit shouldn't override their actions
-        Given that I'm on courseware page where there are two inline discussion
-        When I click on one discussion xblock new post button
-        Then it should add new post form of that xblock in DOM
-        And I should be shown new post form of that xblock
-        And I shouldn't be shown second discussion xblock new post form
-        And I click on second discussion xblock new post button
-        Then it should add new post form of second xblock in DOM
-        And I should be shown second discussion new post form
-        And I shouldn't be shown first discussion xblock new post form
-        And I have two new post form in the DOM
-        When I click back on first xblock new post button
-        And I should be shown new post form of that xblock
-        And I shouldn't be shown second discussion xblock new post form
+        Given that I'm on a courseware page where there are two inline discussion
+        When I click on the first discussion block's new post button
+        Then I should be shown only the new post form for the first block
+        When I click on the second discussion block's new post button
+        Then I should be shown both new post forms
+        When I cancel the first form
+        Then I should be shown only the new post form for the second block
+        When I cancel the second form
+        And I click on the first discussion block's new post button
+        Then I should be shown only the new post form for the first block
+        When I cancel the first form
+        Then I should be shown none of the forms
         """
         self.discussion_page.wait_for_page()
         self.additional_discussion_page.wait_for_page()
+
+        # Expand the first discussion, click to add a post
         self.discussion_page.expand_discussion()
         self.discussion_page.click_new_post_button()
-        with self.discussion_page.handle_alert():
-            self.discussion_page.click_cancel_new_post()
+
+        # Verify that only the first discussion's form is shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+        # Expand the second discussion, click to add a post
         self.additional_discussion_page.expand_discussion()
         self.additional_discussion_page.click_new_post_button()
-        self.assertFalse(self.discussion_page._is_element_visible(".new-post-article"))
-        with self.additional_discussion_page.handle_alert():
-            self.additional_discussion_page.click_cancel_new_post()
-        self.discussion_page.expand_discussion()
+
+        # Verify that both discussion's forms are shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNotNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the first form
+        self.discussion_page.click_cancel_new_post()
+
+        # Verify that only the second discussion's form is shown
+        self.assertIsNone(self.discussion_page.new_post_form)
+        self.assertIsNotNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the second form and click to show the first one
+        self.additional_discussion_page.click_cancel_new_post()
         self.discussion_page.click_new_post_button()
-        self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
+
+        # Verify that only the first discussion's form is shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the first form
+        self.discussion_page.click_cancel_new_post()
+
+        # Verify that neither discussion's forms are shwon
+        self.assertIsNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
 
 
 @attr(shard=2)

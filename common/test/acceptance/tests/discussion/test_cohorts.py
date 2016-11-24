@@ -129,8 +129,8 @@ class InlineDiscussionTest(UniqueCourseTest):
         discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
         discussion_page.expand_discussion()
         self.assertEqual(discussion_page.get_num_displayed_threads(), 1)
-        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
-        self.thread_page.expand()
+        discussion_page.show_thread(thread_id)
+        self.thread_page = discussion_page.thread_page  # pylint: disable=attribute-defined-outside-init
 
     def refresh_thread_page(self, thread_id):
         self.browser.refresh()
