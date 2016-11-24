@@ -459,28 +459,13 @@ def compile_sass(options):
     """
     debug = options.get('debug')
     force = options.get('force')
-    systems = getattr(options, 'system', ALL_SYSTEMS)
-    themes = getattr(options, 'themes', [])
-    theme_dirs = getattr(options, 'theme-dirs', [])
+    systems = get_parsed_option(options, 'system', ALL_SYSTEMS)
+    themes = get_parsed_option(options, 'themes', [])
+    theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
     if not theme_dirs and themes:
         # We can not compile a theme sass without knowing the directory that contains the theme.
         raise ValueError('theme-dirs must be provided for compiling theme sass.')
-
-    if isinstance(systems, basestring):
-        systems = systems.split(',')
-    else:
-        systems = systems if isinstance(systems, list) else [systems]
-
-    if isinstance(themes, basestring):
-        themes = themes.split(',')
-    else:
-        themes = themes if isinstance(themes, list) else [themes]
-
-    if isinstance(theme_dirs, basestring):
-        theme_dirs = theme_dirs.split(',')
-    else:
-        theme_dirs = theme_dirs if isinstance(theme_dirs, list) else [theme_dirs]
 
     if themes and theme_dirs:
         themes = get_theme_paths(themes=themes, theme_dirs=theme_dirs)
@@ -718,6 +703,38 @@ def execute_compile_sass(args):
         )
 
 
+def get_parsed_option(command_opts, opt_key, default=None):
+    """
+    Extract user command option and parse it.
+    Arguments:
+        command_opts: Command line arguments passed via paver command.
+        opt_key: name of option to get and parse
+        default: if `command_opt_value` not in `command_opts`, `command_opt_value` will be set to default.
+    Returns:
+         list or None
+    """
+    command_opt_value = getattr(command_opts, opt_key, default)
+    if command_opt_value:
+        command_opt_value = listfy(command_opt_value)
+
+    return command_opt_value
+
+
+def listfy(data):
+    """
+    Check and convert data to list.
+    Arguments:
+        data: data structure to be converted.
+    """
+
+    if isinstance(data, basestring):
+        data = data.split(',')
+    elif not isinstance(data, list):
+        data = [data]
+
+    return data
+
+
 @task
 @cmdopts([
     ('background', 'b', 'Background mode'),
@@ -733,19 +750,14 @@ def watch_assets(options):
     if tasks.environment.dry_run:
         return
 
-    themes = getattr(options, 'themes', None)
-    theme_dirs = getattr(options, 'theme-dirs', [])
+    themes = get_parsed_option(options, 'themes')
+    theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
     if not theme_dirs and themes:
         # We can not add theme sass watchers without knowing the directory that contains the themes.
         raise ValueError('theme-dirs must be provided for watching theme sass.')
     else:
         theme_dirs = [path(_dir) for _dir in theme_dirs]
-
-    if isinstance(themes, basestring):
-        themes = themes.split(',')
-    else:
-        themes = themes if isinstance(themes, list) else [themes]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
     observer = PollingObserver()
@@ -833,5 +845,5 @@ def update_assets(args):
     if args.watch:
         call_task(
             'pavelib.assets.watch_assets',
-            options={'background': not args.debug, 'theme-dirs': args.theme_dirs, 'themes': args.themes},
+            options={'background': not args.debug, 'theme_dirs': args.theme_dirs, 'themes': args.themes},
         )
