@@ -216,15 +216,15 @@ class CourseInfoTitleTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         )
         self.assertIn(
             expected_title,
-            content('h1.page-title').contents()
+            content('.page-title').contents()[0]
         )
         self.assertIn(
             expected_display_title,
-            display_content('h1.page-title').contents()
+            display_content('.page-title').contents()[0]
         )
         self.assertIn(
             display_course.display_name_with_default,
-            display_content('h2.page-subtitle').contents()
+            display_content('.page-subtitle').contents()
         )
 
 
