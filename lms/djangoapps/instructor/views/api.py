@@ -11,7 +11,6 @@ import logging
 import re
 import time
 from django.conf import settings
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST, require_http_methods
 from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -263,7 +262,6 @@ COUNTRY_INDEX = 3
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def register_and_enroll_students(request, course_id):  # pylint: disable=too-many-statements
@@ -557,7 +555,6 @@ def create_and_enroll_user(email, username, name, country, password, course_id, 
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params(action="enroll or unenroll", identifiers="stringified list of emails and/or usernames")
@@ -722,7 +719,6 @@ def students_update_enrollment(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @common_exceptions_400
@@ -803,7 +799,6 @@ def bulk_beta_modify_access(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @common_exceptions_400
@@ -884,7 +879,6 @@ def modify_access(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_post_params(rolename="'instructor', 'staff', or 'beta'")
@@ -937,7 +931,6 @@ def list_course_role_members(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_problem_responses(request, course_id):
@@ -983,7 +976,6 @@ def get_problem_responses(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_grading_config(request, course_id):
@@ -1003,7 +995,6 @@ def get_grading_config(request, course_id):
     return JsonResponse(response_payload)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
@@ -1034,7 +1025,6 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-a
         return instructor_analytics.csvs.create_csv_response("e-commerce_sale_invoice_records.csv", header, datarows)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument
@@ -1141,7 +1131,6 @@ def re_validate_invoice(obj_invoice):
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_issued_certificates(request, course_id):
@@ -1182,7 +1171,6 @@ def get_issued_certificates(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
@@ -1279,7 +1267,6 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_students_who_may_enroll(request, course_id):
@@ -1311,7 +1298,6 @@ def get_students_who_may_enroll(request, course_id):
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_POST
 @require_level('staff')
@@ -1356,7 +1342,6 @@ def add_users_to_cohorts(request, course_id):
     return JsonResponse()
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
@@ -1387,7 +1372,6 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_finance_admin
@@ -1412,7 +1396,6 @@ def get_enrollment_report(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_finance_admin
@@ -1438,7 +1421,6 @@ def get_exec_summary_report(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_course_survey_results(request, course_id):
@@ -1463,7 +1445,6 @@ def get_course_survey_results(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_proctored_exam_results(request, course_id):
@@ -1570,7 +1551,6 @@ def random_code_generator():
     return generate_random_string(code_length)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
@@ -1593,7 +1573,6 @@ def get_registration_codes(request, course_id):
     return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_sales_admin
 @require_POST
@@ -1776,7 +1755,6 @@ def generate_registration_codes(request, course_id):
     return registration_codes_csv("Registration_Codes.csv", registration_codes)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
@@ -1807,7 +1785,6 @@ def active_registration_codes(request, course_id):
     return registration_codes_csv("Active_Registration_Codes.csv", registration_codes_list)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
@@ -1838,7 +1815,6 @@ def spent_registration_codes(request, course_id):
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
@@ -1873,7 +1849,6 @@ def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @common_exceptions_400
 @require_level('staff')
@@ -1904,7 +1879,6 @@ def get_student_progress_url(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params(
@@ -1993,7 +1967,6 @@ def reset_student_attempts(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @common_exceptions_400
@@ -2068,7 +2041,6 @@ def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: dis
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @require_post_params(problem_to_reset="problem urlname to reset")
@@ -2133,7 +2105,6 @@ def rescore_problem(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('instructor')
 @common_exceptions_400
@@ -2190,7 +2161,6 @@ def rescore_entrance_exam(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def list_background_email_tasks(request, course_id):  # pylint: disable=unused-argument
@@ -2212,7 +2182,6 @@ def list_background_email_tasks(request, course_id):  # pylint: disable=unused-a
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def list_email_content(request, course_id):  # pylint: disable=unused-argument
@@ -2231,7 +2200,6 @@ def list_email_content(request, course_id):  # pylint: disable=unused-argument
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def list_instructor_tasks(request, course_id):
@@ -2277,7 +2245,6 @@ def list_instructor_tasks(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=invalid-name
@@ -2319,7 +2286,6 @@ def list_entrance_exam_instructor_tasks(request, course_id):  # pylint: disable=
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def list_report_downloads(_request, course_id):
@@ -2339,7 +2305,6 @@ def list_report_downloads(_request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_finance_admin
@@ -2361,7 +2326,6 @@ def list_financial_report_downloads(_request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def export_ora2_data(request, course_id):
@@ -2387,7 +2351,6 @@ def export_ora2_data(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def calculate_grades_csv(request, course_id):
@@ -2409,7 +2372,6 @@ def calculate_grades_csv(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def problem_grade_report(request, course_id):
@@ -2436,7 +2398,6 @@ def problem_grade_report(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params('rolename')
@@ -2500,7 +2461,6 @@ def list_forum_members(request, course_id):
 
 @transaction.non_atomic_requests
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params(send_to="sending to whom", subject="subject line", message="message text")
@@ -2557,7 +2517,6 @@ def send_email(request, course_id):
 
 
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params(
@@ -2648,7 +2607,6 @@ def _display_unit(unit):
 
 @handle_dashboard_error
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params('student', 'url', 'due_datetime')
@@ -2670,7 +2628,6 @@ def change_due_date(request, course_id):
 
 @handle_dashboard_error
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params('student', 'url')
@@ -2697,7 +2654,6 @@ def reset_due_date(request, course_id):
 
 @handle_dashboard_error
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params('url')
@@ -2712,7 +2668,6 @@ def show_unit_extensions(request, course_id):
 
 @handle_dashboard_error
 @require_POST
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_post_params('student')
@@ -2799,7 +2754,6 @@ def enable_certificate_generation(request, course_id=None):
     return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
@@ -2824,7 +2778,6 @@ def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_POST
@@ -2844,7 +2797,6 @@ def start_certificate_generation(request, course_id):
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_POST
@@ -2888,7 +2840,6 @@ def start_certificate_regeneration(request, course_id):
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_http_methods(['POST', 'DELETE'])
@@ -3061,7 +3012,6 @@ def get_student(username_or_email, course_key):
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_POST
@@ -3198,7 +3148,6 @@ def generate_bulk_certificate_exceptions(request, course_id):  # pylint: disable
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_global_staff
 @require_http_methods(['POST', 'DELETE'])

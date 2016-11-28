@@ -24,7 +24,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.generic.base import TemplateView
 from django.views.decorators.http import condition
-from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 import mongoengine
 from path import Path as path
@@ -61,7 +60,6 @@ class SysadminDashboardView(TemplateView):
         self.datatable = []
         super(SysadminDashboardView, self).__init__(**kwargs)
 
-    @method_decorator(ensure_csrf_cookie)
     @method_decorator(login_required)
     @method_decorator(cache_control(no_cache=True, no_store=True,
                                     must_revalidate=True))

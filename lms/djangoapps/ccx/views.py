@@ -23,7 +23,6 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.models import User
 
 from courseware.access import has_access
@@ -121,7 +120,6 @@ def coach_dashboard(view):
     return wrapper
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def dashboard(request, course, ccx=None):
@@ -173,7 +171,6 @@ def dashboard(request, course, ccx=None):
     return render_to_response('ccx/coach_dashboard.html', context)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def create_ccx(request, course, ccx=None):
@@ -254,7 +251,6 @@ def create_ccx(request, course, ccx=None):
     return redirect(url)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def save_ccx(request, course, ccx=None):
@@ -358,7 +354,6 @@ def save_ccx(request, course, ccx=None):
     )
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def set_grading_policy(request, course, ccx=None):
@@ -453,7 +448,6 @@ def get_ccx_schedule(course, ccx):
         return tuple(visit(course))
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
@@ -468,7 +462,6 @@ def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
     return HttpResponse(json_schedule, content_type='application/json')
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_invite(request, course, ccx=None):
@@ -491,7 +484,6 @@ def ccx_invite(request, course, ccx=None):
     return redirect(url)
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_student_management(request, course, ccx=None):

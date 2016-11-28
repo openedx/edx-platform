@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from opaque_keys.edx import locator
 from rest_framework import authentication
 from rest_framework import filters
@@ -49,7 +49,6 @@ class LoginSessionView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
-    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         """Return a description of the login form.
 
@@ -210,7 +209,6 @@ class RegistrationView(APIView):
             handler = getattr(self, "_add_{field_name}_field".format(field_name=field_name))
             self.field_handlers[field_name] = handler
 
-    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         """Return a description of the registration form.
 
@@ -893,7 +891,6 @@ class PasswordResetView(APIView):
     # so do not require authentication.
     authentication_classes = []
 
-    @method_decorator(ensure_csrf_cookie)
     def get(self, request):
         """Return a description of the password reset form.
 
@@ -1008,7 +1005,6 @@ class UpdateEmailOptInPreference(APIView):
     authentication_classes = (SessionAuthenticationAllowInactiveUser,)
 
     @method_decorator(require_post_params(["course_id", "email_opt_in"]))
-    @method_decorator(ensure_csrf_cookie)
     def post(self, request):
         """ Post function for updating the email opt in preference.
 

@@ -7,8 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
-from django.views.decorators.csrf import ensure_csrf_cookie
-
 from edxmako.shortcuts import render_to_response
 from ipware.ip import get_ip
 
@@ -164,7 +162,6 @@ def task_track(request_info, task_info, event_type, event, page=None):
 
 
 @login_required
-@ensure_csrf_cookie
 def view_tracking_log(request, args=''):
     """View to output contents of TrackingLog model.  For staff use only."""
     if not request.user.is_staff:

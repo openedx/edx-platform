@@ -12,7 +12,6 @@ from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import View
 from django.shortcuts import redirect
 
@@ -62,7 +61,6 @@ class CoursewareIndex(View):
     View class for the Courseware page.
     """
     @method_decorator(login_required)
-    @method_decorator(ensure_csrf_cookie)
     @method_decorator(cache_control(no_cache=True, no_store=True, must_revalidate=True))
     @method_decorator(ensure_valid_course_key)
     def get(self, request, course_id, chapter=None, section=None, position=None):

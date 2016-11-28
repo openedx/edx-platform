@@ -7,7 +7,6 @@ from util.json_request import expect_json, JsonResponse
 from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
 from edxmako.shortcuts import render_to_response
@@ -23,7 +22,6 @@ __all__ = ['tabs_handler']
 
 @expect_json
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
 def tabs_handler(request, course_key_string):
     """

@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
@@ -35,7 +34,6 @@ def request_course_creator(request):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 def course_team_handler(request, course_key_string=None, email=None):
     """

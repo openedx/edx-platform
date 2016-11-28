@@ -15,7 +15,6 @@ from django.core.exceptions import PermissionDenied
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -40,7 +39,6 @@ LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(('GET', 'POST'))
 def library_handler(request, library_key_string=None):
     """
