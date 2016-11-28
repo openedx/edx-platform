@@ -725,7 +725,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # Expect that the expiration date is set
         response = self._get_page(payment_flow, course.id)
         data = self._get_page_data(response)
-        self.assertEqual(data['verification_deadline'], deadline.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertEqual(data['verification_deadline'], unicode(deadline))
 
     def test_course_mode_expired(self):
         deadline = datetime.now(tz=pytz.UTC) + timedelta(days=-360)
@@ -743,7 +743,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # to the student that the deadline has passed
         response = self._get_page("verify_student_verify_now", course.id)
         self.assertContains(response, "verification deadline")
-        self.assertContains(response, deadline.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertContains(response, deadline)
 
     @ddt.data(datetime.now(tz=pytz.UTC) + timedelta(days=360), None)
     def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
@@ -792,7 +792,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         # Check that the verification deadline (rather than the upgrade deadline) is displayed
         if verification_deadline is not None:
-            self.assertEqual(data["verification_deadline"], verification_deadline.strftime("%b %d, %Y at %H:%M UTC"))
+            self.assertEqual(data["verification_deadline"], unicode(verification_deadline))
         else:
             self.assertEqual(data["verification_deadline"], "")
 
@@ -821,7 +821,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # message when we go to verify.
         response = self._get_page("verify_student_verify_now", course.id)
         self.assertContains(response, "verification deadline")
-        self.assertContains(response, verification_deadline_in_past.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertContains(response, verification_deadline_in_past)
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
