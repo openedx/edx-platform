@@ -33,8 +33,7 @@ from openedx.core.djangolib.markup import HTML, Text
           % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
           <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
-
-          % if library_creator_status=='granted':
+          % if show_new_library_button:
             <a href="#" class="button new-button new-library-button"><span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
             ${_("New Library")}</a>
           % endif
@@ -130,7 +129,7 @@ from openedx.core.djangolib.markup import HTML, Text
 
       % endif
 
-      %if libraries_enabled and library_creator_status=='granted':
+      %if libraries_enabled and show_new_library_button:
       <div class="wrapper-create-element wrapper-create-library">
         <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
           <div class="wrap-error">
@@ -497,7 +496,7 @@ from openedx.core.djangolib.markup import HTML, Text
               </div>
           </div>
         </div>
-        % if library_creator_status=='granted':
+        % if show_new_library_button:
         <div class="notice-item has-actions">
           <div class="msg">
               <h3 class="title">${_('Create Your First Library')}</h3>

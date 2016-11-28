@@ -16,7 +16,7 @@ from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexin
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor, reverse_usage_url
 from contentstore.views.course import (
-    course_outline_initial_state, reindex_course_and_check_access, _deprecated_blocks_info, _get_library_creator_status
+    course_outline_initial_state, reindex_course_and_check_access, _deprecated_blocks_info
 )
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.managers import CourseRerunUIStateManager
@@ -30,7 +30,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
-from student import auth
 from student.roles import CourseCreatorRole
 
 
@@ -49,36 +48,6 @@ class TestCourseIndex(CourseTestCase):
             number='test-2.3_course',
             display_name='dotted.course.name-2',
         )
-
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", False)
-    def test_library_creator_status_libraries_not_enabled(self):
-        _, nostaff_user = self.create_non_staff_authed_user_client()
-        self.assertEqual(_get_library_creator_status(nostaff_user), "disallowed_for_this_site")
-            
-
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
-    def test_library_creator_status_with_is_staff_user(self):
-        _, staff_user = self.create_staff_authed_user_client()
-        self.assertEqual(_get_library_creator_status(staff_user), "granted")
-
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
-    def test_library_creator_status_with_disable_library_creation(self):
-        _, nostaff_user = self.create_non_staff_authed_user_client()
-        with mock.patch.dict('django.conf.settings.FEATURES', {"DISABLE_LIBRARY_CREATION": True}):
-            self.assertEqual(_get_library_creator_status(nostaff_user), "disallowed_for_this_site")
-
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
-    def test_library_creator_status_with_course_creator_role(self):
-        _, staff_user = self.create_staff_authed_user_client()
-        _, nostaff_user = self.create_non_staff_authed_user_client()
-        auth.add_users(staff_user, CourseCreatorRole(), nostaff_user)
-        self.assertEqual(_get_library_creator_status(nostaff_user), "granted")
-
-    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
-    def test_library_creator_status_with_no_course_creator_role_no_is_staff_no_disable_library_creation(self):
-        _, nostaff_user = self.create_non_staff_authed_user_client()
-        with mock.patch.dict('django.conf.settings.FEATURES', {"DISABLE_LIBRARY_CREATION": False}):
-            self.assertEqual(_get_library_creator_status(nostaff_user), "disallowed_for_this_site")
 
     def check_index_and_outline(self, authed_client):
         """

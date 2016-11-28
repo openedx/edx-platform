@@ -519,18 +519,18 @@ def course_listing(request):
     return render_to_response('index.html', {
         'courses': courses,
         'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries': [format_library_for_view(lib) for lib in libraries],
+        'show_new_library_button': _get_library_creator_status(user),
         'user': user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(user),
         'rerun_creator_status': GlobalStaff().has_user(user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'libraries_enabled': LIBRARIES_ENABLED,
-        'libraries': [format_library_for_view(lib) for lib in libraries],
-        'library_creator_status': _get_library_creator_status(user),
         'is_programs_enabled': programs_config.is_studio_tab_enabled and user.is_staff,
         'programs': programs,
-        'program_authoring_url': reverse('programs')
+        'program_authoring_url': reverse('programs'),
     })
 
 
@@ -1655,19 +1655,15 @@ def _get_course_creator_status(user):
 def _get_library_creator_status(user):
     """
     Helper method for returning the library creation status for a particular user,
-    taking into account the values of DISABLE_LIBRARY_CREATION and LIBRARIES_ENABLED.
+    taking into account the value LIBRARIES_ENABLED.
 
     """
 
     if not LIBRARIES_ENABLED:
-        library_creator_status = 'disallowed_for_this_site'
+        return False
     elif user.is_staff:
-        library_creator_status = 'granted'
-    elif CourseCreatorRole().has_user(user):
-        library_creator_status = 'granted'
-    elif settings.FEATURES.get('DISABLE_LIBRARY_CREATION', False):
-        library_creator_status = 'disallowed_for_this_site'
+        return True
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return CourseCreatorRole().has_user(user)
     else:
-        library_creator_status = 'disallowed_for_this_site'
-
-    return library_creator_status
+        return False

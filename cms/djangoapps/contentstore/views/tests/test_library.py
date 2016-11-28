@@ -5,13 +5,17 @@ More important high-level tests are in contentstore/tests/test_libraries.py
 """
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
 from contentstore.utils import reverse_course_url, reverse_library_url
+from contentstore.tests.utils import CourseTestCase
 from contentstore.views.component import get_component_templates
+from contentstore.views.course import _get_library_creator_status
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import LibraryFactory
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 import ddt
-from student.roles import LibraryUserRole
+import mock
+from student.auth import add_users
+from student.roles import CourseCreatorRole, LibraryUserRole
 
 LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 
@@ -24,7 +28,7 @@ def make_url_for_lib(key):
 
 
 @ddt.ddt
-class UnitTestLibraries(ModuleStoreTestCase):
+class UnitTestLibraries(CourseTestCase):
     """
     Unit tests for library views
     """
@@ -37,6 +41,28 @@ class UnitTestLibraries(ModuleStoreTestCase):
 
     ######################################################
     # Tests for /library/ - list and create libraries:
+
+    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", False)
+    def test_library_creator_status_libraries_not_enabled(self):
+        _, nostaff_user = self.create_non_staff_authed_user_client()
+        self.assertEqual(_get_library_creator_status(nostaff_user), False)
+            
+
+    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    def test_library_creator_status_with_is_staff_user(self):
+        self.assertEqual(_get_library_creator_status(self.user), True)
+
+    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    def test_library_creator_status_with_course_creator_role(self):
+        _, nostaff_user = self.create_non_staff_authed_user_client()
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+            add_users(self.user, CourseCreatorRole(), nostaff_user)
+            self.assertEqual(_get_library_creator_status(nostaff_user), True)
+
+    @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
+    def test_library_creator_status_with_no_course_creator_role(self):
+        _, nostaff_user = self.create_non_staff_authed_user_client()        
+        self.assertEqual(_get_library_creator_status(nostaff_user), False)
 
     @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):
@@ -93,7 +119,7 @@ class UnitTestLibraries(ModuleStoreTestCase):
         self.client.logout()
         ns_user, password = self.create_non_staff_user()
         self.client.login(username=ns_user.username, password=password)
-
+        add_users(self.user, CourseCreatorRole(), ns_user)
         response = self.client.ajax_post(LIBRARY_REST_URL, {
             'org': 'org', 'library': 'lib', 'display_name': "New Library",
         })
