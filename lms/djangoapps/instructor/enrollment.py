@@ -15,8 +15,7 @@ from django.utils.translation import override as override_language
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
-from lms.djangoapps.grades.scores import weighted_score
-from lms.djangoapps.grades.signals.signals import PROBLEM_SCORE_CHANGED
+from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -290,27 +289,29 @@ def _reset_module_attempts(studentmodule):
 
 def _fire_score_changed_for_block(course_id, student, block, module_state_key):
     """
-    Fires a PROBLEM_SCORE_CHANGED event for the given module. The earned points are
-    always zero. We must retrieve the possible points from the XModule, as
-    noted below.
+    Fires a PROBLEM_WEIGHTED_SCORE_CHANGED event for the given module.
+    The earned points are always zero. We must retrieve the possible points
+    from the XModule, as noted below.
     """
     if block and block.has_score:
         max_score = block.max_score()
         if max_score is None:
             return
         else:
-            points_earned, points_possible = weighted_score(0, max_score, getattr(block, 'weight', None))
+            raw_earned, raw_possible = 0, max_score
     else:
-        points_earned, points_possible = 0, 0
+        raw_earned, raw_possible = 0, 0
 
-    PROBLEM_SCORE_CHANGED.send(
+    PROBLEM_RAW_SCORE_CHANGED.send(
         sender=None,
-        points_possible=points_possible,
-        points_earned=points_earned,
+        raw_possible=raw_possible,
+        raw_earned=raw_earned,
+        weight=getattr(block, 'weight', None),
         user_id=student.id,
         course_id=unicode(course_id),
         usage_id=unicode(module_state_key),
         score_deleted=True,
+        only_if_higher=False,
     )
 
 

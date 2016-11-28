@@ -18,7 +18,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
-from lms.djangoapps.grades.signals.signals import PROBLEM_SCORE_CHANGED
+from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms.djangoapps.grades.tasks import recalculate_subsection_grade
 
 
@@ -50,9 +50,9 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
         self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='Problem')
 
-        self.problem_score_changed_kwargs = OrderedDict([
-            ('points_earned', 1.0),
-            ('points_possible', 2.0),
+        self.problem_weighted_score_changed_kwargs = OrderedDict([
+            ('weighted_earned', 1.0),
+            ('weighted_possible', 2.0),
             ('user_id', self.user.id),
             ('course_id', unicode(self.course.id)),
             ('usage_id', unicode(self.problem.location)),
@@ -64,8 +64,8 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             ('course_id', unicode(self.course.id)),
             ('usage_id', unicode(self.problem.location)),
             ('only_if_higher', None),
-            ('raw_earned', 1.0),
-            ('raw_possible', 2.0),
+            ('weighted_earned', 1.0),
+            ('weighted_possible', 2.0),
             ('score_deleted', False),
         ])
 
@@ -82,17 +82,17 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with patch("lms.djangoapps.grades.tasks.get_score", return_value=score):
             yield
 
-    def test_problem_score_changed_queues_task(self):
+    def test_problem_weighted_score_changed_queues_task(self):
         """
-        Ensures that the PROBLEM_SCORE_CHANGED signal enqueues the correct task.
+        Ensures that the PROBLEM_WEIGHTED_SCORE_CHANGED signal enqueues the correct task.
         """
         self.set_up_course()
-        send_args = self.problem_score_changed_kwargs
+        send_args = self.problem_weighted_score_changed_kwargs
         with self.mock_get_score() and patch(
             'lms.djangoapps.grades.tasks.recalculate_subsection_grade.apply_async',
             return_value=None
         ) as mock_task_apply:
-            PROBLEM_SCORE_CHANGED.send(sender=None, **send_args)
+            PROBLEM_WEIGHTED_SCORE_CHANGED.send(sender=None, **send_args)
             mock_task_apply.assert_called_once_with(kwargs=self.recalculate_subsection_grade_kwargs)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')

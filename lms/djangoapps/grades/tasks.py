@@ -23,7 +23,9 @@ log = getLogger(__name__)
 
 
 @task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
-def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, **kwargs):
+def recalculate_subsection_grade(
+        user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, **kwargs
+):
     """
     Updates a saved subsection grade.
 
@@ -34,9 +36,9 @@ def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, r
         only_if_higher (boolean): indicating whether grades should
             be updated only if the new raw_earned is higher than the
             previous value.
-        raw_earned (float): the raw points the learner earned on the
+        weighted_earned (float): the weighted points the learner earned on the
             problem that triggered the update.
-        raw_possible (float): the max raw points the leaner could have
+        weighted_possible (float): the max weighted points the leaner could have
             earned on the problem.
         score_deleted (boolean): indicating whether the grade change is
             a result of the problem's score being deleted.
@@ -53,10 +55,10 @@ def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, r
     # creator's process hasn't committed before the task initiates in the worker
     # process.
     if not _has_database_updated_with_new_score(
-            user_id, scored_block_usage_key, raw_earned, raw_possible, score_deleted,
+            user_id, scored_block_usage_key, weighted_earned, weighted_possible, score_deleted,
     ):
         raise _retry_recalculate_subsection_grade(
-            user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, score_deleted,
+            user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, score_deleted,
         )
 
     _update_subsection_grades(
@@ -66,8 +68,8 @@ def recalculate_subsection_grade(user_id, course_id, usage_id, only_if_higher, r
         course_id,
         user_id,
         usage_id,
-        raw_earned,
-        raw_possible,
+        weighted_earned,
+        weighted_possible,
         score_deleted,
     )
 
@@ -100,8 +102,8 @@ def _update_subsection_grades(
         course_id,
         user_id,
         usage_id,
-        raw_earned,
-        raw_possible,
+        weighted_earned,
+        weighted_possible,
         score_deleted,
 ):
     """
@@ -138,12 +140,12 @@ def _update_subsection_grades(
 
     except DatabaseError as exc:
         raise _retry_recalculate_subsection_grade(
-            user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, score_deleted, exc,
+            user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, score_deleted, exc,
         )
 
 
 def _retry_recalculate_subsection_grade(
-        user_id, course_id, usage_id, only_if_higher, raw_earned, raw_possible, score_deleted, exc=None,
+        user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, score_deleted, exc=None,
 ):
     """
     Calls retry for the recalculate_subsection_grade task with the
@@ -155,8 +157,8 @@ def _retry_recalculate_subsection_grade(
             course_id=course_id,
             usage_id=usage_id,
             only_if_higher=only_if_higher,
-            raw_earned=raw_earned,
-            raw_possible=raw_possible,
+            weighted_earned=weighted_earned,
+            weighted_possible=weighted_possible,
             score_deleted=score_deleted,
         ),
         exc=exc,
