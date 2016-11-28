@@ -2002,8 +2002,8 @@ class CountryTimeZoneListViewTest(UserApiTestCase):
         self.assertIn(time_zone_name, common_timezones_set)
         self.assertEqual(time_zone_info['description'], get_display_time_zone(time_zone_name))
 
-    @ddt.data((ALL_TIME_ZONES_URI, 432),
-              (COUNTRY_TIME_ZONES_URI, 27))
+    @ddt.data((ALL_TIME_ZONES_URI, 436),
+              (COUNTRY_TIME_ZONES_URI, 28))
     @ddt.unpack
     def test_get_basic(self, country_uri, expected_count):
         """ Verify that correct time zone info is returned """
