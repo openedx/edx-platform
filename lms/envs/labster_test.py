@@ -1,6 +1,17 @@
-from.labster import *  # pylint: disable=wildcard-import, unused-wildcard-import
 from .test import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
+
+LABSTER_FEATURES = {
+    "ENABLE_WIKI": True,
+    "ENABLE_VOUCHERS": True,
+}
+
+INSTALLED_APPS += (
+    'labster_course_license',
+    'labster_vouchers',
+)
+
+FEATURES['SHOW_LABSTER_NOTIFICATION'] = False
 LABSTER_WIKI_LINK = 'https://theory.example.com/'
 LABSTER_API_AUTH_TOKEN = ''
 
@@ -13,3 +24,4 @@ LABSTER_ENDPOINTS = {
 }
 
 DISABLE_PROGRESS_TAB = False
+LABSTER_DEFAULT_LTI_ID = 'MC'
