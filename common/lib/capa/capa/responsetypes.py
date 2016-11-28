@@ -154,7 +154,7 @@ class LoncapaResponse(object):
     # By default, we set this to False, allowing subclasses to override as appropriate.
     multi_device_support = False
 
-    def __init__(self, xml, inputfields, context, system, capa_module):
+    def __init__(self, xml, inputfields, context, system, capa_module, minimal_init):
         """
         Init is passed the following arguments:
 
@@ -213,28 +213,29 @@ class LoncapaResponse(object):
             maxpoints = inputfield.get('points', '1')
             self.maxpoints.update({inputfield.get('id'): int(maxpoints)})
 
-        # dict for default answer map (provided in input elements)
-        self.default_answer_map = {}
-        for entry in self.inputfields:
-            answer = entry.get('correct_answer')
-            if answer:
-                self.default_answer_map[entry.get(
-                    'id')] = contextualize_text(answer, self.context)
+        if not minimal_init:
+            # dict for default answer map (provided in input elements)
+            self.default_answer_map = {}
+            for entry in self.inputfields:
+                answer = entry.get('correct_answer')
+                if answer:
+                    self.default_answer_map[entry.get(
+                        'id')] = contextualize_text(answer, self.context)
 
-        # Does this problem have partial credit?
-        # If so, what kind? Get it as a list of strings.
-        partial_credit = xml.xpath('.')[0].get('partial_credit', default=False)
+            # Does this problem have partial credit?
+            # If so, what kind? Get it as a list of strings.
+            partial_credit = xml.xpath('.')[0].get('partial_credit', default=False)
 
-        if str(partial_credit).lower().strip() == 'false':
-            self.has_partial_credit = False
-            self.credit_type = []
-        else:
-            self.has_partial_credit = True
-            self.credit_type = partial_credit.split(',')
-            self.credit_type = [word.strip().lower() for word in self.credit_type]
+            if str(partial_credit).lower().strip() == 'false':
+                self.has_partial_credit = False
+                self.credit_type = []
+            else:
+                self.has_partial_credit = True
+                self.credit_type = partial_credit.split(',')
+                self.credit_type = [word.strip().lower() for word in self.credit_type]
 
-        if hasattr(self, 'setup_response'):
-            self.setup_response()
+            if hasattr(self, 'setup_response'):
+                self.setup_response()
 
     def get_max_score(self):
         """

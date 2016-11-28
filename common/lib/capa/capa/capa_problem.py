@@ -187,7 +187,7 @@ class LoncapaProblem(object):
 
         # construct script processor context (eg for customresponse problems)
         if minimal_init:
-            self.context = {'script_code': ""}
+            self.context = {}
         else:
             self.context = self._extract_context(self.tree)
 
@@ -195,24 +195,24 @@ class LoncapaProblem(object):
         # transformations.  This also creates the dict (self.responders) of Response
         # instances for each question in the problem. The dict has keys = xml subtree of
         # Response, values = Response instance
-        self.problem_data = self._preprocess_problem(self.tree)
-
-        if not self.student_answers:  # True when student_answers is an empty dict
-            self.set_initial_display()
-
-        # dictionary of InputType objects associated with this problem
-        #   input_id string -> InputType object
-        self.inputs = {}
-
-        # Run response late_transforms last (see MultipleChoiceResponse)
-        # Sort the responses to be in *_1 *_2 ... order.
-        responses = self.responders.values()
-        responses = sorted(responses, key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
-        for response in responses:
-            if hasattr(response, 'late_transforms'):
-                response.late_transforms(self)
+        self.problem_data = self._preprocess_problem(self.tree, minimal_init)
 
         if not minimal_init:
+            if not self.student_answers:  # True when student_answers is an empty dict
+                self.set_initial_display()
+
+            # dictionary of InputType objects associated with this problem
+            #   input_id string -> InputType object
+            self.inputs = {}
+
+            # Run response late_transforms last (see MultipleChoiceResponse)
+            # Sort the responses to be in *_1 *_2 ... order.
+            responses = self.responders.values()
+            responses = sorted(responses, key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
+            for response in responses:
+                if hasattr(response, 'late_transforms'):
+                    response.late_transforms(self)
+
             self.extracted_tree = self._extract_html(self.tree)
 
     def make_xml_compatible(self, tree):
@@ -869,7 +869,7 @@ class LoncapaProblem(object):
 
         return tree
 
-    def _preprocess_problem(self, tree):  # private
+    def _preprocess_problem(self, tree, minimal_init):  # private
         """
         Assign IDs to all the responses
         Assign sub-IDs to all entries (textline, schematic, etc.)
@@ -907,28 +907,31 @@ class LoncapaProblem(object):
 
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
-            responder = responsetype_cls(response, inputfields, self.context, self.capa_system, self.capa_module)
+            responder = responsetype_cls(
+                response, inputfields, self.context, self.capa_system, self.capa_module, minimal_init
+            )
             # save in list in self
             self.responders[response] = responder
 
-        # get responder answers (do this only once, since there may be a performance cost,
-        # eg with externalresponse)
-        self.responder_answers = {}
-        for response in self.responders.keys():
-            try:
-                self.responder_answers[response] = self.responders[response].get_answers()
-            except:
-                log.debug('responder %s failed to properly return get_answers()',
-                          self.responders[response])  # FIXME
-                raise
+        if not minimal_init:
+            # get responder answers (do this only once, since there may be a performance cost,
+            # eg with externalresponse)
+            self.responder_answers = {}
+            for response in self.responders.keys():
+                try:
+                    self.responder_answers[response] = self.responders[response].get_answers()
+                except:
+                    log.debug('responder %s failed to properly return get_answers()',
+                              self.responders[response])  # FIXME
+                    raise
 
-        # <solution>...</solution> may not be associated with any specific response; give
-        # IDs for those separately
-        # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
-        solution_id = 1
-        for solution in tree.findall('.//solution'):
-            solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
-            solution_id += 1
+            # <solution>...</solution> may not be associated with any specific response; give
+            # IDs for those separately
+            # TODO: We should make the namespaces consistent and unique (e.g. %s_problem_%i).
+            solution_id = 1
+            for solution in tree.findall('.//solution'):
+                solution.attrib['id'] = "%s_solution_%i" % (self.problem_id, solution_id)
+                solution_id += 1
 
         return problem_data
 
