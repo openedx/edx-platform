@@ -385,7 +385,9 @@
     &:hover,
     &:focus {
         color: $forum-color-active-text;
-        background-color: $forum-color-active-thread;
+        // !important overrides the one set here:
+        // https://github.com/edx/edx-platform/blob/master/lms/static/sass/elements/_controls.scss#L472
+        background-color: $forum-color-active-thread !important;
     }
 }
 
