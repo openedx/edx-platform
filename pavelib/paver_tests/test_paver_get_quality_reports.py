@@ -34,7 +34,7 @@ class TestGetReportFiles(unittest.TestCase):
     def test_get_pep8_reports_noisy(self, my_mock):
         """ Several conditions: different report types, different files, multiple files """
         my_mock.return_value = iter([
-            ('/foo', ('',), ('pep8.report',)),
+            ('/foo', (None,), ('pep8.report',)),
             ('/fooz', ('/ball',), ('pylint.report',)),
             ('/fooz', ('/ball',), ('non.report',)),
             ('/fooz', ('/ball',), ('lms.xml',)),
