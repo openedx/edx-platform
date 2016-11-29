@@ -1,9 +1,14 @@
+<%page expression_filter="h"/>
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "video" %></%def>
 <%!
   import json
   from django.core.serializers.json import DjangoJSONEncoder
   from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.js_utils import (
+      dump_js_escaped_json, js_escaped_string
+  )
+  from openedx.core.djangolib.markup import HTML, Text
 %>
 <%block name="title">${_("Video Uploads")}</%block>
 <%block name="bodyclass">is-signedin course view-video-uploads</%block>
@@ -11,7 +16,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% for template_name in ["active-video-upload-list", "active-video-upload", "previous-video-upload-list"]:
+% for template_name in ["active-video-upload", "previous-video-upload-list"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -24,11 +29,12 @@
         var $contentWrapper = $(".content-primary");
         VideosIndexFactory(
             $contentWrapper,
-            "${video_handler_url}",
-            "${encodings_download_url}",
-            ${concurrent_upload_limit},
+            "${video_handler_url | n, js_escaped_string}",
+            "${encodings_download_url | n, js_escaped_string}",
+            ${concurrent_upload_limit | n, dump_js_escaped_json},
             $(".nav-actions .upload-button"),
-            $contentWrapper.data("previous-uploads")
+            $contentWrapper.data("previous-uploads"),
+            ${video_supported_file_formats | n, dump_js_escaped_json}
         );
     });
 </%block>
@@ -55,21 +61,32 @@
 
 <div class="wrapper-content wrapper">
     <section class="content">
-        <article class="content-primary" role="main" data-previous-uploads="${json.dumps(previous_uploads, cls=DjangoJSONEncoder) | h}"></article>
+        <article class="content-primary" role="main" data-previous-uploads="${json.dumps(previous_uploads, cls=DjangoJSONEncoder)}"></article>
 
         <aside class="content-supplementary" role="complementary">
             <div class="bit">
                 <h3 class="title-3">${_("Why upload video files?")}</h3>
-                <p>${_("For a video to play on different devices, it needs to be available in multiple formats. After you upload an original video file in .mp4 or .mov format on this page, an automated process creates those additional formats and stores them for you.")}</p>
+                <p>${_("For a video to play on different devices, it needs to be available in multiple formats. After you upload an original video file in {file_formats} format on this page, an automated process creates those additional formats and stores them for you.").format(
+                    file_formats=' or '.join(video_supported_file_formats)
+                )}</p>
                 <h3 class="title-3">${_("Maximum Video File Size")}</h3>
                 <p>${_("The maximum size for each video file that you upload is 5 GB. The upload process fails for larger files.")}</p>
                 <h3 class="title-3">${_("Monitoring files as they upload")}</h3>
                 <p>${_("Each video file that you upload needs to reach the video processing servers successfully before additional work can begin. You can monitor the progress of files as they upload, and try again if the upload fails.")}</p>
                 <h3 class="title-3">${_("Managing uploaded files")}</h3>
-                <p>${_("After a file uploads successfully, automated processing begins. The file is then listed under Previous Uploads as {em_start}In Progress{em_end}. You can add the video to your course as soon as it has a unique video ID and the status is {em_start}Ready{em_end}. Allow 24 hours for file processing at the external video hosting sites to complete.").format(em_start='<strong>', em_end="</strong>")}</p>
-                <p>${_("If something goes wrong, the {em_start}Failed{em_end} status message appears. Check for problems in your original file and upload a replacement.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${Text(_("After a file uploads successfully, automated processing begins. The file is then listed under Previous Uploads as {em_start}In Progress{em_end}. You can add the video to your course as soon as it has a unique video ID and the status is {em_start}Ready{em_end}. Allow 24 hours for file processing at the external video hosting sites to complete.")).format(
+                    em_start=HTML('<strong>'),
+                    em_end=HTML('</strong>')
+                )}</p>
+                <p>${Text(_("If something goes wrong, the {em_start}Failed{em_end} status message appears. Check for problems in your original file and upload a replacement.")).format(
+                    em_start=HTML('<strong>'),
+                    em_end=HTML('</strong>')
+                )}</p>
                 <h3 class="title-3">${_("How do I get the videos into my course?")}</h3>
-                <p>${_("When status for a file is {em_start}Ready{em_end}, you can add that video to a component in your course. Copy the unique video ID. In another browser window, on the Course Outline page, create or locate a video component to play this video. Edit the video component to paste the ID into the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS as soon as its status is {em_start}Ready{em_end}, although processing may not be complete for all encodings and all video hosting sites.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${Text(_("When the status for a file is {em_start}Ready{em_end}, you can add that video to a component in your course. Copy the unique video ID. In another browser window, on the Course Outline page, create or locate a video component to play this video. Edit the video component to paste the ID into the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS as soon as its status is {em_start}Ready{em_end}, although processing may not be complete for all encodings and all video hosting sites.")).format(
+                    em_start=HTML('<strong>'),
+                    em_end=HTML('</strong>')
+                )}</p>
             </div>
         </aside>
     </section>

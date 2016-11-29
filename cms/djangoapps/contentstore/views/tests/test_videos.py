@@ -3,6 +3,7 @@
 Unit tests for video-related REST APIs.
 """
 import csv
+import ddt
 import json
 import dateutil.parser
 import re
@@ -158,6 +159,7 @@ class VideoUploadTestMixin(object):
         self.assertEqual(self.client.get(self.url).status_code, 404)
 
 
+@ddt.ddt
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
 class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
@@ -223,6 +225,70 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
     @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
     @patch("boto.s3.key.Key")
     @patch("boto.s3.connection.S3Connection")
+    @ddt.data(
+        (
+            [
+                {
+                    "file_name": "supported-1.mp4",
+                    "content_type": "video/mp4",
+                },
+                {
+                    "file_name": "supported-2.mov",
+                    "content_type": "video/quicktime",
+                },
+            ],
+            200
+        ),
+        (
+            [
+                {
+                    "file_name": "unsupported-1.txt",
+                    "content_type": "text/plain",
+                },
+                {
+                    "file_name": "unsupported-2.png",
+                    "content_type": "image/png",
+                },
+            ],
+            400
+        )
+    )
+    @ddt.unpack
+    def test_video_supported_file_formats(self, files, expected_status, mock_conn, mock_key):
+        """
+        Test that video upload works correctly against supported and unsupported file formats.
+        """
+        bucket = Mock()
+        mock_conn.return_value = Mock(get_bucket=Mock(return_value=bucket))
+        mock_key_instances = [
+            Mock(
+                generate_url=Mock(
+                    return_value="http://example.com/url_{}".format(file_info["file_name"])
+                )
+            )
+            for file_info in files
+        ]
+        # If extra calls are made, return a dummy
+        mock_key.side_effect = mock_key_instances + [Mock()]
+
+        # Check supported formats
+        response = self.client.post(
+            self.url,
+            json.dumps({"files": files}),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, expected_status)
+        response = json.loads(response.content)
+
+        if expected_status == 200:
+            self.assertNotIn('error', response)
+        else:
+            self.assertIn('error', response)
+            self.assertEqual(response['error'], "Request 'files' entry contain unsupported content_type")
+
+    @override_settings(AWS_ACCESS_KEY_ID="test_key_id", AWS_SECRET_ACCESS_KEY="test_secret")
+    @patch("boto.s3.key.Key")
+    @patch("boto.s3.connection.S3Connection")
     def test_post_success(self, mock_conn, mock_key):
         files = [
             {
@@ -230,8 +296,8 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 "content_type": "video/mp4",
             },
             {
-                "file_name": "second.webm",
-                "content_type": "video/webm",
+                "file_name": "second.mp4",
+                "content_type": "video/mp4",
             },
             {
                 "file_name": "third.mov",

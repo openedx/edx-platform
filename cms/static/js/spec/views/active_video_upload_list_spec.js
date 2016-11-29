@@ -17,10 +17,12 @@ define(
                 TemplateHelpers.installTemplate('active-video-upload-list');
                 this.postUrl = '/test/post/url';
                 this.uploadButton = $('<button>');
+                this.videoSupportedFileFormats = ['.mp4', '.mov'];
                 this.view = new ActiveVideoUploadListView({
                     concurrentUploadLimit: concurrentUploadLimit,
                     postUrl: this.postUrl,
-                    uploadButton: this.uploadButton
+                    uploadButton: this.uploadButton,
+                    videoSupportedFileFormats: this.videoSupportedFileFormats
                 });
                 this.view.render();
                 jasmine.Ajax.install();
@@ -58,6 +60,34 @@ define(
                     return request.readyState > 0;
                 });
             };
+
+            describe('supported file formats', function() {
+                it('should not show unsupported file format notification for supported files', function() {
+                    var supportedFiles = {
+                        files: [
+                            {name: 'test-1.mp4', size: 0},
+                            {name: 'test-1.mov', size: 0}
+                        ]
+                    };
+                    this.view.$uploadForm.fileupload('add', supportedFiles);
+                    expect(this.view.fileErrorMsg).toBeNull();
+                });
+                it('should show invalid file format notification for unspoorted files', function() {
+                    var unSupportedFiles = {
+                        files: [
+                            {name: 'test-3.txt', size: 0},
+                            {name: 'test-4.png', size: 0}
+                        ]
+                    };
+                    this.view.$uploadForm.fileupload('add', unSupportedFiles);
+                    expect(this.view.fileErrorMsg).toBeDefined();
+                    expect(this.view.fileErrorMsg.options.title).toEqual('Your file could not be uploaded');
+                    expect(this.view.fileErrorMsg.options.message).toEqual(
+                        'test-3.txt is not in a supported file format. Supported file formats are ' +
+                        this.videoSupportedFileFormats.join(' and ') + '.'
+                    );
+                });
+            });
 
             _.each(
                 [
