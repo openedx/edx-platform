@@ -14,6 +14,7 @@ from openedx.core.djangolib.markup import HTML, Text
 from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
+from util.enterprise_helpers import get_enterprise_customer_logo_url
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -51,7 +52,14 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
-            <img src="${branding_api.get_logo_url(is_secure)}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
+        <%
+        logo_url = get_enterprise_customer_logo_url(request)
+        logo_size = 'ec-logo-size'
+        if logo_url is None:
+            logo_url = branding_api.get_logo_url(is_secure)
+            logo_size = ''
+        %>
+            <img class="${logo_size}" src="${logo_url}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
         </%block>
       </a>
     </h1>

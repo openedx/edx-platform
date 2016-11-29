@@ -47,6 +47,7 @@ from third_party_auth import pipeline
 from third_party_auth.decorators import xframe_allow_whitelisted
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 from util.date_utils import strftime_localized
+from util.enterprise_helpers import set_enterprise_branding_filter_param
 
 AUDIT_LOG = logging.getLogger("audit")
 log = logging.getLogger(__name__)
@@ -68,13 +69,27 @@ def login_and_registration_form(request, initial_mode="login"):
     """
     # Determine the URL to redirect to following login/registration/third_party_auth
     redirect_to = get_next_url_for_login_page(request)
-
     # If we're already logged in, redirect to the dashboard
     if request.user.is_authenticated():
         return redirect(redirect_to)
 
     # Retrieve the form descriptions from the user API
     form_descriptions = _get_form_descriptions(request)
+
+    # Our ?next= URL may itself contain a parameter 'tpa_hint=x' that we need to check.
+    # If present, we display a login page focused on third-party auth with that provider.
+    third_party_auth_hint = None
+    if '?' in redirect_to:
+        try:
+            next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
+            provider_id = next_args['tpa_hint'][0]
+            if third_party_auth.provider.Registry.get(provider_id=provider_id):
+                third_party_auth_hint = provider_id
+                initial_mode = "hinted_login"
+        except (KeyError, ValueError, IndexError):
+            pass
+
+    set_enterprise_branding_filter_param(request=request, provider_id=third_party_auth_hint)
 
     # If this is a themed site, revert to the old login/registration pages.
     # We need to do this for now to support existing themes.
@@ -91,19 +106,6 @@ def login_and_registration_form(request, initial_mode="login"):
     ext_auth_response = _external_auth_intercept(request, initial_mode)
     if ext_auth_response is not None:
         return ext_auth_response
-
-    # Our ?next= URL may itself contain a parameter 'tpa_hint=x' that we need to check.
-    # If present, we display a login page focused on third-party auth with that provider.
-    third_party_auth_hint = None
-    if '?' in redirect_to:
-        try:
-            next_args = urlparse.parse_qs(urlparse.urlparse(redirect_to).query)
-            provider_id = next_args['tpa_hint'][0]
-            if third_party_auth.provider.Registry.get(provider_id=provider_id):
-                third_party_auth_hint = provider_id
-                initial_mode = "hinted_login"
-        except (KeyError, ValueError, IndexError):
-            pass
 
     # Otherwise, render the combined login/registration page
     context = {

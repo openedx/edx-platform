@@ -3,9 +3,11 @@ Helpers to access the enterprise app
 """
 from django.conf import settings
 from django.utils.translation import ugettext as _
+import logging
 
 try:
     from enterprise.models import EnterpriseCustomer
+    from enterprise import api as enterprise_api
     from enterprise.tpa_pipeline import (
         active_provider_requests_data_sharing,
         active_provider_enforces_data_sharing,
@@ -16,6 +18,8 @@ except ImportError:
     pass
 
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS = 'enterprise_customer_branding_override_details'
+LOGGER = logging.getLogger("edx.enterprise_helpers")
 
 
 def enterprise_enabled():
@@ -120,3 +124,60 @@ def insert_enterprise_pipeline_elements(pipeline):
 
     for index, element in enumerate(additional_elements):
         pipeline.insert(insert_point + index, element)
+
+
+def get_enterprise_customer_logo_url(request):
+    """
+    Client API operation adapter/wrapper.
+    """
+
+    if not enterprise_enabled():
+        return None
+
+    parameter = get_enterprise_branding_filter_param(request)
+    if not parameter:
+        return None
+
+    provider_id = parameter.get('provider_id', None)
+    ec_uuid = parameter.get('ec_uuid', None)
+
+    if provider_id:
+        branding_info = enterprise_api.get_enterprise_branding_info_by_provider_id(provider_id=provider_id)
+    elif ec_uuid:
+        branding_info = enterprise_api.get_enterprise_branding_info_by_ec_uuid(ec_uuid=ec_uuid)
+
+    logo_url = None
+    if branding_info and branding_info.logo:
+        logo_url = branding_info.logo.url
+
+    return logo_url
+
+
+def set_enterprise_branding_filter_param(request, provider_id):
+    """
+    Setting 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS' in session. 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS'
+    either be provider_id or ec_uuid. e.g. {provider_id: 'xyz'} or {ec_src: enterprise_customer_uuid}
+    """
+    ec_uuid = request.GET.get('ec_src', None)
+    if provider_id:
+        LOGGER.info(
+            "Session key 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS' has been set with provider_id '%s'",
+            provider_id
+        )
+        request.session[ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS] = {'provider_id': provider_id}
+
+    elif ec_uuid:
+        # we are assuming that none sso based enterprise will return Enterprise Customer uuid as 'ec_src' in query
+        # param e.g. edx.org/foo/bar?ec_src=6185ed46-68a4-45d6-8367-96c0bf70d1a6
+        LOGGER.info(
+            "Session key 'ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS' has been set with ec_uuid '%s'", ec_uuid
+        )
+        request.session[ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS] = {'ec_uuid': ec_uuid}
+
+
+def get_enterprise_branding_filter_param(request):
+    """
+    :return Filter parameter from session for enterprise customer branding information.
+
+    """
+    return request.session.get(ENTERPRISE_CUSTOMER_BRANDING_OVERRIDE_DETAILS, None)
