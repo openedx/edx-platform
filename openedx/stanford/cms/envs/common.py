@@ -1,6 +1,8 @@
 from cms.envs.common import *
-from openedx.stanford.lms.envs.common import DEFAULT_COURSE_ABOUT_IMAGE_URL
-
+from openedx.stanford.lms.envs.common import (
+    DEFAULT_COURSE_ABOUT_IMAGE_URL,
+    INSTRUCTOR_QUERY_PROBLEM_TYPES,
+)
 
 COPYRIGHT_EMAIL = 'copyright@example.com'
 COURSE_UTILITIES = [

@@ -92,3 +92,8 @@ TYPES_WITH_CHILD_PROBLEMS_LIST = [
     # These types are children of children of units.
     'library_content',
 ]
+
+# These are the problem types (by block_type) that an instructor can query over in the Instructor Query tab
+INSTRUCTOR_QUERY_PROBLEM_TYPES = [
+    'problem',
+]

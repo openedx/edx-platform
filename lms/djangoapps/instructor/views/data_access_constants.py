@@ -2,6 +2,7 @@
 Constants and Query definition associated with data_access
 """
 import re
+from django.conf import settings
 
 
 class StudentQuery(object):
@@ -49,7 +50,7 @@ REVERSE_INCLUSION_MAP = {'A': Inclusion.AND,
                          'F': Inclusion.FILTER}
 
 INCLUDE_SECTION_PATTERN = re.compile('chapter|sequential')
-INCLUDE_PROBLEM_PATTERN = re.compile('problem')
+INCLUDE_PROBLEM_PATTERN = re.compile('|'.join(settings.INSTRUCTOR_QUERY_PROBLEM_TYPES))
 TEMPORARY_QUERY_LIFETIME = 15  # in minutes, how long a temporary query lives before it gets purged
 
 
