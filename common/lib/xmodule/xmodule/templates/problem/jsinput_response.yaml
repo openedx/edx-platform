@@ -66,6 +66,7 @@ data: |
               width="400"
               height="400"
               html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"
+              title="Spinning Cone and Cube"
               sop="false"/>
           </customresponse>
       </problem>

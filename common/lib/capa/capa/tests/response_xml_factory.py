@@ -608,6 +608,18 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
         return input_element
 
 
+class JSInputXMLFactory(CustomResponseXMLFactory):
+    """
+    Factory for producing <jsinput> XML.
+    Note that this factory currently does not create a functioning problem.
+    It will only create an empty iframe.
+    """
+
+    def create_input_element(self, **kwargs):
+        """ Create the <jsinput> element """
+        return etree.Element("jsinput")
+
+
 class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):
     """ Factory for producing <multiplechoiceresponse> XML """
 
