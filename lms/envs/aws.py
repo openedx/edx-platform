@@ -104,13 +104,6 @@ ALTERNATE_QUEUES = [
     DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
     for alternate in ALTERNATE_QUEUE_ENVS
 ]
-CELERY_QUEUES.update(
-    {
-        alternate: {}
-        for alternate in ALTERNATE_QUEUES
-        if alternate not in CELERY_QUEUES.keys()
-    }
-)
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 # If we're a worker on the high_mem queue, set ourselves to die after processing
@@ -274,6 +267,18 @@ BULK_EMAIL_ROUTING_KEY_SMALL_JOBS = ENV_TOKENS.get('BULK_EMAIL_ROUTING_KEY_SMALL
 
 # Queue to use for updating persistent grades
 RECALCULATE_GRADES_ROUTING_KEY = ENV_TOKENS.get('RECALCULATE_GRADES_ROUTING_KEY', LOW_PRIORITY_QUEUE)
+
+# Allow CELERY_QUEUES to be overwritten before adding alternates
+ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
+if ENV_CELERY_QUEUES:
+    CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
+CELERY_QUEUES.update(
+    {
+        alternate: {}
+        for alternate in ALTERNATE_QUEUES
+        if alternate not in CELERY_QUEUES.keys()
+    }
+)
 
 # following setting is for backward compatibility
 if ENV_TOKENS.get('COMPREHENSIVE_THEME_DIR', None):

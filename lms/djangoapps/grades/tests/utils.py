@@ -24,17 +24,27 @@ def mock_get_score(earned=0, possible=1):
     Mocks the get_score function to return a valid grade.
     """
     with patch('lms.djangoapps.grades.new.subsection_grade.get_score') as mock_score:
-        mock_score.return_value = ProblemScore(earned, possible, earned, possible, 1, True, None, None)
+        mock_score.return_value = ProblemScore(
+            raw_earned=earned,
+            raw_possible=possible,
+            weighted_earned=earned,
+            weighted_possible=possible,
+            weight=1,
+            graded=True,
+            display_name=None,
+            module_id=None,
+            attempted=True,
+        )
         yield mock_score
 
 
 @contextmanager
-def mock_get_submissions_score(earned=0, possible=1):
+def mock_get_submissions_score(earned=0, possible=1, attempted=True):
     """
     Mocks the _get_submissions_score function to return the specified values
     """
     with patch('lms.djangoapps.grades.scores._get_score_from_submissions') as mock_score:
-        mock_score.return_value = (earned, possible, earned, possible)
+        mock_score.return_value = (earned, possible, earned, possible, attempted)
         yield mock_score
 
 

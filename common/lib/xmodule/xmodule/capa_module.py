@@ -275,6 +275,38 @@ class CapaDescriptor(CapaFields, RawDescriptor):
             )
         return False
 
+    def max_score(self):
+        """
+        Return the problem's max score
+        """
+        from capa.capa_problem import LoncapaProblem, LoncapaSystem
+        capa_system = LoncapaSystem(
+            ajax_url=None,
+            anonymous_student_id=None,
+            cache=None,
+            can_execute_unsafe_code=None,
+            get_python_lib_zip=None,
+            DEBUG=None,
+            filestore=self.runtime.resources_fs,
+            i18n=self.runtime.service(self, "i18n"),
+            node_path=None,
+            render_template=None,
+            seed=None,
+            STATIC_URL=None,
+            xqueue=None,
+            matlab_api_key=None,
+        )
+        lcp = LoncapaProblem(
+            problem_text=self.data,
+            id=self.location.html_id(),
+            capa_system=capa_system,
+            capa_module=self,
+            state={},
+            seed=1,
+            minimal_init=True,
+        )
+        return lcp.get_max_score()
+
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')
     submit_button_name = module_attr('submit_button_name')

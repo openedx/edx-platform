@@ -645,107 +645,67 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
 
     def test_thread_content(self):
         source_threads = [
-            {
-                "type": "thread",
+            make_minimal_cs_thread({
                 "id": "test_thread_id_0",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_x",
-                "group_id": None,
-                "user_id": str(self.author.id),
                 "username": self.author.username,
-                "anonymous": False,
-                "anonymous_to_peers": False,
-                "created_at": "2015-04-28T00:00:00Z",
-                "updated_at": "2015-04-28T11:11:11Z",
-                "thread_type": "discussion",
+                "user_id": str(self.author.id),
                 "title": "Test Title",
                 "body": "Test body",
-                "pinned": False,
-                "closed": False,
-                "abuse_flaggers": [],
                 "votes": {"up_count": 4},
                 "comments_count": 5,
                 "unread_comments_count": 3,
                 "endorsed": True,
                 "read": True,
-            },
-            {
-                "type": "thread",
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+            }),
+            make_minimal_cs_thread({
                 "id": "test_thread_id_1",
                 "course_id": unicode(self.course.id),
                 "commentable_id": "topic_y",
                 "group_id": self.cohort.id,
-                "user_id": str(self.author.id),
                 "username": self.author.username,
-                "anonymous": False,
-                "anonymous_to_peers": False,
-                "created_at": "2015-04-28T22:22:22Z",
-                "updated_at": "2015-04-28T00:33:33Z",
+                "user_id": str(self.author.id),
                 "thread_type": "question",
                 "title": "Another Test Title",
                 "body": "More content",
-                "pinned": False,
-                "closed": False,
-                "abuse_flaggers": [],
                 "votes": {"up_count": 9},
                 "comments_count": 18,
-                "unread_comments_count": 0,
-                "endorsed": False,
-                "read": False,
-            },
+                "created_at": "2015-04-28T22:22:22Z",
+                "updated_at": "2015-04-28T00:33:33Z",
+            })
         ]
         expected_threads = [
-            {
+            self.expected_thread_data({
                 "id": "test_thread_id_0",
-                "course_id": unicode(self.course.id),
-                "topic_id": "topic_x",
-                "group_id": None,
-                "group_name": None,
                 "author": self.author.username,
-                "author_label": None,
-                "created_at": "2015-04-28T00:00:00Z",
-                "updated_at": "2015-04-28T11:11:11Z",
-                "type": "discussion",
-                "title": "Test Title",
-                "raw_body": "Test body",
-                "rendered_body": "<p>Test body</p>",
-                "pinned": False,
-                "closed": False,
-                "following": False,
-                "abuse_flagged": False,
-                "voted": False,
+                "topic_id": "topic_x",
                 "vote_count": 4,
                 "comment_count": 6,
                 "unread_comment_count": 3,
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
-                "endorsed_comment_list_url": None,
-                "non_endorsed_comment_list_url": None,
                 "editable_fields": ["abuse_flagged", "following", "read", "voted"],
                 "has_endorsed": True,
                 "read": True,
-            },
-            {
+                "created_at": "2015-04-28T00:00:00Z",
+                "updated_at": "2015-04-28T11:11:11Z",
+            }),
+            self.expected_thread_data({
                 "id": "test_thread_id_1",
-                "course_id": unicode(self.course.id),
+                "author": self.author.username,
                 "topic_id": "topic_y",
                 "group_id": self.cohort.id,
                 "group_name": self.cohort.name,
-                "author": self.author.username,
-                "author_label": None,
-                "created_at": "2015-04-28T22:22:22Z",
-                "updated_at": "2015-04-28T00:33:33Z",
                 "type": "question",
                 "title": "Another Test Title",
                 "raw_body": "More content",
                 "rendered_body": "<p>More content</p>",
-                "pinned": False,
-                "closed": False,
-                "following": False,
-                "abuse_flagged": False,
-                "voted": False,
                 "vote_count": 9,
                 "comment_count": 19,
-                "unread_comment_count": 1,
+                "created_at": "2015-04-28T22:22:22Z",
+                "updated_at": "2015-04-28T00:33:33Z",
                 "comment_list_url": None,
                 "endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=True"
@@ -754,9 +714,7 @@ class GetThreadListTest(ForumsEnableMixin, CommentsServiceMockMixin, UrlResetMix
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=False"
                 ),
                 "editable_fields": ["abuse_flagged", "following", "read", "voted"],
-                "has_endorsed": False,
-                "read": False,
-            },
+            }),
         ]
 
         expected_result = make_paginated_api_response(
@@ -1479,42 +1437,17 @@ class CreateThreadTest(
         cs_thread = make_minimal_cs_thread({
             "id": "test_id",
             "username": self.user.username,
-            "created_at": "2015-05-19T00:00:00Z",
-            "updated_at": "2015-05-19T00:00:00Z",
+            "read": True,
         })
         self.register_post_thread_response(cs_thread)
         with self.assert_signal_sent(api, 'thread_created', sender=None, user=self.user, exclude_args=('post',)):
             actual = create_thread(self.request, self.minimal_data)
-        expected = {
+        expected = self.expected_thread_data({
             "id": "test_id",
             "course_id": unicode(self.course.id),
-            "topic_id": "test_topic",
-            "group_id": None,
-            "group_name": None,
-            "author": self.user.username,
-            "author_label": None,
-            "created_at": "2015-05-19T00:00:00Z",
-            "updated_at": "2015-05-19T00:00:00Z",
-            "type": "discussion",
-            "title": "Test Title",
-            "raw_body": "Test body",
-            "rendered_body": "<p>Test body</p>",
-            "pinned": False,
-            "closed": False,
-            "following": False,
-            "abuse_flagged": False,
-            "voted": False,
-            "vote_count": 0,
-            "comment_count": 1,
-            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
-            "endorsed_comment_list_url": None,
-            "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            'read': False,
-            'has_endorsed': False,
-            'response_count': 0,
-        }
+            "read": True,
+        })
         self.assertEqual(actual, expected)
         self.assertEqual(
             httpretty.last_request().parsed_body,
@@ -2002,8 +1935,6 @@ class UpdateThreadTest(
             "commentable_id": "original_topic",
             "username": self.user.username,
             "user_id": str(self.user.id),
-            "created_at": "2015-05-29T00:00:00Z",
-            "updated_at": "2015-05-29T00:00:00Z",
             "thread_type": "discussion",
             "title": "Original Title",
             "body": "Original body",
@@ -2025,37 +1956,14 @@ class UpdateThreadTest(
         self.register_thread()
         with self.assert_signal_sent(api, 'thread_edited', sender=None, user=self.user, exclude_args=('post',)):
             actual = update_thread(self.request, "test_thread", {"raw_body": "Edited body"})
-        expected = {
-            "id": "test_thread",
-            "course_id": unicode(self.course.id),
-            "topic_id": "original_topic",
-            "group_id": None,
-            "group_name": None,
-            "author": self.user.username,
-            "author_label": None,
-            "created_at": "2015-05-29T00:00:00Z",
-            "updated_at": "2015-05-29T00:00:00Z",
-            "type": "discussion",
-            "title": "Original Title",
+
+        self.assertEqual(actual, self.expected_thread_data({
             "raw_body": "Edited body",
             "rendered_body": "<p>Edited body</p>",
-            "pinned": False,
-            "closed": False,
-            "following": False,
-            "abuse_flagged": False,
-            "voted": False,
-            "vote_count": 0,
-            "comment_count": 1,
-            "unread_comment_count": 0,
-            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
-            "endorsed_comment_list_url": None,
-            "non_endorsed_comment_list_url": None,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            'read': True,
-            'has_endorsed': False,
-            'response_count': 0
-        }
-        self.assertEqual(actual, expected)
+            "topic_id": "original_topic",
+            "read": True,
+            "title": "Original Title",
+        }))
         self.assertEqual(
             httpretty.last_request().parsed_body,
             {
@@ -3096,12 +3004,12 @@ class RetrieveThreadTest(
         httpretty.reset()
         httpretty.enable()
         self.addCleanup(httpretty.disable)
-        self.thread_author = UserFactory.create()
-        self.register_get_user_response(self.thread_author)
+        self.user = UserFactory.create()
+        self.register_get_user_response(self.user)
         self.request = RequestFactory().get("/test_path")
-        self.request.user = self.thread_author
+        self.request.user = self.user
         self.thread_id = "test_thread"
-        CourseEnrollmentFactory.create(user=self.thread_author, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id)
 
     def register_thread(self, overrides=None):
         """
@@ -3113,12 +3021,10 @@ class RetrieveThreadTest(
             "id": self.thread_id,
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
-            "username": self.thread_author.username,
-            "user_id": str(self.thread_author.id),
+            "username": self.user.username,
+            "user_id": str(self.user.id),
             "title": "Test Title",
             "body": "Test body",
-            "created_at": "2015-05-29T00:00:00Z",
-            "updated_at": "2015-05-29T00:00:00Z",
             "resp_total": 0,
 
         })
@@ -3126,38 +3032,11 @@ class RetrieveThreadTest(
         self.register_get_thread_response(cs_data)
 
     def test_basic(self):
-        expected_response_data = {
-            "author": self.thread_author.username,
-            "author_label": None,
-            "created_at": "2015-05-29T00:00:00Z",
-            "updated_at": "2015-05-29T00:00:00Z",
-            "raw_body": "Test body",
-            "rendered_body": "<p>Test body</p>",
-            "abuse_flagged": False,
-            "voted": False,
-            "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"],
-            "course_id": unicode(self.course.id),
-            "topic_id": "test_topic",
-            "group_id": None,
-            "group_name": None,
-            "title": "Test Title",
-            "pinned": False,
-            "closed": False,
-            "following": False,
-            "comment_count": 1,
-            "unread_comment_count": 1,
-            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
-            "endorsed_comment_list_url": None,
-            "non_endorsed_comment_list_url": None,
-            "read": False,
-            "has_endorsed": False,
-            "id": "test_thread",
-            "type": "discussion",
-            "response_count": 2,
-        }
         self.register_thread({"resp_total": 2})
-        self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
+        self.assertEqual(get_thread(self.request, self.thread_id), self.expected_thread_data({
+            "response_count": 2,
+            "unread_comment_count": 1,
+        }))
         self.assertEqual(httpretty.last_request().method, "GET")
 
     def test_thread_id_not_found(self):
@@ -3166,42 +3045,15 @@ class RetrieveThreadTest(
             get_thread(self.request, "missing_thread")
 
     def test_nonauthor_enrolled_in_course(self):
-        expected_response_data = {
-            "author": self.thread_author.username,
-            "author_label": None,
-            "created_at": "2015-05-29T00:00:00Z",
-            "updated_at": "2015-05-29T00:00:00Z",
-            "raw_body": "Test body",
-            "rendered_body": "<p>Test body</p>",
-            "abuse_flagged": False,
-            "voted": False,
-            "vote_count": 0,
-            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
-            "course_id": unicode(self.course.id),
-            "topic_id": "test_topic",
-            "group_id": None,
-            "group_name": None,
-            "title": "Test Title",
-            "pinned": False,
-            "closed": False,
-            "following": False,
-            "comment_count": 1,
-            "unread_comment_count": 1,
-            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
-            "endorsed_comment_list_url": None,
-            "non_endorsed_comment_list_url": None,
-            "read": False,
-            "has_endorsed": False,
-            "id": "test_thread",
-            "type": "discussion",
-            "response_count": 0,
-        }
         non_author_user = UserFactory.create()
         self.register_get_user_response(non_author_user)
         CourseEnrollmentFactory.create(user=non_author_user, course_id=self.course.id)
         self.register_thread()
         self.request.user = non_author_user
-        self.assertEqual(get_thread(self.request, self.thread_id), expected_response_data)
+        self.assertEqual(get_thread(self.request, self.thread_id), self.expected_thread_data({
+            "editable_fields": ["abuse_flagged", "following", "read", "voted"],
+            "unread_comment_count": 1,
+        }))
         self.assertEqual(httpretty.last_request().method, "GET")
 
     def test_not_enrolled_in_course(self):
@@ -3233,10 +3085,10 @@ class RetrieveThreadTest(
         the student role is the author and the thread is in the author's cohort.
         """
         cohort_course = CourseFactory.create(cohort_config={"cohorted": course_is_cohorted})
-        CourseEnrollmentFactory.create(user=self.thread_author, course_id=cohort_course.id)
-        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.thread_author])
+        CourseEnrollmentFactory.create(user=self.user, course_id=cohort_course.id)
+        cohort = CohortFactory.create(course_id=cohort_course.id, users=[self.user])
         role = Role.objects.create(name=role_name, course_id=cohort_course.id)
-        role.users = [self.thread_author]
+        role.users = [self.user]
         self.register_thread({
             "course_id": unicode(cohort_course.id),
             "group_id": (

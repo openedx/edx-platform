@@ -228,6 +228,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 self.assertFalse(mock_create_grade.called)
 
         self.assertEqual(grade_a.url_name, grade_b.url_name)
+        grade_b.all_total.attempted = False  # TODO TNL-5930
         self.assertEqual(grade_a.all_total, grade_b.all_total)
 
     def test_update(self):
@@ -253,31 +254,6 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
         verify_update_if_higher((2, 4), (1, 2))  # previous value was equivalent
         verify_update_if_higher((1, 4), (1, 2))  # previous value was greater
         verify_update_if_higher((3, 4), (3, 4))  # previous value was less
-
-    @ddt.data(
-        (
-            'lms.djangoapps.grades.new.subsection_grade.SubsectionGrade.create_model',
-            lambda self: self.subsection_grade_factory.create(self.sequence)
-        ),
-        (
-            'lms.djangoapps.grades.new.subsection_grade.SubsectionGrade.bulk_create_models',
-            lambda self: self.subsection_grade_factory.bulk_create_unsaved()
-        ),
-    )
-    @ddt.unpack
-    def test_fallback_handling(self, underlying_method, method_to_test):
-        """
-        Tests that the persistent grades fallback handler functions as expected.
-        """
-        with patch('lms.djangoapps.grades.new.subsection_grade.log') as log_mock:
-            with patch(underlying_method) as underlying:
-                underlying.side_effect = DatabaseError("I'm afraid I can't do that")
-                method_to_test(self)
-                # By making it this far, we implicitly assert
-                # "the factory method swallowed the exception correctly"
-                self.assertTrue(
-                    log_mock.warning.call_args_list[0].startswith("Persistent Grades: Persistence Error, falling back.")
-                )
 
     @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
     @ddt.data(
@@ -314,7 +290,7 @@ class SubsectionGradeTest(GradeTestBase):
         and that loading saved grades returns the same data.
         """
         # Create a grade that *isn't* saved to the database
-        input_grade = SubsectionGrade(self.sequence, self.course)
+        input_grade = SubsectionGrade(self.sequence)
         input_grade.init_from_structure(
             self.request.user,
             self.course_structure,
@@ -328,7 +304,7 @@ class SubsectionGradeTest(GradeTestBase):
         self.assertEqual(PersistentSubsectionGrade.objects.count(), 1)
 
         # load from db, and ensure output matches input
-        loaded_grade = SubsectionGrade(self.sequence, self.course)
+        loaded_grade = SubsectionGrade(self.sequence)
         saved_model = PersistentSubsectionGrade.read_grade(
             user_id=self.request.user.id,
             usage_key=self.sequence.location,
@@ -342,6 +318,7 @@ class SubsectionGradeTest(GradeTestBase):
         )
 
         self.assertEqual(input_grade.url_name, loaded_grade.url_name)
+        loaded_grade.all_total.attempted = False  # TODO TNL-5930
         self.assertEqual(input_grade.all_total, loaded_grade.all_total)
 
 
@@ -352,7 +329,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
     """
 
     SCORED_BLOCK_COUNT = 7
-    ACTUAL_TOTAL_POSSIBLE = 16.0
+    ACTUAL_TOTAL_POSSIBLE = 17.0
 
     @classmethod
     def setUpClass(cls):
@@ -409,7 +386,7 @@ class TestMultipleProblemTypesSubsectionScores(SharedModuleStoreTestCase):
             # Configure one block to return no possible score, the rest to return 3.0 earned / 7.0 possible
             block_count = self.SCORED_BLOCK_COUNT - 1
             mock_score.side_effect = itertools.chain(
-                [(earned_per_block, None, earned_per_block, None)],
+                [(earned_per_block, None, earned_per_block, None, True)],
                 itertools.repeat(mock_score.return_value)
             )
             score = subsection_factory.update(self.seq1)
@@ -459,12 +436,6 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         self.request = get_mock_request(UserFactory())
         self.client.login(username=self.request.user.username, password="test")
         CourseEnrollment.enroll(self.request.user, self.course.id)
-        course_structure = get_course_blocks(self.request.user, self.course.location)
-        self.subsection_factory = SubsectionGradeFactory(
-            self.request.user,
-            course_structure=course_structure,
-            course=self.course,
-        )
 
     def _get_altered_metadata(self, alterations):
         """
@@ -496,7 +467,13 @@ class TestVariedMetadata(ProblemSubmissionTestMixin, ModuleStoreTestCase):
         """
 
         self.submit_question_answer(u'problem', {u'2_1': u'Correct'})
-        return self.subsection_factory.create(self.sequence)
+        course_structure = get_course_blocks(self.request.user, self.course.location)
+        subsection_factory = SubsectionGradeFactory(
+            self.request.user,
+            course_structure=course_structure,
+            course=self.course,
+        )
+        return subsection_factory.create(self.sequence)
 
     @ddt.data(
         ({}, 1.25, 2.5),

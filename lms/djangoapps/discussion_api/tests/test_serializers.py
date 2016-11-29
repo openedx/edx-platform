@@ -161,60 +161,27 @@ class ThreadSerializerSerializationTest(SerializerTestMixin, SharedModuleStoreTe
         return ThreadSerializer(thread, context=get_context(self.course, self.request)).data
 
     def test_basic(self):
-        thread = {
-            "type": "thread",
+        thread = make_minimal_cs_thread({
             "id": "test_thread",
             "course_id": unicode(self.course.id),
             "commentable_id": "test_topic",
-            "group_id": None,
             "user_id": str(self.author.id),
             "username": self.author.username,
-            "anonymous": False,
-            "anonymous_to_peers": False,
-            "created_at": "2015-04-28T00:00:00Z",
-            "updated_at": "2015-04-28T11:11:11Z",
-            "thread_type": "discussion",
             "title": "Test Title",
             "body": "Test body",
             "pinned": True,
-            "closed": False,
-            "abuse_flaggers": [],
             "votes": {"up_count": 4},
             "comments_count": 5,
             "unread_comments_count": 3,
-            "read": False,
-            "endorsed": False,
-            "response_count": None,
-        }
-        expected = {
-            "id": "test_thread",
-            "course_id": unicode(self.course.id),
-            "topic_id": "test_topic",
-            "group_id": None,
-            "group_name": None,
+        })
+        expected = self.expected_thread_data({
             "author": self.author.username,
-            "author_label": None,
-            "created_at": "2015-04-28T00:00:00Z",
-            "updated_at": "2015-04-28T11:11:11Z",
-            "type": "discussion",
-            "title": "Test Title",
-            "raw_body": "Test body",
-            "rendered_body": "<p>Test body</p>",
-            "pinned": True,
-            "closed": False,
-            "following": False,
-            "abuse_flagged": False,
-            "voted": False,
             "vote_count": 4,
             "comment_count": 6,
-            "unread_comment_count": 4,
-            "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
-            "endorsed_comment_list_url": None,
-            "non_endorsed_comment_list_url": None,
+            "unread_comment_count": 3,
+            "pinned": True,
             "editable_fields": ["abuse_flagged", "following", "read", "voted"],
-            "read": False,
-            "has_endorsed": False,
-        }
+        })
         self.assertEqual(self.serialize(thread), expected)
 
         thread["thread_type"] = "question"

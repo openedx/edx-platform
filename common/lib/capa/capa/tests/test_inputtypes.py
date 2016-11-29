@@ -705,17 +705,13 @@ class MatlabTest(unittest.TestCase):
         self.assertEqual(
             etree.tostring(output),
             textwrap.dedent("""
-            <div>{\'status\': Status(\'queued\'), \'button_enabled\': True,
-            \'rows\': \'10\', \'queue_len\': \'3\', \'mode\': \'\',
-            \'tabsize\': 4, \'cols\': \'80\',
-            \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\': \'true\', \'queue_msg\': \'\',
-            \'value\': \'print "good evening"\',
-            \'msg\': u\'Submitted. As soon as a response is returned,
-            this message will be replaced by that feedback.\',
+            <div>{\'status\': Status(\'queued\'), \'button_enabled\': True, \'rows\': \'10\', \'queue_len\': \'3\',
+            \'mode\': \'\', \'tabsize\': 4, \'cols\': \'80\', \'STATIC_URL\': \'/dummy-static/\', \'linenumbers\':
+            \'true\', \'queue_msg\': \'\', \'value\': \'print "good evening"\',
+            \'msg\': u\'Submitted. As soon as a response is returned, this message will be replaced by that feedback.\',
             \'matlab_editor_js\': \'/dummy-static/js/vendor/CodeMirror/octave.js\',
             \'hidden\': \'\', \'id\': \'prob_1_2\',
-            \'describedby_html\': Markup(u\'aria-describedby="status_prob_1_2"\'),
-            \'response_data\': {}}</div>
+            \'describedby_html\': Markup(u\'aria-describedby="status_prob_1_2"\'), \'response_data\': {}}</div>
             """).replace('\n', ' ').strip()
         )
 

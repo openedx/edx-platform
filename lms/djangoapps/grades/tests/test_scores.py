@@ -52,7 +52,7 @@ class TestGetScore(TestCase):
     PersistedBlockValue = namedtuple('PersistedBlockValue', 'exists, raw_possible, weight, graded')
     ContentBlockValue = namedtuple('ContentBlockValue', 'raw_possible, weight, explicit_graded')
     ExpectedResult = namedtuple(
-        'ExpectedResult', 'raw_earned, raw_possible, weighted_earned, weighted_possible, weight, graded'
+        'ExpectedResult', 'raw_earned, raw_possible, weighted_earned, weighted_possible, weight, graded, attempted'
     )
 
     def _create_submissions_scores(self, submission_value):
@@ -113,7 +113,9 @@ class TestGetScore(TestCase):
             PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
-                raw_earned=None, raw_possible=None, weighted_earned=50, weighted_possible=100, weight=40, graded=True
+                raw_earned=None, raw_possible=None,
+                weighted_earned=50, weighted_possible=100,
+                weight=40, graded=True, attempted=True,
             ),
         ),
         # same as above, except submissions doesn't exist; CSM values used
@@ -123,7 +125,21 @@ class TestGetScore(TestCase):
             PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
-                raw_earned=10, raw_possible=40, weighted_earned=10, weighted_possible=40, weight=40, graded=True
+                raw_earned=10, raw_possible=40,
+                weighted_earned=10, weighted_possible=40,
+                weight=40, graded=True, attempted=True,
+            ),
+        ),
+        # CSM values exist, but with NULL earned score treated as not-attempted
+        (
+            SubmissionValue(exists=False, weighted_earned=50, weighted_possible=100),
+            CSMValue(exists=True, raw_earned=None, raw_possible=40),
+            PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
+            ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
+            ExpectedResult(
+                raw_earned=0, raw_possible=40,
+                weighted_earned=0, weighted_possible=40,
+                weight=40, graded=True, attempted=False,
             ),
         ),
         # neither submissions nor CSM exist; Persisted values used
@@ -133,7 +149,9 @@ class TestGetScore(TestCase):
             PersistedBlockValue(exists=True, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
-                raw_earned=0, raw_possible=5, weighted_earned=0, weighted_possible=40, weight=40, graded=True
+                raw_earned=0, raw_possible=5,
+                weighted_earned=0, weighted_possible=40,
+                weight=40, graded=True, attempted=False,
             ),
         ),
         # none of submissions, CSM, or persisted exist; Latest content values used
@@ -143,7 +161,9 @@ class TestGetScore(TestCase):
             PersistedBlockValue(exists=False, raw_possible=5, weight=40, graded=True),
             ContentBlockValue(raw_possible=1, weight=20, explicit_graded=False),
             ExpectedResult(
-                raw_earned=0, raw_possible=1, weighted_earned=0, weighted_possible=20, weight=20, graded=False
+                raw_earned=0, raw_possible=1,
+                weighted_earned=0, weighted_possible=20,
+                weight=20, graded=False, attempted=False,
             ),
         ),
     )
@@ -259,9 +279,10 @@ class TestInternalGetScoreFromBlock(TestCase):
         Verifies the result of _get_score_from_persisted_or_latest_block is as expected.
         """
         # pylint: disable=unbalanced-tuple-unpacking
-        raw_earned, raw_possible, weighted_earned, weighted_possible = scores._get_score_from_persisted_or_latest_block(
-            persisted_block, block, weight,
-        )
+        (
+            raw_earned, raw_possible, weighted_earned, weighted_possible, attempted
+        ) = scores._get_score_from_persisted_or_latest_block(persisted_block, block, weight)
+
         self.assertEquals(raw_earned, 0.0)
         self.assertEquals(raw_possible, expected_r_possible)
         self.assertEquals(weighted_earned, 0.0)
@@ -269,6 +290,7 @@ class TestInternalGetScoreFromBlock(TestCase):
             self.assertEquals(weighted_possible, expected_r_possible)
         else:
             self.assertEquals(weighted_possible, weight)
+        self.assertFalse(attempted)
 
     @ddt.data(
         *itertools.product((0, 1, 5), (None, 0, 1, 5))

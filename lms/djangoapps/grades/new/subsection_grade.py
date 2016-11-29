@@ -2,9 +2,6 @@
 SubsectionGrade Class
 """
 from collections import OrderedDict
-from contextlib import contextmanager
-from django.db import transaction
-from django.db.utils import DatabaseError
 from lazy import lazy
 from logging import getLogger
 from courseware.model_data import ScoresClient
@@ -14,7 +11,6 @@ from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from openedx.core.lib.grade_utils import is_score_higher
 from student.models import anonymous_id_for_user
 from submissions import api as submissions_api
-from traceback import format_exc
 from xmodule import block_metadata_utils, graders
 from xmodule.graders import AggregatedScore
 
@@ -22,25 +18,11 @@ from xmodule.graders import AggregatedScore
 log = getLogger(__name__)
 
 
-@contextmanager
-def persistence_safe_fallback():
-    """
-    A context manager intended to be used to wrap robust grades database-specific code that can be ignored on failure.
-    """
-    try:
-        with transaction.atomic():
-            yield
-    except DatabaseError:
-        # Error deliberately logged, then swallowed. It's assumed that the wrapped code is not guaranteed to succeed.
-        # TODO: enqueue a celery task to finish the task asynchronously, see TNL-5471
-        log.warning("Persistent Grades: database_error.safe_fallback.\n{}".format(format_exc()))
-
-
 class SubsectionGrade(object):
     """
     Class for Subsection Grades.
     """
-    def __init__(self, subsection, course):
+    def __init__(self, subsection):
         self.location = subsection.location
         self.display_name = block_metadata_utils.display_name_with_default_escaped(subsection)
         self.url_name = block_metadata_utils.url_name_for_block(subsection)
@@ -62,6 +44,19 @@ class SubsectionGrade(object):
         List of all problem scores in the subsection.
         """
         return self.locations_to_scores.values()
+
+    @property
+    def attempted(self):
+        """
+        Returns whether any problem in this subsection
+        was attempted by the student.
+        """
+
+        assert self.all_total is not None, (
+            "SubsectionGrade not fully populated yet.  Call init_from_structure or init_from_model "
+            "before use."
+        )
+        return self.all_total.attempted
 
     def init_from_structure(self, student, course_structure, submissions_scores, csm_scores):
         """
@@ -90,6 +85,7 @@ class SubsectionGrade(object):
             graded=True,
             display_name=self.display_name,
             module_id=self.location,
+            attempted=model.first_attempted is not None,
         )
         self.all_total = AggregatedScore(
             tw_earned=model.earned_all,
@@ -97,6 +93,7 @@ class SubsectionGrade(object):
             graded=False,
             display_name=self.display_name,
             module_id=self.location,
+            attempted=model.first_attempted is not None,
         )
         self._log_event(log.debug, u"init_from_model", student)
         return self
@@ -164,6 +161,7 @@ class SubsectionGrade(object):
             earned_graded=self.graded_total.earned,
             possible_graded=self.graded_total.possible,
             visible_blocks=self._get_visible_blocks,
+            attempted=self.attempted
         )
 
     @property
@@ -223,25 +221,23 @@ class SubsectionGradeFactory(object):
 
         subsection_grade = self._get_bulk_cached_grade(subsection)
         if not subsection_grade:
-            subsection_grade = SubsectionGrade(subsection, self.course).init_from_structure(
+            subsection_grade = SubsectionGrade(subsection).init_from_structure(
                 self.student, self.course_structure, self._submissions_scores, self._csm_scores,
             )
             if PersistentGradesEnabledFlag.feature_enabled(self.course.id):
                 if read_only:
                     self._unsaved_subsection_grades.append(subsection_grade)
                 else:
-                    with persistence_safe_fallback():
-                        grade_model = subsection_grade.create_model(self.student)
-                        self._update_saved_subsection_grade(subsection.location, grade_model)
+                    grade_model = subsection_grade.create_model(self.student)
+                    self._update_saved_subsection_grade(subsection.location, grade_model)
         return subsection_grade
 
     def bulk_create_unsaved(self):
         """
         Bulk creates all the unsaved subsection_grades to this point.
         """
-        with persistence_safe_fallback():
-            SubsectionGrade.bulk_create_models(self.student, self._unsaved_subsection_grades, self.course.id)
-            self._unsaved_subsection_grades = []
+        SubsectionGrade.bulk_create_models(self.student, self._unsaved_subsection_grades, self.course.id)
+        self._unsaved_subsection_grades = []
 
     def update(self, subsection, only_if_higher=None):
         """
@@ -254,7 +250,7 @@ class SubsectionGradeFactory(object):
 
         self._log_event(log.warning, u"update, subsection: {}".format(subsection.location), subsection)
 
-        calculated_grade = SubsectionGrade(subsection, self.course).init_from_structure(
+        calculated_grade = SubsectionGrade(subsection).init_from_structure(
             self.student, self.course_structure, self._submissions_scores, self._csm_scores,
         )
 
@@ -264,7 +260,7 @@ class SubsectionGradeFactory(object):
             except PersistentSubsectionGrade.DoesNotExist:
                 pass
             else:
-                orig_subsection_grade = SubsectionGrade(subsection, self.course).init_from_model(
+                orig_subsection_grade = SubsectionGrade(subsection).init_from_model(
                     self.student, grade_model, self.course_structure, self._submissions_scores, self._csm_scores,
                 )
                 if not is_score_higher(
@@ -310,7 +306,7 @@ class SubsectionGradeFactory(object):
         saved_subsection_grades = self._get_bulk_cached_subsection_grades()
         subsection_grade = saved_subsection_grades.get(subsection.location)
         if subsection_grade:
-            return SubsectionGrade(subsection, self.course).init_from_model(
+            return SubsectionGrade(subsection).init_from_model(
                 self.student, subsection_grade, self.course_structure, self._submissions_scores, self._csm_scores,
             )
 

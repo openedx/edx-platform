@@ -225,6 +225,94 @@ class ProblemNotificationTests(ProblemsTest):
         self.assertFalse(problem_page.is_save_notification_visible())
 
 
+class ProblemFeedbackNotificationTests(ProblemsTest):
+    """
+    Tests that the feedback notifications are visible when expected.
+    """
+
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 10},
+                                 grader_type='Final Exam')
+
+    def test_feedback_notification_hides_after_save(self):
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        problem_page.click_choice("choice_0")
+        problem_page.click_submit()
+        problem_page.wait_for_feedback_message_visibility()
+        problem_page.click_choice("choice_1")
+        problem_page.click_save()
+        self.assertFalse(problem_page.is_feedback_message_notification_visible())
+
+
+class ProblemSaveStatusUpdateTests(ProblemsTest):
+    """
+    Tests the problem status updates correctly with an answer change and save.
+    """
+    def get_problem(self):
+        """
+        Problem structure.
+        """
+        xml = dedent("""
+            <problem>
+                <label>Which of the following countries has the largest population?</label>
+                    <multiplechoiceresponse>
+                      <choicegroup type="MultipleChoice">
+                        <choice correct="false">Brazil <choicehint>timely feedback -- explain why an almost correct answer is wrong</choicehint></choice>
+                        <choice correct="false">Germany</choice>
+                        <choice correct="true">Indonesia</choice>
+                        <choice correct="false">Russia</choice>
+                      </choicegroup>
+                    </multiplechoiceresponse>
+            </problem>
+        """)
+        return XBlockFixtureDesc('problem', 'TEST PROBLEM', data=xml,
+                                 metadata={'max_attempts': 10},
+                                 grader_type='Final Exam')
+
+    def test_status_removed_after_save_before_submit(self):
+        """
+        Scenario: User should see the status removed when saving after submitting an answer and reloading the page.
+        Given that I have loaded the problem page
+        And a choice has been selected and submitted
+        When I change the choice
+        And Save the problem
+        And reload the problem page
+        Then I should see the save notification and I should not see any indication of problem status
+        """
+        self.courseware_page.visit()
+        problem_page = ProblemPage(self.browser)
+        problem_page.click_choice("choice_1")
+        problem_page.click_submit()
+        problem_page.wait_incorrect_notification()
+        problem_page.wait_for_expected_status('label.choicegroup_incorrect', 'incorrect')
+        problem_page.click_choice("choice_2")
+        self.assertFalse(problem_page.is_expected_status_visible('label.choicegroup_incorrect'))
+        problem_page.click_save()
+        problem_page.wait_for_save_notification()
+        # Refresh the page and the status should not be added
+        self.courseware_page.visit()
+        self.assertFalse(problem_page.is_expected_status_visible('label.choicegroup_incorrect'))
+        self.assertTrue(problem_page.is_save_notification_visible())
+
+
 class ProblemSubmitButtonMaxAttemptsTest(ProblemsTest):
     """
     Tests that the Submit button disables after the number of max attempts is reached.

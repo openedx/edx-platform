@@ -107,7 +107,7 @@ from student.helpers import (
     DISABLE_UNENROLL_CERT_STATES,
     destroy_oauth_tokens
 )
-from student.cookies import set_logged_in_cookies, delete_logged_in_cookies
+from student.cookies import set_logged_in_cookies, delete_logged_in_cookies, set_user_info_cookie
 from student.models import anonymous_id_for_user, UserAttribute, EnrollStatusChange
 from shoppingcart.models import DonationConfiguration, CourseRegistrationCode
 
@@ -785,7 +785,9 @@ def dashboard(request):
             'ecommerce_payment_page': ecommerce_service.payment_page_url(),
         })
 
-    return render_to_response('dashboard.html', context)
+    response = render_to_response('dashboard.html', context)
+    set_user_info_cookie(response, request)
+    return response
 
 
 def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name

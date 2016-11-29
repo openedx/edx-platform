@@ -11,7 +11,7 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-% for template_name in ["active-video-upload-list", "active-video-upload", "previous-video-upload-list", "previous-video-upload"]:
+% for template_name in ["active-video-upload-list", "active-video-upload", "previous-video-upload-list"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -24,7 +24,7 @@
         var $contentWrapper = $(".content-primary");
         VideosIndexFactory(
             $contentWrapper,
-            "${post_url}",
+            "${video_handler_url}",
             "${encodings_download_url}",
             ${concurrent_upload_limit},
             $(".nav-actions .upload-button"),

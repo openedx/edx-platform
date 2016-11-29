@@ -1,11 +1,13 @@
 """
 Test the student dashboard view.
 """
+import json
 import unittest
 
 import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test import RequestFactory
 from django.test import TestCase
 from edx_oauth2_provider.constants import AUTHORIZED_CLIENTS_SESSION_KEY
 from edx_oauth2_provider.tests.factories import ClientFactory, TrustedClientFactory
@@ -14,6 +16,7 @@ from pyquery import PyQuery as pq
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from student.cookies import get_user_info_cookie_data
 from student.helpers import DISABLE_UNENROLL_CERT_STATES
 from student.models import CourseEnrollment, LogoutViewConfiguration
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -195,3 +198,26 @@ class LogoutTests(TestCase):
             'target': '/',
         }
         self.assertDictContainsSubset(expected, response.context_data)  # pylint: disable=no-member
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class StudentDashboardTests(TestCase):
+    """ Tests for the student dashboard. """
+
+    def setUp(self):
+        """ Create a course and user, then log in. """
+        super(StudentDashboardTests, self).setUp()
+        self.user = UserFactory()
+        self.client.login(username=self.user.username, password=PASSWORD)
+        self.path = reverse('dashboard')
+
+    def test_user_info_cookie(self):
+        """ Verify visiting the learner dashboard sets the user info cookie. """
+        self.assertNotIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
+
+        request = RequestFactory().get(self.path)
+        request.user = self.user
+        expected = json.dumps(get_user_info_cookie_data(request))
+        self.client.get(self.path)
+        actual = self.client.cookies[settings.EDXMKTG_USER_INFO_COOKIE_NAME].value
+        self.assertEqual(actual, expected)

@@ -616,13 +616,14 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 org = course_id.org
                 update_email_opt_in(request.user, org, email_opt_in)
 
+            log.info('The user [%s] has already been enrolled in course run [%s].', username, course_id)
             return Response(response)
         except CourseModeNotFoundError as error:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={
                     "message": (
-                        u"The course mode '{mode}' is not available for course '{course_id}'."
+                        u"The [{mode}] course mode is expired or otherwise unavailable for course run [{course_id}]."
                     ).format(mode=mode, course_id=course_id),
                     "course_details": error.data
                 })
@@ -634,8 +635,11 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                 }
             )
         except CourseEnrollmentExistsError as error:
+            log.warning('An enrollment already exists for user [%s] in course run [%s].', username, course_id)
             return Response(data=error.enrollment)
         except CourseEnrollmentError:
+            log.exception("An error occurred while creating the new course enrollment for user "
+                          "[%s] in course run [%s]", username, course_id)
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={

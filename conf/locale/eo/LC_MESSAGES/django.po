@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-09 22:14+0000\n"
-"PO-Revision-Date: 2016-11-09 22:14:56.380821\n"
+"POT-Creation-Date: 2016-11-22 15:44+0000\n"
+"PO-Revision-Date: 2016-11-22 15:44:56.953763\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -180,7 +180,6 @@ msgstr ""
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -638,13 +637,13 @@ msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм ιρѕυм ∂σłσя
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "No Formal Education"
-msgstr "Nö Förmäl Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+msgid "No formal education"
+msgstr "Nö förmäl édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other Education"
-msgstr "Öthér Édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+msgid "Other education"
+msgstr "Öthér édüçätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -2241,6 +2240,12 @@ msgstr ""
 "¢σηѕє¢тєтυя #"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Whether or not the answers have been saved since last submit"
+msgstr ""
+"Whéthér ör nöt thé änswérs hävé ßéén sävéd sïnçé läst süßmït Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether the student has answered the problem"
 msgstr ""
 "Whéthér thé stüdént häs änswéréd thé prößlém Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
@@ -2367,6 +2372,13 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "Hïnt ({hint_num} öf {hints_count}):  Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Your answers were previously saved. Click '{button_name}' to grade them."
+msgstr ""
+"Ýöür änswérs wéré prévïöüslý sävéd. Çlïçk '{button_name}' tö grädé thém. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect ({progress} point)"
@@ -5526,7 +5538,6 @@ msgstr "Térms öf Sérvïçé & Hönör Çödé Ⱡ'σяєм ιρѕυм ∂σł
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5542,7 +5553,6 @@ msgstr "Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕ
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
-#: themes/example/lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -6292,10 +6302,6 @@ msgstr "{relative} ägö - {absolute} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
 msgstr "ïn {relative} - {absolute} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr "Tödäý ïs {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
@@ -7934,10 +7940,6 @@ msgstr ""
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
 msgstr "Çöürsé Ìnfö Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
-msgstr "Nö énd däté sét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -12318,7 +12320,6 @@ msgstr "Çöürsé Nümßér: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "Çöürsés Ⱡ'σяєм ιρѕυм #"
@@ -12464,7 +12465,6 @@ msgid "Choose Language"
 msgstr "Çhöösé Längüägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: themes/example/lms/templates/header.html
 msgid "Account"
 msgstr "Àççöünt Ⱡ'σяєм ιρѕυм #"
 
@@ -12533,7 +12533,6 @@ msgstr "Sénd än émäïl tö {email} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι�
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
-#: themes/example/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "Çöntäçt Ûs Ⱡ'σяєм ιρѕυм ∂σłσ#"
@@ -12547,7 +12546,6 @@ msgid "Usermenu dropdown"
 msgstr "Ûsérménü dröpdöwn Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "Sïgn Öüt Ⱡ'σяєм ιρѕυм ∂#"
@@ -12585,6 +12583,38 @@ msgstr ""
 #: common/templates/license.html
 msgid "Some Rights Reserved"
 msgstr "Sömé Rïghts Résérvéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Feedback Form"
+msgstr "Féédßäçk Förm Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Email: {email}"
+msgstr "Émäïl: {email} Ⱡ'σяєм ιρѕυм ∂σłσ#"
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Full Name: {realname}"
+msgstr "Füll Nämé: {realname} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Inquiry Type: {inquiry_type}"
+msgstr "Ìnqüïrý Týpé: {inquiry_type} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Message: {message}"
+msgstr "Méssägé: {message} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Tags: {tags}"
+msgstr "Tägs: {tags} Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Additional Info:"
+msgstr "Àddïtïönäl Ìnfö: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/templates/emails/contact_us_feedback_email_subject.txt
+msgid "Feedback from user"
+msgstr "Féédßäçk fröm üsér Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
@@ -12653,11 +12683,17 @@ msgstr "Böökmärkéd Ⱡ'σяєм ιρѕυм ∂σłσ#"
 msgid "Bookmark this page"
 msgstr "Böökmärk thïs pägé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
-#: lms/templates/course.html themes/example/lms/templates/course.html
+#: lms/templates/conditional_module.html
+msgid "You do not have access to this dependency module."
+msgstr ""
+"Ýöü dö nöt hävé äççéss tö thïs dépéndénçý mödülé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α#"
+
+#: lms/templates/course.html
 msgid "LEARN MORE"
 msgstr "LÉÀRN MÖRÉ Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
-#: lms/templates/course.html themes/example/lms/templates/course.html
+#: lms/templates/course.html
 msgid "Starts"
 msgstr "Stärts Ⱡ'σяєм ιρѕυ#"
 
@@ -12671,7 +12707,6 @@ msgstr "Vïéw äll Çöürsés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
-#: themes/example/lms/templates/header.html
 msgid "Dashboard"
 msgstr "Däshßöärd Ⱡ'σяєм ιρѕυм ∂σł#"
 
@@ -12778,7 +12813,6 @@ msgstr ""
 #: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "Enroll"
 msgstr "Énröll Ⱡ'σяєм ιρѕυ#"
 
@@ -12960,18 +12994,18 @@ msgstr "Thänk Ýöü! Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
 "Thänk ýöü för ýöür ïnqüïrý ör féédßäçk.  Wé týpïçällý réspönd tö ä réqüést "
-"wïthïn öné ßüsïnéss däý (Möndäý tö Frïdäý, {open_time} ÛTÇ tö {close_time} "
-"ÛTÇ.) Ìn thé méäntïmé, pléäsé révïéw öür {link_start}détäïléd FÀQs{link_end}"
-" whéré möst qüéstïöns hävé älréädý ßéén änswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєł#"
+"wïthïn öné ßüsïnéss däý, Möndäý tö Frïdäý.  Ìn thé méäntïmé, pléäsé révïéw "
+"öür {link_start}détäïléd FÀQs{link_end} whéré möst qüéstïöns hävé älréädý "
+"ßéén änswéréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, "
+"ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм "
+"α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
+"єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
+" νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυł#"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -13379,8 +13413,7 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Räw dätä: Ⱡ'σяєм ιρѕυм ∂σł#"
 
-#: lms/templates/navigation.html themes/example/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "Glößäl Ⱡ'σяєм ιρѕυ#"
 
@@ -13420,7 +13453,6 @@ msgid "Register"
 msgstr "Régïstér Ⱡ'σяєм ιρѕυм ∂#"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "Sïgn ïn Ⱡ'σяєм ιρѕυм #"
@@ -14169,7 +14201,7 @@ msgstr ""
 msgid "Dashboard for:"
 msgstr "Däshßöärd för: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
-#: lms/templates/user_dropdown.html themes/example/lms/templates/header.html
+#: lms/templates/user_dropdown.html
 msgid "Profile"
 msgstr "Pröfïlé Ⱡ'σяєм ιρѕυм #"
 
@@ -15925,14 +15957,12 @@ msgid "This content is graded"
 msgstr "Thïs çöntént ïs grädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr ""
 "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
 "¢σηѕє¢тєтυя #"
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -16023,7 +16053,6 @@ msgid "Additional Resources"
 msgstr "Àddïtïönäl Résöürçés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "énröll Ⱡ'σяєм ιρѕυ#"
 
@@ -16230,6 +16259,10 @@ msgstr "Händöüt Nävïgätïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α
 #: lms/templates/courseware/info.html
 msgid "Important Course Dates"
 msgstr "Ìmpörtänt Çöürsé Dätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr "Tödäý ïs {date} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -18393,6 +18426,10 @@ msgstr "Çöürsé Dïspläý Nämé: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
 msgstr "Çöürsé Énd Däté: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
+msgstr "Nö énd däté sét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -21307,6 +21344,18 @@ msgstr ""
 "Ìf ýöü hävé äný qüéstïöns äßöüt thïs çöürsé ör thïs förm, ýöü çän çöntäçt "
 "{link_start}{mail_to_link}{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
 
+#: lms/templates/verify_student/_verification_help.html
+msgid "Have questions?"
+msgstr "Hävé qüéstïöns? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/templates/verify_student/_verification_help.html
+msgid ""
+"Please read {a_start}our FAQs to view common questions about our "
+"certificates{a_end}."
+msgstr ""
+"Pléäsé réäd {a_start}öür FÀQs tö vïéw çömmön qüéstïöns äßöüt öür "
+"çértïfïçätés{a_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "Ré-Vérïfý för {course_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
@@ -21353,18 +21402,6 @@ msgstr "Vérïfý För {course_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Enroll In {course_name}"
 msgstr "Énröll Ìn {course_name} Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Have questions?"
-msgstr "Hävé qüéstïöns? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid ""
-"Please read {a_start}our FAQs to view common questions about our "
-"certificates{a_end}."
-msgstr ""
-"Pléäsé réäd {a_start}öür FÀQs tö vïéw çömmön qüéstïöns äßöüt öür "
-"çértïfïçätés{a_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Technical Requirements"
@@ -21498,90 +21535,6 @@ msgid ""
 msgstr ""
 "{b_start}Süppört öür Mïssïön: {b_end} ÉdX, ä nön-pröfït, rélïés ön vérïfïéd "
 "çértïfïçätés tö hélp fünd fréé édüçätïön för évérýöné glößällý Ⱡ'σя#"
-
-#: themes/example/lms/templates/header.html
-msgid "Create Account"
-msgstr "Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Want to purchase this course for a group?"
-msgstr ""
-"Wänt tö pürçhäsé thïs çöürsé för ä gröüp? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя #"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid ""
-"You can purchase enrollment codes for this course to distribute to your team"
-msgstr ""
-"Ýöü çän pürçhäsé énröllmént çödés för thïs çöürsé tö dïstrïßüté tö ýöür téäm"
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυ#"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Purchase for a Group"
-msgstr "Pürçhäsé för ä Gröüp Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid ""
-"Bulk discounts may apply for groups larger than 10. Contact "
-"{link_start}harvardxplus@harvard.edu{link_end} for more information."
-msgstr ""
-"Bülk dïsçöünts mäý äpplý för gröüps lärgér thän 10. Çöntäçt "
-"{link_start}härvärdxplüs@härvärd.édü{link_end} för möré ïnförmätïön. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя#"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Email Us"
-msgstr "Émäïl Ûs Ⱡ'σяєм ιρѕυм ∂#"
-
-#: themes/example/lms/templates/courseware/courses.html
-msgid "Lorem ipsum dolor sit amet."
-msgstr "Lörém ïpsüm dölör sït ämét. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
-
-#: themes/example/lms/templates/static_templates/about.html
-msgid "About Us"
-msgstr "Àßöüt Ûs Ⱡ'σяєм ιρѕυм ∂#"
-
-#: themes/example/lms/templates/static_templates/contact.html
-msgid "Thank you for your inquiry"
-msgstr "Thänk ýöü för ýöür ïnqüïrý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "FAQ's"
-msgstr "FÀQ's Ⱡ'σяєм ιρѕ#"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "General FAQs"
-msgstr "Généräl FÀQs Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: themes/example/lms/templates/static_templates/faq.html
-#: themes/example/lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/tos.html
-msgid "Lorem ipsum dolor sit amet"
-msgstr "Lörém ïpsüm dölör sït ämét Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Academic Planning"
-msgstr "Àçädémïç Plännïng Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
-
-#: themes/example/lms/templates/static_templates/faq.html
-#: themes/example/lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/tos.html
-msgid "Back to top"
-msgstr "Bäçk tö töp Ⱡ'σяєм ιρѕυм ∂σłσя #"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Registration"
-msgstr "Régïsträtïön Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Finances"
-msgstr "Fïnänçés Ⱡ'σяєм ιρѕυм ∂#"
-
-#: themes/example/lms/templates/student_account/login_and_register.html
-msgid "Sign in or Create Account"
-msgstr "Sïgn ïn ör Çréäté Àççöünt Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.

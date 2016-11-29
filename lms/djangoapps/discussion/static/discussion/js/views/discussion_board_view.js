@@ -32,6 +32,7 @@
 
             initialize: function(options) {
                 this.courseSettings = options.courseSettings;
+                this.showThreadPreview = true;
                 this.sidebar_padding = 10;
                 this.current_search = '';
                 this.mode = 'all';
@@ -45,7 +46,8 @@
                 this.discussionThreadListView = new DiscussionThreadListView({
                     collection: this.discussion,
                     el: this.$('.discussion-thread-list-container'),
-                    courseSettings: this.courseSettings
+                    courseSettings: this.courseSettings,
+                    showThreadPreview: this.showThreadPreview
                 }).render();
                 this.searchView = new DiscussionSearchView({
                     el: this.$('.forum-search')

@@ -74,6 +74,7 @@ from openedx.core.djangolib.markup import HTML
                 notification_type='success',
                 notification_icon='fa-check',
                 notification_name='submit',
+                is_hidden=False,
                 notification_message=answer_notification_message"
             />
         % endif
@@ -82,6 +83,7 @@ from openedx.core.djangolib.markup import HTML
                 notification_type='error',
                 notification_icon='fa-close',
                 notification_name='submit',
+                is_hidden=False,
                 notification_message=answer_notification_message"
             />
         % endif
@@ -90,6 +92,7 @@ from openedx.core.djangolib.markup import HTML
                 notification_type='success',
                 notification_icon='fa-asterisk',
                 notification_name='submit',
+                is_hidden=False,
                 notification_message=answer_notification_message"
             />
         % endif
@@ -98,6 +101,7 @@ from openedx.core.djangolib.markup import HTML
       notification_type='warning',
       notification_icon='fa-save',
       notification_name='save',
-      notification_message=''"
+      notification_message=save_message,
+      is_hidden=not has_saved_answers"
     />
 </div>

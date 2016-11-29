@@ -144,5 +144,9 @@
       width: flex-grid(4, 9);
       text-align: right;
     }
+
+    .actions-list {
+      @extend %actions-list;
+    }
   }
 }

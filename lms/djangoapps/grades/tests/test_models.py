@@ -8,6 +8,7 @@ import ddt
 from hashlib import sha1
 import json
 
+from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
 from django.test import TestCase
 from django.utils.timezone import now
@@ -210,6 +211,7 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             "earned_graded": 6.0,
             "possible_graded": 8.0,
             "visible_blocks": self.block_records,
+            "attempted": True,
         }
 
     def test_create(self):
@@ -224,20 +226,29 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
             )
             self.assertEqual(created_grade, read_grade)
             self.assertEqual(read_grade.visible_blocks.blocks, self.block_records)
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ValidationError):
             PersistentSubsectionGrade.create_grade(**self.params)
 
-    def test_create_bad_params(self):
-        """
-        Confirms create will fail if params are missing.
-        """
-        del self.params["earned_graded"]
-        with self.assertRaises(IntegrityError):
-            PersistentSubsectionGrade.create_grade(**self.params)
-
-    def test_course_version_is_optional(self):
+    def test_optional_fields(self):
         del self.params["course_version"]
         PersistentSubsectionGrade.create_grade(**self.params)
+
+    @ddt.data(
+        ("user_id", ValidationError),
+        ("usage_key", KeyError),
+        ("subtree_edited_timestamp", ValidationError),
+        ("earned_all", ValidationError),
+        ("possible_all", ValidationError),
+        ("earned_graded", ValidationError),
+        ("possible_graded", ValidationError),
+        ("visible_blocks", KeyError),
+        ("attempted", KeyError),
+    )
+    @ddt.unpack
+    def test_non_optional_fields(self, field, error):
+        del self.params[field]
+        with self.assertRaises(error):
+            PersistentSubsectionGrade.create_grade(**self.params)
 
     @ddt.data(True, False)
     def test_update_or_create_grade(self, already_created):
@@ -249,6 +260,44 @@ class PersistentSubsectionGradeTest(GradesModelTestCase):
         if already_created:
             self.assertEqual(created_grade.id, updated_grade.id)
             self.assertEqual(created_grade.earned_all, 6)
+
+    def test_update_or_create_attempted(self):
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.assertIsInstance(grade.first_attempted, datetime)
+
+    def test_unattempted(self):
+        self.params['attempted'] = False
+        self.params['earned_all'] = 0.0
+        self.params['earned_graded'] = 0.0
+        grade = PersistentSubsectionGrade.create_grade(**self.params)
+        self.assertIsNone(grade.first_attempted)
+        self.assertEqual(grade.earned_all, 0.0)
+        self.assertEqual(grade.earned_graded, 0.0)
+
+    def test_create_inconsistent_unattempted(self):
+        self.params['attempted'] = False
+        with self.assertRaises(ValidationError):
+            PersistentSubsectionGrade.create_grade(**self.params)
+
+    def test_update_or_create_inconsistent_unattempted(self):
+        self.params['attempted'] = False
+        self.params['earned_all'] = 1.0
+        self.params['earned_graded'] = 1.0
+        with self.assertRaises(ValidationError):
+            PersistentSubsectionGrade.update_or_create_grade(**self.params)
+
+    def test_first_attempted_not_changed_on_update(self):
+        PersistentSubsectionGrade.create_grade(**self.params)
+        moment = now()
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.assertLess(grade.first_attempted, moment)
+
+    def test_unattempted_save_does_not_remove_attempt(self):
+        PersistentSubsectionGrade.create_grade(**self.params)
+        self.params['attempted'] = False
+        grade = PersistentSubsectionGrade.update_or_create_grade(**self.params)
+        self.assertIsInstance(grade.first_attempted, datetime)
+        self.assertEqual(grade.earned_all, 6.0)
 
 
 @ddt.ddt

@@ -34,11 +34,25 @@ class ProblemPage(PageObject):
         return self.q(css="div.problem p").text
 
     @property
+    def problem_input_content(self):
+        """
+        Return the text of the question of the problem.
+        """
+        return self.q(css="div.wrapper-problem-response").text[0]
+
+    @property
     def problem_content(self):
         """
         Return the content of the problem
         """
         return self.q(css="div.problems-wrapper").text[0]
+
+    @property
+    def problem_meta(self):
+        """
+        Return the problem meta text
+        """
+        return self.q(css=".problems-wrapper .problem-progress").text[0]
 
     @property
     def message_text(self):
@@ -144,6 +158,12 @@ class ProblemPage(PageObject):
         """
         return self.q(css='.notification.notification-hint').visible
 
+    def is_feedback_message_notification_visible(self):
+        """
+        Is the Feedback Messaged notification visible
+        """
+        return self.q(css='.wrapper-problem-response .message').visible
+
     def is_save_notification_visible(self):
         """
         Is the Save Notification Visible?
@@ -155,6 +175,13 @@ class ProblemPage(PageObject):
         Is the Submit Notification Visible?
         """
         return self.q(css='.notification.success.notification-submit').visible
+
+    def wait_for_feedback_message_visibility(self):
+        """
+        Wait for the Feedback Message notification to be visible.
+        """
+        self.wait_for_element_visibility('.wrapper-problem-response .message',
+                                         'Waiting for the Feedback message to be visible')
 
     def wait_for_save_notification(self):
         """
@@ -236,6 +263,15 @@ class ProblemPage(PageObject):
         """
         msg = "Wait for status to be {}".format(message)
         self.wait_for_element_visibility(status_selector, msg)
+
+    def is_expected_status_visible(self, status_selector):
+        """
+        check for the expected status indicator to be visible.
+
+        Args:
+            status_selector(str): status selector string.
+        """
+        return self.q(css=status_selector).visible
 
     def wait_success_notification(self):
         """

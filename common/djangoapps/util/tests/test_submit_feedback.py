@@ -5,6 +5,7 @@ from django.http import Http404
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from smtplib import SMTPException
 from student.tests.factories import UserFactory
 from util import views
 from zendesk import ZendeskError
@@ -14,11 +15,25 @@ import mock
 from student.tests.test_configuration_overrides import fake_get_value
 
 
+def fake_support_backend_values(name, default=None):  # pylint: disable=unused-argument
+    """
+    Method for getting configuration override values for support email.
+    """
+    config_dict = {
+        "CONTACT_FORM_SUBMISSION_BACKEND": "email",
+        "email_from_address": "support_from@example.com",
+    }
+    return config_dict[name]
+
+
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
 @override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy")
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
 class SubmitFeedbackTest(TestCase):
+    """
+    Class to test the submit_feedback function in views.
+    """
     def setUp(self):
         """Set up data for the test case"""
         super(SubmitFeedbackTest, self).setUp()
@@ -356,3 +371,19 @@ class SubmitFeedbackTest(TestCase):
         test_case("django.conf.settings.ZENDESK_URL")
         test_case("django.conf.settings.ZENDESK_USER")
         test_case("django.conf.settings.ZENDESK_API_KEY")
+
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_support_backend_values)
+    def test_valid_request_over_email(self, zendesk_mock_class, datadog_mock):  # pylint: disable=unused-argument
+        with mock.patch("util.views.send_mail") as patched_send_email:
+            resp = self._build_and_run_request(self._anon_user, self._anon_fields)
+            self.assertEqual(patched_send_email.call_count, 1)
+            self.assertIn(self._anon_fields["email"], str(patched_send_email.call_args))
+        self.assertEqual(resp.status_code, 200)
+
+    @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_support_backend_values)
+    def test_exception_request_over_email(self, zendesk_mock_class, datadog_mock):  # pylint: disable=unused-argument
+        with mock.patch("util.views.send_mail", side_effect=SMTPException) as patched_send_email:
+            resp = self._build_and_run_request(self._anon_user, self._anon_fields)
+            self.assertEqual(patched_send_email.call_count, 1)
+            self.assertIn(self._anon_fields["email"], str(patched_send_email.call_args))
+        self.assertEqual(resp.status_code, 500)

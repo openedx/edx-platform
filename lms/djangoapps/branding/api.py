@@ -178,7 +178,7 @@ def _footer_navigation_links():
             ("contact", marketing_link("CONTACT"), _("Contact")),
             ("careers", marketing_link("CAREERS"), _("Careers")),
             ("donate", marketing_link("DONATE"), _("Donate")),
-            ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
+            ("media_kit", marketing_link("MEDIA_KIT"), _("Media Kit"))
         ]
         if link_url and link_url != "#"
     ]
@@ -191,6 +191,7 @@ def _footer_legal_links():
         ("terms_of_service_and_honor_code", marketing_link("TOS_AND_HONOR"), _("Terms of Service & Honor Code")),
         ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
         ("accessibility_policy", marketing_link("ACCESSIBILITY"), _("Accessibility Policy")),
+        ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"

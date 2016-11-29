@@ -48,7 +48,6 @@ from certificates.models import (
 )
 from certificates import api as certs_api
 from bulk_email.models import BulkEmailFlag
-from util.date_utils import get_default_time_display
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url
@@ -430,8 +429,8 @@ def _section_course_info(course, access):
         'course_display_name': course.display_name,
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
-        'start_date': get_default_time_display(course.start),
-        'end_date': get_default_time_display(course.end) or _('No end date set'),
+        'start_date': course.start,
+        'end_date': course.end,
         'num_sections': len(course.children),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
     }

@@ -9,8 +9,9 @@ from django.core.exceptions import PermissionDenied
 
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
 from student.tests.factories import AdminFactory
-from student.auth import user_has_role, add_users, remove_users
+from student.auth import user_has_role, add_users, remove_users, has_studio_write_access, has_studio_read_access
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from ccx_keys.locator import CCXLocator
 
 
 class CreatorGroupTest(TestCase):
@@ -130,6 +131,45 @@ class CreatorGroupTest(TestCase):
         with self.assertRaises(PermissionDenied):
             self.admin.is_authenticated = mock.Mock(return_value=False)
             remove_users(self.admin, CourseCreatorRole(), self.user)
+
+
+class CCXCourseGroupTest(TestCase):
+    """
+    Test that access to a CCX course in Studio is disallowed
+    """
+    def setUp(self):
+        """
+        Set up test variables
+        """
+        super(CCXCourseGroupTest, self).setUp()
+        self.global_admin = AdminFactory()
+        self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
+        self.ccx_course_key = CCXLocator.from_string('ccx-v1:edX+DemoX+Demo_Course+ccx@1')
+        add_users(self.global_admin, CourseStaffRole(self.ccx_course_key), self.staff)
+
+    def test_no_global_admin_write_access(self):
+        """
+        Test that global admins have no write access
+        """
+        self.assertFalse(has_studio_write_access(self.global_admin, self.ccx_course_key))
+
+    def test_no_staff_write_access(self):
+        """
+        Test that course staff have no write access
+        """
+        self.assertFalse(has_studio_write_access(self.staff, self.ccx_course_key))
+
+    def test_no_global_admin_read_access(self):
+        """
+        Test that global admins have no read access
+        """
+        self.assertFalse(has_studio_read_access(self.global_admin, self.ccx_course_key))
+
+    def test_no_staff_read_access(self):
+        """
+        Test that course staff have no read access
+        """
+        self.assertFalse(has_studio_read_access(self.staff, self.ccx_course_key))
 
 
 class CourseGroupTest(TestCase):

@@ -2,15 +2,19 @@
 Tests for the score change signals defined in the courseware models module.
 """
 
+import re
+
 import ddt
 from django.test import TestCase
 from mock import patch, MagicMock
 
 from ..signals.handlers import (
+    enqueue_subsection_update,
     submissions_score_set_handler,
     submissions_score_reset_handler,
 )
 
+UUID_REGEX = re.compile(ur'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
 
 SUBMISSION_SET_KWARGS = {
     'points_possible': 10,
@@ -117,3 +121,22 @@ class SubmissionSignalRelayTest(TestCase):
         self.get_user_mock = self.setup_patch('lms.djangoapps.grades.signals.handlers.user_by_anonymous_id', None)
         handler(None, **kwargs)
         self.signal_mock.assert_not_called()
+
+    @patch('lms.djangoapps.grades.signals.handlers.log.info')
+    def test_problem_score_changed_logging(self, mocklog):
+        enqueue_subsection_update(
+            sender='test',
+            user_id=1,
+            course_id=u'course-v1:edX+Demo_Course+DemoX',
+            usage_id=u'block-v1:block-key',
+        )
+        log_statement = mocklog.call_args[0][0]
+        log_statement = UUID_REGEX.sub(u'*UUID*', log_statement)
+        self.assertEqual(
+            log_statement,
+            (
+                u'Grades: Request async calculation of subsection grades with args: '
+                u'course_id:course-v1:edX+Demo_Course+DemoX, usage_id:block-v1:block-key, '
+                u'user_id:1. Task [*UUID*]'
+            )
+        )

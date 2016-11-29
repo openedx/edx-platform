@@ -11,14 +11,12 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
 from django.utils.translation import to_locale, get_language
-from edxmako.shortcuts import render_to_string
 from lazy import lazy
 
 from course_modes.models import CourseMode
 from lms.djangoapps.commerce.utils import EcommerceService
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
 from student.models import CourseEnrollment
-from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 
 
 class DateSummary(object):
@@ -78,24 +76,8 @@ class DateSummary(object):
         self.course = course
         self.user = user
 
-    def get_context(self):
-        """Return the template context used to render this summary block."""
-        return {
-            'title': self.title,
-            'date': self._format_date(),
-            'description': self.description,
-            'css_class': self.css_class,
-            'link': self.link,
-            'link_text': self.link_text,
-        }
-
-    def render(self):
-        """
-        Return an HTML representation of this summary block.
-        """
-        return render_to_string('courseware/date_summary.html', self.get_context())
-
-    def _format_date(self):
+    @property
+    def relative_datestring(self):
         """
         Return this block's date in a human-readable format. If the date
         is None, returns the empty string.
@@ -121,7 +103,7 @@ class DateSummary(object):
         date_format = _(u"{relative} ago - {absolute}") if date_has_passed else _(u"in {relative} - {absolute}")
         return date_format.format(
             relative=relative_date,
-            absolute=self.date.astimezone(self.time_zone).strftime(self.date_format.encode('utf-8')).decode('utf-8'),
+            absolute='{date}',
         )
 
     @property
@@ -151,10 +133,6 @@ class TodaysDate(DateSummary):
     css_class = 'todays-date'
     is_enabled = True
 
-    @property
-    def date_format(self):
-        return u'%b %d, %Y (%H:%M {tz_abbr})'.format(tz_abbr=get_time_zone_abbr(self.time_zone))
-
     # The date is shown in the title, no need to display it again.
     def get_context(self):
         context = super(TodaysDate, self).get_context()
@@ -167,9 +145,7 @@ class TodaysDate(DateSummary):
 
     @property
     def title(self):
-        return _(u'Today is {date}').format(
-            date=self.date.astimezone(self.time_zone).strftime(self.date_format.encode('utf-8')).decode('utf-8')
-        )
+        return 'current_datetime'
 
 
 class CourseStartDate(DateSummary):

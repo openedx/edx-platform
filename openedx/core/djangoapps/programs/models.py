@@ -7,11 +7,11 @@ from django.db import models
 from config_models.models import ConfigurationModel
 
 
-# TODO: To be simplified as part of ECOM-5136.
 class ProgramsApiConfig(ConfigurationModel):
     """
-    Manages configuration for connecting to the Programs service and using its
-    API.
+    DEPRECATED. To be removed as part of ECOM-5136.
+
+    Manages configuration for connecting to the Programs service and using its API.
     """
     OAUTH2_CLIENT_NAME = 'programs'
     CACHE_KEY = 'programs.api.data'

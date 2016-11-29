@@ -21,6 +21,9 @@
       <span class="icon fa <%= icon_class %>" aria-hidden="true"></span>
     </div><div class="forum-nav-thread-wrapper-1">
       <span class="forum-nav-thread-title"><%- title %></span>
+      <% if (showThreadPreview){ %>
+        <div class="thread-preview-body"><%- threadPreview %></div>
+      <% } %>
       <% if(typeof(subscribed) === "undefined") { var subscribed = null; } %>
       <% if(pinned || subscribed || staff_authored || community_ta_authored) { %>
         <ul class="forum-nav-thread-labels">

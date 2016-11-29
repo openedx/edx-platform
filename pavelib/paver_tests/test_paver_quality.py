@@ -1,18 +1,20 @@
 """
 Tests for paver quality tasks
 """
-import os
-from path import Path as path
 import tempfile
 import textwrap
 import unittest
-from mock import patch, MagicMock, mock_open
-from ddt import ddt, file_data
 
-import pavelib.quality
+import os
 import paver.easy
 import paver.tasks
+from ddt import ddt, file_data
+from mock import patch, MagicMock, mock_open
+from path import Path as path
 from paver.easy import BuildFailure
+
+import pavelib.quality
+from pavelib.paver_tests.utils import fail_on_pylint, fail_on_eslint
 
 
 @ddt
@@ -296,7 +298,7 @@ class TestPaverRunQuality(unittest.TestCase):
         """
 
         # Underlying sh call must fail when it is running the pylint diff-quality task
-        self._mock_paver_sh.side_effect = CustomShMock().fail_on_pylint
+        self._mock_paver_sh.side_effect = fail_on_pylint
         _mock_pep8_violations = MagicMock(return_value=(0, []))
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
@@ -316,7 +318,7 @@ class TestPaverRunQuality(unittest.TestCase):
         """
 
         # Underlying sh call must fail when it is running the eslint diff-quality task
-        self._mock_paver_sh.side_effect = CustomShMock().fail_on_eslint
+        self._mock_paver_sh.side_effect = fail_on_eslint
         _mock_pep8_violations = MagicMock(return_value=(0, []))
         with patch('pavelib.quality._get_pep8_violations', _mock_pep8_violations):
             with self.assertRaises(SystemExit):
@@ -351,32 +353,3 @@ class TestPaverRunQuality(unittest.TestCase):
         self.assertEqual(_mock_pep8_violations.call_count, 1)
         # And assert that sh was called twice (for the call to "pylint" & "eslint")
         self.assertEqual(self._mock_paver_sh.call_count, 2)
-
-
-class CustomShMock(object):
-    """
-    Diff-quality makes a number of sh calls. None of those calls should be made during tests; however, some
-    of them need to have certain responses.
-    """
-
-    def fail_on_pylint(self, arg):
-        """
-        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
-        is going to fail when we pass in a percentage ("p") requirement.
-        """
-        if "pylint" in arg:
-            # Essentially mock diff-quality exiting with 1
-            paver.easy.sh("exit 1")
-        else:
-            return
-
-    def fail_on_eslint(self, arg):
-        """
-        For our tests, we need the call for diff-quality running pep8 reports to fail, since that is what
-        is going to fail when we pass in a percentage ("p") requirement.
-        """
-        if "eslint" in arg:
-            # Essentially mock diff-quality exiting with 1
-            paver.easy.sh("exit 1")
-        else:
-            return

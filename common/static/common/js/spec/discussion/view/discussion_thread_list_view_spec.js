@@ -83,10 +83,12 @@
         renderSingleThreadWithProps = function(props) {
             return makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render();
         };
-        makeView = function(discussion) {
+        makeView = function(discussion, options) {
+            var opts = options || {};
             return new DiscussionThreadListView({
                 el: $('#fixture-element'),
                 collection: discussion,
+                showThreadPreview: opts.showThreadPreview || true,
                 courseSettings: new DiscussionCourseSettings({
                     is_cohorted: true
                 })
@@ -542,5 +544,40 @@
             });
         });
 
+        describe('thread preview body', function() {
+            it('should be shown when showThreadPreview is true', function() {
+                renderSingleThreadWithProps({
+                    thread_type: 'discussion'
+                });
+                expect($('.thread-preview-body').length).toEqual(1);
+            });
+
+            it('should not show image when showThreadPreview is true', function() {
+                renderSingleThreadWithProps({
+                    thread_type: 'discussion',
+                    body: '![customizedImageAltTitle].png'
+                });
+                expect($('.thread-preview-body').text()).toEqual('');
+            });
+
+            it('should not show MathJax when showThreadPreview is true', function() {
+                renderSingleThreadWithProps({
+                    thread_type: 'discussion',
+                    body: '$$x^2 + sqrt(y)$$'
+                });
+                expect($('.thread-preview-body').text()).toEqual('');
+            });
+
+            it('should not be shown when showThreadPreview is false', function() {
+                var view,
+                    discussion = new Discussion([]),
+                    options = {
+                        showThreadPreview: false
+                    };
+                view = makeView(discussion, options);
+                view.render();
+                expect(view.$el.find('.thread-preview-body').length).toEqual(0);
+            });
+        });
     });
 }).call(this);
