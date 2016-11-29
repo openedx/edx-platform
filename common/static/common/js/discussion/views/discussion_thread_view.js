@@ -261,18 +261,18 @@
                         }
                         if (xhr.status === 404) {
                             DiscussionUtil.discussionAlert(
-                                gettext('Sorry'),
-                                gettext('The thread you selected has been deleted. Please select another thread.')
+                                gettext('Error'),
+                                gettext('The post you selected has been deleted.')
                             );
                         } else if (firstLoad) {
                             DiscussionUtil.discussionAlert(
-                                gettext('Sorry'),
-                                gettext('We had some trouble loading responses. Please reload the page.')
+                                gettext('Error'),
+                                gettext('Responses could not be loaded. Refresh the page to try again.')
                             );
                         } else {
                             DiscussionUtil.discussionAlert(
-                                gettext('Sorry'),
-                                gettext('We had some trouble loading more responses. Please try again.')
+                                gettext('Error'),
+                                gettext('Additional responses could not be loaded. Refresh the page to try again.')
                             );
                         }
                     }

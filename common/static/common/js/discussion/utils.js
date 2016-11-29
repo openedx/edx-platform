@@ -184,10 +184,8 @@
             if (!params.error) {
                 params.error = function() {
                     self.discussionAlert(
-                        gettext('Sorry'),
-                        gettext(
-                            'We had some trouble processing your request. Please ensure you have copied any ' +
-                            'unsaved work and then reload the page.')
+                        gettext('Error'),
+                        gettext('Your request could not be processed. Refresh the page and try again.')
                     );
                 };
             }
@@ -223,7 +221,7 @@
                 self = this;
             if (errorMsg) {
                 safeAjaxParams.error = function() {
-                    return self.discussionAlert(gettext('Sorry'), errorMsg);
+                    return self.discussionAlert(gettext('Error'), errorMsg);
                 };
             }
             undo = _.pick(model.attributes, _.keys(updates));
@@ -276,7 +274,7 @@
                         }
                     }
                 } else {
-                    $errorItem = makeErrorElem('We had some trouble processing your request. Please try again.', 0);
+                    $errorItem = makeErrorElem('Your request could not be processed. Refresh the page and try again.', 0); // eslint-disable-line max-len
                     edx.HtmlUtils.append(errorsField, $errorItem);
                 }
 

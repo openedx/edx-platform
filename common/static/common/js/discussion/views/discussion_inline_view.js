@@ -26,6 +26,7 @@
             var match;
 
             this.$el = options.el;
+            this.readOnly = options.readOnly;
             this.showByDefault = options.showByDefault || false;
             this.toggleDiscussionBtn = this.$('.discussion-show');
             this.listenTo(this.model, 'change', this.render);
@@ -144,6 +145,7 @@
                 course_settings: this.course_settings
             });
             this.threadView.render();
+            this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);
             this.threadListView.$el.addClass('is-hidden');
             this.$('.inline-thread').removeClass('is-hidden');
         },
@@ -179,8 +181,8 @@
                     this.loadDiscussions(this.$el, function() {
                         self.hideDiscussion();
                         DiscussionUtil.discussionAlert(
-                            gettext('Sorry'),
-                            gettext('We had some trouble loading the discussion. Please try again.')
+                            gettext('Error'),
+                            gettext('This discussion could not be loaded. Refresh the page to try again.')
                         );
                     });
                 }

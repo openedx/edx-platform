@@ -33,7 +33,8 @@ from common.test.acceptance.fixtures.discussion import (
     Response,
     Comment,
     SearchResult,
-    MultipleThreadFixture)
+    MultipleThreadFixture,
+)
 
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin
 from common.test.acceptance.tests.helpers import skip_if_browser
@@ -416,7 +417,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
 
 
-class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
+class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixin):
     """
     Tests for the discussion page with multiple threads
     """
@@ -440,19 +441,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
             self.thread_ids[1]
         )
         self.thread_page_1.visit()
-
-    @attr(shard=2)
-    def setup_multiple_threads(self, thread_count):
-        threads = []
-        for i in range(thread_count):
-            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
-            thread_body = "Dummy Long text body." * 50
-            threads.append(
-                Thread(id=thread_id, commentable_id=self.discussion_id, body=thread_body),
-            )
-            self.thread_ids.append(thread_id)
-        view = MultipleThreadFixture(threads)
-        view.push()
 
     @attr('a11y')
     def test_page_accessibility(self):
@@ -1039,13 +1027,23 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         """
         Tests Inline Discussion for accessibility issues.
         """
-        self.setup_multiple_inline_threads(thread_count=3)
+        self.setup_multiple_threads(thread_count=3)
+
+        # First test the a11y of the expanded list of threads
         self.discussion_page.expand_discussion()
         self.discussion_page.a11y_audit.config.set_rules({
             'ignore': [
                 'section'
             ]
         })
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
+
+        # Now show the first thread and test the a11y again
+        self.discussion_page.show_thread(self.thread_ids[0])
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
+
+        # Finally show the new post form and test its a11y
+        self.discussion_page.click_new_post_button()
         self.discussion_page.a11y_audit.check_for_accessibility_errors()
 
     def test_add_a_post_is_present_if_can_create_thread_when_expanded(self):
@@ -1363,7 +1361,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     def test_no_rewrite(self):
         self.setup_corrected_text(None)
         self.page.perform_search()
-        self.check_search_alert_messages(["no threads"])
+        self.check_search_alert_messages(["no posts"])
 
     @attr(shard=2)
     def test_rewrite_dismiss(self):
@@ -1385,7 +1383,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
 
         self.setup_corrected_text(None)
         self.page.perform_search()
-        self.check_search_alert_messages(["no threads"])
+        self.check_search_alert_messages(["no posts"])
 
     @attr(shard=2)
     def test_rewrite_and_user(self):
@@ -1397,7 +1395,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     def test_user_only(self):
         self.setup_corrected_text(None)
         self.page.perform_search(self.SEARCHED_USERNAME)
-        self.check_search_alert_messages(["no threads", self.SEARCHED_USERNAME])
+        self.check_search_alert_messages(["no posts", self.SEARCHED_USERNAME])
         # make sure clicking the link leads to the user profile page
         UserProfileViewFixture([]).push()
         self.page.get_search_alert_links().first.click()

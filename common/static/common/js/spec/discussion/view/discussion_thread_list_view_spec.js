@@ -550,7 +550,7 @@
             it('does not add a search alert when no alternate term was searched', function() {
                 testCorrection(this.view, null);
                 expect(this.view.addSearchAlert.calls.count()).toEqual(1);
-                return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no threads matched/i);
+                return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no posts matched/i);
             });
 
             it('clears search alerts when a new search is performed', function() {
