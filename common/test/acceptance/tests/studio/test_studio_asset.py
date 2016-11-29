@@ -43,7 +43,7 @@ class AssetIndexTest(StudioCourseTest):
         assert self.asset_page.type_filter_on_page() is True
 
     @skip_if_browser('chrome')  # TODO Need to fix test_page_existance for this for chrome browser
-    @flaky    # TODO FEDX-88
+    @flaky    g# TODO FEDX-88
     def test_filter_results(self):
         """
         Make sure type filter actually filters the results.

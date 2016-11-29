@@ -68,6 +68,7 @@ function emptyxunit {
 END
 
 }
+export DISABLE_MIGRATIONS=1
 case "$TEST_SUITE" in
 
     "quality")
