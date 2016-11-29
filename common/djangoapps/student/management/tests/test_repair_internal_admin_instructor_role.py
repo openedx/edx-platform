@@ -10,6 +10,7 @@ from student.tests.factories import UserFactory, GroupFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+
 @ddt.ddt
 class TestRepairInternalAdminInstructorRole(ModuleStoreTestCase):
     """Tests for repair_internal_admin_instructor_role script."""
@@ -46,7 +47,9 @@ class TestRepairInternalAdminInstructorRole(ModuleStoreTestCase):
         # Creating courses
         self.course_list = []
         for index in range(0, self.TEST_COURSES):
-            self.original_course_location = locator.CourseLocator('Org0'+str(index), 'Course0'+str(index), 'Run0'+str(index))
+            self.original_course_location = locator.CourseLocator(
+                'Org0' + str(index), 'Course0' + str(index), 'Run0' + str(index)
+            )
             self.course = self._create_course(self.original_course_location)
             self.course_list.append(self.course)
 
@@ -79,7 +82,6 @@ class TestRepairInternalAdminInstructorRole(ModuleStoreTestCase):
             for course in self.course_list:
                 roles = CourseAccessRole.objects.filter(user=student, course_id=course.id)
                 self.assertEquals(len(roles), 0)
-
 
     def test_adding_instructor_role_to_courses(self):
 
@@ -137,7 +139,6 @@ class TestRepairInternalAdminInstructorRole(ModuleStoreTestCase):
                 roles = CourseAccessRole.objects.filter(user=student, course_id=course.id)
                 for role_data in roles:
                     self.assertEquals('instructor', role_data.role)
-
 
     def _create_course(self, course_location):
         """ Creates a course """

@@ -13,6 +13,8 @@ celery==3.1.18
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
+# we need markey 0.7 to pass interpolate as keyword option to babel_underscore
+markey==0.7
 django-babel-underscore==0.1.0
 django-celery==3.1.16
 django-countries==3.3
