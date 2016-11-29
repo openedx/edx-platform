@@ -11,8 +11,9 @@ import random
 import os
 import textwrap
 import unittest
-import ddt
 
+import ddt
+import flaky
 from lxml import etree
 from mock import Mock, patch, DEFAULT
 import webob
@@ -1417,6 +1418,7 @@ class CapaModuleTest(unittest.TestCase):
         RANDOMIZATION.ALWAYS,
         RANDOMIZATION.ONRESET
     )
+    @flaky.flaky  # TNL-6041
     def test_random_seed_with_reset(self, rerandomize):
         """
         Run the test for each possible rerandomize value
