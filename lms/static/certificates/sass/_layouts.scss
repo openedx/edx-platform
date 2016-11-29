@@ -293,6 +293,7 @@
 
             .metadata {
                 @extend %divider-2;
+                @include span(12);
                 margin-bottom: spacing-vertical(small);
                 border-bottom-color: palette(grayscale, x-back);
                 padding-bottom: spacing-vertical(small);

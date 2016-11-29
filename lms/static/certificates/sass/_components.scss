@@ -367,6 +367,7 @@
     .recipient-details {
         @extend %copy-base;
         font-weight: font-weight(semi-bold);
+        max-width: calc(100% - (#{rem(100)} + #{spacing-horizontal(small)} + 5px));
     }
 
     .recipient-name {
