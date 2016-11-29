@@ -2,7 +2,7 @@ from .test import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
 LABSTER_FEATURES = {
-    "ENABLE_WIKI": True,
+    "ENABLE_WIKI": False,
 }
 
 INSTALLED_APPS += (
