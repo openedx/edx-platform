@@ -2,8 +2,6 @@
 // ====================
 
 .discussion.inline-discussion {
-    padding-top: $baseline;
-
     .inline-threads {
         border: 1px solid $forum-color-border;
         border-radius: $forum-border-radius;
@@ -14,10 +12,11 @@
         border-radius: $forum-border-radius;
 
         .forum-nav-bar {
-            background-color: $forum-color-navigation-bar;
+            color: $forum-color-navigation-bar;
+            padding: ($baseline / 4);
 
             .btn-link {
-                color: $forum-color-active-text;
+                color: $forum-color-primary;
             }
         }
 

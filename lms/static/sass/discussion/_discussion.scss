@@ -296,9 +296,6 @@ body.discussion {
   @extend .discussion-body;
   display: block;
   position: relative;
-  margin: $baseline 0;
-  padding: $baseline;
-  border: 1px solid $forum-color-border !important;
   border-radius: $forum-border-radius;
 
   header {
@@ -319,6 +316,7 @@ body.discussion {
   .discussion-module-header {
     @include float(left);
     width: flex-grid(7);
+    margin-bottom: ($baseline * 0.75);
   }
 
   .add_post_btn_container {

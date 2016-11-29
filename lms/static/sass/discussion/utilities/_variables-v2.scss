@@ -24,7 +24,7 @@ $forum-color-read-post: palette(grayscale, base) !default;
 $forum-color-never-read-post: $forum-color-primary !default;
 $forum-color-editor-preview-label: palette(grayscale, base) !default;
 $forum-color-response-count: palette(grayscale, base) !default;
-$forum-color-navigation-bar: $forum-color-primary !default;
+$forum-color-navigation-bar: palette(grayscale, x-back) !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
