@@ -171,5 +171,4 @@
          */
         logLevel: 1
     };
-}())  // eslint-disable-line semi
-// A semicolon on the line above will break the requirejs optimizer
+}());
