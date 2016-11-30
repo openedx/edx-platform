@@ -45,7 +45,7 @@ pygments==1.5
 pymongo==2.4.1
 python-memcached==1.48
 python-openid==2.2.5
-pytz==2015.2
+pytz==2016.7
 PyYAML==3.10
 requests==2.3.0
 Shapely==1.2.16

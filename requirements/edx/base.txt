@@ -90,7 +90,7 @@ python-dateutil==2.1
 # We can also remove the fix to auth_url in third_party_auth/saml.py when that fix is included upstream.
 python-social-auth==0.2.12
 
-pytz==2015.2
+pytz==2016.7
 pysrt==0.4.7
 PyYAML==3.10
 requests==2.9.1
