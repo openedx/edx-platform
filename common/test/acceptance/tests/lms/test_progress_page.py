@@ -5,6 +5,7 @@ progress page.
 """
 from contextlib import contextmanager
 import ddt
+import flaky
 from nose.plugins.attrib import attr
 
 from ..helpers import (
@@ -224,6 +225,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
         _change_subsection_structure,
         _change_weight_for_problem
     )
+    @flaky.flaky  # TNL-6040
     def test_content_changes_do_not_change_score(self, edit):
         with self._logged_in_session():
             self.courseware_page.visit()
