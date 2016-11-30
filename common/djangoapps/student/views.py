@@ -2001,6 +2001,7 @@ def auto_auth(request):
     * `redirect`: Set to "true" will redirect to the `redirect_to` value if set, or
         course home page if course_id is defined, otherwise it will redirect to dashboard
     * `redirect_to`: will redirect to to this url
+    * `is_active` : make/update account with status provided as 'is_active'
     If username, email, or password are not provided, use
     randomly generated credentials.
     """
@@ -2017,9 +2018,12 @@ def auto_auth(request):
     is_superuser = request.GET.get('superuser', None)
     course_id = request.GET.get('course_id', None)
     redirect_to = request.GET.get('redirect_to', None)
+    active_status = request.GET.get('is_active')
 
     # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
     enrollment_mode = request.GET.get('enrollment_mode', 'honor')
+
+    active_status = (not active_status or active_status == 'true')
 
     course_key = None
     if course_id:
@@ -2048,6 +2052,7 @@ def auto_auth(request):
         user = User.objects.get(username=username)
         user.email = email
         user.set_password(password)
+        user.is_active = active_status
         user.save()
         profile = UserProfile.objects.get(user=user)
         reg = Registration.objects.get(user=user)
@@ -2061,9 +2066,9 @@ def auto_auth(request):
         user.is_superuser = (is_superuser == "true")
         user.save()
 
-    # Activate the user
-    reg.activate()
-    reg.save()
+    if active_status:
+        reg.activate()
+        reg.save()
 
     # ensure parental consent threshold is met
     year = datetime.date.today().year
