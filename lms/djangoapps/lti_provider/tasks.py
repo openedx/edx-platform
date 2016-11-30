@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 import logging
 
-from lms.djangoapps.grades import progress
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
 from lms import CELERY_APP
 from lti_provider.models import GradedAssignment
@@ -109,8 +109,8 @@ def send_composite_outcome(user_id, course_id, assignment_id, version):
     mapped_usage_key = assignment.usage_key.map_into_course(course_key)
     user = User.objects.get(id=user_id)
     course = modulestore().get_course(course_key, depth=0)
-    progress_summary = progress.summary(user, course)
-    earned, possible = progress_summary.score_for_module(mapped_usage_key)
+    course_grade = CourseGradeFactory().create(user, course)
+    earned, possible = course_grade.score_for_module(mapped_usage_key)
     if possible == 0:
         weighted_score = 0
     else:

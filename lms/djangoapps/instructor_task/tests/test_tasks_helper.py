@@ -15,7 +15,7 @@ import urllib
 
 import ddt
 from freezegun import freeze_time
-from mock import Mock, patch
+from mock import Mock, patch, MagicMock
 from nose.plugins.attrib import attr
 import tempfile
 import unicodecsv
@@ -115,15 +115,14 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
 
     @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
-    @patch('lms.djangoapps.instructor_task.tasks_helper.iterate_grades_for')
-    def test_grading_failure(self, mock_iterate_grades_for, _mock_current_task):
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.iter')
+    def test_grading_failure(self, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the
         progress dict and uploaded to the report store.
         """
-        # mock an error response from `iterate_grades_for`
-        mock_iterate_grades_for.return_value = [
-            (self.create_student('username', 'student@example.com'), {}, 'Cannot grade student')
+        mock_grades_iter.return_value = [
+            (self.create_student('username', 'student@example.com'), None, 'Cannot grade student')
         ]
         result = upload_grades_csv(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
@@ -293,17 +292,20 @@ class TestInstructorGradeReport(InstructorGradeReportTestCase):
         )
 
     @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
-    @patch('lms.djangoapps.instructor_task.tasks_helper.iterate_grades_for')
-    def test_unicode_in_csv_header(self, mock_iterate_grades_for, _mock_current_task):
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.iter')
+    def test_unicode_in_csv_header(self, mock_grades_iter, _mock_current_task):
         """
         Tests that CSV grade report works if unicode in headers.
         """
-        # mock a response from `iterate_grades_for`
-        mock_iterate_grades_for.return_value = [
+        mock_course_grade = MagicMock()
+        mock_course_grade.summary = {'section_breakdown': [{'label': u'\u8282\u540e\u9898 01'}]}
+        mock_course_grade.letter_grade = None
+        mock_course_grade.percent = 0
+        mock_grades_iter.return_value = [
             (
                 self.create_student('username', 'student@example.com'),
-                {'section_breakdown': [{'label': u'\u8282\u540e\u9898 01'}], 'percent': 0, 'grade': None},
-                'Cannot grade student'
+                mock_course_grade,
+                '',
             )
         ]
         result = upload_grades_csv(None, None, self.course.id, None, 'graded')
@@ -588,7 +590,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         # technically possible in openedx.
         self.student_1 = self.create_student(u'üser_1')
         self.student_2 = self.create_student(u'üser_2')
-        self.csv_header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        self.csv_header_row = [u'Student ID', u'Email', u'Username', u'Grade']
 
     @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
     def test_no_problems(self, _get_current_task):
@@ -622,7 +624,7 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
         self.submit_student_answer(self.student_1.username, u'Problem1', ['Option 1'])
         result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
-        problem_name = u'Homework 1: Problem - Problem1'
+        problem_name = u'Homework 1: Subsection - Problem1'
         header_row = self.csv_header_row + [problem_name + ' (Earned)', problem_name + ' (Possible)']
         self.verify_rows_in_csv([
             dict(zip(
@@ -631,7 +633,8 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     unicode(self.student_1.id),
                     self.student_1.email,
                     self.student_1.username,
-                    '0.01', '1.0', '2.0']
+                    '0.01', '1.0', '2.0',
+                ]
             )),
             dict(zip(
                 header_row,
@@ -639,23 +642,22 @@ class TestProblemGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                     unicode(self.student_2.id),
                     self.student_2.email,
                     self.student_2.username,
-                    '0.0', '0.0', '2'
+                    '0.0', u'Not Attempted', '2.0',
                 ]
             ))
         ])
 
     @patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task')
-    @patch('lms.djangoapps.instructor_task.tasks_helper.iterate_grades_for')
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.iter')
     @ddt.data(u'Cannot grade student', '')
-    def test_grading_failure(self, error_message, mock_iterate_grades_for, _mock_current_task):
+    def test_grading_failure(self, error_message, mock_grades_iter, _mock_current_task):
         """
         Test that any grading errors are properly reported in the progress
         dict and uploaded to the report store.
         """
-        # mock an error response from `iterate_grades_for`
         student = self.create_student(u'username', u'student@example.com')
-        mock_iterate_grades_for.return_value = [
-            (student, {}, error_message)
+        mock_grades_iter.return_value = [
+            (student, None, error_message)
         ]
         result = upload_problem_grade_report(None, None, self.course.id, None, 'graded')
         self.assertDictContainsSubset({'attempted': 1, 'succeeded': 0, 'failed': 1}, result)
@@ -694,7 +696,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
         In order to verify that the behavior of the grade report is correct, we submit answers for problems
         that the student won't have access to. A/B tests won't restrict access to the problems, but it should
-        not show up in that student's course tree when generating the grade report, hence the N/A's in the grade report.
+        not show up in that student's course tree when generating the grade report, hence the Not Accessible's
+        in the grade report.
         """
         # student A will get 100%, student B will get 50% because
         # OPTION_1 is the correct option, and OPTION_2 is the
@@ -711,8 +714,8 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 {'action_name': 'graded', 'attempted': 2, 'succeeded': 2, 'failed': 0}, result
             )
 
-        problem_names = [u'Homework 1: Problem - problem_a_url', u'Homework 1: Problem - problem_b_url']
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        problem_names = [u'Homework 1: Subsection - problem_a_url', u'Homework 1: Subsection - problem_b_url']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -723,7 +726,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                     unicode(self.student_a.id),
                     self.student_a.email,
                     self.student_a.username,
-                    u'1.0', u'2.0', u'2.0', u'N/A', u'N/A'
+                    u'1.0', u'2.0', u'2.0', u'Not Accessible', u'Not Accessible'
                 ]
             )),
             dict(zip(
@@ -731,7 +734,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 [
                     unicode(self.student_b.id),
                     self.student_b.email,
-                    self.student_b.username, u'0.5', u'N/A', u'N/A', u'1.0', u'2.0'
+                    self.student_b.username, u'0.5', u'Not Accessible', u'Not Accessible', u'1.0', u'2.0'
                 ]
             ))
         ])
@@ -793,7 +796,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
             title = 'Homework %d 1: Problem section %d - %s' % (i, i, problem_url)
             problem_names.append(title)
 
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
@@ -858,16 +861,28 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
             self.assertDictContainsSubset(
                 {'action_name': 'graded', 'attempted': 4, 'succeeded': 4, 'failed': 0}, result
             )
-        problem_names = [u'Homework 1: Problem - Problem0', u'Homework 1: Problem - Problem1']
-        header_row = [u'Student ID', u'Email', u'Username', u'Final Grade']
+        problem_names = [u'Homework 1: Subsection - Problem0', u'Homework 1: Subsection - Problem1']
+        header_row = [u'Student ID', u'Email', u'Username', u'Grade']
         for problem in problem_names:
             header_row += [problem + ' (Earned)', problem + ' (Possible)']
 
         user_grades = [
-            {'user': self.staff_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
-            {'user': self.alpha_user, 'grade': [u'1.0', u'2.0', u'2.0', u'N/A', u'N/A']},
-            {'user': self.beta_user, 'grade': [u'0.5', u'N/A', u'N/A', u'1.0', u'2.0']},
-            {'user': self.non_cohorted_user, 'grade': [u'0.0', u'N/A', u'N/A', u'N/A', u'N/A']},
+            {
+                'user': self.staff_user,
+                'grade': [u'0.0', u'Not Accessible', u'Not Accessible', u'Not Accessible', u'Not Accessible'],
+            },
+            {
+                'user': self.alpha_user,
+                'grade': [u'1.0', u'2.0', u'2.0', u'Not Accessible', u'Not Accessible'],
+            },
+            {
+                'user': self.beta_user,
+                'grade': [u'0.5', u'Not Accessible', u'Not Accessible', u'1.0', u'2.0'],
+            },
+            {
+                'user': self.non_cohorted_user,
+                'grade': [u'0.0', u'Not Accessible', u'Not Accessible', u'Not Accessible', u'Not Accessible'],
+            },
         ]
 
         # Verify generated grades and expected grades match
@@ -1490,6 +1505,90 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ],
             verify_order=False
         )
+
+
+@patch('lms.djangoapps.instructor_task.tasks_helper.DefaultStorage', new=MockDefaultStorage)
+class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
+    """
+    Test that grade report has correct grade values.
+    """
+    def setUp(self):
+        super(TestGradeReport, self).setUp()
+        self.create_course()
+        self.student = self.create_student(u'üser_1')
+
+    def create_course(self):
+        """
+        Creates a course with various subsections for testing
+        """
+        self.course = CourseFactory.create(
+            grading_policy={
+                "GRADER": [
+                    {
+                        "type": "Homework",
+                        "min_count": 4,
+                        "drop_count": 0,
+                        "weight": 1.0
+                    },
+                ],
+            },
+        )
+        self.chapter = ItemFactory.create(parent=self.course, category='chapter')
+
+        self.problem_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Subsection'
+        )
+        self.define_option_problem(u'Problem1', parent=self.problem_section, num_responses=1)
+        self.hidden_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            visible_to_staff_only=True,
+            display_name='Hidden',
+        )
+        self.define_option_problem(u'Problem2', parent=self.hidden_section)
+        self.unattempted_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Unattempted',
+        )
+        self.define_option_problem(u'Problem3', parent=self.unattempted_section)
+        self.empty_section = ItemFactory.create(
+            parent=self.chapter,
+            category='sequential',
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name='Empty',
+        )
+
+    def test_grade_report(self):
+        self.submit_student_answer(self.student.username, u'Problem1', ['Option 1'])
+
+        with patch('lms.djangoapps.instructor_task.tasks_helper._get_current_task'):
+            result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+            self.assertDictContainsSubset(
+                {'action_name': 'graded', 'attempted': 1, 'succeeded': 1, 'failed': 0},
+                result,
+            )
+            self.verify_rows_in_csv(
+                [
+                    {
+                        u'Student ID': unicode(self.student.id),
+                        u'Email': self.student.email,
+                        u'Username': self.student.username,
+                        u'Grade': '0.13',
+                        u'Homework 1: Subsection': '0.5',
+                        u'Homework 2: Hidden': u'Not Accessible',
+                        u'Homework 3: Unattempted': u'Not Attempted',
+                        u'Homework 4: Empty': u'Not Accessible',
+                        u'Homework (Avg)': '0.125',
+                    },
+                ],
+                ignore_other_columns=True,
+            )
 
 
 @ddt.ddt

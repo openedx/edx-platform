@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 import os
 from lms.djangoapps.courseware import courses
 from lms.djangoapps.certificates.models import GeneratedCertificate
-from lms.djangoapps.grades import course_grades
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -124,18 +124,18 @@ class Command(BaseCommand):
                     count, total, hours, minutes)
                 start = datetime.datetime.now()
             request.user = student
-            grade = course_grades.summary(student, course)
+            grade = CourseGradeFactory().create(student, course)
             if not header:
-                header = [section['label'] for section in grade[u'section_breakdown']]
+                header = [section['label'] for section in grade.summary[u'section_breakdown']]
                 rows.append(["email", "username", "certificate-grade", "grade"] + header)
-            percents = {section['label']: section['percent'] for section in grade[u'section_breakdown']}
+            percents = {section['label']: section['percent'] for section in grade.summary[u'section_breakdown']}
             row_percents = [percents[label] for label in header]
             if student.username in cert_grades:
                 rows.append(
-                    [student.email, student.username, cert_grades[student.username], grade['percent']] + row_percents,
+                    [student.email, student.username, cert_grades[student.username], grade.percent] + row_percents,
                 )
             else:
-                rows.append([student.email, student.username, "N/A", grade['percent']] + row_percents)
+                rows.append([student.email, student.username, "N/A", grade.percent] + row_percents)
         with open(options['output'], 'wb') as f:
             writer = csv.writer(f)
             writer.writerows(rows)

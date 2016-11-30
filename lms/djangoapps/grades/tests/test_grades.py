@@ -3,11 +3,9 @@ Test grade calculation.
 """
 
 import ddt
-from django.http import Http404
 import itertools
 from mock import patch
 from nose.plugins.attrib import attr
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from capa.tests.response_xml_factory import MultipleChoiceResponseXMLFactory
 from courseware.model_data import set_score
@@ -17,49 +15,21 @@ from lms.djangoapps.course_blocks.api import get_course_blocks
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
-from xmodule.block_metadata_utils import display_name_with_default_escaped
 from xmodule.graders import ProblemScore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 from .utils import answer_problem
-from .. import course_grades
-from ..course_grades import summary as grades_summary
 from ..module_grades import get_module_score
 from ..new.course_grade import CourseGradeFactory
 from ..new.subsection_grade import SubsectionGradeFactory
 
 
-def _grade_with_errors(student, course):
-    """This fake grade method will throw exceptions for student3 and
-    student4, but allow any other students to go through normal grading.
-
-    It's meant to simulate when something goes really wrong while trying to
-    grade a particular student, so we can test that we won't kill the entire
-    course grading run.
-    """
-    if student.username in ['student3', 'student4']:
-        raise Exception("I don't like {}".format(student.username))
-
-    return grades_summary(student, course)
-
-
-def _create_problem_xml():
-    """
-    Creates and returns XML for a multiple choice response problem
-    """
-    return MultipleChoiceResponseXMLFactory().build_xml(
-        question_text='The correct answer is Choice 3',
-        choices=[False, False, True, False],
-        choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
-    )
-
-
 @attr(shard=1)
 class TestGradeIteration(SharedModuleStoreTestCase):
     """
-    Test iteration through student gradesets.
+    Test iteration through student course grades.
     """
     COURSE_NUM = "1000"
     COURSE_NAME = "grading_test_course"
@@ -87,29 +57,25 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         ]
 
     def test_empty_student_list(self):
-        """If we don't pass in any students, it should return a zero-length
-        iterator, but it shouldn't error."""
-        gradeset_results = list(course_grades.iterate_grades_for(self.course.id, []))
-        self.assertEqual(gradeset_results, [])
-
-    def test_nonexistent_course(self):
-        """If the course we want to get grades for does not exist, a `Http404`
-        should be raised. This is a horrible crossing of abstraction boundaries
-        and should be fixed, but for now we're just testing the behavior. :-("""
-        with self.assertRaises(Http404):
-            gradeset_results = course_grades.iterate_grades_for(SlashSeparatedCourseKey("I", "dont", "exist"), [])
-            gradeset_results.next()
+        """
+        If we don't pass in any students, it should return a zero-length
+        iterator, but it shouldn't error.
+        """
+        grade_results = list(CourseGradeFactory().iter(self.course, []))
+        self.assertEqual(grade_results, [])
 
     def test_all_empty_grades(self):
-        """No students have grade entries"""
-        all_gradesets, all_errors = self._gradesets_and_errors_for(self.course.id, self.students)
+        """
+        No students have grade entries.
+        """
+        all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(len(all_errors), 0)
-        for gradeset in all_gradesets.values():
-            self.assertIsNone(gradeset['grade'])
-            self.assertEqual(gradeset['percent'], 0.0)
+        for course_grade in all_course_grades.values():
+            self.assertIsNone(course_grade.letter_grade)
+            self.assertEqual(course_grade.percent, 0.0)
 
-    @patch('lms.djangoapps.grades.course_grades.summary', _grade_with_errors)
-    def test_grading_exception(self):
+    @patch('lms.djangoapps.grades.new.course_grade.CourseGradeFactory.create')
+    def test_grading_exception(self, mock_course_grade):
         """Test that we correctly capture exception messages that bubble up from
         grading. Note that we only see errors at this level if the grading
         process for this student fails entirely due to an unexpected event --
@@ -118,43 +84,51 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         We patch the grade() method with our own, which will generate the errors
         for student3 and student4.
         """
-        all_gradesets, all_errors = self._gradesets_and_errors_for(self.course.id, self.students)
+
         student1, student2, student3, student4, student5 = self.students
+        mock_course_grade.side_effect = [
+            Exception("Error for {}.".format(student.username))
+            if student.username in ['student3', 'student4']
+            else mock_course_grade.return_value
+            for student in self.students
+        ]
+        all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
         self.assertEqual(
             all_errors,
             {
-                student3: "I don't like student3",
-                student4: "I don't like student4"
+                student3: "Error for student3.",
+                student4: "Error for student4.",
             }
         )
 
         # But we should still have five gradesets
-        self.assertEqual(len(all_gradesets), 5)
+        self.assertEqual(len(all_course_grades), 5)
 
         # Even though two will simply be empty
-        self.assertFalse(all_gradesets[student3])
-        self.assertFalse(all_gradesets[student4])
+        self.assertIsNone(all_course_grades[student3])
+        self.assertIsNone(all_course_grades[student4])
 
         # The rest will have grade information in them
-        self.assertTrue(all_gradesets[student1])
-        self.assertTrue(all_gradesets[student2])
-        self.assertTrue(all_gradesets[student5])
+        self.assertIsNotNone(all_course_grades[student1])
+        self.assertIsNotNone(all_course_grades[student2])
+        self.assertIsNotNone(all_course_grades[student5])
 
-    ################################# Helpers #################################
-    def _gradesets_and_errors_for(self, course_id, students):
-        """Simple helper method to iterate through student grades and give us
+    def _course_grades_and_errors_for(self, course, students):
+        """
+        Simple helper method to iterate through student grades and give us
         two dictionaries -- one that has all students and their respective
-        gradesets, and one that has only students that could not be graded and
-        their respective error messages."""
-        students_to_gradesets = {}
+        course grades, and one that has only students that could not be graded
+        and their respective error messages.
+        """
+        students_to_course_grades = {}
         students_to_errors = {}
 
-        for student, gradeset, err_msg in course_grades.iterate_grades_for(course_id, students):
-            students_to_gradesets[student] = gradeset
+        for student, course_grade, err_msg in CourseGradeFactory().iter(course, students):
+            students_to_course_grades[student] = course_grade
             if err_msg:
                 students_to_errors[student] = err_msg
 
-        return students_to_gradesets, students_to_errors
+        return students_to_course_grades, students_to_errors
 
 
 @ddt.ddt
@@ -169,7 +143,7 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         cls.chapter = ItemFactory.create(parent=cls.course, category="chapter", display_name="chapter")
         cls.sequential = ItemFactory.create(parent=cls.chapter, category="sequential", display_name="sequential")
         cls.vertical = ItemFactory.create(parent=cls.sequential, category="vertical", display_name="vertical1")
-        problem_xml = _create_problem_xml()
+        problem_xml = cls._create_problem_xml()
         cls.problems = []
         for i in range(2):
             cls.problems.append(
@@ -185,6 +159,17 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         super(TestWeightedProblems, self).setUp()
         self.user = UserFactory()
         self.request = get_mock_request(self.user)
+
+    @classmethod
+    def _create_problem_xml(cls):
+        """
+        Creates and returns XML for a multiple choice response problem
+        """
+        return MultipleChoiceResponseXMLFactory().build_xml(
+            question_text='The correct answer is Choice 3',
+            choices=[False, False, True, False],
+            choice_names=['choice_0', 'choice_1', 'choice_2', 'choice_3']
+        )
 
     def _verify_grades(self, raw_earned, raw_possible, weight, expected_score):
         """
@@ -211,8 +196,6 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
         # verify all problem grades
         for problem in self.problems:
             problem_score = subsection_grade.locations_to_scores[problem.location]
-            expected_score.display_name = display_name_with_default_escaped(problem)
-            expected_score.module_id = problem.location
             self.assertEquals(problem_score, expected_score)
 
         # verify subsection grades
@@ -246,8 +229,6 @@ class TestWeightedProblems(SharedModuleStoreTestCase):
             weighted_possible=expected_w_possible,
             weight=weight,
             graded=expected_graded,
-            display_name=None,  # problem-specific, filled in by _verify_grades
-            module_id=None,  # problem-specific, filled in by _verify_grades
             attempted=True,
         )
         self._verify_grades(raw_earned, raw_possible, weight, expected_score)
@@ -296,7 +277,7 @@ class TestScoreForModule(SharedModuleStoreTestCase):
         answer_problem(cls.course, cls.request, cls.l, score=1, max_value=3)
         answer_problem(cls.course, cls.request, cls.n, score=3, max_value=10)
 
-        cls.course_grade = CourseGradeFactory(cls.request.user).create(cls.course)
+        cls.course_grade = CourseGradeFactory().create(cls.request.user, cls.course)
 
     def test_score_chapter(self):
         earned, possible = self.course_grade.score_for_module(self.a.location)

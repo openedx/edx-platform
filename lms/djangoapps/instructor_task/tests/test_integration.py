@@ -134,9 +134,9 @@ class TestRescoringTask(TestIntegrationTask):
         # are in sync.
         expected_subsection_grade = expected_score
 
-        course_grade = CourseGradeFactory(user).create(self.course)
+        course_grade = CourseGradeFactory().create(user, self.course)
         self.assertEquals(
-            course_grade.subsection_grade_totals_by_format['Homework'][0].earned,
+            course_grade.graded_subsections_by_format['Homework'][self.problem_section.location].graded_total.earned,
             expected_subsection_grade,
         )
 
@@ -574,13 +574,13 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
         self.verify_rows_in_csv(
             [
                 merge_dicts(
-                    {'id': str(student.id), 'username': student.username, 'email': student.email},
+                    {'Student ID': str(student.id), 'Username': student.username, 'Email': student.email},
                     grades,
                     user_partition_group(student)
                 )
                 for student_grades in students_grades for student, grades in student_grades.iteritems()
             ],
-            ignore_other_columns=ignore_other_columns
+            ignore_other_columns=ignore_other_columns,
         )
 
     def test_both_groups_problems(self):
@@ -604,10 +604,20 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
-                    {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
-                    {self.student_b: {'grade': '0.5', 'HW': '0.5'}}
+                    {
+                        self.student_a: {
+                            u'Grade': '1.0',
+                            u'Homework': '1.0',
+                        }
+                    },
+                    {
+                        self.student_b: {
+                            u'Grade': '0.5',
+                            u'Homework': '0.5',
+                        }
+                    },
                 ],
-                ignore_other_columns=True
+                ignore_other_columns=True,
             )
 
     def test_one_group_problem(self):
@@ -627,8 +637,18 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
             self.verify_csv_task_success(result)
             self.verify_grades_in_csv(
                 [
-                    {self.student_a: {'grade': '1.0', 'HW': '1.0'}},
-                    {self.student_b: {'grade': '0.0', 'HW': '0.0'}}
+                    {
+                        self.student_a: {
+                            u'Grade': '1.0',
+                            u'Homework': '1.0',
+                        },
+                    },
+                    {
+                        self.student_b: {
+                            u'Grade': '0.0',
+                            u'Homework': u'Not Accessible',
+                        }
+                    },
                 ],
                 ignore_other_columns=True
             )

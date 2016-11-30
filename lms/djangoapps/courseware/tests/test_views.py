@@ -1235,7 +1235,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []}),
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}),
     )
     def test_view_certificate_link(self):
         """
@@ -1294,7 +1294,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_view_certificate_link_hidden(self):
         """
@@ -1341,7 +1341,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     @ddt.data(
         *itertools.product(
@@ -1381,7 +1381,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_page_with_invalidated_certificate_with_html_view(self):
         """
@@ -1415,7 +1415,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
@@ -1432,7 +1432,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled

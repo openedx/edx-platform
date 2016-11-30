@@ -122,8 +122,6 @@ def get_score(submissions_scores, csm_scores, persisted_block, block):
             weighted_possible,
             weight,
             graded,
-            display_name=display_name_with_default_escaped(block),
-            module_id=block.location,
             attempted=attempted,
         )
 

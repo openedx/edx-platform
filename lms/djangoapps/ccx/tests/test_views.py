@@ -1174,11 +1174,8 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
         student_info = response.mako_context['students'][0]  # pylint: disable=no-member
         self.assertEqual(student_info['grade_summary']['percent'], 0.5)
-        self.assertEqual(
-            student_info['grade_summary']['grade_breakdown'][0]['percent'],
-            0.5)
-        self.assertEqual(
-            len(student_info['grade_summary']['section_breakdown']), 4)
+        self.assertEqual(student_info['grade_summary']['grade_breakdown'].values()[0]['percent'], 0.5)
+        self.assertEqual(len(student_info['grade_summary']['section_breakdown']), 4)
 
     def test_grades_csv(self):
         self.course.enable_ccx = True
@@ -1223,7 +1220,7 @@ class TestCCXGrades(FieldOverrideTestMixin, SharedModuleStoreTestCase, LoginEnro
         self.assertEqual(response.status_code, 200)
         grades = response.mako_context['grade_summary']  # pylint: disable=no-member
         self.assertEqual(grades['percent'], 0.5)
-        self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
+        self.assertEqual(grades['grade_breakdown'].values()[0]['percent'], 0.5)
         self.assertEqual(len(grades['section_breakdown']), 4)
 
 

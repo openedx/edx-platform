@@ -22,7 +22,7 @@ from capa.tests.response_xml_factory import (
 from course_modes.models import CourseMode
 from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from lms.djangoapps.grades import course_grades, progress
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from openedx.core.djangoapps.credit.api import (
     set_credit_requirements, get_credit_requirement_status
 )
@@ -270,39 +270,17 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         self.update_course(self.course, self.student_user.id)
         self.refresh_course()
 
-    def get_grade_summary(self):
+    def get_course_grade(self):
         """
-        calls course_grades.summary for current user and course.
-
-        the keywords for the returned object are
-        - grade : A final letter grade.
-        - percent : The final percent for the class (rounded up).
-        - section_breakdown : A breakdown of each section that makes
-            up the grade. (For display)
-        - grade_breakdown : A breakdown of the major components that
-            make up the final grade. (For display)
+        Return CourseGrade for current user and course.
         """
-        return course_grades.summary(self.student_user, self.course)
-
-    def get_progress_summary(self):
-        """
-        Return progress summary structure for current user and course.
-
-        Returns
-        - courseware_summary is a summary of all sections with problems in the course.
-        It is organized as an array of chapters, each containing an array of sections,
-        each containing an array of scores. This contains information for graded and
-        ungraded problems, and is good for displaying a course summary with due dates,
-        etc.
-        """
-        return progress.summary(self.student_user, self.course).chapter_grades
+        return CourseGradeFactory().create(self.student_user, self.course)
 
     def check_grade_percent(self, percent):
         """
         Assert that percent grade is as expected.
         """
-        grade_summary = self.get_grade_summary()
-        self.assertEqual(grade_summary['percent'], percent)
+        self.assertEqual(self.get_course_grade().percent, percent)
 
     def earned_hw_scores(self):
         """
@@ -310,7 +288,9 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
 
         Returns list of scores: [<points on hw_1>, <points on hw_2>, ..., <points on hw_n>]
         """
-        return [s.earned for s in self.get_grade_summary()['totaled_scores']['Homework']]
+        return [
+            s.graded_total.earned for s in self.get_course_grade().graded_subsections_by_format['Homework'].itervalues()
+        ]
 
     def hw_grade(self, hw_url_name):
         """
@@ -318,7 +298,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase, Probl
         """
         # list of grade summaries for each section
         sections_list = []
-        for chapter in self.get_progress_summary():
+        for chapter in self.get_course_grade().chapter_grades:
             sections_list.extend(chapter['sections'])
 
         # get the first section that matches the url (there should only be one)
@@ -431,8 +411,11 @@ class TestCourseGrader(TestSubmittingProblems):
                     "drop_count": 0,
                     "short_label": "HW",
                     "weight": hw_weight
-                }, {
+                },
+                {
                     "type": "Final",
+                    "min_count": 0,
+                    "drop_count": 0,
                     "name": "Final Section",
                     "short_label": "Final",
                     "weight": final_weight
@@ -558,7 +541,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
         self.basic_setup()
         self.check_grade_percent(0)
-        self.assertEqual(self.get_grade_summary()['grade'], None)
+        self.assertEqual(self.get_course_grade().letter_grade, None)
 
     def test_b_grade_exact(self):
         """
@@ -567,7 +550,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.basic_setup()
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.check_grade_percent(0.33)
-        self.assertEqual(self.get_grade_summary()['grade'], 'B')
+        self.assertEqual(self.get_course_grade().letter_grade, 'B')
 
     def test_b_grade_above(self):
         """
@@ -577,7 +560,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.check_grade_percent(0.67)
-        self.assertEqual(self.get_grade_summary()['grade'], 'B')
+        self.assertEqual(self.get_course_grade().letter_grade, 'B')
 
     def test_a_grade(self):
         """
@@ -588,7 +571,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.submit_question_answer('p3', {'2_1': 'Correct'})
         self.check_grade_percent(1.0)
-        self.assertEqual(self.get_grade_summary()['grade'], 'A')
+        self.assertEqual(self.get_course_grade().letter_grade, 'A')
 
     def test_wrong_answers(self):
         """
@@ -599,7 +582,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.submit_question_answer('p3', {'2_1': 'Incorrect'})
         self.check_grade_percent(0.67)
-        self.assertEqual(self.get_grade_summary()['grade'], 'B')
+        self.assertEqual(self.get_course_grade().letter_grade, 'B')
 
     def test_submissions_api_overrides_scores(self):
         """
@@ -610,7 +593,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.submit_question_answer('p3', {'2_1': 'Incorrect'})
         self.check_grade_percent(0.67)
-        self.assertEqual(self.get_grade_summary()['grade'], 'B')
+        self.assertEqual(self.get_course_grade().letter_grade, 'B')
 
         # But now, set the score with the submissions API and watch
         # as it overrides the score read from StudentModule and our
@@ -625,7 +608,7 @@ class TestCourseGrader(TestSubmittingProblems):
         submission = submissions_api.create_submission(student_item, 'any answer')
         submissions_api.set_score(submission['uuid'], 1, 1)
         self.check_grade_percent(1.0)
-        self.assertEqual(self.get_grade_summary()['grade'], 'A')
+        self.assertEqual(self.get_course_grade().letter_grade, 'A')
 
     def test_submissions_api_anonymous_student_id(self):
         """
@@ -640,7 +623,7 @@ class TestCourseGrader(TestSubmittingProblems):
             mock_get_scores.return_value = {
                 self.problem_location('p3').to_deprecated_string(): (1, 1)
             }
-            self.get_grade_summary()
+            self.get_course_grade()
 
             # Verify that the submissions API was sent an anonymized student ID
             mock_get_scores.assert_called_with(
@@ -752,9 +735,6 @@ class TestCourseGrader(TestSubmittingProblems):
         # the Django student views, and does not update enrollment if it already exists.
         CourseEnrollment.enroll(self.student_user, self.course.id, mode)
 
-        self.submit_question_answer('p1', {'2_1': 'Correct'})
-        self.submit_question_answer('p2', {'2_1': 'Correct'})
-
         # Enable the course for credit
         CreditCourse.objects.create(course_key=self.course.id, enabled=True)
 
@@ -774,7 +754,15 @@ class TestCourseGrader(TestSubmittingProblems):
         # Add a single credit requirement (final grade)
         set_credit_requirements(self.course.id, requirements)
 
-        self.get_grade_summary()
+        # Credit requirement is not satisfied before passing grade
+        req_status = get_credit_requirement_status(self.course.id, self.student_user.username, 'grade', 'grade')
+        self.assertEqual(req_status[0]["status"], None)
+
+        self._stop_signal_patch()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+
+        # Credit requirement is now satisfied after passing grade
         req_status = get_credit_requirement_status(self.course.id, self.student_user.username, 'grade', 'grade')
         self.assertEqual(req_status[0]["status"], 'satisfied')
 

@@ -148,7 +148,7 @@ class UserGradeView(GradeViewMixin, GenericAPIView):
             return course
 
         prep_course_for_grading(course, request)
-        course_grade = CourseGradeFactory(request.user).create(course)
+        course_grade = CourseGradeFactory().create(request.user, course)
 
         return Response([{
             'username': username,
