@@ -309,7 +309,7 @@
                 error = function() {
                     self.renderThreads();
                     DiscussionUtil.discussionAlert(
-                        gettext('Sorry'), gettext('We had some trouble loading more threads. Please try again.')
+                        gettext('Sorry'), gettext('We had some trouble loading more posts. Please try again.')
                     );
                 };
                 return this.collection.retrieveAnotherPage(this.mode, options, {
@@ -478,7 +478,7 @@
                             element,
                             edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.HTML("<li class='forum-nav-load-more'>"),
-                                    self.getLoadingContent(gettext('Loading thread list')),
+                                    self.getLoadingContent(gettext('Loading posts list')),
                                 edx.HtmlUtils.HTML('</li>')
                             )
                         );
@@ -515,7 +515,7 @@
                                 );
                                 self.addSearchAlert(message);
                             } else if (response.discussion_data.length === 0) {
-                                self.addSearchAlert(gettext('No threads matched your query.'));
+                                self.addSearchAlert(gettext('No posts matched your query.'));
                             }
                             self.displayedCollection.reset(self.collection.models);
                             if (text) {

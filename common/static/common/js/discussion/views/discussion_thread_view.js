@@ -262,7 +262,7 @@
                         if (xhr.status === 404) {
                             DiscussionUtil.discussionAlert(
                                 gettext('Sorry'),
-                                gettext('The thread you selected has been deleted. Please select another thread.')
+                                gettext('The post you selected has been deleted. Please select another post.')
                             );
                         } else if (firstLoad) {
                             DiscussionUtil.discussionAlert(

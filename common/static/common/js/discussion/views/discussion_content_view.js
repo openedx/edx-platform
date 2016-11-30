@@ -349,9 +349,9 @@
                 is_subscribing = !this.model.get('subscribed');
                 url = this.model.urlFor(is_subscribing ? 'follow' : 'unfollow');
                 if (is_subscribing) {
-                    msg = gettext('We had some trouble subscribing you to this thread. Please try again.');
+                    msg = gettext('We had some trouble subscribing you to this post. Please try again.');
                 } else {
-                    msg = gettext('We had some trouble unsubscribing you from this thread. Please try again.');
+                    msg = gettext('We had some trouble unsubscribing you from this post. Please try again.');
                 }
                 return DiscussionUtil.updateWithUndo(this.model, {
                     'subscribed': is_subscribing
@@ -434,9 +434,9 @@
                 is_pinning = !this.model.get('pinned');
                 url = this.model.urlFor(is_pinning ? 'pinThread' : 'unPinThread');
                 if (is_pinning) {
-                    msg = gettext('We had some trouble pinning this thread. Please try again.');
+                    msg = gettext('We had some trouble pinning this post. Please try again.');
                 } else {
-                    msg = gettext('We had some trouble unpinning this thread. Please try again.');
+                    msg = gettext('We had some trouble unpinning this post. Please try again.');
                 }
                 return DiscussionUtil.updateWithUndo(this.model, {
                     pinned: is_pinning
@@ -475,9 +475,9 @@
                 event.preventDefault();
                 is_closing = !this.model.get('closed');
                 if (is_closing) {
-                    msg = gettext('We had some trouble closing this thread.  Please try again.');
+                    msg = gettext('We had some trouble closing this post.  Please try again.');
                 } else {
-                    msg = gettext('We had some trouble reopening this thread.  Please try again.');
+                    msg = gettext('We had some trouble reopening this post.  Please try again.');
                 }
                 updates = {
                     closed: is_closing
