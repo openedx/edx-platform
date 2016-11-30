@@ -182,6 +182,9 @@
 
     .forum-nav-thread-labels {
         margin: 5px 0 0;
+        // Overrides overspecific courseware CSS from:
+        // https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L470
+        padding-left: 0 !important;
     }
 
     .thread-preview-body {
@@ -290,6 +293,7 @@
 .forum-nav-thread-wrapper-0 {
     @extend %forum-nav-thread-wrapper;
     @include margin-right($baseline/5);
+    align-self: flex-start;
 
     .icon {
         font-size: $forum-base-font-size;

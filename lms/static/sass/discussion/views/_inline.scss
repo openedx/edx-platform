@@ -13,7 +13,7 @@
 
         .forum-nav-bar {
             color: $forum-color-navigation-bar;
-            padding: ($baseline / 4);
+            padding: ($baseline / 2) $baseline;
 
             .btn-link {
                 color: $forum-color-primary;
