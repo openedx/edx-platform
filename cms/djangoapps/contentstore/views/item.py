@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import hashlib
+import json
 import logging
 from collections import OrderedDict
 from datetime import datetime
@@ -297,7 +298,6 @@ def xblock_view_handler(request, usage_key_string, view_name):
         elif view_name in PREVIEW_VIEWS + container_views:
             is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
             can_edit = has_studio_write_access(request.user, usage_key.course_key)
-            can_edit_visibility = not view_name == 'library_container_child_preview'
 
             # Determine the items to be shown as reorderable. Note that the view
             # 'reorderable_container_child_preview' is only rendered for xblocks that
@@ -327,18 +327,21 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 )
 
             force_render = request.GET.get('force_render', None)
+            can_edit_visibility = request.GET.get('can_edit_visibility', None)
 
             # Set up the context to be passed to each XBlock's render method.
             context = {
                 'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
                 'is_unit_page': is_unit(xblock),
                 'can_edit': can_edit,
-                'can_edit_visibility': can_edit_visibility,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items,
                 'paging': paging,
                 'force_render': force_render,
             }
+
+            if can_edit_visibility is not None:
+                context['can_edit_visibility'] = json.loads(can_edit_visibility)
 
             fragment = get_preview_fragment(request, xblock, context)
 

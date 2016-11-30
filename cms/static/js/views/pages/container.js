@@ -302,7 +302,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
              * refreshing.
              * @returns {jQuery promise} A promise representing the complete operation.
              */
-            refreshChildXBlock: function(xblockElement, block_added, is_duplicate) {
+            refreshChildXBlock: function(xblockElement, block_added, is_duplicate, renderParameters) {
                 var self = this,
                     xblockInfo,
                     TemporaryXBlockView,
@@ -327,6 +327,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                     el: xblockElement
                 });
                 return temporaryView.render({
+                    data: renderParameters || {},
                     success: function() {
                         self.onXBlockRefresh(temporaryView, block_added, is_duplicate);
                         temporaryView.unbind();  // Remove the temporary view

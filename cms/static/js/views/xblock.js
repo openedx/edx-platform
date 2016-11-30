@@ -23,6 +23,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     url: decodeURIComponent(xblockUrl) + '/' + view,
                     type: 'GET',
                     cache: false,
+                    data: options.data || {},
                     headers: {Accept: 'application/json'},
                     success: function(fragment) {
                         self.handleXBlockFragment(fragment, options);
