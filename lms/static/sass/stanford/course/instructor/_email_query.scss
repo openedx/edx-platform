@@ -1,0 +1,204 @@
+.instructor-dashboard-wrapper-2 section.idash-section#queries {
+  .queries-section {
+    margin-bottom: ($baseline*1.5);
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .email-lists-management {
+    .wrapper-email-select {
+      padding: ($baseline/2);
+      background-color: $light-gray;
+    }
+    .email-list-container {
+      margin-bottom: ($baseline*1.5);
+      .email-list-widget {
+        .header {
+          @include box-sizing(border-box);
+          @include border-top-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          background-color: #efefef;
+          border: 1px solid $light-gray;
+          display: none; // hiding to prefer dropdown as header
+        }
+        .title {
+          @include font-size(16);
+        }
+        .label {
+          @extend %t-copy-sub1;
+          color: $lighter-base-font-color;
+        }
+        .info {
+          @include box-sizing(border-box);
+          padding: ($baseline/2);
+          border: 1px solid $light-gray;
+          color: $lighter-base-font-color;
+          line-height: 1.3em;
+          font-size: .85em;
+        }
+      }
+    }
+  }
+  .email-list {
+    @include box-sizing(border-box);
+    margin: ($baseline/4) 0;
+    padding: ($baseline/4);
+    background-color: $light-gray;
+    table {
+      width: 100%;
+    }
+    thead {
+      background-color: #696969;
+    }
+    tr {
+      border-bottom: 1px solid $light-gray;
+      text-transform: capitalize;
+    }
+    .or {
+      background-color: #778899;
+    }
+    .and {
+      background-color: #8FBC8F;
+    }
+    .not {
+      background-color: #DB7093;
+    }
+    .problem_specific, .section_specific {
+      display: none;
+    }
+    .active {
+      display: table-cell;
+    }
+    .addingQuery {
+      text-align: right;
+    }
+    .addQuery {
+      @include idashbutton($blue);
+      position: relative;
+      right: $baseline;
+      font-size: 12px;
+    }
+    .incompleteMessage {
+      padding-right: $baseline * 2;
+      color: #C71585;
+    }
+    .remove {
+      color: $white
+    }
+    .remove, .deleteSaved {
+      cursor: pointer;
+      text-align: center;
+      &:hover, &:focus {
+        color: $alert-color;
+      }
+    }
+    .deleteSaved {
+      color: $black
+    }
+    .emailWidget.invisibleSavedGroupName {
+      display:none;
+    }
+    .emailWidget.saveEditName, .emailWidget.cancelEditName {
+      display:inline-block;
+    }
+    .emailWidget.cancelEditName {
+      float:right;
+    }
+    .emailWidget.saveEditName {
+      float:left;
+    }
+    .emailWidget.editNameInput {
+      width:100%;
+    }
+    .emailWidget.editName, .emailWidget.saveEditName, .emailWidget.cancelEditName {
+      color: $black;
+      cursor: pointer;
+      text-align: right;
+      &:hover, &:focus {
+        color: $blue;
+      }
+    }
+    .loadQuery {
+      color: $black;
+      cursor: pointer;
+      text-align: center;
+      &:hover, &:focus {
+        color: $blue;
+      }
+    }
+    .tableCaption {
+      padding: $baseline / 2;
+      padding-left: $baseline / 4;
+      padding-bottom: $baseline / 2;
+      font-weight: bold;
+      text-align: left;
+    }
+    thead {
+      color:white;
+    }
+    td {
+      @extend %t-copy-sub1;
+      padding: ($baseline/2) ($baseline/4);
+      vertical-align: middle;
+      word-wrap: break-word;
+      border-left: 1px solid $light-gray;
+      border-right: 1px solid $light-gray;
+    }
+    .estimated {
+      padding-bottom: $baseline / 2;
+      color: #1E90FF;
+      font-size: 20px;
+    }
+    .subsection {
+      text-indent: $baseline / 2;
+    }
+    .working {
+      color: $black;
+    }
+    .bottom-email {
+      @include box-sizing(border-box);
+      @include border-bottom-radius(3);
+      position: relative;
+      padding: $baseline;
+      margin-top: -1px;
+      border: 1px solid $light-gray;
+      background-color: #efefef;
+      box-shadow: inset #bbb 0 1px 1px 0;
+    }
+    .savequeryname {
+      right: $baseline;
+      margin-right: 5px;
+      float: right;
+      font-size: 15px;
+    }
+    .savequery {
+      @include idashbutton($red);
+      float: right;
+      right: $baseline;
+      font-size: 15px;
+    }
+    .getcsv {
+      @include idashbutton($blue);
+      float: right;
+      right: $baseline;
+      font-size: 15px;
+    }
+    .disabled {
+      button:disabled;
+    }
+    .queryTableBody {
+      color: $white;
+    }
+    .savedQueriesTable {
+      background-color: #FAF0E6;
+      color: $black;
+    }
+    .invisibleQueriesStorage {
+      display: none;
+    }
+    .emailHelp {
+      padding: $baseline / 2;
+    }
+  }
+}

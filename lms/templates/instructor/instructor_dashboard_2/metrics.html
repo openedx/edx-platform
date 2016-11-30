@@ -7,6 +7,7 @@ from django.template.defaultfilters import escapejs
 
 <script>
   ${d3_stacked_bar_graph.body()}
+  ${metrics_click_handlers.body(section_data)}
 </script>
 
 %if not any (section_data.values()):
@@ -14,6 +15,7 @@ from django.template.defaultfilters import escapejs
 %else:
   <%namespace name="d3_stacked_bar_graph" file="/class_dashboard/d3_stacked_bar_graph.js"/>
   <%namespace name="all_section_metrics" file="/class_dashboard/all_section_metrics.js"/>
+  <%namespace name='metrics_click_handlers' file='/class_dashboard/metrics_click_handlers.js'/>
   <div id="graph_reload">
     <p>${_("Use Reload Graphs to refresh the graphs.")}</p>
     <p><input type="button" value="${_("Reload Graphs")}"/></p>
