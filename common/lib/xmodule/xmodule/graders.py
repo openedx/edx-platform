@@ -126,9 +126,8 @@ def grader_from_conf(conf):
     This creates a CourseGrader from a configuration (such as in course_settings.py).
     The conf can simply be an instance of CourseGrader, in which case no work is done.
     More commonly, the conf is a list of dictionaries. A WeightedSubsectionsGrader
-    with AssignmentFormatGrader's or SingleSectionGrader's as subsections will be
-    generated. Every dictionary should contain the parameters for making either a
-    AssignmentFormatGrader or SingleSectionGrader, in addition to a 'weight' key.
+    with AssignmentFormatGrader's will be generated. Every dictionary should contain
+    the parameters for making an AssignmentFormatGrader, in addition to a 'weight' key.
     """
     if isinstance(conf, CourseGrader):
         return conf
@@ -137,27 +136,14 @@ def grader_from_conf(conf):
     for subgraderconf in conf:
         subgraderconf = subgraderconf.copy()
         weight = subgraderconf.pop("weight", 0)
-        # NOTE: 'name' used to exist in SingleSectionGrader. We are deprecating SingleSectionGrader
-        # and converting everything into an AssignmentFormatGrader by adding 'min_count' and
-        # 'drop_count'. AssignmentFormatGrader does not expect 'name', so if it appears
-        # in bad_args, go ahead remove it (this causes no errors). Eventually, SingleSectionGrader
-        # should be completely removed.
-        name = 'name'
         try:
             if 'min_count' in subgraderconf:
                 #This is an AssignmentFormatGrader
                 subgrader_class = AssignmentFormatGrader
-            elif name in subgraderconf:
-                #This is an SingleSectionGrader
-                subgrader_class = SingleSectionGrader
             else:
                 raise ValueError("Configuration has no appropriate grader class.")
 
             bad_args = invalid_args(subgrader_class.__init__, subgraderconf)
-            # See note above concerning 'name'.
-            if bad_args.issuperset({name}):
-                bad_args = bad_args - {name}
-                del subgraderconf[name]
             if len(bad_args) > 0:
                 log.warning("Invalid arguments for a subgrader: %s", bad_args)
                 for key in bad_args:
@@ -264,57 +250,6 @@ class WeightedSubsectionsGrader(CourseGrader):
                 'grade_breakdown': grade_breakdown}
 
 
-class SingleSectionGrader(CourseGrader):
-    """
-    This grades a single section with the format 'type' and the name 'name'.
-
-    If the name is not appropriate for the short short_label or category, they each may
-    be specified individually.
-    """
-    def __init__(self, type, name, short_label=None, category=None):  # pylint: disable=redefined-builtin
-        self.type = type
-        self.name = name
-        self.short_label = short_label or name
-        self.category = category or name
-
-    def grade(self, grade_sheet, generate_random_scores=False):
-        found_score = None
-        if self.type in grade_sheet:
-            for score in grade_sheet[self.type]:
-                if score.display_name == self.name:
-                    found_score = score
-                    break
-
-        if found_score or generate_random_scores:
-            if generate_random_scores:  	# for debugging!
-                earned = random.randint(2, 15)
-                possible = random.randint(earned, 15)
-            else:   # We found the score
-                earned = found_score.earned
-                possible = found_score.possible
-
-            percent = earned / possible
-            detail = u"{name} - {percent:.0%} ({earned:.3n}/{possible:.3n})".format(
-                name=self.name,
-                percent=percent,
-                earned=float(earned),
-                possible=float(possible)
-            )
-
-        else:
-            percent = 0.0
-            detail = u"{name} - 0% (?/?)".format(name=self.name)
-
-        breakdown = [{'percent': percent, 'label': self.short_label,
-                      'detail': detail, 'category': self.category, 'prominent': True}]
-
-        return {
-            'percent': percent,
-            'section_breakdown': breakdown,
-            #No grade_breakdown here
-        }
-
-
 class AssignmentFormatGrader(CourseGrader):
     """
     Grades all sections matching the format 'type' with an equal weight. A specified
@@ -332,9 +267,9 @@ class AssignmentFormatGrader(CourseGrader):
     hide_average is to suppress the display of the total score in this grader and instead
     only show each assignment in this grader in the breakdown.
 
-    If there is only a single assignment in this grader, then it acts like a SingleSectionGrader
-    and returns only one entry for the grader.  Since the assignment and the total are the same,
-    the total is returned but is not labeled as an average.
+    If there is only a single assignment in this grader, then it returns only one entry for the
+    grader.  Since the assignment and the total are the same, the total is returned but is not
+    labeled as an average.
 
     category should be presentable to the user, but may not appear. When the grade breakdown is
     displayed, scores from the same category will be similar (for example, by color).
@@ -442,8 +377,7 @@ class AssignmentFormatGrader(CourseGrader):
 
         if len(breakdown) == 1:
             # if there is only one entry in a section, suppress the existing individual entry and the average,
-            # and just display a single entry for the section.  That way it acts automatically like a
-            # SingleSectionGrader.
+            # and just display a single entry for the section.
             total_detail = u"{section_type} = {percent:.0%}".format(
                 percent=total_percent,
                 section_type=self.section_type,

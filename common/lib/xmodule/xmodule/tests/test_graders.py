@@ -104,27 +104,6 @@ class GraderTest(unittest.TestCase):
         ],
     }
 
-    def test_single_section_grader(self):
-        midterm_grader = graders.SingleSectionGrader("Midterm", "Midterm Exam")
-        lab4_grader = graders.SingleSectionGrader("Lab", "lab4")
-        bad_lab_grader = graders.SingleSectionGrader("Lab", "lab42")
-
-        for graded in [
-                midterm_grader.grade(self.empty_gradesheet),
-                midterm_grader.grade(self.incomplete_gradesheet),
-                bad_lab_grader.grade(self.test_gradesheet),
-        ]:
-            self.assertEqual(len(graded['section_breakdown']), 1)
-            self.assertEqual(graded['percent'], 0.0)
-
-        graded = midterm_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.505)
-        self.assertEqual(len(graded['section_breakdown']), 1)
-
-        graded = lab4_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.2)
-        self.assertEqual(len(graded['section_breakdown']), 1)
-
     def test_assignment_format_grader(self):
         homework_grader = graders.AssignmentFormatGrader("Homework", 12, 2)
         no_drop_grader = graders.AssignmentFormatGrader("Homework", 12, 0)
@@ -179,8 +158,6 @@ class GraderTest(unittest.TestCase):
         # First, a few sub graders
         homework_grader = graders.AssignmentFormatGrader("Homework", 12, 2)
         lab_grader = graders.AssignmentFormatGrader("Lab", 7, 3)
-        # phasing out the use of SingleSectionGraders, and instead using AssignmentFormatGraders that
-        # will act like SingleSectionGraders on single sections.
         midterm_grader = graders.AssignmentFormatGrader("Midterm", 1, 0)
 
         weighted_grader = graders.WeightedSubsectionsGrader([
