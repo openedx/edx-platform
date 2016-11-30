@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import ddt
 from django.conf import settings
+from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -323,6 +324,30 @@ class BasketsViewTests(EnrollmentEventTestMixin, UserMixin, ModuleStoreTestCase)
             response = self._post_to_view(marketing_email_opt_in=is_opt_in)
         self.assertEqual(mock_update.called, is_opt_in)
         self.assertEqual(response.status_code, 200)
+
+    def _test_enrollment_email(self):
+        self.course.enable_enrollment_email = True
+        self.update_course(self.course, self.user.id)
+
+        self._post_to_view()
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_enrollment_email_without_sku(self):
+        """
+        Test that email is sent upon enrollment for course without SKU.
+        """
+        # Remove SKU from all course modes
+        for course_mode in CourseMode.objects.filter(course_id=self.course.id):
+            course_mode.sku = None
+            course_mode.save()
+        self._test_enrollment_email()
+
+    @override_settings(ECOMMERCE_API_URL=None, ECOMMERCE_API_SIGNING_KEY=None)
+    def test_enrollment_email_api_not_configured(self):
+        """
+        Test that email is sent upon enrollment when E-Commerce service is not configured.
+        """
+        self._test_enrollment_email()
 
 
 @attr('shard_1')
