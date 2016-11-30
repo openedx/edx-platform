@@ -294,6 +294,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
 
         elif view_name in PREVIEW_VIEWS + container_views:
             is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
+            is_library_view = view_name == 'container_child_preview'
             can_edit = has_studio_write_access(request.user, usage_key.course_key)
 
             # Determine the items to be shown as reorderable. Note that the view
@@ -330,6 +331,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                 'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
                 'is_unit_page': is_unit(xblock),
                 'can_edit': can_edit,
+                'can_edit_visibility': not is_library_view,
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
                 'reorderable_items': reorderable_items,
                 'paging': paging,
