@@ -73,7 +73,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                 };
             },
 
-            new_child_view: 'container_child_preview',
+            new_child_view: 'library_container_child_preview',
 
             render: function(options) {
                 options = options || {};

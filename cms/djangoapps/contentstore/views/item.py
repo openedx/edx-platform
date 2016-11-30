@@ -268,7 +268,9 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if 'application/json' in accept_header:
         store = modulestore()
         xblock = store.get_item(usage_key)
-        container_views = ['container_preview', 'reorderable_container_child_preview', 'container_child_preview']
+        container_views = [
+            'container_preview', 'reorderable_container_child_preview', 'library_container_child_preview'
+        ]
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -295,7 +297,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
         elif view_name in PREVIEW_VIEWS + container_views:
             is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
             can_edit = has_studio_write_access(request.user, usage_key.course_key)
-            can_edit_visibility = not view_name == 'container_child_preview'
+            can_edit_visibility = not view_name == 'library_container_child_preview'
 
             # Determine the items to be shown as reorderable. Note that the view
             # 'reorderable_container_child_preview' is only rendered for xblocks that
