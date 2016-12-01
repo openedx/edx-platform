@@ -37,7 +37,7 @@ $learn-more-horizontal-position: calc(50% - 100px); // calculate the left positi
         // places the shadow on top of the course image while hovering over the course card
         &:before {
           @include left(0);
-          @extend %ui-depth1;
+          @extend %ui-depth_initial;
           position: absolute;
           top: 0;
           opacity: 0;

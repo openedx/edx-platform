@@ -24,6 +24,7 @@
 }
 
 // extends - UI - depth levels
+%ui-depth_initial { z-index: initial; }
 %ui-depth0 { z-index: 0; }
 %ui-depth1 { z-index: 10; }
 %ui-depth2 { z-index: 100; }
