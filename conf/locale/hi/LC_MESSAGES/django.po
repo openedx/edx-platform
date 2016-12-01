@@ -71,7 +71,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:47+0000\n"
+"POT-Creation-Date: 2016-11-22 16:37+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: plankton rules <planktonrules0@gmail.com>\n"
 "Language-Team: Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)\n"
@@ -4843,10 +4843,6 @@ msgid "in {relative} - {absolute}"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr ""
 
@@ -6064,10 +6060,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -10147,14 +10139,10 @@ msgstr "धन्यवाद!"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"आपके सवालों और सुझावों के लिए धन्यवाद। हमारी कोशिश रहती है कि हम आपके सवालों"
-" का जवाब एक ही कार्यकारी दिन में दें (सोमवार से शुक्रवार, {open_time} UTC से"
-" {close_time} UTC.) इस बीच इस लिंक {link_start}detailed FAQs{link_end} पर "
-"जाएं जहां ज़्यादातर सवालों का जवाब पहले से ही दिया हुआ है।"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -12713,6 +12701,10 @@ msgstr "है्न्डआउट नैविगेशन"
 msgid "Important Course Dates"
 msgstr ""
 
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
+
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "समाचार - MITx 6.002x"
@@ -14339,6 +14331,10 @@ msgstr "पाठ्यक्रम का प्रदर्शित नाम
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html

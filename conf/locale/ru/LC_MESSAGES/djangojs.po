@@ -39,6 +39,7 @@
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# Vladimir Osypets <v@osypets.com>, 2016
 # Weyedide <weyedide@gmail.com>, 2014-2016
 # Weyedide <weyedide@gmail.com>, 2014
 # Yana Malinovskaya <y.malinovskaya@itransition.com>, 2014
@@ -125,9 +126,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:45+0000\n"
-"PO-Revision-Date: 2016-11-17 18:52+0000\n"
-"Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
+"POT-Creation-Date: 2016-11-22 16:36+0000\n"
+"PO-Revision-Date: 2016-11-22 16:42+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -261,6 +262,7 @@ msgid "Unknown"
 msgstr "Hеизвестный"
 
 #: cms/static/js/views/metadata.js
+#: cms/static/js/views/previous_video_upload.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -313,6 +315,11 @@ msgstr "Дополнительно"
 msgid "Close"
 msgstr "Закрыть"
 
+#: cms/static/js/views/previous_video_upload.js
+#: lms/static/js/views/image_field.js
+msgid "Removing"
+msgstr "Удаление"
+
 #: cms/static/js/views/validation.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
@@ -340,6 +347,22 @@ msgstr "Пополнение последними данными из библи
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
 msgid "Creating missing groups"
 msgstr "Создание недостающих групп"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -2003,22 +2026,6 @@ msgstr "Включить транскрипты"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "Отключить транскрипты"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "title_word_{uniqueId}"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId}"
-msgstr ""
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -5050,10 +5057,6 @@ msgid "Change image"
 msgstr "Изменить изображение"
 
 #: lms/static/js/views/image_field.js
-msgid "Removing"
-msgstr "Удаление"
-
-#: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
 msgstr "Возникла ошибка. Обновите страницу и попробуйте ещё раз."
 
@@ -6022,10 +6025,6 @@ msgstr "Дата добавления"
 msgid "Editing visibility for: %(title)s"
 msgstr "Настройки видимости для: %(title)s"
 
-#: cms/static/js/views/pages/container.js
-msgid "Duplicating"
-msgstr "Копирование"
-
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
 msgstr "Публикация"
@@ -6148,6 +6147,16 @@ msgstr "{totalItems} итог"
 msgid "Pending"
 msgstr "Ожидание"
 
+#: cms/static/js/views/previous_video_upload.js
+msgid "Are you sure you want to remove this video from the list?"
+msgstr ""
+
+#: cms/static/js/views/previous_video_upload.js
+msgid ""
+"Removing a video from this list does not affect course content. Any content "
+"that uses a previously uploaded video ID continues to display in the course."
+msgstr ""
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -6253,8 +6262,12 @@ msgstr ""
 " символов."
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
-msgstr "Удаление %(xblock_type)s невозможно будет отменить."
+msgid "Duplicating"
+msgstr "Копирование"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Deleting this {xblock_type} is permanent and cannot be undone."
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid ""
@@ -6265,16 +6278,16 @@ msgstr ""
 "содержимого является предварительным условием, будет снято."
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s (and prerequisite)?"
-msgstr "Удалить %(xblock_type)s (и предварительные условия)?"
+msgid "Delete this {xblock_type} (and prerequisite)?"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Yes, delete this %(xblock_type)s"
-msgstr "Да, удалить %(xblock_type)s"
+msgid "Yes, delete this {xblock_type}"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "Удалить %(xblock_type)s?"
+msgid "Delete this {xblock_type}?"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -6372,8 +6385,8 @@ msgid "Settings"
 msgstr "Настройки"
 
 #: cms/static/js/views/xblock_outline.js
-msgid "New %(component_type)s"
-msgstr "Новый %(component_type)s"
+msgid "New {component_type}"
+msgstr ""
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
@@ -6416,6 +6429,12 @@ msgstr "Предыдущее"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "Состояние"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "Действие"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
@@ -7405,11 +7424,6 @@ msgstr "Аннулировано"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
 msgstr "Примечания"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Action"
-msgstr "Действие"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
@@ -9160,6 +9174,10 @@ msgid "Configure"
 msgstr "Настройки"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Duplicate"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
 msgstr "Перетащите для изменения порядка"
 
@@ -9546,6 +9564,14 @@ msgstr "Продолжительность"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
 msgstr "Идентификатор видео"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove this video"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove {video_name} video"
+msgstr ""
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"

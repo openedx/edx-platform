@@ -181,8 +181,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:45+0000\n"
-"PO-Revision-Date: 2016-11-17 16:50+0000\n"
+"POT-Creation-Date: 2016-11-22 16:36+0000\n"
+"PO-Revision-Date: 2016-11-22 16:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -314,6 +314,7 @@ msgid "Unknown"
 msgstr "未知"
 
 #: cms/static/js/views/metadata.js
+#: cms/static/js/views/previous_video_upload.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -364,6 +365,11 @@ msgstr "高级"
 msgid "Close"
 msgstr "关闭"
 
+#: cms/static/js/views/previous_video_upload.js
+#: lms/static/js/views/image_field.js
+msgid "Removing"
+msgstr "移除中"
+
 #: cms/static/js/views/validation.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
@@ -391,6 +397,22 @@ msgstr "更新最新的库内容"
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
 msgid "Creating missing groups"
 msgstr "正在创建缺失的组。"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -1996,22 +2018,6 @@ msgstr "打开字幕"
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
 msgid "Turn off transcripts"
 msgstr "关闭字幕"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "title_word_{uniqueId}"
-msgstr ""
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId}"
-msgstr ""
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
@@ -4740,10 +4746,6 @@ msgid "Change image"
 msgstr "修改图片"
 
 #: lms/static/js/views/image_field.js
-msgid "Removing"
-msgstr "移除中"
-
-#: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
 msgstr "发生了一个错误，请刷新页面后重试。"
 
@@ -5632,10 +5634,6 @@ msgstr "添加日期"
 msgid "Editing visibility for: %(title)s"
 msgstr "编辑%(title)s的可见性"
 
-#: cms/static/js/views/pages/container.js
-msgid "Duplicating"
-msgstr "正在复制"
-
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
 msgstr "正在发布"
@@ -5744,6 +5742,16 @@ msgstr ""
 msgid "Pending"
 msgstr "挂起"
 
+#: cms/static/js/views/previous_video_upload.js
+msgid "Are you sure you want to remove this video from the list?"
+msgstr ""
+
+#: cms/static/js/views/previous_video_upload.js
+msgid ""
+"Removing a video from this list does not affect course content. Any content "
+"that uses a previously uploaded video ID continues to display in the course."
+msgstr ""
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -5833,8 +5841,12 @@ msgid ""
 msgstr "机构和知识库编号字段合在一起不能超过 <%=limit%> 个字符"
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
-msgstr "将永久删除该%(xblock_type)s，无法撤销。"
+msgid "Duplicating"
+msgstr "正在复制"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Deleting this {xblock_type} is permanent and cannot be undone."
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid ""
@@ -5843,16 +5855,16 @@ msgid ""
 msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s (and prerequisite)?"
+msgid "Delete this {xblock_type} (and prerequisite)?"
 msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Yes, delete this %(xblock_type)s"
-msgstr "是的，删除该%(xblock_type)s"
+msgid "Yes, delete this {xblock_type}"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "要删除该%(xblock_type)s吗？"
+msgid "Delete this {xblock_type}?"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -5947,8 +5959,8 @@ msgid "Settings"
 msgstr "设置"
 
 #: cms/static/js/views/xblock_outline.js
-msgid "New %(component_type)s"
-msgstr "新建%(component_type)s"
+msgid "New {component_type}"
+msgstr ""
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
@@ -5991,6 +6003,12 @@ msgstr "上一步"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "状态"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "操作"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
@@ -6944,11 +6962,6 @@ msgstr "已设定为无效"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
 msgstr "笔记"
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Action"
-msgstr "操作"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
@@ -8539,6 +8552,10 @@ msgid "Configure"
 msgstr ""
 
 #: cms/templates/js/course-outline.underscore
+msgid "Duplicate"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
 msgstr ""
 
@@ -8908,6 +8925,14 @@ msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove this video"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove {video_name} video"
 msgstr ""
 
 #: cms/templates/js/publish-history.underscore
