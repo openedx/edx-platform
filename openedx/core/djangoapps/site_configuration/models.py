@@ -141,9 +141,9 @@ class SiteConfiguration(models.Model):
         collected_output_path = os.path.join(settings.STATIC_ROOT, 'customer_themes', '{}.css'.format(
             domain_without_port_number))
         with open(output_path, 'w') as f:
-            f.write(css_output)
+            f.write(css_output.encode('utf-8'))
         with open(collected_output_path, 'w') as f:
-            f.write(css_output)
+            f.write(css_output.encode('utf-8'))
 
     def collect_css_file(self):
         path = self.values.get('css_overrides_file')
