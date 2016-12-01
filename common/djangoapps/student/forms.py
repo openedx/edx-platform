@@ -15,11 +15,7 @@ from django.template import loader
 
 from django.conf import settings
 from microsite_configuration import microsite
-from util.password_policy_validators import (
-    validate_password_length,
-    validate_password_complexity,
-    validate_password_dictionary,
-)
+from util.password_policy_validators import validate_password_strength
 
 
 class PasswordResetFormNoActive(PasswordResetForm):
@@ -218,9 +214,7 @@ class AccountCreationForm(forms.Form):
             raise ValidationError(_("Username and password fields cannot match"))
         if self.enforce_password_policy:
             try:
-                validate_password_length(password)
-                validate_password_complexity(password)
-                validate_password_dictionary(password)
+                validate_password_strength(password)
             except ValidationError, err:
                 raise ValidationError(_("Password: ") + "; ".join(err.messages))
         return password
