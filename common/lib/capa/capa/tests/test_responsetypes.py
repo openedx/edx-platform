@@ -31,7 +31,6 @@ from capa.tests.response_xml_factory import (
     CustomResponseXMLFactory,
     FormulaResponseXMLFactory,
     ImageResponseXMLFactory,
-    JavascriptResponseXMLFactory,
     MultipleChoiceResponseXMLFactory,
     NumericalResponseXMLFactory,
     OptionResponseXMLFactory,
@@ -1340,46 +1339,6 @@ class ChoiceResponseTest(ResponseTest):  # pylint: disable=missing-docstring
         # Ensure the expected correctness
         self.assert_grade(problem, ['choice_0', 'choice_2'], 'correct')
         self.assert_grade(problem, ['choice_1', 'choice_3'], 'incorrect')
-
-
-class JavascriptResponseTest(ResponseTest):  # pylint: disable=missing-docstring
-    xml_factory_class = JavascriptResponseXMLFactory
-
-    def test_grade(self):
-        # Compile coffee files into javascript used by the response
-        coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
-        os.system("node_modules/.bin/coffee -c %s" % (coffee_file_path))
-
-        capa_system = test_capa_system()
-        capa_system.can_execute_unsafe_code = lambda: True
-        problem = self.build_problem(
-            capa_system=capa_system,
-            generator_src="test_problem_generator.js",
-            grader_src="test_problem_grader.js",
-            display_class="TestProblemDisplay",
-            display_src="test_problem_display.js",
-            param_dict={'value': '4'},
-        )
-
-        # Test that we get graded correctly
-        self.assert_grade(problem, json.dumps({0: 4}), "correct")
-        self.assert_grade(problem, json.dumps({0: 5}), "incorrect")
-
-    def test_cant_execute_javascript(self):
-        # If the system says to disallow unsafe code execution, then making
-        # this problem will raise an exception.
-        capa_system = test_capa_system()
-        capa_system.can_execute_unsafe_code = lambda: False
-
-        with self.assertRaises(LoncapaProblemError):
-            self.build_problem(
-                capa_system=capa_system,
-                generator_src="test_problem_generator.js",
-                grader_src="test_problem_grader.js",
-                display_class="TestProblemDisplay",
-                display_src="test_problem_display.js",
-                param_dict={'value': '4'},
-            )
 
 
 class NumericalResponseTest(ResponseTest):  # pylint: disable=missing-docstring
