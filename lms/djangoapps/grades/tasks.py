@@ -3,12 +3,14 @@ This module contains tasks for asynchronous execution of grade updates.
 """
 
 from celery import task
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.utils import DatabaseError
 from logging import getLogger
+import pytz
 
-from courseware.model_data import get_score
+from courseware.model_data import get_full_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator
@@ -24,8 +26,26 @@ log = getLogger(__name__)
 
 @task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
 def recalculate_subsection_grade(
+        # pylint: disable=unused-argument
         user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, **kwargs
 ):
+    """
+    Shim to allow us to modify this task's signature without blowing up production on deployment.
+    """
+    _recalculate_subsection_grade.apply(
+        kwargs=dict(
+            user_id=user_id,
+            course_id=course_id,
+            usage_id=usage_id,
+            only_if_higher=only_if_higher,
+            task_queued_time=kwargs.get('task_queued_time', "1970-01-01 12:00:00.000001"),
+            score_deleted=kwargs['score_deleted'],
+        )
+    )
+
+
+@task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+def _recalculate_subsection_grade(**kwargs):
     """
     Updates a saved subsection grade.
 
@@ -36,63 +56,57 @@ def recalculate_subsection_grade(
         only_if_higher (boolean): indicating whether grades should
             be updated only if the new raw_earned is higher than the
             previous value.
-        weighted_earned (float): the weighted points the learner earned on the
-            problem that triggered the update.
-        weighted_possible (float): the max weighted points the leaner could have
-            earned on the problem.
+        task_queued_time (serialized datetime): indicates when the task
+            was queued so that we can verify the underlying data update.
         score_deleted (boolean): indicating whether the grade change is
             a result of the problem's score being deleted.
     """
-    course_key = CourseLocator.from_string(course_id)
+    course_key = CourseLocator.from_string(kwargs['course_id'])
     if not PersistentGradesEnabledFlag.feature_enabled(course_key):
         return
 
     score_deleted = kwargs['score_deleted']
-    scored_block_usage_key = UsageKey.from_string(usage_id).replace(course_key=course_key)
+    scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
+    task_queued_time = datetime.strptime(kwargs['task_queued_time'], "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=pytz.UTC)
 
     # Verify the database has been updated with the scores when the task was
     # created. This race condition occurs if the transaction in the task
     # creator's process hasn't committed before the task initiates in the worker
     # process.
     if not _has_database_updated_with_new_score(
-            user_id, scored_block_usage_key, weighted_earned, weighted_possible, score_deleted,
+            kwargs['user_id'], scored_block_usage_key, task_queued_time, score_deleted,
     ):
-        raise _retry_recalculate_subsection_grade(
-            user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, score_deleted,
-        )
+        raise _retry_recalculate_subsection_grade(**kwargs)
 
     _update_subsection_grades(
         course_key,
         scored_block_usage_key,
-        only_if_higher,
-        course_id,
-        user_id,
-        usage_id,
-        weighted_earned,
-        weighted_possible,
+        kwargs['only_if_higher'],
+        kwargs['course_id'],
+        kwargs['user_id'],
+        kwargs['usage_id'],
+        kwargs['task_queued_time'],
         score_deleted,
     )
 
 
 def _has_database_updated_with_new_score(
-        user_id, scored_block_usage_key, expected_raw_earned, expected_raw_possible, score_deleted,
+        user_id, scored_block_usage_key, task_queued_time, score_deleted,
 ):
     """
     Returns whether the database has been updated with the
     expected new score values for the given problem and user.
     """
-    score = get_score(user_id, scored_block_usage_key)
+    score = get_full_score(user_id, scored_block_usage_key)
 
     if score is None:
         # score should be None only if it was deleted.
         # Otherwise, it hasn't yet been saved.
         return score_deleted
 
-    found_raw_earned, found_raw_possible = score  # pylint: disable=unpacking-non-sequence
-    return (
-        found_raw_earned == expected_raw_earned and
-        found_raw_possible == expected_raw_possible
-    )
+    # In non-async environments, we're still inside an uncommited transaction. This means that score.modified will be
+    # reporting a time slightly earlier than task_queued_time, so we add a "fudge factor" of 1/10 of a second.
+    return (score.modified + timedelta(milliseconds=100)) >= task_queued_time
 
 
 def _update_subsection_grades(
@@ -102,8 +116,7 @@ def _update_subsection_grades(
         course_id,
         user_id,
         usage_id,
-        weighted_earned,
-        weighted_possible,
+        task_queued_time,
         score_deleted,
 ):
     """
@@ -140,25 +153,24 @@ def _update_subsection_grades(
 
     except DatabaseError as exc:
         raise _retry_recalculate_subsection_grade(
-            user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, score_deleted, exc,
+            user_id, course_id, usage_id, only_if_higher, task_queued_time, score_deleted, exc,
         )
 
 
 def _retry_recalculate_subsection_grade(
-        user_id, course_id, usage_id, only_if_higher, weighted_earned, weighted_possible, score_deleted, exc=None,
+        user_id, course_id, usage_id, only_if_higher, task_queued_time, score_deleted, exc=None,
 ):
     """
     Calls retry for the recalculate_subsection_grade task with the
     given inputs.
     """
-    recalculate_subsection_grade.retry(
+    _recalculate_subsection_grade.retry(
         kwargs=dict(
             user_id=user_id,
             course_id=course_id,
             usage_id=usage_id,
             only_if_higher=only_if_higher,
-            weighted_earned=weighted_earned,
-            weighted_possible=weighted_possible,
+            task_queued_time=task_queued_time,
             score_deleted=score_deleted,
         ),
         exc=exc,

@@ -2,6 +2,7 @@
 Grades related signals.
 """
 
+from datetime import datetime
 from django.dispatch import receiver
 from logging import getLogger
 
@@ -18,7 +19,7 @@ from .signals import (
 )
 from ..new.course_grade import CourseGradeFactory
 from ..scores import weighted_score
-from ..tasks import recalculate_subsection_grade
+from ..tasks import _recalculate_subsection_grade
 
 
 log = getLogger(__name__)
@@ -158,14 +159,13 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     Handles the PROBLEM_WEIGHTED_SCORE_CHANGED signal by
     enqueueing a subsection update operation to occur asynchronously.
     """
-    result = recalculate_subsection_grade.apply_async(
+    result = _recalculate_subsection_grade.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
             course_id=kwargs['course_id'],
             usage_id=kwargs['usage_id'],
             only_if_higher=kwargs.get('only_if_higher'),
-            weighted_earned=kwargs.get('weighted_earned'),
-            weighted_possible=kwargs.get('weighted_possible'),
+            task_queued_time=unicode(datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f")),
             score_deleted=kwargs.get('score_deleted', False),
         )
     )

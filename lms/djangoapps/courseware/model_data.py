@@ -1009,6 +1009,23 @@ def set_score(user_id, usage_key, score, max_score):
         student_module.save()
 
 
+def get_full_score(user_id, usage_key):
+    """
+    Get the full student_module object for the specified user and xblock usage.
+    Returns None if not found.
+    """
+    try:
+        student_module = StudentModule.objects.get(
+            student_id=user_id,
+            module_state_key=usage_key,
+            course_id=usage_key.course_key,
+        )
+    except StudentModule.DoesNotExist:
+        return None
+    else:
+        return student_module
+
+
 def get_score(user_id, usage_key):
     """
     Get the score and max_score for the specified user and xblock usage.

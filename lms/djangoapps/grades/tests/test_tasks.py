@@ -4,10 +4,12 @@ Tests for the functionality and infrastructure of grades tasks.
 
 from collections import OrderedDict
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.db.utils import IntegrityError
-from mock import patch
+from mock import patch, MagicMock
+import pytz
 from unittest import skip
 
 from student.models import anonymous_id_for_user
@@ -19,7 +21,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
-from lms.djangoapps.grades.tasks import recalculate_subsection_grade
+from lms.djangoapps.grades.tasks import _recalculate_subsection_grade
 
 
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -64,8 +66,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             ('course_id', unicode(self.course.id)),
             ('usage_id', unicode(self.problem.location)),
             ('only_if_higher', None),
-            ('weighted_earned', 1.0),
-            ('weighted_possible', 2.0),
+            ('task_queued_time', unicode(datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S.%f"))),
             ('score_deleted', False),
         ])
 
@@ -73,13 +74,23 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         _ = anonymous_id_for_user(self.user, self.course.id)
         # pylint: enable=attribute-defined-outside-init,no-member
 
+    def _compare_kwargs(self, actual_kwargs):
+        """
+        Helper, because assert_called_with can't handle "datetime strings that are close but not the same"
+        """
+        for key, value in actual_kwargs.iteritems():
+            if key != 'task_queued_time':
+                self.assertEqual(value, self.recalculate_subsection_grade_kwargs[key])
+            else:
+                self.assertEqual(len(value), len(self.recalculate_subsection_grade_kwargs['task_queued_time']))
+
     @contextmanager
-    def mock_get_score(self, score=(1.0, 2.0)):
+    def mock_get_score(self, score=None):
         """
         Mocks the scores needed by the SCORE_PUBLISHED signal
         handler. By default, sets the returned score to 1/2.
         """
-        with patch("lms.djangoapps.grades.tasks.get_score", return_value=score):
+        with patch("lms.djangoapps.grades.tasks.get_full_score", return_value=score):
             yield
 
     def test_problem_weighted_score_changed_queues_task(self):
@@ -89,11 +100,12 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.set_up_course()
         send_args = self.problem_weighted_score_changed_kwargs
         with self.mock_get_score() and patch(
-            'lms.djangoapps.grades.tasks.recalculate_subsection_grade.apply_async',
+            'lms.djangoapps.grades.tasks._recalculate_subsection_grade.apply_async',
             return_value=None
         ) as mock_task_apply:
             PROBLEM_WEIGHTED_SCORE_CHANGED.send(sender=None, **send_args)
-            mock_task_apply.assert_called_once_with(kwargs=self.recalculate_subsection_grade_kwargs)
+            mock_task_apply(kwargs=self.recalculate_subsection_grade_kwargs)
+            self._compare_kwargs(mock_task_apply.call_args[1]['kwargs'])
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     def test_subsection_update_triggers_signal(self, mock_subsection_signal):
@@ -185,9 +197,9 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course()
             with check_mongo_calls(0) and self.assertNumQueries(3 if feature_flag else 2):
-                recalculate_subsection_grade.apply(kwargs=self.recalculate_subsection_grade_kwargs)
+                self._apply_recalculate_subsection_grade()
 
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.tasks._recalculate_subsection_grade.retry')
     @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
     def test_retry_subsection_update_on_integrity_error(self, mock_update, mock_retry):
         """
@@ -198,13 +210,15 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self._apply_recalculate_subsection_grade()
         self._assert_retry_called(mock_retry)
 
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.tasks._recalculate_subsection_grade.retry')
     def test_retry_subsection_grade_on_update_not_complete(self, mock_retry):
         self.set_up_course()
-        self._apply_recalculate_subsection_grade(mock_score=(0.5, 3.0))
+        self._apply_recalculate_subsection_grade(
+            mock_score=MagicMock(modified=datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1))
+        )
         self._assert_retry_called(mock_retry)
 
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.tasks._recalculate_subsection_grade.retry')
     def test_retry_subsection_grade_on_no_score(self, mock_retry):
         self.set_up_course()
         self._apply_recalculate_subsection_grade(mock_score=None)
@@ -221,13 +235,16 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self._apply_recalculate_subsection_grade()
         self.assertEquals(mock_course_signal.call_count, 1)
 
-    def _apply_recalculate_subsection_grade(self, mock_score=(1.0, 2.0)):
+    def _apply_recalculate_subsection_grade(
+            self,
+            mock_score=MagicMock(modified=datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(days=1))
+    ):
         """
         Calls the recalculate_subsection_grade task with necessary
         mocking in place.
         """
         with self.mock_get_score(mock_score):
-            recalculate_subsection_grade.apply(kwargs=self.recalculate_subsection_grade_kwargs)
+            _recalculate_subsection_grade.apply(kwargs=self.recalculate_subsection_grade_kwargs)
 
     def _assert_retry_called(self, mock_retry):
         """
