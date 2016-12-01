@@ -172,11 +172,11 @@ footer#footer-edx-v3 {
     padding: 20px 10px;
 
     .site-details {
-      @include span-columns(7);
+      @include span-columns(8);
     }
 
     .external-links {
-      @include span-columns(5);
+      @include span-columns(4);
     }
 
     .social-media-links,
@@ -195,11 +195,11 @@ footer#footer-edx-v3 {
     }
 
     .site-details {
-      @include span-columns(6);
+      @include span-columns(7);
     }
 
     .external-links {
-      @include span-columns(4);
+      @include span-columns(3);
     }
 
     .social-media-links {
