@@ -221,6 +221,9 @@
 
     .forum-nav-thread-link {
         @include border-left(3px solid transparent);
+        @include rtl {
+            flex-direction: row-reverse;
+        }
         display: flex;
         padding: $baseline / 2;
         transition: none;
@@ -252,12 +255,6 @@
             @include border-left(3px solid $forum-color-never-read-post);
             color: $forum-color-never-read-post;
         }
-    }
-}
-
-body.rtl {
-    .forum-nav-thread .forum-nav-thread-link {
-        flex-direction: row-reverse;
     }
 }
 
