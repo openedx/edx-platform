@@ -19,6 +19,7 @@ define(['jquery', 'underscore', 'common/js/components/utils/view_utils', 'js/vie
                     view = this.view,
                     xblockInfo = this.model,
                     xblockUrl = xblockInfo.url();
+                options = options || {};
                 return $.ajax({
                     url: decodeURIComponent(xblockUrl) + '/' + view,
                     type: 'GET',
