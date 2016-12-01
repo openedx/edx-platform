@@ -17,7 +17,7 @@
 -e git+https://github.com/edx-solutions/xblock.git@d25a661454da9e6b149d6c559de50ddcd0770857#egg=xblock
 git+https://github.com/edx-solutions/api-integration.git@v1.0.8#egg=api-integration==1.0.8
 git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.2#egg=organizations-edx-platform-extensions==1.1.2
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.2#egg=gradebook-edx-platform-extensions==1.0.2
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.4#egg=gradebook-edx-platform-extensions==1.0.4
 git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.6#egg=projects-edx-platform-extensions==1.0.6
 git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.0.0#egg=discussion-edx-platform-extensions==1.0.0
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
