@@ -688,6 +688,26 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
             "waiting for server to return result"
         ).fulfill()
 
+    def is_element_visible(self, selector):
+        """
+        Returns true if the element matching the specified selector is visible.
+        """
+        query = self.q(css=selector)
+        return query.present and query.visible
+
+    def is_checkbox_selected(self, selector):
+        """
+        Returns true or false depending upon the matching checkbox is checked.
+        """
+        return self.q(css=selector).selected
+
+    def refresh_and_wait_for_load(self):
+        """
+        Refresh the page and wait for all resources to load.
+        """
+        self.browser.refresh()
+        self.wait_for_page()
+
     def get_search_alert_messages(self):
         return self.q(css=self.ALERT_SELECTOR + " .message").text
 
@@ -719,6 +739,13 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
             ),
             "New post action succeeded"
         ).fulfill()
+
+    def click_element(self, selector):
+        """
+         Clicks the element specified by selector
+        """
+        element = self.q(css=selector)
+        return element.click()
 
     @property
     def new_post_button(self):
