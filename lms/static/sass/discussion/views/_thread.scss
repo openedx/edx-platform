@@ -27,7 +27,12 @@
     }
 
     .post-body {
+        @include float(left);
         width: flex-grid(10,12);
+    }
+
+    .post-context {
+        @include float(left);
     }
 }
 

@@ -14,9 +14,16 @@
         .forum-nav-bar {
             color: $forum-color-navigation-bar;
             padding: ($baseline / 2) $baseline;
+            position: relative;
 
-            .btn-link {
+            .all-posts-btn {
                 color: $forum-color-primary;
+
+                .icon {
+                    position: absolute;
+                    @include left(7px);
+                    top: 17px;
+                }
             }
         }
 
