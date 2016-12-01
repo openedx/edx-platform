@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 15:44+0000\n"
-"PO-Revision-Date: 2016-11-22 15:44:56.953763\n"
+"POT-Creation-Date: 2016-12-01 16:06+0000\n"
+"PO-Revision-Date: 2016-12-01 16:06:57.209894\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5525,8 +5525,9 @@ msgid "Donate"
 msgstr "Dönäté Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "Sïtémäp Ⱡ'σяєм ιρѕυм #"
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "Médïä Kït Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
@@ -5547,6 +5548,10 @@ msgstr "Prïväçý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 #: lms/djangoapps/branding/api.py
 msgid "Accessibility Policy"
 msgstr "Àççéssïßïlïtý Pölïçý Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "Sïtémäp Ⱡ'σяєм ιρѕυм #"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
@@ -15953,6 +15958,10 @@ msgid "due {date}"
 msgstr "düé {date} Ⱡ'σяєм ιρѕυм #"
 
 #: lms/templates/courseware/accordion.html
+msgid "{section_format} due {{date}}"
+msgstr "{section_format} düé {{date}} Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
+
+#: lms/templates/courseware/accordion.html
 msgid "This content is graded"
 msgstr "Thïs çöntént ïs grädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
@@ -16131,10 +16140,6 @@ msgstr ""
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "Çöürsé Mätérïäl Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/courseware/course_updates.html
-msgid "All course updates"
-msgstr "Àll çöürsé üpdätés Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -16316,16 +16321,12 @@ msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"{student_name}, you have met the requirements for credit in this course."
+"{student_name}, you have met the requirements for credit in this course. "
+"{a_start}Go to your dashboard{a_end} to purchase course credit."
 msgstr ""
 "{student_name}, ýöü hävé mét thé réqüïréménts för çrédït ïn thïs çöürsé. "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
-
-#: lms/templates/courseware/progress.html
-msgid "{a_start}Go to your dashboard{a_end} to purchase course credit."
-msgstr ""
 "{a_start}Gö tö ýöür däshßöärd{a_end} tö pürçhäsé çöürsé çrédït. Ⱡ'σяєм ιρѕυм"
-" ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
+" ∂σł#"
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -21126,10 +21127,6 @@ msgstr "FÀQ Ⱡ'σяєм#"
 msgid "Jobs"
 msgstr "Jößs Ⱡ'σяєм ι#"
 
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "Médïä Kït Ⱡ'σяєм ιρѕυм ∂σł#"
-
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 msgid "In the Press"
@@ -21371,11 +21368,11 @@ msgstr "Ûpgrädé Déädlïné Häs Pässéd Ⱡ'σяєм ιρѕυм ∂σłσ�
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The verification deadline for {course_name} was {date}. Verification is no "
-"longer available."
+"The verification deadline for {course_name} was {{date}}. Verification is no"
+" longer available."
 msgstr ""
-"Thé vérïfïçätïön déädlïné för {course_name} wäs {date}. Vérïfïçätïön ïs nö "
-"löngér äväïläßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+"Thé vérïfïçätïön déädlïné för {course_name} wäs {{date}}. Vérïfïçätïön ïs nö"
+" löngér äväïläßlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тє#"
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""

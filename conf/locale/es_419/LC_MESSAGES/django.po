@@ -189,7 +189,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:47+0000\n"
+"POT-Creation-Date: 2016-11-22 16:37+0000\n"
 "PO-Revision-Date: 2016-10-22 05:21+0000\n"
 "Last-Translator: Laura Silva <lingison@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -5665,10 +5665,6 @@ msgid "in {relative} - {absolute}"
 msgstr "Dentro de {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr "Hoy es {date}"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "Inicio del Curso"
 
@@ -7100,10 +7096,6 @@ msgstr "Se actualizó correctamente el precio para el modo de curso."
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
 msgstr "Información del curso"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
-msgstr "Sin fecha de finalización definida"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -11651,15 +11643,10 @@ msgstr "Muchas gracias!"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"Gracias por sus preguntas y aportes. Generalmente respondemos cada solicitud"
-" en un día hábil (Lunes a Viernes {open_time} UTC a {close_time} UTC.) Entre"
-" tanto, por favor revise nuestra sección de {link_start}Preguntas Frecuentes"
-" detalladas{link_end} en donde la mayoría de preguntas ya han sido "
-"respondidas."
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -14518,7 +14505,7 @@ msgstr ""
 
 #: lms/templates/courseware/info.html
 msgid "Welcome to {org}'s {course_name}!"
-msgstr "Bienvenido a {course_name} de {org}!"
+msgstr "Bienvenido a {course_name}  {org}"
 
 #: lms/templates/courseware/info.html
 msgid "Resume Course"
@@ -14539,6 +14526,10 @@ msgstr "Navegación de documentos"
 #: lms/templates/courseware/info.html
 msgid "Important Course Dates"
 msgstr "Fechas importantes del curso"
+
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
 
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
@@ -16408,6 +16399,10 @@ msgstr "Nombre para mostrar del curso:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
 msgstr "Fecha de finalización del curso:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"

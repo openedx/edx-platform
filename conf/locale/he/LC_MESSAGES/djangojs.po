@@ -63,8 +63,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:45+0000\n"
-"PO-Revision-Date: 2016-11-17 16:50+0000\n"
+"POT-Creation-Date: 2016-11-22 16:36+0000\n"
+"PO-Revision-Date: 2016-11-22 16:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -183,14 +183,14 @@ msgstr "בחר קובץ"
 #: lms/static/js/Markdown.Editor.js
 #: common/static/common/templates/discussion/alert-popup.underscore
 msgid "OK"
-msgstr "ok"
+msgstr "בסדר"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/js/views/manage_users_and_roles.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Ok"
-msgstr "OK"
+msgstr "בסדר"
 
 #: cms/static/js/views/manage_users_and_roles.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
@@ -199,6 +199,7 @@ msgid "Unknown"
 msgstr "לא ידוע"
 
 #: cms/static/js/views/metadata.js
+#: cms/static/js/views/previous_video_upload.js
 #: lms/djangoapps/teams/static/teams/js/views/edit_team_members.js
 #: lms/static/js/views/image_field.js
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -251,6 +252,11 @@ msgstr "מתקדם"
 msgid "Close"
 msgstr "סגור"
 
+#: cms/static/js/views/previous_video_upload.js
+#: lms/static/js/views/image_field.js
+msgid "Removing"
+msgstr "מסיר"
+
 #: cms/static/js/views/validation.js
 #: lms/static/js/groups/views/cohort_discussions_course_wide.js
 #: lms/static/js/groups/views/cohort_discussions_inline.js
@@ -278,6 +284,22 @@ msgstr "מעדכן עם התוכן העדכני ביותר"
 #: common/lib/xmodule/xmodule/js/public/js/split_test_author_view.js
 msgid "Creating missing groups"
 msgstr "יצירה של קבוצות חסרות"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "{start_strong}{total}{end_strong} words submitted in total."
+msgstr "{start_strong}{total}{end_strong} סך כל המילים שנשלחו."
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId} title_word_{uniqueId}"
+msgstr "text_word_{uniqueId} title_word_{uniqueId}"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "title_word_{uniqueId}"
+msgstr "title_word_{uniqueId}"
+
+#: common/lib/xmodule/xmodule/assets/word_cloud/public/js/word_cloud_main.js
+msgid "text_word_{uniqueId}"
+msgstr "text_word_{uniqueId}"
 
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Show Annotations"
@@ -462,7 +484,7 @@ msgstr "ישור"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Alternative source"
-msgstr "מקור אלטרנטיבי"
+msgstr "מקור חלופי"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -559,7 +581,7 @@ msgstr "מאפייני התא"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Cell spacing"
-msgstr "Cell spacing"
+msgstr "ריווח תא"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1054,7 +1076,7 @@ msgstr "הכנס תבנית"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert video"
-msgstr "הכנס וידאו"
+msgstr "הכנס סרטון וידאו"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1078,13 +1100,13 @@ msgstr "הכנס/ערוך קישור"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Insert/edit video"
-msgstr "הכנס/ערוך וידאו"
+msgstr "הכנס/ערוך סרטון וידאו"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Italic"
-msgstr "הטייה"
+msgstr "נטוי"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
@@ -1250,13 +1272,13 @@ msgstr "פוסטר"
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Pre"
-msgstr "Pre"
+msgstr "קדם"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Prev"
-msgstr "קודם"
+msgstr "תצוגה מקדימה"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1748,7 +1770,7 @@ msgstr "מושתק"
 #. Translators: Volume level in range ]0,20]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very low"
-msgstr "נמוך מאוד"
+msgstr "נמוך מאד"
 
 #. Translators: Volume level in range ]20,40]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
@@ -1768,7 +1790,7 @@ msgstr "רועש"
 #. Translators: Volume level in range ]80,99]%
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Very loud"
-msgstr "רועש מאוד"
+msgstr "רועש מאד"
 
 #. Translators: Volume level equals 100%.
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
@@ -1923,29 +1945,13 @@ msgstr "הפעל תמלילים"
 msgid "Turn off transcripts"
 msgstr "כבה תמלילים"
 
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "{start_strong}{total}{end_strong} words submitted in total."
-msgstr "{start_strong}{total}{end_strong} סך כל המילים שנשלחו."
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId} title_word_{uniqueId}"
-msgstr "text_word_{uniqueId} title_word_{uniqueId}"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "title_word_{uniqueId}"
-msgstr "title_word_{uniqueId}"
-
-#: common/lib/xmodule/xmodule/js/src/word_cloud/word_cloud_main.js
-msgid "text_word_{uniqueId}"
-msgstr "text_word_{uniqueId}"
-
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Required field."
 msgstr "שדה חובה"
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Please do not use any spaces in this field."
-msgstr "אנא אל תשתמשו ברווחים בשדה זה."
+msgstr "אנא אל תשתמש ברווחים בשדה זה."
 
 #: common/static/common/js/components/utils/view_utils.js
 msgid "Please do not use any spaces or special characters in this field."
@@ -2035,59 +2041,59 @@ msgstr[1] "{numVotes} קולות"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble subscribing you to this thread. Please try again."
-msgstr "נתקלנו בבעיה בהרשמתך לשרשור זה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בהרשמתך לשרשור זה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble unsubscribing you from this thread. Please try again."
-msgstr "נתקלנו בבעיה בביטול הרשמתך לשרשור זה. אנא נסה שוב. "
+msgstr "נתקלנו בבעיה בביטול הרשמתך לשרשור זה. נא נסה שוב. "
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble marking this response as an answer.  Please try again."
-msgstr "נתקלנו בבעיה בסימון תגובה זו כתשובה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בסימון תגובה זו כתשובה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing this response as an answer.  Please try again."
-msgstr "נתקלנו בבעיה בבזמן מחיקת תגובה זו כתשובה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בזמן מחיקת תגובה זו כתשובה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble marking this response endorsed.  Please try again."
-msgstr "נתקלנו בבעיה בזמן סימון תגובה זו כמאושרת. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בזמן סימון תגובה זו כמאושרת. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble removing this endorsement.  Please try again."
-msgstr "נתקלנו בבעיה בזמן הסרת תגובה זו כמאושרת. בבקשה נסה שוב."
+msgstr "נתקלנו בבעיה בזמן הסרת תגובה זו כמאושרת. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble saving your vote.  Please try again."
-msgstr "נתקלנו בבעיה בשמירת הצבעתך. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בשמירת הצבעתך. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble pinning this thread. Please try again."
-msgstr "נתקלנו בבעיה בהצמדת שרשור זה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בהצמדת שרשור זה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble unpinning this thread. Please try again."
-msgstr "נתקלנו בבעיה בביטול הצמדת שרשור זה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בביטול הצמדת שרשור זה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
 "We had some trouble removing your flag on this post.  Please try again."
-msgstr "נתקלנו בבעיה בהסרת הדגל מפוסט זה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בהסרת הדגל מפוסט זה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble reporting this post.  Please try again."
-msgstr "נתקלנו בבעיות בדיווח של הפוסט הזה. אנא נסה שוב."
+msgstr "נתקלנו בבעיות בדיווח הפוסט הזה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble closing this thread.  Please try again."
-msgstr "נתקלנו בבעיה בסגירת השרשור הזה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בסגירת השרשור הזה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid "We had some trouble reopening this thread.  Please try again."
-msgstr "נתקלנו בבעיה בזמן פתיחה מחדש של שרשור הזה. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בזמן פתיחה מחדש של השרשור הזה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
@@ -2095,7 +2101,7 @@ msgstr "טוען עוד שרשורים"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "We had some trouble loading more threads. Please try again."
-msgstr "חלה תקלה בטעינת שרשורים נוספים. אנא נסה שוב. "
+msgstr "חלה תקלה בטעינת שרשורים נוספים. נא נסה שוב. "
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
@@ -2120,15 +2126,15 @@ msgstr "הראה פוסטים של {username}."
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
 "The thread you selected has been deleted. Please select another thread."
-msgstr "השרשור שבחרת נמחק. אנא בחר שרשור אחר. "
+msgstr "השרשור שבחרת נמחק. נא בחר שרשור אחר. "
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading responses. Please reload the page."
-msgstr "אירעה תקלה בזמן טעינת התגובות. אנא טען מחדש את העמוד."
+msgstr "אירעה תקלה בזמן טעינת התגובות. נא טען מחדש את העמוד."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "We had some trouble loading more responses. Please try again."
-msgstr "אירעה תקלה בזמן טעינת התגובות הנוספות. אנא נסה שוב."
+msgstr "אירעה תקלה בזמן טעינת התגובות הנוספות. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
@@ -2180,7 +2186,7 @@ msgstr "האם אתה בטוח שאתה מעוניין למחוק תגובה ז�
 
 #: common/static/common/js/discussion/views/response_comment_view.js
 msgid "We had some trouble deleting this comment. Please try again."
-msgstr "אירעה תקלה בזמן מחיקה של התגובה. אנא נסו שוב."
+msgstr "אירעה תקלה בזמן מחיקה של התגובה. נא נסה שוב."
 
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
@@ -2382,7 +2388,7 @@ msgstr "טקסט"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Video"
-msgstr "וידיאו"
+msgstr "וידאו"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: lms/static/js/views/image_field.js
@@ -2421,7 +2427,7 @@ msgstr[1] "סמן את התיבה כדי להסיר %(count)s דגלים."
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "All flags have been removed. To undo, uncheck the box."
-msgstr "כל הדגלים הוסרו. בכדי לבטל את הפעולה, בטל את הסימון בתיבה."
+msgstr "כל הדגלים הוסרו. כדי לבטל את הפעולה, בטל את הסימון בתיבה."
 
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "You have already reported this annotation."
@@ -2440,7 +2446,7 @@ msgstr[1] "להסבר זה יש %(count)s דגלים."
 
 #: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
 msgid "We had some trouble loading the page you requested. Please try again."
-msgstr "נתקלנו בבעיה בטעינת העמוד המבוקש. אנא נסה שוב."
+msgstr "נתקלנו בבעיה בטעינת העמוד המבוקש. נא נסה שוב."
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -2464,7 +2470,7 @@ msgstr "ציין סיבה."
 
 #: lms/djangoapps/support/static/support/js/views/enrollment_modal.js
 msgid "Something went wrong changing this enrollment. Please try again."
-msgstr "משהו השתבש בעת שינוי הרשמה זו. נסה שוב."
+msgstr "משהו השתבש בעת שינוי הרשמה זו. נא נסה שוב."
 
 #: lms/djangoapps/teams/static/teams/js/collections/team.js
 msgid "last activity"
@@ -2545,7 +2551,7 @@ msgstr "המדינה העיקרית איתה מזוהים חברי הצוות."
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 #: lms/static/js/views/fields.js
 msgid "An error occurred. Please try again."
-msgstr "אירעה שגיאה. אנא נסה שוב."
+msgstr "אירעה שגיאה. נא נסה שוב."
 
 #: lms/djangoapps/teams/static/teams/js/views/edit_team.js
 msgid "Check the highlighted fields below and try again."
@@ -2686,8 +2692,8 @@ msgid ""
 "See all teams in your course, organized by topic. Join a team to collaborate"
 " with other learners who are interested in the same topic as you are."
 msgstr ""
-"ראה את כל הצוותים שבקורס שלך מאורגנים לפי נושא. הצטרף לצוות כדי לשתף פעולה "
-"עם תלמידים אחרים שמעוניינים באותו נושא בו אתה מתעניין."
+"ראה שכל הצוותים שבקורס שלך מאורגנים לפי נושא. הצטרף לצוות כדי לשתף פעולה עם "
+"תלמידים אחרים המעוניינים באותו נושא בו אתה מתעניין."
 
 #: lms/djangoapps/teams/static/teams/js/views/teams_tab.js
 msgid "My Team"
@@ -2837,17 +2843,17 @@ msgstr "אירעה שגיאה בעת קבלת רשימת התעודות שנופ
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating proctored exam results. Please try again."
-msgstr "אירעה שגיאה בעת יצירת תוצאות מבחנים תחת פיקוח. נסה שוב."
+msgstr "אירעה שגיאה בעת יצירת תוצאות מבחנים תחת פיקוח. נא נסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating survey results. Please try again."
-msgstr "אירעה שגיאה בעת יצירת תוצאות סקר. נסה שוב."
+msgstr "אירעה שגיאה בעת יצירת תוצאות סקר. נא נסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
-msgstr "שגיאת בזמן יצירת פרופיל סטודנט. אנא נסו שוב."
+msgstr "שגיאת בזמן יצירת פרופיל סטודנט. נא נסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/bookmarks/views/bookmarks_list.js
@@ -2864,7 +2870,7 @@ msgstr "שגיאה בקבלת רשימת הסטודנטים."
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating list of students who may enroll. Please try again."
-msgstr "אירעה שגיאה בעת יצירת רשימת סטודנטים שעשויים להירשם. נאנא סה שוב."
+msgstr "אירעה שגיאה בעת יצירת רשימת סטודנטים שעשויים להירשם. נא נסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
@@ -2874,17 +2880,17 @@ msgstr "שגיאה בטעינה של קונפיגורציית ציונים."
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating grades. Please try again."
-msgstr "שגיאה בזמן יצירת ציונים. אנא נסה שוב."
+msgstr "שגיאה בזמן יצירת ציונים. נא נסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating problem grade report. Please try again."
-msgstr "אירעה שגיאה בעת יצירת דוח דירוג בעיות. נסה שוב."
+msgstr "אירעה שגיאה בעת יצירת דוח דירוג בעיות. נא נסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 #: lms/static/js/instructor_dashboard/data_download.js
 msgid "Error generating ORA data report. Please try again."
-msgstr "אירעה שגיאה בעת דוח נתוני ORA. נסה שוב."
+msgstr "אירעה שגיאה בעת דוח נתוני ORA. נא נסה שוב."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/js/instructor_dashboard/membership.js
@@ -3469,7 +3475,7 @@ msgid ""
 "An error occurred retrieving your email. Please try again later, and contact"
 " technical support if the problem persists."
 msgstr ""
-"אירע שגיאה באחזור הדואר האלקטרוני שלך. אנא נסה שוב מאוחר יותר. אם הבעיה "
+"אירעה שגיאה באחזור הדואר האלקטרוני שלך. אנא נסה שוב מאוחר יותר. אם הבעיה "
 "נמשכת, פנה לתמיכה טכנית. "
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
@@ -3530,7 +3536,7 @@ msgstr "הודעה:"
 #: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/js/instructor_dashboard/util.js
 msgid "No tasks currently running."
-msgstr "אין משימות שרצות כרגע."
+msgstr "אין משימות בהרצה כרגע."
 
 #: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/js/instructor_dashboard/util.js
@@ -3586,7 +3592,7 @@ msgid ""
 "Please describe this image or agree that it has no contextual value by "
 "checking the checkbox."
 msgstr ""
-"תאר את התמונה או אשר שהיא חסרת ערך מבחינה תכנית על ידי סימון בתיבה המיועדת "
+"תאר את התמונה או אשר שהיא חסרת ערך מבחינה תכנית באמצעות סימון בתיבה המיועדת "
 "לכך. "
 
 #: lms/static/js/Markdown.Editor.js
@@ -3594,7 +3600,7 @@ msgid ""
 "e.g. 'Sky with clouds'. The description is helpful for users who cannot see "
 "the image."
 msgstr ""
-"למשל 'שמיים עם עננים'. התיאור מועיל למשתמשים שאינם יכולים לראות את התמונה."
+"לדוגמה 'שמיים עם עננים'. התיאור מועיל למשתמשים שאינם יכולים לראות את התמונה."
 
 #: lms/static/js/Markdown.Editor.js
 msgid "How to create useful text alternatives."
@@ -3635,7 +3641,7 @@ msgstr "נטוי (Ctrl+I)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Hyperlink (Ctrl+L)"
-msgstr "היפר - קישור (Ctrl+L)"
+msgstr "היפר קישור (Ctrl+L)"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Blockquote (Ctrl+Q)"
@@ -3994,7 +4000,7 @@ msgstr "שגיאה בהוספת סטודנטים"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Enter a username or email."
-msgstr "הכנס שם משתמש או דוא\"ל"
+msgstr "הכנס שם משתמש או דואר אלקטרוני"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "{numUsersAdded} student has been added to this cohort"
@@ -4126,11 +4132,11 @@ msgstr ""
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Allow students to generate certificates for this course?"
-msgstr "אפשר לסטודנטים ליצור תעודות עבור קורס זה?"
+msgstr "לאפשר לסטודנטים ליצור תעודות עבור קורס זה?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Prevent students from generating certificates in this course?"
-msgstr "מנע מסטודנטים ליצור תעודות עבור קורס זה?"
+msgstr "למנוע מסטודנטים ליצור תעודות עבור קורס זה?"
 
 #: lms/static/js/instructor_dashboard/certificates.js
 msgid "Start generating certificates for all students in this course?"
@@ -4385,7 +4391,7 @@ msgstr ""
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
-msgstr "אירעה שגיאה. נסה לרענן את הדף, או בדוק את חיבור האינטרנט."
+msgstr "אירעה שגיאה. נסה לרענן את הדף או בדוק את חיבור האינטרנט."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -4429,8 +4435,8 @@ msgid ""
 "The email address you use to sign in. Communications from {platform_name} "
 "and your courses are sent to this address."
 msgstr ""
-"כתובת הדוא\"ל שאתה משתמש בה כדי להיכנס. הודעות מ-{platform_name} ומהקורסים "
-"שלך נשלחות לכתובת זו."
+"כתובת הדואר האלקטרוני שאתה משתמש בה כדי להיכנס. הודעות מ-{platform_name} "
+"ומהקורסים שלך נשלחות לכתובת זו."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 #: lms/templates/student_account/account.underscore
@@ -4439,7 +4445,7 @@ msgstr "סיסמה"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Reset Your Password"
-msgstr "אפס את הסיסמה שלך"
+msgstr "אפס את סיסמתך"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid ""
@@ -4520,7 +4526,7 @@ msgstr "ההזמנה נשלחה"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "TOTAL"
-msgstr "סה\"כ"
+msgstr "סך הכל"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "ORDER NUMBER"
@@ -4828,10 +4834,6 @@ msgid "Change image"
 msgstr "שנה תמונה"
 
 #: lms/static/js/views/image_field.js
-msgid "Removing"
-msgstr "מסיר"
-
-#: lms/static/js/views/image_field.js
 msgid "An error has occurred. Refresh the page, and then try again."
 msgstr "אירעה שגיאה. רענן את העמוד ונסה שוב."
 
@@ -4847,13 +4849,13 @@ msgstr "על גודל הקובץ להיות קטן מ{size}."
 msgid ""
 "Upload is in progress. To avoid errors, stay on this page until the process "
 "is complete."
-msgstr "העלאה מתבצעת. בכדי להימנע משגיאות, הישאר בעמוד זה עד שהתהליך יושלם."
+msgstr "העלאה מתבצעת. כדי להימנע משגיאות, הישאר בעמוד זה עד שהתהליך יושלם."
 
 #: lms/static/js/views/image_field.js
 msgid ""
 "Removal is in progress. To avoid errors, stay on this page until the process"
 " is complete."
-msgstr "הסרה מתבצעת. בכדי להימנע משגיאות, הישאר בעמוד זה עד שהתהליך יושלם."
+msgstr "הסרה מתבצעת. כדי להימנע משגיאות, הישאר בעמוד זה עד שהתהליך יושלם."
 
 #: lms/static/js/views/image_field.js
 msgid "bytes"
@@ -5757,10 +5759,6 @@ msgstr "הוסף תאריך"
 msgid "Editing visibility for: %(title)s"
 msgstr "עורך הצגה/הסתרה: %(title)s"
 
-#: cms/static/js/views/pages/container.js
-msgid "Duplicating"
-msgstr "משכפל"
-
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
 msgstr "מפרסם"
@@ -5882,6 +5880,16 @@ msgstr "{totalItems} סך הכל"
 msgid "Pending"
 msgstr "בהמתנה"
 
+#: cms/static/js/views/previous_video_upload.js
+msgid "Are you sure you want to remove this video from the list?"
+msgstr ""
+
+#: cms/static/js/views/previous_video_upload.js
+msgid ""
+"Removing a video from this list does not affect course content. Any content "
+"that uses a previously uploaded video ID continues to display in the course."
+msgstr ""
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -5984,8 +5992,12 @@ msgstr ""
 "תווים."
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Deleting this %(xblock_type)s is permanent and cannot be undone."
-msgstr "מחיקת %(xblock_type)s זה הינה קבועה ואינה הפיכה."
+msgid "Duplicating"
+msgstr "משכפל"
+
+#: cms/static/js/views/utils/xblock_utils.js
+msgid "Deleting this {xblock_type} is permanent and cannot be undone."
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid ""
@@ -5994,16 +6006,16 @@ msgid ""
 msgstr "גם בכל תוכן שרשם תוכן זה כדרישה מוקדמת יוסרו מגבלות הגישה."
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s (and prerequisite)?"
-msgstr "האם למחוק %(xblock_type)s זה (ואת הדרישה המוקדמת)?"
+msgid "Delete this {xblock_type} (and prerequisite)?"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Yes, delete this %(xblock_type)s"
-msgstr "כן, מחק את %(xblock_type)s"
+msgid "Yes, delete this {xblock_type}"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
-msgid "Delete this %(xblock_type)s?"
-msgstr "מחק את  %(xblock_type)s זה?"
+msgid "Delete this {xblock_type}?"
+msgstr ""
 
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "section"
@@ -6099,8 +6111,8 @@ msgid "Settings"
 msgstr "הגדרות"
 
 #: cms/static/js/views/xblock_outline.js
-msgid "New %(component_type)s"
-msgstr "חדש %(component_type)s"
+msgid "New {component_type}"
+msgstr ""
 
 #. Translators: This message will be added to the front of messages of type
 #. warning,
@@ -6143,6 +6155,12 @@ msgstr "הקודם"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "סטטוס"
+
+#: cms/templates/js/previous-video-upload-list.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
+#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
+msgid "Action"
+msgstr "פעולה"
 
 #: common/static/common/templates/image-modal.underscore
 msgid "Large"
@@ -7131,11 +7149,6 @@ msgstr "נפסלה"
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Notes"
 msgstr "סיכומי שיעור "
-
-#: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
-#: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
-msgid "Action"
-msgstr "פעולה"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Remove from Invalidation Table"
@@ -8811,6 +8824,10 @@ msgid "Configure"
 msgstr "הגדר"
 
 #: cms/templates/js/course-outline.underscore
+msgid "Duplicate"
+msgstr ""
+
+#: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
 msgstr "גרור על מנת לסדר מחדש"
 
@@ -9194,6 +9211,14 @@ msgstr "משך זמן"
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Video ID"
 msgstr "מזהה וידאו"
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove this video"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload.underscore
+msgid "Remove {video_name} video"
+msgstr ""
 
 #: cms/templates/js/publish-history.underscore
 msgid "Never published"
