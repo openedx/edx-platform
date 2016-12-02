@@ -33,7 +33,7 @@ from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from opaque_keys.edx.keys import UsageKey
-from opaque_keys.edx.asides import AsideUsageKeyV1, AsideDefinitionKeyV1
+from opaque_keys.edx.asides import AsideUsageKeyV2, AsideDefinitionKeyV2
 from xmodule.exceptions import UndefinedContext
 import dogstats_wrapper as dog_stats_api
 
@@ -155,8 +155,8 @@ class AsideKeyGenerator(IdGenerator):
         Returns:
             (aside_definition_id, aside_usage_id)
         """
-        def_key = AsideDefinitionKeyV1(definition_id, aside_type)
-        usage_key = AsideUsageKeyV1(usage_id, aside_type)
+        def_key = AsideDefinitionKeyV2(definition_id, aside_type)
+        usage_key = AsideUsageKeyV2(usage_id, aside_type)
         return (def_key, usage_key)
 
     def create_usage(self, def_id):
