@@ -361,6 +361,9 @@ FEATURES = {
     # Note: This has no effect unless ANALYTICS_DASHBOARD_URL is already set,
     #       because without that setting, the tab does not show up for any courses.
     'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
+
+    # Set this to False to facilitate cleaning up invalid xml from your modulestore.
+    'ENABLE_XBLOCK_XML_VALIDATION': True,
 }
 
 # Ignore static asset files on import which match this pattern
