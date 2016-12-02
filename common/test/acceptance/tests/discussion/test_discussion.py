@@ -1192,11 +1192,18 @@ class DiscussionUserProfileTest(UniqueCourseTest):
             roles_str = ','.join(roles)
         return AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str, **user_info).visit().get_user_id()
 
-    def check_pages(self, num_threads):
-        # set up the stub server to return the desired amount of thread results
-        threads = [Thread(id=uuid4().hex) for _ in range(num_threads)]
-        UserProfileViewFixture(threads).push()
-        # navigate to default view (page 1)
+    def test_redirects_to_learner_profile(self):
+        """
+        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
+
+        Given that I am on discussion forum user's profile page.
+        And I can see a username on the page
+        When I click on my username.
+        Then I will be navigated to Learner Profile page.
+        And I can my username on Learner Profile page
+        """
+        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
+
         page = DiscussionUserProfilePage(
             self.browser,
             self.course_id,
@@ -1204,90 +1211,6 @@ class DiscussionUserProfileTest(UniqueCourseTest):
             self.PROFILED_USERNAME
         )
         page.visit()
-
-        current_page = 1
-        total_pages = max(num_threads - 1, 1) / self.PAGE_SIZE + 1
-        all_pages = range(1, total_pages + 1)
-        return page
-
-        def _check_page():
-            # ensure the page being displayed as "current" is the expected one
-            self.assertEqual(page.get_current_page(), current_page)
-            # ensure the expected threads are being shown in the right order
-            threads_expected = threads[(current_page - 1) * self.PAGE_SIZE:current_page * self.PAGE_SIZE]
-            self.assertEqual(page.get_shown_thread_ids(), [t["id"] for t in threads_expected])
-            # ensure the clickable page numbers are the expected ones
-            self.assertEqual(page.get_clickable_pages(), [
-                p for p in all_pages
-                if p != current_page
-                and p - 2 <= current_page <= p + 2
-                or (current_page > 2 and p == 1)
-                or (current_page < total_pages and p == total_pages)
-            ])
-            # ensure the previous button is shown, but only if it should be.
-            # when it is shown, make sure it works.
-            if current_page > 1:
-                self.assertTrue(page.is_prev_button_shown(current_page - 1))
-                page.click_prev_page()
-                self.assertEqual(page.get_current_page(), current_page - 1)
-                page.click_next_page()
-                self.assertEqual(page.get_current_page(), current_page)
-            else:
-                self.assertFalse(page.is_prev_button_shown())
-            # ensure the next button is shown, but only if it should be.
-            if current_page < total_pages:
-                self.assertTrue(page.is_next_button_shown(current_page + 1))
-            else:
-                self.assertFalse(page.is_next_button_shown())
-
-        # click all the way up through each page
-        for __ in range(current_page, total_pages):
-            _check_page()
-            if current_page < total_pages:
-                page.click_on_page(current_page + 1)
-                current_page += 1
-
-        # click all the way back down
-        for __ in range(current_page, 0, -1):
-            _check_page()
-            if current_page > 1:
-                page.click_on_page(current_page - 1)
-                current_page -= 1
-
-    def test_0_threads(self):
-        self.check_pages(0)
-
-    def test_1_thread(self):
-        self.check_pages(1)
-
-    def test_20_threads(self):
-        self.check_pages(20)
-
-    def test_21_threads(self):
-        self.check_pages(21)
-
-    def test_151_threads(self):
-        self.check_pages(151)
-
-    def test_pagination_window_reposition(self):
-        page = self.check_pages(50)
-        page.click_next_page()
-        page.wait_for_ajax()
-        self.assertTrue(page.is_window_on_top())
-
-    def test_redirects_to_learner_profile(self):
-        """
-        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
-
-        Given that I am on discussion forum user's profile page.
-        And I can see a username on left sidebar
-        When I click on my username.
-        Then I will be navigated to Learner Profile page.
-        And I can my username on Learner Profile page
-        """
-        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
-
-        page = self.check_pages(1)
         page.click_on_sidebar_username()
 
         learner_profile_page.wait_for_page()
@@ -1305,7 +1228,13 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         )
 
         # Visit the page and verify the roles are listed correctly.
-        page = self.check_pages(1)
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
         student_roles = page.get_user_roles()
         self.assertEqual(student_roles, ', '.join(expected_student_roles))
 
@@ -1325,7 +1254,13 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
         # Visit the user profile in course discussion page of Course-B. Make sure the
         # roles are listed correctly.
-        page = self.check_pages(1)
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
         self.assertEqual(page.get_user_roles(), u'Student')
 
 

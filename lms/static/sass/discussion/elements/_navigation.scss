@@ -221,9 +221,6 @@
 
     .forum-nav-thread-link {
         @include border-left(3px solid transparent);
-        @include rtl {
-            flex-direction: row-reverse;
-        }
         display: flex;
         padding: $baseline / 2;
         transition: none;
@@ -258,34 +255,36 @@
     }
 }
 
-.discussion:not(.inline-discussion) .forum-nav-thread {
-    .forum-nav-thread-link.is-active {
-        color: $forum-color-background;
-        background-color: $forum-color-reading-thread;
-
-        .forum-nav-thread-labels > li {
-            border-color: $forum-color-background;
+.discussion.discussion-board {
+    .forum-nav-thread {
+        .forum-nav-thread-link.is-active {
             color: $forum-color-background;
-        }
+            background-color: $forum-color-reading-thread;
 
-        .forum-nav-thread-votes-count {
-            color: $forum-color-background;
-        }
-
-        .forum-nav-thread-comments-count {
-            color: $base-font-color;
-
-            &:after {
-                @include border-right-color($forum-color-border);
+            .forum-nav-thread-labels > li {
+                border-color: $forum-color-background;
+                color: $forum-color-background;
             }
-        }
 
-        span.icon {
-            color: $forum-color-background;
-        }
+            .forum-nav-thread-votes-count {
+                color: $forum-color-background;
+            }
 
-        .thread-preview-body {
-            color: $forum-color-background;
+            .forum-nav-thread-comments-count {
+                color: $base-font-color;
+
+                &:after {
+                    @include border-right-color($forum-color-border);
+                }
+            }
+
+            span.icon {
+                color: $forum-color-background;
+            }
+
+            .thread-preview-body {
+                color: $forum-color-background;
+            }
         }
     }
 }
