@@ -12,6 +12,7 @@ from common.test.acceptance.fixtures.discussion import (
     Thread,
     Response,
     ForumsConfigMixin,
+    MultipleThreadFixture,
 )
 from common.test.acceptance.pages.lms.discussion import DiscussionTabSingleThreadPage
 from common.test.acceptance.tests.helpers import UniqueCourseTest
