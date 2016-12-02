@@ -779,15 +779,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self._add_cache(course_entry.structure['_id'], runtime)
             self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
 
-        blocks = [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
-
-        # TODO Once PLAT-1055 is implemented, we can expose the course version
-        # information within the key identifier of the block.  Until then, set
-        # the course_version as a field on each returned block so higher layers
-        # can use it when needed.
-        for block in blocks:
-            block.course_version = course_entry.course_key.version_guid
-        return blocks
+        return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
 
     def _get_cache(self, course_version_guid):
         """
