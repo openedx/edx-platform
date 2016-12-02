@@ -87,12 +87,6 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
-# Setup alternate queues, to allow access to cross-process workers
-ALTERNATE_QUEUE_ENVS = os.environ.get('ALTERNATE_WORKER_QUEUES', '').split()
-ALTERNATE_QUEUES = [
-    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
-    for alternate in ALTERNATE_QUEUE_ENVS
-]
 CELERY_ROUTES = "{}celery.Router".format(QUEUE_VARIANT)
 
 ############# NON-SECURE ENV CONFIG ##############################
@@ -365,10 +359,17 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
 
-# Allow CELERY_QUEUES to be overwritten before adding alternates
+# Allow CELERY_QUEUES to be overwritten by ENV_TOKENS,
 ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
 if ENV_CELERY_QUEUES:
     CELERY_QUEUES = {queue: {} for queue in ENV_CELERY_QUEUES}
+
+# Then add alternate environment queues
+ALTERNATE_QUEUE_ENVS = ENV_TOKENS.get('ALTERNATE_WORKER_QUEUES', '').split()
+ALTERNATE_QUEUES = [
+    DEFAULT_PRIORITY_QUEUE.replace(QUEUE_VARIANT, alternate + '.')
+    for alternate in ALTERNATE_QUEUE_ENVS
+]
 CELERY_QUEUES.update(
     {
         alternate: {}
