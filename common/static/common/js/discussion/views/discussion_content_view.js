@@ -1,4 +1,4 @@
-/* globals DiscussionContentView, DiscussionUtil */
+/* globals _, Backbone, DiscussionContentView, DiscussionUtil */
 (function() {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
@@ -148,22 +148,22 @@
                 return _results;
             };
 
-            DiscussionContentView.prototype.makeWmdEditor = function(cls_identifier) {
+            DiscussionContentView.prototype.makeWmdEditor = function(classIdentifier) {
                 if (!this.$el.find('.wmd-panel').length) {
-                    return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), cls_identifier);
+                    return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), classIdentifier);
                 }
             };
 
-            DiscussionContentView.prototype.getWmdEditor = function(cls_identifier) {
-                return DiscussionUtil.getWmdEditor(this.$el, $.proxy(this.$, this), cls_identifier);
+            DiscussionContentView.prototype.getWmdEditor = function(classIdentifier) {
+                return DiscussionUtil.getWmdEditor(this.$el, $.proxy(this.$, this), classIdentifier);
             };
 
-            DiscussionContentView.prototype.getWmdContent = function(cls_identifier) {
-                return DiscussionUtil.getWmdContent(this.$el, $.proxy(this.$, this), cls_identifier);
+            DiscussionContentView.prototype.getWmdContent = function(classIdentifier) {
+                return DiscussionUtil.getWmdContent(this.$el, $.proxy(this.$, this), classIdentifier);
             };
 
-            DiscussionContentView.prototype.setWmdContent = function(cls_identifier, text) {
-                return DiscussionUtil.setWmdContent(this.$el, $.proxy(this.$, this), cls_identifier, text);
+            DiscussionContentView.prototype.setWmdContent = function(classIdentifier, text) {
+                return DiscussionUtil.setWmdContent(this.$el, $.proxy(this.$, this), classIdentifier, text);
             };
 
             DiscussionContentView.prototype.initialize = function() {
@@ -171,7 +171,7 @@
                 this.model.bind('change', this.renderPartialAttrs, this);
                 return this.listenTo(this.model, 'change:endorsed', function() {
                     if (self.model instanceof Comment) {
-                        return self.trigger('comment:endorse');
+                        self.trigger('comment:endorse');
                     }
                 });
             };
@@ -330,7 +330,7 @@
             DiscussionContentShowView.prototype.handleSecondaryActionEscape = function(event) {
                 if (event.keyCode === 27) {
                     this.toggleSecondaryActions(event);
-                    return this.$('.action-more').focus();
+                    this.$('.action-more').focus();
                 }
             };
 
@@ -338,23 +338,23 @@
                 var self = this;
                 return setTimeout(function() {
                     if (self.secondaryActionsExpanded && self.$('.actions-dropdown :focus').length === 0) {
-                        return self.toggleSecondaryActions(event);
+                        self.toggleSecondaryActions(event);
                     }
                 }, 10);
             };
 
             DiscussionContentShowView.prototype.toggleFollow = function(event) {
-                var is_subscribing, msg, url;
+                var isSubscribing, msg, url;
                 event.preventDefault();
-                is_subscribing = !this.model.get('subscribed');
-                url = this.model.urlFor(is_subscribing ? 'follow' : 'unfollow');
-                if (is_subscribing) {
-                    msg = gettext('We had some trouble subscribing you to this post. Please try again.');
+                isSubscribing = !this.model.get('subscribed');
+                url = this.model.urlFor(isSubscribing ? 'follow' : 'unfollow');
+                if (isSubscribing) {
+                    msg = gettext('You could not be subscribed to this post. Refresh the page and try again.');
                 } else {
-                    msg = gettext('We had some trouble unsubscribing you from this post. Please try again.');
+                    msg = gettext('You could not be unsubscribed from this post. Refresh the page and try again.');
                 }
                 return DiscussionUtil.updateWithUndo(this.model, {
-                    'subscribed': is_subscribing
+                    subscribed: isSubscribing
                 }, {
                     url: url,
                     type: 'POST',
@@ -363,30 +363,30 @@
             };
 
             DiscussionContentShowView.prototype.toggleEndorse = function(event) {
-                var beforeFunc, is_endorsing, msg, updates, url,
+                var isEndorsing, msg, updates, url,
                     self = this;
                 event.preventDefault();
-                is_endorsing = !this.model.get('endorsed');
+                isEndorsing = !this.model.get('endorsed');
                 url = this.model.urlFor('endorse');
                 updates = {
-                    endorsed: is_endorsing,
-                    endorsement: is_endorsing ? {
+                    endorsed: isEndorsing,
+                    endorsement: isEndorsing ? {
                         username: DiscussionUtil.getUser().get('username'),
                         user_id: DiscussionUtil.getUser().id,
                         time: new Date().toISOString()
                     } : null
                 };
                 if (this.model.get('thread').get('thread_type') === 'question') {
-                    if (is_endorsing) {
-                        msg = gettext('We had some trouble marking this response as an answer.  Please try again.');
+                    if (isEndorsing) {
+                        msg = gettext('This response could not be marked as an answer. Refresh the page and try again.');  // eslint-disable-line max-len
                     } else {
-                        msg = gettext('We had some trouble removing this response as an answer.  Please try again.');
+                        msg = gettext('This response could not be marked as not an answer. Refresh the page and try again.');  // eslint-disable-line max-len
                     }
                 } else {
-                    if (is_endorsing) {
-                        msg = gettext('We had some trouble marking this response endorsed.  Please try again.');
+                    if (isEndorsing) {
+                        msg = gettext('This response could not be marked as endorsed. Refresh the page and try again.');
                     } else {
-                        msg = gettext('We had some trouble removing this endorsement.  Please try again.');
+                        msg = gettext('This response could not be unendorsed. Refresh the page and try again.');
                     }
                 }
                 return DiscussionUtil.updateWithUndo(
@@ -395,7 +395,7 @@
                     {
                         url: url,
                         type: 'POST',
-                        data: {endorsed: is_endorsing},
+                        data: {endorsed: isEndorsing},
                         $elem: $(event.currentTarget)
                     },
                     msg,
@@ -404,22 +404,22 @@
             };
 
             DiscussionContentShowView.prototype.toggleVote = function(event) {
-                var is_voting, updates, url, user,
+                var isVoting, updates, url, user,
                     self = this;
                 event.preventDefault();
                 user = DiscussionUtil.getUser();
-                is_voting = !user.voted(this.model);
-                url = this.model.urlFor(is_voting ? 'upvote' : 'unvote');
+                isVoting = !user.voted(this.model);
+                url = this.model.urlFor(isVoting ? 'upvote' : 'unvote');
                 updates = {
-                    upvoted_ids: (is_voting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id])
+                    upvoted_ids: (isVoting ? _.union : _.difference)(user.get('upvoted_ids'), [this.model.id])
                 };
                 if (!$(event.target.closest('.actions-item')).hasClass('is-disabled')) {
                     return DiscussionUtil.updateWithUndo(user, updates, {
                         url: url,
                         type: 'POST',
                         $elem: $(event.currentTarget)
-                    }, gettext('We had some trouble saving your vote.  Please try again.')).done(function() {
-                        if (is_voting) {
+                    }, gettext('This vote could not be processed. Refresh the page and try again.')).done(function() {
+                        if (isVoting) {
                             return self.model.vote();
                         } else {
                             return self.model.unvote();
@@ -429,17 +429,17 @@
             };
 
             DiscussionContentShowView.prototype.togglePin = function(event) {
-                var is_pinning, msg, url;
+                var isPinning, msg, url;
                 event.preventDefault();
-                is_pinning = !this.model.get('pinned');
-                url = this.model.urlFor(is_pinning ? 'pinThread' : 'unPinThread');
-                if (is_pinning) {
-                    msg = gettext('We had some trouble pinning this post. Please try again.');
+                isPinning = !this.model.get('pinned');
+                url = this.model.urlFor(isPinning ? 'pinThread' : 'unPinThread');
+                if (isPinning) {
+                    msg = gettext('This post could not be pinned. Refresh the page and try again.');
                 } else {
-                    msg = gettext('We had some trouble unpinning this post. Please try again.');
+                    msg = gettext('This post could not be unpinned. Refresh the page and try again.');
                 }
                 return DiscussionUtil.updateWithUndo(this.model, {
-                    pinned: is_pinning
+                    pinned: isPinning
                 }, {
                     url: url,
                     type: 'POST',
@@ -448,18 +448,18 @@
             };
 
             DiscussionContentShowView.prototype.toggleReport = function(event) {
-                var is_flagging, msg, updates, url;
+                var isFlagging, msg, updates, url;
                 event.preventDefault();
                 if (this.model.isFlagged()) {
-                    is_flagging = false;
-                    msg = gettext('We had some trouble removing your flag on this post.  Please try again.');
+                    isFlagging = false;
+                    msg = gettext('This post could not be flagged for abuse. Refresh the page and try again.');
                 } else {
-                    is_flagging = true;
-                    msg = gettext('We had some trouble reporting this post.  Please try again.');
+                    isFlagging = true;
+                    msg = gettext('This post could not be unflagged for abuse. Refresh the page and try again.');
                 }
-                url = this.model.urlFor(is_flagging ? 'flagAbuse' : 'unFlagAbuse');
+                url = this.model.urlFor(isFlagging ? 'flagAbuse' : 'unFlagAbuse');
                 updates = {
-                    abuse_flaggers: (is_flagging ? _.union : _.difference)(
+                    abuse_flaggers: (isFlagging ? _.union : _.difference)(
                         this.model.get('abuse_flaggers'), [DiscussionUtil.getUser().id]
                     )
                 };
@@ -471,16 +471,16 @@
             };
 
             DiscussionContentShowView.prototype.toggleClose = function(event) {
-                var is_closing, msg, updates;
+                var isClosing, msg, updates;
                 event.preventDefault();
-                is_closing = !this.model.get('closed');
-                if (is_closing) {
-                    msg = gettext('We had some trouble closing this post.  Please try again.');
+                isClosing = !this.model.get('closed');
+                if (isClosing) {
+                    msg = gettext('This post could not be closed. Refresh the page and try again.');
                 } else {
-                    msg = gettext('We had some trouble reopening this post.  Please try again.');
+                    msg = gettext('This post could not be reopened. Refresh the page and try again.');
                 }
                 updates = {
-                    closed: is_closing
+                    closed: isClosing
                 };
                 return DiscussionUtil.updateWithUndo(this.model, updates, {
                     url: this.model.urlFor('close'),

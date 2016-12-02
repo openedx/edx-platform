@@ -180,8 +180,8 @@
                     this.loadDiscussions(this.$el, function() {
                         self.hideDiscussion();
                         DiscussionUtil.discussionAlert(
-                            gettext('Sorry'),
-                            gettext('We had some trouble loading the discussion. Please try again.')
+                            gettext('Error'),
+                            gettext('This discussion could not be opened. Refresh the page to try again.')
                         );
                     });
                 }

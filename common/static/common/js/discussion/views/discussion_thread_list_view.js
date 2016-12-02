@@ -309,7 +309,8 @@
                 error = function() {
                     self.renderThreads();
                     DiscussionUtil.discussionAlert(
-                        gettext('Sorry'), gettext('We had some trouble loading more posts. Please try again.')
+                        gettext('Error'),
+                        gettext('New posts could not be loaded. Refresh the page to try again.')
                     );
                 };
                 return this.collection.retrieveAnotherPage(this.mode, options, {
