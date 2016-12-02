@@ -1155,8 +1155,8 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         html = response.content
         self.assertRegexpMatches(html, r'data-page="1"')
         self.assertRegexpMatches(html, r'data-num-pages="1"')
-        self.assertRegexpMatches(html, r'<span>1</span> discussion started')
-        self.assertRegexpMatches(html, r'<span>2</span> comments')
+        self.assertRegexpMatches(html, r'<span class="discussion-count">1</span> discussion started')
+        self.assertRegexpMatches(html, r'<span class="discussion-count">2</span> comments')
         self.assertRegexpMatches(html, r'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
         self.assertRegexpMatches(html, r'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
         self.assertRegexpMatches(html, r'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
@@ -1181,14 +1181,8 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     def test_html(self, mock_request):
         self.check_html(mock_request)
 
-    def test_html_p2(self, mock_request):
-        self.check_html(mock_request, page="2")
-
     def test_ajax(self, mock_request):
         self.check_ajax(mock_request)
-
-    def test_ajax_p2(self, mock_request):
-        self.check_ajax(mock_request, page="2")
 
     def test_404_non_enrolled_user(self, __):
         """

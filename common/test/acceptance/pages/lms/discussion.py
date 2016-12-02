@@ -618,9 +618,9 @@ class DiscussionUserProfilePage(CoursePage):
         return (
             self.q(css='.discussion-user-threads[data-course-id="{}"]'.format(self.course_id)).present
             and
-            self.q(css='.user-profile .learner-profile-link').present
+            self.q(css='.user-name').present
             and
-            self.q(css='.user-profile .learner-profile-link').text[0] == self.username
+            self.q(css='.user-name').text[0] == self.username
         )
 
     @wait_for_js
@@ -628,85 +628,16 @@ class DiscussionUserProfilePage(CoursePage):
         return self.browser.execute_script("return $('html, body').offset().top") == 0
 
     def get_shown_thread_ids(self):
-        elems = self.q(css="article.discussion-thread")
-        return [elem.get_attribute("id")[7:] for elem in elems]
-
-    def get_current_page(self):
-        def check_func():
-            try:
-                current_page = int(self.q(css="nav.discussion-paginator li.current-page").text[0])
-            except:
-                return False, None
-            return True, current_page
-
-        return Promise(
-            check_func, 'discussion-paginator current page has text', timeout=5,
-        ).fulfill()
-
-    def _check_pager(self, text, page_number=None):
-        """
-        returns True if 'text' matches the text in any of the pagination elements.  If
-        page_number is provided, only return True if the element points to that result
-        page.
-        """
-        elems = self.q(css=self.PAGING_SELECTOR).filter(lambda elem: elem.text == text)
-        if page_number:
-            elems = elems.filter(lambda elem: int(elem.get_attribute('data-page-number')) == page_number)
-        return elems.present
-
-    def get_clickable_pages(self):
-        return sorted([
-            int(elem.get_attribute('data-page-number'))
-            for elem in self.q(css=self.PAGING_SELECTOR)
-            if str(elem.text).isdigit()
-        ])
-
-    def is_prev_button_shown(self, page_number=None):
-        return self._check_pager(self.TEXT_PREV, page_number)
-
-    def is_next_button_shown(self, page_number=None):
-        return self._check_pager(self.TEXT_NEXT, page_number)
-
-    def _click_pager_with_text(self, text, page_number):
-        """
-        click the first pagination element with whose text is `text` and ensure
-        the resulting page number matches `page_number`.
-        """
-        targets = [elem for elem in self.q(css=self.PAGING_SELECTOR) if elem.text == text]
-        targets[0].click()
-        EmptyPromise(
-            lambda: self.get_current_page() == page_number,
-            "navigated to desired page"
-        ).fulfill()
-
-    def click_prev_page(self):
-        self._click_pager_with_text(self.TEXT_PREV, self.get_current_page() - 1)
-        EmptyPromise(
-            self.is_window_on_top,
-            "Window is on top"
-        ).fulfill()
-
-    def click_next_page(self):
-        self._click_pager_with_text(self.TEXT_NEXT, self.get_current_page() + 1)
-        EmptyPromise(
-            self.is_window_on_top,
-            "Window is on top"
-        ).fulfill()
-
-    def click_on_page(self, page_number):
-        self._click_pager_with_text(unicode(page_number), page_number)
-        EmptyPromise(
-            self.is_window_on_top,
-            "Window is on top"
-        ).fulfill()
+        elems = self.q(css="li.forum-nav-thread")
+        return [elem.get_attribute("data-id") for elem in elems]
 
     def click_on_sidebar_username(self):
         self.wait_for_page()
-        self.q(css='.learner-profile-link').first.click()
+        self.q(css='.user-name').first.click()
 
     def get_user_roles(self):
         """Get user roles"""
-        return self.q(css='.sidebar-user-roles').text[0]
+        return self.q(css='.user-roles').text[0]
 
 
 class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
