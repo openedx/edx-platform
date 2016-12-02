@@ -74,18 +74,18 @@
     width: 0px;
     height: 0px;
   }
-  
+
     .downloads-heading {
         margin: 1em 0 0 0;
     }
-  
+
     .wrapper-downloads {
         display: flex;
-        
+
         .hd {
             margin: 0;
         }
-        
+
         .wrapper-download-video,
         .wrapper-download-transcripts,
         .wrapper-handouts,
@@ -95,27 +95,27 @@
             @include padding-right($baseline);
             vertical-align: top;
         }
-        
+
         .wrapper-download-video {
-            
+
             .video-sources {
                 margin: 0;
             }
         }
-        
+
         .wrapper-download-transcripts {
-            
+
             .list-download-transcripts {
                 margin: 0;
                 padding: 0;
                 list-style: none;
-                
+
                 .transcript-option {
                     margin: 0;
                 }
             }
         }
-        
+
         .branding {
             @include padding-right(0);
 
@@ -681,9 +681,9 @@
       }
     }
   }
-  
+
   &.video-fullscreen {
-      
+
       .closed-captions {
           width: 60%;
       }
@@ -705,7 +705,7 @@
     .subtitles-menu {
       height: 100%;
       margin: 0;
-      padding: 0;
+      padding: 0 3px;
       list-style: none;
 
       li {
@@ -715,6 +715,10 @@
         padding: 0;
         color: #0074b5; // AA compliant
         line-height: lh();
+
+        span {
+          display: block;
+        }
 
         &.current {
           color: #333;
@@ -734,10 +738,10 @@
         &:empty {
           margin-bottom: 0;
         }
-        
+
         &.spacing:last-of-type {
             position: relative;
-            
+
             .transcript-end {
                 position: absolute;
                 bottom: 0;
