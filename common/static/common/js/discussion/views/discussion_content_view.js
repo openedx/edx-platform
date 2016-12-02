@@ -151,6 +151,8 @@
             DiscussionContentView.prototype.makeWmdEditor = function(classIdentifier) {
                 if (!this.$el.find('.wmd-panel').length) {
                     return DiscussionUtil.makeWmdEditor(this.$el, $.proxy(this.$, this), classIdentifier);
+                } else {
+                    return null;
                 }
             };
 
@@ -380,7 +382,7 @@
                     if (isEndorsing) {
                         msg = gettext('This response could not be marked as an answer. Refresh the page and try again.');  // eslint-disable-line max-len
                     } else {
-                        msg = gettext('This response could not be marked as not an answer. Refresh the page and try again.');  // eslint-disable-line max-len
+                        msg = gettext('This response could not be unmarked as an answer. Refresh the page and try again.');  // eslint-disable-line max-len
                     }
                 } else {
                     if (isEndorsing) {

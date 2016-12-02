@@ -272,7 +272,7 @@
                         } else {
                             DiscussionUtil.discussionAlert(
                                 gettext('Error'),
-                                gettext('More responses could not be loaded. Refresh the page to try again.')
+                                gettext('Additional responses could not be loaded. Refresh the page to try again.')
                             );
                         }
                     }

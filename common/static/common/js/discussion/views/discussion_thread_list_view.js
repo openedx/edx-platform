@@ -310,7 +310,7 @@
                     self.renderThreads();
                     DiscussionUtil.discussionAlert(
                         gettext('Error'),
-                        gettext('New posts could not be loaded. Refresh the page to try again.')
+                        gettext('Additional posts could not be loaded. Refresh the page to try again.')
                     );
                 };
                 return this.collection.retrieveAnotherPage(this.mode, options, {

@@ -181,7 +181,7 @@
                         self.hideDiscussion();
                         DiscussionUtil.discussionAlert(
                             gettext('Error'),
-                            gettext('This discussion could not be opened. Refresh the page to try again.')
+                            gettext('This discussion could not be loaded. Refresh the page to try again.')
                         );
                     });
                 }
