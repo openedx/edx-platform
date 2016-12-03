@@ -145,6 +145,7 @@
                 course_settings: this.course_settings
             });
             this.threadView.render();
+            this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllPosts);
             this.threadListView.$el.addClass('is-hidden');
             this.$('.inline-thread').removeClass('is-hidden');
         },
