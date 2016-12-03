@@ -364,6 +364,7 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+BROKER_USE_SSL = ENV_TOKENS.get('CELERY_BROKER_USE_SSL', False)
 
 # Allow CELERY_QUEUES to be overwritten before adding alternates
 ENV_CELERY_QUEUES = ENV_TOKENS.get('CELERY_QUEUES', None)
