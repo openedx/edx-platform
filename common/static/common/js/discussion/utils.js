@@ -184,6 +184,7 @@
             if (!params.error) {
                 params.error = function() {
                     self.discussionAlert(
+                        gettext('Error'),
                         gettext('Your request could not be processed. Refresh the page and try again.')
                     );
                 };

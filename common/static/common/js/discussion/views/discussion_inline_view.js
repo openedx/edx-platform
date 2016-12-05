@@ -181,6 +181,7 @@
                     this.loadDiscussions(this.$el, function() {
                         self.hideDiscussion();
                         DiscussionUtil.discussionAlert(
+                            gettext('Error'),
                             gettext('This discussion could not be loaded. Refresh the page and try again.')
                         );
                     });

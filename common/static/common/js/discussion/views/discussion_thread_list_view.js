@@ -309,6 +309,7 @@
                 error = function() {
                     self.renderThreads();
                     DiscussionUtil.discussionAlert(
+                        gettext('Error'),
                         gettext('Additional posts could not be loaded. Refresh the page and try again.')
                     );
                 };
