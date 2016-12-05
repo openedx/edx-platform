@@ -205,7 +205,7 @@
             }
             if (this.showed) {
                 this.$('section.discussion').find('.inline-discussion-thread-container').addClass('is-hidden');
-                this.$('section.discussion').find('.new-post-btn').addClass('is-hidden');
+                this.$('section.discussion').find('.add_post_btn_container').addClass('is-hidden');
                 this.newPostForm.removeClass('is-hidden').find('.js-post-title').focus();
             }
             this.newPostView.$el.removeClass('is-hidden');
@@ -216,7 +216,7 @@
 
         hideNewPost: function() {
             this.$('section.discussion').find('.inline-discussion-thread-container').removeClass('is-hidden');
-            this.$('section.discussion').find('.new-post-btn')
+            this.$('section.discussion').find('.add_post_btn_container')
                 .removeClass('is-hidden')
                 .focus();
             this.newPostForm.addClass('is-hidden');

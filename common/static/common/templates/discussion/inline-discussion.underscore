@@ -1,6 +1,6 @@
 <section class="discussion inline-discussion" data-discussion-id="<%- discussionId %>">
-    <div class="add_post_btn_container">
-        <button class="btn-link new-post-btn <%if (read_only) {%>is-hidden<%} %>"><%- gettext("Add a Post") %></button>
+    <div class="add_post_btn_container <%if (read_only) {%>is-hidden<%} %>">
+        <button class="btn-link new-post-btn"><%- gettext("Add a Post") %></button>
     </div>
 
     <article class="new-post-article is-hidden"></article>
