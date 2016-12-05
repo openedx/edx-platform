@@ -1,7 +1,7 @@
 <div class="discussion-post">
     <header class="wrapper-post-header">
         <div class="post-header-content">
-            <h1 class="post-title"><%- title %></h1>
+            <h4 class="post-title"><%- title %></h4>
             <p class="posted-details">
             <%
             var timeAgoHtml = interpolate(

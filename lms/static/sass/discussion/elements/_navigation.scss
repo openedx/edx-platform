@@ -191,7 +191,7 @@
     }
 
     .thread-preview-body {
-        margin-top: $baseline / 4;
+        @include margin($baseline / 4, $baseline, 0, 0);
         color: $forum-color-response-count;
         font-size: $forum-small-font-size;
         overflow: hidden;
