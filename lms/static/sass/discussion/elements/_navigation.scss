@@ -176,6 +176,7 @@
 // -----------
 .forum-nav-thread-list {
     padding-left: 0 !important; // should *not* be RTLed, see below for explanation
+    min-height: 60px;  // @TODO: Remove this when we have a real empty state for the discussion thread list
     margin: 0;
     overflow-y: scroll;
     list-style: none;
