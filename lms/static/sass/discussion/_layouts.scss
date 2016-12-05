@@ -3,6 +3,11 @@
 
 .discussion-user-profile-board {
 
+    .discussion-profile-title {
+        margin-bottom: $baseline / 5;
+        font-size: $forum-x-large-font-size;
+    }
+
     .discussion-profile-count {
         margin-top: $baseline / 4;
     }

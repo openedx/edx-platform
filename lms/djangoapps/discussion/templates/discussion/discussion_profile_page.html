@@ -57,6 +57,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
         <div class="page-header-main">
             <div class="sr-is-focusable" tabindex="-1"></div>
             <div>
+                <h2 class="discussion-profile-title">${_("Discussion")}</h2>
                 <%def name="span(num)"><span class="discussion-count">${num}</span></%def>
                 <span class="user-name"><a href="${learner_profile_page_url}">${django_user.username}</a></span>
                 <span class="discussion-profile-info">
