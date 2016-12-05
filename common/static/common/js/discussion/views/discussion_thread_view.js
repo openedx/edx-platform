@@ -261,14 +261,17 @@
                         }
                         if (xhr.status === 404) {
                             DiscussionUtil.discussionAlert(
+                                gettext('Error'),
                                 gettext('The post you selected has been deleted.')
                             );
                         } else if (firstLoad) {
                             DiscussionUtil.discussionAlert(
+                                gettext('Error'),
                                 gettext('Responses could not be loaded. Refresh the page and try again.')
                             );
                         } else {
                             DiscussionUtil.discussionAlert(
+                                gettext('Error'),
                                 gettext('Additional responses could not be loaded. Refresh the page and try again.')
                             );
                         }
