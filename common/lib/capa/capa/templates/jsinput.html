@@ -1,11 +1,12 @@
+<%page expression_filter="h"/>
 <%! from openedx.core.djangolib.markup import HTML %>
-<section id="inputtype_${id}" class="jsinput"
+<div id="inputtype_${id}" class="jsinput"
     data="${gradefn}"
     % if saved_state:
-    data-stored="${saved_state|x}"
+    data-stored="${saved_state}"
     % endif
     % if initial_state:
-    data-initial-state="${initial_state|x}"
+    data-initial-state="${initial_state}"
     % endif
     % if get_statefn:
     data-getstate="${get_statefn}"
@@ -33,10 +34,11 @@
       src="${html_file}"
       height="${height}"
       width="${width}"
+      title="${title}"
       />
   <input type="hidden" name="input_${id}" id="input_${id}"
     waitfor=""
-    value="${value|h}"/>
+    value="${value}"/>
 
   <br/>
     <p id="answer_${id}" class="answer"></p>
@@ -54,4 +56,4 @@
   % if msg:
       <span class="message" tabindex="-1">${HTML(msg)}</span>
   % endif
-</section>
+</div>
