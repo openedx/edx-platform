@@ -315,7 +315,7 @@ def videos_post(course, request):
     resp_files = []
 
     for req_file in req_files:
-        file_name = req_file["file_name"]
+        file_name = unicode(req_file["file_name"])
 
         edx_video_id = unicode(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
