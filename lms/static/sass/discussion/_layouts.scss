@@ -34,6 +34,10 @@
         padding: 0;
         font-size: $forum-base-font-size;
     }
+
+    .response-count {
+        @include margin-right($baseline / 4);
+    }
 }
 
 .discussion-column {

@@ -444,6 +444,8 @@ def user_profile(request, course_key, user_id):
 
         is_staff = has_permission(request.user, 'openclose_thread', course.id)
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]
+        with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
+            add_courseware_context(threads, course, request.user)
         if request.is_ajax():
             return utils.JsonResponse({
                 'discussion_data': threads,
