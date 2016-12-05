@@ -114,8 +114,7 @@
                     },
                     error: function() {
                         return DiscussionUtil.discussionAlert(
-                            gettext('Error'),
-                            gettext('This comment could not be deleted. Refresh the page to try again.')
+                            gettext('This comment could not be deleted. Refresh the page and try again.')
                         );
                     }
                 });
