@@ -149,8 +149,9 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         kwargs.setdefault('attr_email', 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6')  # eduPersonPrincipalName
         self.configure_saml_provider(**kwargs)
         self.assertTrue(httpretty.is_enabled())
-        num_changed, num_failed, num_total = fetch_saml_metadata()
+        num_changed, num_failed, num_total, failure_messages = fetch_saml_metadata()
         self.assertEqual(num_failed, 0)
+        self.assertEqual(len(failure_messages), 0)
         self.assertEqual(num_changed, 1)
         self.assertEqual(num_total, 1)
 
@@ -176,9 +177,10 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
 
         if fetch_metadata:
             self.assertTrue(httpretty.is_enabled())
-            num_changed, num_failed, num_total = fetch_saml_metadata()
+            num_changed, num_failed, num_total, failure_messages = fetch_saml_metadata()
             if assert_metadata_updates:
                 self.assertEqual(num_failed, 0)
+                self.assertEqual(len(failure_messages), 0)
                 self.assertEqual(num_changed, 1)
                 self.assertEqual(num_total, 1)
 
