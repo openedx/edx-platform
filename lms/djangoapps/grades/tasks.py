@@ -103,6 +103,23 @@ def _has_database_updated_with_new_score(
         # score should be None only if it was deleted.
         # Otherwise, it hasn't yet been saved.
         return score_deleted
+    else:  # this happens for ORA. We know a score exists, but will have to ask edx-submissions.
+        from submissions import api as sub_api
+        from student.models import anonymous_id_for_user
+        anon_id = anonymous_id_for_user(User.objects.get(id=user_id), scored_block_usage_key.course_key)
+        course_id = unicode(scored_block_usage_key.course_key)
+        item_id = unicode(scored_block_usage_key)
+
+        api_score = sub_api.get_score(
+            {
+                "student_id": anon_id,
+                "course_id": course_id,
+                "item_id": item_id,
+                "item_type": "openassessment"
+            }
+        )
+        if api_score is not None:
+            return (api_score['created_at'] + timedelta(milliseconds=100)) >= task_queued_time
 
     # In non-async environments, we're still inside an uncommited transaction. This means that score.modified will be
     # reporting a time slightly earlier than task_queued_time, so we add a "fudge factor" of 1/10 of a second.
