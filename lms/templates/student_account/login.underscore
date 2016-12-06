@@ -26,7 +26,7 @@
     </div>
 <% } %>
 
-<form id="login" class="login-form" tabindex="-1">
+<form id="login" class="login-form" tabindex="-1" method="POST">
 
     <div class="section-title lines">
         <h2>
