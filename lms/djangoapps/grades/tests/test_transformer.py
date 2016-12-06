@@ -352,6 +352,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
             blocks = self.build_course_with_problems()
         block_structure = get_course_blocks(self.student, blocks[u'course'].location, self.transformers)
         self.assertIsNotNone(block_structure.get_xblock_field(blocks[u'course'].location, u'course_version'))
+        self.assertIsNotNone(block_structure.get_xblock_field(blocks[u'problem'].location, u'course_version'))
 
     def test_grading_policy_collected(self):
         # the calculated hash of the original and updated grading policies of the test course
