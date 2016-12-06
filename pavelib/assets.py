@@ -49,9 +49,9 @@ COMMON_LOOKUP_PATHS = [
 NPM_INSTALLED_LIBRARIES = [
     'backbone-validation/dist/backbone-validation-min.js',
     'backbone/backbone.js',
-    'edx-ui-toolkit/node_modules/backbone.paginator/lib/backbone.paginator.js',
-    'edx-ui-toolkit/node_modules/moment-timezone/builds/moment-timezone-with-data.js',
-    'edx-ui-toolkit/node_modules/moment/min/moment-with-locales.js',
+    'backbone.paginator/lib/backbone.paginator.js',
+    'moment-timezone/builds/moment-timezone-with-data.js',
+    'moment/min/moment-with-locales.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
     'jquery/dist/jquery.js',
@@ -64,7 +64,7 @@ NPM_INSTALLED_LIBRARIES = [
 # A list of NPM installed developer libraries that should be copied into the common
 # static directory only in development mode.
 NPM_INSTALLED_DEVELOPER_LIBRARIES = [
-    'edx-ui-toolkit/node_modules/sinon/pkg/sinon.js',
+    'sinon/pkg/sinon.js',
     'squirejs/src/Squire.js',
 ]
 
