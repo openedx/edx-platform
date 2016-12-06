@@ -142,25 +142,26 @@ define([
             });
 
             it('view containing verification msg when verification deadline is set and user is active', function() {
-                var verificationDeadlineDateFormat = 'Aug 14, 2016 at 23:59 UTC';
+                var verificationDeadline = '2016-08-14 23:59:00+00:00';
                 createView({
                     userEmail: 'test@example.com',
+                    userTimezone: 'PDT',
+                    userLanguage: 'es-ES',
                     requirements: {
                         isVisible: true
                     },
-                    verificationDeadline: verificationDeadlineDateFormat,
+                    verificationDeadline: verificationDeadline,
                     isActive: true
                 });
                 // Verify user does not get user activation message when he is already activated.
                 expect($('p.instruction-info:contains("test@example.com")').length).toEqual(0);
                 // Verify user gets verification message.
-                expect(
-                    $(
-                        'p.instruction-info:contains("You can pay now even if you don\'t have ' +
-                        'the following items available, but you will need to have these by ' +
-                        verificationDeadlineDateFormat + ' to qualify to earn a Verified Certificate.")'
-                    ).length
-                ).toEqual(1);
+                expect($('p.localized-datetime').attr('data-string')).toEqual(
+                    'You can pay now even if you don\'t have the following items available,' +
+                    ' but you will need to have these by {date} to qualify to earn a Verified Certificate.'
+                );
+                expect($('p.localized-datetime').attr('data-timezone')).toEqual('PDT');
+                expect($('p.localized-datetime').attr('data-language')).toEqual('es-ES');
             });
 
             it('view containing user email when verification deadline is set and user is not active', function() {

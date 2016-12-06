@@ -9,7 +9,6 @@ Module containing the problem elements which render into input objects
 - textbox (aka codeinput)
 - schematic
 - choicegroup (aka radiogroup, checkboxgroup)
-- javascriptinput
 - imageinput  (for clickable image)
 - optioninput (for option list)
 - filesubmission (upload a file)
@@ -543,42 +542,6 @@ class ChoiceGroup(InputTypeBase):
             return self._choices_map[internal_answer]
 
         return [self._choices_map[i] for i in internal_answer]
-
-
-#-----------------------------------------------------------------------------
-
-
-@registry.register
-class JavascriptInput(InputTypeBase):
-    """
-    Hidden field for javascript to communicate via; also loads the required
-    scripts for rendering the problem and passes data to the problem.
-
-    TODO (arjun?): document this in detail.  Initial notes:
-    - display_class is a subclass of XProblemClassDisplay (see
-        xmodule/xmodule/js/src/capa/display.js),
-    - display_file is the js script to be in /static/js/ where display_class is defined.
-    """
-
-    template = "javascriptinput.html"
-    tags = ['javascriptinput']
-
-    @classmethod
-    def get_attributes(cls):
-        """
-        Register the attributes.
-        """
-        return [Attribute('params', None),
-                Attribute('problem_state', None),
-                Attribute('display_class', None),
-                Attribute('display_file', None), ]
-
-    def setup(self):
-        # Need to provide a value that JSON can parse if there is no
-        # student-supplied value yet.
-        if self.value == "":
-            self.value = 'null'
-
 
 #-----------------------------------------------------------------------------
 

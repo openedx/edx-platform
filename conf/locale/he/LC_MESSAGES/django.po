@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:47+0000\n"
+"POT-Creation-Date: 2016-11-22 16:37+0000\n"
 "PO-Revision-Date: 2016-10-30 14:15+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -5284,10 +5284,6 @@ msgid "in {relative} - {absolute}"
 msgstr "ב-{relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr "היום {date}"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "תחילת הקורס"
 
@@ -6626,10 +6622,6 @@ msgstr "המחיר של מצב הקורס עודכן בהצלחה"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
 msgstr "מידע על הקורס"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
-msgstr "לא הוגדר תאריך סיום"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -10998,12 +10990,10 @@ msgstr "תודה רבה!"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"תודה רבה על שאלתך או משובך. לרוב, אנו מגיבים לפנייה תוך יום עסקים אחד (ראשון עד חמישי בין {open_time} ל-{close_time} שעון ישראל). \n"
-"בינתיים, אנא קרא את {link_start}השאלות הנפוצות{link_end}, שם השבנו על רוב השאלות הנפוצות. "
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -13823,6 +13813,10 @@ msgstr "ניווט דפי מידע"
 msgid "Important Course Dates"
 msgstr "תאריכים חשובים של הקורס"
 
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
+
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "חדשות - MITx 6.002x"
@@ -15593,6 +15587,10 @@ msgstr "שם תצורת הקורס"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
 msgstr "תאריך סיום הקורס:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"

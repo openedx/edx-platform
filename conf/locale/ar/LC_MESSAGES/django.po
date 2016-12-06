@@ -95,6 +95,7 @@
 # Jad Freij <jkfreij@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Karim Mohamed <karim.mohamed.eg@gmail.com>, 2016
+# keltouma <said.benkrim@gmail.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # Lekaa Ahmed <inactive+lekaaahmed_gtc_YmU0Yz@transifex.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
@@ -156,7 +157,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:47+0000\n"
+"POT-Creation-Date: 2016-11-22 16:37+0000\n"
 "PO-Revision-Date: 2016-11-08 08:16+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -5588,10 +5589,6 @@ msgid "in {relative} - {absolute}"
 msgstr "في {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr "تاريخ اليوم {date}"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "تاريخ ابتداء المساق"
 
@@ -6966,10 +6963,6 @@ msgstr "حُدِّث سعر CourseMode بنجاح"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
 msgstr "معلومات المساق "
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
-msgstr "لم يُحدّد تاريخ الانتهاء"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -11422,15 +11415,10 @@ msgstr "شكرًا لك!"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"نشكرك على تقديم تساؤلك أو آرائك وملاحظاتك. نردّ عادةً على أي طلب في غضون يوم"
-" عمل واحد (الاثنين إلى الجمعة، {open_time} بحسب التوقيت العالمي UTC حتى "
-"{close_time} بحسب التوقيت العالمي UTC). وفي هذه الأثناء، يُرجى مراجعة قسمنا "
-"بشأن {link_start}الأسئلة الشائعة المفصّلة{link_end} حيث ستجد إجابات لغالبية "
-"الأسئلة المطروحة."
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -14339,6 +14327,10 @@ msgstr "تصفّح النشرات "
 msgid "Important Course Dates"
 msgstr "تواريخ مهمّة بالنسبة للمساق"
 
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
+
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "أخبار- MITx 6.002x "
@@ -16179,6 +16171,10 @@ msgstr "الاسم الظاهر للمساق:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
 msgstr "تاريخ انتهاء المساق:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"

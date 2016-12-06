@@ -2,19 +2,18 @@ define([
     'backbone',
     'jquery',
     'js/programs/utils/api_config',
-    'js/programs/collections/auto_auth_collection',
     'jquery.cookie'
 ],
-    function(Backbone, $, apiConfig, AutoAuthCollection) {
+    function(Backbone, $, apiConfig) {
         'use strict';
 
-        return AutoAuthCollection.extend({
+        return Backbone.Collection.extend({
             allRuns: [],
 
             initialize: function(models, options) {
                 // Ignore pagination and give me everything
                 var orgStr = options.organization.key,
-                    queries = '?org=' + orgStr + '&username=' + apiConfig.get('username') + '&page_size=1000';
+                    queries = '?org=' + orgStr + '&page_size=1000';
 
                 this.url = apiConfig.get('lmsBaseUrl') + 'api/courses/v1/courses/' + queries;
             },

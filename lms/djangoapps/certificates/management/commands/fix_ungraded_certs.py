@@ -1,14 +1,16 @@
 """
 Management command which fixes ungraded certificates for students
 """
-
+from django.core.management.base import BaseCommand
+import logging
+from optparse import make_option
 
 from certificates.models import GeneratedCertificate
 from courseware import courses
-from lms.djangoapps.grades import course_grades
-from django.test.client import RequestFactory
-from django.core.management.base import BaseCommand
-from optparse import make_option
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+
+
+log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -42,18 +44,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         course_id = options['course']
-        print "Fetching ungraded students for {0}".format(course_id)
+        log.info('Fetching ungraded students for %s.', course_id)
         ungraded = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
             course_id__exact=course_id
         ).filter(grade__exact='')
         course = courses.get_course_by_id(course_id)
-        factory = RequestFactory()
-        request = factory.get('/')
-
         for cert in ungraded:
             # grade the student
-            grade = course_grades.summary(cert.user, course)
-            print "grading {0} - {1}".format(cert.user, grade['percent'])
-            cert.grade = grade['percent']
+            grade = CourseGradeFactory().create(cert.user, course)
+            log.info('grading %s - %s', cert.user, grade.percent)
+            cert.grade = grade.percent
             if not options['noop']:
                 cert.save()

@@ -149,7 +149,7 @@
                         &.graded {
 
                             .menu-icon {
-                                @include right($baseline/2);
+                                @include right($baseline/2.5);
                                 position: absolute;
                                 bottom: ($baseline/2);
                                 color: $link-color;

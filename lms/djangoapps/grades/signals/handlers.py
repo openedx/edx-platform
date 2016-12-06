@@ -10,8 +10,14 @@ from openedx.core.lib.grade_utils import is_score_higher
 from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
-from .signals import PROBLEM_SCORE_CHANGED, SUBSECTION_SCORE_CHANGED, SCORE_PUBLISHED
+from .signals import (
+    PROBLEM_RAW_SCORE_CHANGED,
+    PROBLEM_WEIGHTED_SCORE_CHANGED,
+    SUBSECTION_SCORE_CHANGED,
+    SCORE_PUBLISHED,
+)
 from ..new.course_grade import CourseGradeFactory
+from ..scores import weighted_score
 from ..tasks import recalculate_subsection_grade
 
 
@@ -22,9 +28,9 @@ log = getLogger(__name__)
 def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_set signal defined in the Submissions API, and convert it
-    to a PROBLEM_SCORE_CHANGED signal defined in this module. Converts the unicode keys
-    for user, course and item into the standard representation for the
-    PROBLEM_SCORE_CHANGED signal.
+    to a PROBLEM_WEIGHTED_SCORE_CHANGED signal defined in this module. Converts the
+    unicode keys for user, course and item into the standard representation for the
+    PROBLEM_WEIGHTED_SCORE_CHANGED signal.
 
     This method expects that the kwargs dictionary will contain the following
     entries (See the definition of score_set):
@@ -42,10 +48,10 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
     if user is None:
         return
 
-    PROBLEM_SCORE_CHANGED.send(
+    PROBLEM_WEIGHTED_SCORE_CHANGED.send(
         sender=None,
-        points_earned=points_earned,
-        points_possible=points_possible,
+        weighted_earned=points_earned,
+        weighted_possible=points_possible,
         user_id=user.id,
         course_id=course_id,
         usage_id=usage_id
@@ -56,9 +62,9 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
 def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused-argument
     """
     Consume the score_reset signal defined in the Submissions API, and convert
-    it to a PROBLEM_SCORE_CHANGED signal indicating that the score has been set to 0/0.
-    Converts the unicode keys for user, course and item into the standard
-    representation for the PROBLEM_SCORE_CHANGED signal.
+    it to a PROBLEM_WEIGHTED_SCORE_CHANGED signal indicating that the score
+    has been set to 0/0. Converts the unicode keys for user, course and item
+    into the standard representation for the PROBLEM_WEIGHTED_SCORE_CHANGED signal.
 
     This method expects that the kwargs dictionary will contain the following
     entries (See the definition of score_reset):
@@ -72,10 +78,10 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
     if user is None:
         return
 
-    PROBLEM_SCORE_CHANGED.send(
+    PROBLEM_WEIGHTED_SCORE_CHANGED.send(
         sender=None,
-        points_earned=0,
-        points_possible=0,
+        weighted_earned=0,
+        weighted_possible=0,
         user_id=user.id,
         course_id=course_id,
         usage_id=usage_id
@@ -106,10 +112,11 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
 
     if update_score:
         set_score(user.id, block.location, raw_earned, raw_possible)
-        PROBLEM_SCORE_CHANGED.send(
+        PROBLEM_RAW_SCORE_CHANGED.send(
             sender=None,
-            points_earned=raw_earned,
-            points_possible=raw_possible,
+            raw_earned=raw_earned,
+            raw_possible=raw_possible,
+            weight=getattr(block, 'weight', None),
             user_id=user.id,
             course_id=unicode(block.location.course_key),
             usage_id=unicode(block.location),
@@ -118,10 +125,38 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
     return update_score
 
 
-@receiver(PROBLEM_SCORE_CHANGED)
+@receiver(PROBLEM_RAW_SCORE_CHANGED)
+def problem_raw_score_changed_handler(sender, **kwargs):  # pylint: disable=unused-argument
+    """
+    Handles the raw score changed signal, converting the score to a
+    weighted score and firing the PROBLEM_WEIGHTED_SCORE_CHANGED signal.
+    """
+    if kwargs['raw_possible'] is not None:
+        weighted_earned, weighted_possible = weighted_score(
+            kwargs['raw_earned'],
+            kwargs['raw_possible'],
+            kwargs['weight'],
+        )
+    else:  # TODO: remove as part of TNL-5982
+        weighted_earned, weighted_possible = kwargs['raw_earned'], kwargs['raw_possible']
+
+    PROBLEM_WEIGHTED_SCORE_CHANGED.send(
+        sender=None,
+        weighted_earned=weighted_earned,
+        weighted_possible=weighted_possible,
+        user_id=kwargs['user_id'],
+        course_id=kwargs['course_id'],
+        usage_id=kwargs['usage_id'],
+        only_if_higher=kwargs['only_if_higher'],
+        score_deleted=kwargs.get('score_deleted', False),
+    )
+
+
+@receiver(PROBLEM_WEIGHTED_SCORE_CHANGED)
 def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argument
     """
-    Handles the PROBLEM_SCORE_CHANGED signal by enqueueing a subsection update operation to occur asynchronously.
+    Handles the PROBLEM_WEIGHTED_SCORE_CHANGED signal by
+    enqueueing a subsection update operation to occur asynchronously.
     """
     result = recalculate_subsection_grade.apply_async(
         kwargs=dict(
@@ -129,8 +164,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             course_id=kwargs['course_id'],
             usage_id=kwargs['usage_id'],
             only_if_higher=kwargs.get('only_if_higher'),
-            raw_earned=kwargs.get('points_earned'),
-            raw_possible=kwargs.get('points_possible'),
+            weighted_earned=kwargs.get('weighted_earned'),
+            weighted_possible=kwargs.get('weighted_possible'),
             score_deleted=kwargs.get('score_deleted', False),
         )
     )
@@ -147,4 +182,4 @@ def recalculate_course_grade(sender, course, course_structure, user, **kwargs): 
     """
     Updates a saved course grade.
     """
-    CourseGradeFactory(user).update(course, course_structure)
+    CourseGradeFactory().update(user, course, course_structure)

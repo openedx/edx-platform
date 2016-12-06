@@ -206,6 +206,25 @@ class DiscussionHomePageTest(BaseDiscussionTestCase):
         self.page.click_new_post_button()
         self.assertIsNotNone(self.page.new_post_form)
 
+    def test_receive_update_checkbox(self):
+        """
+        Scenario: I can save the receive update email notification checkbox
+                on Discussion home page.
+            Given that I am on the Discussion home page
+            When I click on the 'Receive update' checkbox
+            Then it should always shown selected.
+        """
+        receive_updates_selector = '.email-setting'
+        receive_updates_checkbox = self.page.is_element_visible(receive_updates_selector)
+        self.assertTrue(receive_updates_checkbox)
+
+        self.assertFalse(self.page.is_checkbox_selected(receive_updates_selector))
+        self.page.click_element(receive_updates_selector)
+
+        self.assertTrue(self.page.is_checkbox_selected(receive_updates_selector))
+        self.page.refresh_and_wait_for_load()
+        self.assertTrue(self.page.is_checkbox_selected(receive_updates_selector))
+
     @attr('a11y')
     def test_page_accessibility(self):
         self.page.a11y_audit.config.set_rules({

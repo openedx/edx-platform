@@ -42,6 +42,7 @@
 # Toskira <toskira@gmail.com>, 2015
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# Vladimir Osypets <v@osypets.com>, 2016
 # webslavic <webslavic@yahoo.com>, 2014
 # Weyedide <weyedide@gmail.com>, 2014-2016
 # Weyedide <weyedide@gmail.com>, 2014
@@ -124,6 +125,7 @@
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
 # Viktoria Surovtseva <viktoria@cde.ifmo.ru>, 2013
+# Vladimir Osypets <v@osypets.com>, 2016
 # Vladimir.Serykh <Vladimir.Serykh@extenza-studio.ru>, 2015
 # W01fdalE <vershinin.a@donnu.edu.ua>, 2014
 # webslavic <webslavic@yahoo.com>, 2014
@@ -193,7 +195,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:47+0000\n"
+"POT-Creation-Date: 2016-11-22 16:37+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -5636,10 +5638,6 @@ msgid "in {relative} - {absolute}"
 msgstr "в {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr "Сегодня {date}"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "Курс начнется"
 
@@ -7043,10 +7041,6 @@ msgid "Course Info"
 msgstr "О курсе"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
-msgstr "Дата окончания не задана"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
 msgstr ""
 "Данные о количестве зарегистрировавшихся теперь доступны здесь "
@@ -7089,10 +7083,10 @@ msgstr "отправленных: 0"
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
-msgstr[0] "{num_emails} отправлен"
+msgstr[0] "{num_emails} отправлено"
 msgstr[1] "{num_emails} отправлено"
 msgstr[2] "{num_emails} отправлено"
-msgstr[3] "{num_emails} отправлены"
+msgstr[3] "{num_emails} отправлено"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "{num_emails} failed"
@@ -11527,14 +11521,10 @@ msgstr "Спасибо!"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"Спасибо за вопрос или предложение! Как правило, мы отвечаем в течение одного"
-" рабочего дня (с понедельника по пятницу, с {open_time} UTC до {close_time} "
-"UTC). Тем временем, вы можете изучить наш {link_start}детальный "
-"FAQs{link_end}, где уже есть ответы на многие вопросы. "
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -14382,6 +14372,10 @@ msgstr "Навигация по наглядным материалам"
 msgid "Important Course Dates"
 msgstr "Важные даты курса"
 
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
+
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "Новости - MITx 6.002x"
@@ -15148,10 +15142,10 @@ msgstr "по количеству голосов"
 #, python-format
 msgid "%s discussion started"
 msgid_plural "%s discussions started"
-msgstr[0] "Открыта %s тема обсуждения"
-msgstr[1] "Открыты %s темы обсуждения"
-msgstr[2] "Открыто %s тем обсуждения"
-msgstr[3] "Открыто %s тем обсуждения"
+msgstr[0] "%s открытая тема обсуждений"
+msgstr[1] "%s открытые темы обсуждений"
+msgstr[2] "%s открытых тем обсуждений"
+msgstr[3] "%s открытых тем обсуждений"
 
 #: lms/templates/discussion/_user_profile.html
 #, python-format
@@ -16250,6 +16244,10 @@ msgstr "Отображаемое название курса:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
 msgstr "Дата окончания курса:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"

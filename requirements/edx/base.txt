@@ -34,7 +34,7 @@ django-simple-history==1.6.3
 django-statici18n==1.1.5
 django-storages==1.4.1
 django-method-override==0.1.0
-django-user-tasks==0.1.1
+django-user-tasks==0.1.2
 # We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
 #djangorestframework>=3.1,<3.2
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
@@ -90,7 +90,7 @@ python-dateutil==2.1
 # We can also remove the fix to auth_url in third_party_auth/saml.py when that fix is included upstream.
 python-social-auth==0.2.12
 
-pytz==2015.2
+pytz==2016.7
 pysrt==0.4.7
 PyYAML==3.10
 requests==2.9.1
@@ -108,7 +108,7 @@ sympy==0.7.1
 xmltodict==0.4.1
 django-ratelimit-backend==1.0
 unicodecsv==0.9.4
-django-require==1.0.6
+django-require==1.0.11
 pyuca==1.1
 wrapt==1.10.5
 zendesk==1.1.1
@@ -127,7 +127,7 @@ watchdog==0.8.3
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==2.64.0.48
+newrelic==2.74.0.54
 
 # Used for documentation gathering
 sphinx==1.1.3

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 15:42+0000\n"
-"PO-Revision-Date: 2016-11-22 15:44:57.516074\n"
+"POT-Creation-Date: 2016-12-01 16:05+0000\n"
+"PO-Revision-Date: 2016-12-01 16:06:57.646699\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -5548,6 +5548,10 @@ msgstr[1] "%(num_questions)s qüéstïöns Ⱡ'σяєм ιρѕυм ∂σłσя �
 msgid "Number of Students"
 msgstr "Nümßér öf Stüdénts Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
+#: lms/templates/courseware/progress_graph.js
+msgid "Overall Score"
+msgstr "Övéräll Sçöré Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
 #: cms/static/cms/js/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
@@ -9193,14 +9197,13 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
 msgid ""
 "You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
+"you will need to have these by {date} to qualify to earn a Verified "
 "Certificate."
 msgstr ""
 "Ýöü çän päý nöw évén ïf ýöü dön't hävé thé föllöwïng ïtéms äväïläßlé, ßüt "
-"ýöü wïll nééd tö hävé thésé ßý %(date)s tö qüälïfý tö éärn ä Vérïfïéd "
+"ýöü wïll nééd tö hävé thésé ßý {date} tö qüälïfý tö éärn ä Vérïfïéd "
 "Çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
 "∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ "
 "мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ "
@@ -9311,13 +9314,11 @@ msgstr ""
 "Vérïfïéd Çértïfïçäté för {courseName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
 msgid ""
-"To receive a certificate, you must also verify your identity before "
-"%(date)s."
+"To receive a certificate, you must also verify your identity before {date}."
 msgstr ""
-"Tö réçéïvé ä çértïfïçäté, ýöü müst älsö vérïfý ýöür ïdéntïtý ßéföré "
-"%(date)s. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+"Tö réçéïvé ä çértïfïçäté, ýöü müst älsö vérïfý ýöür ïdéntïtý ßéföré {date}. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."

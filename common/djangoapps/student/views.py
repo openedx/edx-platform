@@ -404,7 +404,7 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
                 )
 
     if status in {'generating', 'ready', 'notpassing', 'restricted', 'auditing', 'unverified'}:
-        persisted_grade = CourseGradeFactory(user).get_persisted(course_overview)
+        persisted_grade = CourseGradeFactory().get_persisted(user, course_overview)
         if persisted_grade is not None:
             status_dict['grade'] = unicode(persisted_grade.percent)
         elif 'grade' in cert_status:

@@ -346,7 +346,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:47+0000\n"
+"POT-Creation-Date: 2016-11-22 16:37+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -5217,10 +5217,6 @@ msgid "in {relative} - {absolute}"
 msgstr "in {relative} - {absolute}"
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr "今天是 {date}"
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr "课程开始"
 
@@ -6477,10 +6473,6 @@ msgstr "课程模式价格更新成功"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
 msgstr "课程信息"
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
-msgstr "未设置结束日期"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -10682,12 +10674,10 @@ msgstr "谢谢！"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"感谢您的咨询或者反馈。我们通常在一个工作日 (周一到周五， {open_time} UTC 到 {close_time} UTC) "
-"内答复疑问。请您先浏览我们 {link_start} FAQs {link_end} ，在那里大部分问题已经得到了解答。"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -13331,6 +13321,10 @@ msgstr "讲义导航"
 msgid "Important Course Dates"
 msgstr "重要课程日期"
 
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
+
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "新闻 - MITx 6.002x"
@@ -14974,6 +14968,10 @@ msgstr "课程显示名称："
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
 msgstr "课程结束日期:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"

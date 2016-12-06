@@ -1,13 +1,18 @@
+/* globals _, requirejs */
+/* eslint-disable quote-props */
+
 (function(require, define) {
     'use strict';
+
+    var defineDependency;
 
     // We do not wish to bundle common libraries (that may also be used by non-RequireJS code on the page
     // into the optimized files. Therefore load these libraries through script tags and explicitly define them.
     // Note that when the optimizer executes this code, window will not be defined.
     if (window) {
-        var defineDependency = function(globalName, name, noShim) {
-            var getGlobalValue = function(name) {
-                    var globalNamePath = name.split('.'),
+        defineDependency = function(globalName, name, noShim) {
+            var getGlobalValue = function() {
+                    var globalNamePath = globalName.split('.'),
                         result = window,
                         i;
                     for (i = 0; i < globalNamePath.length; i++) {
@@ -15,16 +20,14 @@
                     }
                     return result;
                 },
-                globalValue = getGlobalValue(globalName);
+                globalValue = getGlobalValue();
             if (globalValue) {
                 if (noShim) {
                     define(name, {});
-                }
-                else {
+                } else {
                     define(name, [], function() { return globalValue; });
                 }
-            }
-            else {
+            } else {
                 console.error('Expected library to be included on page, but not found on window object: ' + name);
             }
         };

@@ -13,6 +13,7 @@
 # Chr0m3 <chr0m3.kr@gmail.com>, 2015
 # Kevin Min <gr326887@graded.br>, 2015
 # Seok Jun Yoon <fake2real@dctribe.com>, 2015
+# kmooc <shevious@gmail.com>, 2016
 # Sujin Lee <sujinlee.me@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
@@ -66,6 +67,7 @@
 # Chanseok <kcsgoodboy@naver.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # JiyeonLee <leejiyeon00@gmail.com>, 2014
+# kmooc <shevious@gmail.com>, 2016
 # Sunah Lim <whitetree70@snu.ac.kr>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -81,14 +83,15 @@
 # Chanseok <kcsgoodboy@naver.com>, 2014
 # Kevin Min <gr326887@graded.br>, 2015
 # Nicole <dlruddk1112@gmail.com>, 2014
+# kmooc <shevious@gmail.com>, 2016
 # shin2012 <shin2013@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-17 16:47+0000\n"
-"PO-Revision-Date: 2016-05-09 11:27+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2016-11-22 16:37+0000\n"
+"PO-Revision-Date: 2016-11-25 05:04+0000\n"
+"Last-Translator: kmooc <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4811,10 +4814,6 @@ msgid "in {relative} - {absolute}"
 msgstr ""
 
 #: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr ""
-
-#: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
 msgstr ""
 
@@ -6016,10 +6015,6 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
-msgstr ""
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -10055,13 +10050,10 @@ msgstr "감사합니다!"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"질문이나 피드백 감사합니다.  근무기간에는 보통 하루안에 답변을 드립니다 (월요일에서 금요일, {open_time} UTC 에서 "
-"{close_time} UTC 까지). 그동안 {link_start} 상세하게 제공되는 자주하는 질문{link_end}를 살펴 보세요. "
-"대부분 많은 질문들에 대한 답이 있습니다."
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -12614,6 +12606,10 @@ msgstr "학습 자료 찾기"
 msgid "Important Course Dates"
 msgstr ""
 
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
+
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "새소식 - MITx 6.002x"
@@ -14266,6 +14262,10 @@ msgstr "강좌 이름:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html

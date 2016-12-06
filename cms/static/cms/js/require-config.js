@@ -1,3 +1,6 @@
+/* globals _, requirejs */
+/* eslint-disable quote-props */
+
 (function(require, define) {
     'use strict';
 

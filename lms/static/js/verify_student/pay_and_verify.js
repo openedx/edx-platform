@@ -50,6 +50,8 @@ var edx = edx || {};
                 courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
                 userEmail: el.data('user-email'),
+                userLanguage: el.data('user-language'),
+                userTimezone: el.data('user-timezone'),
                 hasVisibleReqs: _.some(
                     el.data('requirements'),
                     function(isVisible) { return isVisible; }

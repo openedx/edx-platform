@@ -1073,3 +1073,13 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
         validation = descriptor.validate()
         self.assert_validation_message(validation, expected_validation_msg)
+
+    def test_video_transcript_none(self):
+        """
+        Test video when transcripts is None.
+        """
+        descriptor = instantiate_descriptor(data=None)
+        descriptor.transcripts = None
+        response = descriptor.get_transcripts_info()
+        expected = {'transcripts': {}, 'sub': ''}
+        self.assertEquals(expected, response)

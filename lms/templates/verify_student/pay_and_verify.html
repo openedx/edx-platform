@@ -82,6 +82,8 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
       data-msg-key='${message_key}'
       data-is-active='${is_active}'
       data-user-email='${user_email}'
+      data-user-language='${user_language}'
+      data-user-timezone='${user_timezone}'
       data-already-verified='${already_verified}'
       data-verification-good-until='${verification_good_until}'
       data-capture-sound='${capture_sound}'
@@ -122,3 +124,6 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
   </section>
 </div>
 </%block>
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

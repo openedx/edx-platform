@@ -171,7 +171,7 @@
                 HtmlUtils.append(this.$('.forum-content').empty(), HtmlUtils.template(discussionHomeTemplate)({}));
                 this.$('.forum-nav-thread-list a').removeClass('is-active').find('.sr')
                     .remove();
-                this.$('input.email-setting').bind('click', this.updateEmailNotifications);
+                this.$('input.email-setting').bind('click', this.discussionThreadListView.updateEmailNotifications);
                 DiscussionUtil.safeAjax({
                     url: url,
                     type: 'GET',

@@ -68,7 +68,7 @@ class SubsectionGrade(object):
         ):
             self._compute_block_score(descendant_key, course_structure, submissions_scores, csm_scores)
 
-        self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
+        self.all_total, self.graded_total = graders.aggregate_scores(self.scores)
         self._log_event(log.debug, u"init_from_structure", student)
         return self
 
@@ -83,16 +83,12 @@ class SubsectionGrade(object):
             tw_earned=model.earned_graded,
             tw_possible=model.possible_graded,
             graded=True,
-            display_name=self.display_name,
-            module_id=self.location,
             attempted=model.first_attempted is not None,
         )
         self.all_total = AggregatedScore(
             tw_earned=model.earned_all,
             tw_possible=model.possible_all,
             graded=False,
-            display_name=self.display_name,
-            module_id=self.location,
             attempted=model.first_attempted is not None,
         )
         self._log_event(log.debug, u"init_from_model", student)
