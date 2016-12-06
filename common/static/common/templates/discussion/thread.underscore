@@ -32,8 +32,4 @@
             <% } %>
         </div>
     </div>
-    <div class="post-tools">
-        <button class="btn-link forum-thread-expand"><span class="icon fa fa-plus" aria-hidden="true"/><%- gettext("Expand discussion") %></button>
-        <button class="btn-link forum-thread-collapse"><span class="icon fa fa-minus" aria-hidden="true"/><%- gettext("Collapse discussion") %></button>
-    </div>
 </article>

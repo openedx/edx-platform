@@ -52,7 +52,7 @@
 
     <div class="post-body"><%- body %></div>
     <div class="post-context">
-        <% if (mode == "tab" && obj.courseware_url) { %>
+        <% if (mode === "tab" && obj.courseware_url) { %>
             <%
             var courseware_title_linked = interpolate(
                 '<a href="%(courseware_url)s">%(courseware_title)s</a>',

@@ -152,14 +152,7 @@
                         });
                     });
                 }
-                if (this.mode === 'tab') {
-                    setTimeout(function() {
-                        return self.loadInitialResponses();
-                    }, 100);
-                    return this.$('.post-tools').hide();
-                } else {
-                    return this.collapse();
-                }
+                this.loadInitialResponses();
             };
 
             DiscussionThreadView.prototype.attrRenderer = $.extend({}, DiscussionContentView.prototype.attrRenderer, {
@@ -221,9 +214,7 @@
             };
 
             DiscussionThreadView.prototype.loadResponses = function(responseLimit, $elem, firstLoad) {
-                var takeFocus,
-                    self = this;
-                takeFocus = this.mode === 'tab' ? false : true;
+                var self = this;
                 this.responsesRequest = DiscussionUtil.safeAjax({
                     url: DiscussionUtil.urlFor(
                         'retrieve_single_thread', this.model.get('commentable_id'), this.model.id
@@ -234,7 +225,7 @@
                     },
                     $elem: $elem,
                     $loading: $elem,
-                    takeFocus: takeFocus,
+                    takeFocus: false,
                     complete: function() {
                         self.responsesRequest = null;
                     },
@@ -253,7 +244,6 @@
                         );
                         self.trigger('thread:responses:rendered');
                         self.loadedResponses = true;
-                        return self.$el.find('.discussion-article[data-id="' + self.model.id + '"]').focus();
                     },
                     error: function(xhr, textStatus) {
                         if (textStatus === 'abort') {
