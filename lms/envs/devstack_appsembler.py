@@ -27,6 +27,7 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
 INSTALLED_APPS += (
+    'django_extensions',
     'appsembler',
     'openedx.core.djangoapps.appsembler.sites',
 )
