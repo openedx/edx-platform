@@ -141,7 +141,7 @@
             this.threadView = new DiscussionThreadView({
                 el: this.$('.forum-content'),
                 model: thread,
-                mode: 'tab',
+                mode: 'inline',
                 course_settings: this.course_settings
             });
             this.threadView.render();

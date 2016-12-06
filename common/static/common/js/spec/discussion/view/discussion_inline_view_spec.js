@@ -52,7 +52,12 @@
                     title: TEST_THREAD_TITLE
                 }),
                 page: 1,
-                num_pages: 1
+                num_pages: 1,
+                content: {
+                    endorsed_responses: [],
+                    non_endorsed_responses: [],
+                    children: []
+                }
             });
             testView.$('.discussion-show').click();
         };
