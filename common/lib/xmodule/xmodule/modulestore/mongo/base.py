@@ -955,7 +955,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         item = system.load_item(location, for_parent=for_parent)
 
-        # TODO Once PLAT-1055 is implemented, we can remove the following line
+        # TODO Once TNL-5092 is implemented, we can remove the following line
         # of code. Until then, set the course_version field on the block to be
         # consistent with the Split modulestore. Since Mongo modulestore doesn't
         # maintain course versions set it to None.
