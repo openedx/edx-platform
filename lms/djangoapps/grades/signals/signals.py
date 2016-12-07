@@ -20,6 +20,8 @@ PROBLEM_RAW_SCORE_CHANGED = Signal(
         'weight',  # Weight of the problem
         'only_if_higher',   # Boolean indicating whether updates should be
                             # made only if the new score is higher than previous.
+        'modified',  # A datetime indicating when the database representation of
+                     # this the problem score was saved.
     ]
 )
 
@@ -39,6 +41,8 @@ PROBLEM_WEIGHTED_SCORE_CHANGED = Signal(
         'weighted_possible',  # Maximum score available for the exercise
         'only_if_higher',   # Boolean indicating whether updates should be
                             # made only if the new score is higher than previous.
+        'modified',  # A datetime indicating when the database representation of
+                     # this the problem score was saved.
     ]
 )
 

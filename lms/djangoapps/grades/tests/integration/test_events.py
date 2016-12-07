@@ -156,6 +156,9 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'course_version': unicode(course.course_version),
             }
         )
+        enrollment_tracker.reset_mock()
+        models_tracker.reset_mock()
+        handlers_tracker.reset_mock()
 
     @patch('lms.djangoapps.instructor_task.tasks_helper.tracker')
     @patch('lms.djangoapps.grades.signals.handlers.tracker')
@@ -223,3 +226,6 @@ class GradesEventIntegrationTest(ProblemSubmissionTestMixin, SharedModuleStoreTe
                 'course_edited_timestamp': unicode(course.subtree_edited_on),
             }
         )
+        instructor_task_tracker.reset_mock()
+        models_tracker.reset_mock()
+        handlers_tracker.reset_mock()

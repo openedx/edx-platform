@@ -1008,6 +1008,7 @@ def set_score(user_id, usage_key, score, max_score):
         student_module.grade = score
         student_module.max_grade = max_score
         student_module.save()
+    return student_module.modified
 
 
 def get_score(user_id, usage_key):
@@ -1024,4 +1025,4 @@ def get_score(user_id, usage_key):
     except StudentModule.DoesNotExist:
         return None
     else:
-        return student_module.grade, student_module.max_grade
+        return student_module

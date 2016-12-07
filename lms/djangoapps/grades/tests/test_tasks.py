@@ -4,10 +4,13 @@ Tests for the functionality and infrastructure of grades tasks.
 
 from collections import OrderedDict
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 import ddt
 from django.conf import settings
 from django.db.utils import IntegrityError
-from mock import patch
+from mock import patch, MagicMock
+import pytz
+from util.date_utils import to_timestamp
 from unittest import skip
 
 from student.models import anonymous_id_for_user
@@ -23,7 +26,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, chec
 
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
 from lms.djangoapps.grades.signals.signals import PROBLEM_WEIGHTED_SCORE_CHANGED
-from lms.djangoapps.grades.tasks import recalculate_subsection_grade
+from lms.djangoapps.grades.tasks import recalculate_subsection_grade_v2
 
 
 @patch.dict(settings.FEATURES, {'PERSISTENT_GRADES_ENABLED_FOR_ALL_TESTS': False})
@@ -54,6 +57,9 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
         self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='Problem')
 
+        self.frozen_now_datetime = datetime.now().replace(tzinfo=pytz.UTC)
+        self.frozen_now_timestamp = to_timestamp(self.frozen_now_datetime)
+
         self.problem_weighted_score_changed_kwargs = OrderedDict([
             ('weighted_earned', 1.0),
             ('weighted_possible', 2.0),
@@ -61,6 +67,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             ('course_id', unicode(self.course.id)),
             ('usage_id', unicode(self.problem.location)),
             ('only_if_higher', None),
+            ('modified', self.frozen_now_datetime),
         ])
 
         create_new_event_transaction_id()
@@ -70,8 +77,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             ('course_id', unicode(self.course.id)),
             ('usage_id', unicode(self.problem.location)),
             ('only_if_higher', None),
-            ('weighted_earned', 1.0),
-            ('weighted_possible', 2.0),
+            ('expected_modified_time', self.frozen_now_timestamp),
             ('score_deleted', False),
             ('event_transaction_id', unicode(get_event_transaction_id())),
             ('event_transaction_type', u'edx.grades.problem.submitted'),
@@ -81,6 +87,15 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         _ = anonymous_id_for_user(self.user, self.course.id)
         # pylint: enable=attribute-defined-outside-init,no-member
 
+    @contextmanager
+    def mock_get_score(self, score=MagicMock(grade=1.0, max_grade=2.0)):
+        """
+        Mocks the scores needed by the SCORE_PUBLISHED signal
+        handler. By default, sets the returned score to 1/2.
+        """
+        with patch("lms.djangoapps.grades.tasks.get_score", return_value=score):
+            yield
+
     def test_problem_weighted_score_changed_queues_task(self):
         """
         Ensures that the PROBLEM_WEIGHTED_SCORE_CHANGED signal enqueues the correct task.
@@ -89,8 +104,8 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         send_args = self.problem_weighted_score_changed_kwargs
         local_task_args = self.recalculate_subsection_grade_kwargs.copy()
         local_task_args['event_transaction_type'] = u'edx.grades.problem.submitted'
-        with patch(
-            'lms.djangoapps.grades.tasks.recalculate_subsection_grade.apply_async',
+        with self.mock_get_score() and patch(
+            'lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.apply_async',
             return_value=None
         ) as mock_task_apply:
             PROBLEM_WEIGHTED_SCORE_CHANGED.send(sender=None, **send_args)
@@ -186,9 +201,9 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course()
             with check_mongo_calls(0) and self.assertNumQueries(3 if feature_flag else 2):
-                recalculate_subsection_grade.apply(kwargs=self.recalculate_subsection_grade_kwargs)
+                self._apply_recalculate_subsection_grade()
 
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
     @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
     def test_retry_subsection_update_on_integrity_error(self, mock_update, mock_retry):
         """
@@ -199,18 +214,18 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self._apply_recalculate_subsection_grade()
         self._assert_retry_called(mock_retry)
 
-    @skip  # Pending completion of TNL-5995
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
     def test_retry_subsection_grade_on_update_not_complete(self, mock_retry):
         self.set_up_course()
-        self._apply_recalculate_subsection_grade()
+        self._apply_recalculate_subsection_grade(
+            mock_score=MagicMock(modified=datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1))
+        )
         self._assert_retry_called(mock_retry)
 
-    @skip  # Pending completion of TNL-5995
-    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade.retry')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
     def test_retry_subsection_grade_on_no_score(self, mock_retry):
         self.set_up_course()
-        self._apply_recalculate_subsection_grade()
+        self._apply_recalculate_subsection_grade(mock_score=None)
         self._assert_retry_called(mock_retry)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
@@ -224,12 +239,16 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self._apply_recalculate_subsection_grade()
         self.assertEquals(mock_course_signal.call_count, 1)
 
-    def _apply_recalculate_subsection_grade(self):
+    def _apply_recalculate_subsection_grade(
+            self,
+            mock_score=MagicMock(modified=datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(days=1))
+    ):
         """
         Calls the recalculate_subsection_grade task with necessary
         mocking in place.
         """
-        recalculate_subsection_grade.apply(kwargs=self.recalculate_subsection_grade_kwargs)
+        with self.mock_get_score(mock_score):
+            recalculate_subsection_grade_v2.apply(kwargs=self.recalculate_subsection_grade_kwargs)
 
     def _assert_retry_called(self, mock_retry):
         """
