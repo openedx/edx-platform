@@ -191,7 +191,7 @@
     }
 
     .thread-preview-body {
-        @include margin($baseline / 4, $baseline, 0, 0);
+        margin-top: $baseline / 4;
         color: $forum-color-response-count;
         font-size: $forum-small-font-size;
         overflow: hidden;
@@ -317,13 +317,14 @@
 .forum-nav-thread-wrapper-1 {
     @extend %forum-nav-thread-wrapper;
     margin: 0 ($baseline / 4);
-    width: 80%;
+    max-width: calc(100% - 125px);
     flex-grow: 1;  // This column should consume all the available space
 }
 
 .forum-nav-thread-wrapper-2 {
     @extend %forum-nav-thread-wrapper;
     @include text-align(right);
+    min-width: 90px;
     white-space: nowrap;
 }
 
