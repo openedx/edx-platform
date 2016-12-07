@@ -33,6 +33,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
   </div>
 </script>
 
+%if not section_data['has_professional_mode'] or section_data['access']['admin']:
 <fieldset class="batch-enrollment membership-section">
     <legend id="heading-batch-enrollment" class="hd hd-3">${_("Batch Enrollment")}</legend>
     <label>
@@ -49,24 +50,28 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
             <textarea rows="2" id="reason-field-id" name="reason-field" placeholder="${_('Reason')}" spellcheck="false"></textarea>
         </label>
     %endif
-    <div class="enroll-option">
-        <label for="course-modes-list-selector" class="has-hint">${_("Select a course mode: ")}
-            <select id="course-modes-list-selector" name="course_mode" class="course-modes-list-selector">
-                %for mode_name, mode_data in section_data['course_modes'].items():
-                    <option value="${mode_name}">${mode_data.name}</option>
-                %endfor
-            </select>
 
-            <div class="hint dropdown-hint auto-enroll-hint">
-                <span class="hint-caret"></span>
-                <p id="auto-enroll-tip">
-                    ${_("Learners will be automatically enrolled in the course mode that you select.")}
-                    <br /><br />
-                    ${_("If you select {b_start}Unenroll{b_end} below, you do not need to select a course mode.").format(b_start="<b>", b_end="</b>")}
-                </p>
-            </div>
-        </label>
-    </div>
+    % if section_data['access']['admin']:
+        <div class="enroll-option">
+            <label for="course-modes-list-selector" class="has-hint">${_("Select a course mode: ")}
+                <select id="course-modes-list-selector" name="course_mode" class="course-modes-list-selector">
+                    %for mode_name, mode_data in section_data['course_modes'].items():
+                        <option value="${mode_name}">${mode_data.name}</option>
+                    %endfor
+                </select>
+                <br clear="both" />
+                <div class="hint dropdown-hint auto-enroll-hint">
+                    <span class="hint-caret"></span>
+                    <p id="auto-enroll-tip">
+                        ${_("Learners will be automatically enrolled in the course mode that you select.")}
+                        <br /><br />
+                        ${_("If you select {b_start}Unenroll{b_end} below, you do not need to select a course mode.").format(b_start="<b>", b_end="</b>")}
+                    </p>
+                </div>
+            </label>
+        </div>
+    %endif
+
     <div class="enroll-option">
         <label class="has-hint">
             <input type="checkbox" name="auto-enroll" id="auto-enroll" value="Auto-Enroll" checked="yes" aria-describedby="heading-batch-enrollment">
@@ -101,6 +106,7 @@ from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_
     <div class="request-response"></div>
     <div class="request-response-error"></div>
 </fieldset>
+%endif
 
 %if static.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
 <hr class="divider" />

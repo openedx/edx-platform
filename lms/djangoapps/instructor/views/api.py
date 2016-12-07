@@ -29,7 +29,7 @@ import random
 import unicodecsv
 import decimal
 from student import auth
-from student.roles import CourseSalesAdminRole, CourseFinanceAdminRole
+from student.roles import CourseSalesAdminRole, CourseFinanceAdminRole, GlobalStaff
 from util.file import (
     store_uploaded_file, course_and_time_based_filename_generator,
     FileValidationException, UniversalNewlineIterator
@@ -600,7 +600,6 @@ def students_update_enrollment(request, course_id):
     }
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course_mode = request.POST.get('course_mode')
     action = request.POST.get('action')
     identifiers_raw = request.POST.get('identifiers')
     identifiers = _split_input_list(identifiers_raw)
@@ -608,14 +607,28 @@ def students_update_enrollment(request, course_id):
     email_students = _get_boolean_param(request, 'email_students')
     is_white_label = CourseMode.is_white_label(course_id)
     reason = request.POST.get('reason')
-    if is_white_label:
-        if not reason:
-            return JsonResponse(
-                {
-                    'action': action,
-                    'results': [{'error': True}],
-                    'auto_enroll': auto_enroll,
-                }, status=400)
+    course_modes = CourseMode.modes_for_course_dict(course_id)
+    has_professional_mode = CourseMode.has_professional_mode(course_modes)
+    is_global_staff_user = GlobalStaff().has_user(request.user)
+    if is_global_staff_user:
+        course_mode = request.POST.get('course_mode')
+    else:
+        course_mode = CourseMode.AUDIT
+
+    error_response_data = {
+        'action': action,
+        'results': [{'error': True}],
+        'auto_enroll': auto_enroll
+    }
+
+    # if user is not global staff and course has professional mode
+    # we cannot allow bulk enroll/unenroll actions
+    if not is_global_staff_user and has_professional_mode:
+        return JsonResponse(error_response_data, status=400)
+
+    if not reason and is_white_label:
+        return JsonResponse(error_response_data, status=400)
+
     enrollment_obj = None
     state_transition = DEFAULT_TRANSITION_STATE
 

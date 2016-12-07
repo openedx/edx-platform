@@ -474,6 +474,7 @@ def _section_membership(course, access, is_white_label):
         'access': access,
         'ccx_is_enabled': ccx_enabled,
         'is_white_label': is_white_label,
+        'has_professional_mode': CourseMode.has_professional_mode(course_modes),
         'enroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'unenroll_button_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'upload_student_csv_button_url': reverse('register_and_enroll_students', kwargs={'course_id': unicode(course_key)}),
