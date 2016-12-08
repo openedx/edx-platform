@@ -1440,7 +1440,6 @@ class CapaMixin(CapaFields):
         # rescoring should have no effect on attempts, so don't
         # need to increment here, or mark done.  Just save.
         self.set_state_from_lcp()
-
         self.publish_grade(only_if_higher)
 
         new_score = self.lcp.get_score()
@@ -1460,7 +1459,11 @@ class CapaMixin(CapaFields):
         event_info['attempts'] = self.attempts
         self.track_function_unmask('problem_rescore', event_info)
 
-        return {'success': success}
+        return {
+            'success': success,
+            'new_raw_earned': new_score['score'],
+            'new_raw_possible': new_score['total'],
+        }
 
     def save_problem(self, data):
         """

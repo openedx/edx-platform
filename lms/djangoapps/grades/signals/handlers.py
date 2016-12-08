@@ -2,14 +2,21 @@
 Grades related signals.
 """
 
-from django.dispatch import receiver
 from logging import getLogger
 
-from courseware.model_data import get_score, set_score
+from django.dispatch import receiver
 from openedx.core.lib.grade_utils import is_score_higher
-from student.models import user_by_anonymous_id
 from submissions.models import score_set, score_reset
 
+from courseware.model_data import get_score, set_score
+from eventtracking import tracker
+from student.models import user_by_anonymous_id
+from track.event_transaction_utils import (
+    get_event_transaction_type,
+    get_event_transaction_id,
+    set_event_transaction_type,
+    create_new_event_transaction_id
+)
 from .signals import (
     PROBLEM_RAW_SCORE_CHANGED,
     PROBLEM_WEIGHTED_SCORE_CHANGED,
@@ -20,8 +27,9 @@ from ..new.course_grade import CourseGradeFactory
 from ..scores import weighted_score
 from ..tasks import recalculate_subsection_grade
 
-
 log = getLogger(__name__)
+
+PROBLEM_SUBMITTED_EVENT_TYPE = 'edx.grades.problem.submitted'
 
 
 @receiver(score_set)
@@ -158,6 +166,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     Handles the PROBLEM_WEIGHTED_SCORE_CHANGED signal by
     enqueueing a subsection update operation to occur asynchronously.
     """
+    _emit_problem_submitted_event(kwargs)
     result = recalculate_subsection_grade.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
@@ -167,6 +176,8 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             weighted_earned=kwargs.get('weighted_earned'),
             weighted_possible=kwargs.get('weighted_possible'),
             score_deleted=kwargs.get('score_deleted', False),
+            event_transaction_id=unicode(get_event_transaction_id()),
+            event_transaction_type=unicode(get_event_transaction_type()),
         )
     )
     log.info(
@@ -183,3 +194,31 @@ def recalculate_course_grade(sender, course, course_structure, user, **kwargs): 
     Updates a saved course grade.
     """
     CourseGradeFactory().update(user, course, course_structure)
+
+
+def _emit_problem_submitted_event(kwargs):
+    """
+    Emits a problem submitted event only if
+    there is no current event transaction type,
+    i.e. we have not reached this point in the
+    code via a rescore or student state deletion.
+    """
+    root_type = get_event_transaction_type()
+
+    if not root_type:
+        root_id = get_event_transaction_id()
+        if not root_id:
+            root_id = create_new_event_transaction_id()
+        set_event_transaction_type(PROBLEM_SUBMITTED_EVENT_TYPE)
+        tracker.emit(
+            unicode(PROBLEM_SUBMITTED_EVENT_TYPE),
+            {
+                'user_id': unicode(kwargs['user_id']),
+                'course_id': unicode(kwargs['course_id']),
+                'problem_id': unicode(kwargs['usage_id']),
+                'event_transaction_id': unicode(root_id),
+                'event_transaction_type': unicode(PROBLEM_SUBMITTED_EVENT_TYPE),
+                'weighted_earned': kwargs.get('weighted_earned'),
+                'weighted_possible': kwargs.get('weighted_possible'),
+            }
+        )

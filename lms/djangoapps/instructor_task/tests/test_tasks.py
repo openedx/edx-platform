@@ -73,9 +73,13 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         """
         Calculate dummy values for parameters needed for instantiating xmodule instances.
         """
-        return {'xqueue_callback_url_prefix': 'dummy_value',
-                'request_info': {},
-                }
+        return {
+            'xqueue_callback_url_prefix': 'dummy_value',
+            'request_info': {
+                'username': 'dummy_username',
+                'user_id': 'dummy_id',
+            },
+        }
 
     def _run_task_with_mock_celery(self, task_class, entry_id, task_id, expected_failure_message=None):
         """Submit a task and mock how celery provides a current_task."""
@@ -263,7 +267,13 @@ class TestRescoreInstructorTask(TestInstructorTasks):
         self._create_students_with_state(num_students, input_state)
         task_entry = self._create_input_entry()
         mock_instance = Mock()
-        mock_instance.rescore_problem = Mock(return_value={'success': 'correct'})
+        mock_instance.rescore_problem = Mock(
+            return_value={
+                'success': 'correct',
+                'new_raw_earned': 1,
+                'new_raw_possible': 1,
+            }
+        )
         with patch('lms.djangoapps.instructor_task.tasks_helper.get_module_for_descriptor_internal') as mock_get_module:
             mock_get_module.return_value = mock_instance
             self._run_task_with_mock_celery(rescore_problem, task_entry.id, task_entry.task_id)
