@@ -210,6 +210,14 @@
       }
     }
   }
+
+  #progressive-profile {
+    @include float(right);
+    @include margin-left(flex-gutter());
+    margin-bottom: $baseline;
+    padding: 0;
+    width: flex-grid(3);
+  }
 }
 
 // CASE: empty dashboard
