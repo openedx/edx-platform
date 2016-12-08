@@ -5,6 +5,7 @@ from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
 from common.test.acceptance.tests.helpers import is_focused_on_element
+from common.test.acceptance.pages.common.utils import hover
 
 from common.test.acceptance.pages.lms.course_page import CoursePage
 
@@ -185,10 +186,14 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         return link_href[0] if link_href else None
 
     def get_response_vote_count(self, response_id):
+        vote_count_css = '.response_{} .discussion-response .action-vote'.format(response_id)
+        vote_count_element = self.browser.find_element_by_css_selector(vote_count_css)
+        # To get the vote count, one must hover over the element first.
+        hover(self.browser, vote_count_element)
         return self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
 
     def vote_response(self, response_id):
-        current_count = self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
+        current_count = self.get_response_vote_count(response_id)
         self._find_within(".response_{} .discussion-response .action-vote".format(response_id)).first.click()
         self.wait_for(
             lambda: current_count != self.get_response_vote_count(response_id),
