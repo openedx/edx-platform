@@ -20,7 +20,9 @@ from bulk_email.models import Optout, BulkEmailFlag
 from bulk_email.tasks import _get_source_address, _get_course_email_context
 from openedx.core.djangoapps.course_groups.models import CourseCohort
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
+from course_modes.models import CourseMode
 from courseware.tests.factories import StaffFactory, InstructorFactory
+from enrollment.api import update_enrollment
 from lms.djangoapps.instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment
@@ -238,6 +240,27 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
         self.assertEquals(len(mail.outbox), len(self.students) - 1)
         self.assertNotIn(self.students[-1].email, [e.to[0] for e in mail.outbox])
+
+    def test_send_to_track(self):
+        """
+        Make sure email sent to a registration track goes there.
+        """
+        CourseMode.objects.create(mode_slug='test', course_id=self.course.id)
+        for student in self.students:
+            update_enrollment(student, unicode(self.course.id), 'test')
+        test_email = {
+            'action': 'Send email',
+            'send_to': '["track:test"]',
+            'subject': 'test subject for test track',
+            'message': 'test message for test track',
+        }
+        response = self.client.post(self.send_mail_url, test_email)
+        self.assertEquals(json.loads(response.content), self.success_content)
+
+        self.assertItemsEqual(
+            [e.to[0] for e in mail.outbox],
+            [s.email for s in self.students]
+        )
 
     def test_send_to_all(self):
         """
