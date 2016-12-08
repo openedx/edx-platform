@@ -228,8 +228,6 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
                 data="<p>Test HTML Content %d<p>" % i
             )
 
-        bookmark_html = '<div class="bookmark-button-wrapper"'
-
         mock_user = UserFactory()
         mock_user.id = 100
 
@@ -247,8 +245,8 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
         )
 
         vertical_html = module.render(STUDENT_VIEW).content
-        self.assertIn(bookmark_html, vertical_html)
+        self.assertIn(self.BOOKMARK_HTML_ELEMENT, vertical_html)
 
         self.setup_user(admin=False, enroll=False, login=True)
         response = self.get_response(usage_id=unicode(self.vertical_block.location))
-        self.assertNotContains(response, bookmark_html)
+        self.assertNotContains(response, self.BOOKMARK_HTML_ELEMENT)
