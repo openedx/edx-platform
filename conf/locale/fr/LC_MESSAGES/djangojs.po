@@ -163,7 +163,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 16:36+0000\n"
+"POT-Creation-Date: 2016-12-01 16:14+0000\n"
 "PO-Revision-Date: 2016-11-22 16:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/open-edx/edx-platform/language/fr/)\n"
@@ -5174,6 +5174,10 @@ msgstr[1] "%(num_questions)s questions"
 msgid "Number of Students"
 msgstr "Nombre d'étudiants"
 
+#: lms/templates/courseware/progress_graph.js
+msgid "Overall Score"
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
@@ -8425,14 +8429,11 @@ msgstr ""
 " inscription."
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
 msgid ""
 "You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
+"you will need to have these by {date} to qualify to earn a Verified "
 "Certificate."
 msgstr ""
-"Vous pouvez payer maintenant même si vous n'avez pas les élements suivants, "
-"mais vous en aurez besoin avant le %(date)s pour un Certificat vérifié."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8516,10 +8517,8 @@ msgid "Verified Certificate for {courseName}"
 msgstr "Certificat vérifié pour {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
 msgid ""
-"To receive a certificate, you must also verify your identity before "
-"%(date)s."
+"To receive a certificate, you must also verify your identity before {date}."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore

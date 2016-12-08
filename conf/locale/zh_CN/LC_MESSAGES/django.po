@@ -346,7 +346,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 16:37+0000\n"
+"POT-Creation-Date: 2016-12-01 16:15+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -4598,9 +4598,9 @@ msgstr "招聘"
 msgid "Donate"
 msgstr "捐助"
 
-#: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "网站导航"
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "多媒体工具箱"
 
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
@@ -4621,6 +4621,10 @@ msgstr "隐私政策"
 #: lms/djangoapps/branding/api.py
 msgid "Accessibility Policy"
 msgstr "可访问策略"
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "网站导航"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
@@ -13054,6 +13058,10 @@ msgid "due {date}"
 msgstr "截止日期{date}"
 
 #: lms/templates/courseware/accordion.html
+msgid "{section_format} due {{date}}"
+msgstr ""
+
+#: lms/templates/courseware/accordion.html
 msgid "This content is graded"
 msgstr "该内容计入总分。"
 
@@ -13201,10 +13209,6 @@ msgstr ""
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "课程资料"
-
-#: lms/templates/courseware/course_updates.html
-msgid "All course updates"
-msgstr ""
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -13371,12 +13375,9 @@ msgstr "{student_name}，您已失去获得该课程学分的资格。"
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"{student_name}, you have met the requirements for credit in this course."
-msgstr "{student_name}，您已经达到本课程学分要求。"
-
-#: lms/templates/courseware/progress.html
-msgid "{a_start}Go to your dashboard{a_end} to purchase course credit."
-msgstr "{a_start}去您的课程面板{a_end} 支付这门课程的学分费用。"
+"{student_name}, you have met the requirements for credit in this course. "
+"{a_start}Go to your dashboard{a_end} to purchase course credit."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -17107,10 +17108,6 @@ msgstr "常见问题"
 msgid "Jobs"
 msgstr "招才纳贤"
 
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "多媒体工具箱"
-
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 msgid "In the Press"
@@ -17311,9 +17308,9 @@ msgstr "升级截止日期已过"
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The verification deadline for {course_name} was {date}. Verification is no "
-"longer available."
-msgstr "{course_name}的认证期限是{date}，认证功能已不可用。"
+"The verification deadline for {course_name} was {{date}}. Verification is no"
+" longer available."
+msgstr ""
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""

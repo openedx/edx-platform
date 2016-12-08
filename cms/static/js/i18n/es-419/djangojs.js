@@ -45,6 +45,10 @@
       "%(memberCount)s / %(maxMemberCount)s Miembros"
     ], 
     "%(new_item_message)s": "%(new_item_message)s", 
+    "%(num_points)s point possible (graded)": [
+      "%(num_points)s punto posible (calificado)", 
+      "%(num_points)s puntos posibles (calificado)"
+    ], 
     "%(num_questions)s question": [
       "%(num_questions)s pregunta", 
       "%(num_questions)s preguntas"
@@ -407,6 +411,7 @@
     "Could not find a user with username or email address '<%- identifier %>'.": "No se encontr\u00f3 ning\u00fan usuario con nombre de usuario o direcci\u00f3n  '<%- identifier %>'.", 
     "Could not find the specified string.": "No se encontr\u00f3 la cadena especificada.", 
     "Could not find users associated with the following identifiers:": "No se puede encontrar el usuario asociado al siguiente identificador:", 
+    "Could not grade your answer. The submission was aborted.": "No se ha podido calificar su respuesta. El registro fue cancelado.", 
     "Could not parse certificate JSON. %(message)s": "No fue posible leer el archivo JSON del certificado. %(message)s", 
     "Could not retrieve payment information": "No se pudo conseguir la informaci\u00f3n del pago", 
     "Could not submit order": "No se pudo publicar su petici\u00f3n", 
@@ -1518,7 +1523,6 @@
     "To be sure all students can access the video, we recommend providing both an .mp4 and a .webm version of your video. Click below to add a URL for another version. These URLs cannot be YouTube URLs. The first listed video that's compatible with the student's computer will play.": "Para asegurar que todos los estudiantes puedan ver el video, recomendamos suministrar tanto una versi\u00f3n .mp4 como una versi\u00f3n .webm del recurso. Haga clic a continuaci\u00f3n para a\u00f1adir la URL de una nueva versi\u00f3n. Estas URLs no pueden ser de Youtube. El primer video listado que sea compatible con la terminal del usuario ser\u00e1 el que se reproducir\u00e1.", 
     "To finalize course credit, %(display_name)s requires %(platform_name)s learners to submit a credit request.": "Para finalizar un cr\u00e9dito de curso, %(display_name)s requieres %(platform_name)s profesores para postular una solicitud de cr\u00e9dito.", 
     "To invalidate a certificate for a particular learner, add the username or email address below.": "Para invalidar el certificado de un estudiante particular, a\u00f1ada el nombre de usuario o correo electr\u00f3nico a continuaci\u00f3n.", 
-    "To receive a certificate, you must also verify your identity before %(date)s.": "Para recibir un certificado, tambi\u00e9n debe verificar su identidad antes del %(date)s.", 
     "To receive a certificate, you must also verify your identity.": "Para recibir un certificado, tambi\u00e9n debe verificar su identidad.", 
     "To review student cohort assignments or see the results of uploading a CSV file, download course profile information or cohort results on the {link_start}Data Download{link_end} page.": "Para revisar las asignaciones de estudiantes a cohortes o ver los resultados de cargar un archivo CSV, descargue la informaci\u00f3n del perfil del curso o los resultados de cohortes en {link_start}la p\u00e1gina para descarga de datos{link_end}.", 
     "To share your certificate on Mozilla Backpack, you must first have a Backpack account. Complete the following steps to add your certificate to Backpack.": "Para compartir tu certificado en Mozilla Backpack, debes tener una cuenta de Backpack primero. Completa los siguientes pasos para agregar tu certificado a Backpack.", 
@@ -1742,7 +1746,6 @@
     "You are upgrading your enrollment for: {courseName}": "Est\u00e1s cambiando a la modalidad verificada para: {courseName}", 
     "You can link your social media accounts to simplify signing in to {platform_name}.": "Puede vincular sus cuentas de redes sociales para simplificar el proceso de iniciar sesi\u00f3n en {platform_name}.", 
     "You can now enter your payment information and complete your enrollment.": "Ahora puede agregar su informaci\u00f3n de pago, y completar su inscripci\u00f3n", 
-    "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate.": "Puede pagar ahora, incluso si no tiene los siguientes items disponibles, pero deber\u00e1 tenerlos antes del %(date)s para calificar para un Certificado Verificado.", 
     "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate.": "Puede pagar ahora, incluso si no tiene los siguientes items disponibles, pero deber\u00e1 tenerlos para calificar para un Certificado Verificado.", 
     "You can remove members from this team, especially if they have not participated in the team's activity.": "Puede remover miembros de este equipo, especialmente si no han participado en la actividad del equipo.", 
     "You can use your {accountName} account to sign in to your {platformName} account.": "Puede utilizar su cuenta de {accountName} para iniciar sesi\u00f3n en su cuenta de {platformName}.", 
