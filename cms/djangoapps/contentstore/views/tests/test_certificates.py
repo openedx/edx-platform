@@ -812,28 +812,6 @@ class CertificatesDetailHandlerTestCase(
         )
         self.assertEquals(response.status_code, 403)
 
-    @ddt.data(*itertools.product([True, False], [C4X_SIGNATORY_PATH, SIGNATORY_PATH]))
-    @ddt.unpack
-    def test_certificate_activation_without_global_staff_permissions(self, activate, signatory_path):
-        """
-        Tests certificate Activate and Deactivate should not be allowed if user
-        does not have global staff permissions on course.
-        """
-        test_url = reverse_course_url('certificates.certificate_activation_handler', self.course.id)
-        self._add_course_certificates(count=1, signatory_count=2, asset_path_format=signatory_path)
-        user = UserFactory()
-        for role in [CourseInstructorRole, CourseStaffRole]:
-            role(self.course.id).add_users(user)
-        self.client.login(username=user.username, password='test')
-        response = self.client.post(
-            test_url,
-            data=json.dumps({"is_active": activate}),
-            content_type="application/json",
-            HTTP_ACCEPT="application/json",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
-        )
-        self.assertEquals(response.status_code, 403)
-
     @ddt.data(C4X_SIGNATORY_PATH, SIGNATORY_PATH)
     def test_certificate_activation_failure(self, signatory_path):
         """
