@@ -159,6 +159,10 @@ from openedx.core.djangolib.markup import HTML, Text
         progressive profile goes here
       </div>
 
+      <%static:require_module module_name="common/js/vendor/progressive-profiles" class_name="asdf">
+        DashboardSearchFactory();
+      </%static:require_module>
+
       <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
         <header class="profile">
           <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
