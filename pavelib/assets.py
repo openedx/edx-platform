@@ -587,7 +587,7 @@ def _compile_sass(system, theme, debug, force, timing_info):
             timing_info.append((sass_source_dir, css_dir, duration))
     return True
 
-
+@task
 def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
