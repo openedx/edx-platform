@@ -2010,7 +2010,7 @@ class TestRenderVerticalXBlock(ModuleStoreTestCase):
 
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
-    def get_response(self, url_encoded_params=None, usage_id=None):
+    def get_response(self):
         """ Returns the HTML for the page with vertical block"""
 
         self.assertTrue(self.client.login(username=self.user.username, password='test'))
