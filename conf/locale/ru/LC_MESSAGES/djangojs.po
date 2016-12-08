@@ -126,7 +126,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 16:36+0000\n"
+"POT-Creation-Date: 2016-12-01 16:14+0000\n"
 "PO-Revision-Date: 2016-11-22 16:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -5140,6 +5140,10 @@ msgstr[3] "%(num_questions)s вопросов"
 msgid "Number of Students"
 msgstr "Количество слушателей"
 
+#: lms/templates/courseware/progress_graph.js
+msgid "Overall Score"
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
@@ -8435,15 +8439,11 @@ msgid ""
 msgstr "Теперь вы можете ввести информацию о платеже и завершить регистрацию."
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
 msgid ""
 "You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
+"you will need to have these by {date} to qualify to earn a Verified "
 "Certificate."
 msgstr ""
-"Вы можете оплатить сейчас, даже если вы не закончили все шаги. Но вы должны "
-"будете их завершить не позднее %(date)s , чтобы получить подтверждённый "
-"сертификат."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8534,13 +8534,9 @@ msgid "Verified Certificate for {courseName}"
 msgstr "Подтверждённый сертификат {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
 msgid ""
-"To receive a certificate, you must also verify your identity before "
-"%(date)s."
+"To receive a certificate, you must also verify your identity before {date}."
 msgstr ""
-"Чтобы получить сертификат, вы должны подтвердить свою личность в срок до "
-"%(date)s."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."

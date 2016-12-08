@@ -118,7 +118,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 16:36+0000\n"
+"POT-Creation-Date: 2016-12-01 16:14+0000\n"
 "PO-Revision-Date: 2016-11-22 16:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
@@ -385,8 +385,8 @@ msgstr "Responder a la anotación"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "%(num_points)s point possible (graded)"
 msgid_plural "%(num_points)s points possible (graded)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(num_points)s punto posible (calificado)"
+msgstr[1] "%(num_points)s puntos posibles (calificado)"
 
 #. Translators: %(num_points)s is the number of points possible (examples: 1,
 #. 3, 10).;
@@ -424,7 +424,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Could not grade your answer. The submission was aborted."
-msgstr ""
+msgstr "No se ha podido calificar su respuesta. El registro fue cancelado."
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid ""
@@ -5103,6 +5103,10 @@ msgstr[1] "%(num_questions)s preguntas"
 msgid "Number of Students"
 msgstr "Número de estudiantes"
 
+#: lms/templates/courseware/progress_graph.js
+msgid "Overall Score"
+msgstr ""
+
 #: cms/static/cms/js/main.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
@@ -8411,15 +8415,11 @@ msgstr ""
 "Ahora puede agregar su información de pago, y completar su inscripción"
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#, python-format
 msgid ""
 "You can pay now even if you don't have the following items available, but "
-"you will need to have these by %(date)s to qualify to earn a Verified "
+"you will need to have these by {date} to qualify to earn a Verified "
 "Certificate."
 msgstr ""
-"Puede pagar ahora, incluso si no tiene los siguientes items disponibles, "
-"pero deberá tenerlos antes del %(date)s para calificar para un Certificado "
-"Verificado."
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
@@ -8508,13 +8508,9 @@ msgid "Verified Certificate for {courseName}"
 msgstr "Certificado Verificado para {courseName}"
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
-#, python-format
 msgid ""
-"To receive a certificate, you must also verify your identity before "
-"%(date)s."
+"To receive a certificate, you must also verify your identity before {date}."
 msgstr ""
-"Para recibir un certificado, también debe verificar su identidad antes del "
-"%(date)s."
 
 #: lms/templates/verify_student/make_payment_step_ab_testing.underscore
 msgid "To receive a certificate, you must also verify your identity."
