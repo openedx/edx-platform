@@ -696,7 +696,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
 
         In order to verify that the behavior of the grade report is correct, we submit answers for problems
         that the student won't have access to. A/B tests won't restrict access to the problems, but it should
-        not show up in that student's course tree when generating the grade report, hence the Not Accessible's
+        not show up in that student's course tree when generating the grade report, hence the Not Available's
         in the grade report.
         """
         # student A will get 100%, student B will get 50% because
@@ -726,7 +726,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                     unicode(self.student_a.id),
                     self.student_a.email,
                     self.student_a.username,
-                    u'1.0', u'2.0', u'2.0', u'Not Accessible', u'Not Accessible'
+                    u'1.0', u'2.0', u'2.0', u'Not Available', u'Not Available'
                 ]
             )),
             dict(zip(
@@ -734,7 +734,7 @@ class TestProblemReportSplitTestContent(TestReportMixin, TestConditionalContent,
                 [
                     unicode(self.student_b.id),
                     self.student_b.email,
-                    self.student_b.username, u'0.5', u'Not Accessible', u'Not Accessible', u'1.0', u'2.0'
+                    self.student_b.username, u'0.5', u'Not Available', u'Not Available', u'1.0', u'2.0'
                 ]
             ))
         ])
@@ -869,19 +869,19 @@ class TestProblemReportCohortedContent(TestReportMixin, ContentGroupTestCase, In
         user_grades = [
             {
                 'user': self.staff_user,
-                'grade': [u'0.0', u'Not Accessible', u'Not Accessible', u'Not Accessible', u'Not Accessible'],
+                'grade': [u'0.0', u'Not Available', u'Not Available', u'Not Available', u'Not Available'],
             },
             {
                 'user': self.alpha_user,
-                'grade': [u'1.0', u'2.0', u'2.0', u'Not Accessible', u'Not Accessible'],
+                'grade': [u'1.0', u'2.0', u'2.0', u'Not Available', u'Not Available'],
             },
             {
                 'user': self.beta_user,
-                'grade': [u'0.5', u'Not Accessible', u'Not Accessible', u'1.0', u'2.0'],
+                'grade': [u'0.5', u'Not Available', u'Not Available', u'1.0', u'2.0'],
             },
             {
                 'user': self.non_cohorted_user,
-                'grade': [u'0.0', u'Not Accessible', u'Not Accessible', u'Not Accessible', u'Not Accessible'],
+                'grade': [u'0.0', u'Not Available', u'Not Available', u'Not Available', u'Not Available'],
             },
         ]
 
@@ -1581,9 +1581,9 @@ class TestGradeReport(TestReportMixin, InstructorTaskModuleTestCase):
                         u'Username': self.student.username,
                         u'Grade': '0.13',
                         u'Homework 1: Subsection': '0.5',
-                        u'Homework 2: Hidden': u'Not Accessible',
+                        u'Homework 2: Hidden': u'Not Available',
                         u'Homework 3: Unattempted': u'Not Attempted',
-                        u'Homework 4: Empty': u'Not Accessible',
+                        u'Homework 4: Empty': u'Not Available',
                         u'Homework (Avg)': '0.125',
                     },
                 ],

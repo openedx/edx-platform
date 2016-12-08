@@ -646,7 +646,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestConditionalContent,
                     {
                         self.student_b: {
                             u'Grade': '0.0',
-                            u'Homework': u'Not Accessible',
+                            u'Homework': u'Not Available',
                         }
                     },
                 ],
