@@ -155,13 +155,11 @@ from openedx.core.djangolib.markup import HTML, Text
         <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
       % endif
 
-      <div id="progressive-profile">
-        progressive profile goes here
-      </div>
+      <div id="progressive-profile"></div>
 
-      <%static:require_module module_name="common/js/vendor/progressive-profiles" class_name="asdf">
-        DashboardSearchFactory();
-      </%static:require_module>
+      <%static:require_module_async module_name="common/js/vendor/progressive-profiles" class_name="a">
+        new ProgressiveProfile.default('progressive-profile');
+      </%static:require_module_async>
 
       <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
         <header class="profile">
