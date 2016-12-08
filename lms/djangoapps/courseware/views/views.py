@@ -428,8 +428,7 @@ def content_tab(request, course_id, tab_type):
     course = get_course_with_access(request.user, 'load', course_key)
 
     content_tab = [tab for tab in course.tabs if tab.type == tab_type][0]
-    # content_tab = CourseTabPluginManager.get_plugin(tab_type)
-    fragment = content_tab.render_fragment(request)
+    fragment = content_tab.render_fragment(request, course)
 
 
     return render_to_response('courseware/static_tab.html', {

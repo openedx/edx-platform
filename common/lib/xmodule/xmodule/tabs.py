@@ -254,9 +254,9 @@ class ComponentTabMixin(object):
     def url_slug(self):
         return "content_tab/"+self.type
 
-    def render_fragment(self, request):
+    def render_fragment(self, request, course):
         component = get_storage_class(self.class_name)()
-        fragment = component.render_component(request)
+        fragment = component.render_component(request, course_id=course.id.to_deprecated_string())
         return fragment
 
 

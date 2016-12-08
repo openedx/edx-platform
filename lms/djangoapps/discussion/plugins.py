@@ -20,7 +20,7 @@ class DiscussionTab(ComponentTabMixin, EnrolledTab):
     type = 'discussion'
     title = ugettext_noop('Discussion')
     priority = None
-    class_name = 'discussion.plugins.DiscussionComponentView'
+    class_name = 'discussion.views.DiscussionBoardComponentView'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
     is_default = False
 
@@ -30,12 +30,12 @@ class DiscussionTab(ComponentTabMixin, EnrolledTab):
             return False
         return utils.is_discussion_enabled(course.id)
 
-
-class DiscussionComponentView(ComponentView):
-
-    def render_component(request, *args, **kwargs):
-        """
-        """
-        fragment = Fragment()
-        fragment.content = "Hello World"
-        return fragment
+#
+# class DiscussionComponentView(ComponentView):
+#
+#     def render_component(request, *args, **kwargs):
+#         """
+#         """
+#         fragment = Fragment()
+#         fragment.content = "Hello World"
+#         return fragment
