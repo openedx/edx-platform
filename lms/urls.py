@@ -684,6 +684,17 @@ if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
             name='resubscribe_forum_update',
         ),
     )
+
+urlpatterns += (
+    url(
+        r'^courses/{}/tab/(?P<tab_type>[^/]+)/$'.format(
+            settings.COURSE_ID_PATTERN,
+        ),
+        'courseware.views.views.content_tab',
+        name='content_tab',
+    ),
+)
+
 urlpatterns += (
     # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
     url(
