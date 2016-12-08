@@ -36,7 +36,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
 from lms.djangoapps.instructor.views.api import require_global_staff
 
-from xblock.fragment import Fragment
+# from xblock.fragment import Fragment
 import shoppingcart
 import survey.utils
 import survey.views
@@ -81,7 +81,6 @@ from openedx.core.djangoapps.credit.api import (
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import UserTestGroup, CourseEnrollment
 from student.roles import GlobalStaff
 from util.cache import cache, cache_if_anonymous
@@ -98,6 +97,8 @@ from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from ..entrance_exams import user_must_complete_entrance_exam
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
 
+from django_component_views.component_views import ComponentView
+from django_component_views.fragment import Fragment
 
 log = logging.getLogger("edx.courseware")
 
@@ -412,6 +413,8 @@ def static_tab(request, course_id, tab_slug):
         'active_page': 'static_tab_{0}'.format(tab['url_slug']),
         'tab': tab,
         'fragment': fragment,
+        'uses_pattern_library': False,
+        'disable_courseware_js': True
     })
 
 
@@ -433,27 +436,13 @@ def content_tab(request, course_id, tab_type):
 
     return render_to_response('courseware/static_tab.html', {
         'course': course,
-        'active_page': 'discussion',
+        'active_page': content_tab['type'],
         'tab': content_tab,
         'fragment': fragment,
+        'uses_pattern_library': True,
+        'disable_courseware_js': True
     })
 
-
-    # tab = CourseTabList.get_tab_by_slug(course.tabs, tab_slug)
-    # if tab is None:
-    #     raise Http404
-    #
-    # fragment = get_static_tab_fragment(
-    #     request,
-    #     course,
-    #     tab
-    # )
-    #
-    # return render_to_response('courseware/static_tab.html', {
-    #     'course': course,
-    #     'tab': tab,
-    #     'fragment': fragment,
-    # })
 
 @ensure_csrf_cookie
 @ensure_valid_course_key
@@ -700,6 +689,65 @@ def course_about(request, course_id):
         inject_coursetalk_keys_into_context(context, course_key)
 
         return render_to_response('courseware/course_about.html', context)
+
+
+class ProgressComponentView(ComponentView):
+    """
+    Component implementation of the discussion board.
+    """
+    def render_component(self, request, course_id=None):
+        """
+        Render the component
+        """
+        # nr_transaction = newrelic.agent.current_transaction()
+        #
+        course_key = CourseKey.from_string(course_id)
+        context = _create_progress_context(request, course_key)
+        html = render_to_string('discussion/discussion_board_component.html', context)
+        # # inline_js = render_to_string('discussion/discussion_board_js.template', context)
+        #
+        # fragment = Fragment(html)
+        # # fragment.add_javascript(inline_js)
+        fragment = Fragment()
+        fragment.content = "Hello World"
+        return fragment
+
+
+def _create_progress_context(request, course_key):
+    course = get_course_with_access(request.user, 'load', course_key, depth=None, check_if_enrolled=True)
+    prep_course_for_grading(course, request)
+    staff_access = bool(has_access(request.user, 'staff', course))
+    student = request.user
+
+    # NOTE: To make sure impersonation by instructor works, use
+    # student instead of request.user in the rest of the function.
+
+    # The pre-fetching of groups is done to make auth checks not require an
+    # additional DB lookup (this kills the Progress page in particular).
+    student = User.objects.prefetch_related("groups").get(id=student.id)
+
+    course_grade = CourseGradeFactory().create(student, course)
+    courseware_summary = course_grade.chapter_grades
+    grade_summary = course_grade.summary
+
+    studio_url = get_studio_url(course, 'settings/grading')
+
+    # checking certificate generation configuration
+    enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(student, course_key)
+
+    context = {
+        'course': course,
+        'courseware_summary': courseware_summary,
+        'studio_url': studio_url,
+        'grade_summary': grade_summary,
+        'staff_access': staff_access,
+        'student': student,
+        'passed': is_course_passed(course, grade_summary),
+        'credit_course_requirements': _credit_course_requirements(course_key, student),
+        'certificate_data': _get_cert_data(student, course, course_key, is_active, enrollment_mode)
+    }
+
+    return context
 
 
 @transaction.non_atomic_requests
