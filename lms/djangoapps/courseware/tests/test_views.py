@@ -1996,13 +1996,17 @@ class TestRenderVerticalXBlock(ModuleStoreTestCase):
 
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
-                parent_location=self.course.location, category='chapter', display_name="Chapter")
+                parent_location=self.course.location, category='chapter', display_name="Chapter"
+        )
         self.section = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
-                parent_location=self.chapter.location, category='sequential', display_name="Sequence")
+                parent_location=self.chapter.location, category='sequential', display_name="Sequence"
+        )
         self.vertical = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
-                parent_location=self.section.location, category='vertical', display_name="Vertical")
+                parent_location=self.section.location, category='vertical', display_name="Vertical"
+        )
         self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
-            parent_location=self.vertical.location, category='html', data="Test HTML Content")
+            parent_location=self.vertical.location, category='html', data="Test HTML Content"
+        )
 
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
 
