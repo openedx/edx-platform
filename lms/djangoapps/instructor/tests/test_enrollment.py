@@ -534,6 +534,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         )
         cls.request = get_mock_request(UserFactory())
         cls.user = cls.request.user
+        cls.instructor = UserFactory(username='staff', is_staff=True)
 
     def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):
         """
@@ -557,13 +558,12 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         self._get_subsection_grade_and_verify(0, 1, 0, 1)
         answer_problem(course=self.course, request=self.request, problem=self.problem, score=1, max_value=1)
         self._get_subsection_grade_and_verify(1, 1, 1, 1)
-
         # Delete student state using the instructor dash
         reset_student_attempts(
             self.course.id,
             self.user,
             problem_location,
-            requesting_user=self.user,
+            requesting_user=self.instructor,
             delete_module=True,
         )
         # Verify that the student's grades are reset
