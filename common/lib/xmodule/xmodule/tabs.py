@@ -7,6 +7,8 @@ import logging
 from xblock.fields import List
 from openedx.core.lib.api.plugins import PluginError
 
+from django.core.files.storage import get_storage_class
+
 log = logging.getLogger("edx.courseware")
 
 # Make '_' a no-op so we can scrape strings. Using lambda instead of
@@ -71,10 +73,14 @@ class CourseTab(object):
 
         self.name = tab_dict.get('name', self.title)
         self.tab_id = tab_dict.get('tab_id', getattr(self, 'tab_id', self.type))
-        self.link_func = tab_dict.get('link_func', link_reverse_func(self.view_name))
         self.course_staff_only = tab_dict.get('course_staff_only', False)
-
         self.is_hidden = tab_dict.get('is_hidden', False)
+
+        self.tab_dict = tab_dict
+
+    @property
+    def link_func(self):
+        return self.tab_dict.get('link_func', link_reverse_func(self.view_name))
 
     @classmethod
     def is_enabled(cls, course, user=None):
@@ -228,6 +234,30 @@ class CourseTab(object):
 
         tab_type.validate(tab_dict)
         return tab_type(tab_dict=tab_dict)
+
+
+class ComponentTabMixin(object):
+    """
+    A mixin for tabs that meet the component API (and can be rendered via Fragments).
+    """
+    class_name = None
+
+    @property
+    def link_func(self):
+        def link_func(course, reverse_func):
+            """ Returns a url for a given course and reverse function. """
+            return reverse_func("content_tab", args=[course.id.to_deprecated_string(), self.type])
+
+        return link_func
+
+    @property
+    def url_slug(self):
+        return "content_tab/"+self.type
+
+    def render_fragment(self, request):
+        component = get_storage_class(self.class_name)()
+        fragment = component.render_component(request)
+        return fragment
 
 
 class StaticTab(CourseTab):
