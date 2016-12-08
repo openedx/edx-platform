@@ -48,6 +48,7 @@ from certificates.models import (
 )
 from certificates import api as certs_api
 from bulk_email.models import BulkEmailFlag
+from verified_track_content.models import VerifiedTrackCohortedCourse
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url
@@ -633,6 +634,9 @@ def _section_send_email(course, access):
     cohorts = []
     if is_course_cohorted(course_key):
         cohorts = get_course_cohorts(course)
+    course_modes = []
+    if not VerifiedTrackCohortedCourse.is_verified_track_cohort_enabled(course_key):
+        course_modes = CourseMode.modes_for_course(course_key)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
@@ -641,6 +645,7 @@ def _section_send_email(course, access):
         'send_email': reverse('send_email', kwargs={'course_id': unicode(course_key)}),
         'editor': email_editor,
         'cohorts': cohorts,
+        'course_modes': course_modes,
         'default_cohort_name': DEFAULT_COHORT_NAME,
         'list_instructor_tasks_url': reverse(
             'list_instructor_tasks', kwargs={'course_id': unicode(course_key)}

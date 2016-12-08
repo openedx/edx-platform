@@ -188,7 +188,7 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True):
     """
     if mode is None:
         mode = _default_course_mode(course_id)
-    _validate_course_mode(course_id, mode, is_active=is_active)
+    validate_course_mode(course_id, mode, is_active=is_active)
     return _data_api().create_course_enrollment(user_id, course_id, mode, is_active)
 
 
@@ -247,7 +247,7 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
         mode=mode,
     ))
     if mode is not None:
-        _validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
+        validate_course_mode(course_id, mode, is_active=is_active, include_expired=include_expired)
     enrollment = _data_api().update_course_enrollment(user_id, course_id, mode=mode, is_active=is_active)
     if enrollment is None:
         msg = u"Course Enrollment not found for user {user} in course {course}".format(user=user_id, course=course_id)
@@ -403,7 +403,7 @@ def _default_course_mode(course_id):
     return CourseMode.DEFAULT_MODE_SLUG
 
 
-def _validate_course_mode(course_id, mode, is_active=None, include_expired=False):
+def validate_course_mode(course_id, mode, is_active=None, include_expired=False):
     """Checks to see if the specified course mode is valid for the course.
 
     If the requested course mode is not available for the course, raise an error with corresponding
