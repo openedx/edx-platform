@@ -889,3 +889,11 @@ AFFILIATE_COOKIE_NAME = ENV_TOKENS.get('AFFILIATE_COOKIE_NAME', AFFILIATE_COOKIE
 ############## Settings for LMS Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = ENV_TOKENS.get('DOC_LINK_BASE_URL', DOC_LINK_BASE_URL)
+
+############## Settings for LMS Home Page Course Cards ##############
+
+FEATURES['ENABLE_COURSE_DISCOVERY'] = FEATURES.get('ENABLE_COURSE_DISCOVERY', True)
+# Setting for overriding default filtering facets for Course discovery
+# COURSE_DISCOVERY_FILTERS = ["org", "language", "modes"]
+FEATURES['COURSES_ARE_BROWSEABLE'] = FEATURES.get('COURSES_ARE_BROWSEABLE', True)
+HOMEPAGE_COURSE_MAX = ENV_TOKENS.get('HOMEPAGE_COURSE_MAX', 9)
