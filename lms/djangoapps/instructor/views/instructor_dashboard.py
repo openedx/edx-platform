@@ -11,9 +11,10 @@ import uuid
 import pytz
 
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import get_storage_class
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
-from django.utils.translation import ugettext as _, ugettext_noop
+from django.utils.translation import ugettext as _, ugettext_noop, get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
@@ -54,13 +55,15 @@ from bulk_email.models import BulkEmailFlag
 from django_component_views.fragment import Fragment
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from component_views import LmsComponentView
 
 from openedx.core.djangolib.markup import HTML, Text
+
+from ..instructor_features import InstructorFeature, InstructorFeaturesPluginManager
+from .tools import get_units_with_due_date, title_or_url
 
 log = logging.getLogger(__name__)
 
@@ -709,53 +712,163 @@ class InstructorDashboardComponentView(LmsComponentView):
 
         # course_key = CourseKey.from_string(course_id)
         # context = _create_discussion_board_context(request, course_key, nr_transaction)
+        feature_type = request.GET.get('feature', None)
+        features = InstructorFeaturesPluginManager.get_instructor_features()
+        if feature_type:
+            feature = next(feature for feature in features if feature.type == feature_type)
+            component_name = feature.component_name
+            if component_name:
+                component = get_storage_class(component_name)()
+                return component.render_component(request, course_id=course_id)
+            else:
+                return Fragment(u'<p>Feature ' + feature.title + ' coming soon!</p>')
+        else:
+            context = {
+                'course_id': course_id,
+                'features': features,
+            }
+            html = render_to_string('instructor/instructor_dashboard_component.html', context)
+            # inline_js = render_to_string('discussion/discussion_board_js.template', context)
+
+            fragment = Fragment(html)
+            self.add_resource_urls(fragment)
+            # fragment.add_javascript(inline_js)
+            return fragment
+
+
+class CourseInfoComponentView(LmsComponentView):
+    """
+    """
+    def render_component(self, request, course_id=None):
+        """
+        Render the component
+        """
+        # nr_transaction = newrelic.agent.current_transaction()
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            log.error(u"Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
+            return HttpResponseServerError()
+
+        course = get_course_by_id(course_key, depth=0)
         context = {
-
+            'course': course,
+            'course_id': course_id,
         }
-        html = render_to_string('instructor/instructor_dashboard_component.html', context)
-        # inline_js = render_to_string('discussion/discussion_board_js.template', context)
-
+        html = render_to_string('instructor/course_info_component.html', context)
         fragment = Fragment(html)
-        # self.add_resource_urls(fragment)
+        self.add_resource_urls(fragment)
         # fragment.add_javascript(inline_js)
         return fragment
 
-    def vendor_js_dependencies(self):
-        """
-        Returns list of vendor JS files that this XBlock depends on.
 
-        The helper function that it uses to obtain the list of vendor JS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        dependencies = Set()
-        # TODO: how can we get the base dependencies when not rendered within a page?
-        # dependencies.update(self.get_js_dependencies('base_vendor'))
-        # dependencies.update(self.get_js_dependencies('base_application'))
-        dependencies.update(self.get_js_dependencies('discussion_vendor'))
-        return list(dependencies)
+class CourseInfoInstructorFeature(InstructorFeature):
+    """
 
-    def js_dependencies(self):
-        """
-        Returns list of JS files that this XBlock depends on.
-
-        The helper function that it uses to obtain the list of JS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        return self.get_js_dependencies('discussion')
+    """
+    type = 'course-info'
+    category = 'general'
+    component_name = 'lms.djangoapps.instructor.views.instructor_dashboard.CourseInfoComponentView'
+    title = ugettext_noop('Course Info')
+    description = _("Basic course information")
+    icon_class = 'fa-info'
 
 
-    def css_dependencies(self):
-        """
-        Returns list of CSS files that this XBlock depends on.
+class CourseMembershipInstructorFeature(InstructorFeature):
+    """
 
-        The helper function that it uses to obtain the list of CSS files
-        works in conjunction with the Django pipeline to ensure that in development mode
-        the files are loaded individually, but in production just the single bundle is loaded.
-        """
-        if get_language_bidi():
-            return self.get_css_dependencies('style-discussion-main-rtl')
-        else:
-            return self.get_css_dependencies('style-discussion-main')
+    """
+    type = 'membership'
+    category = 'student'
+    title = ugettext_noop('Membership')
+    description = _("Course membership")
+    icon_class = 'fa-users'
 
+
+class CourseCohortsInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'cohorts'
+    category = 'student'
+    title = ugettext_noop('Cohorts')
+    description = _("Manage course cohorts")
+    icon_class = 'fa-users'
+
+
+class CourseDiscussionInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'discussion'
+    category = 'general'
+    component_name = 'discussion.views.DiscussionBoardComponentView'
+    title = ugettext_noop('Discussion')
+    description = _("Forum administration")
+    icon_class = 'fa-comments'
+
+
+class CourseProctoringInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'proctoring'
+    category = 'student'
+    title = ugettext_noop('Proctoring')
+    description = _("Proctoring administration")
+    icon_class = 'fa-university'
+
+
+class CourseGradingInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'grading'
+    category = 'student'
+    title = ugettext_noop('Grading')
+    description = _("Student administration")
+    icon_class = 'fa-check-square'
+
+
+class CourseDataDownloadInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'data-download'
+    category = 'analytics'
+    title = ugettext_noop('Data Download')
+    description = _("Reports and downloads")
+    icon_class = 'fa-download'
+
+
+class CourseAnalyticsInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'analytics'
+    category = 'analytics'
+    title = ugettext_noop('Analytics')
+    description = _("Course analytics")
+    icon_class = 'fa-line-chart'
+
+
+class CourseEmailInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'email'
+    category = 'general'
+    title = ugettext_noop('Email')
+    description = _("Send emails to course members")
+    icon_class = 'fa-envelope'
+
+
+class CourseCertificatesInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'certificates'
+    category = 'student'
+    title = ugettext_noop('Certificates')
+    description = _("General certificates for learners")
+    icon_class = 'fa-certificate'

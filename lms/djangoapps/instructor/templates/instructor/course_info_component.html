@@ -1,0 +1,47 @@
+## mako
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+import json
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from django.core.urlresolvers import reverse
+
+from django_comment_client.permissions import has_permission
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+
+index = 0
+%>
+
+<section class="instructor-dashboard container">
+    <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <div class="sr-is-focusable" tabindex="-1"></div>
+            <h2 class="hd hd-2 page-title"><a href="./">${_("Instructor Dashboard")}</a> &gt; Course Info</h2>
+        </div>
+        <div class="page-header-secondary">
+            <div class="form-actions">
+                <div class="page-header-search">
+                    <form class="search-form" role="search">
+                        <label class="field-label sr-only" for="search" id="search-hint">Search all the things</label>
+                        <input
+                                class="field-input input-text search-input"
+                                type="search"
+                                name="search"
+                                id="search"
+                                placeholder="Search"
+                        />
+                        <button class="btn-brand btn-small search-btn" type="button">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="page-content">
+        <h2>Basic Course Information</h2>
+        <p>Name: <b>${course.display_name}</b></p>
+        <p>Course ID: <b>${course.id}</b></p>
+    </div>
+</section>

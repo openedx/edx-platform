@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name="Open edX",
-    version="0.6",
+    version="0.7",
     install_requires=["setuptools"],
     requires=[],
     # NOTE: These are not the names we should be installing.  This tree should
@@ -53,6 +53,18 @@ setup(
             "course_blocks_api = lms.djangoapps.course_api.blocks.transformers.blocks_api:BlocksAPITransformer",
             "milestones = lms.djangoapps.course_api.blocks.transformers.milestones:MilestonesTransformer",
             "grades = lms.djangoapps.grades.transformer:GradesTransformer",
+        ],
+        "openedx.instructor_features": [
+            "analytics = lms.djangoapps.instructor.views.instructor_dashboard:CourseAnalyticsInstructorFeature",
+            "certificates = lms.djangoapps.instructor.views.instructor_dashboard:CourseCertificatesInstructorFeature",
+            "cohorts = lms.djangoapps.instructor.views.instructor_dashboard:CourseCohortsInstructorFeature",
+            "course_info = lms.djangoapps.instructor.views.instructor_dashboard:CourseInfoInstructorFeature",
+            "course_membership = lms.djangoapps.instructor.views.instructor_dashboard:CourseMembershipInstructorFeature",
+            "data_download = lms.djangoapps.instructor.views.instructor_dashboard:CourseDataDownloadInstructorFeature",
+            "discussion = lms.djangoapps.instructor.views.instructor_dashboard:CourseDiscussionInstructorFeature",
+            "email = lms.djangoapps.instructor.views.instructor_dashboard:CourseEmailInstructorFeature",
+            "grading = lms.djangoapps.instructor.views.instructor_dashboard:CourseGradingInstructorFeature",
+            "proctoring = lms.djangoapps.instructor.views.instructor_dashboard:CourseProctoringInstructorFeature",
         ],
     }
 )
