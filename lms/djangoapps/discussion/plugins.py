@@ -18,7 +18,7 @@ class DiscussionTab(ComponentTabMixin, EnrolledTab):
     type = 'discussion'
     title = ugettext_noop('Discussion')
     priority = None
-    class_name = 'discussion.views.DiscussionBoardComponentView'
+    component_name = 'discussion.views.DiscussionBoardComponentView'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
     is_default = False
 

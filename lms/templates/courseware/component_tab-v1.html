@@ -1,7 +1,5 @@
 ## mako
 
-
-
 <%page expression_filter="h"/>
 <%!
 from openedx.core.djangolib.markup import HTML
@@ -21,7 +19,6 @@ ${HTML(fragment.head_html())}
 <%include file="/mathjax_include.html" args="disable_fast_preview=True"/>
 ${HTML(fragment.foot_html())}
 </%block>
-
 
 <%block name="pagetitle">${tab['name']} | ${course.display_number_with_default | h}</%block>
 
