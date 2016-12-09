@@ -5,6 +5,7 @@ Support for LMS component views.
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.templatetags.static import static
+from django.utils.translation import get_language_bidi
 
 from django_component_views.component_views import ComponentView
 
@@ -51,6 +52,27 @@ class LmsComponentView(ComponentView):
         # Body dependencies
         for js_file in self.js_dependencies():
             fragment.add_javascript_url(static(js_file))
+
+    def vendor_js_dependencies(self):
+        """
+        Returns the vendor dependencies for this component.
+        """
+        return []
+
+    def js_dependencies(self):
+        """
+        Returns the JavaScript dependencies for this component.
+        """
+        return []
+
+    def css_dependencies(self):
+        """
+        Returns the CSS dependencies for this component.
+        """
+        if get_language_bidi():
+            return self.get_css_dependencies('style-main-v2-rtl')
+        else:
+            return self.get_css_dependencies('style-main-v2')
 
     def render_standalone_html(self, fragment):
         """

@@ -92,3 +92,39 @@
         }
     }
 }
+
+.section-title {
+    color: #666666;
+    font-size: 1.25rem;
+    padding: $baseline 0 0;
+    border-bottom: 0;
+}
+
+.wrapper-card {
+    border: 1px solid $lms-border-color;
+    margin-bottom: $baseline;
+
+    .wrapper-card-core {
+        padding: $baseline/2;
+    }
+
+    .card-icon {
+        @include float(left);
+        @include padding-right($baseline/2)
+    }
+
+    .card-description {
+        font-size: 14px;
+        color: $lms-gray;
+        margin-bottom: 0;
+    }
+
+    .card-actions {
+        @include float(right);
+    }
+
+    .wrapper-card-meta {
+        background: palette(grayscale, x-back);
+        padding: $baseline/4 $baseline;
+    }
+}
