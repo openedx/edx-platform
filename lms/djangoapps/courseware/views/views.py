@@ -32,7 +32,6 @@ from ipware.ip import get_ip
 from markupsafe import escape
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey, UsageKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
 from lms.djangoapps.instructor.views.api import require_global_staff
 
@@ -217,7 +216,7 @@ def jump_to_id(request, course_id, module_id):
     This entry point allows for a shorter version of a jump to where just the id of the element is
     passed in. This assumes that id is unique within the course_id namespace
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     items = modulestore().get_items(course_key, qualifiers={'name': module_id})
 
     if len(items) == 0:
@@ -394,7 +393,7 @@ def static_tab(request, course_id, tab_slug):
     Assumes the course_id is in a valid format.
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     course = get_course_with_access(request.user, 'load', course_key)
 
@@ -408,39 +407,39 @@ def static_tab(request, course_id, tab_slug):
         tab
     )
 
-    return render_to_response('courseware/static_tab.html', {
+    return render_to_response('courseware/component_tab-v1.html', {
         'course': course,
         'active_page': 'static_tab_{0}'.format(tab['url_slug']),
         'tab': tab,
         'fragment': fragment,
         'uses_pattern_library': False,
-        'disable_courseware_js': True
+        'disable_courseware_js': True,
     })
 
 
 @ensure_csrf_cookie
 @ensure_valid_course_key
-def content_tab(request, course_id, tab_type):
+def component_tab(request, course_id, tab_type):
     """
-    Display a content tab based on type name.
+    Display a component tab based on type name.
 
     Assumes the course_id is in a valid format.
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
-    content_tab = [tab for tab in course.tabs if tab.type == tab_type][0]
-    fragment = content_tab.render_fragment(request, course)
+    component_tab = [tab for tab in course.tabs if tab.type == tab_type][0]
+    fragment = component_tab.render_fragment(request, course)
 
 
-    return render_to_response('courseware/static_tab.html', {
+    return render_to_response('courseware/component_tab-v2.html', {
         'course': course,
-        'active_page': content_tab['type'],
-        'tab': content_tab,
+        'active_page': component_tab['type'],
+        'tab': component_tab,
         'fragment': fragment,
         'uses_pattern_library': True,
-        'disable_courseware_js': True
+        'disable_courseware_js': True,
     })
 
 
@@ -453,7 +452,7 @@ def syllabus(request, course_id):
     Assumes the course_id is in a valid format.
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     course = get_course_with_access(request.user, 'load', course_key)
     staff_access = bool(has_access(request.user, 'staff', course))
@@ -561,7 +560,7 @@ def course_about(request, course_id):
     Assumes the course_id is in a valid format.
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     if hasattr(course_key, 'ccx'):
         # if un-enrolled/non-registered user try to access CCX (direct for registration)
@@ -1018,7 +1017,7 @@ def submission_history(request, course_id, student_username, location):
     StudentModuleHistory records.
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     try:
         usage_key = course_key.make_usage_key_from_deprecated_string(location)
@@ -1132,7 +1131,7 @@ def get_course_lti_endpoints(request, course_id):
         (django response object):  HTTP response.  404 if course is not found, otherwise 200 with JSON body.
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     try:
         course = get_course(course_key, depth=2)
@@ -1181,7 +1180,7 @@ def course_survey(request, course_id):
     views.py file in the Survey Djangoapp
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
 
     redirect_url = reverse('info', args=[course_id])
