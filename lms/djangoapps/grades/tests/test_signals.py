@@ -4,9 +4,12 @@ Tests for the score change signals defined in the courseware models module.
 
 import re
 
+from datetime import datetime
 import ddt
 from django.test import TestCase
 from mock import patch, MagicMock
+import pytz
+from util.date_utils import to_timestamp
 
 from ..signals.handlers import (
     enqueue_subsection_update,
@@ -17,19 +20,24 @@ from ..signals.handlers import (
 
 UUID_REGEX = re.compile(ur'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
 
+FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=pytz.UTC)
+FROZEN_NOW_TIMESTAMP = to_timestamp(FROZEN_NOW_DATETIME)
+
 SUBMISSION_SET_KWARGS = {
     'points_possible': 10,
     'points_earned': 5,
     'anonymous_user_id': 'anonymous_id',
     'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456'
+    'item_id': 'i4x://org/course/usage/123456',
+    'created_at': FROZEN_NOW_TIMESTAMP,
 }
 
 
 SUBMISSION_RESET_KWARGS = {
     'anonymous_user_id': 'anonymous_id',
     'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456'
+    'item_id': 'i4x://org/course/usage/123456',
+    'created_at': FROZEN_NOW_TIMESTAMP,
 }
 
 PROBLEM_RAW_SCORE_CHANGED_KWARGS = {
@@ -41,6 +49,7 @@ PROBLEM_RAW_SCORE_CHANGED_KWARGS = {
     'usage_id': 'i4x://org/course/usage/123456',
     'only_if_higher': False,
     'score_deleted': True,
+    'modified': FROZEN_NOW_TIMESTAMP,
 }
 
 
@@ -102,7 +111,8 @@ class ScoreChangedSignalRelayTest(TestCase):
             'weighted_earned': earned,
             'user_id': self.user_mock.id,
             'course_id': 'CourseID',
-            'usage_id': 'i4x://org/course/usage/123456'
+            'usage_id': 'i4x://org/course/usage/123456',
+            'modified': FROZEN_NOW_TIMESTAMP,
         }
         self.signal_mock.assert_called_once_with(**expected_set_kwargs)
         self.get_user_mock.assert_called_once_with(kwargs['anonymous_user_id'])
@@ -152,6 +162,7 @@ class ScoreChangedSignalRelayTest(TestCase):
             'usage_id': 'i4x://org/course/usage/123456',
             'only_if_higher': False,
             'score_deleted': True,
+            'modified': FROZEN_NOW_TIMESTAMP
         }
         self.signal_mock.assert_called_with(**expected_set_kwargs)
 
@@ -168,6 +179,7 @@ class ScoreChangedSignalRelayTest(TestCase):
             'usage_id': 'i4x://org/course/usage/123456',
             'only_if_higher': False,
             'score_deleted': False,
+            'modified': FROZEN_NOW_TIMESTAMP
         }
         self.signal_mock.assert_called_with(**expected_set_kwargs)
 
@@ -178,6 +190,7 @@ class ScoreChangedSignalRelayTest(TestCase):
             user_id=1,
             course_id=u'course-v1:edX+Demo_Course+DemoX',
             usage_id=u'block-v1:block-key',
+            modified=FROZEN_NOW_DATETIME,
         )
         log_statement = mocklog.call_args[0][0]
         log_statement = UUID_REGEX.sub(u'*UUID*', log_statement)
@@ -185,7 +198,7 @@ class ScoreChangedSignalRelayTest(TestCase):
             log_statement,
             (
                 u'Grades: Request async calculation of subsection grades with args: '
-                u'course_id:course-v1:edX+Demo_Course+DemoX, usage_id:block-v1:block-key, '
-                u'user_id:1. Task [*UUID*]'
-            )
+                u'course_id:course-v1:edX+Demo_Course+DemoX, modified:{time}, '
+                u'usage_id:block-v1:block-key, user_id:1. Task [*UUID*]'
+            ).format(time=FROZEN_NOW_DATETIME)
         )

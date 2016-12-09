@@ -7,12 +7,18 @@ Does not include any access control, be sure to check access before calling.
 import json
 import logging
 
-from django.conf import settings
+from datetime import datetime
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.utils.translation import override as override_language
 from eventtracking import tracker
+import pytz
+
+from course_modes.models import CourseMode
+from courseware.models import StudentModule
+from edxmako.shortcuts import render_to_string
 from lms.djangoapps.grades.signals.signals import PROBLEM_RAW_SCORE_CHANGED
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -321,7 +327,7 @@ def _fire_score_changed_for_block(
     """
     Fires a PROBLEM_RAW_SCORE_CHANGED event for the given module.
     The earned points are always zero. We must retrieve the possible points
-    from the XModule, as noted below.
+    from the XModule, as noted below. The effective time is now().
     """
     if block and block.has_score and block.max_score() is not None:
         PROBLEM_RAW_SCORE_CHANGED.send(
@@ -334,6 +340,7 @@ def _fire_score_changed_for_block(
             usage_id=unicode(module_state_key),
             score_deleted=True,
             only_if_higher=False,
+            modified=datetime.now().replace(tzinfo=pytz.UTC),
         )
 
 
