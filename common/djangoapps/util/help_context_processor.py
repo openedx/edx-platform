@@ -71,12 +71,7 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
             # as the base of documentation link URLs. If it is not set, the
             # function reads the base of the documentation link URLs from
             # the .ini configuration file, lms_config.ini or cms_config.ini.
-            if base_url:
-                doc_base_url = base_url
-            elif settings.DOC_LINK_BASE_URL:
-                doc_base_url = settings.DOC_LINK_BASE_URL
-            else:
-                doc_base_url = config_file_object.get("help_settings", "url_base")
+            doc_base_url = _get_base_url("help_settings", "url_base")
 
             # Construct and return the URL for the documentation link.
             return "{url_base}/{language}/{version}/{page_path}".format(
@@ -100,12 +95,7 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
             # as the base of documentation link URLs. If it is not set, the
             # function reads the base of the documentation link URLs from
             # the .ini configuration file, lms_config.ini or cms_config.ini.
-            if base_url:
-                pdf_base_url = base_url
-            elif settings.DOC_LINK_BASE_URL:
-                pdf_base_url = settings.DOC_LINK_BASE_URL
-            else:
-                pdf_base_url = config_file_object.get("pdf_settings", "pdf_base")
+            pdf_base_url = _get_base_url("pdf_settings", "pdf_base")
 
             # Construct and return the URL for the PDF link.
             return "{pdf_base}/{version}/{pdf_file}".format(
@@ -113,6 +103,25 @@ def common_doc_url(request, config_file_object):  # pylint: disable=unused-argum
                 version=config_file_object.get("help_settings", "version"),
                 pdf_file=config_file_object.get("pdf_settings", "pdf_file"),
             )
+
+        def _get_base_url(section_name, option):
+            """
+            Returns a base url value, taking into account base_url, settings.DOC_LINK_BASE_URL,
+            and base configuration.
+
+            Args:
+                section_name: name of the section in the configuration from which the option should be found
+                  (if no value supplied in either base_url or settings.DOC_LINK_BASE_URL)
+                option: name of the configuration option
+            """
+            if base_url:
+                conditional_base_url = base_url
+            elif settings.DOC_LINK_BASE_URL:
+                conditional_base_url = settings.DOC_LINK_BASE_URL
+            else:
+                conditional_base_url = config_file_object.get(section_name, option)
+
+            return conditional_base_url
 
         return {
             "doc_url": get_doc_url(),
