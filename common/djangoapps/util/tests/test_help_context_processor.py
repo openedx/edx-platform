@@ -17,16 +17,21 @@ CONFIG.readfp(CONFIG_FILE)
 
 
 class HelpContextProcessorTest(TestCase):
+    """
+    Tests for help_context_processor.py
+    """
 
     def setUp(self):
         super(HelpContextProcessorTest, self).setUp()
 
     @staticmethod
     def _get_doc_url(page_token=None, base_url=None):
+        """ Helper method for getting the doc url. """
         return common_doc_url(None, CONFIG)['get_online_help_info'](page_token, base_url)['doc_url']
 
     @staticmethod
     def _get_pdf_url(base_url=None):
+        """ Helper method for getting the pdf url. """
         return common_doc_url(None, CONFIG)['get_online_help_info'](base_url=base_url)['pdf_url']
 
     def test_get_doc_url(self):
