@@ -6,7 +6,6 @@ from functools import wraps
 import logging
 from sets import Set
 
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
 from django.core.urlresolvers import reverse
@@ -14,12 +13,10 @@ from django.contrib.auth.models import User
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import render_to_response
 from django.template.loader import render_to_string
-from django.templatetags.static import static
 from django.utils.translation import get_language_bidi
 from django.views.decorators.http import require_GET
 import newrelic.agent
 
-from django_component_views.component_views import ComponentView
 from django_component_views.fragment import Fragment
 
 from courseware.courses import get_course_with_access
@@ -32,6 +29,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 from courseware.access import has_access
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import modulestore
+from component_views import LmsComponentView
 
 from django_comment_common.utils import ThreadContext
 from django_comment_client.permissions import has_permission, get_team
@@ -599,60 +597,6 @@ def followed_threads(request, course_key, user_id):
             return render_to_response('discussion/user_profile.html', context)
     except User.DoesNotExist:
         raise Http404
-
-
-class LmsComponentView(ComponentView):
-    """
-    The base class of all edx-platform component views.
-    """
-    @staticmethod
-    def get_css_dependencies(group):
-        """
-        Returns list of CSS dependencies belonging to `group` in settings.PIPELINE_JS.
-
-        Respects `PIPELINE_ENABLED` setting.
-        """
-        if settings.PIPELINE_ENABLED:
-            return [settings.PIPELINE_CSS[group]['output_filename']]
-        else:
-            return settings.PIPELINE_CSS[group]['source_filenames']
-
-    @staticmethod
-    def get_js_dependencies(group):
-        """
-        Returns list of JS dependencies belonging to `group` in settings.PIPELINE_JS.
-
-        Respects `PIPELINE_ENABLED` setting.
-        """
-        if settings.PIPELINE_ENABLED:
-            return [settings.PIPELINE_JS[group]['output_filename']]
-        else:
-            return settings.PIPELINE_JS[group]['source_filenames']
-
-    def add_resource_urls(self, fragment):
-        """
-        Adds URLs for JS and CSS resources that this XBlock depends on to `fragment`.
-        """
-        # Head dependencies
-        for vendor_js_file in self.vendor_js_dependencies():
-            fragment.add_resource_url(static(vendor_js_file), "application/javascript", "head")
-
-        for css_file in self.css_dependencies():
-            fragment.add_css_url(static(css_file))
-
-        # Body dependencies
-        for js_file in self.js_dependencies():
-            fragment.add_javascript_url(static(js_file))
-
-    def render_standalone_html(self, fragment):
-        """
-        """
-        context = {
-            'settings': settings,
-            'fragment': fragment,
-            'uses-pattern-library': True,
-        }
-        return render_to_response('component-chromeless.html', context)
 
 
 class DiscussionBoardComponentView(LmsComponentView):
