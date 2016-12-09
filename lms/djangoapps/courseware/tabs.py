@@ -77,7 +77,7 @@ class ProgressTab(ComponentTabMixin, EnrolledTab):
     type = 'progress'
     title = ugettext_noop('Progress')
     priority = 40
-    class_name="courseware.views.views.ProgressComponentView"
+    component_name="courseware.views.views.ProgressComponentView"
     is_hideable = True
     is_default = False
 
