@@ -28,6 +28,12 @@ from openedx.core.djangolib.markup import HTML, Text
   <%static:include path="dashboard/${template_name}.underscore" />
 </script>
 % endfor
+
+% for template_name in ["dashboard_revision_item", "dashboard_revision_list", "dashboard_revision_loading", "dashboard_revision_error"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="revisions/${template_name}.underscore" />
+</script>
+% endfor
 </%block>
 
 <%block name="js_extra">
@@ -65,6 +71,10 @@ from openedx.core.djangolib.markup import HTML, Text
         banner.showMessage(${redirect_message | n, dump_js_escaped_json})
     </%static:require_module>
   % endif
+
+  <%static:require_module module_name="js/revisions/dashboard_revision_factory" class_name="DashboardRevisionFactory">
+    DashboardRevisionFactory();
+  </%static:require_module>
 </%block>
 
 <div class="dashboard-notifications" tabindex="-1">
@@ -209,6 +219,8 @@ from openedx.core.djangolib.markup import HTML, Text
                 <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
               </ul>
+            </div>
+            <div id="dashboard-revisions" class="dashboard-revisions" aria-live="polite" aria-atomic="true">
             </div>
           </div>
         % endif

@@ -1,5 +1,5 @@
 """
-Tests for ContentLibraryTransformer.
+Tests for ContentLibraryTransformer and AdaptiveContentLibraryTransformer.
 """
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
@@ -7,7 +7,7 @@ from openedx.core.djangoapps.content.block_structure.transformers import BlockSt
 from student.tests.factories import CourseEnrollmentFactory
 
 from ...api import get_course_blocks
-from ..library_content import ContentLibraryTransformer
+from ..library_content import ContentLibraryTransformer, AdaptiveContentLibraryTransformer
 from .helpers import CourseStructureTestCase
 
 
@@ -27,6 +27,7 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
     ContentLibraryTransformer Test
     """
     TRANSFORMER_CLASS_TO_TEST = ContentLibraryTransformer
+    CATEGORY = 'library_content'
 
     def setUp(self):
         """
@@ -43,12 +44,19 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         # Enroll user in course.
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, is_active=True)
 
+    @classmethod
+    def get_content_library_ref(cls):
+        """
+        Return string to use as #ref for content library block in course hierarchy.
+        """
+        return '{category}1'.format(category=cls.CATEGORY)
+
     def get_course_hierarchy(self):
         """
         Get a course hierarchy to test with.
         """
         return [{
-            'org': 'ContentLibraryTransformer',
+            'org': self.TRANSFORMER_CLASS_TO_TEST.__name__,
             'course': 'CL101F',
             'run': 'test_run',
             '#type': 'course',
@@ -67,9 +75,9 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                                     '#ref': 'vertical1',
                                     '#children': [
                                         {
-                                            'metadata': {'category': 'library_content'},
-                                            '#type': 'library_content',
-                                            '#ref': 'library_content1',
+                                            'metadata': {'category': self.CATEGORY},
+                                            '#type': self.CATEGORY,
+                                            '#ref': self.get_content_library_ref(),
                                             '#children': [
                                                 {
                                                     'metadata': {'display_name': "CL Vertical 2"},
@@ -106,6 +114,12 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
             ]
         }]
 
+    def _assert_default_selection(self, *verticals_selected):
+        """
+        Assert that at least one of the blocks in `verticals` is selected.
+        """
+        self.assertTrue(any(vertical_selected for vertical_selected in verticals_selected))
+
     def test_content_library(self):
         """
         Test when course has content library section.
@@ -130,15 +144,15 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
         # Should dynamically assign a block to student
         trans_keys = set(trans_block_structure.get_block_keys())
         block_key_set = self.get_block_key_set(
-            self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', 'library_content1'
+            self.blocks, 'course', 'chapter1', 'lesson1', 'vertical1', self.get_content_library_ref()
         )
         for key in block_key_set:
             self.assertIn(key, trans_keys)
 
         vertical2_selected = self.get_block_key_set(self.blocks, 'vertical2').pop() in trans_keys
         vertical3_selected = self.get_block_key_set(self.blocks, 'vertical3').pop() in trans_keys
+        self._assert_default_selection(vertical2_selected, vertical3_selected)
 
-        self.assertNotEquals(vertical2_selected, vertical3_selected)  # only one of them should be selected
         selected_vertical = 'vertical2' if vertical2_selected else 'vertical3'
         selected_child = 'html1' if vertical2_selected else 'html2'
 
@@ -158,9 +172,23 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                     'chapter1',
                     'lesson1',
                     'vertical1',
-                    'library_content1',
+                    self.get_content_library_ref(),
                     selected_vertical,
                     selected_child,
                 ),
                 "Expected 'selected' equality failed in iteration {}.".format(i)
             )
+
+
+class AdaptiveContentLibraryTransformerTestCase(ContentLibraryTransformerTestCase):  # pylint: disable=test-inherits-tests
+    """
+    AdaptiveContentLibraryTransformer Test
+    """
+    TRANSFORMER_CLASS = AdaptiveContentLibraryTransformer
+    CATEGORY = 'adaptive_library_content'
+
+    def _assert_default_selection(self, *verticals_selected):
+        """
+        Assert that none of the blocks in `verticals_selected` are selected.
+        """
+        self.assertTrue(not any(vertical_selected for vertical_selected in verticals_selected))

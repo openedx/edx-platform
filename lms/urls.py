@@ -66,6 +66,9 @@ urlpatterns = [
     # Event tracking endpoints
     url(r'', include('track.urls')),
 
+    # Revisions API
+    url(r'^api/revisions/', 'adaptive_learning.views.revisions', name='revisions'),
+
     # Performance endpoints
     url(r'', include('openedx.core.djangoapps.performance.urls')),
 
