@@ -66,7 +66,6 @@
     @include float(right);
     @include margin-left(flex-gutter());
     width: flex-grid(3);
-    margin-top: ($baseline*2);
 
     .user-info {
       @include clearfix();

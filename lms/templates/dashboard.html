@@ -134,6 +134,12 @@ from openedx.core.djangolib.markup import HTML, Text
         % endif
     </div>
 
+    <div id="progressive-profile"></div>
+
+    <%static:require_module_async module_name="common/js/vendor/progressive-profiles" class_name="a">
+      new ProgressiveProfile.default('progressive-profile', '${user}');
+    </%static:require_module_async>
+
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-bar" class="search-bar dashboard-search-bar" role="search" aria-label="Dashboard">
           <form>
@@ -154,12 +160,6 @@ from openedx.core.djangolib.markup import HTML, Text
       % if settings.FEATURES.get('ENABLE_DASHBOARD_SEARCH'):
         <div id="dashboard-search-results" class="search-results dashboard-search-results"></div>
       % endif
-
-      <div id="progressive-profile"></div>
-
-      <%static:require_module_async module_name="common/js/vendor/progressive-profiles" class_name="a">
-        new ProgressiveProfile.default('progressive-profile', '${user}');
-      </%static:require_module_async>
 
       <div class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
         <header class="profile">
