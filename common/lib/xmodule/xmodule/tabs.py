@@ -240,22 +240,22 @@ class ComponentTabMixin(object):
     """
     A mixin for tabs that meet the component API (and can be rendered via Fragments).
     """
-    class_name = None
+    component_name = None
 
     @property
     def link_func(self):
         def link_func(course, reverse_func):
             """ Returns a url for a given course and reverse function. """
-            return reverse_func("content_tab", args=[course.id.to_deprecated_string(), self.type])
+            return reverse_func("component_tab", args=[course.id.to_deprecated_string(), self.type])
 
         return link_func
 
     @property
     def url_slug(self):
-        return "content_tab/"+self.type
+        return "tab/" + self.type
 
     def render_fragment(self, request, course):
-        component = get_storage_class(self.class_name)()
+        component = get_storage_class(self.component_name)()
         fragment = component.render_component(request, course_id=course.id.to_deprecated_string())
         return fragment
 
