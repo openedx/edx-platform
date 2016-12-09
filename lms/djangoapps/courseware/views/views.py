@@ -65,6 +65,7 @@ from courseware.courses import (
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule, BaseStudentModuleHistory
+from courseware.tabs import get_course_tab_list
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
@@ -428,10 +429,9 @@ def component_tab(request, course_id, tab_type):
 
     course_key = CourseKey.from_string(course_id)
     course = get_course_with_access(request.user, 'load', course_key)
-
-    component_tab = [tab for tab in course.tabs if tab.type == tab_type][0]
+    course_tabs = get_course_tab_list(request, course)
+    component_tab = [tab for tab in course_tabs if tab.type == tab_type][0]
     fragment = component_tab.render_fragment(request, course)
-
 
     return render_to_response('courseware/component_tab-v2.html', {
         'course': course,

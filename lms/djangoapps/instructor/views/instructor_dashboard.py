@@ -6,10 +6,12 @@ import logging
 import datetime
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from sets import Set
 import uuid
 import pytz
 
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -26,7 +28,7 @@ from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
+from xmodule.tabs import CourseTab, ComponentTabMixin
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
@@ -49,24 +51,28 @@ from certificates.models import (
 from certificates import api as certs_api
 from bulk_email.models import BulkEmailFlag
 
+from django_component_views.fragment import Fragment
+
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+
+from component_views import LmsComponentView
 
 from openedx.core.djangolib.markup import HTML, Text
 
 log = logging.getLogger(__name__)
 
 
-class InstructorDashboardTab(CourseTab):
+class InstructorDashboardTab(ComponentTabMixin, CourseTab):
     """
     Defines the Instructor Dashboard view type that is shown as a course tab.
     """
 
     type = "instructor"
     title = ugettext_noop('Instructor')
-    view_name = "instructor_dashboard"
+    component_name = 'lms.djangoapps.instructor.views.instructor_dashboard.InstructorDashboardComponentView'
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
 
     @classmethod
@@ -690,3 +696,66 @@ def _section_metrics(course, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+class InstructorDashboardComponentView(LmsComponentView):
+    """
+    """
+    def render_component(self, request, course_id=None):
+        """
+        Render the component
+        """
+        # nr_transaction = newrelic.agent.current_transaction()
+
+        # course_key = CourseKey.from_string(course_id)
+        # context = _create_discussion_board_context(request, course_key, nr_transaction)
+        context = {
+
+        }
+        html = render_to_string('instructor/instructor_dashboard_component.html', context)
+        # inline_js = render_to_string('discussion/discussion_board_js.template', context)
+
+        fragment = Fragment(html)
+        # self.add_resource_urls(fragment)
+        # fragment.add_javascript(inline_js)
+        return fragment
+
+    def vendor_js_dependencies(self):
+        """
+        Returns list of vendor JS files that this XBlock depends on.
+
+        The helper function that it uses to obtain the list of vendor JS files
+        works in conjunction with the Django pipeline to ensure that in development mode
+        the files are loaded individually, but in production just the single bundle is loaded.
+        """
+        dependencies = Set()
+        # TODO: how can we get the base dependencies when not rendered within a page?
+        # dependencies.update(self.get_js_dependencies('base_vendor'))
+        # dependencies.update(self.get_js_dependencies('base_application'))
+        dependencies.update(self.get_js_dependencies('discussion_vendor'))
+        return list(dependencies)
+
+    def js_dependencies(self):
+        """
+        Returns list of JS files that this XBlock depends on.
+
+        The helper function that it uses to obtain the list of JS files
+        works in conjunction with the Django pipeline to ensure that in development mode
+        the files are loaded individually, but in production just the single bundle is loaded.
+        """
+        return self.get_js_dependencies('discussion')
+
+
+    def css_dependencies(self):
+        """
+        Returns list of CSS files that this XBlock depends on.
+
+        The helper function that it uses to obtain the list of CSS files
+        works in conjunction with the Django pipeline to ensure that in development mode
+        the files are loaded individually, but in production just the single bundle is loaded.
+        """
+        if get_language_bidi():
+            return self.get_css_dependencies('style-discussion-main-rtl')
+        else:
+            return self.get_css_dependencies('style-discussion-main')
+

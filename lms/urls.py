@@ -434,13 +434,11 @@ urlpatterns += (
 
     # For the instructor
     url(
-        r'^courses/{}/instructor$'.format(
+        r'^courses/{}/instructor/'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'lms.djangoapps.instructor.views.instructor_dashboard.instructor_dashboard_2',
-        name='instructor_dashboard',
+        include('lms.djangoapps.instructor.urls')
     ),
-
 
     url(
         r'^courses/{}/set_course_mode_price$'.format(
