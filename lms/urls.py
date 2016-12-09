@@ -691,8 +691,8 @@ urlpatterns += (
         r'^courses/{}/tab/(?P<tab_type>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.content_tab',
-        name='content_tab',
+        'courseware.views.views.tab_fragment_container',
+        name='tab_fragment_container',
     ),
 )
 

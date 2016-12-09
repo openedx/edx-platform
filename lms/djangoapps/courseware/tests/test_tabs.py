@@ -14,7 +14,7 @@ from courseware.tabs import (
 )
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.factories import InstructorFactory, StaffFactory
-from courseware.views.views import get_static_tab_contents, static_tab
+from courseware.views.views import get_static_tab_fragment, static_tab
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -260,14 +260,14 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
         with self.assertRaises(Http404):
             static_tab(request, course_id='edX/toy', tab_slug='new_tab')
 
-    def test_get_static_tab_contents(self):
+    def test_get_static_tab_fragment(self):
         self.setup_user()
         course = get_course_by_id(self.course.id)
         request = get_mock_request(self.user)
         tab = xmodule_tabs.CourseTabList.get_tab_by_slug(course.tabs, 'new_tab')
 
         # Test render works okay
-        tab_content = get_static_tab_contents(request, course, tab)
+        tab_content = get_static_tab_fragment(request, course, tab).content
         self.assertIn(self.course.id.to_deprecated_string(), tab_content)
         self.assertIn('static_tab', tab_content)
 
@@ -276,8 +276,8 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, SharedModuleStoreTestCase):
             mock_module_render.return_value = MagicMock(
                 render=Mock(side_effect=Exception('Render failed!'))
             )
-            static_tab = get_static_tab_contents(request, course, tab)
-            self.assertIn("this module is temporarily unavailable", static_tab)
+            static_tab_content = get_static_tab_fragment(request, course, tab).content
+            self.assertIn("this module is temporarily unavailable", static_tab_content)
 
 
 @attr(shard=1)

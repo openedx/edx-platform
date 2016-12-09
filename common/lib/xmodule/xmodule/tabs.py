@@ -80,6 +80,13 @@ class CourseTab(object):
 
     @property
     def link_func(self):
+        """
+        Returns a function that will determine a course URL for this tab.
+
+        The returned function takes two arguments:
+            course (Course) - the course in question.
+            view_name (str) - the name of the view.
+        """
         return self.tab_dict.get('link_func', link_reverse_func(self.view_name))
 
     @classmethod
@@ -236,28 +243,34 @@ class CourseTab(object):
         return tab_type(tab_dict=tab_dict)
 
 
-class ComponentTabMixin(object):
+class TabFragmentViewMixin(object):
     """
-    A mixin for tabs that meet the component API (and can be rendered via Fragments).
+    A mixin for tabs that render themselves as web fragments.
     """
-    class_name = None
+    component_name = None
 
     @property
     def link_func(self):
+        """ Returns a function that returns the course tab's URL. """
         def link_func(course, reverse_func):
-            """ Returns a url for a given course and reverse function. """
-            return reverse_func("content_tab", args=[course.id.to_deprecated_string(), self.type])
+            """ Returns a function that returns the course tab's URL. """
+            return reverse_func("tab_fragment_container", args=[course.id.to_deprecated_string(), self.type])
 
         return link_func
 
     @property
     def url_slug(self):
-        return "content_tab/"+self.type
+        """
+        Returns the slug to be included in this tab's URL.
+        """
+        return "tab/" + self.type
 
     def render_fragment(self, request, course):
-        component = get_storage_class(self.class_name)()
-        fragment = component.render_component(request, course_id=course.id.to_deprecated_string())
-        return fragment
+        """
+        Renders the web fragment for this tab.
+        """
+        fragment_view = get_storage_class(self.component_name)()
+        return fragment_view.render_fragment(request, course_id=course.id.to_deprecated_string())
 
 
 class StaticTab(CourseTab):
@@ -270,7 +283,7 @@ class StaticTab(CourseTab):
 
     def __init__(self, tab_dict=None, name=None, url_slug=None):
         def link_func(course, reverse_func):
-            """ Returns a url for a given course and reverse function. """
+            """ Returns a function that returns the static tab's URL. """
             return reverse_func(self.type, args=[course.id.to_deprecated_string(), self.url_slug])
 
         self.url_slug = tab_dict.get('url_slug') if tab_dict else url_slug
