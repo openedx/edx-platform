@@ -33,14 +33,14 @@ define(
                 DiscussionBoardFactory({
                     el: $('#discussion-container'),
                     courseId: 'test_course_id',
-                    course_name: 'Test Course',
+                    courseName: 'Test Course',
                     user_info: DiscussionSpecHelper.getTestUserInfo(),
                     roles: DiscussionSpecHelper.getTestRoleInfo(),
-                    sort_preference: null,
+                    sortPreference: null,
                     threads: [],
                     thread_pages: [],
-                    content_info: null,
-                    course_settings: {
+                    contentInfo: null,
+                    courseSettings: {
                         is_cohorted: false,
                         allow_anonymous: false,
                         allow_anonymous_to_peers: false,

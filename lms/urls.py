@@ -8,7 +8,7 @@ from django.views.generic.base import RedirectView
 from ratelimitbackend import admin
 from django.conf.urls.static import static
 
-from courseware.views.views import EnrollStaffView
+from courseware.views.views import CourseTabView, EnrollStaffView, StaticCourseTabView
 from config_models.views import ConfigurationModelCurrentAPIView
 from courseware.views.index import CoursewareIndex
 from openedx.core.djangoapps.auth_exchange.views import LoginWithAccessTokenView
@@ -691,8 +691,8 @@ urlpatterns += (
         r'^courses/{}/tab/(?P<tab_type>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.content_tab',
-        name='content_tab',
+        CourseTabView.as_view(),
+        name='course_tab_view',
     ),
 )
 
@@ -702,7 +702,7 @@ urlpatterns += (
         r'^courses/{}/(?P<tab_slug>[^/]+)/$'.format(
             settings.COURSE_ID_PATTERN,
         ),
-        'courseware.views.views.static_tab',
+        StaticCourseTabView.as_view(),
         name='static_tab',
     ),
 )

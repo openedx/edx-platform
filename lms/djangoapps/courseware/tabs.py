@@ -9,7 +9,7 @@ from courseware.access import has_access
 from courseware.entrance_exams import user_must_complete_entrance_exam
 from openedx.core.lib.course_tabs import CourseTabPluginManager
 from student.models import CourseEnrollment
-from xmodule.tabs import ComponentTabMixin, CourseTab, CourseTabList, key_checker
+from xmodule.tabs import CourseTab, CourseTabList, key_checker
 
 
 class EnrolledTab(CourseTab):
@@ -70,14 +70,14 @@ class SyllabusTab(EnrolledTab):
         return getattr(course, 'syllabus_present', False)
 
 
-class ProgressTab(ComponentTabMixin, EnrolledTab):
+class ProgressTab(EnrolledTab):
     """
     The course progress view.
     """
     type = 'progress'
     title = ugettext_noop('Progress')
     priority = 40
-    class_name="courseware.views.views.ProgressComponentView"
+    view_name = 'progress'
     is_hideable = True
     is_default = False
 

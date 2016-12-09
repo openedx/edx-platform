@@ -18,9 +18,9 @@
                 initialize: function(options) {
                     Backbone.Router.prototype.initialize.call(this);
                     _.bindAll(this, 'allThreads', 'showThread');
-                    this.courseId = options.courseId;
+                    this.rootUrl = options.rootUrl;
                     this.discussion = options.discussion;
-                    this.course_settings = options.courseSettings;
+                    this.courseSettings = options.courseSettings;
                     this.discussionBoardView = options.discussionBoardView;
                     this.newPostView = options.newPostView;
                 },
@@ -50,7 +50,7 @@
 
                     Backbone.history.start({
                         pushState: true,
-                        root: '/courses/' + this.courseId + '/discussion/forum/'
+                        root: this.rootUrl
                     });
                 },
 
@@ -95,7 +95,7 @@
                         el: $('.forum-content'),
                         model: this.thread,
                         mode: 'tab',
-                        course_settings: this.course_settings
+                        courseSettings: this.courseSettings
                     });
                     this.main.render();
                     this.main.on('thread:responses:rendered', function() {
