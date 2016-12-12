@@ -1035,6 +1035,8 @@ class Html5VideoTest(VideoBaseTest):
         # check if "Welcome to edX." text in the captions
         self.assertIn('Welcome to edX.', self.video.captions_text)
 
+        self.video.wait_for_element_visibility('.transcript-end', 'Transcript has loaded')
+
         # check if we can download transcript in "srt" format that has text "Welcome to edX."
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', 'Welcome to edX.'))
 
