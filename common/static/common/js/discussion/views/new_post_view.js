@@ -1,4 +1,4 @@
-/* globals DiscussionTopicMenuView, DiscussionUtil, Thread */
+/* globals _, Backbone, DiscussionTopicMenuView, DiscussionUtil, Thread */
 (function() {
     'use strict';
     var __hasProp = {}.hasOwnProperty,
@@ -81,14 +81,14 @@
             };
 
             NewPostView.prototype.getCohortOptions = function() {
-                var user_cohort_id;
+                var userCohortId;
                 if (this.course_settings.get('is_cohorted') && DiscussionUtil.isPrivilegedUser()) {
-                    user_cohort_id = $('#discussion-container').data('user-cohort-id');
+                    userCohortId = $('#discussion-container').data('user-cohort-id');
                     return _.map(this.course_settings.get('cohorts'), function(cohort) {
                         return {
                             value: cohort.id,
                             text: cohort.name,
-                            selected: cohort.id === user_cohort_id
+                            selected: cohort.id === userCohortId
                         };
                     });
                 } else {
@@ -126,15 +126,15 @@
             };
 
             NewPostView.prototype.createPost = function(event) {
-                var anonymous, anonymous_to_peers, body, follow, group, thread_type, title, topicId, url,
+                var anonymous, anonymousToPeers, body, follow, group, threadType, title, topicId, url,
                     self = this;
                 event.preventDefault();
-                thread_type = this.$('.post-type-input:checked').val();
+                threadType = this.$('.post-type-input:checked').val();
                 title = this.$('.js-post-title').val();
                 body = this.$('.js-post-body').find('.wmd-input').val();
                 group = this.$('.js-group-select option:selected').attr('value');
                 anonymous = false || this.$('.js-anon').is(':checked');
-                anonymous_to_peers = false || this.$('.js-anon-peers').is(':checked');
+                anonymousToPeers = false || this.$('.js-anon-peers').is(':checked');
                 follow = false || this.$('.js-follow').is(':checked');
                 topicId = this.isTabMode() ? this.topicView.getCurrentTopicId() : this.topicId;
                 url = DiscussionUtil.urlFor('create_thread', topicId);
@@ -145,11 +145,11 @@
                     type: 'POST',
                     dataType: 'json',
                     data: {
-                        thread_type: thread_type,
+                        thread_type: threadType,
                         title: title,
                         body: body,
                         anonymous: anonymous,
-                        anonymous_to_peers: anonymous_to_peers,
+                        anonymous_to_peers: anonymousToPeers,
                         auto_subscribe: follow,
                         group_id: group
                     },
@@ -179,7 +179,7 @@
                     }
                 }
                 this.trigger('newPost:cancel');
-                return this.resetForm();
+                this.resetForm();
             };
 
             NewPostView.prototype.resetForm = function() {
@@ -187,7 +187,7 @@
                 DiscussionUtil.clearFormErrors(this.$('.post-errors'));
                 this.$('.wmd-preview p').html('');
                 if (this.isTabMode()) {
-                    return this.topicView.setTopic(this.$('button.topic-title').first());
+                    this.topicView.setTopic(this.$('button.topic-title').first());
                 }
             };
 

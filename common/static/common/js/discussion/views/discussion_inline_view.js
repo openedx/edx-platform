@@ -121,7 +121,7 @@
 
             this.newPostView.render();
 
-            this.listenTo(this.newPostView, 'newPost:createPost', this.hideNewPost);
+            this.listenTo(this.newPostView, 'newPost:createPost', this.onNewPostCreated);
             this.listenTo(this.newPostView, 'newPost:cancel', this.hideNewPost);
             this.discussion.on('add', this.addThread);
 
@@ -212,6 +212,11 @@
             this.toggleDiscussionBtn.addClass('shown');
             this.toggleDiscussionBtn.find('.button-text').text(gettext('Hide Discussion'));
             this.showed = true;
+        },
+
+        onNewPostCreated: function() {
+            this.navigateToAllPosts();
+            this.hideNewPost();
         },
 
         hideNewPost: function() {

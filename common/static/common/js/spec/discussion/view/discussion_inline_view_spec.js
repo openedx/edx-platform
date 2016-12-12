@@ -120,12 +120,35 @@
                 expect(testView.$('.new-post-article')).toHaveClass('is-hidden');
             });
 
-            it('should be hidden when the "close" button is clicked', function() {
+            it('should be hidden when the "Close" button is clicked', function() {
                 var testView = createTestView(this);
                 showDiscussion(this, testView);
                 testView.$('.new-post-btn').click();
                 testView.$('.forum-new-post-form .add-post-cancel').click();
                 expect(testView.$('.new-post-article')).toHaveClass('is-hidden');
+            });
+
+            it('should return to the thread listing after adding a post', function() {
+                var testView = createTestView(this);
+                showDiscussion(this, testView);
+
+                // Navigate to an individual thread
+                testView.$('.forum-nav-thread-link').click();
+
+                // Click "Add a Post", fill in the form, and submit it
+                testView.$('.new-post-btn').click();
+                testView.$('.js-post-title').text('Test title');
+                testView.$('.wmd-input').text('Test body');
+                setNextAjaxResult(this, {
+                    hello: 'world'
+                });
+                testView.$('.forum-new-post-form .submit').click();
+
+                // Verify that the list of threads is shown
+                expect(testView.$('.inline-threads')).not.toHaveClass('is-hidden');
+
+                // Verify that the individual thread is no longer shown
+                expect(testView.$('.group-visibility-label').length).toBe(0);
             });
         });
 
