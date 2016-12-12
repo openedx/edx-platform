@@ -156,6 +156,10 @@ class DashboardPage(PageObject):
         """ Retrieves the specified social sharing widget by its classification """
         return self.q(css='a.action-{}'.format(widget_name))
 
+    def get_profile_img(self):
+        """ Retrieves the user's profile image """
+        return self.q(css='img.user-image-frame')
+
     def get_courses(self):
         """
         Get all courses shown in the dashboard
