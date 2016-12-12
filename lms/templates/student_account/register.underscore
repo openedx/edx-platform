@@ -3,7 +3,7 @@
     <ul class="message-copy"></ul>
 </div>
 
-<form id="register" class="register-form" autocomplete="off" tabindex="-1">
+<form id="register" class="register-form" autocomplete="off" tabindex="-1" method="POST">
 
     <% if (context.errorMessage) { %>
         <div class="status submission-error">
