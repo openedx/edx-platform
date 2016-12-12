@@ -23,6 +23,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
+from third_party_auth import pipeline
+from third_party_auth.provider import Registry
+from third_party_auth.pipeline import active_provider_requires_data_sharing, active_provider_requests_data_sharing
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
 from student.forms import get_registration_extension_form
@@ -278,6 +281,12 @@ class RegistrationView(APIView):
                     form_desc,
                     required=self._is_field_required(field_name)
                 )
+
+        # Add a data sharing consent dialog if it's requested
+        if active_provider_requests_data_sharing(request):
+            required = active_provider_requires_data_sharing(request)
+            provider_name = Registry.get_from_pipeline(pipeline.get(request)).name
+            self._add_data_sharing_consent_field(form_desc, provider_name, required)
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
@@ -835,6 +844,34 @@ class RegistrationView(APIView):
             },
             supplementalLink=terms_link,
             supplementalText=terms_text
+        )
+
+    def _add_data_sharing_consent_field(self, form_desc, sso_name, required=True):
+        """
+        Adds a checkbox field to be selected if the user consents to share data with
+        the SSO provider with which they're authenticating.
+        """
+        label = _(
+            "I agree to allow {platform_name} to share data about my enrollment, "
+            "completion and performance in all {platform_name} courses and programs "
+            "where my enrollment is sponsored by {sso_name}."
+        ).format(
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
+            sso_name=sso_name
+        )
+
+        error_msg = _(
+            "To link your account with {sso_name}, you are required to consent to data sharing."
+        ).format(
+            sso_name=sso_name
+        )
+        form_desc.add_field(
+            "data_sharing_consent",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
+            error_messages={"required": error_msg},
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):

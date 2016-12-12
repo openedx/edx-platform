@@ -83,6 +83,7 @@ import student
 from logging import getLogger
 
 from . import provider
+from .models import UserDataSharingConsentAudit
 
 
 # These are the query string params you can pass
@@ -198,6 +199,32 @@ class ProviderUserState(object):
 def get(request):
     """Gets the running pipeline from the passed request."""
     return request.session.get('partial_pipeline')
+
+
+def active_provider_requires_data_sharing(request):
+    """
+    Determine two things - first, whether there's an active third-party
+    identity provider currently running, and second, if that active provider
+    requires data sharing consent in order to proceed.
+    """
+    running_pipeline = get(request)
+    if running_pipeline:
+        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        return current_provider and current_provider.require_data_sharing_consent
+    return False
+
+
+def active_provider_requests_data_sharing(request):
+    """
+    Determines two things - first, whether there's an active third-party
+    identity provider currently running, and second, if that active provider
+    requests data sharing consent in order to proceed.
+    """
+    running_pipeline = get(request)
+    if running_pipeline:
+        current_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        return current_provider and current_provider.request_data_sharing_consent
+    return False
 
 
 def get_authenticated_user(auth_provider, username, uid):
@@ -648,6 +675,49 @@ def login_analytics(strategy, auth_entry, *args, **kwargs):
                 }
             }
         )
+
+
+@partial.partial
+def verify_data_sharing_consent(social, backend, **kwargs):
+    """
+    Checks to ensure that the user has provided data sharing consent
+    if the active SSO provider requires it; if not, then the user will
+    be redirected to a page from which they can provide consent.
+    """
+
+    def redirect_to_consent():
+        """
+        Method redirects the user to a page from which they can provide
+        required data sharing consent before proceeding in the pipeline
+        """
+        return redirect(reverse('grant_data_sharing_permissions'))
+
+    current_provider = provider.Registry.get_from_pipeline({'backend': backend.name, 'kwargs': kwargs})
+    if not current_provider.require_data_sharing_consent:
+        return
+    try:
+        consent = social.data_sharing_consent_audit
+    except UserDataSharingConsentAudit.DoesNotExist:
+        return redirect_to_consent()
+    if not consent.enabled:
+        return redirect_to_consent()
+
+
+def set_data_sharing_consent_record(social, data_sharing_consent=None, **kwargs):
+    """
+    If the pipeline produced a command to explicitly set the data sharing consent
+    record a particular way, set it that way.
+    """
+    if data_sharing_consent is None:
+        return
+
+    consent, _ = UserDataSharingConsentAudit.objects.get_or_create(user_social_auth=social)
+
+    if data_sharing_consent:
+        consent.enable()
+    else:
+        consent.disable()
+    consent.save()
 
 
 @partial.partial

@@ -54,7 +54,7 @@ class IntegrationTestMixin(object):
         self.addCleanup(patcher.stop)
         # Override this method in a subclass and enable at least one provider.
 
-    def test_register(self):
+    def test_register(self, data_sharing_consent=False):
         # The user goes to the register page, and sees a button to register with the provider:
         provider_register_url = self._check_register_page()
         # The user clicks on the Dummy button:
@@ -76,15 +76,18 @@ class IntegrationTestMixin(object):
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
         self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
+        registration_values = {
+            'email': 'email-edited@tpa-test.none',
+            'name': 'My Customized Name',
+            'username': 'new_username',
+            'honor_code': True,
+        }
+        if data_sharing_consent:
+            registration_values.update({'data_sharing_consent': True})
         # Now complete the form:
         ajax_register_response = self.client.post(
             reverse('user_api_registration'),
-            {
-                'email': 'email-edited@tpa-test.none',
-                'name': 'My Customized Name',
-                'username': 'new_username',
-                'honor_code': True,
-            }
+            registration_values
         )
         self.assertEqual(ajax_register_response.status_code, 200)
         # Then the AJAX will finish the third party auth:

@@ -1644,6 +1644,11 @@ def create_account_with_params(request, params):
     if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
 
+    if pipeline.active_provider_requests_data_sharing(request):
+        extra_fields['data_sharing_consent'] = 'optional'
+    if pipeline.active_provider_requires_data_sharing(request):
+        extra_fields['data_sharing_consent'] = 'required'
+
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
     # unless originally we didn't get a valid email or name from the external auth
@@ -1740,6 +1745,7 @@ def create_account_with_params(request, params):
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        running_pipeline['kwargs']['data_sharing_consent'] = form.cleaned_data.get('data_sharing_consent', None)
 
     # Track the user's registration
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:
