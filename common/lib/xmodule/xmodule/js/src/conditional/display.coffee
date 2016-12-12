@@ -15,24 +15,23 @@ class @Conditional
       @render(element)
 
   render: (element) ->
-      $.postWithPrefix "#{@url}/conditional_get", (response) =>
+    $.postWithPrefix "#{@url}/conditional_get", (response) =>
+      parentEl = $(element).parent()
+      parentId = parentEl.attr 'id'
+
+      if response.message?
         @el.html ''
         @el.append(i) for i in response.html
 
-        parentEl = $(element).parent()
-        parentId = parentEl.attr 'id'
-
-        if response.message is false
-          if parentEl.hasClass('vert')
-            parentEl.hide()
-          else
-            $(element).hide()
+        if parentEl.hasClass('vert')
+          parentEl.show()
         else
-          if parentEl.hasClass('vert')
-            parentEl.show()
-          else
-            $(element).show()
+          $(element).show()
+      else
+        promises = []
+        for fragment in response
+          promise = XBlock.renderXBlockFragment fragment, @el
+          promises.push promise
 
-        # The children are rendered with a new request, so they have a different request-token.
-        # Use that token instead of @requestToken by simply not passing a token into initializeBlocks.
-        XBlock.initializeBlocks(@el)
+        $.when.apply(null, promises).always =>
+          XBlock.initializeBlocks @el

@@ -107,5 +107,75 @@
                 expect(XBlock.initializeBlock).toHaveBeenCalledWith(this.vZNode, 'req-token-z');
             });
         });
+        describe("renderXBlockFragment", function() {
+            var postXBlockRequest;
+            postXBlockRequest = function(resources) {
+                var element, fragment, mock_xblock_html;
+                mock_xblock_html = '<div class="mock_xblock"></div>';
+                element = $('#vA');
+                fragment = {
+                    html: mock_xblock_html,
+                    resources: resources
+                };
+              XBlock.renderXBlockFragment(fragment, element);
+              expect(element.html()).toContain(mock_xblock_html);
+            };
+
+            it("can render an xblock with no CSS or JavaScript", function() {
+                postXBlockRequest([]);
+            });
+
+            it("can render an xblock with required CSS", function() {
+                var headHtml, mockCssText, mockCssUrl;
+                mockCssText = "// Just a comment";
+                mockCssUrl = "mock.css";
+                postXBlockRequest([
+                  [
+                    "hash1", {
+                      mimetype: "text/css",
+                      kind: "text",
+                      data: mockCssText
+                    }
+                  ], [
+                    "hash2", {
+                      mimetype: "text/css",
+                      kind: "url",
+                      data: mockCssUrl
+                    }
+                  ]
+                ]);
+                headHtml = $('head').html();
+                expect(headHtml).toContain(mockCssText);
+                expect(headHtml).toContain(mockCssUrl);
+            });
+
+            it("can render an xblock with required JavaScript", function() {
+                postXBlockRequest([
+                  [
+                    "hash3", {
+                      mimetype: "application/javascript",
+                      kind: "text",
+                      data: "window.test = 100;"
+                    }
+                  ]
+                ]);
+                expect(window.test).toBe(100);
+            });
+
+            it("can render an xblock with required HTML", function() {
+                var mockHeadTag;
+                mockHeadTag = "<title>Test Title</title>";
+                postXBlockRequest([
+                  [
+                    "hash4", {
+                      mimetype: "text/html",
+                      placement: "head",
+                      data: mockHeadTag
+                    }
+                  ]
+                ]);
+                expect($('head').html()).toContain(mockHeadTag);
+            });
+        });
     });
 }).call(this);

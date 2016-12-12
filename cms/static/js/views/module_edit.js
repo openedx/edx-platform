@@ -78,7 +78,7 @@
                                 Accept: 'application/json'
                             },
                             success: function(fragment) {
-                                return _this.renderXBlockFragment(fragment, target).done(callback);
+                                return XBlock.renderXBlockFragment(fragment, target).done(callback);
                             }
                         });
                     }
