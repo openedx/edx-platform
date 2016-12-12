@@ -2662,7 +2662,6 @@ OPTIONAL_APPS = (
 
     # Enterprise App (http://github.com/edx/edx-enterprise)
     'enterprise',
-
     # Required by the Enterprise App
     'django_object_actions',  # https://github.com/crccheck/django-object-actions
 )
