@@ -305,6 +305,13 @@ class LmsDashboardPageTest(BaseLmsDashboardTest):
         # and course starts within 5 days
         self.assertEqual(course_date, expected_course_date)
 
+    def test_profile_img_alt_empty(self):
+        """
+        Validate value of profile image alt attribue is null
+        """
+        profile_img = self.dashboard_page.get_profile_img()
+        self.assertEqual(profile_img.attrs('alt')[0], '')
+
 
 @attr('a11y')
 class LmsDashboardA11yTest(BaseLmsDashboardTestMultiple):
