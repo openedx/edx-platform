@@ -206,7 +206,7 @@
             if (this.showed) {
                 this.$('section.discussion').find('.inline-discussion-thread-container').addClass('is-hidden');
                 this.$('section.discussion').find('.add_post_btn_container').addClass('is-hidden');
-                this.newPostForm.removeClass('is-hidden').find('.js-post-title').focus();
+                this.newPostForm.removeClass('is-hidden').find('.js-post-title');
             }
             this.newPostView.$el.removeClass('is-hidden');
             this.toggleDiscussionBtn.addClass('shown');
