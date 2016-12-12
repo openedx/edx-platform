@@ -76,15 +76,16 @@ class IntegrationTestMixin(object):
         self.assertEqual(form_fields['email']['defaultValue'], self.USER_EMAIL)
         self.assertEqual(form_fields['name']['defaultValue'], self.USER_NAME)
         self.assertEqual(form_fields['username']['defaultValue'], self.USER_USERNAME)
+        registration_values = {
+            'email': 'email-edited@tpa-test.none',
+            'name': 'My Customized Name',
+            'username': 'new_username',
+            'honor_code': True,
+        }
         # Now complete the form:
         ajax_register_response = self.client.post(
             reverse('user_api_registration'),
-            {
-                'email': 'email-edited@tpa-test.none',
-                'name': 'My Customized Name',
-                'username': 'new_username',
-                'honor_code': True,
-            }
+            registration_values
         )
         self.assertEqual(ajax_register_response.status_code, 200)
         # Then the AJAX will finish the third party auth:

@@ -74,6 +74,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from social.apps.django_app.default import models
+from social.apps.django_app.default.models import UserSocialAuth
 from social.exceptions import AuthException
 from social.pipeline import partial
 from social.pipeline.social_auth import associate_by_email
@@ -198,6 +199,38 @@ class ProviderUserState(object):
 def get(request):
     """Gets the running pipeline from the passed request."""
     return request.session.get('partial_pipeline')
+
+
+def get_real_social_auth_object(request):
+    """
+    At times, the pipeline will have a "social" kwarg that contains a dictionary
+    rather than an actual DB-backed UserSocialAuth object. We need the real thing,
+    so this method allows us to get that by passing in the relevant request.
+    """
+    running_pipeline = get(request)
+    if running_pipeline and 'social' in running_pipeline['kwargs']:
+        social = running_pipeline['kwargs']['social']
+        if isinstance(social, dict):
+            social = UserSocialAuth.objects.get(uid=social.get('uid', ''))
+        return social
+
+
+def quarantine_session(request, locations):
+    """
+    Set a session variable indicating that the session is restricted
+    to being used in views contained in the modules listed by string
+    in the `locations` argument.
+
+    Example: ``quarantine_session(request, ('enterprise.views',))``
+    """
+    request.session['third_party_auth_quarantined_modules'] = locations
+
+
+def lift_quarantine(request):
+    """
+    Remove the session quarantine variable.
+    """
+    request.session.pop('third_party_auth_quarantined_modules', None)
 
 
 def get_authenticated_user(auth_provider, username, uid):

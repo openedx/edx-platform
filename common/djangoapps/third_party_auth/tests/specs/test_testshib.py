@@ -163,6 +163,7 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
     def _configure_testshib_provider(self, **kwargs):
         """ Enable and configure the TestShib SAML IdP as a third_party_auth provider """
         fetch_metadata = kwargs.pop('fetch_metadata', True)
+        assert_metadata_updates = kwargs.pop('assert_metadata_updates', True)
         kwargs.setdefault('name', self.PROVIDER_NAME)
         kwargs.setdefault('enabled', True)
         kwargs.setdefault('visible', True)
@@ -176,9 +177,10 @@ class TestShibIntegrationTest(IntegrationTestMixin, testutil.SAMLTestCase):
         if fetch_metadata:
             self.assertTrue(httpretty.is_enabled())
             num_changed, num_failed, num_total = fetch_saml_metadata()
-            self.assertEqual(num_failed, 0)
-            self.assertEqual(num_changed, 1)
-            self.assertEqual(num_total, 1)
+            if assert_metadata_updates:
+                self.assertEqual(num_failed, 0)
+                self.assertEqual(num_changed, 1)
+                self.assertEqual(num_total, 1)
 
     def do_provider_login(self, provider_redirect_url):
         """ Mocked: the user logs in to TestShib and then gets redirected back """

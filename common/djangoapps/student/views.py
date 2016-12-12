@@ -46,6 +46,7 @@ from social.exceptions import AuthException, AuthAlreadyAssociated
 
 from edxmako.shortcuts import render_to_response, render_to_string
 
+from util.enterprise_helpers import data_sharing_consent_requirement_at_login
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
 from student.models import (
@@ -1644,6 +1645,10 @@ def create_account_with_params(request, params):
     if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
 
+    # Add a form requirement for data sharing consent if the EnterpriseCustomer
+    # for the request requires it at login
+    extra_fields['data_sharing_consent'] = data_sharing_consent_requirement_at_login(request)
+
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
     # unless originally we didn't get a valid email or name from the external auth
@@ -1740,6 +1745,9 @@ def create_account_with_params(request, params):
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
         third_party_provider = provider.Registry.get_from_pipeline(running_pipeline)
+        # Store received data sharing consent field values in the pipeline for use
+        # by any downstream pipeline elements which require them.
+        running_pipeline['kwargs']['data_sharing_consent'] = form.cleaned_data.get('data_sharing_consent', None)
 
     # Track the user's registration
     if hasattr(settings, 'LMS_SEGMENT_KEY') and settings.LMS_SEGMENT_KEY:

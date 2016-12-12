@@ -17,6 +17,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from django_comment_common.models import ForumsConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from util.enterprise_helpers import enterprise_enabled
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -857,6 +858,12 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         # NOTE: The following login_oauth_token endpoint is DEPRECATED.
         # Please use the exchange_access_token endpoint instead.
         url(r'^login_oauth_token/(?P<backend>[^/]+)/$', 'student.views.login_oauth_token'),
+    )
+
+# Enterprise
+if enterprise_enabled():
+    urlpatterns += (
+        url(r'', include('enterprise.urls')),
     )
 
 # OAuth token exchange
