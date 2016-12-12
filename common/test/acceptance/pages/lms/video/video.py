@@ -629,7 +629,7 @@ class VideoPage(PageObject):
         """
         self.wait_for_ajax()
 
-        # Yes, I feel unclean putting this in:
+        # TODO remove this sleep and wait for the right thing to finish rendering
         time.sleep(1)
 
         # mouse over to transcript button

@@ -1014,7 +1014,6 @@ class Html5VideoTest(VideoBaseTest):
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertTrue(self.video.downloaded_transcript_contains_text('srt', unicode_text))
 
-    @flaky(max_runs=10, min_passes=10)
     def test_download_button_two_transcript_languages(self):
         """
         Scenario: Download button works correctly for multiple transcript languages in HTML5 mode
@@ -1031,7 +1030,6 @@ class Html5VideoTest(VideoBaseTest):
         self.metadata = self.metadata_for_mode('html5', additional_data=data)
 
         # go to video
-        # from nose.tools import set_trace; set_trace()
         self.navigate_to_video()
 
         # check if "Welcome to edX." text in the captions
