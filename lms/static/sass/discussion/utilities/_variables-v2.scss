@@ -19,7 +19,7 @@ $forum-color-marked-answer: palette(success, text) !default;
 $forum-color-border: palette(grayscale, back) !default;
 $forum-color-error: palette(error, accent) !default;
 $forum-color-hover-thread: palette(grayscale, x-back) !default;
-$forum-color-reading-thread: $forum-color-primary !default;
+$forum-color-reading-thread: palette(grayscale, x-back) !default;
 $forum-color-read-post: palette(grayscale, base) !default;
 $forum-color-never-read-post: $forum-color-primary !default;
 $forum-color-editor-preview-label: palette(grayscale, base) !default;

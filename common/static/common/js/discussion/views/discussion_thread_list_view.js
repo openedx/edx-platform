@@ -91,6 +91,7 @@
             DiscussionThreadListView.prototype.initialize = function(options) {
                 var self = this;
                 this.courseSettings = options.courseSettings;
+                this.supportsActiveThread = options.supportsActiveThread;
                 this.displayedCollection = new Discussion(this.collection.models, {
                     pages: this.collection.pages
                 });
@@ -164,7 +165,7 @@
                 active = $currentElement.has('.forum-nav-thread-link.is-active').length !== 0;
                 $currentElement.replaceWith($content);
                 this.showMetadataAccordingToSort();
-                if (active) {
+                if (this.supportsActiveThread && active) {
                     this.setActiveThread(threadId);
                 }
             };
@@ -347,7 +348,9 @@
             DiscussionThreadListView.prototype.threadSelected = function(e) {
                 var threadId;
                 threadId = $(e.target).closest('.forum-nav-thread').attr('data-id');
-                this.setActiveThread(threadId);
+                if (this.supportsActiveThread) {
+                    this.setActiveThread(threadId);
+                }
                 this.trigger('thread:selected', threadId);
                 return false;
             };

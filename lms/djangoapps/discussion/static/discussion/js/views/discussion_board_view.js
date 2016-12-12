@@ -45,7 +45,8 @@
                 this.discussionThreadListView = new DiscussionThreadListView({
                     collection: this.discussion,
                     el: this.$('.discussion-thread-list-container'),
-                    courseSettings: this.courseSettings
+                    courseSettings: this.courseSettings,
+                    supportsActiveThread: true
                 }).render();
                 this.searchView = new DiscussionSearchView({
                     el: this.$('.forum-search')
