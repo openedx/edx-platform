@@ -269,6 +269,12 @@ class RegistrationView(APIView):
                     options=getattr(field, 'choices', None), error_messages=field.error_messages,
                     include_default_option=field_options.get('include_default_option'),
                 )
+        if third_party_auth.is_enabled():
+            running_pipeline = third_party_auth.pipeline.get(request)
+            if running_pipeline:
+                current_provider = third_party_auth.provider.Registry.get_from_pipeline(running_pipeline)
+                if current_provider and current_provider.show_data_sharing_consent_checkbox():
+                    self._add_request_data_sharing_consent_field(form_desc, current_provider)
 
         # Extra fields configured in Django settings
         # may be required, optional, or hidden
@@ -835,6 +841,33 @@ class RegistrationView(APIView):
             },
             supplementalLink=terms_link,
             supplementalText=terms_text
+        )
+
+    def _add_request_data_sharing_consent_field(self, form_desc, provider):
+        """
+        Adds a field to the form that allows the user to enable data sharing
+        """
+        default_label = _(u"I consent to share coursework data with {provider_name}").format(
+            provider_name=provider.name
+        )
+        label = provider.data_sharing_consent_prompt or default_label
+
+        default_error_msg = _(u"{provider_name} requires that you consent to sharing coursework data.").format(
+            provider_name=provider.name
+        )
+        error_msg = provider.data_sharing_consent_error or default_error_msg
+
+        required = provider.require_data_sharing_consent
+
+        form_desc.add_field(
+            "data_sharing_consent",
+            label=label,
+            field_type="checkbox",
+            default=False,
+            required=required,
+            error_messages={
+                "required": error_msg,
+            },
         )
 
     def _apply_third_party_auth_overrides(self, request, form_desc):

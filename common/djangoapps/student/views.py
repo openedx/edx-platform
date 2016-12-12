@@ -1521,7 +1521,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
-def _do_create_account(form, custom_form=None):
+def _do_create_account(form, custom_form=None, request=None):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
     registration for this user.
@@ -1569,6 +1569,12 @@ def _do_create_account(form, custom_form=None):
             )
         else:
             raise
+    # Add a pipeline flag to create a DataSharingConsentSettings object
+    if request is not None and third_party_auth.is_enabled() and pipeline.running(request):
+        running_pipeline = pipeline.get(request)
+        if running_pipeline:
+            sharing_authorized = bool(form.cleaned_data.get('data_sharing_consent'))
+            running_pipeline['kwargs']['create_data_sharing_consent'] = sharing_authorized
 
     # add this account creation to password history
     # NOTE, this will be a NOP unless the feature has been turned on in configuration
@@ -1643,6 +1649,14 @@ def create_account_with_params(request, params):
 
     if should_link_with_social_auth or (third_party_auth.is_enabled() and pipeline.running(request)):
         params["password"] = pipeline.make_random_password()
+        running_pipeline = pipeline.get(request)
+        if running_pipeline:
+            current_provider = provider.Registry.get_from_pipeline(running_pipeline)
+            consent_field = {
+                'data_sharing_consent': 'require' if current_provider.require_data_sharing_consent else 'optional'
+            }
+            if current_provider and current_provider.show_data_sharing_consent_checkbox():
+                extra_fields.update(consent_field)
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
@@ -1691,7 +1705,7 @@ def create_account_with_params(request, params):
     # Perform operations within a transaction that are critical to account creation
     with transaction.atomic():
         # first, create the account
-        (user, profile, registration) = _do_create_account(form, custom_form)
+        (user, profile, registration) = _do_create_account(form, custom_form, request)
 
         # next, link the account with social auth, if provided via the API.
         # (If the user is using the normal register page, the social auth pipeline does the linking, not this code)

@@ -188,6 +188,15 @@ class AccountCreationForm(forms.Form):
                                 "required": _("To enroll, you must follow the honor code.")
                             }
                         )
+                elif field_name == "data_sharing_consent":
+                    if field_value == "require":
+                        self.fields[field_name] = TrueField(
+                            error_messages={
+                                "required": _("Your ID provider requires you to consent to data sharing.")
+                            }
+                        )
+                    elif field_value == "optional":
+                        self.fields[field_name] = forms.BooleanField()
                 else:
                     required = field_value == "required"
                     min_length = 1 if field_name in ("gender", "level_of_education") else 2

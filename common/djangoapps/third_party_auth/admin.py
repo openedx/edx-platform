@@ -15,7 +15,8 @@ from .models import (
     LTIProviderConfig,
     ProviderApiPermissions,
     _PSA_OAUTH2_BACKENDS,
-    _PSA_SAML_BACKENDS
+    _PSA_SAML_BACKENDS,
+    DataSharingConsentSetting
 )
 from .tasks import fetch_saml_metadata
 from third_party_auth.provider import Registry
@@ -169,3 +170,18 @@ class ApiPermissionsAdmin(admin.ModelAdmin):
     form = ApiPermissionsAdminForm
 
 admin.site.register(ProviderApiPermissions, ApiPermissionsAdmin)
+
+
+class DataSharingConsentSettingAdmin(admin.ModelAdmin):
+    """
+    Django admin form for DataSharingConsentSetting
+    """
+
+    readonly_fields = ('date_set',)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # editing an existing object
+            return self.model._meta.get_all_field_names()  # pylint: disable=protected-access
+        return self.readonly_fields
+
+admin.site.register(DataSharingConsentSetting, DataSharingConsentSettingAdmin)

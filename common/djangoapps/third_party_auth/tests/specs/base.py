@@ -84,6 +84,7 @@ class IntegrationTestMixin(object):
                 'name': 'My Customized Name',
                 'username': 'new_username',
                 'honor_code': True,
+                'data_sharing_consent': True,
             }
         )
         self.assertEqual(ajax_register_response.status_code, 200)
@@ -495,6 +496,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
             'password': 'password',
             'mailing_address': '',
             'email': 'user@email.com',
+            'data_sharing_consent': 'true',
         }
 
         if overrides:
