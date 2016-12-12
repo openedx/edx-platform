@@ -61,15 +61,30 @@ class RegistrationSerializer(serializers.Serializer):
     site = SiteSerializer()
     organization = OrganizationSerializer()
     user_email = serializers.EmailField(required=False)
+    password = serializers.CharField(required=False)
+    initial_values = serializers.DictField(required=False)
 
     def create(self, validated_data):
         site_data = validated_data.pop('site')
         site = Site.objects.create(**site_data)
         organization_data = validated_data.pop('organization')
         user_email = validated_data.pop('user_email', None)
-        organization, _, user = bootstrap_site(site, organization_data.get('name'), user_email)
+        password = validated_data.pop('password', None)
+        organization, site, user = bootstrap_site(site, organization_data.get('name'), user_email, password)
+        site_configuration = site.configuration
+        initial_values = validated_data.get('initial_values', {})
+        if initial_values:
+            site_configuration.values['platform_name'] = initial_values.get('platform_name')
+            site_configuration.set_sass_variables({
+                '$brand-primary-color': initial_values.get('primary_brand_color'),
+                '$base-text-color': initial_values.get('base_text_color'),
+                '$cta-button-bg': initial_values.get('cta_button_bg')
+            })
+            site_configuration.save()
         return {
             'site': site,
             'organization': organization,
-            'user_email': user.email
+            'user_email': user_email,
+            'password': 'hashed',
+            'initial_values': initial_values,
         }

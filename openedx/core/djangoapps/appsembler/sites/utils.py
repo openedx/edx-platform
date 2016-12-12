@@ -160,7 +160,7 @@ def json_to_sass(json_input):
     return dict_to_sass(sass_dict)
 
 
-def bootstrap_site(site, organization_id=None, user_email=None):
+def bootstrap_site(site, organization_slug=None, user_email=None, password=None):
     from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
@@ -168,13 +168,13 @@ def bootstrap_site(site, organization_id=None, user_email=None):
     SiteTheme.objects.create(site=site, theme_dir_name=settings.THEME_NAME)
     site.configuration_id = site_config.id
     # temp workarounds while old staging is still up and running
-    if organization_id:
+    if organization_slug:
         organization_data = add_organization({
-            'name': organization_id,
-            'short_name': organization_id
+            'name': organization_slug,
+            'short_name': organization_slug
         })
         organization = Organization.objects.get(id=organization_data.get('id'))
-        site_config.values['course_org_filter'] = organization_id
+        site_config.values['course_org_filter'] = organization_slug
         site_config.save()
     else:
         organization = {}

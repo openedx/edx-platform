@@ -164,6 +164,16 @@ class SiteConfiguration(models.Model):
                 if isinstance(processed, Exception):
                     raise processed
 
+    def set_sass_variables(self, entries):
+        """
+        Accepts a dict with the shape { var_name: value } and sets the SASS variables
+        """
+        for index, entry in enumerate(self.sass_variables):
+            var_name = entry[0]
+            if var_name in entries:
+                new_value = (var_name, (entries[var_name], entries[var_name]))
+                self.sass_variables[index] = new_value
+
     def _formatted_sass_variables(self):
         return " ".join(["{}: {};".format(var, val[0]) for var, val in self.sass_variables])
 
