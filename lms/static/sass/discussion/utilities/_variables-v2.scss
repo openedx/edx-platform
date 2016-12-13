@@ -3,6 +3,8 @@
 
 // base color variables
 $forum-color-primary: palette(primary, base) !default;
+$forum-color-copy-light: palette(grayscale, base) !default;
+$forum-color-background-light: palette(grayscale, x-back) !default;
 
 // contextual color variables
 $forum-color-background: $lms-container-background-color !default;
@@ -18,13 +20,13 @@ $forum-color-community-ta: palette(success, text) !default;
 $forum-color-marked-answer: palette(success, text) !default;
 $forum-color-border: palette(grayscale, back) !default;
 $forum-color-error: palette(error, accent) !default;
-$forum-color-hover-thread: palette(grayscale, x-back) !default;
-$forum-color-reading-thread: palette(grayscale, x-back) !default;
+$forum-color-hover-thread: $forum-color-background-light !default;
+$forum-color-reading-thread: $forum-color-background-light !default;
 $forum-color-read-post: palette(grayscale, base) !default;
 $forum-color-never-read-post: $forum-color-primary !default;
 $forum-color-editor-preview-label: palette(grayscale, base) !default;
 $forum-color-response-count: palette(grayscale, base) !default;
-$forum-color-navigation-bar: palette(grayscale, x-back) !default;
+$forum-color-navigation-bar: $forum-color-background-light !default;
 $forum-color-count: palette(grayscale, base) !default;
 $forum-color-background-label: palette(grayscale, base) !default;
 

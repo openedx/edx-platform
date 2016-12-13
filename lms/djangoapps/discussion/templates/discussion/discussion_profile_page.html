@@ -20,7 +20,6 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
 <%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="headextra">
-<%static:css group='style-inline-discussion'/>
 <%include file="_js_head_dependencies.html" />
 </%block>
 

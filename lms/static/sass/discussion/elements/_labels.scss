@@ -1,11 +1,11 @@
 // discussion - elements - labels
 // ====================
 
-.forum-nav-thread {
+.discussion {
   .post-label {
     @include margin($baseline/4, $baseline/2, 0, 0);
-    @extend %t-weight4;
     font-size: $forum-small-font-size;
+    font-weight: 100;
     display: inline;
     white-space: nowrap;
 

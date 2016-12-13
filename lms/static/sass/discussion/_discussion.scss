@@ -2,7 +2,7 @@
 // ====================
 // NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
 
-body.discussion {
+.discussion-body {
 
   .edit-post-form {
     @include clearfix();
@@ -175,18 +175,17 @@ body.discussion {
   }
 }
 
-.container .discussion-body {
+.discussion-body {
   @include clearfix();
   border: none;
   background: transparent;
   box-shadow: none;
-  line-height: 1.4;
 
   .bottom-post-status {
     padding: 30px;
     font-size: $forum-x-large-font-size;
     font-weight: 700;
-    color: $gray-l3;
+    color: $forum-color-copy-light;
     text-align: center;
   }
 
@@ -196,14 +195,10 @@ body.discussion {
     a {
       word-wrap: break-word;
     }
-
-    p + p {
-      margin-top: $baseline;
-    }
   }
 
   blockquote {
-    background: $gray-l5;
+    background: $forum-color-background-light;
     border-radius: $forum-border-radius;
     padding: ($baseline/4) ($baseline/2);
     font-size: $forum-base-font-size;
@@ -248,7 +243,6 @@ body.discussion {
   .discussion-reply-new {
     @include clearfix();
     @include transition(opacity .2s linear 0s);
-    padding: 0 ($baseline/2);
 
     h4 {
       font-size: $forum-large-font-size;
@@ -432,6 +426,8 @@ section.discussion-pagination {
 
 .response-count {
   @include float(right);
+  color: $forum-color-response-count;
+  font-size: $forum-base-font-size;
 }
 
 .response-pagination {

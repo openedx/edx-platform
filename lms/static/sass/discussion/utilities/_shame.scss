@@ -118,7 +118,20 @@ li[class*=forum-nav-thread-label-] {
 // -------
 .discussion-module {
 
-  .wrapper-post-header .post-title {
-    margin-bottom: 0 !important; // overrides "#seq_content h1" styling
+  .wrapper-post-header {
+    margin-bottom: 0 !important;  // overrides default header styling
+    padding-bottom: 0 !important;  // overrides default header styling
+
+    .posted-details {
+      margin: ($baseline/5) 0 !important; // overrides courseware p styling
+    }
+
+    .post-labels {
+      font-size: $forum-base-font-size; // overrides default heading styling
+    }
+
+    .post-title {
+      margin-bottom: 0 !important; // overrides "#seq_content h1" styling
+    }
   }
 }

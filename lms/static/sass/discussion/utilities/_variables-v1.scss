@@ -3,6 +3,8 @@
 
 // base color variables
 $forum-color-primary: $blue !default;
+$forum-color-copy-light: rgb(65, 65, 65) !default;
+$forum-color-background-light: rgb(245, 245, 245) !default;
 
 // contextual color variables
 $forum-color-background: $white;
@@ -18,13 +20,13 @@ $forum-color-community-ta: $green-d1 !default;
 $forum-color-marked-answer: $green-d1 !default;
 $forum-color-border: $gray-l3 !default;
 $forum-color-error: $red !default;
-$forum-color-hover-thread: #f6f6f6 !default;
-$forum-color-reading-thread: $gray-d3 !default;
+$forum-color-hover-thread: $forum-color-background-light !default;
+$forum-color-reading-thread: $forum-color-background-light !default;
 $forum-color-read-post: $gray-d3 !default;
 $forum-color-never-read-post: $forum-color-primary !default;
 $forum-color-editor-preview-label: $gray-d2 !default;
 $forum-color-response-count: $gray-d2 !default;
-$forum-color-navigation-bar: #f6f6f6 !default;
+$forum-color-navigation-bar: $forum-color-background-light !default;
 $forum-color-count: $gray-d3 !default;
 $forum-color-background-label:  $gray-d2 !default;
 

@@ -1,45 +1,6 @@
 // Layouts for discussion pages
 @import '../course/base/extends';
 
-.discussion-user-profile-board {
-
-    .discussion-profile-title {
-        margin-bottom: $baseline / 5;
-        font-size: $forum-x-large-font-size;
-    }
-
-    .discussion-profile-count {
-        margin-top: $baseline / 4;
-    }
-
-    .discussion-profile-info {
-        @include margin-right($baseline);
-    }
-
-    .user-name {
-        @include margin-right($baseline);
-        font-size: $forum-x-large-font-size;
-    }
-
-    .user-roles {
-        font-size: $forum-small-font-size;
-        font-style: italic;
-    }
-
-    .discussion-post .post-body {
-        width: 90%; // this page is full screen
-    }
-
-    .all-posts-btn {
-        padding: 0;
-        font-size: $forum-base-font-size;
-    }
-
-    .response-count {
-        @include margin-right($baseline / 4);
-    }
-}
-
 .discussion-column {
     min-height: 500px;
 

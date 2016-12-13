@@ -1,5 +1,21 @@
 <div class="discussion-post">
     <header class="wrapper-post-header">
+        <% if (!readOnly) { %>
+            <div class="post-header-actions post-extended-content">
+                <%=
+                _.template(
+                    $('#forum-actions').html())(
+                    {
+                        contentId: cid,
+                        contentType: 'post',
+                        primaryActions: ['vote', 'follow'],
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close'],
+                        readOnly: readOnly
+                    }
+                )
+                %>
+            </div>
+        <% } %>
         <div class="post-header-content">
             <h4 class="post-title"><%- title %></h4>
             <p class="posted-details">
@@ -32,22 +48,6 @@
                 </span>
             </div>
         </div>
-        <% if (!readOnly) { %>
-            <div class="post-header-actions post-extended-content">
-                <%=
-                _.template(
-                    $('#forum-actions').html())(
-                    {
-                        contentId: cid,
-                        contentType: 'post',
-                        primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close'],
-                        readOnly: readOnly
-                    }
-                )
-                %>
-            </div>
-        <% } %>
     </header>
 
     <div class="post-body"><%- body %></div>
