@@ -1,30 +1,5 @@
-<div class="status already-authenticated-msg hidden">
-    <% if (context.currentProvider) { %>
-        <p class="message-copy">
-            <%- _.sprintf( gettext("You have successfully signed into %(currentProvider)s, but your %(currentProvider)s account does not have a linked %(platformName)s account. To link your accounts, sign in now using your %(platformName)s password."), context ) %>
-        </p>
-    <% } %>
+<div class="js-form-feedback" aria-live="assertive" tabindex="-1">
 </div>
-
-<div aria-live="polite">
-    <div class="js-reset-success status submission-success hidden">
-        <h4 class="message-title"><%- gettext("Check Your Email") %></h4>
-        <div class="message-copy">
-        </div>
-    </div>
-
-    <div class="status submission-error hidden">
-        <h4 class="message-title"><%- gettext("We couldn't sign you in.") %></h4>
-        <ul class="message-copy"></ul>
-    </div>
-</div>
-
-<% if (context.errorMessage) { %>
-    <div class="status submission-error">
-        <h4 class="message-title"><%- _.sprintf( gettext("An error occurred when signing you in to %(platformName)s."), context ) %></h4>
-        <ul class="message-copy"><%- context.errorMessage %></ul>
-    </div>
-<% } %>
 
 <form id="login" class="login-form" tabindex="-1" method="POST">
 
