@@ -642,7 +642,7 @@
                 ],
                 exports: 'ThreadResponseView'
             },
-            'common/js/discussion/discussion_module_view': {
+            'common/js/discussion/views/discussion_inline_view': {
                 deps: [
                     'jquery',
                     'underscore',
@@ -666,7 +666,7 @@
                     'common/js/discussion/views/thread_response_show_view',
                     'common/js/discussion/views/thread_response_view'
                 ],
-                exports: 'DiscussionModuleView'
+                exports: 'DiscussionInlineView'
             },
             'common/js/spec_helpers/discussion_spec_helper': {
                 deps: [

@@ -1,7 +1,10 @@
 // discussion - utilities - variables
 // ====================
 
-// color variables
+// base color variables
+$forum-color-primary: palette(primary, base) !default;
+
+// contextual color variables
 $forum-color-background: $lms-container-background-color !default;
 $forum-color-active-thread: $lms-active-color !default;
 $forum-color-hover: palette(primary, dark) !default;
@@ -9,18 +12,19 @@ $forum-color-active-text: $lms-container-background-color !default;
 $forum-color-pinned: palette(secondary, dark) !default;
 $forum-color-reported: palette(secondary, dark) !default;
 $forum-color-closed: $black !default;
-$forum-color-following: palette(primary, base) !default;
-$forum-color-staff: palette(primary, base) !default;
+$forum-color-following: $forum-color-primary !default;
+$forum-color-staff: $forum-color-primary !default;
 $forum-color-community-ta: palette(success, text) !default;
 $forum-color-marked-answer: palette(success, text) !default;
 $forum-color-border: palette(grayscale, back) !default;
 $forum-color-error: palette(error, accent) !default;
 $forum-color-hover-thread: palette(grayscale, x-back) !default;
-$forum-color-reading-thread: palette(primary, base) !default;
+$forum-color-reading-thread: $forum-color-primary !default;
 $forum-color-read-post: palette(grayscale, base) !default;
-$forum-color-never-read-post: palette(primary, base) !default;
+$forum-color-never-read-post: $forum-color-primary !default;
 $forum-color-editor-preview-label: palette(grayscale, base) !default;
 $forum-color-response-count: palette(grayscale, base) !default;
+$forum-color-navigation-bar: $forum-color-primary !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin

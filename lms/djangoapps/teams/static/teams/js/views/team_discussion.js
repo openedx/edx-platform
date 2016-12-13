@@ -3,21 +3,19 @@
  */
 (function(define) {
     'use strict';
-    define(['backbone', 'underscore', 'gettext', 'common/js/discussion/discussion_module_view'],
-        function(Backbone, _, gettext, DiscussionModuleView) {
+    define(['backbone', 'underscore', 'gettext', 'common/js/discussion/views/discussion_inline_view'],
+        function(Backbone, _, gettext, DiscussionInlineView) {
             var TeamDiscussionView = Backbone.View.extend({
                 initialize: function() {
                     window.$$course_id = this.$el.data('course-id');
                 },
 
                 render: function() {
-                    var discussionModuleView = new DiscussionModuleView({
+                    var discussionInlineView = new DiscussionInlineView({
                         el: this.$el,
-                        readOnly: this.$el.data('read-only') === true,
-                        context: 'standalone'
+                        showByDefault: true
                     });
-                    discussionModuleView.render();
-                    discussionModuleView.loadPage(this.$el);
+                    discussionInlineView.render();
                     return this;
                 }
             });

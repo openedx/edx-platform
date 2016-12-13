@@ -122,6 +122,7 @@
 // -------------------
 // Sort and filter bar
 // -------------------
+
 .forum-nav-refine-bar {
     @include clearfix();
     @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
@@ -191,6 +192,12 @@
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+}
+
+// Overrides underspecific style from courseware css:
+// https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L402
+.course-wrapper .course-content .forum-nav-thread-list li {
+    margin: 0;
 }
 
 .forum-nav-thread {
