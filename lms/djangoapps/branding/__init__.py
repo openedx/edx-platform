@@ -10,7 +10,6 @@ such as the site visible courses, university name and logo.
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from django.conf import settings
-from branding_stanford.models import TileConfiguration
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from microsite_configuration import microsite
@@ -29,10 +28,6 @@ def get_visible_courses(org=None, filter_=None):
         filter_ (dict): Optional parameter that allows custom filtering by
             fields on the course.
     """
-    # In the event we don't want any course tiles displayed
-    if not getattr(settings, 'DISPLAY_COURSE_TILES', False):
-        return []
-
     microsite_org = microsite.get_value('course_org_filter')
 
     if org and microsite_org:
@@ -50,15 +45,6 @@ def get_visible_courses(org=None, filter_=None):
         courses = CourseOverview.get_all_courses(org=target_org, filter_=filter_)
 
     courses = sorted(courses, key=lambda course: course.number)
-
-    filtered_by_db = TileConfiguration.objects.filter(
-        enabled=True,
-    ).values('course_id').order_by('-change_date')
-
-    if filtered_by_db:
-        filtered_by_db_ids = [course['course_id'] for course in filtered_by_db]
-        filtered_by_db_keys = frozenset([SlashSeparatedCourseKey.from_string(c) for c in filtered_by_db_ids])
-        return [course for course in courses if course.id in filtered_by_db_keys]
 
     # When called in the context of a microsite, filtering can stop here.
     if microsite_org:
