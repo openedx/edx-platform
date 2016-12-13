@@ -1838,6 +1838,66 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.assertEqual(response.status_code, 200)
         return response
 
+    def test_enrollment_without_professional_mode_non_staff_user(self):
+        """
+        For courses without a professional course mode, use "audit" as the course mode when bulk enrolling users for
+        non-staff users.
+        """
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        params = {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': False}
+        response = self.client.post(url, params)
+
+        self.assertEqual(response.status_code, 200)
+
+        # test the response data
+        expected = {
+            "action": "enroll",
+            "auto_enroll": False,
+            "results": [
+                {
+                    "identifier": self.notenrolled_student.email,
+                    "before": {
+                        "enrollment": False,
+                        "auto_enroll": False,
+                        "user": True,
+                        "allowed": False,
+                    },
+                    "after": {
+                        "enrollment": True,
+                        "auto_enroll": False,
+                        "user": True,
+                        "allowed": False,
+                    }
+                }
+            ]
+        }
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the enrollment is made using "audit" as the course mode for non staff user
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.notenrolled_student, course_id=self.course.id
+        )
+        self.assertEqual(course_enrollment.mode, CourseMode.AUDIT)
+
+    def test_enrollment_professional_course_mode_non_staff_user(self):
+        """
+        For courses with a professional course mode, bulk enrollment should not be allowed for non staff users.
+        """
+        course_mode = CourseMode(
+            course_id=self.course.id,
+            mode_slug=CourseMode.PROFESSIONAL,
+            min_price=40
+        )
+        course_mode.save()
+
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        params = {'identifiers': self.notenrolled_student.email, 'action': 'enroll', 'email_students': False}
+        response = self.client.post(url, params)
+
+        self.assertEqual(response.status_code, 400)
+
 
 @attr(shard=1)
 @ddt.ddt

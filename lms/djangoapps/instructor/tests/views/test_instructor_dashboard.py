@@ -321,6 +321,40 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         # Max number of student per page is one.  Patched setting MAX_STUDENTS_PER_PAGE_GRADE_BOOK = 1
         self.assertEqual(len(response.mako_context['students']), 1)  # pylint: disable=no-member
 
+    def test_bulk_enrollment_section_professional_course_mode(self):
+        """
+        For courses with a professional course mode, remove the entire bulk enrollment section from the "Membership"
+        tab of the Instructor Dashboard for non-staff users.
+        """
+        course_mode = CourseMode(
+            course_id=self.course.id,
+            mode_slug=CourseMode.PROFESSIONAL,
+            min_price=40
+        )
+        course_mode.save()
+        response = self.client.get(self.url)
+        self.assertIn('<fieldset class="batch-enrollment membership-section">', response.content)
+
+        staff = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertNotIn('<fieldset class="batch-enrollment membership-section">', response.content)
+
+    def test_course_mode_option_membership_section(self):
+        """
+        For courses without a professional course mode, remove the "Select a course mode" button from the bulk
+        enrollment section for non-staff users.
+        """
+        response = self.client.get(self.url)
+        self.assertIn('<label for="course-modes-list-selector" class="has-hint">Select a course mode:',
+                      response.content)
+
+        staff = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertNotIn('<label for="course-modes-list-selector" class="has-hint">Select a course mode:',
+                         response.content)
+
 
 @ddt.ddt
 class TestInstructorDashboardPerformance(ModuleStoreTestCase, LoginEnrollmentTestCase, XssTestMixin):
