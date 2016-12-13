@@ -2056,13 +2056,32 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
             url += '?' + url_encoded_params
         return self.client.get(url)
 
-    def verify_response(self, expected_response_code=200, url_params=None):
+    def test_vertical_block_chromeless_view(self):
         """
-        Overridable method to verify the response with HTTP code 200.
+        Test that vertical block doesn't contain bookmarks.
         """
-        response = super(TestRenderXBlock, self).verify_response(expected_response_code, url_params)
-        if expected_response_code == 200:
-            self.assertNotContains(response, self.BOOKMARK_HTML_ELEMENT)
+        self.course = CourseFactory.create()
+        self.setup_user(admin=True, enroll=True, login=True)
+
+        self.chapter = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.course.location, category='chapter', display_name="Chapter"
+        )
+        self.section = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.chapter.location, category='sequential', display_name="Sequence"
+        )
+        self.vertical = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.section.location, category='vertical', display_name="Vertical"
+        )
+        self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.vertical.location, category='html', data="Test HTML Content"
+        )
+
+        url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.vertical.location)})
+        response = self.client.get(url)
+
+        for chrome_element in [self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS]:
+            self.assertNotContains(response, chrome_element)
+        self.assertNotContains(response, self.BOOKMARK_HTML_ELEMENT)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):
