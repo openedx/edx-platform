@@ -38,7 +38,8 @@
                     this.discussionThreadListView = new DiscussionThreadListView({
                         collection: this.discussion,
                         el: this.$('.inline-threads'),
-                        courseSettings: this.courseSettings
+                        courseSettings: this.courseSettings,
+                        hideRefineBar: true  // TODO: re-enable the search/filter bar when it works correctly
                     }).render();
 
                     this.discussionThreadListView.on('thread:selected', _.bind(this.navigateToThread, this));

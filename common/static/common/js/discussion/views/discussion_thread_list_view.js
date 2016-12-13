@@ -91,6 +91,7 @@
             DiscussionThreadListView.prototype.initialize = function(options) {
                 var self = this;
                 this.courseSettings = options.courseSettings;
+                this.hideRefineBar = options.hideRefineBar;
                 this.supportsActiveThread = options.supportsActiveThread;
                 this.displayedCollection = new Discussion(this.collection.models, {
                     pages: this.collection.pages
@@ -221,6 +222,9 @@
                 }
                 this.showMetadataAccordingToSort();
                 this.renderMorePages();
+                if (this.hideRefineBar) {
+                    this.$('.forum-nav-refine-bar').addClass('is-hidden');
+                }
                 this.trigger('threads:rendered');
             };
 
