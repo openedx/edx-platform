@@ -10,8 +10,12 @@ from urlparse import urljoin
 from django.contrib.auth.models import User
 from requests_oauthlib import OAuth1Session
 
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from student.models import anonymous_id_for_user
 from track.backends import BaseBackend
+from xmodule.capa_module import CapaDescriptor
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 LOG = logging.getLogger(__name__)
@@ -78,10 +82,18 @@ class OLIAnalyticsBackend(BaseBackend):
             LOG.info('event_data attribute missing from event for OLI service')
             return None
 
+        problem_text = None
+        # Look where it should be for a capa prob.
         problem_id = event_data.get('problem_id')
+        if problem_id:
+            problem_text = self.get_problem_text(problem_id, course_id)
+
         if not problem_id:
-            LOG.info('problem_id attribute missing from event for OLI service')
-            return None
+            # Look where it should be for an xblock.
+            problem_id = context.get('module').get('usage_key')
+            if not problem_id:
+                LOG.info('problem_id attribute missing from event for OLI service')
+                return None
 
         grade = event_data.get('grade')
         if grade is None:
@@ -113,6 +125,7 @@ class OLIAnalyticsBackend(BaseBackend):
                 'grade': grade,
                 'max_grade': max_grade,
                 'timestamp': timestamp.isoformat(),
+                'problem_text': problem_text,
             },
         })
 
@@ -136,3 +149,22 @@ class OLIAnalyticsBackend(BaseBackend):
         else:
             LOG.info('OLI analytics service returns error status code: %s.', response.status_code)
             return 'Error'
+
+    def get_problem_text(self, block, course_id):
+        """
+        Helper method to get the problem text
+        """
+
+        course_key = CourseKey.from_string(course_id)
+        usage_key = UsageKey.from_string(block).map_into_course(course_key)
+
+        try:
+            descriptor = modulestore().get_item(usage_key, depth=5)
+        except ItemNotFoundError:
+            return None
+
+        if isinstance(descriptor, CapaDescriptor):
+            problem_text = descriptor.lcp.problem_text
+            return problem_text
+        else:
+            return None
