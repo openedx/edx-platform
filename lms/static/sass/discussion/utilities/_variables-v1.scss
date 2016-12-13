@@ -2,33 +2,33 @@
 // ====================
 
 // base color variables
-$forum-color-primary: $blue !default;
+$forum-color-primary: rgb(0, 117, 180) !default;
 $forum-color-copy-light: rgb(65, 65, 65) !default;
 $forum-color-background-light: rgb(245, 245, 245) !default;
 
 // contextual color variables
 $forum-color-background: $white;
 $forum-color-active-thread: $forum-color-primary !default;
-$forum-color-hover: $action-primary-bg !default;
+$forum-color-hover: rgb(6, 86, 131) !default;
 $forum-color-active-text: $white !default;
-$forum-color-pinned: $pink !default;
-$forum-color-reported: $pink !default;
+$forum-color-pinned: rgb(152, 44, 98) !default;
+$forum-color-reported: rgb(152, 44, 98) !default;
 $forum-color-closed: $black !default;
 $forum-color-following: $forum-color-primary !default;
 $forum-color-staff: $forum-color-primary !default;
-$forum-color-community-ta: $green-d1 !default;
-$forum-color-marked-answer: $green-d1 !default;
-$forum-color-border: $gray-l3 !default;
-$forum-color-error: $red !default;
+$forum-color-community-ta: rgb(0, 129, 0) !default;
+$forum-color-marked-answer: rgb(0, 129, 0) !default;
+$forum-color-border: rgb(217, 217, 217) !default;
+$forum-color-error: rgb(203, 7, 18) !default;
 $forum-color-hover-thread: $forum-color-background-light !default;
 $forum-color-reading-thread: $forum-color-background-light !default;
-$forum-color-read-post: $gray-d3 !default;
+$forum-color-read-post: $forum-color-copy-light !default;
 $forum-color-never-read-post: $forum-color-primary !default;
-$forum-color-editor-preview-label: $gray-d2 !default;
-$forum-color-response-count: $gray-d2 !default;
+$forum-color-editor-preview-label: $forum-color-copy-light !default;
+$forum-color-response-count: $forum-color-copy-light !default;
 $forum-color-navigation-bar: $forum-color-background-light !default;
-$forum-color-count: $gray-d3 !default;
-$forum-color-background-label:  $gray-d2 !default;
+$forum-color-count: $forum-color-copy-light !default;
+$forum-color-background-label: rgb(65, 65, 65) !default;
 
 // post images
 $post-image-dimension: ($baseline*3) !default;  // image size  + margin
@@ -45,5 +45,5 @@ $forum-small-font-size: 12px;
 $forum-border-radius: 3px;
 
 // btn colors
-$uxpl-primary-blue: $blue !default;
+$uxpl-primary-blue: rgb(0, 117, 180) !default;
 $btn-default-background-color: $white;
