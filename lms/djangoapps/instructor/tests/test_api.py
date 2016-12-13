@@ -1089,6 +1089,10 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         # verify that there are now two course modes 'honor' and 'verified'
         self.assertEqual(len(CourseMode.modes_for_course_dict(self.course.id)), 2)
 
+        # login with global staff user to auto enroll learner in verified track
+        admin_user = AdminFactory.create()
+        self.client.login(username=admin_user, password="test")
+
         # now use enrollment api to enroll a student in 'verified' mode directly
         url = reverse('students_update_enrollment', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.post(
@@ -1329,6 +1333,10 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
 
         # verify that there are now two course modes 'honor' and 'verified'
         self.assertEqual(len(CourseMode.modes_for_course_dict(self.course.id)), 2)
+
+        # login with global staff user to auto enroll learner in verified track
+        admin_user = AdminFactory.create()
+        self.client.login(username=admin_user, password="test")
 
         # now use enrollment api to enroll a student in 'verified' mode directly
         url = reverse('students_update_enrollment', kwargs={'course_id': unicode(self.course.id)})
