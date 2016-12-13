@@ -12,7 +12,7 @@
             DiscussionSpecHelper.setUpGlobals();
             DiscussionSpecHelper.setUnderscoreFixtures();
             jasmine.clock().install();
-            this.threadData = DiscussionViewSpecHelper.makeThreadWithProps({});
+            this.threadData = DiscussionViewSpecHelper.makeThreadWithProps({id: 'dummy_id'});
             this.thread = new Thread(this.threadData);
             this.discussion = new Discussion(this.thread);
             deferred = $.Deferred();
@@ -121,6 +121,7 @@
             createDiscussionThreadView = function(originallyClosed, mode) {
                 var discussion, thread, threadData, view;
                 threadData = DiscussionViewSpecHelper.makeThreadWithProps({
+                    id: 'dummy_id',
                     closed: originallyClosed
                 });
                 thread = new Thread(threadData);
@@ -131,6 +132,7 @@
                     mode: mode,
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
+                spyOn(view, 'getActiveThreadID').and.returnValue('dummy_id');
                 renderWithTestResponses(view, 1);
                 if (mode === 'inline') {
                     view.expand();
@@ -187,6 +189,7 @@
                     mode: 'tab',
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
+                spyOn(this.view, 'getActiveThreadID').and.returnValue('dummy_id');
             });
             describe('responses', function() {
                 it('can post a first response', function() {
@@ -399,6 +402,7 @@
                     mode: 'tab',
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
+                spyOn(this.view, 'getActiveThreadID').and.returnValue('dummy_id');
             });
             generateContent = function(idStart, idEnd) {
                 return _.map(_.range(idStart, idEnd), function(i) {
