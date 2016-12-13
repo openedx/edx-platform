@@ -16,7 +16,10 @@
     .post-header-actions {
         @include float(right);
     }
+}
 
+// post article
+.discussion-article {
     .posted-details {
         @extend %t-copy-sub2;
         margin: ($baseline/5) 0;
@@ -129,7 +132,9 @@
 }
 
 .discussion-response .response-body {
-    @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
+    @include padding(($baseline/2), $baseline, 0, 0); //ensures content doesn't overlap on post or response actions.
+    margin-bottom: 0.2em;
+    font-size: $forum-base-font-size;
 }
 
 // +post - individual element styling
@@ -220,11 +225,6 @@
                         @include float(left);
                         font-size: $forum-large-font-size;
                     }
-                }
-
-                .response-body {
-                    margin-bottom: 0.2em;
-                    font-size: $forum-base-font-size;
                 }
             }
 

@@ -1,4 +1,4 @@
-<header class="wrapper-response-header">
+<header class="response-header">
   <div class="response-header-content">
     <%= author_display %>
     <p class="posted-details">

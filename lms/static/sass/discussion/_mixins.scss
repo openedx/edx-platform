@@ -43,16 +43,16 @@
 @mixin discussion-wmd-preview-container {
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
   box-sizing: border-box;
-  border: 1px solid $gray-l1;
+  border: 1px solid $forum-color-border;
   border-top: none;
   width: 100%;
-  background: $gray-l4;
+  background: $forum-color-background-light;
   box-shadow: 0 1px 3px $shadow-l1 inset;
 }
 
 @mixin discussion-new-post-wmd-preview-container {
   @include discussion-wmd-preview-container;
-  border-color: $gray-d3;
+  border-color: $forum-color-border;
   box-shadow: 0 1px 3px $shadow-d1 inset;
 }
 
@@ -67,7 +67,7 @@
 @mixin discussion-wmd-preview {
   padding: ($baseline/2) $baseline;
   width: auto;
-  color: $gray-d3;
+  color: $forum-color-background-light;
 
   ol, ul { // Fix up the RTL-only _reset.scss, but only in specific places
     @include padding-left($baseline*2);
