@@ -1,11 +1,12 @@
 define([
     'underscore',
     'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-    'common/js/spec_helpers/discussion_spec_helper',
-    'teams/js/spec_helpers/team_spec_helpers',
+    'edx-ui-toolkit/js/utils/string-utils',
     'teams/js/models/team',
-    'teams/js/views/team_profile'
-], function(_, AjaxHelpers, DiscussionSpecHelper, TeamSpecHelpers, TeamModel, TeamProfileView) {
+    'teams/js/views/team_profile',
+    'teams/js/spec_helpers/team_spec_helpers',
+    'xmodule_js/common_static/coffee/spec/discussion/discussion_spec_helper'
+], function(_, AjaxHelpers, StringUtils, TeamModel, TeamProfileView, TeamSpecHelpers, DiscussionSpecHelper) {
     'use strict';
     describe('TeamProfileView', function() {
         var profileView, createTeamProfileView, createTeamModelData, clickLeaveTeam,
@@ -58,13 +59,12 @@ define([
             AjaxHelpers.expectRequest(
                 requests,
                 'GET',
-                interpolate(
-                    '/courses/%(courseID)s/discussion/forum/%(topicID)s/inline?page=1&ajax=1',
+                StringUtils.interpolate(
+                    '/courses/{courseID}/discussion/forum/{topicID}/inline?page=1&ajax=1',
                     {
                         courseID: TeamSpecHelpers.testCourseID,
                         topicID: TeamSpecHelpers.testTeamDiscussionID
-                    },
-                    true
+                    }
                 )
             );
             AjaxHelpers.respondWithJson(requests, TeamSpecHelpers.createMockDiscussionResponse());
@@ -185,7 +185,7 @@ define([
                     assertTeamDetails(view, 0, false);
                 });
 
-                it("wouldn't do anything if user click on Cancel button on dialog", function() {
+                it('should not do anything if user clicks on Cancel button on dialog', function() {
                     var requests = AjaxHelpers.requests(this);
 
                     var view = createTeamProfileView(

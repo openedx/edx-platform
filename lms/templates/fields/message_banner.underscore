@@ -1,8 +1,8 @@
-<div class="wrapper-msg urgency-<%= urgency %> <%= type %>">
+<div class="wrapper-msg urgency-<%- urgency %> <%- type %>">
     <div class="msg">
         <div class="msg-content">
             <div class="copy">
-                <p><%-message%></p>
+                <p><%= HtmlUtils.ensureHtml(message) %></p>
             </div>
         </div>
     </div>

@@ -3,19 +3,20 @@
  */
 (function(define) {
     'use strict';
-    define([
-        'backbone',
-        'underscore',
-        'gettext',
-        'edx-ui-toolkit/js/utils/html-utils',
-        'teams/js/views/team_discussion',
-        'common/js/components/utils/view_utils',
-        'teams/js/views/team_utils',
-        'text!teams/templates/team-profile.underscore',
-        'text!teams/templates/team-member.underscore'
-    ],
-        function(Backbone, _, gettext, HtmlUtils, TeamDiscussionView, ViewUtils, TeamUtils,
-                  teamTemplate, teamMemberTemplate) {
+    define(
+        [
+            'backbone',
+            'underscore',
+            'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'common/js/components/utils/view_utils',
+            'teams/js/views/team_utils',
+            'teams/js/views/team_discussion',
+            'text!teams/templates/team-profile.underscore',
+            'text!teams/templates/team-member.underscore'
+        ],
+        function(Backbone, _, gettext, HtmlUtils, ViewUtils, TeamUtils, TeamDiscussionView,
+                 teamTemplate, teamMemberTemplate) {
             var TeamProfileView = Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
@@ -86,17 +87,17 @@
                 },
 
                 leaveTeam: function(event) {
-                    event.preventDefault();
                     var view = this;
+                    event.preventDefault();
                     ViewUtils.confirmThenRunOperation(
                         gettext('Leave this team?'),
-                        gettext("If you leave, you can no longer post in this team's discussions. Your place will be available to another learner."),
+                        gettext("If you leave, you can no longer post in this team's discussions. Your place will be available to another learner."),  // eslint-disable-line max-len
                         gettext('Confirm'),
                         function() {
                             $.ajax({
                                 type: 'DELETE',
                                 url: view.context.teamMembershipDetailUrl.replace('team_id', view.model.get('id'))
-                            }).done(function(data) {
+                            }).done(function() {
                                 view.model.fetch()
                                     .done(function() {
                                         view.teamEvents.trigger('teams:update', {

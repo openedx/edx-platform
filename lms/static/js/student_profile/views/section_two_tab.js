@@ -1,20 +1,25 @@
-(function(define, undefined) {
+(function(define) {
     'use strict';
     define([
-        'gettext', 'jquery', 'underscore', 'backbone', 'text!templates/student_profile/section_two.underscore'],
-        function(gettext, $, _, Backbone, sectionTwoTemplate) {
+            'gettext', 'jquery', 'underscore', 'backbone',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'text!templates/student_profile/section_two.underscore'],
+        function(gettext, $, _, Backbone, HtmlUtils, sectionTwoTemplate) {
+
             var SectionTwoTab = Backbone.View.extend({
                 attributes: {
                     'class': 'wrapper-profile-section-two'
                 },
-                template: _.template(sectionTwoTemplate),
+                template: HtmlUtils.template(sectionTwoTemplate),
+
                 initialize: function(options) {
                     this.options = _.extend({}, options);
                 },
+
                 render: function() {
-                    var self = this;
-                    var showFullProfile = this.options.showFullProfile();
-                    this.$el.html(this.template({
+                    var self = this,
+                        showFullProfile = this.options.showFullProfile();
+                    HtmlUtils.setHtml(this.$el, this.template({
                         ownProfile: self.options.ownProfile,
                         showFullProfile: showFullProfile
                     }));

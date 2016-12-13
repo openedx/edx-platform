@@ -1,14 +1,14 @@
 /*  Team utility methods*/
 (function(define) {
     'use strict';
-    define(['jquery', 'underscore'
-    ], function($, _) {
+    define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/string-utils', 'edx-ui-toolkit/js/utils/html-utils'
+    ], function($, _, StringUtils, HtmlUtils) {
         return {
 
             /**
              * Convert a 2d array to an object equivalent with an additional blank element
              *
-             * @param options {Array.<Array.<string>>} Two dimensional options array
+             * @param {Array.<Array.<string>>} options Two dimensional options array
              * @returns {Object} Hash version of the input array
              * @example selectorOptionsArrayToHashWithBlank([["a", "alpha"],["b","beta"]])
              * // returns {"a":"alpha", "b":"beta", "":""}
@@ -20,21 +20,20 @@
             },
 
             teamCapacityText: function(memberCount, maxMemberCount) {
-                return interpolate(
+                return StringUtils.interpolate(
                     // Translators: The following message displays the number of members on a team.
                     ngettext(
-                        '%(memberCount)s / %(maxMemberCount)s Member',
-                        '%(memberCount)s / %(maxMemberCount)s Members',
+                        '{memberCount} / {maxMemberCount} Member',
+                        '{memberCount} / {maxMemberCount} Members',
                         maxMemberCount
                     ),
-                    {memberCount: memberCount, maxMemberCount: maxMemberCount}, true
+                    {memberCount: memberCount, maxMemberCount: maxMemberCount}
                 );
             },
 
             isUserMemberOfTeam: function(memberships, requestUsername) {
                 return _.isObject(
-                    _.find(memberships, function(membership)
-                    {
+                    _.find(memberships, function(membership) {
                         return membership.user.username === requestUsername;
                     })
                 );
@@ -45,24 +44,22 @@
             },
 
             showMessage: function(message, type) {
-                var messageElement = $('#teams-message');
-                if (_.isUndefined(type)) {
-                    type = 'warning';
-                }
-                messageElement.removeClass('is-hidden').addClass(type);
-                $('.teams-content .msg-content .copy').text(message);
-                messageElement.focus();
+                var $message = $('#teams-message');
+                $message.removeClass('is-hidden').addClass(type || 'warning');
+                HtmlUtils.setHtml($('.teams-content .msg-content .copy'), message);
+                $message.focus();
             },
 
             /**
              * Parse `data` and show user message. If parsing fails than show `genericErrorMessage`
              */
             parseAndShowMessage: function(data, genericErrorMessage, type) {
+                var errors;
                 try {
-                    var errors = JSON.parse(data.responseText);
+                    errors = JSON.parse(data.responseText);
                     this.showMessage(
-                       _.isUndefined(errors.user_message) ? genericErrorMessage : errors.user_message, type
-                   );
+                        _.isUndefined(errors.user_message) ? genericErrorMessage : errors.user_message, type
+                    );
                 } catch (error) {
                     this.showMessage(genericErrorMessage, type);
                 }

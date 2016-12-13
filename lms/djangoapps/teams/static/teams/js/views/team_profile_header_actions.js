@@ -5,9 +5,10 @@
             'jquery',
             'underscore',
             'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
             'teams/js/views/team_utils',
             'text!teams/templates/team-profile-header-actions.underscore'],
-        function(Backbone, $, _, gettext, TeamUtils, teamProfileHeaderActionsTemplate) {
+        function(Backbone, $, _, gettext, HtmlUtils, TeamUtils, teamProfileHeaderActionsTemplate) {
             return Backbone.View.extend({
 
                 errorMessage: gettext('An error occurred. Try again.'),
@@ -21,7 +22,7 @@
 
                 initialize: function(options) {
                     this.teamEvents = options.teamEvents;
-                    this.template = _.template(teamProfileHeaderActionsTemplate);
+                    this.template = HtmlUtils.template(teamProfileHeaderActionsTemplate);
                     this.context = options.context;
                     this.showEditButton = options.showEditButton;
                     this.topic = options.topic;
@@ -48,11 +49,14 @@
                             }
                         }
 
-                        view.$el.html(view.template({
-                            showJoinButton: showJoinButton,
-                            message: message,
-                            showEditButton: view.showEditButton
-                        }));
+                        HtmlUtils.setHtml(
+                            view.$el,
+                            view.template({
+                                showJoinButton: showJoinButton,
+                                message: message,
+                                showEditButton: view.showEditButton
+                            })
+                        );
                     });
                     return view;
                 },
@@ -65,7 +69,7 @@
                         type: 'POST',
                         url: view.context.teamMembershipsUrl,
                         data: {'username': view.context.userInfo.username, 'team_id': view.model.get('id')}
-                    }).done(function(data) {
+                    }).done(function() {
                         view.model.fetch()
                             .done(function() {
                                 view.teamEvents.trigger('teams:update', {

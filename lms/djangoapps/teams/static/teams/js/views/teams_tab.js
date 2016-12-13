@@ -28,9 +28,9 @@
             'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
         function(Backbone, $, _, gettext, HtmlUtils, StringUtils, SearchFieldView, HeaderView, HeaderModel,
-                  TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
-                  TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
-                  TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
+                 TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
+                 TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
+                 TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
             var TeamsHeaderModel = HeaderModel.extend({
                 initialize: function() {
                     _.extend(this.defaults, {nav_aria_label: gettext('Topics')});
@@ -133,7 +133,7 @@
 
                     this.mainView = this.tabbedView = this.createViewWithHeader({
                         title: gettext('Teams'),
-                        description: gettext('See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are.'),
+                        description: gettext('See all teams in your course, organized by topic. Join a team to collaborate with other learners who are interested in the same topic as you are.'),  // eslint-disable-line max-len
                         mainView: new TeamsTabbedView({
                             tabs: [{
                                 title: gettext('My Team'),
@@ -174,8 +174,7 @@
                         TeamUtils.showMessage(gettext(
                             'Your request could not be completed. Reload the page and try again.'
                         ));
-                    }
-                    else if (xhr.status === 500) {
+                    } else if (xhr.status === 500) {
                         TeamUtils.showMessage(gettext(
                             'Your request could not be completed due to a server problem. Reload the page' +
                             ' and try again. If the issue persists, click the Help tab to report the problem.'
@@ -236,7 +235,7 @@
                         view.mainView = view.createViewWithHeader({
                             topic: topic,
                             title: gettext('Create a New Team'),
-                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),
+                            description: gettext("Create a new team if you can't find an existing team to join, or if you would like to learn with friends you know."),  // eslint-disable-line max-len
                             breadcrumbs: view.createBreadcrumbs(topic),
                             mainView: new TeamEditView({
                                 action: 'create',
@@ -270,7 +269,7 @@
                         });
                         editViewWithHeader = self.createViewWithHeader({
                             title: gettext('Edit Team'),
-                            description: gettext('If you make significant changes, make sure you notify members of the team before making these changes.'),
+                            description: gettext('If you make significant changes, make sure you notify members of the team before making these changes.'),  // eslint-disable-line max-len
                             breadcrumbs: self.createBreadcrumbs(topic, team),
                             mainView: view,
                             topic: topic,
@@ -295,14 +294,15 @@
                             context: self.context,
                             model: team
                         });
-                        self.mainView = self.createViewWithHeader({
-                            mainView: view,
-                            breadcrumbs: self.createBreadcrumbs(topic, team),
-                            title: gettext('Membership'),
-                            description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),
-                            topic: topic,
-                            team: team
-                        }
+                        self.mainView = self.createViewWithHeader(
+                            {
+                                mainView: view,
+                                breadcrumbs: self.createBreadcrumbs(topic, team),
+                                title: gettext('Membership'),
+                                description: gettext("You can remove members from this team, especially if they have not participated in the team's activity."),  // eslint-disable-line max-len
+                                topic: topic,
+                                team: team
+                            }
                         );
                         self.render();
                         TeamAnalytics.emitPageViewed('edit-team-members', topicID, teamID);
@@ -513,7 +513,7 @@
                 getTopic: function(topicID) {
                     // Try finding topic in the current page of the
                     // topicCollection.  Otherwise call the topic endpoint.
-                    var topic = this.topicsCollection.findWhere({'id': topicID}),
+                    var topic = this.topicsCollection.findWhere({id: topicID}),
                         self = this,
                         deferred = $.Deferred();
                     if (topic) {

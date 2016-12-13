@@ -182,6 +182,9 @@ define([
                     userInfo: TeamSpecHelpers.createMockUserInfo({staff: true})
                 });
                 teamsTabView.teamsCollection = TeamSpecHelpers.createMockTeams();
+                if (expectedEvent.page_name === 'search-teams') {
+                    teamsTabView.teamsCollection.searchString = 'test search string';
+                }
                 teamsTabView.router.navigate(url, {trigger: true});
                 if (requests.length > requests.currentIndex) {
                     AjaxHelpers.respondWithJson(requests, {});

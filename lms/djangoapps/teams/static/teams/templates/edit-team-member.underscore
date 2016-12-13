@@ -1,16 +1,16 @@
 <li class="team-member">
-    <a class="member-profile" href="<%= memberProfileUrl %>">
-        <img class="image-url" src="<%= imageUrl %>" alt="<%= username %>'s profile page" />
+    <a class="member-profile" href="<%- memberProfileUrl %>">
+        <img class="image-url" src="<%- imageUrl %>" alt="<%- imageUrlAlt %>" />
     </a>
     <div class="member-info-container">
-    	<span class="primary"><%= username %></span>
+    	<span class="primary"><%- username %></span>
     	<div class="secondary">
-    		<span id="date-joined"><%= dateJoined %></span>
+    		<span id="date-joined"><%= HtmlUtils.ensureHtml(dateJoinedHtml) %></span>
     		<span> | </span>
-    		<span id="last-active"><%= lastActive %></span>
+    		<span id="last-active"><%= HtmlUtils.ensureHtml(lastActivityHtml) %></span>
     	</div>
     </div>
-    <button class="action-remove-member" data-username="<%= username %>">
-        <%- gettext("Remove") %><span class="sr">&nbsp;<%= username %></span>
+    <button class="action-remove-member" data-username="<%- username %>">
+        <%- gettext("Remove") %><span class="sr">&nbsp;<%- username %></span>
     </button>
 </li>
