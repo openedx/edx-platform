@@ -197,6 +197,12 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+
+        @include rtl {
+            // This is counterintuitive, but when showing a preview of the first part of LTR text, using direction: rtl
+            // will actually show the _last_ part of that text.
+            direction: ltr;
+        }
     }
 }
 
