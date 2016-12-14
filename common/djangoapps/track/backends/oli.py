@@ -164,7 +164,7 @@ class OLIAnalyticsBackend(BaseBackend):
             return None
 
         if isinstance(descriptor, CapaDescriptor):
-            problem_text = descriptor.lcp.problem_text
+            problem_text = descriptor.data
             return problem_text
         else:
             return None
