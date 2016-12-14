@@ -1,6 +1,6 @@
 <form class="forum-new-post-form">
+    <h3 class="thread-title"><%- gettext("Add a Post") %></h3>
     <% if (mode === 'inline') { %>
-        <h3 class="thread-title"><%- gettext("Add a Post") %></h3>
         <button class="btn-default add-post-cancel">
             <span class="sr"><%- gettext('Cancel') %></span>
             <span class="fa fa-close" aria-hidden="true"></span>
@@ -13,28 +13,36 @@
         <label class="field-label">
             <span class="field-label-text">
                 <% //Translators: This labels the selector for which group of students can view a post %>
-                <%- gettext("Visible To:") %>
-            </span><select aria-describedby="field_help_visible_to" class="field-input js-group-select" name="group_id" <% if (!is_commentable_cohorted) { print("disabled"); } %>>
-                <option value=""><%- gettext("All Groups") %></option>
-                <% _.each(cohort_options, function(opt) { %>
-                <option value="<%- opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
-                <% }); %>
-             </select>
-        </label><div class="field-help" id="field_help_visible_to">
-            <%- gettext("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.") %>
-        </div>
+                <%- gettext("Visible to") %>
+            </span>
+            <div class="field-help" id="field_help_visible_to">
+                <%- gettext("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.") %>
+            </div>
+            <div class="field-input">
+                <select aria-describedby="field_help_visible_to" class="post-topic field-input js-group-select" name="group_id" <% if (!is_commentable_cohorted) { print("disabled"); } %>>
+                    <option value=""><%- gettext("All Groups") %></option>
+                    <% _.each(cohort_options, function(opt) { %>
+                    <option value="<%- opt.value %>" <% if (opt.selected) { print("selected"); } %>><%- opt.text %></option>
+                    <% }); %>
+                </select>
+            </div>
+        </label>
     </div>
     <% } %>
     <div class="post-field">
         <label class="field-label">
-            <span class="field-label-text"><%- gettext("Title:") %></span><input aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
-        </label><span class="field-help" id="field_help_title">
-            <%- gettext("Add a clear and descriptive title to encourage participation.") %>
-        </span>
+            <span class="field-label-text"><%- gettext("Title") %></span>
+            <div class="field-help" id="field_help_title">
+                <%- gettext("Add a clear and descriptive title to encourage participation.") %>
+            </div>
+            <div>
+                <input aria-describedby="field_help_title" type="text" class="js-post-title field-input" name="title">
+            </div>
+        </label>
     </div>
 
-    <div class="post-field">
-        <p class="sr-only field-help" id="new-post-editor-description"><%- gettext('Enter your question or comment.') %></p>
+    <div>
+        <span class="field-label-text field-label-text-full" id="new-post-editor-description"><%- gettext('Your question or idea') %></span>
         <div class="js-post-body editor" aria-describedby="new-post-editor-description" name="body"></div>
     </div>
     <div class="post-options">
@@ -52,11 +60,11 @@
         <label class="post-option">
             <input type="checkbox" name="anonymous_to_peers" class="post-option-input js-anon-peers">
             <%- gettext("post anonymously to classmates") %>
-        </label>
+        </div>
         <% } %>
     </div>
     <div>
-        <button type="submit" class="btn-brand submit"><%- gettext('Add Post') %></button>
+        <button type="submit" class="btn-brand submit"><%- gettext('Submit') %></button>
         <button type="button" class="btn cancel"><%- gettext('Cancel') %></button>
     </div>
 </form>

@@ -97,6 +97,9 @@
             };
 
             NewPostView.prototype.events = {
+                'keypress .forum-new-post-form input:not(.wmd-input)': function(event) {
+                    return DiscussionUtil.ignoreEnterKey(event);
+                },
                 'submit .forum-new-post-form': 'createPost',
                 'change .post-option-input': 'postOptionChange',
                 'click .cancel': 'cancel',
