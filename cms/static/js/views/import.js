@@ -81,7 +81,7 @@ define(
          */
         var initEventListeners = function() {
             $(window).on('beforeunload.import', function() {
-                if (current.stage <= STAGE.UNPACKING) {
+                if (current.stage < STAGE.UNPACKING) {
                     return gettext('Your import is in progress; navigating away will abort it.');
                 }
             });
