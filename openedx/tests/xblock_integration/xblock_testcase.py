@@ -37,9 +37,11 @@ Our next steps would be to:
 
 import HTMLParser
 import collections
+from datetime import datetime, timedelta
 import json
 import mock
 import sys
+import pytz
 import unittest
 
 from bs4 import BeautifulSoup
@@ -202,6 +204,8 @@ class GradePublishTestMixin(object):
                                 'usage': usage_key,
                                 'score': score,
                                 'max_score': max_score})
+            # Shim a return time, defaults to 1 hour before now
+            return datetime.now().replace(tzinfo=pytz.UTC) - timedelta(hours=1)
 
         self.scores = []
         patcher = mock.patch("lms.djangoapps.grades.signals.handlers.set_score", capture_score)

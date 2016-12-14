@@ -592,8 +592,12 @@ class JSInput(InputTypeBase):
                                              #   set state
             Attribute('width', "400"),       # iframe width
             Attribute('height', "300"),      # iframe height
-            Attribute('sop', None)           # SOP will be relaxed only if this
-                                             # attribute is set to false.
+            # Title for the iframe, which should be supplied by the author of the problem. Not translated
+            # because we are in a class method and therefore do not have access to capa_system.i18n.
+            # Note that the default "display name" for the problem is also not translated.
+            Attribute('title', "Problem Remote Content"),
+            # SOP will be relaxed only if this attribute is set to false.
+            Attribute('sop', None)
         ]
 
     def _extra_context(self):

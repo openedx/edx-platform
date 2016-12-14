@@ -2662,6 +2662,9 @@ OPTIONAL_APPS = (
 
     # Enterprise App (http://github.com/edx/edx-enterprise)
     'enterprise',
+
+    # Required by the Enterprise App
+    'django_object_actions',  # https://github.com/crccheck/django-object-actions
 )
 
 for app_name in OPTIONAL_APPS:
@@ -3024,3 +3027,7 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 ############## Settings for LMS Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = None
+
+############## Settings for the Enterprise App ######################
+
+ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"

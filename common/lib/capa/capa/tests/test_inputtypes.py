@@ -162,6 +162,89 @@ class ChoiceGroupTest(unittest.TestCase):
         self.check_group('checkboxgroup', 'checkbox', '[]')
 
 
+class JSInputTest(unittest.TestCase):
+    """
+    Test context variables passed into the jsinput template.
+    """
+
+    def test_rendering_default_values(self):
+        """
+        Tests the default values passed through to render.
+        """
+        xml_str = '<jsinput id="prob_1_2"/>'
+        expected = {
+            'html_file': None,
+            'gradefn': "gradefn",
+            'get_statefn': None,
+            'set_statefn': None,
+            'initial_state': None,
+            'width': "400",
+            'height': "300",
+            'title': "Problem Remote Content",
+            'sop': None
+        }
+
+        self._render_context_test(xml_str, expected)
+
+    def test_rendering_provided_values(self):
+        """
+        Tests that values provided by course authors are passed through to render.
+        """
+        xml_str = """
+        <jsinput id="prob_1_2"
+            gradefn="WebGLDemo.getGrade" get_statefn="WebGLDemo.getState" set_statefn="WebGLDemo.setState"
+            initial_state='{"selectedObjects":{"cube":true,"cylinder":false}}'
+            width="1000" height="1200"
+            html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"
+            sop="false" title="Awesome and fun!"
+        />
+        """
+
+        expected = {
+            'html_file': "https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html",
+            'gradefn': "WebGLDemo.getGrade",
+            'get_statefn': "WebGLDemo.getState",
+            'set_statefn': "WebGLDemo.setState",
+            'initial_state': '{"selectedObjects":{"cube":true,"cylinder":false}}',
+            'width': "1000",
+            'height': "1200",
+            'title': "Awesome and fun!",
+            'sop': 'false'
+        }
+
+        self._render_context_test(xml_str, expected)
+
+    def _render_context_test(self, xml_str, expected_context):
+        """
+        Helper method for testing context based on the provided XML string.
+        """
+        element = etree.fromstring(xml_str)
+        state = {
+            'value': 103,
+            'response_data': RESPONSE_DATA
+        }
+        the_input = lookup_tag('jsinput')(test_capa_system(), element, state)
+
+        context = the_input._get_render_context()  # pylint: disable=protected-access
+
+        full_expected_context = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'status': inputtypes.Status('unanswered'),
+            'describedby_html': DESCRIBEDBY.format(status_id='prob_1_2'),
+            'msg': "",
+            'params': None,
+            'jschannel_loader': '/dummy-static/js/capa/src/jschannel.js',
+            'jsinput_loader': '/dummy-static/js/capa/src/jsinput.js',
+            'saved_state': 103,
+            'response_data': RESPONSE_DATA,
+            'value': 103
+        }
+        full_expected_context.update(expected_context)
+
+        self.assertEqual(full_expected_context, context)
+
+
 class TextLineTest(unittest.TestCase):
     '''
     Check that textline inputs work, with and without math.

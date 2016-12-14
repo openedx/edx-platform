@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 16:37+0000\n"
+"POT-Creation-Date: 2016-12-01 16:15+0000\n"
 "PO-Revision-Date: 2016-10-30 14:15+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -4638,9 +4638,9 @@ msgstr "קריירות"
 msgid "Donate"
 msgstr "תרום"
 
-#: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "מפת אתר"
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "ערכת מדיה"
 
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
@@ -4661,6 +4661,10 @@ msgstr "מדיניות פרטיות"
 #: lms/djangoapps/branding/api.py
 msgid "Accessibility Policy"
 msgstr "מדיניות נגישות"
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "מפת אתר"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
@@ -13541,6 +13545,10 @@ msgid "due {date}"
 msgstr "תאריך הגשה {date}"
 
 #: lms/templates/courseware/accordion.html
+msgid "{section_format} due {{date}}"
+msgstr ""
+
+#: lms/templates/courseware/accordion.html
 msgid "This content is graded"
 msgstr "תוכן זה מקבל דירוג"
 
@@ -13691,10 +13699,6 @@ msgstr "אתה צופה כעת בקורס כ-{i_start}{user_name}{i_end}."
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "חומרי הקורס"
-
-#: lms/templates/courseware/course_updates.html
-msgid "All course updates"
-msgstr "כל עדכוני הקורס"
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -13863,12 +13867,9 @@ msgstr "{student_name}, אינך זכאי יותר לקבל נקודות זכו�
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"{student_name}, you have met the requirements for credit in this course."
-msgstr "{student_name}, עמדת בדרישות לקבלת נקודות זכות בקורס זה."
-
-#: lms/templates/courseware/progress.html
-msgid "{a_start}Go to your dashboard{a_end} to purchase course credit."
-msgstr "{a_start}עבור אל לוח הבקרה{a_end} על מנת לרכוש נקודות זכות לקורס."
+"{student_name}, you have met the requirements for credit in this course. "
+"{a_start}Go to your dashboard{a_end} to purchase course credit."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -17860,10 +17861,6 @@ msgstr "שאלות נפוצות"
 msgid "Jobs"
 msgstr "משרות"
 
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "ערכת מדיה"
-
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 msgid "In the Press"
@@ -18076,10 +18073,9 @@ msgstr "תאריך היעד לשדרוג חלף"
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The verification deadline for {course_name} was {date}. Verification is no "
-"longer available."
+"The verification deadline for {course_name} was {{date}}. Verification is no"
+" longer available."
 msgstr ""
-"תאריך היעד לאימות עבור {course_name} היה {date}. האימות אינו זמין יותר."
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""

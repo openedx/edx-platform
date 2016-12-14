@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-01 16:06+0000\n"
-"PO-Revision-Date: 2016-12-01 16:06:57.209894\n"
+"POT-Creation-Date: 2016-12-08 18:16+0000\n"
+"PO-Revision-Date: 2016-12-08 18:16:30.652885\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1469,14 +1469,6 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
-msgstr ""
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "JavaScript Input"
-msgstr ""
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Execution of unsafe Javascript code is not allowed."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py

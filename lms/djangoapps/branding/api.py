@@ -164,6 +164,7 @@ def _footer_social_links():
 
 def _footer_navigation_links():
     """Return the navigation links to display in the footer. """
+    platform_name = configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
     return [
         {
             "name": link_name,
@@ -172,13 +173,14 @@ def _footer_navigation_links():
         }
         for link_name, link_url, link_title in [
             ("about", marketing_link("ABOUT"), _("About")),
+            ("enterprise", marketing_link("ENTERPRISE"),
+             _("{platform_name} for Business").format(platform_name=platform_name)),
             ("blog", marketing_link("BLOG"), _("Blog")),
             ("news", marketing_link("NEWS"), _("News")),
             ("help-center", settings.SUPPORT_SITE_LINK, _("Help Center")),
             ("contact", marketing_link("CONTACT"), _("Contact")),
             ("careers", marketing_link("CAREERS"), _("Careers")),
             ("donate", marketing_link("DONATE"), _("Donate")),
-            ("media_kit", marketing_link("MEDIA_KIT"), _("Media Kit"))
         ]
         if link_url and link_url != "#"
     ]
@@ -192,6 +194,7 @@ def _footer_legal_links():
         ("privacy_policy", marketing_link("PRIVACY"), _("Privacy Policy")),
         ("accessibility_policy", marketing_link("ACCESSIBILITY"), _("Accessibility Policy")),
         ("sitemap", marketing_link("SITE_MAP"), _("Sitemap")),
+        ("media_kit", marketing_link("MEDIA_KIT"), _("Media Kit")),
     ]
 
     # Backwards compatibility: If a combined "terms of service and honor code"

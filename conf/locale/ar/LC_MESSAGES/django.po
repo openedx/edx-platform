@@ -157,7 +157,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-22 16:37+0000\n"
+"POT-Creation-Date: 2016-12-01 16:15+0000\n"
 "PO-Revision-Date: 2016-11-08 08:16+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -4926,9 +4926,9 @@ msgstr "الوظائف"
 msgid "Donate"
 msgstr "تبرَّع"
 
-#: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "خريطة الموقع"
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
 
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
@@ -4949,6 +4949,10 @@ msgstr "سياسة الخصوصية"
 #: lms/djangoapps/branding/api.py
 msgid "Accessibility Policy"
 msgstr "سياسة إمكانية الوصول "
+
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "خريطة الموقع"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
@@ -14049,6 +14053,10 @@ msgid "due {date}"
 msgstr "تاريخ الاستحقاق {date}"
 
 #: lms/templates/courseware/accordion.html
+msgid "{section_format} due {{date}}"
+msgstr ""
+
+#: lms/templates/courseware/accordion.html
 msgid "This content is graded"
 msgstr "جرى تقييم هذا المحتوى"
 
@@ -14203,10 +14211,6 @@ msgstr "أنت الآن تستعرض المساق بصفتك {i_start}{user_name
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "مواد المساق"
-
-#: lms/templates/courseware/course_updates.html
-msgid "All course updates"
-msgstr "جميع تحديثات الدورة التدريبية"
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -14377,12 +14381,9 @@ msgstr "{student_name}، لم تعد مؤهلاً للحصول على مواد �
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"{student_name}, you have met the requirements for credit in this course."
-msgstr "{student_name}، لقد حققت متطلبات النجاح هذا المساق"
-
-#: lms/templates/courseware/progress.html
-msgid "{a_start}Go to your dashboard{a_end} to purchase course credit."
-msgstr "{a_start} قم بزيارة لوحة معلوماتك {a_end} لشراء مواد المساق."
+"{student_name}, you have met the requirements for credit in this course. "
+"{a_start}Go to your dashboard{a_end} to purchase course credit."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -18504,10 +18505,6 @@ msgstr "الأسئلة الشائعة"
 msgid "Jobs"
 msgstr "الوظائف"
 
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
-
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
 msgid "In the Press"
@@ -18721,10 +18718,9 @@ msgstr "لقد انقضى الموعد النهائي للتحديث"
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The verification deadline for {course_name} was {date}. Verification is no "
-"longer available."
+"The verification deadline for {course_name} was {{date}}. Verification is no"
+" longer available."
 msgstr ""
-"الموعد النهائي للتحقق للمساق {course_name} كان {date}. لم يعد التحقق متاحًا."
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
