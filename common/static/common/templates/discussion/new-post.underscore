@@ -1,4 +1,11 @@
 <form class="forum-new-post-form">
+    <% if (mode === 'inline') { %>
+        <h3 class="thread-title"><%- gettext("Add a Post") %></h3>
+        <button class="btn-default add-post-cancel">
+            <span class="sr"><%- gettext('Cancel') %></span>
+            <span class="fa fa-close" aria-hidden="true"></span>
+        </button>
+    <% } %>
     <ul class="post-errors" style="display: none"></ul>
     <div class="forum-new-post-form-wrapper"></div>
     <% if (cohort_options) { %>

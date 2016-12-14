@@ -2,7 +2,7 @@
 // ====================
 // NOTE: this file is deprecated, and we should not continue to add to this file. Use other partials as appropriate.
 
-body.discussion {
+.discussion-body {
 
   .edit-post-form {
     @include clearfix();
@@ -175,18 +175,17 @@ body.discussion {
   }
 }
 
-.container .discussion-body {
+.discussion-body {
   @include clearfix();
   border: none;
   background: transparent;
   box-shadow: none;
-  line-height: 1.4;
 
   .bottom-post-status {
     padding: 30px;
     font-size: $forum-x-large-font-size;
     font-weight: 700;
-    color: $gray-l3;
+    color: $forum-color-copy-light;
     text-align: center;
   }
 
@@ -196,18 +195,10 @@ body.discussion {
     a {
       word-wrap: break-word;
     }
-
-    p + p {
-      margin-top: $baseline;
-    }
-  }
-
-  .responses li header {
-    margin-bottom: $baseline;
   }
 
   blockquote {
-    background: $gray-l5;
+    background: $forum-color-background-light;
     border-radius: $forum-border-radius;
     padding: ($baseline/4) ($baseline/2);
     font-size: $forum-base-font-size;
@@ -252,7 +243,6 @@ body.discussion {
   .discussion-reply-new {
     @include clearfix();
     @include transition(opacity .2s linear 0s);
-    padding: 0 ($baseline/2);
 
     h4 {
       font-size: $forum-large-font-size;
@@ -296,9 +286,6 @@ body.discussion {
   @extend .discussion-body;
   display: block;
   position: relative;
-  margin: $baseline 0;
-  padding: $baseline;
-  border: 1px solid $forum-color-border !important;
   border-radius: $forum-border-radius;
 
   header {
@@ -319,18 +306,13 @@ body.discussion {
   .discussion-module-header {
     @include float(left);
     width: flex-grid(7);
+    margin-bottom: ($baseline * 0.75);
   }
 
   .add_post_btn_container {
     @include text-align(right);
-    position: relative;
-    top: -45px;
-  }
-
-  .discussion {
-    &.inline-discussion {
-      padding-top: $baseline * 3;
-    }
+    width: flex-grid(12);
+    height: (2 * $baseline);
   }
 
   div.add-response.post-extended-content {
@@ -362,7 +344,6 @@ section.discussion {
 }
 
 .new-post-article {
-  display: none;
 
   .inner-wrapper {
     max-width: 1180px;
@@ -377,6 +358,7 @@ section.discussion {
     color: $gray-d3;
     font-weight: 700;
   }
+
 }
 
 .edit-post-form {
@@ -405,6 +387,9 @@ section.discussion {
 
 .xblock-student_view-discussion {
   @extend %ui-print-excluded;
+  // Overrides overspecific courseware CSS from:
+  // https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L499
+  padding-top: 15px !important;
 }
 
 // ====================
@@ -441,6 +426,8 @@ section.discussion-pagination {
 
 .response-count {
   @include float(right);
+  color: $forum-color-response-count;
+  font-size: $forum-base-font-size;
 }
 
 .response-pagination {

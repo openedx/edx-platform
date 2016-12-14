@@ -101,7 +101,7 @@ define([
             it('can render itself', function() {
                 var requests = AjaxHelpers.requests(this),
                     view = createTeamProfileView(requests, {});
-                expect(view.$('.discussion-thread').length).toEqual(3);
+                expect(view.$('.forum-nav-thread').length).toEqual(3);
             });
 
             it('shows New Post button when user joins a team', function() {

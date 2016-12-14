@@ -1,10 +1,10 @@
 // discussion - elements - labels
 // ====================
 
-body.discussion, .discussion-module {
+.discussion {
   .post-label {
     @include margin($baseline/4, $baseline/2, 0, 0);
-    @extend %t-weight4;
+    @extend %t-light;
     font-size: $forum-small-font-size;
     display: inline;
     white-space: nowrap;
