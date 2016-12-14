@@ -20,12 +20,25 @@ SAILTHRU_LIST_CACHE_KEY = "email.marketing.cache"
 
 # pylint: disable=not-callable
 @task(bind=True, default_retry_delay=3600, max_retries=24)
-def update_user(self, sailthru_vars, email, site=None, new_user=False, activation=False):
+def update_user(self, sailthru_vars, email, new_user=False, activation=False):
+    """
+    Shim to allow us to modify this task's signature without blowing up
+    production on deployment.
+    """
+    update_user_v2.delay(
+        sailthru_vars, email, new_user, activation
+    )
+
+
+# pylint: disable=not-callable
+@task(bind=True, default_retry_delay=3600, max_retries=24)
+def update_user_v2(self, sailthru_vars, email, site=None, new_user=False, activation=False):
     """
     Adds/updates Sailthru profile information for a user.
      Args:
         sailthru_vars(dict): User profile information to pass as 'vars' to Sailthru
         email(str): User email address
+        site: site from which user is registered
         new_user(boolean): True if new registration
         activation(boolean): True if activation request
     Returns:
