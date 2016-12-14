@@ -6,12 +6,15 @@ import logging
 import datetime
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from sets import Set
 import uuid
 import pytz
 
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import get_storage_class
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
-from django.utils.translation import ugettext as _, ugettext_noop
+from django.utils.translation import ugettext as _, ugettext_noop, get_language_bidi
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
@@ -26,7 +29,7 @@ from openedx.core.lib.xblock_utils import wrap_xblock
 from openedx.core.lib.url_utils import quote_slashes
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
-from xmodule.tabs import CourseTab
+from xmodule.tabs import CourseTab, ComponentTabMixin
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
@@ -49,24 +52,30 @@ from certificates.models import (
 from certificates import api as certs_api
 from bulk_email.models import BulkEmailFlag
 
+from django_component_views.fragment import Fragment
+
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
-from .tools import get_units_with_due_date, title_or_url
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
+from component_views import LmsComponentView
+
 from openedx.core.djangolib.markup import HTML, Text
+
+from ..instructor_features import InstructorFeature, InstructorFeaturesPluginManager
+from .tools import get_units_with_due_date, title_or_url
 
 log = logging.getLogger(__name__)
 
 
-class InstructorDashboardTab(CourseTab):
+class InstructorDashboardTab(ComponentTabMixin, CourseTab):
     """
     Defines the Instructor Dashboard view type that is shown as a course tab.
     """
 
     type = "instructor"
     title = ugettext_noop('Instructor')
-    view_name = "instructor_dashboard"
+    component_name = 'lms.djangoapps.instructor.views.instructor_dashboard.InstructorDashboardComponentView'
     is_dynamic = True    # The "Instructor" tab is instead dynamically added when it is enabled
 
     @classmethod
@@ -690,3 +699,176 @@ def _section_metrics(course, access):
         'post_metrics_data_csv_url': reverse('post_metrics_data_csv'),
     }
     return section_data
+
+
+class InstructorDashboardComponentView(LmsComponentView):
+    """
+    """
+    def render_component(self, request, course_id=None):
+        """
+        Render the component
+        """
+        # nr_transaction = newrelic.agent.current_transaction()
+
+        # course_key = CourseKey.from_string(course_id)
+        # context = _create_discussion_board_context(request, course_key, nr_transaction)
+        feature_type = request.GET.get('feature', None)
+        features = InstructorFeaturesPluginManager.get_instructor_features()
+        if feature_type:
+            feature = next(feature for feature in features if feature.type == feature_type)
+            component_name = feature.component_name
+            if component_name:
+                component = get_storage_class(component_name)()
+                return component.render_component(request, course_id=course_id)
+            else:
+                return Fragment(u'<p>Feature ' + feature.title + ' coming soon!</p>')
+        else:
+            context = {
+                'course_id': course_id,
+                'features': features,
+            }
+            html = render_to_string('instructor/instructor_dashboard_component.html', context)
+            # inline_js = render_to_string('discussion/discussion_board_js.template', context)
+
+            fragment = Fragment(html)
+            self.add_resource_urls(fragment)
+            # fragment.add_javascript(inline_js)
+            return fragment
+
+
+class CourseInfoComponentView(LmsComponentView):
+    """
+    """
+    def render_component(self, request, course_id=None):
+        """
+        Render the component
+        """
+        # nr_transaction = newrelic.agent.current_transaction()
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            log.error(u"Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
+            return HttpResponseServerError()
+
+        course = get_course_by_id(course_key, depth=0)
+        context = {
+            'course': course,
+            'course_id': course_id,
+        }
+        html = render_to_string('instructor/course_info_component.html', context)
+        fragment = Fragment(html)
+        self.add_resource_urls(fragment)
+        # fragment.add_javascript(inline_js)
+        return fragment
+
+
+class CourseInfoInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'course-info'
+    category = 'general'
+    component_name = 'lms.djangoapps.instructor.views.instructor_dashboard.CourseInfoComponentView'
+    title = ugettext_noop('Course Info')
+    description = _("Basic course information")
+    icon_class = 'fa-info'
+
+
+class CourseMembershipInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'membership'
+    category = 'student'
+    title = ugettext_noop('Membership')
+    description = _("Course membership")
+    icon_class = 'fa-users'
+
+
+class CourseCohortsInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'cohorts'
+    category = 'student'
+    title = ugettext_noop('Cohorts')
+    description = _("Manage course cohorts")
+    icon_class = 'fa-users'
+
+
+class CourseDiscussionInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'discussion'
+    category = 'general'
+    component_name = 'discussion.views.DiscussionBoardComponentView'
+    title = ugettext_noop('Discussion')
+    description = _("Forum administration")
+    icon_class = 'fa-comments'
+
+
+class CourseProctoringInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'proctoring'
+    category = 'student'
+    title = ugettext_noop('Proctoring')
+    description = _("Proctoring administration")
+    icon_class = 'fa-university'
+
+
+class CourseGradingInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'grading'
+    category = 'student'
+    title = ugettext_noop('Grading')
+    description = _("Student administration")
+    icon_class = 'fa-check-square'
+
+
+class CourseDataDownloadInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'data-download'
+    category = 'analytics'
+    title = ugettext_noop('Data Download')
+    description = _("Reports and downloads")
+    icon_class = 'fa-download'
+
+
+class CourseAnalyticsInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'analytics'
+    category = 'analytics'
+    title = ugettext_noop('Analytics')
+    description = _("Course analytics")
+    icon_class = 'fa-line-chart'
+
+
+class CourseEmailInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'email'
+    category = 'general'
+    title = ugettext_noop('Email')
+    description = _("Send emails to course members")
+    icon_class = 'fa-envelope'
+
+
+class CourseCertificatesInstructorFeature(InstructorFeature):
+    """
+
+    """
+    type = 'certificates'
+    category = 'student'
+    title = ugettext_noop('Certificates')
+    description = _("General certificates for learners")
+    icon_class = 'fa-certificate'

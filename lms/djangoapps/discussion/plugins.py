@@ -7,9 +7,10 @@ from django.utils.translation import ugettext_noop
 
 from courseware.tabs import EnrolledTab
 import django_comment_client.utils as utils
+from xmodule.tabs import ComponentTabMixin
 
 
-class DiscussionTab(EnrolledTab):
+class DiscussionTab(ComponentTabMixin, EnrolledTab):
     """
     A tab for the cs_comments_service forums.
     """
@@ -17,7 +18,7 @@ class DiscussionTab(EnrolledTab):
     type = 'discussion'
     title = ugettext_noop('Discussion')
     priority = None
-    view_name = 'discussion.views.forum_form_discussion'
+    component_name = 'discussion.views.DiscussionBoardComponentView'
     is_hideable = settings.FEATURES.get('ALLOW_HIDING_DISCUSSION_TAB', False)
     is_default = False
 

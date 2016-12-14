@@ -1,0 +1,158 @@
+## mako
+
+<%namespace name='static' file='../static_content.html'/>
+
+<%!
+import json
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+from django.core.urlresolvers import reverse
+
+from django_comment_client.permissions import has_permission
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
+from openedx.core.djangolib.markup import HTML
+
+index = 0
+%>
+
+<section class="instructor-dashboard container">
+    <header class="page-header has-secondary">
+        <div class="page-header-main">
+            <div class="sr-is-focusable" tabindex="-1"></div>
+            <h2 class="hd hd-2 page-title">${_("Instructor Dashboard")}</h2>
+        </div>
+        <div class="page-header-secondary">
+            <div class="form-actions">
+                <div class="page-header-search">
+                    <form class="search-form" role="search">
+                        <label class="field-label sr-only" for="search" id="search-hint">Search all the things</label>
+                        <input
+                                class="field-input input-text search-input"
+                                type="search"
+                                name="search"
+                                id="search"
+                                placeholder="Search"
+                        />
+                        <button class="btn-brand btn-small search-btn" type="button">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="page-content">
+        <h3 class="section-title">General Information</h3>
+        <div class="layout-1q1h1q layout">
+            % for feature in features:
+                % if feature.category == 'general':
+            <%
+            column = ['a', 'b', 'c'][index % 3]
+            %>
+            <nav class="layout-col layout-col-${column}">
+                <div class="wrapper-card">
+                    <div class="wrapper-card-core">
+                        <div class="card-core">
+                            <div class="card-icon emphasized hd-3">
+                                <span class="icon fa ${feature.icon_class}" aria-hidden="true"></span>
+                            </div>
+                            <h3 class="card-title emphasized hd-3" aria-describedby="heading-browse-topics">
+                                ${feature.title}
+                            </h3>
+                        </div>
+                        <p class="card-description">${feature.description}</p>
+                    </div>
+                    <div class="wrapper-card-meta has-actions">
+                        <div class="card-actions">
+                            <a class="btn btn-small action action-view" href="./?feature=${feature.type}">
+                                <span>${_('View')}</span>
+                                <span class="sr">&nbsp;instructor feature ${feature.title}</span>
+                                <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <%!
+            index += 1
+            %>
+                % endif
+            % endfor
+        </div>
+
+        <h3 class="section-title">Student Administration</h3>
+        <div class="layout-1q1h1q layout">
+            % for feature in features:
+                % if feature.category == 'student':
+            <%
+            column = ['a', 'b', 'c'][index % 3]
+            %>
+            <nav class="layout-col layout-col-${column}">
+                <div class="wrapper-card">
+                    <div class="wrapper-card-core">
+                        <div class="card-core">
+                            <div class="card-icon emphasized hd-3">
+                                <span class="icon fa ${feature.icon_class}" aria-hidden="true"></span>
+                            </div>
+                            <h3 class="card-title emphasized hd-3" aria-describedby="heading-browse-topics">
+                                ${feature.title}
+                            </h3>
+                        </div>
+                        <p class="card-description">${feature.description}</p>
+                    </div>
+                    <div class="wrapper-card-meta has-actions">
+                        <div class="card-actions">
+                            <a class="btn btn-small action action-view" href="./?feature=${feature.type}">
+                                <span>${_('View')}</span>
+                                <span class="sr">&nbsp;instructor feature ${feature.title}</span>
+                                <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <%!
+            index += 1
+            %>
+                % endif
+            % endfor
+        </div>
+
+        <h3 class="section-title">Data and Analytics</h3>
+        <div class="layout-1q1h1q layout">
+            % for feature in features:
+                % if feature.category == 'analytics':
+
+            <%
+            column = ['a', 'b', 'c'][index % 3]
+            %>
+            <nav class="layout-col layout-col-${column}">
+                <div class="wrapper-card">
+                    <div class="wrapper-card-core">
+                        <div class="card-core">
+                            <div class="card-icon emphasized hd-3">
+                                <span class="icon fa ${feature.icon_class}" aria-hidden="true"></span>
+                            </div>
+                            <h3 class="card-title emphasized hd-3" aria-describedby="heading-browse-topics">
+                                ${feature.title}
+                            </h3>
+                        </div>
+                        <p class="card-description">${feature.description}</p>
+                    </div>
+                    <div class="wrapper-card-meta has-actions">
+                        <div class="card-actions">
+                            <a class="btn btn-small action action-view" href="./?feature=${feature.type}">
+                                <span>${_('View')}</span>
+                                <span class="sr">&nbsp;instructor feature ${feature.title}</span>
+                                <span class="icon fa fa-arrow-right" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <%!
+            index += 1
+            %>
+                % endif
+            % endfor
+        </div>
+    </div>
+</section>
