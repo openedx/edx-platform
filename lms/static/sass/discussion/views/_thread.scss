@@ -22,6 +22,7 @@
 .discussion-article {
     .posted-details {
         @extend %t-copy-sub2;
+        @extend %t-light;
         margin: ($baseline/5) 0;
         color: $forum-color-copy-light;
 
@@ -160,8 +161,8 @@
     // post context
     .post-context {
         @extend %t-copy-sub2;
+        @extend %t-light;
         color: $forum-color-copy-light;
-        font-weight: 100;
 
         // CASE: no courseware context or cohort visibility rules
         &:empty {
