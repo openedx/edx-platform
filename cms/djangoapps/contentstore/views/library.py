@@ -38,6 +38,21 @@ log = logging.getLogger(__name__)
 
 LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
 
+def _get_library_creator_status(user):
+    """
+    Helper method for returning the library creation status for a particular user,
+    taking into account the value LIBRARIES_ENABLED.
+
+    """
+
+    if not LIBRARIES_ENABLED:
+        return False
+    elif user.is_staff:
+        return True
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return CourseCreatorRole().has_user(user)
+    else:
+        return True
 
 @login_required
 @ensure_csrf_cookie
@@ -50,7 +65,7 @@ def library_handler(request, library_key_string=None):
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
 
-    if not CourseCreatorRole().has_user(request.user):
+    if not _get_library_creator_status(request.user):
         if not request.user.is_staff:
             return HttpResponseForbidden()
 

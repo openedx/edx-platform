@@ -26,7 +26,7 @@ from .component import (
     ADVANCED_COMPONENT_TYPES,
 )
 from .item import create_xblock_info
-from .library import LIBRARIES_ENABLED
+from .library import LIBRARIES_ENABLED, _get_library_creator_status
 from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -1634,7 +1634,7 @@ def _get_course_creator_status(user):
     If the user passed in has not previously visited the index page, it will be
     added with status 'unrequested' if the course creator group is in use.
     """
-    
+
     if user.is_staff:
         course_creator_status = 'granted'
     elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
@@ -1650,20 +1650,3 @@ def _get_course_creator_status(user):
         course_creator_status = 'granted'
 
     return course_creator_status
-
-
-def _get_library_creator_status(user):
-    """
-    Helper method for returning the library creation status for a particular user,
-    taking into account the value LIBRARIES_ENABLED.
-
-    """
-
-    if not LIBRARIES_ENABLED:
-        return False
-    elif user.is_staff:
-        return True
-    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        return CourseCreatorRole().has_user(user)
-    else:
-        return False

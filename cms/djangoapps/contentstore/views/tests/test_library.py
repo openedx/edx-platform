@@ -46,7 +46,7 @@ class UnitTestLibraries(CourseTestCase):
     def test_library_creator_status_libraries_not_enabled(self):
         _, nostaff_user = self.create_non_staff_authed_user_client()
         self.assertEqual(_get_library_creator_status(nostaff_user), False)
-            
+
 
     @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_is_staff_user(self):
@@ -61,8 +61,8 @@ class UnitTestLibraries(CourseTestCase):
 
     @mock.patch("contentstore.views.library.LIBRARIES_ENABLED", True)
     def test_library_creator_status_with_no_course_creator_role(self):
-        _, nostaff_user = self.create_non_staff_authed_user_client()        
-        self.assertEqual(_get_library_creator_status(nostaff_user), False)
+        _, nostaff_user = self.create_non_staff_authed_user_client()
+        self.assertEqual(_get_library_creator_status(nostaff_user), True)
 
     @patch("contentstore.views.library.LIBRARIES_ENABLED", False)
     def test_with_libraries_disabled(self):
@@ -113,8 +113,7 @@ class UnitTestLibraries(CourseTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True})
     def test_lib_create_permission(self):
         """
-        Users who are not given course creator roles should still be able to
-        create libraries.
+        Users who are given course creator roles should be able to create libraries.
         """
         self.client.logout()
         ns_user, password = self.create_non_staff_user()
@@ -124,6 +123,32 @@ class UnitTestLibraries(CourseTestCase):
             'org': 'org', 'library': 'lib', 'display_name': "New Library",
         })
         self.assertEqual(response.status_code, 200)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': False})
+    def test_lib_create_permission_no_course_creator_role_and_no_course_creator_group(self):
+        """
+        Users who are not given course creator roles should still be able to create libraries if COURSE_CREATOR_GROUP is not enabled
+        """
+        self.client.logout()
+        ns_user, password = self.create_non_staff_user()
+        self.client.login(username=ns_user.username, password=password)
+        response = self.client.ajax_post(LIBRARY_REST_URL, {
+            'org': 'org', 'library': 'lib', 'display_name': "New Library",
+        })
+        self.assertEqual(response.status_code, 200)
+
+    @patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True})
+    def test_lib_create_permission_no_course_creator_role_and_course_creator_group(self):
+        """
+        Users who are not given course creator roles should not be able to create libraries if COURSE_CREATOR_GROUP is enabled.
+        """
+        self.client.logout()
+        ns_user, password = self.create_non_staff_user()
+        self.client.login(username=ns_user.username, password=password)
+        response = self.client.ajax_post(LIBRARY_REST_URL, {
+            'org': 'org', 'library': 'lib', 'display_name': "New Library",
+        })
+        self.assertEqual(response.status_code, 403)
 
     @ddt.data(
         {},
