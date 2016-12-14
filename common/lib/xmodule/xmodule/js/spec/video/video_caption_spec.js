@@ -333,10 +333,10 @@
 
                 it('render the transcript', function() {
                     var captionsData = jasmine.stubbedCaption,
-                        items = $('.subtitles li[data-index]');
+                        $items = $('.subtitles li span[data-index]');
 
                     _.each(captionsData.text, function(text, index) {
-                        var item = items.eq(index);
+                        var item = $items.eq(index);
 
                         expect(parseIntAttribute(item, 'data-index')).toEqual(index);
                         expect(parseIntAttribute(item, 'data-start')).toEqual(captionsData.start[index]);
@@ -362,7 +362,7 @@
                     $.each(handlerList, function(index, handler) {
                         spyOn(state.videoCaption, handler);
                     });
-                    $('.subtitles li[data-index]').each(
+                    $('.subtitles li span[data-index]').each(
                         function(index, link) {
                             $(link).trigger('mouseover');
                             expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
@@ -420,10 +420,10 @@
                         return state.videoCaption.rendered;
                     }).then(function() {
                         var captionsData = jasmine.stubbedCaption,
-                            items = $('.subtitles li[data-index]');
+                            $items = $('.subtitles li span[data-index]');
 
                         _.each(captionsData.text, function(text, index) {
-                            var item = items.eq(index);
+                            var item = $items.eq(index);
 
                             expect(parseIntAttribute(item, 'data-index')).toEqual(index);
                             expect(parseIntAttribute(item, 'data-start')).toEqual(captionsData.start[index]);
@@ -533,8 +533,9 @@
                     describe('when the player is playing', function() {
                         beforeEach(function() {
                             state.videoCaption.playing = true;
-                            $('.subtitles-menu li[data-index]:first')
-                            .addClass('current');
+                            $('.subtitles-menu span[data-index]:first')
+                                .parent()
+                                .addClass('current');
                             $('.subtitles-menu').trigger(jQuery.Event('mouseout'));
                         });
 
@@ -832,7 +833,7 @@
 
                     captionsData = jasmine.stubbedCaption;
 
-                    $('.subtitles li[data-index]').each(
+                    $('.subtitles li span[data-index]').each(
                         function(index, item) {
                             expect(parseIntAttribute($(item), 'data-index')).toEqual(index);
                             expect(parseIntAttribute($(item), 'data-start')).toEqual(captionsData.start[index]);
@@ -913,17 +914,17 @@
             describe('when the index is not the same', function() {
                 beforeEach(function() {
                     state.videoCaption.currentIndex = 1;
-                    $('.subtitles li[data-index=5]').addClass('current');
+                    $('.subtitles li span[data-index=5]').addClass('current');
                     state.videoCaption.updatePlayTime(25.000);
                 });
 
                 it('deactivate the previous transcript', function() {
-                    expect($('.subtitles li[data-index=1]'))
+                    expect($('.subtitles li span[data-index=1]'))
                         .not.toHaveClass('current');
                 });
 
                 it('activate new transcript', function() {
-                    expect($('.subtitles li[data-index=5]'))
+                    expect($('.subtitles li span[data-index=5]'))
                         .toHaveClass('current');
                 });
 
@@ -939,9 +940,9 @@
             describe('when the index is the same', function() {
                 it('does not change current subtitle', function() {
                     state.videoCaption.currentIndex = 1;
-                    $('.subtitles li[data-index=3]').addClass('current');
+                    $('.subtitles li span[data-index=3]').addClass('current');
                     state.videoCaption.updatePlayTime(15.000);
-                    expect($('.subtitles li[data-index=3]'))
+                    expect($('.subtitles li span[data-index=3]'))
                         .toHaveClass('current');
                 });
             });
@@ -955,7 +956,7 @@
                     return state.videoCaption.rendered;
                 }).then(function() {
                     videoControl = state.videoControl;
-                    $('.subtitles li[data-index=1]').addClass('current');
+                    $('.subtitles li span[data-index=1]').addClass('current');
                     state.videoCaption.onResize();
                 }).always(done);
             });
@@ -1029,7 +1030,7 @@
                 it('does not scroll the transcript', function() {
                     runs(function() {
                         state.videoCaption.frozen = true;
-                        $('.subtitles li[data-index=1]').addClass('current');
+                        $('.subtitles li span[data-index=1]').addClass('current');
                         state.videoCaption.scrollCaption();
                         expect($.fn.scrollTo).not.toHaveBeenCalled();
                     });
@@ -1055,7 +1056,7 @@
                 describe('when there is a current transcript', function() {
                     it('scroll to current transcript', function() {
                         runs(function() {
-                            $('.subtitles li[data-index=1]').addClass('current');
+                            $('.subtitles li span[data-index=1]').addClass('current');
                             state.videoCaption.scrollCaption();
                             expect($.fn.scrollTo).toHaveBeenCalled();
                         });
@@ -1082,7 +1083,7 @@
                 it('trigger seek event with the correct time', function() {
                     runs(function() {
                         state.videoSpeedControl.currentSpeed = '1.0';
-                        $('.subtitles li[data-start="14910"]').trigger('click');
+                        $('.subtitles li span[data-start="14910"]').trigger('click');
                         expect(state.videoPlayer.currentTime).toEqual(14.91);
                     });
                 });
@@ -1092,7 +1093,7 @@
                 it('trigger seek event with the correct time', function() {
                     runs(function() {
                         state.videoSpeedControl.currentSpeed = '0.75';
-                        $('.subtitles li[data-start="14910"]').trigger('click');
+                        $('.subtitles li span[data-start="14910"]').trigger('click');
                         expect(state.videoPlayer.currentTime).toEqual(14.91);
                     });
                 });
@@ -1104,7 +1105,7 @@
                         runs(function() {
                             state.videoSpeedControl.currentSpeed = '0.75';
                             state.currentPlayerMode = 'flash';
-                            $('.subtitles li[data-start="14910"]').trigger('click');
+                            $('.subtitles li span[data-start="14910"]').trigger('click');
                             expect(state.videoPlayer.currentTime).toEqual(15);
                         });
                     });
@@ -1114,7 +1115,7 @@
         describe('toggle', function() {
             beforeEach(function() {
                 state = jasmine.initializePlayer();
-                $('.subtitles li[data-index=1]').addClass('current');
+                $('.subtitles li span[data-index=1]').addClass('current');
             });
 
             describe('when the transcript is visible', function() {
@@ -1172,13 +1173,13 @@
             describe('when getting focus through TAB key', function() {
                 beforeEach(function() {
                     state.videoCaption.isMouseFocus = false;
-                    $('.subtitles li[data-index=0]').trigger(
+                    $('.subtitles li span[data-index=0]').trigger(
                         jQuery.Event('focus')
                     );
                 });
 
                 it('shows an outline around the transcript', function() {
-                    expect($('.subtitles li[data-index=0]'))
+                    expect($('.subtitles span[data-index=0]').parent())
                         .toHaveClass('focused');
                 });
 
@@ -1189,13 +1190,13 @@
 
             describe('when loosing focus through TAB key', function() {
                 beforeEach(function() {
-                    $('.subtitles li[data-index=0]').trigger(
+                    $('.subtitles li span[data-index=0]').trigger(
                         jQuery.Event('blur')
                     );
                 });
 
                 it('does not show an outline around the transcript', function() {
-                    expect($('.subtitles li[data-index=0]'))
+                    expect($('.subtitles li span[data-index=0]'))
                         .not.toHaveClass('focused');
                 });
 
@@ -1210,14 +1211,14 @@
                 function() {
                     beforeEach(function() {
                         state.videoCaption.isMouseFocus = false;
-                        $('.subtitles li[data-index=0]')
+                        $('.subtitles li span[data-index=0]')
                         .trigger(jQuery.Event('focus'));
-                        $('.subtitles li[data-index=0]')
+                        $('.subtitles li span[data-index=0]')
                         .trigger(jQuery.Event('mousedown'));
                     });
 
                     it('does not show an outline around it', function() {
-                        expect($('.subtitles li[data-index=0]'))
+                        expect($('.subtitles li span[data-index=0]'))
                         .not.toHaveClass('focused');
                     });
 
@@ -1230,28 +1231,28 @@
                 'when a second transcript gets focus through mouse after ' +
                 'first had focus through TAB key',
                 function() {
-                    var subDataLiIdx__0, subDataLiIdx__1;
+                    var $subDataLiIdx0, $subDataLiIdx1;
 
                     beforeEach(function() {
-                        subDataLiIdx__0 = $('.subtitles li[data-index=0]');
-                        subDataLiIdx__1 = $('.subtitles li[data-index=1]');
+                        $subDataLiIdx0 = $('.subtitles li span[data-index=0]');
+                        $subDataLiIdx1 = $('.subtitles li span[data-index=1]');
 
                         state.videoCaption.isMouseFocus = false;
 
-                        subDataLiIdx__0.trigger(jQuery.Event('focus'));
-                        subDataLiIdx__0.trigger(jQuery.Event('blur'));
+                        $subDataLiIdx0.trigger(jQuery.Event('focus'));
+                        $subDataLiIdx0.trigger(jQuery.Event('blur'));
 
                         state.videoCaption.isMouseFocus = true;
 
-                        subDataLiIdx__1.trigger(jQuery.Event('mousedown'));
+                        $subDataLiIdx1.trigger(jQuery.Event('mousedown'));
                     });
 
                     it('does not show an outline around the first', function() {
-                        expect(subDataLiIdx__0).not.toHaveClass('focused');
+                        expect($subDataLiIdx0).not.toHaveClass('focused');
                     });
 
                     it('does not show an outline around the second', function() {
-                        expect(subDataLiIdx__1).not.toHaveClass('focused');
+                        expect($subDataLiIdx1).not.toHaveClass('focused');
                     });
 
                     it('has automatic scrolling enabled', function() {
