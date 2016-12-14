@@ -184,7 +184,7 @@ class ImportTestCase(CourseTestCase):
                     "name": self.bad_tar,
                     "course-data": [btar]
                 })
-        self.assertEquals(resp.status_code, 415)
+        self.assertEquals(resp.status_code, 200)
         # Check that `import_status` returns the appropriate stage (i.e., the
         # stage at which import failed).
         resp_status = self.client.get(
@@ -336,8 +336,16 @@ class ImportTestCase(CourseTestCase):
             with open(tarpath) as tar:
                 args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
-            self.assertEquals(resp.status_code, 400)
-            self.assertIn("SuspiciousFileOperation", resp.content)
+            self.assertEquals(resp.status_code, 200)
+            resp = self.client.get(
+                reverse_course_url(
+                    'import_status_handler',
+                    self.course.id,
+                    kwargs={'filename': os.path.split(tarpath)[1]}
+                )
+            )
+            status = json.loads(resp.content)["ImportStatus"]
+            self.assertEqual(status, -1)
 
         try_tar(self._fifo_tar())
         try_tar(self._symlink_tar())
