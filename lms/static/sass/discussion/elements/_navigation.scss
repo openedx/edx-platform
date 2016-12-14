@@ -291,6 +291,8 @@
 .forum-nav-thread-wrapper-1 {
     @extend %forum-nav-thread-wrapper;
     margin: 0 ($baseline / 4);
+      // 125 is the width we need to save for the "X new" comments indicator - and we want to clip the preview
+      // at the same length whether there are unread comments for this story or not.
     max-width: calc(100% - 125px);
     flex-grow: 1;  // This column should consume all the available space
 }
