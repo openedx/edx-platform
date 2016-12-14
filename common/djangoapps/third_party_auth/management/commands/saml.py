@@ -25,9 +25,16 @@ class Command(BaseCommand):
         log = logging.getLogger('third_party_auth.tasks')
         log.propagate = False
         log.addHandler(log_handler)
-        num_changed, num_failed, num_total = fetch_saml_metadata()
+        num_changed, num_failed, num_total, failure_messages = fetch_saml_metadata()
         self.stdout.write(
             "\nDone. Fetched {num_total} total. {num_changed} were updated and {num_failed} failed.\n".format(
                 num_changed=num_changed, num_failed=num_failed, num_total=num_total
             )
         )
+
+        if num_failed > 0:
+            raise CommandError(
+                "Command finished with the following exceptions:\n\n{failures}".format(
+                    failures="\n\n".join(failure_messages)
+                )
+            )
