@@ -9,3 +9,4 @@ xblock-image-modal==0.3.1
 -e git+https://github.com/Stanford-Online/edx-analytics-data-api-client.git@1b8260ce8dd6edb999fffc46b09f77c83f87e1f9#egg=edx-analytics-data-api-client
 -e git+https://github.com/openlearninginitiative/xblock-inline-dropdown.git@dfb96f6e3d42d8faff04c9b183d773a65d85824d#egg=inline_dropdown
 -e git+https://github.com/Stanford-Online/xblock-in-video-quiz.git@release/v0.1.1#egg=invideoquiz_xblock
+ubcpi-xblock==0.5.0
