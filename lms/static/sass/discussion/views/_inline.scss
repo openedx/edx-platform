@@ -20,9 +20,7 @@
                 color: $forum-color-primary;
 
                 .icon {
-                    position: absolute;
-                    @include left(7px);
-                    top: 16px;
+                    @include margin-left(-15px);
                 }
             }
         }
