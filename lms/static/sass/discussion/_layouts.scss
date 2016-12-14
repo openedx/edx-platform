@@ -1,6 +1,32 @@
 // Layouts for discussion pages
 @import '../course/base/extends';
 
+.discussion-user-profile-board {
+
+    .discussion-profile-title {
+        margin-bottom: $baseline / 5;
+        font-size: $forum-x-large-font-size;
+    }
+
+    .discussion-profile-count {
+        margin-top: $baseline / 4;
+    }
+
+    .discussion-profile-info {
+        @include margin-right($baseline);
+    }
+
+    .user-name {
+        @include margin-right($baseline);
+        font-size: $forum-x-large-font-size;
+    }
+
+    .user-roles {
+        font-size: $forum-small-font-size;
+        font-style: italic;
+    }
+}
+
 .discussion-column {
     min-height: 500px;
 
