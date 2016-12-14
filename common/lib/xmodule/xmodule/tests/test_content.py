@@ -4,6 +4,7 @@ import os
 import unittest
 import ddt
 from path import Path as path
+
 from xmodule.contentstore.content import StaticContent, StaticContentStream
 from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
@@ -94,11 +95,6 @@ class ContentTest(unittest.TestCase):
         content = StaticContent('loc', 'name', 'content_type', 'data')
         self.assertIsNone(content.thumbnail_location)
 
-    def test_static_url_generation_from_courseid(self):
-        course_key = SlashSeparatedCourseKey('foo', 'bar', 'bz')
-        url = StaticContent.convert_legacy_static_url_with_course_id('images_course_image.jpg', course_key)
-        self.assertEqual(url, '/c4x/foo/bar/asset/images_course_image.jpg')
-
     @ddt.data(
         (u"monsters__.jpg", u"monsters__.jpg"),
         (u"monsters__.png", u"monsters__-png.jpg"),
@@ -122,9 +118,9 @@ class ContentTest(unittest.TestCase):
         self.assertEqual(AssetLocation(u'mitX', u'400', u'ignore', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)
 
     def test_get_location_from_path(self):
-        asset_location = StaticContent.get_location_from_path(u'/c4x/foo/bar/asset/images_course_image.jpg')
+        asset_location = StaticContent.get_location_from_path(u'/c4x/a/b/asset/images_course_image.jpg')
         self.assertEqual(
-            AssetLocation(u'foo', u'bar', None, u'asset', u'images_course_image.jpg', None),
+            AssetLocation(u'a', u'b', None, u'asset', u'images_course_image.jpg', None),
             asset_location
         )
 

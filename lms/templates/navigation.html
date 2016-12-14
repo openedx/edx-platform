@@ -6,14 +6,16 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from student.models import UserProfile
 
+from lms.djangoapps.ccx.overrides import get_current_ccx
 from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
-from lms.djangoapps.ccx.overrides import get_current_ccx
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 # App that handles subdomain specific branding
-import branding
+from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
+from lang_pref.api import released_languages
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -43,7 +45,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
-            <img src="${static.url(branding.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}"/>
+            <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
         </%block>
       </a>
     </h1>
@@ -52,7 +54,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h2 class="course-header"><span class="provider">${course.display_org_with_default | h}:</span>
       <span class="course-number">${course.display_number_with_default | h}</span>
       <%
-        display_name = course.display_name_with_default
+        display_name = course.display_name_with_default_escaped
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
           ccx = get_current_ccx(course.id)
           if ccx:
@@ -78,12 +80,37 @@ site_status_msg = get_site_status_msg(course_id)
       </%block>
     </ol>
     <ol class="user">
+        % if static.show_language_selector():
+        <% languages = released_languages() %>
+        % if len(languages) > 1:
+            <li class="primary">
+              <form action="/i18n/setlang/" method="post" class="settings-language-form" id="language-settings-form">
+                <input type="hidden" id="csrf_token" name="csrfmiddlewaretoken" value="${csrf_token}">
+                <input title="preference api" type="hidden" id="preference-api-url" value="${reverse('preferences_api', kwargs={'username': user.username})}">
+                <label><span class="sr">${_("Choose Language")}</span>
+                    <select class="input select" id="settings-language-value" name="language">
+                      % for language in languages:
+                        % if language[0] == LANGUAGE_CODE:
+                          <option value="${language[0]}" selected="selected">${language[1]}</option>
+                        % else:
+                          <option value="${language[0]}" >${language[1]}</option>
+                        % endif
+                      % endfor
+                    </select>
+                </label>
+              </form>
+            </li>
+        % endif
+        % endif
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="sr">${_("Dashboard for:")}</span>
-          <div>
-          ${user.username}
-          </div>
+          <%
+          username = user.username
+          profile_image_url = get_profile_image_urls_for_user(user)['medium']
+          %>
+          <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
+          <div class="label-username">${username}</div>
         </a>
       </li>
       <li class="primary">
@@ -98,7 +125,7 @@ site_status_msg = get_site_status_msg(course_id)
         </ul>
       </li>
     </ol>
-      % if should_display_shopping_cart_func() and not (course and microsite.is_request_in_microsite()): # see shoppingcart.context_processor.user_has_cart_context_processor
+      % if should_display_shopping_cart_func() and not (course and static.is_request_in_themed_site()): # see shoppingcart.context_processor.user_has_cart_context_processor
         <ol class="user">
           <li class="primary">
             <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
@@ -110,7 +137,7 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
-        % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+        % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
@@ -124,35 +151,40 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
         % endif
       </%block>
-      % if not settings.DISABLE_REGISTER_BUTTON:
-          % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
-          <li class="nav-global-05">
-            <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
-          </li>
-          %endif
-          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
-          </li>
-          % else:
-          <li class="nav-global-04">
-            <a class="cta cta-register" href="/register${login_query()}">${_("Register")}</a>
-          </li>
-          % endif
 
-      % endif
+      <%block name="navigation_other_global_links">
+        % if not settings.DISABLE_REGISTER_BUTTON:
+            % if settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
+            <li class="nav-global-05">
+              <a class="cta cta-discovery" href="/courses">${_("Find Courses")}</a>
+            </li>
+            %endif
+            % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+            <li class="nav-global-04">
+              <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+            </li>
+            % else:
+            <li class="nav-global-04">
+              <a class="cta cta-register" href="/register${login_query()}">${_("Register")}</a>
+            </li>
+            % endif
+
+        % endif
+      </%block>
     </ol>
 
     <ol class="right nav-courseware">
-    <li class="nav-courseware-01">
-      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <a class="cta cta-login nav-courseware-button" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Log in")}</a>
-          % else:
-          <a class="cta cta-login nav-courseware-button" href="/login${login_query()}">${_("Log in")}</a>
+      <%block name="navigation_sign_in">
+        <li class="nav-courseware-01">
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+              <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+              % else:
+              <a class="cta cta-login" href="/login${login_query()}">${_("Sign in")}</a>
+              % endif
           % endif
-      % endif
-    </li>
+        </li>
+      </%block>
     </ol>
     % endif
   </nav>

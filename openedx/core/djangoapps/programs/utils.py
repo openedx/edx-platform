@@ -1,49 +1,104 @@
-"""
-Helper methods for Programs.
-"""
-from django.core.cache import cache
-from edx_rest_api_client.client import EdxRestApiClient
+"""Helper functions for working with Programs."""
+import logging
+
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.lib.edx_api_utils import get_edx_api_data
 
 
-def is_student_dashboard_programs_enabled():    # pylint: disable=invalid-name
-    """ Returns a Boolean indicating whether LMS dashboard functionality
-     related to Programs should be enabled or not.
-    """
-    return ProgramsApiConfig.current().is_student_dashboard_enabled
+log = logging.getLogger(__name__)
 
 
-def programs_api_client(api_url, jwt_access_token):
-    """ Returns an Programs API client setup with authentication for the
-    specified user.
-    """
-    return EdxRestApiClient(
-        api_url,
-        jwt=jwt_access_token
-    )
-
-
-def is_cache_enabled_for_programs():
-    """Returns a Boolean indicating whether responses from the Programs API
-    will be cached.
-    """
-    return ProgramsApiConfig.current().is_cache_enabled
-
-
-def set_cached_programs_response(programs_data):
-    """ Set cache value for the programs data with specific ttl.
+def get_programs(user):
+    """Given a user, get programs from the Programs service.
+    Returned value is cached depending on user permissions. Staff users making requests
+    against Programs will receive unpublished programs, while regular users will only receive
+    published programs.
 
     Arguments:
-        programs_data (dict): Programs data in dictionary format
+        user (User): The user to authenticate as when requesting programs.
+
+    Returns:
+        list of dict, representing programs returned by the Programs service.
     """
-    cache.set(
-        ProgramsApiConfig.PROGRAMS_API_CACHE_KEY,
-        programs_data,
-        ProgramsApiConfig.current().cache_ttl
-    )
+    programs_config = ProgramsApiConfig.current()
+
+    # Bypass caching for staff users, who may be creating Programs and want
+    # to see them displayed immediately.
+    cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
+
+    return get_edx_api_data(programs_config, user, 'programs', cache_key=cache_key)
 
 
-def get_cached_programs_response():
-    """ Get programs data from cache against cache key."""
-    cache_key = ProgramsApiConfig.PROGRAMS_API_CACHE_KEY
-    return cache.get(cache_key)
+def get_programs_for_dashboard(user, course_keys):
+    """Build a dictionary of programs, keyed by course.
+
+    Given a user and an iterable of course keys, find all the programs relevant
+    to the user's dashboard and return them in a dictionary keyed by course key.
+
+    Arguments:
+        user (User): The user to authenticate as when requesting programs.
+        course_keys (list): List of course keys representing the courses in which
+            the given user has active enrollments.
+
+    Returns:
+        dict, containing programs keyed by course. Empty if programs cannot be retrieved.
+    """
+    programs_config = ProgramsApiConfig.current()
+    course_programs = {}
+
+    if not programs_config.is_student_dashboard_enabled:
+        log.debug('Display of programs on the student dashboard is disabled.')
+        return course_programs
+
+    programs = get_programs(user)
+    if not programs:
+        log.debug('No programs found for the user with ID %d.', user.id)
+        return course_programs
+
+    # Convert course keys to Unicode representation for efficient lookup.
+    course_keys = map(unicode, course_keys)
+
+    # Reindex the result returned by the Programs API from:
+    #     program -> course code -> course run
+    # to:
+    #     course run -> program
+    # Ignore course runs not present in the user's active enrollments.
+    for program in programs:
+        try:
+            for course_code in program['course_codes']:
+                for run in course_code['run_modes']:
+                    course_key = run['course_key']
+                    if course_key in course_keys:
+                        course_programs[course_key] = program
+        except KeyError:
+            log.exception('Unable to parse Programs API response: %r', program)
+
+    return course_programs
+
+
+def get_programs_for_credentials(user, programs_credentials):
+    """ Given a user and an iterable of credentials, get corresponding programs
+    data and return it as a list of dictionaries.
+
+    Arguments:
+        user (User): The user to authenticate as for requesting programs.
+        programs_credentials (list): List of credentials awarded to the user
+            for completion of a program.
+
+    Returns:
+        list, containing programs dictionaries.
+    """
+    certificate_programs = []
+
+    programs = get_programs(user)
+    if not programs:
+        log.debug('No programs for user %d.', user.id)
+        return certificate_programs
+
+    for program in programs:
+        for credential in programs_credentials:
+            if program['id'] == credential['credential']['program_id']:
+                program['credential_url'] = credential['certificate_url']
+                certificate_programs.append(program)
+
+    return certificate_programs

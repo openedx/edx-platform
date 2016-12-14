@@ -1,21 +1,25 @@
 # Compute grades using real division, with no integer truncation
 from __future__ import division
+
+import json
+import logging
+import random
 from collections import defaultdict
 from functools import partial
-import json
-import random
-import logging
-
-from contextlib import contextmanager
-from django.conf import settings
-from django.test.client import RequestFactory
-from django.core.cache import cache
 
 import dogstats_wrapper as dog_stats_api
+from django.conf import settings
+from django.core.cache import cache
+from django.test.client import RequestFactory
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locator import BlockUsageLocator
 
+from openedx.core.lib.gating import api as gating_api
 from courseware import courses
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache, ScoresClient
+from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
 from student.models import anonymous_id_for_user
 from util.db import outer_atomic
 from util.module_utils import yield_dynamic_descriptor_descendants
@@ -25,10 +29,6 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .models import StudentModule
 from .module_render import get_module_for_descriptor
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.signals.signals import GRADES_UPDATED
-
 
 log = logging.getLogger("edx.courseware")
 
@@ -247,7 +247,7 @@ def answer_distributions(course_key):
         problem_store = modulestore()
         if usage_key not in state_keys_to_problem_info:
             problem = problem_store.get_item(usage_key)
-            problem_info = (problem.url_name, problem.display_name_with_default)
+            problem_info = (problem.url_name, problem.display_name_with_default_escaped)
             state_keys_to_problem_info[usage_key] = problem_info
 
         return state_keys_to_problem_info[usage_key]
@@ -374,12 +374,11 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
         format_scores = []
         for section in sections:
             section_descriptor = section['section_descriptor']
-            section_name = section_descriptor.display_name_with_default
+            section_name = section_descriptor.display_name_with_default_escaped
 
             with outer_atomic():
                 # some problems have state that is updated independently of interaction
-                # with the LMS, so they need to always be scored. (E.g. foldit.,
-                # combinedopenended)
+                # with the LMS, so they need to always be scored. (E.g. combinedopenended ORA1)
                 # TODO This block is causing extra savepoints to be fired that are empty because no queries are executed
                 # during the loop. When refactoring this code please keep this outer_atomic call in mind and ensure we
                 # are not making unnecessary database queries.
@@ -450,7 +449,7 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache, scores_c
                                 correct,
                                 total,
                                 graded,
-                                module_descriptor.display_name_with_default,
+                                module_descriptor.display_name_with_default_escaped,
                                 module_descriptor.location
                             )
                         )
@@ -590,6 +589,9 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
         # be hidden behind the ScoresClient.
         max_scores_cache.fetch_from_remote(field_data_cache.scorable_locations)
 
+    # Check for gated content
+    gated_content = gating_api.get_gated_content(course, student)
+
     chapters = []
     locations_to_children = defaultdict(list)
     locations_to_weighted_scores = {}
@@ -603,7 +605,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
             with outer_atomic():
-                if section_module.hide_from_toc:
+                if section_module.hide_from_toc or unicode(section_module.location) in gated_content:
                     continue
 
                 graded = section_module.graded
@@ -630,7 +632,7 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                         correct,
                         total,
                         graded,
-                        module_descriptor.display_name_with_default,
+                        module_descriptor.display_name_with_default_escaped,
                         module_descriptor.location
                     )
 
@@ -639,11 +641,11 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
 
                 scores.reverse()
                 section_total, _ = graders.aggregate_scores(
-                    scores, section_module.display_name_with_default)
+                    scores, section_module.display_name_with_default_escaped)
 
                 module_format = section_module.format if section_module.format is not None else ''
                 sections.append({
-                    'display_name': section_module.display_name_with_default,
+                    'display_name': section_module.display_name_with_default_escaped,
                     'url_name': section_module.url_name,
                     'scores': scores,
                     'section_total': section_total,
@@ -653,8 +655,8 @@ def _progress_summary(student, request, course, field_data_cache=None, scores_cl
                 })
 
         chapters.append({
-            'course': course.display_name_with_default,
-            'display_name': chapter_module.display_name_with_default,
+            'course': course.display_name_with_default_escaped,
+            'display_name': chapter_module.display_name_with_default_escaped,
             'url_name': chapter_module.url_name,
             'sections': sections
         })
@@ -699,7 +701,7 @@ def get_score(user, problem_descriptor, module_creator, scores_client, submissio
         return submissions_scores_cache[location_url]
 
     # some problems have state that is updated independently of interaction
-    # with the LMS, so they need to always be scored. (E.g. foldit.)
+    # with the LMS, so they need to always be scored. (E.g. combinedopenended ORA1.)
     if problem_descriptor.always_recalculate_grades:
         problem = module_creator(problem_descriptor)
         if problem is None:
@@ -809,3 +811,74 @@ def _get_mock_request(student):
     request = RequestFactory().get('/')
     request.user = student
     return request
+
+
+def _calculate_score_for_modules(user_id, course, modules):
+    """
+    Calculates the cumulative score (percent) of the given modules
+    """
+
+    # removing branch and version from exam modules locator
+    # otherwise student module would not return scores since module usage keys would not match
+    modules = [m for m in modules]
+    locations = [
+        BlockUsageLocator(
+            course_key=course.id,
+            block_type=module.location.block_type,
+            block_id=module.location.block_id
+        )
+        if isinstance(module.location, BlockUsageLocator) and module.location.version
+        else module.location
+        for module in modules
+    ]
+
+    scores_client = ScoresClient(course.id, user_id)
+    scores_client.fetch_scores(locations)
+
+    # Iterate over all of the exam modules to get score percentage of user for each of them
+    module_percentages = []
+    ignore_categories = ['course', 'chapter', 'sequential', 'vertical', 'randomize']
+    for index, module in enumerate(modules):
+        if module.category not in ignore_categories and (module.graded or module.has_score):
+            module_score = scores_client.get(locations[index])
+            if module_score:
+                correct = module_score.correct or 0
+                total = module_score.total or 1
+                module_percentages.append(correct / total)
+
+    return sum(module_percentages) / float(len(module_percentages)) if module_percentages else 0
+
+
+def get_module_score(user, course, module):
+    """
+    Collects all children of the given module and calculates the cumulative
+    score for this set of modules for the given user.
+
+    Arguments:
+        user (User): The user
+        course (CourseModule): The course
+        module (XBlock): The module
+
+    Returns:
+        float: The cumulative score
+    """
+    def inner_get_module(descriptor):
+        """
+        Delegate to get_module_for_descriptor
+        """
+        field_data_cache = FieldDataCache([descriptor], course.id, user)
+        return get_module_for_descriptor(
+            user,
+            _get_mock_request(user),
+            descriptor,
+            field_data_cache,
+            course.id,
+            course=course
+        )
+
+    modules = yield_dynamic_descriptor_descendants(
+        module,
+        user.id,
+        inner_get_module
+    )
+    return _calculate_score_for_modules(user.id, course, modules)

@@ -1,6 +1,7 @@
 # Factories are self documenting
 # pylint: disable=missing-docstring
 import factory
+from uuid import uuid4
 from django.core.files.base import ContentFile
 from factory.django import DjangoModelFactory, ImageField
 
@@ -8,7 +9,7 @@ from student.models import LinkedInAddToProfileConfiguration
 
 from certificates.models import (
     GeneratedCertificate, CertificateStatuses, CertificateHtmlViewConfiguration, CertificateWhitelist, BadgeAssertion,
-    BadgeImageConfiguration,
+    BadgeImageConfiguration, CertificateInvalidation,
 )
 
 
@@ -21,6 +22,7 @@ class GeneratedCertificateFactory(DjangoModelFactory):
     status = CertificateStatuses.unavailable
     mode = GeneratedCertificate.MODES.honor
     name = ''
+    verify_uuid = uuid4().hex
 
 
 class CertificateWhitelistFactory(DjangoModelFactory):
@@ -30,7 +32,16 @@ class CertificateWhitelistFactory(DjangoModelFactory):
 
     course_id = None
     whitelist = True
-    notes = None
+    notes = 'Test Notes'
+
+
+class CertificateInvalidationFactory(DjangoModelFactory):
+
+    class Meta(object):
+        model = CertificateInvalidation
+
+    notes = 'Test Notes'
+    active = True
 
 
 class BadgeAssertionFactory(DjangoModelFactory):

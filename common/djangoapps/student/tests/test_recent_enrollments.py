@@ -16,11 +16,12 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.models import CourseEnrollment, DashboardConfiguration
 from student.views import get_course_enrollments, _get_recently_enrolled_courses
+from common.test.utils import XssTestMixin
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class TestRecentEnrollments(ModuleStoreTestCase):
+class TestRecentEnrollments(ModuleStoreTestCase, XssTestMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
@@ -126,23 +127,46 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         response = self.client.get(reverse("dashboard"))
         self.assertContains(response, "Thank you for enrolling in")
 
+    def test_dashboard_escaped_rendering(self):
+        """
+        Tests that the dashboard renders the escaped recent enrollment messages appropriately.
+        """
+        self._configure_message_timeout(600)
+        self.client.login(username=self.student.username, password=self.PASSWORD)
+
+        # New Course
+        course_location = locator.CourseLocator('TestOrg', 'TestCourse', 'TestRun')
+        xss_content = "<script>alert('XSS')</script>"
+        course = CourseFactory.create(
+            org=course_location.org,
+            number=course_location.course,
+            run=course_location.run,
+            display_name=xss_content
+        )
+        CourseEnrollment.enroll(self.student, course.id)
+
+        response = self.client.get(reverse("dashboard"))
+        self.assertContains(response, "Thank you for enrolling in")
+
+        # Check if response is escaped
+        self.assert_no_xss(response, xss_content)
+
     @ddt.data(
-        #Register as an honor in any course modes with no payment option
+        # Register as honor in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'honor', True),
         ([('honor', 0)], 'honor', True),
-        ([], 'honor', True),
-        #Register as an honor in any course modes which has payment option
+        # Register as honor in any course modes which has payment option
         ([('honor', 10)], 'honor', False),  # This is a paid course
         ([('audit', 0), ('honor', 0), ('professional', 20)], 'honor', True),
         ([('audit', 0), ('honor', 0), ('verified', 20)], 'honor', True),
         ([('audit', 0), ('honor', 0), ('verified', 20), ('professional', 20)], 'honor', True),
-        ([], 'honor', True),
-        #Register as an audit in any course modes with no payment option
+        # Register as audit in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'audit', True),
         ([('audit', 0)], 'audit', True),
-        #Register as an audit in any course modes which has no payment option
+        ([], 'audit', True),
+        # Register as audit in any course modes which has no payment option
         ([('audit', 0), ('honor', 0), ('verified', 10)], 'audit', True),
-        #Register as a verified in any course modes which has payment option
+        # Register as verified in any course modes which has payment option
         ([('professional', 20)], 'professional', False),
         ([('verified', 20)], 'verified', False),
         ([('professional', 20), ('verified', 20)], 'verified', False),

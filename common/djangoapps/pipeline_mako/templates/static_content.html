@@ -4,7 +4,8 @@ from pipeline_mako import compressed_css, compressed_js
 from django.utils.translation import get_language_bidi
 from mako.exceptions import TemplateLookupException
 
-from microsite_configuration import microsite
+from openedx.core.djangoapps.theming.helpers import get_page_title_breadcrumbs, get_value, get_template_path, get_themed_template_path, is_request_in_themed_site
+from certificates.api import get_asset_url_by_slug
 %>
 
 <%def name='url(file, raw=False)'><%
@@ -13,6 +14,13 @@ try:
 except:
     url = file
 %>${url}${"?raw" if raw else ""}</%def>
+
+<%def name='certificate_asset_url(slug)'><%
+try:
+    url = get_asset_url_by_slug(slug)
+except:
+    url = ''
+%>${url}</%def>
 
 <%def name='css(group, raw=False)'>
   <%
@@ -80,14 +88,47 @@ source, template_path = Loader(engine).load_template_source(path)
     </script>
 </%def>
 
-<%def name="optional_include_mako(file, with_microsite=False)"><%
+<%def name="optional_include_mako(file, is_theming_enabled=False)"><%
 # http://stackoverflow.com/q/21219531
-if with_microsite:
-    file = microsite.get_template_path(file)
+if is_theming_enabled:
+    file = get_template_path(file)
 try:
     tmpl = self.get_template(file)
 except TemplateLookupException:
     pass
 else:
     tmpl.render_context(context)
+%></%def>
+
+
+<%def name="get_page_title_breadcrumbs(*args)"><%
+    return get_page_title_breadcrumbs(*args)
+%></%def>
+
+<%def name="get_platform_name()"><%
+    return get_value('platform_name', settings.PLATFORM_NAME)
+%></%def>
+
+<%def name="get_value(val_name, default=None, **kwargs)"><%
+    return get_value(val_name, default=default, **kwargs)
+%></%def>
+
+<%def name="get_template_path(relative_path, **kwargs)"><%
+    return get_template_path(relative_path, **kwargs)
+%></%def>
+
+<%def name="get_themed_template_path(relative_path, default_path, **kwargs)"><%
+    return get_themed_template_path(relative_path, default_path, **kwargs)
+%></%def>
+
+<%def name="is_request_in_themed_site()"><%
+    return is_request_in_themed_site()
+%></%def>
+
+<%def name="get_tech_support_email_address()"><%
+    return get_value('email_from_address', settings.TECH_SUPPORT_EMAIL)
+%></%def>
+
+<%def name="show_language_selector()"><%
+    return settings.FEATURES.get('SHOW_LANGUAGE_SELECTOR', False)
 %></%def>

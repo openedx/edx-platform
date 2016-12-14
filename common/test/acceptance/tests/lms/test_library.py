@@ -21,7 +21,7 @@ SUBSECTION_NAME = 'Test Subsection'
 UNIT_NAME = 'Test Unit'
 
 
-@attr('shard_3')
+@attr('shard_7')
 class LibraryContentTestBase(UniqueCourseTest):
     """ Base class for library content block tests """
     USERNAME = "STUDENT_TESTER"
@@ -127,9 +127,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         Open library page in LMS
         """
         self.courseware_page.visit()
-        paragraphs = self.courseware_page.q(css='.course-content p')
-        if paragraphs and "You were most recently in" in paragraphs.text[0]:
-            paragraphs[0].find_element_by_tag_name('a').click()
+        paragraphs = self.courseware_page.q(css='.course-content p').results
+        if not paragraphs:
+            self.courseware_page.q(css='.menu-item a').results[0].click()
         block_id = block_id if block_id is not None else self.lib_block.locator
         #pylint: disable=attribute-defined-outside-init
         self.library_content_page = LibraryContentXBlockWrapper(self.browser, block_id)
@@ -144,7 +144,7 @@ class LibraryContentTestBase(UniqueCourseTest):
 
 
 @ddt.ddt
-@attr('shard_3')
+@attr('shard_7')
 class LibraryContentTest(LibraryContentTestBase):
     """
     Test courseware.
@@ -197,7 +197,7 @@ class LibraryContentTest(LibraryContentTestBase):
 
 
 @ddt.ddt
-@attr('shard_3')
+@attr('shard_7')
 class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearchIndexMixin):
     """
     Test Library Content block in LMS
@@ -265,7 +265,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
     @property
     def _problem_headers(self):
         """ Expected XBLock headers according to populate_library_fixture """
-        return frozenset(child.display_name.upper() for child in self.library_fixture.children)
+        return frozenset(child.display_name for child in self.library_fixture.children)
 
     def _set_library_content_settings(self, count=1, capa_type="Any Type"):
         """
@@ -304,7 +304,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
         self.assertEqual(len(children_headers), 1)
         self.assertLessEqual(
             children_headers,
-            set([header.upper() for header in ["Problem Choice Group 1", "Problem Choice Group 2"]])
+            set(["Problem Choice Group 1", "Problem Choice Group 2"])
         )
 
         # Choice group test
@@ -312,7 +312,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase, TestWithSearc
         self.assertEqual(len(children_headers), 2)
         self.assertEqual(
             children_headers,
-            set([header.upper() for header in ["Problem Select 1", "Problem Select 2"]])
+            set(["Problem Select 1", "Problem Select 2"])
         )
 
         # Missing problem type test

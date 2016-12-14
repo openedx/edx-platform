@@ -14,7 +14,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils
+from xmodule.video_module import VideoDescriptor, bumper_utils, video_utils, rewrite_video_url
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.tests.test_video import VideoDescriptorTestBase, instantiate_descriptor
 from xmodule.tests.test_import import DummySystem
@@ -688,10 +688,10 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
     # pylint: disable=invalid-name
     @patch('xmodule.video_module.video_module.BrandingInfoConfig')
-    @patch('xmodule.video_module.video_module.get_video_from_cdn')
+    @patch('xmodule.video_module.video_module.rewrite_video_url')
     def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
         """
-        Test if sources got from CDN.
+        Test if sources got from CDN
         """
 
         mock_BrandingInfoConfig.get_config.return_value = {
@@ -704,8 +704,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         def side_effect(*args, **kwargs):
             cdn = {
-                'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
-                'http://example.com/example.webm': 'http://cdn_example.com/example.webm',
+                'http://example.com/example.mp4': 'http://cdn-example.com/example.mp4',
+                'http://example.com/example.webm': 'http://cdn-example.com/example.webm',
             }
             return cdn.get(args[1])
 
@@ -733,8 +733,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'result': {
                 'download_video_link': u'example_source.mp4',
                 'sources': [
-                    u'http://cdn_example.com/example.mp4',
-                    u'http://cdn_example.com/example.webm'
+                    u'http://cdn-example.com/example.mp4',
+                    u'http://cdn-example.com/example.webm'
                 ],
             },
         }
@@ -800,6 +800,63 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 context,
                 self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
             )
+
+
+@attr('shard_1')
+class TestVideoCDNRewriting(BaseTestXmodule):
+    """
+    Tests for Video CDN.
+    """
+
+    def setUp(self, *args, **kwargs):
+        super(TestVideoCDNRewriting, self).setUp(*args, **kwargs)
+        self.original_video_file = "original_video.mp4"
+        self.original_video_url = "http://www.originalvideo.com/" + self.original_video_file
+
+    @patch.dict("django.conf.settings.CDN_VIDEO_URLS",
+                {"CN": "https://chinacdn.cn/"})
+    def test_rewrite_video_url_success(self):
+        """
+        Test successful CDN request.
+        """
+        cdn_response_video_url = settings.CDN_VIDEO_URLS["CN"] + self.original_video_file
+
+        self.assertEqual(
+            rewrite_video_url(settings.CDN_VIDEO_URLS["CN"], self.original_video_url),
+            cdn_response_video_url
+        )
+
+    @patch.dict("django.conf.settings.CDN_VIDEO_URLS",
+                {"CN": "https://chinacdn.cn/"})
+    def test_rewrite_url_concat(self):
+        """
+        Test that written URLs are returned clean despite input
+        """
+        cdn_response_video_url = settings.CDN_VIDEO_URLS["CN"] + "original_video.mp4"
+
+        self.assertEqual(
+            rewrite_video_url(settings.CDN_VIDEO_URLS["CN"] + "///", self.original_video_url),
+            cdn_response_video_url
+        )
+
+    def test_rewrite_video_url_invalid_url(self):
+        """
+        Test if no alternative video in CDN exists.
+        """
+        invalid_cdn_url = 'http://http://fakecdn.com/'
+        self.assertIsNone(rewrite_video_url(invalid_cdn_url, self.original_video_url))
+
+    def test_none_args(self):
+        """
+        Ensure None args return None
+        """
+        self.assertIsNone(rewrite_video_url(None, None))
+
+    def test_emptystring_args(self):
+        """
+        Ensure emptyrstring args return None
+        """
+        self.assertIsNone(rewrite_video_url("", ""))
 
 
 @attr('shard_1')

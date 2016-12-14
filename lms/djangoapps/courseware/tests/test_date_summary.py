@@ -257,3 +257,18 @@ class CourseDateSummaryTest(SharedModuleStoreTestCase):
         )
         self.assertEqual(block.link_text, 'Learn More')
         self.assertEqual(block.link, '')
+
+    @freezegun.freeze_time('2015-01-02')
+    @ddt.data(
+        (-1, '1 day ago - Jan 01, 2015'),
+        (1, 'in 1 day - Jan 03, 2015')
+    )
+    @ddt.unpack
+    def test_render_date_string_past(self, delta, expected_date_string):
+        self.setup_course_and_user(
+            days_till_start=-10,
+            verification_status='denied',
+            days_till_verification_deadline=delta,
+        )
+        block = VerificationDeadlineDate(self.course, self.user)
+        self.assertEqual(block.get_context()['date'], expected_date_string)

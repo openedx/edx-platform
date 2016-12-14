@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
 
 XMODULES = [
-    "abtest = xmodule.abtest_module:ABTestDescriptor",
     "book = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "chapter = xmodule.seq_module:SequenceDescriptor",
-    "combinedopenended = xmodule.combined_open_ended_module:CombinedOpenEndedDescriptor",
     "conditional = xmodule.conditional_module:ConditionalDescriptor",
     "course = xmodule.course_module:CourseDescriptor",
     "customtag = xmodule.template_module:CustomTagDescriptor",
@@ -13,7 +11,6 @@ XMODULES = [
     "image = xmodule.backcompat_module:TranslateCustomTagDescriptor",
     "library_content = xmodule.library_content_module:LibraryContentDescriptor",
     "error = xmodule.error_module:ErrorDescriptor",
-    "peergrading = xmodule.peer_grading_module:PeerGradingDescriptor",
     "poll_question = xmodule.poll_module:PollDescriptor",
     "problem = xmodule.capa_module:CapaDescriptor",
     "problemset = xmodule.seq_module:SequenceDescriptor",
@@ -31,12 +28,10 @@ XMODULES = [
     "static_tab = xmodule.html_module:StaticTabDescriptor",
     "custom_tag_template = xmodule.raw_module:RawDescriptor",
     "about = xmodule.html_module:AboutDescriptor",
-    "graphical_slider_tool = xmodule.gst_module:GraphicalSliderToolDescriptor",
     "annotatable = xmodule.annotatable_module:AnnotatableDescriptor",
     "textannotation = xmodule.textannotation_module:TextAnnotationDescriptor",
     "videoannotation = xmodule.videoannotation_module:VideoAnnotationDescriptor",
     "imageannotation = xmodule.imageannotation_module:ImageAnnotationDescriptor",
-    "foldit = xmodule.foldit_module:FolditDescriptor",
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
@@ -48,10 +43,13 @@ XBLOCKS = [
     "vertical = xmodule.vertical_block:VerticalBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
 ]
+XBLOCKS_ASIDES = [
+    'tagging_aside = cms.lib.xblock.tagging:StructuredTagsAside',
+]
 
 setup(
     name="XModule",
-    version="0.1",
+    version="0.1.1",
     packages=find_packages(exclude=["tests"]),
     install_requires=[
         'setuptools',
@@ -59,7 +57,7 @@ setup(
         'capa',
         'path.py',
         'webob',
-        'opaque-keys',
+        'edx-opaque-keys>=0.2.1,<1.0.0',
     ],
     package_data={
         'xmodule': ['js/module/*'],
@@ -70,6 +68,7 @@ setup(
     entry_points={
         'xblock.v1': XMODULES + XBLOCKS,
         'xmodule.v1': XMODULES,
+        'xblock_asides.v1': XBLOCKS_ASIDES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',
         ],

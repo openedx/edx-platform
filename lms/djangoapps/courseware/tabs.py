@@ -30,7 +30,7 @@ class CoursewareTab(EnrolledTab):
     The main courseware view.
     """
     type = 'courseware'
-    title = ugettext_noop('Courseware')
+    title = ugettext_noop('Course')
     priority = 10
     view_name = 'courseware'
     is_movable = False
@@ -43,7 +43,7 @@ class CourseInfoTab(CourseTab):
     The course info view.
     """
     type = 'course_info'
-    title = ugettext_noop('Course Info')
+    title = ugettext_noop('Home')
     priority = 20
     view_name = 'info'
     tab_id = 'info'

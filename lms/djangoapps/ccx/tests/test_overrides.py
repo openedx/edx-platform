@@ -20,7 +20,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import override_field_for_ccx
 
-from lms.djangoapps.ccx.tests.test_views import flatten, iter_blocks
+from lms.djangoapps.ccx.tests.utils import flatten, iter_blocks
 
 
 @attr('shard_1')

@@ -18,9 +18,11 @@ from openedx.core.lib.tempdir import mkdtemp_clean
 
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores, SignalHandler
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
+
+from openedx.core.djangoapps.bookmarks.signals import trigger_update_xblocks_cache_task
 
 
 class StoreConstructors(object):
@@ -158,7 +160,7 @@ def xml_store_config(data_dir, source_dirs=None):
     return store
 
 
-@patch('xmodule.modulestore.django.create_modulestore_instance')
+@patch('xmodule.modulestore.django.create_modulestore_instance', autospec=True)
 def drop_mongo_collections(mock_create):
     """
     If using a Mongo-backed modulestore & contentstore, drop the collections.
@@ -317,10 +319,20 @@ class SharedModuleStoreTestCase(TestCase):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):
             """Call the object method, and reset the test case afterwards."""
-            return_val = f(*args, **kwargs)
-            obj = args[0]
-            obj.reset()
-            return return_val
+            try:
+                # Attempt execution of the test.
+                return_val = f(*args, **kwargs)
+            except:
+                # If the test raises an exception, re-raise it.
+                raise
+            else:
+                # Otherwise, return the test's return value.
+                return return_val
+            finally:
+                # In either case, call SharedModuleStoreTestCase.reset() "on the way out."
+                # For more, see here: https://docs.python.org/2/tutorial/errors.html#defining-clean-up-actions.
+                obj = args[0]
+                obj.reset()
 
         return wrapper
 
@@ -394,6 +406,8 @@ class ModuleStoreTestCase(TestCase):
         OverrideFieldData.provider_classes = None
 
         super(ModuleStoreTestCase, self).setUp()
+
+        SignalHandler.course_published.disconnect(trigger_update_xblocks_cache_task)
 
         self.store = modulestore()
 

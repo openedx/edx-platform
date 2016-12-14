@@ -33,7 +33,7 @@ from django.template.defaultfilters import escapejs
 
       </nav>
     </section>
-    <section class="course-content container discussion-user-threads" data-course-id="${course.id | h}" data-course-name="${course.display_name_with_default | h}" data-threads="${threads | h}" data-user-info="${user_info | h}" data-page="${page | h}" data-num-pages="${num_pages | h}"/>
+    <section class="course-content container discussion-user-threads" data-course-id="${course.id | h}" data-course-name="${course.display_name_with_default_escaped | h}" data-threads="${threads | h}" data-user-info="${user_info | h}" data-page="${page | h}" data-num-pages="${num_pages | h}"/>
   </div>
 </section>
 

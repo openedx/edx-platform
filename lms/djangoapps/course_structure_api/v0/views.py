@@ -23,6 +23,7 @@ from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from openedx.core.lib.api.view_utils import view_course_access, view_auth_classes
 from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
+from openedx.core.lib.exceptions import CourseNotFoundError
 from student.roles import CourseInstructorRole, CourseStaffRole
 from util.module_utils import get_dynamic_descriptor_children
 
@@ -73,7 +74,7 @@ class CourseViewMixin(object):
                 self.course_key = CourseKey.from_string(course_id)
                 self.check_course_permissions(self.request.user, self.course_key)
                 return func(self, *args, **kwargs)
-            except errors.CourseNotFoundError:
+            except CourseNotFoundError:
                 raise Http404
 
         return func_wrapper

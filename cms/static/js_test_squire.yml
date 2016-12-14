@@ -40,7 +40,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/backbone-associations-min.js
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker.js
-    - xmodule_js/common_static/js/vendor/jquery.leanModal.min.js
+    - xmodule_js/common_static/js/vendor/jquery.leanModal.js
     - xmodule_js/common_static/js/vendor/jquery.form.js
     - xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill.js
     - xmodule_js/common_static/js/vendor/sinon-1.17.0.js
@@ -67,7 +67,11 @@ lib_paths:
 # Paths to source JavaScript files
 src_paths:
     - coffee/src
-    - js
+    # We don't include all of js because the Javascript files in js/i18n cause issues with the Squire tests.
+    - js/collections
+    - js/models
+    - js/utils
+    - js/views
     - common/js
 
 # Paths to spec (test) JavaScript files

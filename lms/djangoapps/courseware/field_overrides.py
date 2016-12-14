@@ -228,11 +228,16 @@ class FieldOverrideProvider(object):
     @abstractmethod
     def enabled_for(self, course):  # pragma no cover
         """
-        Return True if this provider should be enabled for a given course
+        Return True if this provider should be enabled for a given course,
+        and False otherwise.
 
-        Return False otherwise
+        Concrete implementations are responsible for implementing this method.
 
-        Concrete implementations are responsible for implementing this method
+        Arguments:
+          course (CourseModule or None)
+
+        Returns:
+          bool
         """
         return False
 

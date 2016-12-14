@@ -12,12 +12,14 @@ def go_to_updates(_step):
     updates_css = 'li.nav-course-courseware-updates a'
     world.css_click(menu_css)
     world.css_click(updates_css)
+    world.wait_for_visible('#course-handouts-view')
 
 
 @step(u'I add a new update with the text "([^"]*)"$')
 def add_update(_step, text):
     update_css = 'a.new-update-button'
     world.css_click(update_css)
+    world.wait_for_visible('.CodeMirror')
     change_text(text)
 
 

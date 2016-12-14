@@ -12,7 +12,6 @@ from .views import (
 )
 from .views import EnrollmentCourseRosterView
 
-USERNAME_PATTERN = '(?P<username>[\w.@+-]+)'
 
 urlpatterns = patterns(
     'enrollment.views',
@@ -22,8 +21,9 @@ urlpatterns = patterns(
         name='courseenrollmentroster',
     ),
     url(
-        r'^enrollment/{username},{course_key}$'.format(username=USERNAME_PATTERN,
-                                                       course_key=settings.COURSE_ID_PATTERN),
+        r'^enrollment/{username},{course_key}$'.format(
+            username=settings.USERNAME_PATTERN, course_key=settings.COURSE_ID_PATTERN
+        ),
         EnrollmentView.as_view(),
         name='courseenrollment'
     ),

@@ -58,8 +58,8 @@ class Course(object):
     def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         """ Save the CourseMode objects to the database. """
 
-        # Update the verification deadline for the course (not the individual modes)
-        VerificationDeadline.set_deadline(self.id, self.verification_deadline)
+        # Override the verification deadline for the course (not the individual modes)
+        VerificationDeadline.set_deadline(self.id, self.verification_deadline, is_explicit=True)
 
         for mode in self.modes:
             mode.course_id = self.id

@@ -1,6 +1,7 @@
 """
 Test for the registration code status information.
 """
+from course_modes.models import CourseMode
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from django.utils.translation import ugettext as _
@@ -116,7 +117,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
-                mode_slug='honor'
+                mode_slug=CourseMode.DEFAULT_MODE_SLUG
             )
 
         reg_code = CourseRegistrationCode.objects.all()[0]
@@ -247,7 +248,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
-                mode_slug='honor',
+                mode_slug=CourseMode.DEFAULT_MODE_SLUG,
                 is_valid=False
             )
 
@@ -278,7 +279,7 @@ class TestCourseRegistrationCodeStatus(SharedModuleStoreTestCase):
                 created_by=self.instructor,
                 invoice=self.sale_invoice,
                 invoice_item=self.invoice_item,
-                mode_slug='honor'
+                mode_slug=CourseMode.DEFAULT_MODE_SLUG,
             )
 
         reg_code = CourseRegistrationCode.objects.all()[0]

@@ -139,7 +139,8 @@ function (HTML5Video, Resizer) {
             rel: 0,
             showinfo: 0,
             enablejsapi: 1,
-            modestbranding: 1
+            modestbranding: 1,
+            cc_load_policy: 0
         };
 
         if (!state.isFlashMode()) {

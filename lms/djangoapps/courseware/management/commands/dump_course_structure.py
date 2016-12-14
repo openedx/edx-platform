@@ -30,8 +30,8 @@ from xblock.fields import Scope
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-FILTER_LIST = ['xml_attributes', 'checklists']
-INHERITED_FILTER_LIST = ['children', 'xml_attributes', 'checklists']
+FILTER_LIST = ['xml_attributes']
+INHERITED_FILTER_LIST = ['children', 'xml_attributes']
 
 
 class Command(BaseCommand):

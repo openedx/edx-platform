@@ -845,9 +845,9 @@ def provider_login(request):
         except User.DoesNotExist:
             request.session['openid_error'] = True
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning("OpenID login failed - Unknown user email")
+                AUDIT_LOG.warning(u"OpenID login failed - Unknown user email")
             else:
-                msg = "OpenID login failed - Unknown user email: {0}".format(email)
+                msg = u"OpenID login failed - Unknown user email: {0}".format(email)
                 AUDIT_LOG.warning(msg)
             return HttpResponseRedirect(openid_request_url)
 
@@ -858,16 +858,16 @@ def provider_login(request):
         try:
             user = authenticate(username=username, password=password, request=request)
         except RateLimitException:
-            AUDIT_LOG.warning('OpenID - Too many failed login attempts.')
+            AUDIT_LOG.warning(u'OpenID - Too many failed login attempts.')
             return HttpResponseRedirect(openid_request_url)
 
         if user is None:
             request.session['openid_error'] = True
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.warning("OpenID login failed - invalid password")
+                AUDIT_LOG.warning(u"OpenID login failed - invalid password")
             else:
-                msg = "OpenID login failed - password for {0} is invalid".format(email)
-                AUDIT_LOG.warning(msg)
+                AUDIT_LOG.warning(
+                    u"OpenID login failed - password for %s is invalid", email)
             return HttpResponseRedirect(openid_request_url)
 
         # authentication succeeded, so fetch user information
@@ -878,11 +878,10 @@ def provider_login(request):
                 del request.session['openid_error']
 
             if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-                AUDIT_LOG.info("OpenID login success - user.id: {0}".format(user.id))
+                AUDIT_LOG.info(u"OpenID login success - user.id: %s", user.id)
             else:
-                AUDIT_LOG.info("OpenID login success - {0} ({1})".format(
-                               user.username, user.email))
-
+                AUDIT_LOG.info(
+                    u"OpenID login success - %s (%s)", user.username, user.email)
             # redirect user to return_to location
             url = endpoint + urlquote(user.username)
             response = openid_request.answer(True, None, url)
@@ -901,10 +900,11 @@ def provider_login(request):
         # the account is not active, so redirect back to the login page:
         request.session['openid_error'] = True
         if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-            AUDIT_LOG.warning("Login failed - Account not active for user.id {0}".format(user.id))
+            AUDIT_LOG.warning(
+                u"Login failed - Account not active for user.id %s", user.id)
         else:
-            msg = "Login failed - Account not active for user {0}".format(username)
-            AUDIT_LOG.warning(msg)
+            AUDIT_LOG.warning(
+                u"Login failed - Account not active for user %s", username)
         return HttpResponseRedirect(openid_request_url)
 
     # determine consumer domain if applicable

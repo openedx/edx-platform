@@ -1,5 +1,5 @@
 """
-    Test utils for Facebook functionality
+Test utils for Facebook functionality
 """
 
 import httpretty
@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from social.apps.django_app.default.models import UserSocialAuth
 
+from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.views import login_oauth_token
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
@@ -182,4 +183,4 @@ class SocialFacebookTestCase(ModuleStoreTestCase, APITestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(user, course.id))
         course_mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course.id)
         self.assertTrue(is_active)
-        self.assertEqual(course_mode, 'honor')
+        self.assertEqual(course_mode, CourseMode.DEFAULT_MODE_SLUG)

@@ -28,7 +28,7 @@ from django.core.urlresolvers import reverse
 <section class="discussion container" id="discussion-container"
          data-roles="${roles | h}"
          data-course-id="${course_id | h}"
-         data-course-name="${course.display_name_with_default | h}"
+         data-course-name="${course.display_name_with_default_escaped | h}"
          data-user-info="${user_info | h}"
          data-user-create-comment="${can_create_comment | h}"
          data-user-create-subcomment="${can_create_subcomment | h}"

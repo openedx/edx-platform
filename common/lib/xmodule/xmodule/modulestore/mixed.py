@@ -266,6 +266,26 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         return store.get_items(course_key, **kwargs)
 
     @strip_key
+    def get_course_summaries(self, **kwargs):
+        """
+        Returns a list containing the course information in CourseSummary objects.
+        Information contains `location`, `display_name`, `locator` of the courses in this modulestore.
+        """
+        course_summaries = {}
+        for store in self.modulestores:
+            for course_summary in store.get_course_summaries(**kwargs):
+                course_id = self._clean_locator_for_mapping(locator=course_summary.id)
+
+                # Check if course is indeed unique. Save it in result if unique
+                if course_id in course_summaries:
+                    log.warning(
+                        u"Modulestore %s have duplicate courses %s; skipping from result.", store, course_id
+                    )
+                else:
+                    course_summaries[course_id] = course_summary
+        return course_summaries.values()
+
+    @strip_key
     def get_courses(self, **kwargs):
         '''
         Returns a list containing the top level XModuleDescriptors of the courses in this modulestore.

@@ -26,7 +26,6 @@ class CourseMetadata(object):
         'enrollment_end',
         'tabs',
         'graceperiod',
-        'checklists',
         'show_timezone',
         'format',
         'graded',
@@ -51,6 +50,7 @@ class CourseMetadata(object):
         'is_proctored_enabled',
         'is_time_limited',
         'is_practice_exam',
+        'exam_review_rules',
         'self_paced'
     ]
 
@@ -93,6 +93,7 @@ class CourseMetadata(object):
         # Do not show enable_ccx if feature is not enabled.
         if not settings.FEATURES.get('CUSTOM_COURSES_EDX'):
             filtered_list.append('enable_ccx')
+            filtered_list.append('ccx_connector')
 
         return filtered_list
 

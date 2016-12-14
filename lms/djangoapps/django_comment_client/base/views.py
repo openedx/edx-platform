@@ -1,5 +1,6 @@
 import functools
 import logging
+import json
 import random
 import time
 import urlparse
@@ -7,7 +8,7 @@ import urlparse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
-from django.http import Http404, HttpResponseBadRequest
+from django.http import Http404, HttpResponseBadRequest, HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators import csrf
 from django.views.decorators.http import require_GET, require_POST
@@ -15,7 +16,7 @@ from opaque_keys.edx.keys import CourseKey
 
 from courseware.access import has_access
 from util.file import store_uploaded_file
-from courseware.courses import get_course_with_access, get_course_by_id
+from courseware.courses import get_course_with_access, get_course_overview_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
 from django_comment_common.signals import (
     thread_created,
@@ -750,13 +751,16 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         result = ''
         file_url = ''
 
-    return JsonResponse({
+    # Using content-type of text/plain here instead of JSON because
+    # IE doesn't know how to handle the JSON response and prompts the
+    # user to save the JSON as a file instead of passing it to the callback.
+    return HttpResponse(json.dumps({
         'result': {
             'msg': result,
             'error': error,
             'file_url': file_url,
         }
-    })
+    }), content_type="text/plain")
 
 
 @require_GET
@@ -770,7 +774,7 @@ def users(request, course_id):
 
     course_key = CourseKey.from_string(course_id)
     try:
-        get_course_with_access(request.user, 'load', course_key, check_if_enrolled=True)
+        get_course_overview_with_access(request.user, 'load', course_key, check_if_enrolled=True)
     except Http404:
         # course didn't exist, or requesting user does not have access to it.
         return JsonError(status=404)

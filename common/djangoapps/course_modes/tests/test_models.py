@@ -15,6 +15,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 import pytz
 
+from course_modes.helpers import enrollment_mode_display
 from course_modes.models import CourseMode, Mode
 
 
@@ -48,7 +49,7 @@ class CourseModeModelTest(TestCase):
             min_price=min_price,
             suggested_prices=suggested_prices,
             currency=currency,
-            expiration_datetime=expiration_datetime,
+            _expiration_datetime=expiration_datetime,
         )
 
     def test_save(self):
@@ -193,6 +194,21 @@ class CourseModeModelTest(TestCase):
         # Verify that we can or cannot auto enroll
         self.assertEqual(CourseMode.can_auto_enroll(self.course_key), can_auto_enroll)
 
+    @ddt.data(
+        ([], None),
+        (["honor", "audit", "verified"], "honor"),
+        (["honor", "audit"], "honor"),
+        (["audit", "verified"], "audit"),
+        (["professional"], None),
+        (["no-id-professional"], None),
+        (["credit", "audit", "verified"], "audit"),
+        (["credit"], None),
+    )
+    @ddt.unpack
+    def test_auto_enroll_mode(self, modes, result):
+        # Verify that the proper auto enroll mode is returned
+        self.assertEqual(CourseMode.auto_enroll_mode(self.course_key, modes), result)
+
     def test_all_modes_for_courses(self):
         now = datetime.now(pytz.UTC)
         future = now + timedelta(days=1)
@@ -316,30 +332,30 @@ class CourseModeModelTest(TestCase):
     def test_enrollment_mode_display(self, mode, verification_status):
         if mode == "verified":
             self.assertEqual(
-                CourseMode.enrollment_mode_display(mode, verification_status),
+                enrollment_mode_display(mode, verification_status, self.course_key),
                 self._enrollment_display_modes_dicts(verification_status)
             )
             self.assertEqual(
-                CourseMode.enrollment_mode_display(mode, verification_status),
+                enrollment_mode_display(mode, verification_status, self.course_key),
                 self._enrollment_display_modes_dicts(verification_status)
             )
             self.assertEqual(
-                CourseMode.enrollment_mode_display(mode, verification_status),
+                enrollment_mode_display(mode, verification_status, self.course_key),
                 self._enrollment_display_modes_dicts(verification_status)
             )
         elif mode == "honor":
             self.assertEqual(
-                CourseMode.enrollment_mode_display(mode, verification_status),
+                enrollment_mode_display(mode, verification_status, self.course_key),
                 self._enrollment_display_modes_dicts(mode)
             )
         elif mode == "audit":
             self.assertEqual(
-                CourseMode.enrollment_mode_display(mode, verification_status),
+                enrollment_mode_display(mode, verification_status, self.course_key),
                 self._enrollment_display_modes_dicts(mode)
             )
         elif mode == "professional":
             self.assertEqual(
-                CourseMode.enrollment_mode_display(mode, verification_status),
+                enrollment_mode_display(mode, verification_status, self.course_key),
                 self._enrollment_display_modes_dicts(mode)
             )
 
@@ -375,9 +391,9 @@ class CourseModeModelTest(TestCase):
                                       'ID verification pending', 'verified'],
             "verify_approved": ["You're enrolled as a verified student", "Verified", True, 'ID Verified Ribbon/Badge',
                                 'verified'],
-            "verify_none": ["You're enrolled as an honor code student", "Honor Code", False, '', 'honor'],
+            "verify_none": ["", "", False, '', 'audit'],
             "honor": ["You're enrolled as an honor code student", "Honor Code", False, '', 'honor'],
-            "audit": ["You're auditing this course", "Auditing", False, '', 'audit'],
+            "audit": ["", "", False, '', 'audit'],
             "professional": ["You're enrolled as a professional education student", "Professional Ed", False, '',
                              'professional']
         }
@@ -387,3 +403,43 @@ class CourseModeModelTest(TestCase):
             return dict(zip(dict_keys, display_values.get('verify_none')))
         else:
             return dict(zip(dict_keys, display_values.get(dict_type)))
+
+    def test_expiration_datetime_explicitly_set(self):
+        """ Verify that setting the expiration_date property sets the explicit flag. """
+        verified_mode, __ = self.create_mode('verified', 'Verified Certificate')
+        now = datetime.now()
+        verified_mode.expiration_datetime = now
+
+        self.assertTrue(verified_mode.expiration_datetime_is_explicit)
+        self.assertEqual(verified_mode.expiration_datetime, now)
+
+    def test_expiration_datetime_not_explicitly_set(self):
+        """ Verify that setting the _expiration_date property does not set the explicit flag. """
+        verified_mode, __ = self.create_mode('verified', 'Verified Certificate')
+        now = datetime.now()
+        verified_mode._expiration_datetime = now  # pylint: disable=protected-access
+
+        self.assertFalse(verified_mode.expiration_datetime_is_explicit)
+        self.assertEqual(verified_mode.expiration_datetime, now)
+
+    def test_expiration_datetime_explicitly_set_to_none(self):
+        """ Verify that setting the _expiration_date property does not set the explicit flag. """
+        verified_mode, __ = self.create_mode('verified', 'Verified Certificate')
+        self.assertFalse(verified_mode.expiration_datetime_is_explicit)
+
+        verified_mode.expiration_datetime = None
+        self.assertFalse(verified_mode.expiration_datetime_is_explicit)
+        self.assertIsNone(verified_mode.expiration_datetime)
+
+    @ddt.data(
+        (CourseMode.AUDIT, False),
+        (CourseMode.HONOR, True),
+        (CourseMode.VERIFIED, True),
+        (CourseMode.CREDIT_MODE, True),
+        (CourseMode.PROFESSIONAL, True),
+        (CourseMode.NO_ID_PROFESSIONAL_MODE, True),
+    )
+    @ddt.unpack
+    def test_eligible_for_cert(self, mode_slug, expected_eligibility):
+        """Verify that non-audit modes are eligible for a cert."""
+        self.assertEqual(CourseMode.is_eligible_for_certificate(mode_slug), expected_eligibility)

@@ -1,6 +1,6 @@
 ## mako
 <%namespace name='static' file='static_content.html'/>
-<%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
+<%namespace file='main.html' import="login_query"/>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -11,8 +11,7 @@ import branding
 from status.status import get_site_status_msg
 
 from microsite_configuration import microsite
-from microsite_configuration.templatetags.microsite import platform_name
-from ccx.overrides import get_current_ccx
+from lms.djangoapps.ccx.overrides import get_current_ccx
 %>
 
 ## Provide a hook for themes to inject branding on top.
@@ -43,7 +42,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo">
       <a href="${marketing_link('ROOT')}">
         <%block name="navigation_logo">
-            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}"/>
+            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}"/>
         </%block>
       </a>
     </h1>
@@ -52,7 +51,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h2><span class="provider">${course.display_org_with_default | h}:</span>
       ${course.display_number_with_default | h}
       <%
-        display_name = course.display_name_with_default
+        display_name = course.display_name_with_default_escaped
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
           ccx = get_current_ccx()
           if ccx:
@@ -110,7 +109,7 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
-        % if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+        % if static.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>

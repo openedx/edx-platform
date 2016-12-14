@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from util.json_request import expect_json, JsonResponse
+from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext
 
@@ -23,7 +24,7 @@ from edxmako.shortcuts import render_to_response
 
 from . import cohorts
 from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
-from .models import CourseUserGroup, CourseUserGroupPartitionGroup
+from .models import CourseUserGroup, CourseUserGroupPartitionGroup, CohortMembership
 
 log = logging.getLogger(__name__)
 
@@ -299,6 +300,7 @@ def users_in_cohort(request, course_key_string, cohort_id):
                                'users': user_info})
 
 
+@transaction.non_atomic_requests
 @ensure_csrf_cookie
 @require_POST
 def add_users_to_cohort(request, course_key_string, cohort_id):
@@ -384,15 +386,21 @@ def remove_user_from_cohort(request, course_key_string, cohort_id):
         return json_http_response({'success': False,
                                    'msg': 'No username specified'})
 
-    cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
     try:
         user = User.objects.get(username=username)
-        cohort.users.remove(user)
-        return json_http_response({'success': True})
     except User.DoesNotExist:
         log.debug('no user')
         return json_http_response({'success': False,
                                    'msg': "No user '{0}'".format(username)})
+
+    try:
+        membership = CohortMembership.objects.get(user=user, course_id=course_key)
+        membership.delete()
+
+    except CohortMembership.DoesNotExist:
+        pass
+
+    return json_http_response({'success': True})
 
 
 def debug_cohort_mgmt(request, course_key_string):

@@ -14,32 +14,7 @@ ${_("Start learning today by activating your "
   http://${ site }/activate/${ key }
 % endif
 
-% if settings.FEATURES.get('IS_EDX_DOMAIN'):
-${_("After you activate your account, you can sign up for "
-    "and take any of the hundreds of courses {platform_name} offers."
-  ).format(platform_name=settings.PLATFORM_NAME)}
-
-${_("If you need help, please use our web form at "
-    "{contact_us_url} or email {info_email_address}."
-  ).format(
-    contact_us_url="https://www.edx.org/contact-us",
-    info_email_address=settings.CONTACT_EMAIL
-  )}
-
-${_("We hope you enjoy learning with {platform_name}!").format(
-    platform_name=settings.PLATFORM_NAME
-)}
-
-${_("The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}
-
-${_("This email was automatically sent by {site_name} because someone "
-      "attempted to create an {platform_name} account using this email address."
-    ).format(
-      site_name=settings.SITE_NAME,
-      platform_name=settings.PLATFORM_NAME
-    )}
-
-% elif stanford_theme_enabled():
+% if stanford_theme_enabled():  ## Temporary hack until we develop a better way to adjust language
 ${_("If you didn't request this, you don't need to do anything; you won't "
     "receive any more email from us. Please do not reply to this email. "
     "For more information, check our Help Center here: ")}

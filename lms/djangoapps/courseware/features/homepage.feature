@@ -15,9 +15,9 @@ Feature: LMS.Homepage for web users
   Scenario Outline: User can see main parts of the page
     Given I visit the homepage
     Then I should see the following links and ids
-    | id      | Link   |
-    | about   | About  |
-    | jobs    | Jobs   |
-    | faq     | FAQs   |
-    | contact | Contact|
-    | news    | News   |
+    | id          | Link        |
+    | about       | About       |
+    | careers     | Careers     |
+    | help-center | Help Center |
+    | contact     | Contact     |
+    | news        | News        |

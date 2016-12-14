@@ -39,18 +39,13 @@ class HtmlComponentEditorView(ComponentEditorView):
         self.cancel()
 
     def set_content(self, content):
-        """Types content into the html component, leaving the component open.
+        """Sets content in the html component, leaving the component open.
 
         Arguments:
             content (str): The content to be used.
         """
         self.q(css=self.editor_mode_css).click()
-
-        selector = '.html-editor .mce-edit-area'
-        editor = self.q(css=self._bounded_selector(selector))[0]
-        ActionChains(self.browser).click(editor).\
-            send_keys([Keys.CONTROL, 'a']).key_up(Keys.CONTROL).\
-            send_keys(content).perform()
+        self.browser.execute_script("tinyMCE.activeEditor.setContent('%s')" % content)
 
     def set_raw_content(self, content):
         """Types content in raw html mode, leaving the component open.
@@ -60,6 +55,7 @@ class HtmlComponentEditorView(ComponentEditorView):
         """
         self.q(css=self.editor_mode_css).click()
         self.q(css='[aria-label="Edit HTML"]').click()
+        self.wait_for_element_visibility('.mce-title', 'Wait for CodeMirror editor')
 
         #Focus goes to the editor by default
         ActionChains(self.browser).send_keys([Keys.CONTROL, 'a']).\

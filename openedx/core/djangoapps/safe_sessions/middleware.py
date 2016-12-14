@@ -61,10 +61,12 @@ from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core import signing
+from django.http import HttpResponse
 from django.utils.crypto import get_random_string
 from hashlib import sha256
 from logging import getLogger
 
+from openedx.core.lib.mobile_utils import is_request_from_mobile_app
 
 log = getLogger(__name__)
 
@@ -339,6 +341,12 @@ class SafeSessionMiddleware(SessionMiddleware):
         cookie and redirects the user to the login page.
         """
         _mark_cookie_for_deletion(request)
+
+        # Mobile apps have custom handling of authentication failures. They
+        # should *not* be redirected to the website's login page.
+        if is_request_from_mobile_app(request):
+            return HttpResponse(status=401)
+
         return redirect_to_login(request.path)
 
     @staticmethod

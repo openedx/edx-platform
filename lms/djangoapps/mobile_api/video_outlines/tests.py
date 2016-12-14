@@ -17,6 +17,9 @@ from xmodule.partitions.partitions import Group, UserPartition
 
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, remove_user_from_cohort
+
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin
 
@@ -406,9 +409,8 @@ class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin):
 
 
 @ddt.ddt
-class TestVideoSummaryList(
-    TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
-):
+class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
+                           TestVideoAPIMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/video_outlines/courses/{course_id}..
     """
@@ -744,7 +746,7 @@ class TestVideoSummaryList(
 
         for cohort_index in range(len(cohorts)):
             # add user to this cohort
-            cohorts[cohort_index].users.add(self.user)
+            add_user_to_cohort(cohorts[cohort_index], self.user.username)
 
             # should only see video for this cohort
             video_outline = self.api_response().data
@@ -755,7 +757,7 @@ class TestVideoSummaryList(
             )
 
             # remove user from this cohort
-            cohorts[cohort_index].users.remove(self.user)
+            remove_user_from_cohort(cohorts[cohort_index], self.user.username)
 
         # un-cohorted user should see no videos
         video_outline = self.api_response().data
@@ -862,9 +864,8 @@ class TestVideoSummaryList(
             )
 
 
-class TestTranscriptsDetail(
-    TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
-):
+class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin,
+                            TestVideoAPIMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/video_outlines/transcripts/{course_id}..
     """

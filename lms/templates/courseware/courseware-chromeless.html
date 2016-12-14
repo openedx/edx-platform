@@ -3,7 +3,6 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
-from microsite_configuration import page_title_breadcrumbs
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 %>
 <%def name="course_name()">
@@ -13,9 +12,9 @@ from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title:
-${page_title_breadcrumbs(section_title, course_name())}
+${static.get_page_title_breadcrumbs(section_title, course_name())}
     % else:
-${page_title_breadcrumbs(course_name())}
+${static.get_page_title_breadcrumbs(course_name())}
     %endif
 </title></%block>
 
@@ -107,6 +106,3 @@ ${fragment.foot_html()}
 </nav>
 
 <%include file="../modal/accessible_confirm.html" />
-
-## No footer in chromeless
-<%block name="footer"></%block>

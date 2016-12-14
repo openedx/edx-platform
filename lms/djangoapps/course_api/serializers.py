@@ -5,90 +5,90 @@ Course API Serializers.  Representing course catalog data
 import urllib
 
 from django.core.urlresolvers import reverse
-from django.template import defaultfilters
-
 from rest_framework import serializers
 
-from lms.djangoapps.courseware.courses import course_image_url, get_course_about_section
-from xmodule.course_module import DEFAULT_START_DATE
+from openedx.core.djangoapps.models.course_details import CourseDetails
 
 
 class _MediaSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Nested serializer to represent a media object.
     """
-    def __init__(self, uri_parser, *args, **kwargs):
+    def __init__(self, uri_attribute, *args, **kwargs):
         super(_MediaSerializer, self).__init__(*args, **kwargs)
-        self.uri_parser = uri_parser
+        self.uri_attribute = uri_attribute
 
     uri = serializers.SerializerMethodField(source='*')
 
-    def get_uri(self, course):
+    def get_uri(self, course_overview):
         """
         Get the representation for the media resource's URI
         """
-        return self.uri_parser(course)
+        return getattr(course_overview, self.uri_attribute)
 
 
 class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Nested serializer to represent a collection of media objects
     """
-    course_image = _MediaSerializer(source='*', uri_parser=course_image_url)
+    course_image = _MediaSerializer(source='*', uri_attribute='course_image_url')
+    course_video = _MediaSerializer(source='*', uri_attribute='course_video_url')
 
 
 class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
-    Serializer for Course objects
+    Serializer for Course objects providing minimal data about the course.
+    Compare this with CourseDetailSerializer.
     """
 
-    course_id = serializers.CharField(source='id', read_only=True)  # pylint: disable=invalid-name
-    name = serializers.CharField(source='display_name_with_default')
-    number = serializers.CharField(source='display_number_with_default')
-    org = serializers.CharField(source='display_org_with_default')
-    description = serializers.SerializerMethodField()
-    media = _CourseApiMediaCollectionSerializer(source='*')
-    start = serializers.DateTimeField()
-    start_type = serializers.SerializerMethodField()
-    start_display = serializers.SerializerMethodField()
+    blocks_url = serializers.SerializerMethodField()
+    effort = serializers.CharField()
     end = serializers.DateTimeField()
     enrollment_start = serializers.DateTimeField()
     enrollment_end = serializers.DateTimeField()
-    blocks_url = serializers.SerializerMethodField()
+    id = serializers.CharField()  # pylint: disable=invalid-name
+    media = _CourseApiMediaCollectionSerializer(source='*')
+    name = serializers.CharField(source='display_name_with_default_escaped')
+    number = serializers.CharField(source='display_number_with_default')
+    org = serializers.CharField(source='display_org_with_default')
+    short_description = serializers.CharField()
+    start = serializers.DateTimeField()
+    start_display = serializers.CharField()
+    start_type = serializers.CharField()
 
-    def get_start_type(self, course):
-        """
-        Get the representation for SerializerMethodField `start_type`
-        """
-        if course.advertised_start is not None:
-            return u'string'
-        elif course.start != DEFAULT_START_DATE:
-            return u'timestamp'
-        else:
-            return u'empty'
+    # 'course_id' is a deprecated field, please use 'id' instead.
+    course_id = serializers.CharField(source='id', read_only=True)
 
-    def get_start_display(self, course):
-        """
-        Get the representation for SerializerMethodField `start_display`
-        """
-        if course.advertised_start is not None:
-            return course.advertised_start
-        elif course.start != DEFAULT_START_DATE:
-            return defaultfilters.date(course.start, "DATE_FORMAT")
-        else:
-            return None
-
-    def get_description(self, course):
-        """
-        Get the representation for SerializerMethodField `description`
-        """
-        return get_course_about_section(self.context['request'], course, 'short_description').strip()
-
-    def get_blocks_url(self, course):
+    def get_blocks_url(self, course_overview):
         """
         Get the representation for SerializerMethodField `blocks_url`
         """
-        return '?'.join([
+        base_url = '?'.join([
             reverse('blocks_in_course'),
-            urllib.urlencode({'course_id': course.id}),
+            urllib.urlencode({'course_id': course_overview.id}),
         ])
+        return self.context['request'].build_absolute_uri(base_url)
+
+
+class CourseDetailSerializer(CourseSerializer):  # pylint: disable=abstract-method
+    """
+    Serializer for Course objects providing additional details about the
+    course.
+
+    This serializer makes additional database accesses (to the modulestore) and
+    returns more data (including 'overview' text). Therefore, for performance
+    and bandwidth reasons, it is expected that this serializer is used only
+    when serializing a single course, and not for serializing a list of
+    courses.
+    """
+
+    overview = serializers.SerializerMethodField()
+
+    def get_overview(self, course_overview):
+        """
+        Get the representation for SerializerMethodField `overview`
+        """
+        # Note: This makes a call to the modulestore, unlike the other
+        # fields from CourseSerializer, which get their data
+        # from the CourseOverview object in SQL.
+        return CourseDetails.fetch_about_attribute(course_overview.id, 'overview')

@@ -5,18 +5,22 @@ Test helpers for Comprehensive Theming.
 from functools import wraps
 import os
 import os.path
+import contextlib
 
 from mock import patch
 
 from django.conf import settings
+from django.template import Engine
 from django.test.utils import override_settings
 
 import edxmako
 
 from .core import comprehensive_theme_changes
 
+EDX_THEME_DIR = settings.REPO_ROOT / "themes" / "edx.org"
 
-def with_comp_theme(theme_dir):
+
+def with_comprehensive_theme(theme_dir):
     """
     A decorator to run a test with a particular comprehensive theme.
 
@@ -34,23 +38,22 @@ def with_comp_theme(theme_dir):
     def _decorator(func):                       # pylint: disable=missing-docstring
         @wraps(func)
         def _decorated(*args, **kwargs):        # pylint: disable=missing-docstring
-            with override_settings(COMP_THEME_DIR=theme_dir, **changes['settings']):
+            with override_settings(COMPREHENSIVE_THEME_DIR=theme_dir, **changes['settings']):
+                default_engine = Engine.get_default()
+                dirs = default_engine.dirs[:]
                 with edxmako.save_lookups():
-                    for template_dir in changes['mako_paths']:
+                    for template_dir in changes['template_paths']:
                         edxmako.paths.add_lookup('main', template_dir, prepend=True)
-
-                    return func(*args, **kwargs)
+                        dirs.insert(0, template_dir)
+                    with patch.object(default_engine, 'dirs', dirs):
+                        return func(*args, **kwargs)
         return _decorated
     return _decorator
 
 
 def with_is_edx_domain(is_edx_domain):
     """
-    A decorator to run a test as if IS_EDX_DOMAIN is true or false.
-
-    We are transitioning away from IS_EDX_DOMAIN and are moving toward an edX
-    theme. This decorator changes both settings to let tests stay isolated
-    from the details.
+    A decorator to run a test as if request originated from edX domain or not.
 
     Arguments:
         is_edx_domain (bool): are we an edX domain or not?
@@ -60,15 +63,33 @@ def with_is_edx_domain(is_edx_domain):
     # decorators, which is confusing.
     def _decorator(func):                       # pylint: disable=missing-docstring
         if is_edx_domain:
-            # This applies @with_comp_theme to the func.
-            func = with_comp_theme(settings.REPO_ROOT / "themes" / "edx.org")(func)
-
-        # This applies @patch.dict() to the func to set IS_EDX_DOMAIN.
-        func = patch.dict('django.conf.settings.FEATURES', {"IS_EDX_DOMAIN": is_edx_domain})(func)
+            # This applies @with_comprehensive_theme to the func.
+            func = with_comprehensive_theme(EDX_THEME_DIR)(func)
 
         return func
 
     return _decorator
+
+
+@contextlib.contextmanager
+def with_edx_domain_context(is_edx_domain):
+    """
+    A function to run a test as if request originated from edX domain or not.
+
+    Arguments:
+        is_edx_domain (bool): are we an edX domain or not?
+
+    """
+    if is_edx_domain:
+        changes = comprehensive_theme_changes(EDX_THEME_DIR)
+        with override_settings(COMPREHENSIVE_THEME_DIR=EDX_THEME_DIR, **changes['settings']):
+            with edxmako.save_lookups():
+                for template_dir in changes['template_paths']:
+                    edxmako.paths.add_lookup('main', template_dir, prepend=True)
+
+                yield
+    else:
+        yield
 
 
 def dump_theming_info():

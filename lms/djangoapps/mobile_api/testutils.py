@@ -139,14 +139,17 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     Subclasses can override verify_success, verify_failure, and init_course_access methods.
     """
     ALLOW_ACCESS_TO_UNRELEASED_COURSE = False  # pylint: disable=invalid-name
+    ALLOW_ACCESS_TO_NON_VISIBLE_COURSE = False  # pylint: disable=invalid-name
 
     def verify_success(self, response):
         """Base implementation of verifying a successful response."""
         self.assertEqual(response.status_code, 200)
 
-    def verify_failure(self, response):
+    def verify_failure(self, response, error_type=None):
         """Base implementation of verifying a failed response."""
         self.assertEqual(response.status_code, 404)
+        if error_type:
+            self.assertEqual(response.data, error_type.to_json())
 
     def init_course_access(self, course_id=None):
         """Base implementation of initializing the user for each test."""
@@ -201,6 +204,8 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         self.init_course_access()
         self.course.visible_to_staff_only = True
         self.store.update_item(self.course, self.user.id)
+        if self.ALLOW_ACCESS_TO_NON_VISIBLE_COURSE:
+            should_succeed = True
         self._verify_response(should_succeed, VisibilityError(), role)
 
     def _verify_response(self, should_succeed, error_type, role=None):
@@ -216,5 +221,4 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         if should_succeed:
             self.verify_success(response)
         else:
-            self.verify_failure(response)
-            self.assertEqual(response.data, error_type.to_json())
+            self.verify_failure(response, error_type)

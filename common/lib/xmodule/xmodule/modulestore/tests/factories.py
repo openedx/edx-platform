@@ -660,7 +660,8 @@ def check_mongo_calls(num_finds=0, num_sends=None):
 # This dict represents the attribute keys for a course's 'about' info.
 # Note: The 'video' attribute is intentionally excluded as it must be
 # handled separately; its value maps to an alternate key name.
-# Reference : cms/djangoapps/models/settings/course_details.py
+# Reference : from openedx.core.djangoapps.models.course_details.py
+
 
 ABOUT_ATTRIBUTES = {
     'effort': "Testing effort",

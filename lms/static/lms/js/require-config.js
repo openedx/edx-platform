@@ -32,11 +32,10 @@
         // NOTE: baseUrl has been previously set in lms/templates/main.html
         waitSeconds: 60,
         paths: {
-            "gettext": "/i18n",
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
             "moment": "js/vendor/moment.min",
-            "moment-with-locales": "js/vendor/moment-with-locales.min",
+            "moment-with-locales": "xmodule_js/common_static/js/vendor/moment-with-locales.min",
             "text": "js/vendor/requirejs/text",
             "logger": "js/src/logger",
             "backbone": "js/vendor/backbone-min",

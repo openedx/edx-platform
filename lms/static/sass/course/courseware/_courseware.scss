@@ -30,16 +30,16 @@ html.video-fullscreen {
   .instructor-info-action {
     @extend %t-copy-sub2;
     @include float(right);
-    margin-left: ($baseline/2);
+    @include margin-left($baseline/2);
     padding: ($baseline/4) ($baseline/2);
     border-radius: ($baseline/4);
     background-color: $shadow-l2;
     text-align: right;
     text-transform: uppercase;
-    color: $lighter-base-font-color;
+    color: $staff-color;
 
     &:hover {
-      background-color: $link-hover;
+      background-color: $staff-color;
       color: $white;
     }
   }
@@ -58,12 +58,14 @@ html.video-fullscreen {
 
 .content-wrapper {
 
-  .course-license, .xblock-license {
+  .course-license,
+  .xblock-license {
     @include text-align(right);
     @extend %t-title7;
     display: block;
     width: auto;
     padding: ($baseline/4) 0;
+    color: $gray-d1;
 
     span {
       color: inherit;
@@ -95,12 +97,17 @@ html.video-fullscreen {
 }
 
 // TO-DO should this be content wrapper?
-div.course-wrapper {
+.course-wrapper {
   position: relative;
 
-  section.course-content {
+  .courseware-results-wrapper {
+    display: none;
+  }
+
+  .course-content,
+  .courseware-results-wrapper {
     @extend .content;
-    padding: ($baseline*2);
+    padding: ($baseline*2) 3%; // percent allows for smaller padding on mobile
     line-height: 1.6;
 
     .xblock {
@@ -401,6 +408,13 @@ div.course-wrapper {
       }
     }
 
+    .sequence .path {
+      @extend %t-copy-sub1;
+      margin-top: -($baseline);
+      margin-bottom: $baseline;
+      color: $gray;
+    }
+
     div#seq_content {
       h1 {
         background: none;
@@ -645,20 +659,6 @@ section.self-assessment {
   .error {
     font-size: 14px;
     font-weight: bold;
-  }
-}
-
-section.foldit {
-  table {
-    margin-top: ($baseline/2);
-  }
-  th {
-    text-align: center;
-  }
-  td {
-    padding-left: ($baseline/4);
-    padding-right: ($baseline/4);
-
   }
 }
 

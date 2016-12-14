@@ -10,6 +10,7 @@ import pytz
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.test.utils import override_settings
 from django.utils.translation import ugettext as _
 
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
@@ -288,6 +289,27 @@ class TestCourseIndex(CourseTestCase):
         response = self.client.get_html(course_outline_url_split)
         self.assertEqual(response.status_code, 404)
 
+    def test_course_outline_with_display_course_number_as_none(self):
+        """
+        Tests course outline when 'display_coursenumber' field is none.
+        """
+        # Change 'display_coursenumber' field to None and update the course.
+        self.course.display_coursenumber = None
+        updated_course = self.update_course(self.course, self.user.id)
+
+        # Assert that 'display_coursenumber' field has been changed successfully.
+        self.assertEqual(updated_course.display_coursenumber, None)
+
+        # Perform GET request on course outline url with the course id.
+        course_outline_url = reverse_course_url('course_handler', updated_course.id)
+        response = self.client.get_html(course_outline_url)
+
+        # Assert that response code is 200.
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that 'display_course_number' is being set to "" (as display_coursenumber was None).
+        self.assertIn('display_course_number: ""', response.content)
+
 
 @ddt.ddt
 class TestCourseOutline(CourseTestCase):
@@ -440,6 +462,7 @@ class TestCourseOutline(CourseTestCase):
             info['block_types_enabled'],
             any(component in advanced_modules for component in deprecated_block_types)
         )
+
         self.assertItemsEqual(info['blocks'], expected_blocks)
         self.assertEqual(
             info['advance_settings_url'],
@@ -455,27 +478,29 @@ class TestCourseOutline(CourseTestCase):
         """
         Verify deprecated warning info for single deprecated feature.
         """
-        block_types = settings.DEPRECATED_BLOCK_TYPES
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
-        info = _deprecated_blocks_info(course_module, block_types)
-        self._verify_deprecated_info(
-            course_module.id,
-            course_module.advanced_modules,
-            info,
-            block_types
-        )
+        block_types = ['notes']
+        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
+            course_module = modulestore().get_item(self.course.location)
+            self._create_test_data(course_module, create_blocks=True, block_types=block_types, publish=publish)
+            info = _deprecated_blocks_info(course_module, block_types)
+            self._verify_deprecated_info(
+                course_module.id,
+                course_module.advanced_modules,
+                info,
+                block_types
+            )
 
     def test_verify_deprecated_warning_message_with_multiple_features(self):
         """
         Verify deprecated warning info for multiple deprecated features.
         """
-        block_types = ['peergrading', 'combinedopenended', 'openassessment']
-        course_module = modulestore().get_item(self.course.location)
-        self._create_test_data(course_module, create_blocks=True, block_types=block_types)
+        block_types = ['notes', 'lti']
+        with override_settings(DEPRECATED_BLOCK_TYPES=block_types):
+            course_module = modulestore().get_item(self.course.location)
+            self._create_test_data(course_module, create_blocks=True, block_types=block_types)
 
-        info = _deprecated_blocks_info(course_module, block_types)
-        self._verify_deprecated_info(course_module.id, course_module.advanced_modules, info, block_types)
+            info = _deprecated_blocks_info(course_module, block_types)
+            self._verify_deprecated_info(course_module.id, course_module.advanced_modules, info, block_types)
 
     @ddt.data(
         {'delete_vertical': True},
@@ -492,7 +517,7 @@ class TestCourseOutline(CourseTestCase):
             un-published block(s). This behavior should be same if we delete
             unpublished vertical or problem.
         """
-        block_types = ['peergrading']
+        block_types = ['notes']
         course_module = modulestore().get_item(self.course.location)
 
         vertical1 = ItemFactory.create(
@@ -500,8 +525,8 @@ class TestCourseOutline(CourseTestCase):
         )
         problem1 = ItemFactory.create(
             parent_location=vertical1.location,
-            category='peergrading',
-            display_name='peergrading problem in vert1',
+            category='notes',
+            display_name='notes problem in vert1',
             publish_item=False
         )
 
@@ -515,8 +540,8 @@ class TestCourseOutline(CourseTestCase):
         )
         ItemFactory.create(
             parent_location=vertical2.location,
-            category='peergrading',
-            display_name='peergrading problem in vert2',
+            category='notes',
+            display_name='notes problem in vert2',
             pubish_item=True
         )
         # At this point CourseStructure will contain both the above
@@ -526,8 +551,8 @@ class TestCourseOutline(CourseTestCase):
         self.assertItemsEqual(
             info['blocks'],
             [
-                [reverse_usage_url('container_handler', vertical1.location), 'peergrading problem in vert1'],
-                [reverse_usage_url('container_handler', vertical2.location), 'peergrading problem in vert2']
+                [reverse_usage_url('container_handler', vertical1.location), 'notes problem in vert1'],
+                [reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']
             ]
         )
 
@@ -542,7 +567,7 @@ class TestCourseOutline(CourseTestCase):
         # There shouldn't be any info present about un-published vertical1
         self.assertEqual(
             info['blocks'],
-            [[reverse_usage_url('container_handler', vertical2.location), 'peergrading problem in vert2']]
+            [[reverse_usage_url('container_handler', vertical2.location), 'notes problem in vert2']]
         )
 
 

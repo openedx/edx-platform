@@ -120,7 +120,7 @@ class ChooseModeView(View):
             "course_modes_choose_url": reverse("course_modes_choose", kwargs={'course_id': course_key.to_deprecated_string()}),
             "modes": modes,
             "has_credit_upsell": has_credit_upsell,
-            "course_name": course.display_name_with_default,
+            "course_name": course.display_name_with_default_escaped,
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
@@ -174,10 +174,14 @@ class ChooseModeView(View):
         if requested_mode not in allowed_modes:
             return HttpResponseBadRequest(_("Enrollment mode not supported"))
 
-        if requested_mode == 'honor':
-            # The user will have already been enrolled in the honor mode at this
+        if requested_mode == 'audit':
+            # The user will have already been enrolled in the audit mode at this
             # point, so we just redirect them to the dashboard, thereby avoiding
             # hitting the database a second time attempting to enroll them.
+            return redirect(reverse('dashboard'))
+
+        if requested_mode == 'honor':
+            CourseEnrollment.enroll(user, course_key, mode=requested_mode)
             return redirect(reverse('dashboard'))
 
         mode_info = allowed_modes[requested_mode]
@@ -224,6 +228,8 @@ class ChooseModeView(View):
             return 'verified'
         if 'honor_mode' in request_dict:
             return 'honor'
+        if 'audit_mode' in request_dict:
+            return 'audit'
         else:
             return None
 

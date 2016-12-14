@@ -87,9 +87,6 @@ GRADES_DOWNLOAD = {
 # Configure the LMS to use our stub XQueue implementation
 XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 
-# Configure the LMS to use our stub ORA implementation
-OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
-
 # Configure the LMS to use our stub EdxNotes implementation
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'
 EDXNOTES_INTERNAL_API = 'http://localhost:8042/api/v1'

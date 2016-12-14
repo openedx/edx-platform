@@ -1,0 +1,3 @@
+<poll url_name="markdown" question="## This is a test&#10;&#10;&lt;h1&gt;This is only a &amp;gt;&amp;lt;test&lt;/h1&gt;&#10;&#10;* One&#10;* Two&#10;* Three&#10;&#10;1. First&#10;2. Second&#10;3. Third&#10;&#10;We shall find out if markdown is respected.&#10;&#10;&gt; &quot;I have not yet begun to code.&quot;"
+      feedback="### This is some feedback&#10;&#10;[This is a link](http://www.example.com)&#10;&#10;&lt;a href=&quot;http://www.example.com&quot; target=&quot;_blank&quot;&gt;This is also a link.&lt;/a&gt;&#10;&#10;This is a paragraph with *emphasized* and **bold** text, and **_both_**."
+      answers='[["long", {"label": "I *feel* like this test will **pass**&lt;code&gt;test&lt;/code&gt;.", "img": null}]]'/>

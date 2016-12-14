@@ -24,7 +24,8 @@ define([
             };
 
             var EXPECTED_ERRORS = {
-                user_name_or_email_required: "Student username/email is required."
+                user_name_or_email_required: 'Student username/email field is required and can not be empty. ' +
+                'Kindly fill in username/email and then press "Add to Exception List" button.'
             };
 
             beforeEach(function() {
@@ -54,8 +55,8 @@ define([
                 certificate_exception_url = 'test/url/';
             var certificates_exceptions_json = [
                 {
-                    id: "1",
-                    user_id: "1",
+                    id: 1,
+                    user_id: 1,
                     user_name: "test1",
                     user_email: "test1@test.com",
                     course_id: "edX/test/course",
@@ -63,8 +64,8 @@ define([
                     notes: "test notes for test certificate exception"
                 },
                 {
-                    id: "2",
-                    user_id : "2",
+                    id: 2,
+                    user_id : 2,
                     user_name: "test2",
                     user_email : "test2@test.com",
                     course_id: "edX/test/course",
@@ -77,7 +78,8 @@ define([
                 certificate_white_list = new CertificateWhiteListCollection(certificates_exceptions_json, {
                     parse: true,
                     canBeEmpty: true,
-                    url: certificate_exception_url
+                    url: certificate_exception_url,
+                    generate_certificates_url: certificate_exception_url
                 });
             });
 
@@ -94,17 +96,17 @@ define([
 
                 expect(certificate_white_list.getModel({user_name: 'test1'}).attributes).toEqual(
                     {
-                        id: '1', user_id: '1', user_name: 'test1', user_email: 'test1@test.com',
+                        id: 1, user_id: 1, user_name: 'test1', user_email: 'test1@test.com',
                         course_id: 'edX/test/course', created: "Thursday, October 29, 2015",
-                        notes: 'test notes for test certificate exception'
+                        notes: 'test notes for test certificate exception', certificate_generated: ''
                     }
                 );
 
                 expect(certificate_white_list.getModel({user_email: 'test2@test.com'}).attributes).toEqual(
                     {
-                        id: '2', user_id: '2', user_name: 'test2', user_email: 'test2@test.com',
+                        id: 2, user_id: 2, user_name: 'test2', user_email: 'test2@test.com',
                         course_id: 'edX/test/course', created: "Thursday, October 29, 2015",
-                        notes: 'test notes for test certificate exception'
+                        notes: 'test notes for test certificate exception', certificate_generated: ''
                     }
                 );
             });
@@ -129,7 +131,7 @@ define([
                     requests = AjaxHelpers.requests(this),
                     add_students = 'new';
 
-                certificate_white_list.add({user_name: 'test3', notes: 'test3 notes'});
+                certificate_white_list.add({user_name: 'test3', notes: 'test3 notes', new: true});
                 certificate_white_list.sync({success: successCallback, error: errorCallback}, add_students);
 
                 var expected = {
@@ -139,7 +141,9 @@ define([
                          user_name: "test3",
                          user_email: "",
                          created: "",
-                         notes: "test3 notes"}
+                         notes: "test3 notes",
+                         certificate_generated : '',
+                         new: true}
                         ]
                 };
                 AjaxHelpers.expectJsonRequest(requests, 'POST', expected.url, expected.postData);
@@ -152,8 +156,8 @@ define([
 
             var certificates_exceptions_json = [
                 {
-                    id: "1",
-                    user_id: "1",
+                    id: 1,
+                    user_id: 1,
                     user_name: "test1",
                     user_email: "test1@test.com",
                     course_id: "edX/test/course",
@@ -161,8 +165,8 @@ define([
                     notes: "test notes for test certificate exception"
                 },
                 {
-                    id: "2",
-                    user_id : "2",
+                    id: 2,
+                    user_id : 2,
                     user_name: "test2",
                     user_email : "test2@test.com",
                     course_id: "edX/test/course",
@@ -181,7 +185,9 @@ define([
                 var certificate_white_list = new CertificateWhiteListCollection(certificates_exceptions_json, {
                     parse: true,
                     canBeEmpty: true,
-                    url: certificate_exception_url
+                    url: certificate_exception_url,
+                    generate_certificates_url: certificate_exception_url
+
                 });
 
                 view = new CertificateWhiteListView({collection: certificate_white_list});
@@ -252,20 +258,24 @@ define([
 
         describe("edx.certificates.views.certificate_whitelist_editor.CertificateWhiteListEditorView", function() {
             var view = null,
+                list_view= null,
                 certificate_exception_url = 'test/url/';
             var certificates_exceptions_json = [
                 {
-                    id: "1",
-                    user_id: "1",
+                    url: certificate_exception_url,
+                    id: 1,
+                    user_id: 1,
                     user_name: "test1",
                     user_email: "test1@test.com",
                     course_id: "edX/test/course",
                     created: "Thursday, October 29, 2015",
-                    notes: "test notes for test certificate exception"
+                    notes: "test notes for test certificate exception",
+                    new: true
                 },
                 {
-                    id: "2",
-                    user_id : "2",
+                    url: certificate_exception_url,
+                    id: 2,
+                    user_id : 2,
                     user_name: "test2",
                     user_email : "test2@test.com",
                     course_id: "edX/test/course",
@@ -281,19 +291,35 @@ define([
                     "templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore"
                 );
 
+                var fixture_2 = readFixtures(
+                    "templates/instructor/instructor_dashboard_2/certificate-white-list.underscore"
+                );
+
                 setFixtures(
                     "<script type='text/template' id='certificate-white-list-editor-tpl'>" + fixture + "</script>" +
-                    "<div id='certificate-white-list-editor'></div>"
+                    "<script type='text/template' id='certificate-white-list-tpl'>" + fixture_2 + "</script>" +
+                    "<div id='certificate-white-list-editor'></div>" +
+                    "<div class='white-listed-students' id='white-listed-students'></div>"
                 );
 
                 var certificate_white_list = new CertificateWhiteListCollection(certificates_exceptions_json, {
                     parse: true,
                     canBeEmpty: true,
-                    url: certificate_exception_url
+                    url: certificate_exception_url,
+                    generate_certificates_url: certificate_exception_url
                 });
 
-                view = new CertificateWhiteListEditorView({collection: certificate_white_list});
+                view = new CertificateWhiteListEditorView({
+                    collection: certificate_white_list,
+                    url: certificate_exception_url
+                });
                 view.render();
+
+                list_view = new CertificateWhiteListView({
+                    collection: certificate_white_list,
+                    certificateWhiteListEditorView: view
+                });
+                list_view.render();
             });
 
             it("verifies view is initialized and rendered successfully", function() {
@@ -305,40 +331,69 @@ define([
 
             it("verifies success and error messages", function() {
                 var message_selector='.message',
-                    error_class = 'msg-error',
-                    success_class = 'msg-success',
-                    success_message = 'Student Added to exception list';
+                    success_message = 'test_user has been successfully added to the exception list. Click Generate' +
+                        ' Exception Certificate below to send the certificate.',
+                    requests = AjaxHelpers.requests(this),
+                    duplicate_user='test_user';
 
                 var error_messages = {
-                    empty_user_name_email: 'Student username/email is required.',
-                    duplicate_user: 'username/email already in exception list'
+                    empty_user_name_email: 'Student username/email field is required and can not be empty. ' +
+                    'Kindly fill in username/email and then press "Add to Exception List" button.',
+                    duplicate_user: "<p>" + (duplicate_user) + " already in exception list.</p>"
                 };
 
                 // click 'Add Exception' button with empty username/email field
+                view.$el.find('#certificate-exception').val("");
                 view.$el.find('#add-exception').click();
 
                 // Verify error message for missing username/email
-                expect(view.$el.find(message_selector)).toHaveClass(error_class);
                 expect(view.$el.find(message_selector).html()).toMatch(error_messages.empty_user_name_email);
 
                 // Add a new Exception to list
-                view.$el.find('#certificate-exception').val("test_user");
+                view.$el.find('#certificate-exception').val(duplicate_user);
                 view.$el.find('#notes').val("test user notes");
                 view.$el.find('#add-exception').click();
 
+                AjaxHelpers.respondWithJson(
+                    requests,
+                    {
+                        id: 3,
+                        user_id : 3,
+                        user_name: duplicate_user,
+                        user_email : "test2@test.com",
+                        course_id: "edX/test/course",
+                        created: "Thursday, October 29, 2015",
+                        notes: "test user notes"
+                    }
+                );
+
                 // Verify success message
-                expect(view.$el.find(message_selector)).toHaveClass(success_class);
                 expect(view.$el.find(message_selector).html()).toMatch(success_message);
 
                 // Add a duplicate Certificate Exception
-                view.$el.find('#certificate-exception').val("test_user");
+                view.$el.find('#certificate-exception').val(duplicate_user);
                 view.$el.find('#notes').val("test user notes");
                 view.$el.find('#add-exception').click();
 
                 // Verify success message
-                expect(view.$el.find(message_selector)).toHaveClass(error_class);
-                expect(view.$el.find(message_selector).html()).toMatch(error_messages.duplicate_user);
+                expect(view.$el.find(message_selector).html()).toEqual(error_messages.duplicate_user);
             });
+
+            it('verifies certificate exception can be deleted by clicking "delete" ', function(){
+                var user_name = 'test1',
+                    certificate_exception_selector = "div.white-listed-students table tr:contains('" + user_name + "')",
+                    delete_btn_selector =
+                        certificate_exception_selector + " td .delete-exception",
+                    requests = AjaxHelpers.requests(this);
+
+                $(delete_btn_selector).click();
+                AjaxHelpers.respondWithJson(requests, {});
+
+                // Verify the certificate exception is removed from the list
+                expect($(certificate_exception_selector).length).toBe(0);
+
+            });
+
         });
     }
 );

@@ -209,20 +209,20 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             parent = course_key.make_usage_key(parent_key.type, parent_key.id)
         else:
             parent = None
-        kvs = SplitMongoKVS(
-            definition_loader,
-            converted_fields,
-            converted_defaults,
-            parent=parent,
-            field_decorator=kwargs.get('field_decorator')
-        )
-
-        if InheritanceMixin in self.modulestore.xblock_mixins:
-            field_data = inheriting_field_data(kvs)
-        else:
-            field_data = KvsFieldData(kvs)
-
         try:
+            kvs = SplitMongoKVS(
+                definition_loader,
+                converted_fields,
+                converted_defaults,
+                parent=parent,
+                field_decorator=kwargs.get('field_decorator')
+            )
+
+            if InheritanceMixin in self.modulestore.xblock_mixins:
+                field_data = inheriting_field_data(kvs)
+            else:
+                field_data = KvsFieldData(kvs)
+
             module = self.construct_xblock_from_class(
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),

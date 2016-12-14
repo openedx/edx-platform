@@ -604,7 +604,7 @@ class OwnLearnerProfilePageTest(LearnerProfileTestMixin, WebAppTest):
 
         self.assert_default_image_has_public_access(profile_page)
 
-        profile_page.upload_file(filename='cohort_users_only_username.csv')
+        profile_page.upload_file(filename='generic_csv.csv')
         self.assertEqual(
             profile_page.profile_image_message,
             "The file must be one of the following types: .gif, .png, .jpeg, .jpg."
@@ -767,7 +767,6 @@ class LearnerProfileA11yTest(LearnerProfileTestMixin, WebAppTest):
 
         profile_page.a11y_audit.config.set_rules({
             "ignore": [
-                'color-contrast',  # TODO: AC-232
                 'skip-link',  # TODO: AC-179
                 'link-href',  # TODO: AC-231
             ],
