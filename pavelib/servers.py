@@ -157,7 +157,7 @@ def celery(options):
     """
     Runs Celery workers.
     """
-    settings = getattr(options, 'settings', 'dev_with_worker')
+    settings = getattr(options, 'settings', 'devstack_with_worker')
     run_process(django_cmd('lms', settings, 'celery', 'worker', '--beat', '--loglevel=INFO', '--pythonpath=.'))
 
 
@@ -187,7 +187,7 @@ def run_all_servers(options):
     """
     settings = getattr(options, 'settings', DEFAULT_SETTINGS)
     asset_settings = getattr(options, 'asset_settings', settings)
-    worker_settings = getattr(options, 'worker_settings', 'dev_with_worker')
+    worker_settings = getattr(options, 'worker_settings', 'devstack_with_worker')
     fast = getattr(options, 'fast', False)
     optimized = getattr(options, 'optimized', False)
 
