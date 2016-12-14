@@ -695,7 +695,7 @@ class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
 
     def test_problem_with_no_answer(self):
         self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
-        problem_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H1P2')
+        problem_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H2P1')
 
         self.create_student()
         StudentModuleFactory.create(
