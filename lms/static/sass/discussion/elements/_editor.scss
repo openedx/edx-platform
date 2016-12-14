@@ -51,20 +51,6 @@
     width: 100%;
   }
 
-  .wmd-input {
-    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
-    width: 100%;
-    height: 150px;
-    font-style: normal;
-    font-size: $forum-base-font-size;
-    font-family: Monaco, 'Lucida Console', monospace;
-    line-height: 1.6em;
-
-    &::-webkit-input-placeholder {
-      color: #888;
-    }
-  }
-
   .wmd-button-row {
     @include transition(all .2s ease-out 0s);
     position: relative;
