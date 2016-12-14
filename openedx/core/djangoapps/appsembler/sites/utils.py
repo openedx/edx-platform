@@ -23,7 +23,8 @@ def get_initial_sass_variables():
 
 def get_branding_values_from_file():
     sass_var_file = os.path.join(settings.ENV_ROOT, "themes",
-                                 settings.THEME_NAME, 'lms', 'static', 'sass', 'base', '_branding-basics.scss')
+                                 settings.THEME_NAME, 'customer_specific', 'lms', 'static',
+                                 'sass', 'base', '_branding-basics.scss')
     with open(sass_var_file, 'r') as f:
         contents = f.read()
         values = sass_to_dict(contents)
