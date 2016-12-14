@@ -142,6 +142,7 @@
     @include clearfix();
 
     .post-header-content {
+        max-width: calc(100% - 100px);
 
         // post title
         .post-title {
