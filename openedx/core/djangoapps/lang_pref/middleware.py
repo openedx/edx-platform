@@ -49,5 +49,5 @@ class LanguagePreferenceMiddleware(object):
                 else:
                     continue
                 if request.session.get(LANGUAGE_SESSION_KEY, None) is None:
-                            request.session[LANGUAGE_SESSION_KEY] = unicode(browser_lang)
+                    request.session[LANGUAGE_SESSION_KEY] = unicode(browser_lang)
                 break
