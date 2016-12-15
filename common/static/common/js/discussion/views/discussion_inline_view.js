@@ -156,9 +156,11 @@
             this.$('.inline-thread').addClass('is-hidden');
 
             // Delete the thread view
-            this.threadView.$el.empty().off();
-            this.threadView.stopListening();
-            this.threadView = null;
+            if (this.threadView) {
+                this.threadView.$el.empty().off();
+                this.threadView.stopListening();
+                this.threadView = null;
+            }
 
             // Show the thread list view
             this.threadListView.$el.removeClass('is-hidden');
