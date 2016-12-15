@@ -346,7 +346,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-01 16:15+0000\n"
+"POT-Creation-Date: 2016-12-08 18:46+0000\n"
 "PO-Revision-Date: 2016-06-29 18:11+0000\n"
 "Last-Translator: Yue Fang <yfang@juilliard.edu>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/open-edx/edx-platform/language/zh_CN/)\n"
@@ -1781,14 +1781,6 @@ msgstr "(源代码不可用 )"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "参见 XML 源文件中的行{sourcenum}。"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "JavaScript Input"
-msgstr "JavaScript输入"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Execution of unsafe Javascript code is not allowed."
-msgstr "禁止使用不安全的JavaScript代码"
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html

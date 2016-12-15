@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-08 18:14+0000\n"
-"PO-Revision-Date: 2016-12-08 18:16:31.097413\n"
+"POT-Creation-Date: 2016-12-15 12:30+0000\n"
+"PO-Revision-Date: 2016-12-15 12:33:14.465029\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -230,6 +230,11 @@ msgstr ""
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/utils.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/static/js/student_account/views/FinishAuthView.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
@@ -1904,40 +1909,12 @@ msgstr ""
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
 msgstr ""
 
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Hide Discussion"
-msgstr ""
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Show Discussion"
-msgstr ""
-
-#: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/response_comment_view.js
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "Sorry"
-msgstr ""
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "We had some trouble loading the discussion. Please try again."
-msgstr ""
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid ""
-"We had some trouble loading the threads you requested. Please try again."
-msgstr ""
-
 #: common/static/common/js/discussion/utils.js
 msgid "Loading content"
 msgstr ""
 
 #: common/static/common/js/discussion/utils.js
-msgid ""
-"We had some trouble processing your request. Please ensure you have copied "
-"any "
+msgid "Your request could not be processed. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/utils.js
@@ -1966,59 +1943,78 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble subscribing you to this thread. Please try again."
+msgid ""
+"You could not be subscribed to this post. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble unsubscribing you from this thread. Please try again."
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble marking this response as an answer.  Please try again."
+"This response could not be marked as an answer. Refresh the page and try "
+"again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing this response as an answer.  Please try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble marking this response endorsed.  Please try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble removing this endorsement.  Please try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble saving your vote.  Please try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble pinning this thread. Please try again."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble unpinning this thread. Please try again."
+"This response could not be unmarked as an answer. Refresh the page and try "
+"again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing your flag on this post.  Please try again."
+"This response could not be marked as endorsed. Refresh the page and try "
+"again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reporting this post.  Please try again."
+msgid "This response could not be unendorsed. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble closing this thread.  Please try again."
+msgid "This vote could not be processed. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reopening this thread.  Please try again."
+msgid "This post could not be pinned. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be unpinned. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be flagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be unflagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be closed. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be reopened. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Hide Discussion"
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "This discussion could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2026,7 +2022,7 @@ msgid "Loading more threads"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "We had some trouble loading more threads. Please try again."
+msgid "Additional posts could not be loaded. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2034,7 +2030,7 @@ msgid "Current conversation"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "Loading thread list"
+msgid "Loading posts list"
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2042,7 +2038,7 @@ msgid "No results found for {original_query}. "
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No threads matched your query."
+msgid "No posts matched your query."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
@@ -2050,16 +2046,16 @@ msgid "Show posts by {username}."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "The post you selected has been deleted."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Responses could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
-"The thread you selected has been deleted. Please select another thread."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading responses. Please reload the page."
-msgstr ""
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading more responses. Please try again."
+"Additional responses could not be loaded. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
@@ -2111,7 +2107,7 @@ msgid "Are you sure you want to delete this comment?"
 msgstr ""
 
 #: common/static/common/js/discussion/views/response_comment_view.js
-msgid "We had some trouble deleting this comment. Please try again."
+msgid "This comment could not be deleted. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/views/thread_response_view.js
@@ -2369,10 +2365,6 @@ msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
 msgstr[0] ""
 msgstr[1] ""
-
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "We had some trouble loading the page you requested. Please try again."
-msgstr ""
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -5192,6 +5184,15 @@ msgid "Your video uploads are not complete."
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
+#: cms/static/js/views/assets.js
+msgid "Your file could not be uploaded"
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} is not in a supported file format. "
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
 msgid ": video upload complete."
 msgstr ""
 
@@ -5232,10 +5233,6 @@ msgstr ""
 msgid ""
 "Please follow the instructions here to upload a file elsewhere and link to "
 "it: {maxFileSizeRedirectUrl}"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid "Your file could not be uploaded"
 msgstr ""
 
 #: cms/static/js/views/assets.js
@@ -5985,6 +5982,10 @@ msgid "Error posting your message."
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
+msgid "Add a Post"
+msgstr ""
+
+#: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible To:"
 msgstr ""
 
@@ -6204,14 +6205,6 @@ msgstr ""
 msgid "Add a response:"
 msgstr ""
 
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Expand discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Collapse discussion"
-msgstr ""
-
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Topic Area:"
 msgstr ""
@@ -6277,7 +6270,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "Active Threads"
+msgid "All Posts"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
