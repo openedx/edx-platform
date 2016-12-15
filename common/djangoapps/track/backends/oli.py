@@ -132,6 +132,7 @@ class OLIAnalyticsBackend(BaseBackend):
         endpoint = urljoin(self.url, self.path)
 
         try:
+            response = None
             response = self.oauth.put(endpoint, request_payload_string)
             status_code = response.status_code
         except Exception as error:
