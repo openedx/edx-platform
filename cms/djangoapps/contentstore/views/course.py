@@ -645,11 +645,13 @@ def _remove_in_process_courses(courses, in_process_course_actions):
         """
         Return a dict of the data which the view requires for each course
         """
+        course_key = course.id
+        course_module = modulestore().get_course(course_key, depth=0)
         return {
             'display_name': course.display_name,
             'course_key': unicode(course.location.course_key),
             'url': reverse_course_url('course_handler', course.id),
-            'lms_link': get_lms_link_for_item(course.location),
+            'lms_link': get_lms_link_for_item(course_module.location),
             'rerun_link': _get_rerun_link_for_item(course.id),
             'org': course.display_org_with_default,
             'number': course.display_number_with_default,
