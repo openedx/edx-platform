@@ -30,7 +30,7 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
+from student.roles import CourseCcxCoachRole, CourseStaffRole
 from student.tests.factories import (
     AdminFactory,
     AnonymousUserFactory,
@@ -122,6 +122,23 @@ class CoachAccessTestCaseCCX(SharedModuleStoreTestCase, LoginEnrollmentTestCase)
         # user dont have access as coach on ccx
         self.setup_user()
         self.assertFalse(access.has_ccx_coach_role(self.user, ccx_locator))
+
+    def test_ccx_coach_has_staff_role(self):
+        """
+        Assert that user has staff access on ccx.
+        """
+        ccx_locator = self.make_ccx()
+
+        # coach user has access as staff on ccx
+        self.assertTrue(access.has_access(self.coach, 'staff', ccx_locator))
+
+        # basic user doesn't have staff access on ccx..
+        self.setup_user()
+        self.assertFalse(access.has_access(self.user, 'staff', ccx_locator))
+
+        # until we give her a staff role.
+        CourseStaffRole(ccx_locator).add_users(self.user)
+        self.assertTrue(access.has_access(self.user, 'staff', ccx_locator))
 
     def test_access_student_progress_ccx(self):
         """
