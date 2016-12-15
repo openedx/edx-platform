@@ -11,23 +11,25 @@
   padding: $baseline;
   max-width: 1180px;
 
+  label,
+  .field-label-text {
+    -webkit-font-smoothing: initial;
+  }
+
   .post-errors {
     padding: 0 !important;
     list-style: none !important;
   }
 
   .post-field {
-    margin-bottom: $baseline;
+    margin-bottom: $baseline * 1.5;
 
     .field-label {
-      display: inline-block;
-      width: 50%;
-      vertical-align: top;
       margin: 0;
 
       .field-input {
         display: inline-block;
-        width: 100%;
+        width: 70%;
         vertical-align: top;
         &:not([type="text"]) {
           border-width: 0;
@@ -36,29 +38,37 @@
       }
 
       .field-label-text {
-        display: inline-block;
-        width: 25%;
-        vertical-align: top;
-        font-size: $forum-small-font-size;
-        line-height: 40px;
+        margin: $baseline 0 0 0;
+        display: block;
       }
 
       .field-label-text + .field-input {
         width: 75%;
       }
+
+      .js-post-title {
+        width: 85%;
+      }
     }
 
     // UI: support text for input fields
     .field-help {
-      box-sizing: border-box;
-      display: inline-block;
-      @include padding-left($baseline);
-      width: 50%;
+      margin: ($baseline / 4) 0 ($baseline / 4) 0;
       font-size: $forum-small-font-size;
+      line-height: 1.5;
+
+      &#field_help_post_type {
+        margin-top: ($baseline / 2) 0 ($baseline / 3) 0;
+      }
 
       &#new-post-editor-description {
           @include padding-left(0);
       }
+    }
+
+    .field-input {
+      padding: 0;
+      border: none;
     }
   }
 
@@ -82,24 +92,18 @@
   }
 
   .post-type-label {
-    @extend %cont-truncated;
+    @include margin(0, $baseline / 2, 0, 0);
     @include white-button;
     font-size: $forum-base-font-size;
     box-sizing: border-box;
     display: inline-block;
-    padding: 0 ($baseline/2);
-    width: 48%;
-    height: 40px;
+    padding: 0 $baseline;
+    height: 36px;
     text-align: center;
     color: $gray-d3;
     border: 1px solid $forum-color-border;
     font-weight: 600;
     line-height: 36px;
-    @include float(left);
-
-    &:last-of-type {
-      @include float(right);
-    }
 
     .icon {
       @include margin-right($baseline/4);
@@ -111,7 +115,7 @@
     background-color: $forum-color-active-thread;
     color: $forum-color-active-text;
     background-image: none;
-    box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset;
+    box-shadow: none;
   }
 
   .post-type-input:focus + .post-type-label {
@@ -125,7 +129,6 @@
     padding: 0 $baseline/2;
     height: 40px;
     color: #333;
-    font-weight: 700;
     font-size: $forum-large-font-size;
     font-family: 'Open Sans', sans-serif;
   }
@@ -139,25 +142,16 @@
     box-sizing: border-box;
     display: inline-block;
     @include margin-right($baseline);
-    border: 1px solid transparent;
     border-radius: $forum-border-radius;
     padding: ($baseline/2);
+    cursor: pointer;
 
     &:hover {
       border-color: $forum-color-border;
     }
 
-    &.is-enabled {
-      border-color: $forum-color-following;
-      color: $forum-color-following;
-    }
-
-    .post-option-input {
-      @include margin-right($baseline/2);
-    }
-
     .icon {
-      @include margin-right($baseline/2);
+      @include margin-right($baseline / 4);
     }
   }
 }
