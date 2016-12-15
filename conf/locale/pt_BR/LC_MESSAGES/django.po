@@ -87,6 +87,7 @@
 # aivuk <e@vaz.io>, 2014
 # Felipe Nogueira de Souza <felipensouza@live.com>, 2015
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013
+# Athanazio <ivan.athanazio@gmail.com>, 2016
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
 # Leonardo Lehnemann <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
@@ -249,7 +250,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-01 16:15+0000\n"
+"POT-Creation-Date: 2016-12-08 18:46+0000\n"
 "PO-Revision-Date: 2016-10-24 19:45+0000\n"
 "Last-Translator: Monica Farias <monifar.tp@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
@@ -1755,14 +1756,6 @@ msgstr "(A linha de código fonte não está disponível)"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "Veja a linha do código fonte em XML {sourcenum}."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "JavaScript Input"
-msgstr "Entrada JavaScript"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Execution of unsafe Javascript code is not allowed."
-msgstr "A execução de um código em Javascript suspeito não é permitida."
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html

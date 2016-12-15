@@ -91,6 +91,7 @@
 # Guilherme Batista Ferreira <guilherme@uft.edu.br>, 2015
 # Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Igor Carnerio <igor.ribeiro.carneiro@gmail.com>, 2016
+# Athanazio <ivan.athanazio@gmail.com>, 2016
 # Larissa Queiroz Pontes <lariqbiotec@gmail.com>, 2015
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann <lehneman@gmail.com>, 2014
@@ -186,7 +187,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-01 16:14+0000\n"
+"POT-Creation-Date: 2016-12-08 18:45+0000\n"
 "PO-Revision-Date: 2016-11-22 16:42+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/open-edx/edx-platform/language/pt_BR/)\n"
