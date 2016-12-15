@@ -125,22 +125,22 @@ class @Sequence
     is_first_tab = @position == 1
     previous_button_class = '.sequence-nav-button.button-previous'
     @updateButtonState(
-      previous_button_class,  # bound element
-      @selectPrevious,  # action
-      'Previous',  # label prefix
-      is_first_tab,  # is boundary?
-      @prevUrl  # boundary_url
+      previous_button_class,
+      @selectPrevious,
+      'Previous',
+      is_first_tab,
+      @prevUrl
     )
 
     # next button
     is_last_tab = @position >= @contents.length  # use inequality in case contents.length is 0 and position is 1.
     next_button_class = '.sequence-nav-button.button-next'
     @updateButtonState(
-      next_button_class,  # bound element
-      @selectNext,  # action
-      'Next',  # label prefix
-      is_last_tab,  # is boundary?
-      @nextUrl  # boundary_url
+      next_button_class,
+      @selectNext,
+      'Next',
+      is_last_tab,
+      @nextUrl
     )
 
   render: (new_position) ->
@@ -252,7 +252,7 @@ class @Sequence
       window.location.href = @prevUrl
     else
       # If the bottom nav is used, scroll to the top of the page on change.
-      if is_bottom_nav 
+      if is_bottom_nav
         $.scrollTo 0, 150
       offset =
         next: 1
