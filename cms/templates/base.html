@@ -2,8 +2,8 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import (
-    escape_json_dumps, escape_js_string
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
 )
 %>
 <!doctype html>
@@ -16,13 +16,18 @@ from openedx.core.lib.js_utils import (
         <%block name="title"></%block> |
         % if context_course:
         <% ctx_loc = context_course.location %>
-        ${context_course.display_name_with_default | h} |
+        ${context_course.display_name_with_default_escaped | h} |
         % elif context_library:
-        ${context_library.display_name_with_default | h} |
+        ${context_library.display_name_with_default_escaped | h} |
         % endif
         ${settings.STUDIO_NAME}
     </title>
 
+    <%
+      jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    %>
+
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="path_prefix" content="${EDX_ROOT_URL}">
 
@@ -42,7 +47,7 @@ from openedx.core.lib.js_utils import (
     <a class="nav-skip" href="#content">${_("Skip to main content")}</a>
 
     <script type="text/javascript">
-      window.baseUrl = "${escape_js_string(settings.STATIC_URL) | n}";
+      window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
@@ -86,14 +91,14 @@ from openedx.core.lib.js_utils import (
             % if context_course:
               require(['js/factories/course'], function(CourseFactory) {
                   CourseFactory({
-                      id: "${escape_js_string(context_course.id) | n}",
-                      name: "${context_course.display_name_with_default | h}",
+                      id: "${context_course.id | n, js_escaped_string}",
+                      name: "${context_course.display_name_with_default_escaped | h}",
                       url_name: "${context_course.location.name | h}",
                       org: "${context_course.location.org | h}",
                       num: "${context_course.location.course | h}",
-                      display_course_number: "${_(context_course.display_number_with_default)}",
+                      display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
                       revision: "${context_course.location.revision | h}",
-                      self_paced: ${escape_json_dumps(context_course.self_paced) | n}
+                      self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
                   });
               });
             % endif

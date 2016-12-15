@@ -22,6 +22,7 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from student.models import CourseEnrollment
+from student.views import notify_enrollment_by_email
 from util.json_request import JsonResponse
 
 
@@ -59,9 +60,9 @@ class BasketsView(APIView):
 
         return True, course_key, None
 
-    def _enroll(self, course_key, user):
+    def _enroll(self, course_key, user, mode=CourseMode.DEFAULT_MODE_SLUG):
         """ Enroll the user in the course. """
-        add_enrollment(user.username, unicode(course_key))
+        add_enrollment(user.username, unicode(course_key), mode)
 
     def _handle_marketing_opt_in(self, request, course_key, user):
         """
@@ -100,19 +101,29 @@ class BasketsView(APIView):
             msg = Messages.ENROLLMENT_EXISTS.format(course_id=course_id, username=user.username)
             return DetailResponse(msg, status=HTTP_409_CONFLICT)
 
-        # If there is no honor course mode, this most likely a Prof-Ed course. Return an error so that the JS
-        # redirects to track selection.
+        # If there is no audit or honor course mode, this most likely
+        # a Prof-Ed course. Return an error so that the JS redirects
+        # to track selection.
         honor_mode = CourseMode.mode_for_course(course_key, CourseMode.HONOR)
+        audit_mode = CourseMode.mode_for_course(course_key, CourseMode.AUDIT)
 
-        if not honor_mode:
-            msg = Messages.NO_HONOR_MODE.format(course_id=course_id)
+        # Accept either honor or audit as an enrollment mode to
+        # maintain backwards compatibility with existing courses
+        default_enrollment_mode = audit_mode or honor_mode
+
+        if not default_enrollment_mode:
+            msg = Messages.NO_DEFAULT_ENROLLMENT_MODE.format(course_id=course_id)
             return DetailResponse(msg, status=HTTP_406_NOT_ACCEPTABLE)
-        elif not honor_mode.sku:
+        elif default_enrollment_mode and not default_enrollment_mode.sku:
             # If there are no course modes with SKUs, enroll the user without contacting the external API.
-            msg = Messages.NO_SKU_ENROLLED.format(enrollment_mode=CourseMode.HONOR, course_id=course_id,
-                                                  username=user.username)
+            msg = Messages.NO_SKU_ENROLLED.format(
+                enrollment_mode=default_enrollment_mode.slug,
+                course_id=course_id,
+                username=user.username
+            )
             log.info(msg)
-            self._enroll(course_key, user)
+            self._enroll(course_key, user, default_enrollment_mode.slug)
+            notify_enrollment_by_email(courses.get_course(course_key), user, request)
             self._handle_marketing_opt_in(request, course_key, user)
             return DetailResponse(msg)
 
@@ -122,6 +133,7 @@ class BasketsView(APIView):
             api = ecommerce_api_client(user)
         except ValueError:
             self._enroll(course_key, user)
+            notify_enrollment_by_email(courses.get_course(course_key), user, request)
             msg = Messages.NO_ECOM_API.format(username=user.username, course_id=unicode(course_key))
             log.debug(msg)
             return DetailResponse(msg)
@@ -131,7 +143,7 @@ class BasketsView(APIView):
         # Make the API call
         try:
             response_data = api.baskets.post({
-                'products': [{'sku': honor_mode.sku}],
+                'products': [{'sku': default_enrollment_mode.sku}],
                 'checkout': True,
             })
 
@@ -158,7 +170,7 @@ class BasketsView(APIView):
             audit_log(
                 'checkout_requested',
                 course_id=course_id,
-                mode=honor_mode.slug,
+                mode=default_enrollment_mode.slug,
                 processor_name=None,
                 user_id=user.id
             )

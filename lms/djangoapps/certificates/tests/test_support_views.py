@@ -7,7 +7,6 @@ import json
 import ddt
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test import TestCase
 from django.test.utils import override_settings
 
 from opaque_keys.edx.keys import CourseKey
@@ -22,7 +21,7 @@ FEATURES_WITH_CERTS_ENABLED = settings.FEATURES.copy()
 FEATURES_WITH_CERTS_ENABLED['CERTIFICATES_HTML_VIEW'] = True
 
 
-class CertificateSupportTestCase(TestCase):
+class CertificateSupportTestCase(ModuleStoreTestCase):
     """
     Base class for tests of the certificate support views.
     """
@@ -36,6 +35,9 @@ class CertificateSupportTestCase(TestCase):
     STUDENT_PASSWORD = "student"
 
     CERT_COURSE_KEY = CourseKey.from_string("edX/DemoX/Demo_Course")
+    COURSE_NOT_EXIST_KEY = CourseKey.from_string("test/TestX/Test_Course_Not_Exist")
+    EXISTED_COURSE_KEY_1 = CourseKey.from_string("test1/Test1X/Test_Course_Exist_1")
+    EXISTED_COURSE_KEY_2 = CourseKey.from_string("test2/Test2X/Test_Course_Exist_2")
     CERT_GRADE = 0.89
     CERT_STATUS = CertificateStatuses.downloadable
     CERT_MODE = "verified"
@@ -47,6 +49,11 @@ class CertificateSupportTestCase(TestCase):
         Log in as the support team member.
         """
         super(CertificateSupportTestCase, self).setUp()
+        CourseFactory(
+            org=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.org,
+            course=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.course,
+            run=CertificateSupportTestCase.EXISTED_COURSE_KEY_1.run,
+        )
 
         # Create the support staff user
         self.support = UserFactory(
@@ -64,7 +71,7 @@ class CertificateSupportTestCase(TestCase):
         )
 
         # Create certificates for the student
-        self.cert = GeneratedCertificate.objects.create(
+        self.cert = GeneratedCertificate.eligible_certificates.create(
             user=self.student,
             course_id=self.CERT_COURSE_KEY,
             grade=self.CERT_GRADE,
@@ -83,6 +90,30 @@ class CertificateSearchTests(CertificateSupportTestCase):
     """
     Tests for the certificate search end-point used by the support team.
     """
+    def setUp(self):
+        """
+        Create a course
+        """
+        super(CertificateSearchTests, self).setUp()
+        self.course = CourseFactory()
+        self.course.cert_html_view_enabled = True
+
+        #course certificate configurations
+        certificates = [
+            {
+                'id': 1,
+                'name': 'Name 1',
+                'description': 'Description 1',
+                'course_title': 'course_title_1',
+                'signatories': [],
+                'version': 1,
+                'is_active': True
+            }
+        ]
+
+        self.course.certificates = {'certificates': certificates}
+        self.course.save()  # pylint: disable=no-member
+        self.store.update_item(self.course, self.user.id)
 
     @ddt.data(
         (GlobalStaff, True),
@@ -113,14 +144,20 @@ class CertificateSearchTests(CertificateSupportTestCase):
         (CertificateSupportTestCase.STUDENT_EMAIL, True),
         ("bar", False),
         ("bar@example.com", False),
+        ("", False),
+        (CertificateSupportTestCase.STUDENT_USERNAME, False, 'invalid_key'),
+        (CertificateSupportTestCase.STUDENT_USERNAME, False, unicode(CertificateSupportTestCase.COURSE_NOT_EXIST_KEY)),
+        (CertificateSupportTestCase.STUDENT_USERNAME, True, unicode(CertificateSupportTestCase.EXISTED_COURSE_KEY_1)),
     )
     @ddt.unpack
-    def test_search(self, query, expect_result):
-        response = self._search(query)
-        self.assertEqual(response.status_code, 200)
-
-        results = json.loads(response.content)
-        self.assertEqual(len(results), 1 if expect_result else 0)
+    def test_search(self, user_filter, expect_result, course_filter=None):
+        response = self._search(user_filter, course_filter)
+        if expect_result:
+            self.assertEqual(response.status_code, 200)
+            results = json.loads(response.content)
+            self.assertEqual(len(results), 1)
+        else:
+            self.assertEqual(response.status_code, 400)
 
     def test_results(self):
         response = self._search(self.STUDENT_USERNAME)
@@ -141,6 +178,7 @@ class CertificateSearchTests(CertificateSupportTestCase):
 
     @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
     def test_download_link(self):
+        self.cert.course_id = self.course.id  # pylint: disable=no-member
         self.cert.download_url = ''
         self.cert.save()
 
@@ -155,18 +193,20 @@ class CertificateSearchTests(CertificateSupportTestCase):
             retrieved_cert["download_url"],
             reverse(
                 'certificates:html_view',
-                kwargs={"user_id": self.student.id, "course_id": self.CERT_COURSE_KEY}  # pylint: disable=no-member
+                kwargs={"user_id": self.student.id, "course_id": self.course.id}  # pylint: disable=no-member
             )
         )
 
-    def _search(self, query):
+    def _search(self, user_filter, course_filter=None):
         """Execute a search and return the response. """
-        url = reverse("certificates:search") + "?query=" + query
+        url = reverse("certificates:search") + "?user=" + user_filter
+        if course_filter:
+            url += '&course_id=' + course_filter
         return self.client.get(url)
 
 
 @ddt.ddt
-class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase):
+class CertificateRegenerateTests(CertificateSupportTestCase):
     """
     Tests for the certificate regeneration end-point used by the support team.
     """
@@ -219,7 +259,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
         # Check that the user's certificate was updated
         # Since the student hasn't actually passed the course,
         # we'd expect that the certificate status will be "notpassing"
-        cert = GeneratedCertificate.objects.get(user=self.student)
+        cert = GeneratedCertificate.eligible_certificates.get(user=self.student)
         self.assertEqual(cert.status, CertificateStatuses.notpassing)
 
     def test_regenerate_certificate_missing_params(self):
@@ -258,7 +298,7 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
 
     def test_regenerate_user_has_no_certificate(self):
         # Delete the user's certificate
-        GeneratedCertificate.objects.all().delete()
+        GeneratedCertificate.eligible_certificates.all().delete()
 
         # Should be able to regenerate
         response = self._regenerate(
@@ -268,12 +308,126 @@ class CertificateRegenerateTests(ModuleStoreTestCase, CertificateSupportTestCase
         self.assertEqual(response.status_code, 200)
 
         # A new certificate is created
-        num_certs = GeneratedCertificate.objects.filter(user=self.student).count()
+        num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
         self.assertEqual(num_certs, 1)
 
     def _regenerate(self, course_key=None, username=None):
         """Call the regeneration end-point and return the response. """
         url = reverse("certificates:regenerate_certificate_for_user")
+        params = {}
+
+        if course_key is not None:
+            params["course_key"] = course_key
+
+        if username is not None:
+            params["username"] = username
+
+        return self.client.post(url, params)
+
+
+@ddt.ddt
+class CertificateGenerateTests(CertificateSupportTestCase):
+    """
+    Tests for the certificate generation end-point used by the support team.
+    """
+
+    def setUp(self):
+        """
+        Create a course and enroll the student in the course.
+        """
+        super(CertificateGenerateTests, self).setUp()
+        self.course = CourseFactory(
+            org=self.EXISTED_COURSE_KEY_2.org,
+            course=self.EXISTED_COURSE_KEY_2.course,
+            run=self.EXISTED_COURSE_KEY_2.run
+        )
+        CourseEnrollment.enroll(self.student, self.EXISTED_COURSE_KEY_2, self.CERT_MODE)
+
+    @ddt.data(
+        (GlobalStaff, True),
+        (SupportStaffRole, True),
+        (None, False),
+    )
+    @ddt.unpack
+    def test_access_control(self, role, has_access):
+        # Create a user and log in
+        user = UserFactory(username="foo", password="foo")
+        success = self.client.login(username="foo", password="foo")
+        self.assertTrue(success, msg="Could not log in")
+
+        # Assign the user to the role
+        if role is not None:
+            role().add_users(user)
+
+        # Make a POST request
+        # Since we're not passing valid parameters, we'll get an error response
+        # but at least we'll know we have access
+        response = self._generate()
+
+        if has_access:
+            self.assertEqual(response.status_code, 400)
+        else:
+            self.assertEqual(response.status_code, 403)
+
+    def test_generate_certificate(self):
+        response = self._generate(
+            course_key=self.course.id,  # pylint: disable=no-member
+            username=self.STUDENT_USERNAME,
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_generate_certificate_missing_params(self):
+        # Missing username
+        response = self._generate(course_key=self.EXISTED_COURSE_KEY_2)
+        self.assertEqual(response.status_code, 400)
+
+        # Missing course key
+        response = self._generate(username=self.STUDENT_USERNAME)
+        self.assertEqual(response.status_code, 400)
+
+    def test_generate_no_such_user(self):
+        response = self._generate(
+            course_key=unicode(self.EXISTED_COURSE_KEY_2),
+            username="invalid_username",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_generate_no_such_course(self):
+        response = self._generate(
+            course_key=CourseKey.from_string("edx/invalid/course"),
+            username=self.STUDENT_USERNAME
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_generate_user_is_not_enrolled(self):
+        # Unenroll the user
+        CourseEnrollment.unenroll(self.student, self.EXISTED_COURSE_KEY_2)
+
+        # Can no longer regenerate certificates for the user
+        response = self._generate(
+            course_key=self.EXISTED_COURSE_KEY_2,
+            username=self.STUDENT_USERNAME
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_generate_user_has_no_certificate(self):
+        # Delete the user's certificate
+        GeneratedCertificate.eligible_certificates.all().delete()
+
+        # Should be able to generate
+        response = self._generate(
+            course_key=self.EXISTED_COURSE_KEY_2,
+            username=self.STUDENT_USERNAME
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # A new certificate is created
+        num_certs = GeneratedCertificate.eligible_certificates.filter(user=self.student).count()
+        self.assertEqual(num_certs, 1)
+
+    def _generate(self, course_key=None, username=None):
+        """Call the generation end-point and return the response. """
+        url = reverse("certificates:generate_certificate_for_user")
         params = {}
 
         if course_key is not None:

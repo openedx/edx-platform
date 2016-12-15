@@ -1,0 +1,29 @@
+<%! from django.utils.translation import ugettext as _ %>
+<section>
+<div class="recent-updates">
+  % for index, update in enumerate(visible_updates):
+    <article class="updates-article">
+      % if not update.get("is_error"):
+        <h2 class="date">${update.get("date")}</h2>
+        <a class="toggle-visibility-button" data-hide="${_('Hide')}" data-show="${_('Show')}"></a>
+      % endif
+      <div class="toggle-visibility-element article-content ${'hidden' if index >= 1 else ''}">
+        ${update.get("content")}
+      </div>
+    </article>
+  % endfor
+</div>
+<div class="old-updates hidden toggle-visibility-element">
+  % for update in hidden_updates:
+    <article class="updates-article">
+      <h2 class="date">${update.get("date")}</h2>
+      <a class="toggle-visibility-button" data-hide="${_('Hide')}" data-show="${_('Show')}"></a>
+      <div class="toggle-visibility-element article-content hidden">${update.get("content")}</div>
+    </article>
+  % endfor
+</div>
+
+% if len(hidden_updates) > 0:
+  <a class="toggle-visibility-button show-older-updates" data-hide="" data-show="${_('Show Earlier Course Updates')}"></a>
+% endif
+</section>

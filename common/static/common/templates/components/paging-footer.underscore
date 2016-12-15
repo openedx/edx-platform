@@ -1,4 +1,4 @@
-<nav class="pagination pagination-full bottom" aria-label="Teams Pagination">
+<nav class="pagination pagination-full bottom" aria-label="Pagination">
     <div class="nav-item previous"><button class="nav-link previous-page-link"><i class="icon fa fa-angle-left" aria-hidden="true"></i> <span class="nav-label"><%= gettext("Previous") %></span></button></div>
     <div class="nav-item page">
         <div class="pagination-form">

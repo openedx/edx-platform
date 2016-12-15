@@ -157,7 +157,8 @@ class CertificateStatusReport(Report):
             # it in the report.  These comparisons are unicode-safe.
             cur_course = get_course_by_id(course_id)
             university = cur_course.org
-            course = cur_course.number + " " + cur_course.display_name_with_default  # TODO add term (i.e. Fall 2013)?
+            # TODO add term (i.e. Fall 2013) to course?
+            course = cur_course.number + " " + cur_course.display_name_with_default_escaped
             counts = CourseEnrollment.objects.enrollment_counts(course_id)
             total_enrolled = counts['total']
             audit_enrolled = counts['audit']
@@ -237,7 +238,7 @@ class UniversityRevenueShareReport(Report):
         for course_id in course_ids_between(self.start_word, self.end_word):
             cur_course = get_course_by_id(course_id)
             university = cur_course.org
-            course = cur_course.number + " " + cur_course.display_name_with_default
+            course = cur_course.number + " " + cur_course.display_name_with_default_escaped
             total_payments_collected = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'purchased', 'unit_cost')
             service_fees = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'purchased', 'service_fee')
             num_refunds = CertificateItem.verified_certificates_count(course_id, "refunded")

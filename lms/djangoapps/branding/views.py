@@ -52,7 +52,7 @@ def index(request):
     Redirects to main page -- info page if user authenticated, or marketing if not
     '''
 
-    if settings.COURSEWARE_ENABLED and UserProfile.has_registered(request.user):
+    if UserProfile.has_registered(request.user):
         # For microsites, only redirect to dashboard if user has
         # courses in his/her dashboard. Otherwise UX is a bit cryptic.
         # In this case, we want to have the user stay on a course catalog
@@ -149,8 +149,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
 
     """
     bidi = 'rtl' if translation.get_language_bidi() else 'ltr'
-    version = 'edx' if settings.FEATURES.get('IS_EDX_DOMAIN') else 'openedx'
-    css_name = settings.FOOTER_CSS[version][bidi]
+    css_name = settings.FOOTER_CSS['openedx'][bidi]
 
     context = {
         'hide_openedx_link': not show_openedx_logo,
@@ -160,11 +159,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
         'include_dependencies': include_dependencies,
     }
 
-    return (
-        render_to_response("footer-edx-v3.html", context)
-        if settings.FEATURES.get("IS_EDX_DOMAIN", False)
-        else render_to_response("footer.html", context)
-    )
+    return render_to_response("footer.html", context)
 
 
 @cache_control(must_revalidate=True, max_age=settings.FOOTER_BROWSER_CACHE_MAX_AGE)
@@ -233,7 +228,7 @@ def footer(request):
                 "title": "Powered by Open edX",
                 "image": "http://example.com/openedx.png"
             },
-            "logo_image": "http://example.com/static/images/default-theme/logo.png",
+            "logo_image": "http://example.com/static/images/logo.png",
             "copyright": "EdX, Open edX, and the edX and Open edX logos are \
                 registered trademarks or trademarks of edX Inc."
         }

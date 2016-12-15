@@ -118,6 +118,20 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         """
         return self.wrap_xblock(block, view_name, Fragment(), context)
 
+    def layout_asides(self, block, context, frag, view_name, aside_frag_fns):
+        position_for_asides = '<!-- footer for xblock_aside -->'
+        result = Fragment()
+        result.add_frag_resources(frag)
+
+        for aside, aside_fn in aside_frag_fns:
+            aside_frag = self.wrap_aside(block, aside, view_name, aside_fn(block, context), context)
+            aside.save()
+            result.add_frag_resources(aside_frag)
+            frag.content = frag.content.replace(position_for_asides, position_for_asides + aside_frag.content)
+
+        result.add_content(frag.content)
+        return result
+
 
 def _preview_module_system(request, descriptor, field_data):
     """

@@ -26,7 +26,7 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 os.environ['SERVICE_VARIANT'] = 'bok_choy'
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 
-from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from openedx.stanford.lms.envs.aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
 ######################### Testing overrides ####################################
@@ -86,9 +86,6 @@ GRADES_DOWNLOAD = {
 
 # Configure the LMS to use our stub XQueue implementation
 XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
-
-# Configure the LMS to use our stub ORA implementation
-OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 
 # Configure the LMS to use our stub EdxNotes implementation
 EDXNOTES_PUBLIC_API = 'http://localhost:8042/api/v1'

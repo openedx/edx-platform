@@ -42,7 +42,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/backbone-relational.min.js
     - xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker.js
-    - xmodule_js/common_static/js/vendor/jquery.leanModal.min.js
+    - xmodule_js/common_static/js/vendor/jquery.leanModal.js
     - xmodule_js/common_static/js/vendor/jquery.ajaxQueue.js
     - xmodule_js/common_static/js/vendor/jquery.form.js
     - xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill.js

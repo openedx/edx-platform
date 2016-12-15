@@ -14,6 +14,7 @@ from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode, Mode
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 
 @ddt.ddt
@@ -177,6 +178,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     # Mapping of course modes to the POST parameters sent
     # when the user chooses that mode.
     POST_PARAMS_FOR_COURSE_MODE = {
+        'audit': {},
         'honor': {'honor_mode': True},
         'verified': {'verified_mode': True, 'contribution': '1.23'},
         'unsupported': {'unsupported_mode': True},
@@ -227,9 +229,9 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         expected_amount = decimal.Decimal(self.POST_PARAMS_FOR_COURSE_MODE['verified']['contribution'])
         self.assertEqual(actual_amount, expected_amount)
 
-    def test_successful_honor_enrollment(self):
+    def test_successful_default_enrollment(self):
         # Create the course modes
-        for mode in ('honor', 'verified'):
+        for mode in (CourseMode.DEFAULT_MODE_SLUG, 'verified'):
             CourseModeFactory(mode_slug=mode, course_id=self.course.id)
 
         # Enroll the user in the default mode (honor) to emulate
@@ -242,11 +244,11 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         # Explicitly select the honor mode (POST request)
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE['honor'])
+        self.client.post(choose_track_url, self.POST_PARAMS_FOR_COURSE_MODE[CourseMode.DEFAULT_MODE_SLUG])
 
         # Verify that the user's enrollment remains unchanged
         mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course.id)
-        self.assertEqual(mode, 'honor')
+        self.assertEqual(mode, CourseMode.DEFAULT_MODE_SLUG)
         self.assertEqual(is_active, True)
 
     def test_unsupported_enrollment_mode_failure(self):
@@ -323,7 +325,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEquals(course_modes, expected_modes)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    @with_is_edx_domain(True)
     def test_hide_nav(self):
         # Create the course modes
         for mode in ["honor", "verified"]:

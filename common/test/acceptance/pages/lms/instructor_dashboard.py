@@ -767,6 +767,53 @@ class SpecialExamsPageAllowanceSection(PageObject):
         """
         return self.q(css="a#add-allowance").present
 
+    @property
+    def is_allowance_record_visible(self):
+        """
+        Returns True if the Add Allowance button is present.
+        """
+        return self.q(css="table.allowance-table tr.allowance-items").present
+
+    @property
+    def is_add_allowance_popup_visible(self):
+        """
+        Returns True if the Add Allowance popup and it's all assets are present.
+        """
+        return self.q(css="div.modal div.modal-header").present and self._are_all_assets_present()
+
+    def _are_all_assets_present(self):
+        """
+        Returns True if all the assets present in add allowance popup/form
+        """
+        return (
+            self.q(css="select#proctored_exam").present and
+            self.q(css="label#exam_type_label").present and
+            self.q(css="input#allowance_value").present and
+            self.q(css="input#user_info").present and
+            self.q(css="input#addNewAllowance").present
+        ) and (
+            # This will be present if exam is proctored
+            self.q(css="select#allowance_type").present or
+            # This will be present if exam is timed
+            self.q(css="label#timed_exam_allowance_type").present
+        )
+
+    def click_add_allowance_button(self):
+        """
+        Click the add allowance button
+        """
+        self.q(css="a#add-allowance").click()
+        self.wait_for_element_presence("div.modal div.modal-header", "Popup should be visible")
+
+    def submit_allowance_form(self, allowed_minutes, username):
+        """
+        Fill and submit the allowance
+        """
+        self.q(css='input#allowance_value').fill(allowed_minutes)
+        self.q(css='input#user_info').fill(username)
+        self.q(css="input#addNewAllowance").click()
+        self.wait_for_element_absence("div.modal div.modal-header", "Popup should be hidden")
+
 
 class SpecialExamsPageAttemptsSection(PageObject):
     """
@@ -1001,10 +1048,20 @@ class CertificatesPage(PageObject):
         Wait for Certificate Exceptions to be rendered on page
         """
         self.wait_for_element_visibility(
-            'div.certificate_exception-container',
+            'div.certificate-exception-container',
             'Certificate Exception Section is visible'
         )
         self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+
+    def wait_for_certificate_invalidations_section(self):  # pylint: disable=invalid-name
+        """
+        Wait for certificate invalidations section to be rendered on page
+        """
+        self.wait_for_element_visibility(
+            'div.certificate-invalidation-container',
+            'Certificate invalidations section is visible.'
+        )
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
 
     def refresh(self):
         """
@@ -1032,10 +1089,19 @@ class CertificatesPage(PageObject):
         self.get_selector('#notes').fill(free_text_note)
         self.get_selector('#add-exception').click()
 
+        self.wait_for_ajax()
         self.wait_for(
             lambda: student in self.get_selector('div.white-listed-students table tr:last-child td').text,
             description='Certificate Exception added to list'
         )
+
+    def remove_first_certificate_exception(self):
+        """
+        Remove Certificate Exception from the white list.
+        """
+        self.wait_for_element_visibility('#add-exception', 'Add Exception button is visible')
+        self.get_selector('div.white-listed-students table tr td .delete-exception').first.click()
+        self.wait_for_ajax()
 
     def click_generate_certificate_exceptions_button(self):  # pylint: disable=invalid-name
         """
@@ -1043,11 +1109,53 @@ class CertificatesPage(PageObject):
         """
         self.get_selector('#generate-exception-certificates').click()
 
+    def fill_user_name_field(self, student):
+        """
+        Fill username/email field with given text
+        """
+        self.get_selector('#certificate-exception').fill(student)
+
     def click_add_exception_button(self):
         """
         Click 'Add Exception' button in 'Certificates Exceptions' section
         """
         self.get_selector('#add-exception').click()
+
+    def add_certificate_invalidation(self, student, notes):
+        """
+        Add certificate invalidation for 'student'.
+        """
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+
+        self.get_selector('#certificate-invalidation-user').fill(student)
+        self.get_selector('#certificate-invalidation-notes').fill(notes)
+        self.get_selector('#invalidate-certificate').click()
+
+        self.wait_for_ajax()
+        self.wait_for(
+            lambda: student in self.get_selector('div.invalidation-history table tr:last-child td').text,
+            description='Certificate invalidation added to list.'
+        )
+
+    def remove_first_certificate_invalidation(self):
+        """
+        Remove certificate invalidation from the invalidation list.
+        """
+        self.wait_for_element_visibility('#invalidate-certificate', 'Invalidate Certificate button is visible')
+        self.get_selector('div.invalidation-history table tr td .re-validate-certificate').first.click()
+        self.wait_for_ajax()
+
+    def fill_certificate_invalidation_user_name_field(self, student):  # pylint: disable=invalid-name
+        """
+        Fill username/email field with given text
+        """
+        self.get_selector('#certificate-invalidation-user').fill(student)
+
+    def click_invalidate_certificate_button(self):
+        """
+        Click 'Invalidate Certificate' button in 'certificates invalidations' section
+        """
+        self.get_selector('#invalidate-certificate').click()
 
     @property
     def generate_certificates_button(self):
@@ -1082,7 +1190,7 @@ class CertificatesPage(PageObject):
         """
         Returns the "Certificate Exceptions" section.
         """
-        return self.get_selector('div.certificate_exception-container')
+        return self.get_selector('div.certificate-exception-container')
 
     @property
     def last_certificate_exception(self):
@@ -1096,4 +1204,18 @@ class CertificatesPage(PageObject):
         """
         Returns the Message (error/success) in "Certificate Exceptions" section.
         """
-        return self.get_selector('div.message')
+        return self.get_selector('.certificate-exception-container div.message')
+
+    @property
+    def last_certificate_invalidation(self):
+        """
+        Returns last certificate invalidation from "Certificate Invalidations" section.
+        """
+        return self.get_selector('div.certificate-invalidation-container table tr:last-child td')
+
+    @property
+    def certificate_invalidation_message(self):  # pylint: disable=invalid-name
+        """
+        Returns the message (error/success) in "Certificate Invalidation" section.
+        """
+        return self.get_selector('.certificate-invalidation-container div.message')

@@ -1,12 +1,12 @@
 if Backbone?
   class @DiscussionContentView extends Backbone.View
 
-  
+
     events:
       "click .discussion-flag-abuse": "toggleFlagAbuse"
       "keydown .discussion-flag-abuse":
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
-  
+
     attrRenderer:
       ability: (ability) ->
         for action, selector of @abilityRenderer
@@ -56,7 +56,7 @@ if Backbone?
 
     setWmdContent: (cls_identifier, text) =>
       DiscussionUtil.setWmdContent @$el, $.proxy(@$, @), cls_identifier, text
-      
+
 
     initialize: ->
       @model.bind('change', @renderPartialAttrs, @)

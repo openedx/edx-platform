@@ -11,6 +11,7 @@
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/pagination';
 @import 'elements/navigation'; // all archetypes of navigation
 
 // course - base
@@ -45,14 +46,10 @@
 @import "course/profile";
 @import "course/gradebook";
 @import "course/tabs";
-@import "course/staff_grading";
-@import "course/rubric";
-@import "course/open_ended_grading";
 @import "course/student-notes";
 @import "views/teams";
 
 // course - instructor-only views
-@import "course/instructor/instructor";
 @import "course/instructor/instructor_2";
 @import "course/instructor/email";
 @import "course/instructor/inline_analytics";
@@ -63,6 +60,7 @@
 
 // discussion
 @import "course/discussion/form-wmd-toolbar";
+@import "course/discussion/form";
 
 // search
 @import 'search/_search';

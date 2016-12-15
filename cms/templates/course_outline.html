@@ -4,9 +4,8 @@
 import logging
 from util.date_utils import get_default_time_display
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 from contentstore.utils import reverse_usage_url
-from microsite_configuration import microsite
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 %>
 <%block name="title">${_("Course Outline")}</%block>
@@ -16,13 +15,16 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 
 <%block name="requirejs">
     require(["js/factories/outline"], function (OutlineFactory) {
-        OutlineFactory(${escape_json_dumps(course_structure) | n}, ${escape_json_dumps(initial_state) | n});
+        OutlineFactory(
+            ${course_structure | n, dump_js_escaped_json},
+            ${initial_state | n, dump_js_escaped_json}
+        );
     });
 </%block>
 
 <%block name="header_extras">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'verification-access-editor', 'timed-examination-preference-editor']:
+% for template_name in ['course-outline', 'xblock-string-field-editor', 'basic-modal', 'modal-button', 'course-outline-modal', 'due-date-editor', 'release-date-editor', 'grading-editor', 'publish-editor', 'staff-lock-editor', 'verification-access-editor', 'timed-examination-preference-editor', 'access-editor', 'settings-modal-tabs']:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
 </script>
@@ -54,9 +56,6 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
   %endif
 
     %if deprecated_blocks_info.get('blocks') or deprecated_blocks_info.get('block_types_enabled'):
-      <%
-        platform_name = microsite.get_value('platform_name', settings.PLATFORM_NAME)
-      %>
       <div class="wrapper wrapper-alert wrapper-alert-error is-shown">
         <div class="alert announcement">
           <i class="feedback-symbol fa fa-warning" aria-hidden="true"></i><span class="sr">${_("Warning")}</span>
@@ -87,7 +86,7 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
               <div class="advance-modules-list">
                 <p class="advance-modules-remove-text">
                   ${_("To avoid errors, {platform_name} strongly recommends that you remove unsupported features from the course advanced settings. To do this, go to the {link_start}Advanced Settings page{link_end}, locate the \"Advanced Module List\" setting, and then delete the following modules from the list.").format(
-                    platform_name=platform_name,
+                    platform_name=static.get_platform_name(),
                     link_start='<a href="{advance_settings_url}">'.format(advance_settings_url=deprecated_blocks_info['advance_settings_url']), link_end="</a>"
                   )}
                 </p>

@@ -8,13 +8,21 @@ from django.test.utils import override_settings
 from nose.plugins.attrib import attr
 from path import Path as path
 
-from opaque_keys.edx.locator import CourseLocator
 from certificates.models import (
     ExampleCertificate,
     ExampleCertificateSet,
     CertificateHtmlViewConfiguration,
     CertificateTemplateAsset,
-    BadgeImageConfiguration)
+    BadgeImageConfiguration,
+    EligibleCertificateManager,
+    GeneratedCertificate,
+    CertificateStatuses,
+)
+from certificates.tests.factories import GeneratedCertificateFactory
+from opaque_keys.edx.locator import CourseLocator
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 FEATURES_INVALID_FILE_PATH = settings.FEATURES.copy()
 FEATURES_INVALID_FILE_PATH['CERTS_HTML_VIEW_CONFIG_PATH'] = 'invalid/path/to/config.json'
@@ -234,3 +242,42 @@ class CertificateTemplateAssetTest(TestCase):
 
         certificate_template_asset = CertificateTemplateAsset.objects.get(id=1)
         self.assertEqual(certificate_template_asset.asset, 'certificate_template_assets/1/picture2.jpg')
+
+
+@attr('shard_1')
+class EligibleCertificateManagerTest(SharedModuleStoreTestCase):
+    """
+    Test the GeneratedCertificate model's object manager for filtering
+    out ineligible certs.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super(EligibleCertificateManagerTest, cls).setUpClass()
+        cls.courses = (CourseFactory(), CourseFactory())
+
+    def setUp(self):
+        super(EligibleCertificateManagerTest, self).setUp()
+        self.user = UserFactory()
+        self.eligible_cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.downloadable,
+            user=self.user,
+            course_id=self.courses[0].id  # pylint: disable=no-member
+        )
+        self.ineligible_cert = GeneratedCertificateFactory.create(
+            status=CertificateStatuses.audit_passing,
+            user=self.user,
+            course_id=self.courses[1].id  # pylint: disable=no-member
+        )
+
+    def test_filter_ineligible_certificates(self):
+        """
+        Verify that the EligibleCertificateManager filters out
+        certificates marked as ineligible, and that the default object
+        manager for GeneratedCertificate does not filter them out.
+        """
+        self.assertEqual(list(GeneratedCertificate.eligible_certificates.filter(user=self.user)), [self.eligible_cert])
+        self.assertEqual(
+            list(GeneratedCertificate.objects.filter(user=self.user)),  # pylint: disable=no-member
+            [self.eligible_cert, self.ineligible_cert]
+        )

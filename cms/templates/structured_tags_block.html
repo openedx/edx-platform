@@ -1,0 +1,15 @@
+<div class="xblock-render">
+    % for tag in tags:
+    <label for="problem_tags_${tag['key']}">${tag['title']}</label>:
+    <select id="problem_tags_${tag['key']}" name="problem_tags_${tag['key']}">
+        % for k,v in tag['values'].iteritems():
+            <%
+                selected = ''
+                if k == tag['current_value']:
+                    selected = 'selected'
+            %>
+            <option value="${k}" ${selected}>${v}</option>
+        % endfor
+    % endfor
+    </select>
+</div>

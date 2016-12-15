@@ -238,20 +238,20 @@ These are examples of how to run a single test and get stdout and get coverage.
 
 ::
 
-    python -m coverage run --rcfile=./common/lib/xmodule/.coveragerc which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example
-    python -m coverage run --rcfile=./lms/.coveragerc which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
+    python -m coverage run which ./manage.py cms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000 contentstore.tests.test_import_nostatic -s # cms example
+    python -m coverage run which ./manage.py lms --settings test test --traceback --logging-clear-handlers --liveserver=localhost:8000-9000  courseware.tests.test_module_render -s # lms example
 
 Use this command to generate coverage report.
 
 ::
 
-    coverage report --rcfile=./common/lib/xmodule/.coveragerc
+    coverage report
 
 Use this command to generate an HTML report.
 
 ::
 
-    coverage html --rcfile=./common/lib/xmodule/.coveragerc
+    coverage html
 
 The report is then saved in reports/common/lib/xmodule/cover/index.html
 
@@ -262,7 +262,7 @@ you can run one of these commands.
 ::
 
     paver test_system -s cms -t common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
-    python -m coverage run --rcfile=cms/.coveragerc `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
+    python -m coverage run `which ./manage.py` cms --settings test test --traceback common/djangoapps/terrain/stubs/tests/test_youtube_stub.py
 
 Very handy: if you pass the ``--pdb`` flag to a paver test function, or
 uncomment the ``pdb=1`` line in ``setup.cfg``, the test runner
@@ -729,6 +729,27 @@ To view JavaScript code style quality run this command.
 ::
 
 	paver run_jshint --limit=700
+
+
+
+Code Complexity Tools
+----------------------
+
+Two tools are available for evaluating complexity of edx-platform code:
+
+- `radon <https://radon.readthedocs.org/en/latest/>`__ for Python code complexity.
+   * To obtain complexity, run
+
+::
+
+       paver run_complexity
+
+- `plato <https://github.com/es-analysis/plato>`__ for JavaScript code complexity. Several options are available on the command line; see documentation.
+    * Below, the following command will produce an html report in a subdirectory called "jscomplexity"
+
+::
+
+       plato -q -x common/static/js/vendor/ -t common -l .jshintrc -r -d jscomplexity common/static/js/
 
 
 

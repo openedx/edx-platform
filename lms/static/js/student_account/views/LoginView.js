@@ -127,12 +127,13 @@
                         return;
                     }
                 }
+                var msg = error.responseText;
                 if (error.status === 0) {
-                    this.errors = ['<li>' + gettext('Please check your internet connection and try again.') + '</li>'];
+                    msg = gettext('An error has occurred. Check your Internet connection and try again.');
+                } else if(error.status === 500){
+                    msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.');
                 }
-                else {
-                    this.errors = ['<li>' + error.responseText + '</li>'];
-                }
+                this.errors = ['<li>' + msg + '</li>'];
                 this.setErrors();
                 this.element.hide( this.$resetSuccess );
 

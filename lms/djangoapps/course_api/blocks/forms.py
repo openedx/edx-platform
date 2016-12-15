@@ -9,37 +9,28 @@ from rest_framework.exceptions import PermissionDenied
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import UsageKey
-from openedx.core.djangoapps.util.forms import MultiValueField
+from openedx.core.djangoapps.util.forms import ExtendedNullBooleanField, MultiValueField
 from xmodule.modulestore.django import modulestore
 
-from .permissions import can_access_other_users_blocks, can_access_users_blocks
+from . import permissions
 
 
 class BlockListGetForm(Form):
     """
     A form to validate query parameters in the block list retrieval endpoint
     """
-    username = CharField(required=True)  # TODO return all blocks if user is not specified by requesting staff user
-    usage_key = CharField(required=True)
-    requested_fields = MultiValueField(required=False)
-    student_view_data = MultiValueField(required=False)
+    all_blocks = ExtendedNullBooleanField(required=False)
     block_counts = MultiValueField(required=False)
     depth = CharField(required=False)
     nav_depth = IntegerField(required=False, min_value=0)
+    requested_fields = MultiValueField(required=False)
     return_type = ChoiceField(
         required=False,
         choices=[(choice, choice) for choice in ['dict', 'list']],
     )
-
-    def clean_requested_fields(self):
-        """
-        Return a set of `requested_fields`, merged with defaults of `type`
-        and `display_name`
-        """
-        requested_fields = self.cleaned_data['requested_fields']
-
-        # add default requested_fields
-        return (requested_fields or set()) | {'type', 'display_name'}
+    student_view_data = MultiValueField(required=False)
+    usage_key = CharField(required=True)
+    username = CharField(required=False)
 
     def clean_depth(self):
         """
@@ -56,6 +47,22 @@ class BlockListGetForm(Form):
         except ValueError:
             raise ValidationError("'{}' is not a valid depth value.".format(value))
 
+    def clean_requested_fields(self):
+        """
+        Return a set of `requested_fields`, merged with defaults of `type`
+        and `display_name`
+        """
+        requested_fields = self.cleaned_data['requested_fields']
+
+        # add default requested_fields
+        return (requested_fields or set()) | {'type', 'display_name'}
+
+    def clean_return_type(self):
+        """
+        Return valid 'return_type' or default value of 'dict'
+        """
+        return self.cleaned_data['return_type'] or 'dict'
+
     def clean_usage_key(self):
         """
         Ensure a valid `usage_key` was provided.
@@ -64,58 +71,19 @@ class BlockListGetForm(Form):
 
         try:
             usage_key = UsageKey.from_string(usage_key)
-            usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
         except InvalidKeyError:
             raise ValidationError("'{}' is not a valid usage key.".format(unicode(usage_key)))
 
-        return usage_key
-
-    def clean_return_type(self):
-        """
-        Return valid 'return_type' or default value of 'dict'
-        """
-        return self.cleaned_data['return_type'] or 'dict'
-
-    def clean_requested_user(self, cleaned_data, course_key):
-        """
-        Validates and returns the requested_user, while checking permissions.
-        """
-        requested_username = cleaned_data.get('username', '')
-        requesting_user = self.initial['requesting_user']
-
-        if requesting_user.username.lower() == requested_username.lower():
-            requested_user = requesting_user
-        else:
-            # the requesting user is trying to access another user's view
-            # verify requesting user can access another user's blocks
-            if not can_access_other_users_blocks(requesting_user, course_key):
-                raise PermissionDenied(
-                    "'{requesting_username}' does not have permission to access view for '{requested_username}'."
-                    .format(requesting_username=requesting_user.username, requested_username=requested_username)
-                )
-
-            # update requested user object
-            try:
-                requested_user = User.objects.get(username=requested_username)
-            except User.DoesNotExist:
-                raise Http404("Requested user '{username}' does not exist.".format(username=requested_username))
-
-        # verify whether the requested user's blocks can be accessed
-        if not can_access_users_blocks(requested_user, course_key):
-            raise PermissionDenied(
-                "Course blocks for '{requested_username}' cannot be accessed."
-                .format(requested_username=requested_username)
-            )
-
-        return requested_user
+        return usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
 
     def clean(self):
         """
-        Return cleanded data, including additional requested fields.
+        Return cleaned data, including additional requested fields.
         """
         cleaned_data = super(BlockListGetForm, self).clean()
 
-        # add additional requested_fields that are specified as separate parameters, if they were requested
+        # Add additional requested_fields that are specified as separate
+        # parameters, if they were requested.
         additional_requested_fields = [
             'student_view_data',
             'block_counts',
@@ -130,5 +98,72 @@ class BlockListGetForm(Form):
         if not usage_key:
             return
 
-        cleaned_data['user'] = self.clean_requested_user(cleaned_data, usage_key.course_key)
+        cleaned_data['user'] = self._clean_requested_user(cleaned_data, usage_key.course_key)
         return cleaned_data
+
+    def _clean_requested_user(self, cleaned_data, course_key):
+        """
+        Validates and returns the requested_user, while checking permissions.
+        """
+        requesting_user = self.initial['requesting_user']
+        requested_username = cleaned_data.get('username', None)
+
+        if not requested_username:
+            return self._verify_no_user(requesting_user, cleaned_data, course_key)
+        elif requesting_user.username.lower() == requested_username.lower():
+            return self._verify_requesting_user(requesting_user, course_key)
+        else:
+            return self._verify_other_user(requesting_user, requested_username, course_key)
+
+    @staticmethod
+    def _verify_no_user(requesting_user, cleaned_data, course_key):
+        """
+        Verifies form for when no username is specified, including permissions.
+        """
+        # Verify that access to all blocks is requested
+        # (and not unintentionally requested).
+        if not cleaned_data.get('all_blocks', None):
+            raise ValidationError({'username': ['This field is required unless all_blocks is requested.']})
+
+        # Verify all blocks can be accessed for the course.
+        if not permissions.can_access_all_blocks(requesting_user, course_key):
+            raise PermissionDenied(
+                "'{requesting_username}' does not have permission to access all blocks in '{course_key}'."
+                .format(requesting_username=requesting_user.username, course_key=unicode(course_key))
+            )
+
+        # return None for user
+        return None
+
+    @staticmethod
+    def _verify_requesting_user(requesting_user, course_key):
+        """
+        Verifies whether the requesting user can access blocks in the course.
+        """
+        if not permissions.can_access_self_blocks(requesting_user, course_key):
+            raise PermissionDenied(
+                "Course blocks for '{requesting_username}' cannot be accessed."
+                .format(requesting_username=requesting_user.username)
+            )
+        return requesting_user
+
+    @staticmethod
+    def _verify_other_user(requesting_user, requested_username, course_key):
+        """
+        Verifies whether the requesting user can access another user's view of
+        the blocks in the course.
+        """
+        # Verify requesting user can access the user's blocks.
+        if not permissions.can_access_others_blocks(requesting_user, course_key):
+            raise PermissionDenied(
+                "'{requesting_username}' does not have permission to access view for '{requested_username}'."
+                .format(requesting_username=requesting_user.username, requested_username=requested_username)
+            )
+
+        # Verify user exists.
+        try:
+            return User.objects.get(username=requested_username)
+        except User.DoesNotExist:
+            raise Http404(
+                "Requested user '{requested_username}' does not exist.".format(requested_username=requested_username)
+            )

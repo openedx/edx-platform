@@ -41,6 +41,11 @@ class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # working properly, we must use start dates and set a start date in the past (otherwise the access
         # checks exist prematurely).
         self.course = CourseFactory.create(number='masquerade-test', metadata={'start': datetime.now(UTC())})
+        # Creates info page and puts random data in it for specific student info page test
+        self.info_page = ItemFactory.create(
+            category="course_info", parent_location=self.course.location,
+            data="OOGIE BLOOGIE", display_name="updates"
+        )
         self.chapter = ItemFactory.create(
             parent_location=self.course.location,
             category="chapter",
@@ -85,6 +90,18 @@ class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 'course_id': unicode(self.course.id),
                 'chapter': self.chapter.location.name,
                 'section': self.sequential.location.name,
+            }
+        )
+        return self.client.get(url)
+
+    def get_course_info_page(self):
+        """
+        Returns the server response for course info page.
+        """
+        url = reverse(
+            'info',
+            kwargs={
+                'course_id': unicode(self.course.id),
             }
         )
         return self.client.get(url)
@@ -299,6 +316,24 @@ class TestStaffMasqueradeAsSpecificStudent(StaffMasqueradeTestCase, ProblemSubmi
         # Verify the student state did not change.
         self.login_student()
         self.assertEqual(self.get_progress_detail(), u'2/2')
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_masquerade_as_specific_student_course_info(self):
+        """
+        Test masquerading as a specific user for course info page.
+
+        We login with login_staff and check course info page content if it's working and then we
+        set masquerade to view same page as a specific student and test if it's working or not.
+        """
+        # Log in as staff, and check we can see the info page.
+        self.login_staff()
+        content = self.get_course_info_page().content
+        self.assertIn("OOGIE BLOOGIE", content)
+
+        # Masquerade as the student, and check we can see the info page.
+        self.update_masquerade(role='student', user_name=self.student_user.username)
+        content = self.get_course_info_page().content
+        self.assertIn("OOGIE BLOOGIE", content)
 
 
 @attr('shard_1')

@@ -1375,6 +1375,13 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         if self.signal_handler:
             self.signal_handler.send("course_deleted", course_key=course_key)
 
+    def _emit_item_deleted_signal(self, usage_key, user_id):
+        """
+        Helper method used to emit the item_deleted signal.
+        """
+        if self.signal_handler:
+            self.signal_handler.send("item_deleted", usage_key=usage_key, user_id=user_id)
+
 
 def only_xmodules(identifier, entry_points):
     """Only use entry_points that are supplied by the xmodule package"""

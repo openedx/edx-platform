@@ -303,7 +303,7 @@
     display: none;
 
     p {
-      color: #a2a2a2;
+      color: $gray-d2;
       font-style: italic;
     }
   }
@@ -470,43 +470,6 @@
     }
     .enrollment_signup_button {
       @include margin-right($baseline/4);
-    }
-    // Custom File upload
-    .customBrowseBtn {
-      margin: ($baseline/2) 0;
-      display: inline-block;
-      .file-browse {
-        position:relative;
-        overflow:hidden;
-        display: inline;
-        @include margin-left(-5px);
-        span.browse{
-          @include button(simple, $blue);
-          @include margin-right($baseline);
-          padding: 6px ($baseline/2);
-          font-size: 12px;
-          border-radius: 0 3px 3px 0;
-        }
-        input.file_field {
-          position:absolute;
-          @include right(0);
-          top:0;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          opacity:0;
-          filter:alpha(opacity=0);
-        }
-      }
-      & > span, & input[disabled]{
-        vertical-align: middle;
-      }
-      input[disabled] {
-        @include border-radius(4px 0 0 4px);
-        @include padding(6px 6px 5px);
-        border: 1px solid $lightGrey1;
-        cursor: not-allowed;
-      }
     }
   }
 
@@ -2138,80 +2101,232 @@ input[name="subject"] {
   @include right(auto);
 }
 
-#certificate-white-list-editor{
-  .certificate-exception-inputs{
-    .student-username-or-email{
-      width: 300px;
-    }
-    .notes-field{
-      width: 400px;
-    }
-    p+p{
-      margin-top: 5px;
-    }
+// view - certificates
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#certificates {
+
+  .btn-blue {
+    @extend %btn-primary-blue;
+    padding: ($baseline/2.5) ($baseline/2);
+    text-shadow: none;
+    margin-bottom: 10px;
+  }
+
+  %exception-message {
+        margin-top: 15px;
+        background-color: $gray-l4;
+        border-top-style: groove;
+        color: $black;
+      }
+  .certificates-wrapper{
     .message{
-      margin-top: 10px;
+      @extend %exception-message;
     }
   }
-}
 
-.white-listed-students {
+  p.under-heading {
+    margin: 12px 0 12px 0;
+    line-height: 23px;
+  }
 
-  table {
-    width: 100%;
-    word-wrap: break-word;
+  hr.section-divider{
+    margin: 25px 0;
+    border-top: 7px solid #646464;
+  }
 
-    th {
-      @extend %t-copy-sub2;
-      background-color: $gray-l5;
-      padding: ($baseline*0.75) ($baseline/2) ($baseline*0.75) ($baseline/2);
-      vertical-align: middle;
-      text-align: left;
-      color: $gray;
-
-      &.date-column{
-        width: 230px;
-      }
-    }
-
-    td {
-      padding: ($baseline/2);
-      vertical-align: middle;
-      text-align: left;
-    }
-
-    tbody {
-      box-shadow: 0 2px 2px $shadow-l1;
-      border: 1px solid $gray-l4;
-      background: $white;
-
-      tr {
-        @include transition(all $tmg-f2 ease-in-out 0s);
-        border-top: 1px solid $gray-l4;
-
-        &:first-child {
-          border-top: none;
-        }
-
-        &:nth-child(odd) {
-          background-color: $gray-l6;
-        }
-
-        a {
-          color: $gray-d1;
-
-          &:hover {
-            color: $blue;
+  .certificate-generation-history{
+    table{
+      thead{
+        tr{
+          td.task-name{
+            width: 150px;
+          }
+          td.task-date{
+            width: 200px;
           }
         }
+      }
 
-        &:hover {
-          background-color: $blue-l5;
+      tbody{
+        tr{
+          td{
+            padding: 5px;
+            vertical-align: middle;
+            text-align: left;;
+          }
         }
       }
     }
   }
+
+  .student-username-or-email {
+      width: 300px;
+      margin-bottom: 10px;
+    }
+    .notes-field {
+      width: 400px;
+    }
+
+
+  #certificate-white-list-editor {
+    padding-top: 5px;
+    .certificate-exception-inputs {
+      p + p {
+        margin-top: 5px;
+      }
+      .message {
+        @extend %exception-message;
+      }
+    }
+  }
+
+  .white-listed-students, .invalidation-history {
+    margin-top: 10px;
+    padding-top: 5px;
+    table {
+      margin-top: 5px;
+      width: 100%;
+      word-wrap: break-word;
+
+      th {
+        @extend %t-copy-sub2;
+        background-color: $gray-l5;
+        padding: ($baseline*0.75) ($baseline/2) ($baseline*0.75) ($baseline/2);
+        vertical-align: middle;
+        text-align: left;
+        color: $gray;
+
+        &.date{
+          width: 150px;
+        }
+
+        &.user-name {
+          width: 120px;
+        }
+        &.user-email {
+          width: 200px;
+        }
+
+        &.action {
+          width: 150px;
+        }
+
+      }
+
+      td {
+        padding: ($baseline/2);
+        vertical-align: middle;
+        text-align: left;
+      }
+
+      tbody {
+        box-shadow: 0 2px 2px $shadow-l1;
+        border: 1px solid $gray-l4;
+        background: $white;
+
+        tr {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          border-top: 1px solid $gray-l4;
+
+          &:first-child {
+            border-top: none;
+          }
+
+          &:nth-child(odd) {
+            background-color: $gray-l6;
+          }
+
+          a {
+            color: $gray-d1;
+
+            &:hover {
+              color: $blue;
+            }
+          }
+
+          &:hover {
+            background-color: $blue-l5;
+          }
+        }
+      }
+    }
+
+    .message {
+        @extend %exception-message;
+      }
+  }
+
+  .certificate-exception-container {
+    h3 {
+      border-bottom: 1px groove black;
+      display: inline-block;
+    }
+  }
+
+  .bulk-white-list-exception {
+    margin-top: 10px;
+    padding-top: 5px;
+    .white-list-csv {
+      .bulk-exception-results {
+        margin-top: 10px;
+        background-color: $gray-l4;
+        border-top-style: groove;
+        color: $black;
+        margin-bottom: 15px;
+
+        .message {
+          padding: 5px 10px;
+          margin: 2px;
+          border-top-style: none;
+        }
+
+      }
+      .arrow {
+        font-weight: bold;
+      }
+    }
+  }
+
 }
+
+// Custom File upload
+.customBrowseBtn {
+  margin: ($baseline/2) 0;
+  display: inline-block;
+  .file-browse {
+    position: relative;
+    overflow: hidden;
+    display: inline;
+    @include margin-left(-5px);
+    span.browse {
+      @include button(simple, $blue);
+      @include margin-right($baseline);
+      padding: 6px ($baseline/2);
+      font-size: 12px;
+      border-radius: 0 3px 3px 0;
+    }
+    input.file_field {
+      position: absolute;
+      @include right(0);
+      top: 0;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+      opacity: 0;
+      filter: alpha(opacity=0);
+    }
+  }
+  & > span, & input[disabled] {
+    vertical-align: middle;
+  }
+  input[disabled] {
+    @include border-radius(4px 0 0 4px);
+    @include padding(6px 6px 5px);
+    border: 1px solid $lightGrey1;
+    cursor: not-allowed;
+  }
+}
+
 @import 'stanford/course/instructor/email_query';
 @import 'stanford/course/instructor/data_download';
 @import 'stanford/course/instructor/lti_upload';

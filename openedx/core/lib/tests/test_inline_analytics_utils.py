@@ -5,6 +5,7 @@ Inline analytics utility tests
 import unittest
 import textwrap
 
+from django.conf import settings
 from django.test.utils import override_settings
 
 from xmodule.tests.test_capa_module import CapaFactory
@@ -12,6 +13,7 @@ from xmodule.tests.test_capa_module import CapaFactory
 from openedx.core.lib.inline_analytics_utils import get_responses_data
 
 
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Run only in LMS')
 class ResponseTest(unittest.TestCase):
     """ unittest class """
 

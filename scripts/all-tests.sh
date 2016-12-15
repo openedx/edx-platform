@@ -11,7 +11,7 @@ set -e
 ###############################################################################
 
 # Violations thresholds for failing the build
-export PYLINT_THRESHOLD=5555
+export PYLINT_THRESHOLD=4500
 export JSHINT_THRESHOLD=9080
 
 doCheckVars() {

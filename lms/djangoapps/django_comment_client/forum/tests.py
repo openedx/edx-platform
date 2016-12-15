@@ -217,7 +217,7 @@ class PartialDictMatcher(object):
         ])
 
 
-@patch('requests.request')
+@patch('requests.request', autospec=True)
 class SingleThreadTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(SingleThreadTestCase, self).setUp(create_user=False)
@@ -328,7 +328,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@patch('requests.request')
+@patch('requests.request', autospec=True)
 class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     """
     Ensures the number of modulestore queries and number of sql queries are
@@ -395,7 +395,7 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
                     call_single_thread()
 
 
-@patch('requests.request')
+@patch('requests.request', autospec=True)
 class SingleCohortedThreadTestCase(CohortedTestCase):
     def _create_mock_cohorted_thread(self, mock_request):
         self.mock_text = "dummy content"
@@ -454,7 +454,7 @@ class SingleCohortedThreadTestCase(CohortedTestCase):
         self.assertRegexpMatches(html, r'&#34;group_name&#34;: &#34;student_cohort&#34;')
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class SingleThreadAccessTestCase(CohortedTestCase):
     def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):
         thread_id = "test_thread_id"
@@ -541,7 +541,7 @@ class SingleThreadAccessTestCase(CohortedTestCase):
         self.assertEqual(resp.status_code, 200)
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
@@ -593,7 +593,7 @@ class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixi
         )
 
 
-@patch('requests.request')
+@patch('requests.request', autospec=True)
 class SingleThreadContentGroupTestCase(ContentGroupTestCase):
     def assert_can_access(self, user, discussion_id, thread_id, should_have_access):
         """
@@ -705,7 +705,7 @@ class SingleThreadContentGroupTestCase(ContentGroupTestCase):
         self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, True)
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionContextTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionContextTestCase, self).setUp()
@@ -744,7 +744,7 @@ class InlineDiscussionContextTestCase(ModuleStoreTestCase):
         self.assertEqual(json_response['discussion_data'][0]['context'], ThreadContext.STANDALONE)
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionGroupIdTestCase(
         CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
@@ -795,7 +795,7 @@ class InlineDiscussionGroupIdTestCase(
         )
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
@@ -845,7 +845,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdT
         )
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/active_threads"
 
@@ -1011,7 +1011,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupI
         verify_group_id_not_present(profiled_user=self.moderator, pass_group_id=False)
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/subscribed_threads"
 
@@ -1048,7 +1048,7 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGr
         )
 
 
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class InlineDiscussionTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
@@ -1106,7 +1106,7 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
         self.verify_response(response)
 
 
-@patch('requests.request')
+@patch('requests.request', autospec=True)
 class UserProfileTestCase(ModuleStoreTestCase):
 
     TEST_THREAD_TEXT = 'userprofile-test-text'
@@ -1223,7 +1223,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 405)
 
 
-@patch('requests.request')
+@patch('requests.request', autospec=True)
 class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1293,7 +1293,7 @@ class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1316,7 +1316,7 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1331,7 +1331,7 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
 
 @ddt.ddt
-@patch('lms.lib.comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request', autospec=True)
 class ForumDiscussionXSSTestCase(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -1388,7 +1388,7 @@ class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         data = {
@@ -1414,7 +1414,7 @@ class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
@@ -1437,7 +1437,7 @@ class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1459,7 +1459,7 @@ class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
-    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def _test_unicode_data(self, text, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
@@ -1486,7 +1486,7 @@ class EnrollmentTestCase(ModuleStoreTestCase):
         self.student = UserFactory.create()
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
-    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch('lms.lib.comment_client.utils.requests.request', autospec=True)
     def test_unenrolled(self, mock_request):
         mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
         request = RequestFactory().get('dummy_url')

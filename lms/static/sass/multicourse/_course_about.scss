@@ -258,10 +258,10 @@
         background-color: $shadow-l2;
         text-align: right;
         text-transform: uppercase;
-        color: $lighter-base-font-color;
+        color: $staff-color;
 
         &:hover {
-          background-color: $link-hover;
+          background-color: $staff-color;
           color: $white;
         }
       }

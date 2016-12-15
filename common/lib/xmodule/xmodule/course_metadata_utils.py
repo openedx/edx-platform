@@ -5,9 +5,10 @@ This is a place to put simple functions that operate on course metadata. It
 allows us to share code between the CourseDescriptor and CourseOverview
 classes, which both need these type of functions.
 """
-from datetime import datetime
-from datetime import timedelta
 from base64 import b32encode
+from datetime import datetime, timedelta
+import dateutil.parser
+from math import exp
 
 from django.utils.timezone import UTC
 
@@ -56,15 +57,51 @@ def display_name_with_default(course):
     like to just pass course.display_name and course.url_name as arguments to
     this function, we can't do so without breaking those tests.
 
+    Note: This method no longer escapes as it once did, so the caller must
+    ensure it is properly escaped where necessary.
+
     Arguments:
         course (CourseDescriptor|CourseOverview): descriptor or overview of
             said course.
     """
-    # TODO: Consider changing this to use something like xml.sax.saxutils.escape
     return (
         course.display_name if course.display_name is not None
         else course.url_name.replace('_', ' ')
-    ).replace('<', '&lt;').replace('>', '&gt;')
+    )
+
+
+def display_name_with_default_escaped(course):
+    """
+    DEPRECATED: use display_name_with_default
+
+    Calculates the display name for a course with some HTML escaping.
+    This follows the same logic as display_name_with_default, with
+    the addition of the escaping.
+
+    Here is an example of how to move away from this method in Mako html:
+        Before:
+        <span class="course-name">${course.display_name_with_default_escaped}</span>
+
+        After:
+        <span class="course-name">${course.display_name_with_default | h}</span>
+    If the context is Javascript in Mako, you'll need to follow other best practices.
+
+    Note: Switch to display_name_with_default, and ensure the caller
+    properly escapes where necessary.
+
+    Note: This newly introduced method should not be used.  It was only
+    introduced to enable a quick search/replace and the ability to slowly
+    migrate and test switching to display_name_with_default, which is no
+    longer escaped.
+
+    Arguments:
+        course (CourseDescriptor|CourseOverview): descriptor or overview of
+            said course.
+    """
+    # This escaping is incomplete.  However, rather than switching this to use
+    # markupsafe.escape() and fixing issues, better to put that energy toward
+    # migrating away from this method altogether.
+    return course.display_name_with_default.replace('<', '&lt;').replace('>', '&gt;')
 
 
 def number_for_course_location(location):
@@ -222,3 +259,43 @@ def may_certify_for_course(certificates_display_behavior, certificates_show_befo
         or certificates_show_before_end
     )
     return show_early or has_ended
+
+
+def sorting_score(start, advertised_start, announcement):
+    """
+    Returns a tuple that can be used to sort the courses according
+    to how "new" they are. The "newness" score is computed using a
+    heuristic that takes into account the announcement and
+    (advertised) start dates of the course if available.
+
+    The lower the number the "newer" the course.
+    """
+    # Make courses that have an announcement date have a lower
+    # score than courses than don't, older courses should have a
+    # higher score.
+    announcement, start, now = sorting_dates(start, advertised_start, announcement)
+    scale = 300.0  # about a year
+    if announcement:
+        days = (now - announcement).days
+        score = -exp(-days / scale)
+    else:
+        days = (now - start).days
+        score = exp(days / scale)
+    return score
+
+
+def sorting_dates(start, advertised_start, announcement):
+    """
+    Utility function to get datetime objects for dates used to
+    compute the is_new flag and the sorting_score.
+    """
+    try:
+        start = dateutil.parser.parse(advertised_start)
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=UTC())
+    except (ValueError, AttributeError):
+        start = start
+
+    now = datetime.now(UTC())
+
+    return announcement, start, now

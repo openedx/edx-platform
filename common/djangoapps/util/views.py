@@ -4,6 +4,7 @@ import sys
 from functools import wraps
 
 from django.conf import settings
+from django.core.cache import caches
 from django.core.validators import ValidationError, validate_email
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import server_error
@@ -116,6 +117,10 @@ def calculate(request):
 
 
 class _ZendeskApi(object):
+
+    CACHE_PREFIX = 'ZENDESK_API_CACHE'
+    CACHE_TIMEOUT = 60 * 60
+
     def __init__(self):
         """
         Instantiate the Zendesk API.
@@ -151,8 +156,39 @@ class _ZendeskApi(object):
         """
         self._zendesk_instance.update_ticket(ticket_id=ticket_id, data=update)
 
+    def get_group(self, name):
+        """
+        Find the Zendesk group named `name`. Groups are cached for
+        CACHE_TIMEOUT seconds.
 
-def _record_feedback_in_zendesk(realname, email, subject, details, tags, additional_info):
+        If a matching group exists, it is returned as a dictionary
+        with the format specifed by the zendesk package.
+
+        Otherwise, returns None.
+        """
+        cache = caches['default']
+        cache_key = '{prefix}_group_{name}'.format(prefix=self.CACHE_PREFIX, name=name)
+        cached = cache.get(cache_key)
+        if cached:
+            return cached
+        groups = self._zendesk_instance.list_groups()['groups']
+        for group in groups:
+            if group['name'] == name:
+                cache.set(cache_key, group, self.CACHE_TIMEOUT)
+                return group
+        return None
+
+
+def _record_feedback_in_zendesk(
+        realname,
+        email,
+        subject,
+        details,
+        tags,
+        additional_info,
+        group_name=None,
+        require_update=False
+):
     """
     Create a new user-requested Zendesk ticket.
 
@@ -160,12 +196,18 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
     additional information from the browser and server, such as HTTP headers
     and user state. Returns a boolean value indicating whether ticket creation
     was successful, regardless of whether the private comment update succeeded.
+
+    If `group_name` is provided, attaches the ticket to the matching Zendesk group.
+
+    If `require_update` is provided, returns False when the update does not
+    succeed. This allows using the private comment to add necessary information
+    which the user will not see in followup emails from support.
     """
     zendesk_api = _ZendeskApi()
 
     additional_info_string = (
-        "Additional information:\n\n" +
-        "\n".join("%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
+        u"Additional information:\n\n" +
+        u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
     )
 
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
@@ -185,8 +227,18 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
             "tags": zendesk_tags
         }
     }
+    group = None
+    if group_name is not None:
+        group = zendesk_api.get_group(group_name)
+        if group is not None:
+            new_ticket['ticket']['group_id'] = group['id']
     try:
         ticket_id = zendesk_api.create_ticket(new_ticket)
+        if group_name is not None and group is None:
+            # Support uses Zendesk groups to track tickets. In case we
+            # haven't been able to correctly group this ticket, log its ID
+            # so it can be found later.
+            log.warning('Unable to find group named %s for Zendesk ticket with ID %s.', group_name, ticket_id)
     except zendesk.ZendeskError:
         log.exception("Error creating Zendesk ticket")
         return False
@@ -197,10 +249,12 @@ def _record_feedback_in_zendesk(realname, email, subject, details, tags, additio
     try:
         zendesk_api.update_ticket(ticket_id, ticket_update)
     except zendesk.ZendeskError:
-        log.exception("Error updating Zendesk ticket")
-        # The update is not strictly necessary, so do not indicate failure to the user
-        pass
-
+        log.exception("Error updating Zendesk ticket with ID %s.", ticket_id)
+        # The update is not strictly necessary, so do not indicate
+        # failure to the user unless it has been requested with
+        # `require_update`.
+        if require_update:
+            return False
     return True
 
 

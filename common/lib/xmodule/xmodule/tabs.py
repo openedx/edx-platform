@@ -309,8 +309,8 @@ class CourseTabList(List):
         """
 
         course.tabs.extend([
-            CourseTab.load('courseware'),
-            CourseTab.load('course_info')
+            CourseTab.load('course_info'),
+            CourseTab.load('courseware')
         ])
 
         # Presence of syllabus tab is indicated by a course attribute
@@ -407,6 +407,19 @@ class CourseTabList(List):
                     yield tab
 
     @classmethod
+    def upgrade_tabs(cls, tabs):
+        """
+        Reverse and Rename Courseware to Course and Course Info to Home Tabs.
+        """
+        if tabs and len(tabs) > 1:
+            if tabs[0].get('type') == 'courseware' and tabs[1].get('type') == 'course_info':
+                tabs[0], tabs[1] = tabs[1], tabs[0]
+                tabs[0]['name'] = _('Home')
+                tabs[1]['name'] = _('Course')
+
+        return tabs
+
+    @classmethod
     def validate_tabs(cls, tabs):
         """
         Check that the tabs set for the specified course is valid.  If it
@@ -423,13 +436,13 @@ class CourseTabList(List):
         if len(tabs) < 2:
             raise InvalidTabsException("Expected at least two tabs.  tabs: '{0}'".format(tabs))
 
-        if tabs[0].get('type') != 'courseware':
+        if tabs[0].get('type') != 'course_info':
             raise InvalidTabsException(
-                "Expected first tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
+                "Expected first tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
 
-        if tabs[1].get('type') != 'course_info':
+        if tabs[1].get('type') != 'courseware':
             raise InvalidTabsException(
-                "Expected second tab to have type 'course_info'.  tabs: '{0}'".format(tabs))
+                "Expected second tab to have type 'courseware'.  tabs: '{0}'".format(tabs))
 
     @staticmethod
     def _validate_num_tabs_of_type(tabs, tab_type, max_num):
@@ -465,6 +478,7 @@ class CourseTabList(List):
         """
         Overrides the from_json method to de-serialize the CourseTab objects from a json-like representation.
         """
+        self.upgrade_tabs(values)
         self.validate_tabs(values)
         tabs = []
         for tab_dict in values:

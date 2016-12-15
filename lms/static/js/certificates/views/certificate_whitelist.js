@@ -14,28 +14,60 @@
         function($, _, gettext, Backbone){
             return Backbone.View.extend({
                 el: "#white-listed-students",
+                message_div: 'div.white-listed-students > div.message',
                 generate_exception_certificates_radio:
                     'input:radio[name=generate-exception-certificates-radio]:checked',
 
                 events: {
-                    'click #generate-exception-certificates': 'generateExceptionCertificates'
+                    'click #generate-exception-certificates': 'generateExceptionCertificates',
+                    'click .delete-exception': 'removeException'
                 },
 
-                initialize: function(){
+                initialize: function(options){
+                    this.certificateWhiteListEditorView = options.certificateWhiteListEditorView;
                     // Re-render the view when an item is added to the collection
-                    this.listenTo(this.collection, 'change add', this.render);
+                    this.listenTo(this.collection, 'change add remove', this.render);
                 },
 
                 render: function(){
                     var template = this.loadTemplate('certificate-white-list');
                     this.$el.html(template({certificates: this.collection.models}));
-
+                    if (this.collection.isEmpty()) {
+                        this.$("#generate-exception-certificates").addClass("is-disabled");
+                    }
+                    else {
+                        this.$("#generate-exception-certificates").removeClass("is-disabled");
+                    }
                 },
 
                 loadTemplate: function(name) {
                     var templateSelector = "#" + name + "-tpl",
                     templateText = $(templateSelector).text();
                     return _.template(templateText);
+                },
+
+                removeException: function(event){
+                    var certificate = $(event.target).data();
+                    var model = this.collection.findWhere(certificate);
+                    var self = this;
+                    if(model){
+                        model.destroy(
+                            {
+                                success: function() {
+                                    self.showMessage('Student Removed from certificate white list successfully.');
+                                },
+                                error: this.showError(this),
+                                wait: true,
+                                data: JSON.stringify(model.attributes)
+                            }
+                        );
+                    }
+                    else{
+                        this.showMessage(
+                            'Could not find Certificate Exception in white list. ' +
+                            'Please refresh the page and try again'
+                        );
+                    }
                 },
 
                 generateExceptionCertificates: function(){
@@ -45,25 +77,28 @@
                     );
                 },
 
+                showMessage: function(message){
+                    $(this.message_div +  ">p" ).remove();
+                    $(this.message_div).removeClass('hidden').append("<p>"+ gettext(message) + "</p>").focus();
+                    $(this.message_div).fadeOut(6000, "linear");
+                },
+
                 showSuccess: function(caller_object){
                     return function(xhr){
-                        var response = xhr;
-                        $(".message").text(response.message).removeClass('msg-error').addClass('msg-success').focus();
-                        caller_object.collection.update(JSON.parse(response.data));
-                        $('html, body').animate({
-                            scrollTop: $("#certificate-exception").offset().top - 10
-                        }, 1000);
+                        caller_object.showMessage(xhr.message);
                     };
                 },
 
                 showError: function(caller_object){
                     return function(xhr){
-                        var response = JSON.parse(xhr.responseText);
-                        $(".message").text(response.message).removeClass('msg-success').addClass("msg-error").focus();
-                        caller_object.collection.update(JSON.parse(response.data));
-                        $('html, body').animate({
-                            scrollTop: $("#certificate-exception").offset().top - 10
-                        }, 1000);
+                        try{
+                            var response = JSON.parse(xhr.responseText);
+                            caller_object.showMessage(response.message);
+                        }
+                        catch(exception){
+                            caller_object.showMessage(
+                                "Server Error, Please refresh the page and try again.");
+                        }
                     };
                 }
             });

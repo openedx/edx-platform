@@ -112,7 +112,8 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
 
             analytics.track('Saved Course Update', {
                 'course': course_location_analytics,
-                'date': this.dateEntry(event).val()
+                'date': this.dateEntry(event).val(),
+                'push_notification_selected': this.push_notification_selected(event)
             });
         },
 
@@ -141,7 +142,7 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
             // Variable stored for unit test.
             this.$modalCover = ModalUtils.showModalCover(false,
                 function() {
-                    self.closeEditor(false)
+                    self.closeEditor(false);
                 }
             );
         },
@@ -218,8 +219,9 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
 
                 // hide the push notification checkbox for subsequent edits to the Post
                 var push_notification_ele = this.$currentPost.find(".new-update-push-notification");
-                if (push_notification_ele)
+                if (push_notification_ele) {
                     push_notification_ele.hide();
+                }
             }
 
             ModalUtils.hideModalCover(this.$modalCover);
@@ -238,12 +240,16 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
 
         editor: function(event) {
             var li = $(event.currentTarget).closest("li");
-            if (li) return $(li).find("form").first();
+            if (li) {
+                return $(li).find("form").first();
+            }
         },
 
         dateEntry: function(event) {
             var li = $(event.currentTarget).closest("li");
-            if (li) return $(li).find(".date").first();
+            if (li) {
+                return $(li).find(".date").first();
+            }
         },
 
         push_notification_selected: function(event) {
@@ -256,7 +262,6 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
                 }
             }
         }
-
     });
 
     return CourseInfoUpdateView;

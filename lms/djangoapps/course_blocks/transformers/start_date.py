@@ -1,7 +1,7 @@
 """
 Start Date Transformer implementation.
 """
-from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 from lms.djangoapps.courseware.access_utils import check_start_date
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 

@@ -30,6 +30,7 @@ from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPart
 from third_party_auth.tests.utils import (
     ThirdPartyOAuthTestMixin, ThirdPartyOAuthTestMixinFacebook, ThirdPartyOAuthTestMixinGoogle
 )
+from .test_helpers import TestCaseForm
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from ..accounts.api import get_account_settings
@@ -892,7 +893,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                 u"required": True,
                 u"label": u"Full name",
                 u"placeholder": u"Jane Doe",
-                u"instructions": u"Needed for any certificates you may earn",
+                u"instructions": u"Your legal name, used for any certificates you earn.",
                 u"restrictions": {
                     "max_length": 255
                 },
@@ -929,6 +930,62 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     # 'min_length': account_api.PASSWORD_MIN_LENGTH,
                     # 'max_length': account_api.PASSWORD_MAX_LENGTH
                 },
+            }
+        )
+
+    @override_settings(REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm')
+    def test_extension_form_fields(self):
+        no_extra_fields_setting = {}
+
+        # Verify other fields didn't disappear for some reason.
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u"name": u"email",
+                u"type": u"email",
+                u"required": True,
+                u"label": u"Email",
+                u"placeholder": u"username@domain.com",
+                u"restrictions": {
+                    "min_length": EMAIL_MIN_LENGTH,
+                    "max_length": EMAIL_MAX_LENGTH
+                },
+            }
+        )
+
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u"name": u"favorite_editor",
+                u"type": u"select",
+                u"required": False,
+                u"label": u"Favorite Editor",
+                u"placeholder": u"cat",
+                u"defaultValue": u"vim",
+                u"errorMessages": {
+                    u'required': u'This field is required.',
+                    u'invalid_choice': u'Select a valid choice. %(value)s is not one of the available choices.',
+                }
+            }
+        )
+
+        self._assert_reg_field(
+            no_extra_fields_setting,
+            {
+                u"name": u"favorite_movie",
+                u"type": u"text",
+                u"required": True,
+                u"label": u"Fav Flick",
+                u"placeholder": None,
+                u"defaultValue": None,
+                u"errorMessages": {
+                    u'required': u'Please tell us your favorite movie.',
+                    u'invalid': u"We're pretty sure you made that movie up."
+                },
+                u"restrictions": {
+                    "min_length": TestCaseForm.MOVIE_MIN_LEN,
+                    "max_length": TestCaseForm.MOVIE_MAX_LEN,
+                }
             }
         )
 
@@ -978,7 +1035,7 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
                     u"required": True,
                     u"label": u"Full name",
                     u"placeholder": u"Jane Doe",
-                    u"instructions": u"Needed for any certificates you may earn",
+                    u"instructions": u"Your legal name, used for any certificates you earn.",
                     u"restrictions": {
                         "max_length": NAME_MAX_LENGTH,
                     }
@@ -1309,16 +1366,19 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             }
         )
 
-    @override_settings(REGISTRATION_EXTRA_FIELDS={
-        "level_of_education": "optional",
-        "gender": "optional",
-        "year_of_birth": "optional",
-        "mailing_address": "optional",
-        "goals": "optional",
-        "city": "optional",
-        "country": "required",
-        "honor_code": "required",
-    })
+    @override_settings(
+        REGISTRATION_EXTRA_FIELDS={
+            "level_of_education": "optional",
+            "gender": "optional",
+            "year_of_birth": "optional",
+            "mailing_address": "optional",
+            "goals": "optional",
+            "city": "optional",
+            "country": "required",
+            "honor_code": "required",
+        },
+        REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm',
+    )
     def test_field_order(self):
         response = self.client.get(self.url)
         self.assertHttpOK(response)
@@ -1331,6 +1391,8 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
             "name",
             "username",
             "password",
+            "favorite_movie",
+            "favorite_editor",
             "city",
             "country",
             "gender",
@@ -1404,6 +1466,47 @@ class RegistrationViewTest(ThirdPartyAuthTestMixin, ApiTestCase):
         self.assertEqual(account_settings["year_of_birth"], int(self.YEAR_OF_BIRTH))
         self.assertEqual(account_settings["goals"], self.GOALS)
         self.assertEqual(account_settings["country"], self.COUNTRY)
+
+    @override_settings(REGISTRATION_EXTENSION_FORM='openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm')
+    @mock.patch('openedx.core.djangoapps.user_api.tests.test_helpers.TestCaseForm.DUMMY_STORAGE', new_callable=dict)
+    @mock.patch(
+        'openedx.core.djangoapps.user_api.tests.test_helpers.DummyRegistrationExtensionModel',
+    )
+    def test_with_extended_form(self, dummy_model, storage_dict):
+        dummy_model_instance = mock.Mock()
+        dummy_model.return_value = dummy_model_instance
+        # Create a new registration
+        self.assertEqual(storage_dict, {})
+        response = self.client.post(self.url, {
+            "email": self.EMAIL,
+            "name": self.NAME,
+            "username": self.USERNAME,
+            "password": self.PASSWORD,
+            "honor_code": "true",
+            "favorite_movie": "Inception",
+            "favorite_editor": "cat",
+        })
+        self.assertHttpOK(response)
+        self.assertIn(settings.EDXMKTG_LOGGED_IN_COOKIE_NAME, self.client.cookies)
+        self.assertIn(settings.EDXMKTG_USER_INFO_COOKIE_NAME, self.client.cookies)
+
+        user = User.objects.get(username=self.USERNAME)
+        request = RequestFactory().get('/url')
+        request.user = user
+        account_settings = get_account_settings(request)
+
+        self.assertEqual(self.USERNAME, account_settings["username"])
+        self.assertEqual(self.EMAIL, account_settings["email"])
+        self.assertFalse(account_settings["is_active"])
+        self.assertEqual(self.NAME, account_settings["name"])
+
+        self.assertEqual(storage_dict, {'favorite_movie': "Inception", "favorite_editor": "cat"})
+        self.assertEqual(dummy_model_instance.user, user)
+
+        # Verify that we've been logged in
+        # by trying to access a page that requires authentication
+        response = self.client.get(reverse("dashboard"))
+        self.assertHttpOK(response)
 
     def test_activation_email(self):
         # Register, which should trigger an activation email

@@ -33,7 +33,7 @@
                                     gettext('The name that identifies you throughout {platform_name}. You cannot change your username.'), {platform_name: platformName}
                                 )
                             })
-                        }
+                        },
                     ]
                 },
                 {
@@ -62,7 +62,7 @@
                                 model: userAccountModel,
                                 title: gettext('Year of Birth'),
                                 valueAttribute: 'year_of_birth',
-                                options: fieldsData['year_of_birth']['options'],
+                                options: fieldsData.year_of_birth.options,
                                 persistChanges: true
                             })
                         },

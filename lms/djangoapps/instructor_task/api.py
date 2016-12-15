@@ -36,6 +36,8 @@ from instructor_task.tasks import (
     proctored_exam_results_csv
 )
 
+from certificates.models import CertificateGenerationHistory
+
 from instructor_task.api_helper import (
     check_arguments_for_rescoring,
     encode_problem_and_student_input,
@@ -479,20 +481,6 @@ def submit_cohort_students(request, course_key, file_name):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def generate_certificates_for_all_students(request, course_key):   # pylint: disable=invalid-name
-    """
-    Submits a task to generate certificates for all students enrolled in the course.
-
-    Raises AlreadyRunningError if certificates are currently being generated.
-    """
-    task_type = 'generate_certificates_all_student'
-    task_class = generate_certificates
-    task_input = {}
-    task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
 def generate_certificates_for_students(request, course_key, students=None):  # pylint: disable=invalid-name
     """
     Submits a task to generate certificates for given students enrolled in the course or
@@ -510,8 +498,16 @@ def generate_certificates_for_students(request, course_key, students=None):  # p
 
     task_class = generate_certificates
     task_key = ""
+    instructor_task = submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+    CertificateGenerationHistory.objects.create(
+        course_id=course_key,
+        generated_by=request.user,
+        instructor_task=instructor_task,
+        is_regeneration=False
+    )
+
+    return instructor_task
 
 
 def regenerate_certificates(request, course_key, statuses_to_regenerate, students=None):
@@ -535,4 +531,13 @@ def regenerate_certificates(request, course_key, statuses_to_regenerate, student
     task_class = generate_certificates
     task_key = ""
 
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+    instructor_task = submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+    CertificateGenerationHistory.objects.create(
+        course_id=course_key,
+        generated_by=request.user,
+        instructor_task=instructor_task,
+        is_regeneration=True
+    )
+
+    return instructor_task

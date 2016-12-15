@@ -68,7 +68,7 @@ class BokChoyTestSuite(TestSuite):
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()      # pylint: disable=no-value-for-parameter
 
-        if not (self.fasttest or self.skip_clean):
+        if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
@@ -77,6 +77,9 @@ class BokChoyTestSuite(TestSuite):
 
         if not self.testsonly:
             self.prepare_bokchoy_run()
+        else:
+            # load data in db_fixtures
+            self.load_data()
 
         msg = colorize('green', "Confirming servers have started...")
         print msg
@@ -97,12 +100,16 @@ class BokChoyTestSuite(TestSuite):
     def __exit__(self, exc_type, exc_value, traceback):
         super(BokChoyTestSuite, self).__exit__(exc_type, exc_value, traceback)
 
-        msg = colorize('green', "Cleaning up databases...")
-        print msg
-
-        # Clean up data we created in the databases
-        sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
-        bokchoy_utils.clear_mongo()
+        # Using testsonly will leave all fixtures in place (Note: the db will also be dirtier.)
+        if self.testsonly:
+            msg = colorize('green', 'Running in testsonly mode... SKIPPING database cleanup.')
+            print msg
+        else:
+            # Clean up data we created in the databases
+            msg = colorize('green', "Cleaning up databases...")
+            print msg
+            sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+            bokchoy_utils.clear_mongo()
 
     def verbosity_processes_string(self):
         """
@@ -147,13 +154,8 @@ class BokChoyTestSuite(TestSuite):
         bokchoy_utils.clear_mongo()
         self.cache.flush_all()
 
-        sh(
-            "DEFAULT_STORE={default_store}"
-            " ./manage.py lms --settings bok_choy loaddata --traceback"
-            " common/test/db_fixtures/*.json".format(
-                default_store=self.default_store,
-            )
-        )
+        # load data in db_fixtures
+        self.load_data()
 
         if self.imports_dir:
             sh(
@@ -168,6 +170,19 @@ class BokChoyTestSuite(TestSuite):
         msg = colorize('green', "Confirming servers are running...")
         print msg
         bokchoy_utils.start_servers(self.default_store, self.coveragerc)
+
+    def load_data(self):
+        """
+        Loads data into database from db_fixtures
+        """
+        print 'Loading data from json fixtures in db_fixtures directory'
+        sh(
+            "DEFAULT_STORE={default_store}"
+            " ./manage.py lms --settings bok_choy loaddata --traceback"
+            " common/test/db_fixtures/*.json".format(
+                default_store=self.default_store,
+            )
+        )
 
     def run_servers_continuously(self):
         """

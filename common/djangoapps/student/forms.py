@@ -1,6 +1,9 @@
 """
 Utility functions for validating forms
 """
+from importlib import import_module
+import re
+
 from django import forms
 from django.forms import widgets
 from django.core.exceptions import ValidationError
@@ -15,6 +18,7 @@ from django.template import loader
 
 from django.conf import settings
 from microsite_configuration import microsite
+from student.models import CourseEnrollmentAllowed
 from util.password_policy_validators import (
     validate_password_length,
     validate_password_complexity,
@@ -225,6 +229,28 @@ class AccountCreationForm(forms.Form):
                 raise ValidationError(_("Password: ") + "; ".join(err.messages))
         return password
 
+    def clean_email(self):
+        """ Enforce email restrictions (if applicable) """
+        email = self.cleaned_data["email"]
+        if settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED is not None:
+            # This Open edX instance has restrictions on what email addresses are allowed.
+            allowed_patterns = settings.REGISTRATION_EMAIL_PATTERNS_ALLOWED
+            # We append a '$' to the regexs to prevent the common mistake of using a
+            # pattern like '.*@edx\\.org' which would match 'bob@edx.org.badguy.com'
+            if not any(re.match(pattern + "$", email) for pattern in allowed_patterns):
+                # This email is not on the whitelist of allowed emails. Check if
+                # they may have been manually invited by an instructor and if not,
+                # reject the registration.
+                if not CourseEnrollmentAllowed.objects.filter(email=email).exists():
+                    raise ValidationError(_("Unauthorized email address."))
+        if User.objects.filter(email__iexact=email).exists():
+            raise ValidationError(
+                _(
+                    "It looks like {email} belongs to an existing account. Try again with a different email address."
+                ).format(email=email)
+            )
+        return email
+
     def clean_year_of_birth(self):
         """
         Parse year_of_birth to an integer, but just use None instead of raising
@@ -246,3 +272,18 @@ class AccountCreationForm(forms.Form):
             for key, value in self.cleaned_data.items()
             if key in self.extended_profile_fields and value is not None
         }
+
+
+def get_registration_extension_form(*args, **kwargs):
+    """
+    Convenience function for getting the custom form set in settings.REGISTRATION_EXTENSION_FORM.
+
+    An example form app for this can be found at http://github.com/open-craft/custom-form-app
+    """
+    if not settings.FEATURES.get("ENABLE_COMBINED_LOGIN_REGISTRATION"):
+        return None
+    if not getattr(settings, 'REGISTRATION_EXTENSION_FORM', None):
+        return None
+    module, klass = settings.REGISTRATION_EXTENSION_FORM.rsplit('.', 1)
+    module = import_module(module)
+    return getattr(module, klass)(*args, **kwargs)

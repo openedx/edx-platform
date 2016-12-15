@@ -344,6 +344,11 @@ def get_element_padding(page, selector):
     return page.browser.execute_script(js_script)
 
 
+def is_404_page(browser):
+    """ Check if page is 404 """
+    return 'Page not found (404)' in browser.find_element_by_tag_name('h1').text
+
+
 class EventsTestMixin(TestCase):
     """
     Helpers and setup for running tests that evaluate events emitted
@@ -351,7 +356,7 @@ class EventsTestMixin(TestCase):
     def setUp(self):
         super(EventsTestMixin, self).setUp()
         self.event_collection = MongoClient()["test"]["events"]
-        self.reset_event_tracking()
+        self.start_time = datetime.now()
 
     def reset_event_tracking(self):
         """Drop any events that have been collected thus far and start collecting again from scratch."""

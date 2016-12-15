@@ -5,7 +5,9 @@
 <%!
 from contentstore import utils
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
 %>
 
 <%block name="title">${_("Group Configurations")}</%block>
@@ -21,7 +23,13 @@ from openedx.core.lib.js_utils import escape_json_dumps
 
 <%block name="requirejs">
   require(["js/factories/group_configurations"], function(GroupConfigurationsFactory) {
-      GroupConfigurationsFactory(${escape_json_dumps(should_show_experiment_groups) | n}, ${escape_json_dumps(experiment_group_configurations) | n}, ${escape_json_dumps(content_group_configuration) | n}, "${group_configuration_url}", "${course_outline_url}");
+      GroupConfigurationsFactory(
+          ${should_show_experiment_groups | n, dump_js_escaped_json},
+          ${experiment_group_configurations | n, dump_js_escaped_json},
+          ${content_group_configuration | n, dump_js_escaped_json},
+          "${group_configuration_url | n, js_escaped_string}",
+          "${course_outline_url | n, js_escaped_string}"
+      );
   });
 </%block>
 

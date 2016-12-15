@@ -22,6 +22,11 @@ SUPPORT_INDEX_URLS = [
         "name": _("Manual Refund"),
         "description": _("Track refunds issued directly through CyberSource."),
     },
+    {
+        "url": reverse_lazy("support:enrollment"),
+        "name": _("Enrollment"),
+        "description": _("View and update learner enrollments."),
+    },
 ]
 
 

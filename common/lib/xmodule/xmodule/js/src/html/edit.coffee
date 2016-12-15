@@ -86,12 +86,13 @@ class @HTMLEditingDescriptor
         image_advtab: true,
         # We may want to add "styleselect" when we collect all styles used throughout the LMS
         toolbar: "formatselect | fontselect | bold italic underline forecolor wrapAsCode | bullist numlist outdent indent blockquote | link unlink image | code",
-        block_formats: interpolate("%(paragraph)s=p;%(preformatted)s=pre;%(heading1)s=h1;%(heading2)s=h2;%(heading3)s=h3", {
+        block_formats: interpolate("%(paragraph)s=p;%(preformatted)s=pre;%(heading3)s=h3;%(heading4)s=h4;%(heading5)s=h5;%(heading6)s=h6", {
             paragraph: gettext("Paragraph"),
             preformatted: gettext("Preformatted"),
-            heading1: gettext("Heading 1"),
-            heading2: gettext("Heading 2"),
-            heading3: gettext("Heading 3")
+            heading3: gettext("Heading 3"),
+            heading4: gettext("Heading 4"),
+            heading5: gettext("Heading 5"),
+            heading6: gettext("Heading 6")
           }, true),
         width: '100%',
         height: '400px',

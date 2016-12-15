@@ -140,8 +140,8 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         course = CourseFactory.create(org="test", course="course1", display_name="run1")
         course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
         self.store.update_item(course, self.instructor.id)
-        cohort = CohortFactory.create(name='cohort', course_id=course.id)
         cohorted_students = [UserFactory.create() for _ in xrange(10)]
+        cohort = CohortFactory.create(name='cohort', course_id=course.id, users=cohorted_students)
         cohorted_usernames = [student.username for student in cohorted_students]
         non_cohorted_student = UserFactory.create()
         for student in cohorted_students:
@@ -695,7 +695,7 @@ class TestStudentResponsesAnalyticsBasic(ModuleStoreTestCase):
 
     def test_problem_with_no_answer(self):
         self.course = get_course(CourseKey.from_string('edX/graded/2012_Fall'))
-        problem_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H1P2')
+        problem_location = Location('edX', 'graded', '2012_Fall', 'problem', 'H2P1')
 
         self.create_student()
         StudentModuleFactory.create(

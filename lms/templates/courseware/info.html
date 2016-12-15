@@ -14,72 +14,89 @@ from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 <%static:css group='style-course'/>
 </%block>
 
-
 % if show_enroll_banner:
-  <div class="wrapper-msg urgency-low" id="failed-verification-banner">
-    <div class="msg msg-reverify is-dismissable">
-      <div class="msg-content">
-        <h2 class="title">${_("You are not enrolled yet")}</h2>
-        <div class="copy">
-          <p class='enroll-message'>
-            ${_(u"You are not currently enrolled in this course. {link_start}Sign up now!{link_end}").format(
-            link_start=u"<a href={}>".format(url_to_enroll),
-            link_end=u"</a>"
-            )}
-          </p>
-        </div>
+<div class="wrapper-msg urgency-low" id="failed-verification-banner">
+  <div class="msg msg-reverify is-dismissable">
+    <div class="msg-content">
+      <h2 class="title">${_("You are not enrolled yet")}</h2>
+      <div class="copy">
+        <p class='enroll-message'>
+          ${_(u"You are not currently enrolled in this course. {link_start}Sign up now!{link_end}").format(
+          link_start=u"<a href={}>".format(url_to_enroll),
+          link_end=u"</a>"
+          )}
+        </p>
       </div>
     </div>
   </div>
+</div>
 % endif
 
 <%include file="/courseware/course_navigation.html" args="active_page='info'" />
 
+<%static:require_module module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+        ToggleElementVisibility();
+</%static:require_module>
+<%static:require_module module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+        CourseHomeEvents();
+</%static:require_module>
+
 <%block name="js_extra">
-  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
-  <script type="text/javascript" charset="utf-8">
-$(document).ready(function(){
-    $(".handouts").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
-    });
-  </script>
+<script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
+<script type="text/javascript" charset="utf-8">
+ $(document).ready(function(){
+     $(".handouts").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
+ });
+</script>
 </%block>
 
 <%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
 <section class="container">
+  <div class="home">
+    <div class="page-header-main">
+        <h1 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.id.org, course_name=course.id.course) | h}</h1>
+        <h2 class="page-subtitle">${course.display_name | h}</h2>
+    </div>
+    % if last_accessed_courseware_url:
+      <div class="page-header-secondary">
+          <a href="${last_accessed_courseware_url}" class="last-accessed-link">${_("Resume Course")}</a>
+      </div>
+    % endif
+  </div>
   <div class="info-wrapper">
     % if user.is_authenticated():
     <section class="updates">
       % if studio_url is not None and masquerade and masquerade.role == 'staff':
-        <div class="wrap-instructor-info studio-view">
-          <a class="instructor-info-action" href="${studio_url}">
-            ${_("View Updates in Studio")}
-          </a>
-        </div>
+      <div class="wrap-instructor-info studio-view">
+        <a class="instructor-info-action" href="${studio_url}">
+          ${_("View Updates in Studio")}
+        </a>
+      </div>
       % endif
 
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'updates')}
+      <h1>${_("Course Updates and News")}</h1>
+      ${get_course_info_section(request, masquerade_user, course, 'updates')}
       % if self.course_info_extra_file:
         <%include file="${self.course_info_extra_file}" />
       % endif
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
-      % if False:
+      % if SelfPacedConfiguration.current().enable_course_home_improvements:
         <h1>${_("Important Course Dates")}</h1>
         ${get_course_date_summary(course, user)}
       % endif
 
       <h1>${_(course.info_sidebar_name)}</h1>
-      ${get_course_info_section(request, course, 'handouts')}
+      ${get_course_info_section(request, masquerade_user, course, 'handouts')}
     </section>
     % else:
     <section class="updates">
       <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'guest_updates')}
+      ${get_course_info_section(request, masquerade_user, course, 'guest_updates')}
     </section>
     <section aria-label="${_('Handout Navigation')}" class="handouts">
       <h1>${_("Course Handouts")}</h1>
-      ${get_course_info_section(request, course, 'guest_handouts')}
+      ${get_course_info_section(request, masquerade_user, course, 'guest_handouts')}
     </section>
     % endif
   </div>

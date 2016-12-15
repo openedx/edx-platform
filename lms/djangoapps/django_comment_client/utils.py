@@ -14,7 +14,7 @@ import pystache_custom as pystache
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
-from ccx.overrides import get_current_ccx
+from lms.djangoapps.ccx.overrides import get_current_ccx
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission, get_team
@@ -129,7 +129,7 @@ def get_accessible_discussion_modules(course, user, include_all=False):  # pylin
     Return a list of all valid discussion modules in this course that
     are accessible to the given user.
     """
-    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
+    all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'}, include_orphans=False)
 
     return [
         module for module in all_modules

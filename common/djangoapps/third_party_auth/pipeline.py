@@ -57,6 +57,10 @@ rather than spreading them across two functions in the pipeline.
 See http://psa.matiasaguirre.net/docs/pipeline.html for more docs.
 """
 
+import base64
+import hashlib
+import hmac
+import json
 import random
 import string
 from collections import OrderedDict
@@ -104,6 +108,18 @@ AUTH_ENTRY_ACCOUNT_SETTINGS = 'account_settings'
 AUTH_ENTRY_LOGIN_API = 'login_api'
 AUTH_ENTRY_REGISTER_API = 'register_api'
 
+# AUTH_ENTRY_CUSTOM: Custom auth entry point for post-auth integrations.
+# This should be a dict where the key is a word passed via ?auth_entry=, and the
+# value is a dict with an arbitrary 'secret_key' and a 'url'.
+# This can be used as an extension point to inject custom behavior into the auth
+# process, replacing the registration/login form that would normally be seen
+# immediately after the user has authenticated with the third party provider.
+# If a custom 'auth_entry' query parameter is used, then once the user has
+# authenticated with a specific backend/provider, they will be redirected to the
+# URL specified with this setting, rather than to the built-in
+# registration/login form/logic.
+AUTH_ENTRY_CUSTOM = getattr(settings, 'THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
+
 
 def is_api(auth_entry):
     """Returns whether the auth entry point is via an API call."""
@@ -128,7 +144,7 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_ACCOUNT_SETTINGS,
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
-])
+] + AUTH_ENTRY_CUSTOM.keys())
 
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12
 _PASSWORD_CHARSET = string.letters + string.digits
@@ -445,6 +461,38 @@ def set_pipeline_timeout(strategy, user, *args, **kwargs):
         # choice of the user.
 
 
+def redirect_to_custom_form(request, auth_entry, kwargs):
+    """
+    If auth_entry is found in AUTH_ENTRY_CUSTOM, this is used to send provider
+    data to an external server's registration/login page.
+
+    The data is sent as a base64-encoded values in a POST request and includes
+    a cryptographic checksum in case the integrity of the data is important.
+    """
+    backend_name = request.backend.name
+    provider_id = provider.Registry.get_from_pipeline({'backend': backend_name, 'kwargs': kwargs}).provider_id
+    form_info = AUTH_ENTRY_CUSTOM[auth_entry]
+    secret_key = form_info['secret_key']
+    if isinstance(secret_key, unicode):
+        secret_key = secret_key.encode('utf-8')
+    custom_form_url = form_info['url']
+    data_str = json.dumps({
+        "auth_entry": auth_entry,
+        "backend_name": backend_name,
+        "provider_id": provider_id,
+        "user_details": kwargs['details'],
+    })
+    digest = hmac.new(secret_key, msg=data_str, digestmod=hashlib.sha256).digest()
+    # Store the data in the session temporarily, then redirect to a page that will POST it to
+    # the custom login/register page.
+    request.session['tpa_custom_auth_entry_data'] = {
+        'data': base64.b64encode(data_str),
+        'hmac': base64.b64encode(digest),
+        'post_url': custom_form_url,
+    }
+    return redirect(reverse('tpa_post_to_custom_auth_form'))
+
+
 @partial.partial
 def ensure_user_information(strategy, auth_entry, backend=None, user=None, social=None,
                             allow_inactive_user=False, *args, **kwargs):
@@ -492,6 +540,9 @@ def ensure_user_information(strategy, auth_entry, backend=None, user=None, socia
             return dispatch_to_register()
         elif auth_entry == AUTH_ENTRY_ACCOUNT_SETTINGS:
             raise AuthEntryError(backend, 'auth_entry is wrong. Settings requires a user.')
+        elif auth_entry in AUTH_ENTRY_CUSTOM:
+            # Pass the username, email, etc. via query params to the custom entry page:
+            return redirect_to_custom_form(strategy.request, auth_entry, kwargs)
         else:
             raise AuthEntryError(backend, 'auth_entry invalid')
 

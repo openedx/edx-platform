@@ -192,3 +192,14 @@ class DashboardPage(PageObject):
         Click on `Account` link.
         """
         self.q(css='.dropdown-menu li a').nth(2).click()
+
+    @property
+    def language_selector(self):
+        """
+        return language selector
+        """
+        self.wait_for_element_visibility(
+            '#settings-language-value',
+            'Language selector element is available'
+        )
+        return self.q(css='#settings-language-value')

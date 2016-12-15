@@ -32,6 +32,10 @@ body.discussion, .discussion-module {
       @include float(right);
       width: flex-grid(3,12);
     }
+
+    .posted-details {
+      color: $gray-d1;
+    }
   }
 
   // response layout
@@ -128,7 +132,7 @@ body.discussion {
     .posted-details {
       @extend %t-copy-sub2;
       margin-top: ($baseline/5);
-      color: $gray-l1;
+      color: $gray-d1;
 
       .username {
         @extend %t-strong;

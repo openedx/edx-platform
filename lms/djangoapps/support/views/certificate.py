@@ -30,6 +30,7 @@ class CertificatesSupportView(View):
     def get(self, request):
         """Render the certificates support view. """
         context = {
-            "user_query": request.GET.get("query", "")
+            "user_filter": request.GET.get("user", ""),
+            "course_filter": request.GET.get("course_id", "")
         }
         return render_to_response("support/certificates.html", context)

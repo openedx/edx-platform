@@ -10,7 +10,7 @@ import openedx.core.operations
 openedx.core.operations.install_memory_dumper()
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cms.envs.aws")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "openedx.stanford.cms.envs.aws")
 
 import cms.startup as startup
 startup.run()

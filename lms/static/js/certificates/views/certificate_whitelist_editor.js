@@ -45,20 +45,35 @@
                     }
 
                     var certificate_exception = new CertificateExceptionModel({
+                        url: this.collection.url,
                         user_name: user_name,
                         user_email: user_email,
-                        notes: notes
+                        notes: notes,
+                        new: true
                     });
 
                     if(this.collection.findWhere(model)){
-                        this.showMessage("username/email already in exception list", 'msg-error');
+                        this.showMessage(
+                                (user_name || user_email) + " already in exception list."
+                        );
                     }
                     else if(certificate_exception.isValid()){
-                        this.collection.add(certificate_exception, {validate: true});
-                        this.showMessage("Student Added to exception list", 'msg-success');
+                        certificate_exception.save(
+                            null,
+                            {
+                                success: this.showSuccess(
+                                    this,
+                                    true,
+                                    (user_name || user_email) + ' has been successfully added to the exception list.' +
+                                        ' Click Generate Exception Certificate below to send the certificate.'
+                                ),
+                                error: this.showError(this)
+                            }
+                        );
+
                     }
                     else{
-                        this.showMessage(certificate_exception.validationError, 'msg-error');
+                        this.showMessage(certificate_exception.validationError);
                     }
                 },
 
@@ -67,12 +82,32 @@
                     return re.test(email);
                 },
 
-                showMessage: function(message, messageClass){
-                    this.$(this.message_div).text(message).
-                        removeClass('msg-error msg-success').addClass(messageClass).focus();
-                    $('html, body').animate({
-                        scrollTop: this.$el.offset().top - 20
-                    }, 1000);
+                showMessage: function(message){
+                    $(this.message_div +  ">p" ).remove();
+                    this.$(this.message_div).removeClass('hidden').append("<p>"+ gettext(message) + "</p>");
+                },
+
+                showSuccess: function(caller, add_model, message){
+                    return function(model){
+                        if(add_model){
+                            caller.collection.add(model);
+                        }
+                        caller.showMessage(message);
+                    };
+                },
+
+                showError: function(caller){
+                    return function(model, response){
+                        try{
+                            var response_data = JSON.parse(response.responseText);
+                            caller.showMessage(response_data.message);
+                        }
+                        catch(exception){
+                            caller.showMessage("" +
+                                "Server Error, Please refresh the page and try again."
+                            );
+                        }
+                    };
                 }
             });
         }
