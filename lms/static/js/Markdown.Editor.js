@@ -1061,45 +1061,15 @@
             }
         };
 
-        var hasClassList = 'classList' in document.documentElement;
-
-        // Remove class from elemnet
-        var removeClass = function (element, className) {
-            if (hasClassList) {
-                element.classList.remove(className)
-            } else {
-                element.className = (' ' + element.className + ' ')
-                    .replace(' ' + className + ' ', '')
-                    .trim()
-            }
-        };
-
-        // Add class to element
-        var addClass = function (element, className) {
-            if (hasClassList) {
-                element.classList.add(className)
-            } else {
-                var cur = ' ' + element.className + ' '
-                if (cur.indexOf(' ' + className + ' ') < 0) {
-                    element.className = (cur + className).trim()
-                }
-            }
-        };
-
         // Checks validity of input element
         var checkValidity = function (element) {
             return (typeof element.checkValidity === "undefined") ? true : element.checkValidity();
         };
 
-        // Checks the required property on element
-        var requiredPropertyCheck = function (element) {
-            return (typeof element.required === "undefined") ? $(element).attr('required') : element.required;
-        };
-
         var clearFormErrorMessages = function () {
-            removeClass(urlInput, 'has-error');
+            $(urlInput).removeClass('has-error');
             urlErrorMsg.style.display = 'none';
-            removeClass(descInput, 'has-error');
+            $(descInput).removeClass('has-error');
             descErrorMsg.style.display = 'none';
         };
 
@@ -1128,7 +1098,7 @@
             var isValidUrl = util.isValidUrl(url),
                 isValidDesc = (
                     checkValidity(descInput) &&
-                    (requiredPropertyCheck(descInput) ? description.length : true)
+                    ($(descInput).attr('required') ? description.length : true)
                 );
 
             if ((isValidUrl && isValidDesc) || isCancel) {
@@ -1137,11 +1107,11 @@
             } else {
                 var errorCount = 0;
                 if (!isValidUrl) {
-                    addClass(urlInput, 'has-error');
+                    $(urlInput).addClass('has-error');
                     urlErrorMsg.style.display = 'inline-block';
                     errorCount += 1;
                 } if (!isValidDesc) {
-                    addClass(descInput, 'has-error');
+                    $(descInput).addClass('has-error');
                     descErrorMsg.style.display = 'inline-block';
                     errorCount += 1;
                 }
