@@ -19,6 +19,12 @@ class InstructorDashboardPage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css='div.instructor-dashboard-wrapper-2').present
 
+    def click_help(self):
+        """
+        Clicks the general Help button in the header.
+        """
+        self.q(css='.doc-link').first.click()
+
     def select_membership(self):
         """
         Selects the membership tab and returns the MembershipSection
