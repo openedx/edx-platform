@@ -18,8 +18,6 @@ from xblock.fields import Scope, ScopeBase
 from courseware.models import StudentModule, StudentModuleHistory
 from edx_user_state_client.interface import XBlockUserStateClient, XBlockUserState
 
-from openedx.core.djangoapps.call_stack_manager import donottrack
-
 
 class DjangoXBlockUserStateClient(XBlockUserStateClient):
     """
@@ -71,7 +69,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         """
         self.user = user
 
-    @donottrack(StudentModule, StudentModuleHistory)
     def _get_student_modules(self, username, block_keys):
         """
         Retrieve the :class:`~StudentModule`s for the supplied ``username`` and ``block_keys``.
@@ -119,7 +116,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             sample_rate=self.API_DATADOG_SAMPLE_RATE,
         )
 
-    @donottrack(StudentModule, StudentModuleHistory)
     def get_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
         Retrieve the stored XBlock state for the specified XBlock usages.
@@ -173,7 +169,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         self._ddog_histogram(evt_time, 'get_many.blks_out', block_count)
         self._ddog_histogram(evt_time, 'get_many.response_time', (finish_time - evt_time) * 1000)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     def set_many(self, username, block_keys_to_state, scope=Scope.user_state):
         """
         Set fields for a particular XBlock.
@@ -250,7 +245,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         self._ddog_histogram(evt_time, 'set_many.blks_updated', len(block_keys_to_state))
         self._ddog_histogram(evt_time, 'set_many.response_time', (finish_time - evt_time) * 1000)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     def delete_many(self, username, block_keys, scope=Scope.user_state, fields=None):
         """
         Delete the stored XBlock state for a many xblock usages.
@@ -291,7 +285,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
         finish_time = time()
         self._ddog_histogram(evt_time, 'delete_many.response_time', (finish_time - evt_time) * 1000)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     def get_history(self, username, block_key, scope=Scope.user_state):
         """
         Retrieve history of state changes for a given block for a given
@@ -346,7 +339,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
 
             yield XBlockUserState(username, block_key, state, history_entry.created, scope)
 
-    @donottrack(StudentModule, StudentModuleHistory)
     def iter_all_for_block(self, block_key, scope=Scope.user_state, batch_size=None):
         """
         You get no ordering guarantees. Fetching will happen in batch_size
@@ -357,7 +349,6 @@ class DjangoXBlockUserStateClient(XBlockUserStateClient):
             raise ValueError("Only Scope.user_state is supported")
         raise NotImplementedError()
 
-    @donottrack(StudentModule, StudentModuleHistory)
     def iter_all_for_course(self, course_key, block_type=None, scope=Scope.user_state, batch_size=None):
         """
         You get no ordering guarantees. Fetching will happen in batch_size

@@ -4,7 +4,7 @@ Extra views required for SSO
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseServerError, Http404, HttpResponseNotAllowed
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 import social
 from social.apps.django_app.views import complete
@@ -59,3 +59,26 @@ def lti_login_and_complete_view(request, backend, *args, **kwargs):
 
     request.backend.start()
     return complete(request, backend, *args, **kwargs)
+
+
+def post_to_custom_auth_form(request):
+    """
+    Redirect to a custom login/register page.
+
+    Since we can't do a redirect-to-POST, this view is used to pass SSO data from
+    the third_party_auth pipeline to a custom login/register form (possibly on another server).
+    """
+    pipeline_data = request.session.pop('tpa_custom_auth_entry_data', None)
+    if not pipeline_data:
+        raise Http404
+    # Verify the format of pipeline_data:
+    data = {
+        'post_url': pipeline_data['post_url'],
+        # data: The provider info and user's name, email, etc. as base64 encoded JSON
+        # It's base64 encoded because it's signed cryptographically and we don't want whitespace
+        # or ordering issues affecting the hash/signature.
+        'data': pipeline_data['data'],
+        # The cryptographic hash of user_data:
+        'hmac': pipeline_data['hmac'],
+    }
+    return render(request, 'third_party_auth/post_custom_auth_entry.html', data)

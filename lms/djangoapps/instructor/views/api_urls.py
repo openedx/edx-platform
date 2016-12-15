@@ -216,7 +216,19 @@ urlpatterns = patterns(
         'instructor.views.api.start_certificate_regeneration',
         name='start_certificate_regeneration'),
 
-    url(r'^create_certificate_exception/(?P<white_list_student>[^/]*)',
-        'instructor.views.api.create_certificate_exception',
-        name='create_certificate_exception'),
+    url(r'^certificate_exception_view/$',
+        'instructor.views.api.certificate_exception_view',
+        name='certificate_exception_view'),
+
+    url(r'^generate_certificate_exceptions/(?P<generate_for>[^/]*)',
+        'instructor.views.api.generate_certificate_exceptions',
+        name='generate_certificate_exceptions'),
+
+    url(r'^generate_bulk_certificate_exceptions',
+        'instructor.views.api.generate_bulk_certificate_exceptions',
+        name='generate_bulk_certificate_exceptions'),
+
+    url(r'^certificate_invalidation_view/$',
+        'instructor.views.api.certificate_invalidation_view',
+        name='certificate_invalidation_view'),
 )

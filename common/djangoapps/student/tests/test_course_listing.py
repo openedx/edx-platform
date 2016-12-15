@@ -21,11 +21,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     set_prerequisite_courses,
-    seed_milestone_relationship_types
 )
+from milestones.tests.utils import MilestonesTestCaseMixin
 
 
-class TestCourseListing(ModuleStoreTestCase):
+class TestCourseListing(ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Unit tests for getting the list of courses for a logged in user
     """
@@ -126,7 +126,6 @@ class TestCourseListing(ModuleStoreTestCase):
         Sets two of them as pre-requisites of another course.
         Checks course where pre-requisite course is set has appropriate info.
         """
-        seed_milestone_relationship_types()
         course_location2 = self.store.make_course_key('Org1', 'Course2', 'Run2')
         self._create_course_with_access_groups(course_location2)
         pre_requisite_course_location = self.store.make_course_key('Org1', 'Course3', 'Run3')

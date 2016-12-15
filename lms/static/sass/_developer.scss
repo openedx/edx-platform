@@ -89,149 +89,6 @@
 }
 
 // teams temporary
-.view-teams {
-
-  // Copied from _pagination.scss in cms
-  .pagination {
-    @include clearfix();
-    display: inline-block;
-    width: flex-grid(3, 12);
-
-    &.pagination-compact {
-      @include text-align(right);
-    }
-
-    &.pagination-full {
-      display: block;
-      width: flex-grid(4, 12);
-      margin: $baseline auto;
-    }
-
-    .nav-item {
-      position: relative;
-      display: inline-block;
-      vertical-align: middle;
-    }
-
-    .nav-link {
-      @include transition(all $tmg-f2 ease-in-out 0s);
-      display: block;
-      border: 0;
-      background-image: none;
-      background-color: transparent;
-      padding: ($baseline/2) ($baseline*0.75);
-
-      &.previous {
-        margin-right: ($baseline/2);
-      }
-
-      &.next {
-        margin-left: ($baseline/2);
-      }
-
-      &:hover {
-        background-color: $blue;
-        border-radius: 3px;
-        color: $white;
-      }
-
-      &.is-disabled {
-        background-color: transparent;
-        color: $gray-l2;
-        pointer-events: none;
-      }
-    }
-
-    .nav-label {
-      /* This wasn't working for me, so I directly copied the rule
-      @extend %cont-text-sr; */
-      border: 0;
-      clip: rect(0 0 0 0);
-      height: 1px;
-      margin: -1px;
-      overflow: hidden;
-      padding: 0;
-      position: absolute;
-      width: 1px;
-    }
-
-    .pagination-form,
-    .current-page,
-    .page-divider,
-    .total-pages {
-      display: inline-block;
-    }
-
-    .current-page,
-    .page-number-input,
-    .total-pages {
-      @extend %t-copy-base;
-      @extend %t-strong;
-      width: ($baseline*2.5);
-      vertical-align: middle;
-      margin: 0 ($baseline*0.75);
-      padding: ($baseline/4);
-      text-align: center;
-      color: $gray;
-    }
-
-    .current-page {
-      @extend %ui-depth1;
-      position: absolute;
-      @include left(-($baseline/4));
-    }
-
-    .page-divider {
-      @extend %t-title4;
-      @extend %t-regular;
-      vertical-align: middle;
-      color: $gray-l2;
-    }
-
-    .pagination-form {
-      @extend %ui-depth2;
-      position: relative;
-
-      .page-number-label,
-      .submit-pagination-form {
-        /* This wasn't working for me, so I directly copied the rule
-        @extend %cont-text-sr; */
-        border: 0;
-        clip: rect(0 0 0 0);
-        height: 1px;
-        margin: -1px;
-        overflow: hidden;
-        padding: 0;
-        position: absolute;
-        width: 1px;
-      }
-
-      .page-number-input {
-        @include transition(all $tmg-f2 ease-in-out 0s);
-        border: 1px solid transparent;
-        border-bottom: 1px dotted $gray-l2;
-        border-radius: 0;
-        box-shadow: none;
-        background: none;
-
-        &:hover {
-          background-color: $white;
-          opacity: 0.6;
-        }
-
-        &:focus {
-          // borrowing the base input focus styles to match overall app
-          @include linear-gradient($paleYellow, tint($paleYellow, 90%));
-          opacity: 1.0;
-          box-shadow: 0 0 3px $shadow-d1 inset;
-          background-color: $white;
-          border: 1px solid transparent;
-          border-radius: 3px;
-        }
-      }
-    }
-  }
-}
 
 //efischer; scratch space for teams instructor tools
 .view-teams {
@@ -374,40 +231,41 @@
 .date-summary-container {
   .date-summary {
     @include clearfix;
-    margin-top: $baseline/2;
-    margin-bottom: $baseline/2;
     padding: 10px;
-    background-color: $gray-l4;
     @include border-left(3px solid $gray-l3);
+
+    .heading {
+      @extend %t-title7;
+      color: $gray-d2;
+    }
 
     .description {
       margin-top: $baseline/2;
       margin-bottom: $baseline/2;
       display: inline-block;
-      color: $lighter-base-font-color;
-      font-size: 80%;
+      color: $gray-d1;
+      @extend %t-title8;
     }
 
     .date-summary-link {
-      @include float(right);
-      font-size: 80%;
+      @extend %t-title8;
       font-weight: $font-semibold;
       a {
-        color: $base-font-color;
+        color: $link-color;
+        font-weight: normal;
       }
     }
 
     .date {
-      color: $lighter-base-font-color;
-      font-size: 80%;
+      color: $gray-d1;
+      @extend %t-title9;
     }
 
     &-todays-date {
       @include border-left(3px solid $blue);
 
       .heading {
-        font-weight: $font-regular;
-        font-size: 80%;
+        @extend %t-title8;
       }
     }
 

@@ -15,7 +15,7 @@
                 model: CertificateExceptionModel,
 
                 initialize: function(attrs, options){
-                    this.url = options.url;
+                    this.generate_certificates_url = options.generate_certificates_url;
                 },
 
                 getModel: function(attrs){
@@ -33,13 +33,16 @@
                 },
 
                 sync: function(options, appended_url){
-                    var filtered = this.filter(function(model){
-                        return model.isNew();
-                    });
-
+                    var filtered = [];
+                    if(appended_url === 'new'){
+                        filtered = this.filter(function(model){
+                            return model.get('new');
+                        });
+                    }
+                    var url = this.generate_certificates_url + appended_url;
                     Backbone.sync(
                         'create',
-                        new CertificateWhiteList(filtered, {url: this.url + appended_url}),
+                        new CertificateWhiteList(filtered, {url: url, generate_certificates_url: url}),
                         options
                     );
                 },

@@ -22,6 +22,7 @@ from xmodule.exceptions import NotFoundError
 from student.models import CourseEnrollment
 from student.roles import CourseInstructorRole, CourseStaffRole
 from student.tests.factories import UserFactory
+from course_modes.tests.factories import CourseModeFactory
 from contentstore.views.certificates import CertificateManager
 from django.test.utils import override_settings
 from contentstore.utils import get_lms_link_for_certificate_web_view
@@ -194,6 +195,7 @@ class CertificatesBaseTestCase(object):
         self.assertTrue('must have name of the certificate' in context.exception)
 
 
+@ddt.ddt
 @override_settings(FEATURES=FEATURES_WITH_CERTS_ENABLED)
 class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, CertificatesBaseTestCase, HelperMethods):
     """
@@ -274,8 +276,9 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
     @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_certificate_info_in_response(self):
         """
-        Test that certificate has been created and rendered properly.
+        Test that certificate has been created and rendered properly with non-audit course mode.
         """
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
         response = self.client.ajax_post(
             self._url(),
             data=CERTIFICATE_JSON_WITH_SIGNATORIES
@@ -295,6 +298,22 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         self.assertEqual(data[0]['name'], 'Test certificate')
         self.assertEqual(data[0]['description'], 'Test description')
         self.assertEqual(data[0]['version'], CERTIFICATE_SCHEMA_VERSION)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
+    def test_certificate_info_not_in_response(self):
+        """
+        Test that certificate has not been rendered audit only course mode.
+        """
+        response = self.client.ajax_post(
+            self._url(),
+            data=CERTIFICATE_JSON_WITH_SIGNATORIES
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        # in html response
+        result = self.client.get_html(self._url())
+        self.assertNotIn('Test certificate', result.content)
 
     def test_unsupported_http_accept_header(self):
         """
@@ -325,6 +344,53 @@ class CertificatesListHandlerTestCase(EventTestMixin, CourseTestCase, Certificat
         )
         self.assertEqual(response.status_code, 403)
         self.assertIn("error", response.content)
+
+    def test_audit_course_mode_is_skipped(self):
+        """
+        Tests audit course mode is skipped when rendering certificates page.
+        """
+        CourseModeFactory.create(course_id=self.course.id)
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='verified')
+        response = self.client.get_html(
+            self._url(),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'verified')
+        self.assertNotContains(response, 'audit')
+
+    def test_audit_only_disables_cert(self):
+        """
+        Tests audit course mode is skipped when rendering certificates page.
+        """
+        CourseModeFactory.create(course_id=self.course.id, mode_slug='audit')
+        response = self.client.get_html(
+            self._url(),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This course does not use a mode that offers certificates.')
+        self.assertNotContains(response, 'This module is not enabled.')
+        self.assertNotContains(response, 'Loading')
+
+    @ddt.data(
+        ['audit', 'verified'],
+        ['verified'],
+        ['audit', 'verified', 'credit'],
+        ['verified', 'credit'],
+        ['professional']
+    )
+    def test_non_audit_enables_cert(self, slugs):
+        """
+        Tests audit course mode is skipped when rendering certificates page.
+        """
+        for slug in slugs:
+            CourseModeFactory.create(course_id=self.course.id, mode_slug=slug)
+        response = self.client.get_html(
+            self._url(),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'This course does not use a mode that offers certificates.')
+        self.assertNotContains(response, 'This module is not enabled.')
+        self.assertContains(response, 'Loading')
 
     def test_assign_unique_identifier_to_certificates(self):
         """

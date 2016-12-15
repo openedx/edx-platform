@@ -1,11 +1,12 @@
+<%namespace name='static' file='/static_content.html'/>
+
 <%inherit file="shopping_cart_flow.html" />
 <%!
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
-from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 from markupsafe import escape
-from microsite_configuration import microsite
+from openedx.core.lib.courses import course_image_url
 %>
 
 <%block name="billing_details_highlight">
@@ -292,7 +293,7 @@ from microsite_configuration import microsite
         <div class="clearfix">
           <div class="image">
             <img class="item-image" src="${course_image_url(course)}"
-                 alt="${course.display_number_with_default | h} ${get_course_about_section(request, course, 'title')} Image"/>
+                 alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} Image"/>
           </div>
           <div class="data-input">
 
@@ -377,8 +378,8 @@ from microsite_configuration import microsite
         <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>
       </div>
     </div>
-    ## Allow for a microsite to be able to insert additional text at the bottom of the page
-    <%include file="${microsite.get_template_path('receipt_custom_pane.html')}" />
+    ## Allow for a theming to be able to insert additional text at the bottom of the page
+    <%include file="${static.get_template_path('receipt_custom_pane.html')}" />
   </section>
 </div>
 </%block>

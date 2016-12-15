@@ -3,7 +3,6 @@
 <%!
 from django.utils.translation import ugettext as _
 from courseware.tabs import get_course_tab_list
-from courseware.views import notification_image_for_tab
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
@@ -93,7 +92,6 @@ include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and
       % for tab in get_course_tab_list(request, course):
         <%
             tab_is_active = (tab.tab_id == active_page) or (tab.tab_id == default_tab)
-            tab_image = notification_image_for_tab(tab, user, course)
         %>
           <li>
              <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">

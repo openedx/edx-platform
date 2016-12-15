@@ -39,8 +39,6 @@ class BlocksView(DeveloperErrorViewMixin, ListAPIView):
         * username: (string) The name of the user on whose behalf we want to
           see the data.
 
-          Default is the logged in user
-
           Example: username=anjali
 
         * student_view_data: (list) Indicates for which block types to return

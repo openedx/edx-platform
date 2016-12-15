@@ -98,6 +98,11 @@ class Env(object):
         'edxnotes': {
             'port': 8042,
             'log': BOK_CHOY_LOG_DIR / "bok_choy_edxnotes.log",
+        },
+
+        'programs': {
+            'port': 8090,
+            'log': BOK_CHOY_LOG_DIR / "bok_choy_programs.log",
         }
     }
 

@@ -12,18 +12,13 @@
 
     <div class="wrapper wrapper-l">
       <h1 class="branding"><a href="/">
-        % if settings.FEATURES.get('IS_EDX_DOMAIN', False):
-          <img src="${static.url("images/edx-theme/edx-studio-logo.png")}" alt="${settings.STUDIO_NAME}" />
-        % else:
-          <img src="${static.url("images/default-theme/logo.png")}" alt="${settings.STUDIO_NAME}" />
-        % endif
+        <img src="${static.url("images/studio-logo.png")}" alt="${settings.STUDIO_NAME}" />
       </a></h1>
 
       % if context_course:
       <%
             course_key = context_course.id
             index_url = reverse('contentstore.views.course_handler', kwargs={'course_key_string': unicode(course_key)})
-            checklists_url = reverse('contentstore.views.checklists_handler', kwargs={'course_key_string': unicode(course_key)})
             course_team_url = reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_key)})
             assets_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
             textbooks_url = reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)})
@@ -44,7 +39,7 @@
         <span class="sr">${_("Current Course:")}</span>
         <a class="course-link" href="${index_url}">
           <span class="course-org">${context_course.display_org_with_default | h}</span><span class="course-number">${context_course.display_number_with_default | h}</span>
-          <span class="course-title" title="${context_course.display_name_with_default}">${context_course.display_name_with_default}</span>
+          <span class="course-title" title="${context_course.display_name_with_default_escaped}">${context_course.display_name_with_default_escaped}</span>
         </a>
       </h2>
 
@@ -118,9 +113,6 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
-                  <li class="nav-item nav-course-tools-checklists">
-                    <a href="${checklists_url}">${_("Checklists")}</a>
-                  </li>
                   <li class="nav-item nav-course-tools-import">
                     <a href="${import_url}">${_("Import")}</a>
                   </li>
@@ -153,7 +145,7 @@
         <span class="sr">${_("Current Library:")}</span>
         <a class="course-link" href="${index_url}">
           <span class="course-org">${context_library.display_org_with_default | h}</span><span class="course-number">${context_library.display_number_with_default | h}</span>
-          <span class="course-title" title="${context_library.display_name_with_default}">${context_library.display_name_with_default}</span>
+          <span class="course-title" title="${context_library.display_name_with_default_escaped}">${context_library.display_name_with_default_escaped}</span>
         </a>
       </h2>
 
@@ -191,6 +183,11 @@
           </li>
         </ol>
       </nav>
+      % elif show_programs_header:
+      <h2 class="info-course">
+        <span class="course-org">${settings.PLATFORM_NAME}</span><span class="course-number">${_("Programs")}</span>
+        <span class="course-title">${_("Program Administration")}</span>
+      </h2>
       % endif
     </div>
 

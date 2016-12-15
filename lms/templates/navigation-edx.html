@@ -5,11 +5,11 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from microsite_configuration import microsite
 from microsite_configuration.templatetags.microsite import platform_name
+from openedx.core.djangoapps.user_api.accounts.image_helpers import get_profile_image_urls_for_user
 
 # App that handles subdomain specific branding
-import branding
+from branding import api as branding_api
 # app that handles site status messages
 from status.status import get_site_status_msg
 %>
@@ -41,7 +41,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
       <a href="${marketing_link('ROOT')}" itemprop="url">
         <%block name="navigation_logo">
-            <img src="${static.url(branding.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=platform_name())}" itemprop="logo" />
+            <img src="${static.url(branding_api.get_logo_url())}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
         </%block>
       </a>
     </h1>
@@ -50,7 +50,7 @@ site_status_msg = get_site_status_msg(course_id)
     <h2 class="course-header">
       <span class="provider">${course.display_org_with_default | h}:</span>
       <span class="course-number">${course.display_number_with_default | h}</span>
-      <span class="course-name">${course.display_name_with_default}</span>
+      <span class="course-name">${course.display_name_with_default_escaped}</span>
     </h2>
     % endif
 
@@ -79,7 +79,12 @@ site_status_msg = get_site_status_msg(course_id)
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="sr">${_("Dashboard for:")}</span>
-          <div>${user.username}</div>
+          <%
+          username = user.username
+          profile_image_url = get_profile_image_urls_for_user(user)['medium']
+          %>
+          <img class="user-image-frame" src="${profile_image_url}" alt="${_('Profile image for {username}').format(username=username)}">
+          <div class="label-username">${username}</div>
         </a>
       </li>
       <li class="primary">

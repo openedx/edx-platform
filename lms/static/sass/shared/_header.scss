@@ -115,8 +115,12 @@ header.global {
   .user {
     @include float(right);
     @extend %ui-print-excluded;
-    margin-top: ($baseline/4);
     padding-left: 0;
+    margin: 0;
+
+    .settings-language-form {
+      margin-top: 4px;
+    }
 
     > .primary {
       display: block;
@@ -131,7 +135,7 @@ header.global {
 
       &:last-child {
         > a {
-          padding: ($baseline/5) ($baseline/2);
+          padding: ($baseline/2);
 
           &.shopping-cart {
             border-radius: 4px;
@@ -143,13 +147,18 @@ header.global {
       }
     }
 
-    a.user-link {
-      @include padding(5px, 2px, 10px, 10px);
+    .user-link {
+      padding: 0;
       position: relative;
       text-transform: none;
       font-size: 14px;
       font-weight: bold;
       letter-spacing: 0;
+
+      .user-image-frame {
+        max-width: ($baseline*2);
+        border-radius: 10%;
+      }
 
       .icon {
         display: inline-block;
@@ -159,35 +168,9 @@ header.global {
         color: $m-gray;
       }
 
-      .avatar {
-
-        // CASE: right to left layout
-
-        display: inline-block;
-        @include left(8px);
-        opacity: 0.5;
-        overflow: hidden;
-        top: 4px;
-        margin-top: 1px;
-        margin-right: 2px;
-        @include transition(all 0.15s linear 0s);
-        width: 19px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-
-      &:hover, &:focus {
-        .avatar {
-          opacity: 0.8;
-        }
+      .label-username {
+        @include float(right);
+        @include margin(($baseline*0.75), ($baseline/4), ($baseline*0.75), ($baseline*0.75));
       }
     }
 
@@ -467,7 +450,7 @@ header.global-new {
 
   .user {
     @include float(right);
-    margin-top: 4px;
+    margin-top: 0;
 
     > .primary {
       display: block;
@@ -485,7 +468,7 @@ header.global-new {
         > a {
           @include border-radius(0, 4px, 4px, 0);
           @include border-left(none);
-          padding: ($baseline/5) ($baseline/2);
+          padding: ($baseline/2) ($baseline/2);
 
           &.shopping-cart {
             border-radius: 4px;
@@ -496,13 +479,18 @@ header.global-new {
         }
       }
     }
-    a.user-link {
-      @include padding(5px, 2px, 10px, 10px);
+    .user-link {
+      padding: 0;
       position: relative;
       text-transform: none;
       font-size: 14px;
       font-weight: bold;
       letter-spacing: 0;
+
+      .user-image-frame {
+        max-width: ($baseline*2);
+        border-radius: 10%;
+      }
 
       .icon {
         display: inline-block;
@@ -512,41 +500,15 @@ header.global-new {
         color: $m-gray;
       }
 
-      .avatar {
-
-        // CASE: right to left layout
-
-        display: inline-block;
-        @include left(8px);
-        opacity: 0.5;
-        overflow: hidden;
-        top: 4px;
-        margin-top: 1px;
-        margin-right: 2px;
-        @include transition(all 0.15s linear 0s);
-        width: 19px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-      div {
-        margin-top: 3px;
-        float: right;
-        margin-left: 4px;
-      }
-
-      &:hover, &:focus {
-        .avatar {
-          opacity: 0.8;
-        }
+      .label-username {
+        @include float(right);
+        @include margin(($baseline*0.75), ($baseline/4), ($baseline*0.75), ($baseline*0.75));
       }
     }
 
     .dropdown {
       font-size: $body-font-size;
-      padding: 0 ($baseline/2);
+      padding: ($baseline/5) ($baseline/2);
       color: $base-font-color;
       border: none;
       background: $white;

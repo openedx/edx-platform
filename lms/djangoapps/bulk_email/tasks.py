@@ -39,7 +39,8 @@ from bulk_email.models import (
     SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
     SEND_TO_STAFF,
 )
-from courseware.courses import get_course, course_image_url
+from courseware.courses import get_course
+from openedx.core.lib.courses import course_image_url
 from student.roles import CourseStaffRole, CourseInstructorRole
 from instructor.views.data_access import get_group_query_students, delete_group_temp_queries_and_students
 from instructor_email_widget.models import GroupedQuery

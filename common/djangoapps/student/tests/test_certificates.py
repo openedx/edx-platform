@@ -82,12 +82,6 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     @override_settings(CERT_NAME_SHORT='Test_Certificate')
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     def test_linked_student_to_web_view_credential(self, enrollment_mode):
-        test_url = get_certificate_url(
-            user_id=self.user.id,
-            course_id=unicode(self.course.id)
-        )
-
-        self._create_certificate(enrollment_mode)
         certificates = [
             {
                 'id': 0,
@@ -102,6 +96,9 @@ class CertificateDisplayTest(ModuleStoreTestCase):
         self.course.cert_html_view_enabled = True
         self.course.save()   # pylint: disable=no-member
         self.store.update_item(self.course, self.user.id)
+
+        cert = self._create_certificate(enrollment_mode)
+        test_url = get_certificate_url(course_id=self.course.id, uuid=cert.verify_uuid)
 
         response = self.client.get(reverse('dashboard'))
 
@@ -165,7 +162,7 @@ class CertificateDisplayTest(ModuleStoreTestCase):
     def _create_certificate(self, enrollment_mode):
         """Simulate that the user has a generated certificate. """
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course.id, mode=enrollment_mode)
-        GeneratedCertificateFactory(
+        return GeneratedCertificateFactory(
             user=self.user,
             course_id=self.course.id,
             mode=enrollment_mode,

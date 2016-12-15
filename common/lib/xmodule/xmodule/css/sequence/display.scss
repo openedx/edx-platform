@@ -1,5 +1,5 @@
 $sequence--border-color: #C8C8C8;
-
+$link-color: rgb(26, 161, 222) !default;
 // repeated extends - needed since LMS styling was referenced
 .block-link {
   border-left: 1px solid lighten($sequence--border-color, 10%);
@@ -36,7 +36,7 @@ $sequence--border-color: #C8C8C8;
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
-  margin: -4px 0 ($baseline*1.5);
+  margin: -4px 0 $baseline;
   position: relative;
   border-bottom: none;
   z-index: 0;
@@ -119,6 +119,10 @@ $sequence--border-color: #C8C8C8;
           -webkit-font-smoothing: antialiased; // Clear up the lines on the icons
         }
 
+        i.fa-bookmark {
+          color: $link-color;
+        }
+
         &.inactive {
 
           .icon {
@@ -141,6 +145,10 @@ $sequence--border-color: #C8C8C8;
 
             .icon {
               color: rgb(10, 10, 10);
+            }
+
+            i.fa-bookmark {
+              color: $link-color;
             }
           }
         }
@@ -295,3 +303,4 @@ nav.sequence-bottom {
     outline: none;
   }
 }
+

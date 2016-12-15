@@ -5,6 +5,6 @@
     <input type="file" class="sr js-file-input" name="file" multiple>
 </form>
 <section class="active-video-upload-container">
-    <h3 class="sr">Active Uploads</h3>
+    <h3 class="sr"><%= gettext("Active Uploads") %></h3>
     <ul class="active-video-upload-list"></ul>
 </section>

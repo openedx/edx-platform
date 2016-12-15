@@ -19,7 +19,7 @@ class TestTrackViews(EventTrackingTestCase):
 
         self.request_factory = RequestFactory()
 
-        patcher = patch('track.views.tracker')
+        patcher = patch('track.views.tracker', autospec=True)
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 

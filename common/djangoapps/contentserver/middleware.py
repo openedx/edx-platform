@@ -4,11 +4,14 @@ Middleware to serve assets.
 
 import logging
 
+import datetime
 from django.http import (
-    HttpResponse, HttpResponseNotModified, HttpResponseForbidden
-)
+    HttpResponse, HttpResponseNotModified, HttpResponseForbidden,
+    HttpResponseBadRequest, HttpResponseNotFound)
 from student.models import CourseEnrollment
+from contentserver.models import CourseAssetCacheTtlConfig
 
+from clean_headers import remove_headers_from_response
 from xmodule.assetstore.assetmgr import AssetManager
 from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
 from xmodule.modulestore import InvalidLocationError
@@ -22,67 +25,43 @@ from xmodule.exceptions import NotFoundError
 # to change this file so instead of using course_id_partial, we're just using asset keys
 
 log = logging.getLogger(__name__)
+HTTP_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
 
 class StaticContentServer(object):
-    def process_request(self, request):
-        # look to see if the request is prefixed with an asset prefix tag
-        if (
-            request.path.startswith('/' + XASSET_LOCATION_TAG + '/') or
+    def is_asset_request(self, request):
+        """Determines whether the given request is an asset request"""
+        return (
+            request.path.startswith('/' + XASSET_LOCATION_TAG + '/')
+            or
             request.path.startswith('/' + AssetLocator.CANONICAL_NAMESPACE)
-        ):
+        )
+
+    def process_request(self, request):
+        """Process the given request"""
+        if self.is_asset_request(request):
+            # Make sure we can convert this request into a location.
             if AssetLocator.CANONICAL_NAMESPACE in request.path:
                 request.path = request.path.replace('block/', 'block@', 1)
             try:
                 loc = StaticContent.get_location_from_path(request.path)
             except (InvalidLocationError, InvalidKeyError):
-                # return a 'Bad Request' to browser as we have a malformed Location
-                response = HttpResponse()
-                response.status_code = 400
-                return response
+                return HttpResponseBadRequest()
 
-            # first look in our cache so we don't have to round-trip to the DB
-            content = get_cached_content(loc)
-            if content is None:
-                # nope, not in cache, let's fetch from DB
-                try:
-                    content = AssetManager.find(loc, as_stream=True)
-                except (ItemNotFoundError, NotFoundError):
-                    response = HttpResponse()
-                    response.status_code = 404
-                    return response
+            # Try and load the asset.
+            content = None
+            try:
+                content = self.load_asset_from_location(loc)
+            except (ItemNotFoundError, NotFoundError):
+                return HttpResponseNotFound()
 
-                # since we fetched it from DB, let's cache it going forward, but only if it's < 1MB
-                # this is because I haven't been able to find a means to stream data out of memcached
-                if content.length is not None:
-                    if content.length < 1048576:
-                        # since we've queried as a stream, let's read in the stream into memory to set in cache
-                        content = content.copy_to_in_mem()
-                        set_cached_content(content)
-            else:
-                # NOP here, but we may wish to add a "cache-hit" counter in the future
-                pass
+            # Check that user has access to the content.
+            if not self.is_user_authorized(request, content, loc):
+                return HttpResponseForbidden('Unauthorized')
 
-            # Check that user has access to content
-            if getattr(content, "locked", False):
-                if not hasattr(request, "user") or not request.user.is_authenticated():
-                    return HttpResponseForbidden('Unauthorized')
-                if not request.user.is_staff:
-                    if getattr(loc, 'deprecated', False) and not CourseEnrollment.is_enrolled_by_partial(
-                        request.user, loc.course_key
-                    ):
-                        return HttpResponseForbidden('Unauthorized')
-                    if not getattr(loc, 'deprecated', False) and not CourseEnrollment.is_enrolled(
-                        request.user, loc.course_key
-                    ):
-                        return HttpResponseForbidden('Unauthorized')
-
-            # convert over the DB persistent last modified timestamp to a HTTP compatible
-            # timestamp, so we can simply compare the strings
-            last_modified_at_str = content.last_modified_at.strftime("%a, %d-%b-%Y %H:%M:%S GMT")
-
-            # see if the client has cached this content, if so then compare the
-            # timestamps, if they are the same then just return a 304 (Not Modified)
+            # Figure out if the client sent us a conditional request, and let them know
+            # if this asset has changed since then.
+            last_modified_at_str = content.last_modified_at.strftime(HTTP_DATE_FORMAT)
             if 'HTTP_IF_MODIFIED_SINCE' in request.META:
                 if_modified_since = request.META['HTTP_IF_MODIFIED_SINCE']
                 if if_modified_since == last_modified_at_str:
@@ -96,7 +75,7 @@ class StaticContentServer(object):
             # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.35
             response = None
             if request.META.get('HTTP_RANGE'):
-                # Data from cache (StaticContent) has no easy byte management, so we use the DB instead (StaticContentStream)
+                # If we have a StaticContent, get a StaticContentStream.  Can't manipulate the bytes otherwise.
                 if type(content) == StaticContent:
                     content = AssetManager.find(loc, as_stream=True)
 
@@ -144,9 +123,88 @@ class StaticContentServer(object):
             # "Accept-Ranges: bytes" tells the user that only "bytes" ranges are allowed
             response['Accept-Ranges'] = 'bytes'
             response['Content-Type'] = content.content_type
-            response['Last-Modified'] = last_modified_at_str
+
+            # Set any caching headers, and do any response cleanup needed.  Based on how much
+            # middleware we have in place, there's no easy way to use the built-in Django
+            # utilities and properly sanitize and modify a response to ensure that it is as
+            # cacheable as possible, which is why we do it ourselves.
+            self.set_caching_headers(content, response)
 
             return response
+
+    def set_caching_headers(self, content, response):
+        """
+        Sets caching headers based on whether or not the asset is locked.
+        """
+
+        is_locked = getattr(content, "locked", False)
+
+        # We want to signal to the end user's browser, and to any intermediate proxies/caches,
+        # whether or not this asset is cacheable.  If we have a TTL configured, we inform the
+        # caller, for unlocked assets, how long they are allowed to cache it.  Since locked
+        # assets should be restricted to enrolled students, we simply send headers that
+        # indicate there should be no caching whatsoever.
+        cache_ttl = CourseAssetCacheTtlConfig.get_cache_ttl()
+        if cache_ttl > 0 and not is_locked:
+            response['Expires'] = StaticContentServer.get_expiration_value(datetime.datetime.utcnow(), cache_ttl)
+            response['Cache-Control'] = "public, max-age={ttl}, s-maxage={ttl}".format(ttl=cache_ttl)
+        elif is_locked:
+            response['Cache-Control'] = "private, no-cache, no-store"
+
+        response['Last-Modified'] = content.last_modified_at.strftime(HTTP_DATE_FORMAT)
+
+        remove_headers_from_response(response, "Vary")
+
+    @staticmethod
+    def get_expiration_value(now, cache_ttl):
+        """Generates an RFC1123 datetime string based on a future offset."""
+        expire_dt = now + datetime.timedelta(seconds=cache_ttl)
+        return expire_dt.strftime(HTTP_DATE_FORMAT)
+
+    def is_user_authorized(self, request, content, location):
+        """
+        Determines whether or not the user for this request is authorized to view the given asset.
+        """
+
+        is_locked = getattr(content, "locked", False)
+        if not is_locked:
+            return True
+
+        if not hasattr(request, "user") or not request.user.is_authenticated():
+            return False
+
+        if not request.user.is_staff:
+            deprecated = getattr(location, 'deprecated', False)
+            if deprecated and not CourseEnrollment.is_enrolled_by_partial(request.user, location.course_key):
+                return False
+            if not deprecated and not CourseEnrollment.is_enrolled(request.user, location.course_key):
+                return False
+
+        return True
+
+    def load_asset_from_location(self, location):
+        """
+        Loads an asset based on its location, either retrieving it from a cache
+        or loading it directly from the contentstore.
+        """
+
+        # See if we can load this item from cache.
+        content = get_cached_content(location)
+        if content is None:
+            # Not in cache, so just try and load it from the asset manager.
+            try:
+                content = AssetManager.find(location, as_stream=True)
+            except (ItemNotFoundError, NotFoundError):
+                raise
+
+            # Now that we fetched it, let's go ahead and try to cache it. We cap this at 1MB
+            # because it's the default for memcached and also we don't want to do too much
+            # buffering in memory when we're serving an actual request.
+            if content.length is not None and content.length < 1048576:
+                content = content.copy_to_in_mem()
+                set_cached_content(content)
+
+        return content
 
 
 def parse_range_header(header_value, content_length):

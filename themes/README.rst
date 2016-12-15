@@ -90,6 +90,28 @@ in the appropriate place, and making the changes you need.  Keep in mind that
 in the future if you upgrade the Open edX code, you may have to update the
 copied template in your theme also.
 
+Template Names
+==============
+
+Here are the list of template names that you *should* use in your comprehensive
+theme (so far):
+
+* ``header.html``
+* ``footer.html``
+
+You should **not** use the following names in your comprehensive theme:
+
+* ``themable-footer.html``
+
+If you look at the ``main.html`` template file, you will notice that it includes
+``header.html`` and ``themable-footer.html``, rather than ``footer.html``.
+You might be inclined to override ``themable-footer.html`` as a result. DO NOT
+DO THIS. ``themable-footer.html`` is an additional layer of indirection that
+is necessary to avoid breaking microsites, which also refers to a file named
+``footer.html``. The goal is to eventually make comprehensive theming do
+everything that microsites does now, and then deprecate and remove microsites
+from the codebase. At that point, the ``themable-footer.html`` file will go
+away, since the additional layer of indirection will no longer be necessary.
 
 Installing your theme
 ---------------------
@@ -101,9 +123,9 @@ directory. There are two ways to do this.
 
     #.  As the vagrant user, edit (or create)
         /edx/app/edx_ansible/server-vars.yml to add the
-        ``edxapp_comp_theme_dir`` value::
+        ``edxapp_comprehensive_theme_dir`` value::
 
-            edxapp_comp_theme_dir: '/full/path/to/my-theme'
+            edxapp_comprehensive_theme_dir: '/full/path/to/my-theme'
 
     #.  Run the update script::
 
@@ -111,11 +133,16 @@ directory. There are two ways to do this.
             $ sudo /edx/bin/update edx-platform HEAD
 
 #.  Otherwise, edit the /edx/app/edxapp/lms.env.json file to add the
-    ``COMP_THEME_DIR`` value::
+    ``COMPREHENSIVE_THEME_DIR`` value::
 
-        "COMP_THEME_DIR": "/full/path/to/my-theme",
+        "COMPREHENSIVE_THEME_DIR": "/full/path/to/my-theme",
 
 Restart your site.  Your changes should now be visible.
+
+
+Comprehensive Theming
+=====================
+* The ``PROFILE_IMAGE_DEFAULT_FILENAME`` Django setting is now ignored.
 
 
 "Stanford" theming
@@ -154,3 +181,54 @@ name in the ``@import`` line.
 Run the ``update_assets`` command to recompile the theme::
 
     $ paver update_assets lms --settings=aws
+
+Microsites
+==========
+
+If you want to continue using the "Microsites" theming system, there are a few
+changes you'll need to make. A few templates have been renamed, or folded into
+other templates:
+
+* ``header_extra.html`` has been renamed to ``head-extra.html``. This file
+  was always inserted into the ``<head>`` element of the page, rather than
+  the header of the ``<body>`` element, so this change makes the name more
+  accurate.
+
+* ``google_analytics.html`` has been removed. The contents of this template
+  can and should be added to the ``head-extra.html`` template.
+
+* ``google_tag_manager.html`` has been renamed to ``body-initial.html``.
+
+In addition, there are some other changes you'll need to make:
+
+* The ``google_analytics_file`` config value is now ignored. If your Open edX
+  installation has a Google Analytics account ID set, the Google Analytics
+  JavaScript will be included automatically on your site using that account ID.
+  You can set this account ID either using the "GOOGLE_ANALYTICS_ACCOUNT" value
+  in the Django settings, or by setting the newly-added "GOOGLE_ANALYTICS_ACCOUNT"
+  config value in your microsite configuration.
+
+* If you don't want the Google Analytics JavaScript to be output at all in your
+  microsite, set the "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string.
+  If you want to customize the way that Google Analytics is loaded, set the
+  "GOOGLE_ANALYTICS_ACCOUNT" config value to the empty string, and then load
+  Google Analytics yourself (with whatever customizations you want) in your
+  ``head-extra.html`` template.
+
+* The ``css_overrides_file`` config value is now ignored. To add a CSS override
+  file to your microsite, create a ``head-extra.html`` template with the
+  following content:
+
+  .. code-block:: mako
+
+    <%namespace name='static' file='../../static_content.html'/>
+    <%! from microsite_configuration import microsite %>
+    <% style_overrides_file = microsite.get_value('css_overrides_file') %>
+
+    % if style_overrides_file:
+      <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+    % endif
+
+  If you already have a ``head-extra.html`` template, you can modify it to
+  output this ``<link rel="stylesheet">`` tag, in addition to whatever else you
+  already have in that template.

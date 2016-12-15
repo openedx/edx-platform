@@ -59,5 +59,5 @@ def signature(params, shared_secret):
         for key in sorted(params.keys())
         if key != u"signature"
     ])
-    hasher = hmac.new(shared_secret, encoded_params.encode('utf-8'), hashlib.sha256)
+    hasher = hmac.new(shared_secret.encode('utf-8'), encoded_params.encode('utf-8'), hashlib.sha256)
     return hasher.hexdigest()

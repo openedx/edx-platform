@@ -5,7 +5,6 @@ from django.utils.translation import ugettext as _
 from django.template import RequestContext
 import third_party_auth
 from third_party_auth import pipeline
-from microsite_configuration import microsite
 from django.core.urlresolvers import reverse
 import json
 %>
@@ -152,13 +151,6 @@ import json
     <section id="dashboard-search-results" class="search-results dashboard-search-results"></section>
   % endif
 
-  % if settings.FEATURES.get('IS_EDX_DOMAIN') and settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
-    <div class="wrapper-find-courses">
-      <p class="copy">${_("Check out our recently launched courses and what's new in your favorite subjects")}</p>
-      <p><a class="btn-find-courses" href="${marketing_link('COURSES')}">${_("Find New Courses")}</a></p>
-    </div>
-  % endif
-
   <section class="profile-sidebar" id="profile-sidebar" role="region" aria-label="Account Status Info">
     <header class="profile">
       <h2 class="account-status-title sr">${_("Account Status Info")}: </h2>
@@ -175,7 +167,7 @@ import json
         </li>
         % endif
 
-        <%include file='dashboard/_dashboard_status_verification.html' />
+        <%include file="${static.get_template_path('dashboard/_dashboard_status_verification.html')}" />
 
       </ul>
     </section>
@@ -183,6 +175,19 @@ import json
         <%include file='${self.dashboard_extra_file}' />
     % endif
   </section>
+  % if xseries_credentials:
+    <div class="wrapper-xseries-certificates">
+      <p class="title">${_("XSeries Program Certificates")}</p>
+      <p class="copy">${_("You have received a certificate for the following XSeries programs:")}</p>
+      <ul>
+      % for xseries_credential in xseries_credentials:
+        <li>
+          <a class="copy" href="${xseries_credential['credential_url']}">${xseries_credential['display_name']}</a>
+        </li>
+      % endfor
+      </ul>
+    </div>
+  % endif
 </section>
 
 <section id="email-settings-modal" class="modal" aria-hidden="true">

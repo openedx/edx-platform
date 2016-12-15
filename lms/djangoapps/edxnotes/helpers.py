@@ -22,7 +22,7 @@ from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from capa.util import sanitize_html
 from courseware.views import get_current_child
 from courseware.access import has_access
-from openedx.core.djangoapps.util.helpers import get_id_token
+from openedx.core.lib.token_utils import get_id_token
 from student.models import anonymous_id_for_user
 from util.date_utils import get_default_time_display
 from xmodule.modulestore.django import modulestore
@@ -207,7 +207,7 @@ def get_module_context(course, item):
     """
     item_dict = {
         'location': unicode(item.location),
-        'display_name': item.display_name_with_default,
+        'display_name': item.display_name_with_default_escaped,
     }
     if item.category == 'chapter' and item.get_parent():
         # course is a locator w/o branch and version
@@ -328,7 +328,7 @@ def get_course_position(course_module):
     urlargs['chapter'] = chapter.url_name
     if course_module.position is not None:
         return {
-            'display_name': chapter.display_name_with_default,
+            'display_name': chapter.display_name_with_default_escaped,
             'url': reverse('courseware_chapter', kwargs=urlargs),
         }
 
@@ -340,7 +340,7 @@ def get_course_position(course_module):
 
     urlargs['section'] = section.url_name
     return {
-        'display_name': section.display_name_with_default,
+        'display_name': section.display_name_with_default_escaped,
         'url': reverse('courseware_section', kwargs=urlargs)
     }
 

@@ -32,8 +32,7 @@ define([
                 entrance_exam_enabled : '',
                 entrance_exam_minimum_score_pct: '50',
                 license: null,
-                language: '',
-                has_cert_config: false
+                language: ''
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 

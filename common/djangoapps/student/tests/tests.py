@@ -11,6 +11,7 @@ from urlparse import urljoin
 import pytz
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from pyquery import PyQuery as pq
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -18,6 +19,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
 
+from course_modes.models import CourseMode
 from student.models import (
     anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment,
     unique_id_for_user, LinkedInAddToProfileConfiguration
@@ -42,6 +44,7 @@ from certificates.tests.factories import GeneratedCertificateFactory  # pylint: 
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.theming.test_util import with_is_edx_domain
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
@@ -248,7 +251,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.client.login(username="jack", password="test")
         self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
         self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
-        self._check_verification_status_on('audit', 'You\'re auditing this course')
+        self._check_verification_status_off('audit', '')
         self._check_verification_status_on('professional', 'You\'re enrolled as a professional education student')
         self._check_verification_status_on('no-id-professional', 'You\'re enrolled as a professional education student')
 
@@ -268,8 +271,13 @@ class DashboardTest(ModuleStoreTestCase):
             attempt.approve()
 
         response = self.client.get(reverse('dashboard'))
-        self.assertNotContains(response, "class=\"course {0}\"".format(mode))
-        self.assertNotContains(response, value)
+
+        if mode == 'audit':
+            # Audit mode does not have a banner.  Assert no banner element.
+            self.assertEqual(pq(response.content)(".sts-enrollment").length, 0)
+        else:
+            self.assertNotContains(response, "class=\"course {0}\"".format(mode))
+            self.assertNotContains(response, value)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': False})
     def test_verification_status_invisible(self):
@@ -280,7 +288,7 @@ class DashboardTest(ModuleStoreTestCase):
         self.client.login(username="jack", password="test")
         self._check_verification_status_off('verified', 'You\'re enrolled as a verified student')
         self._check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
-        self._check_verification_status_off('audit', 'You\'re auditing this course')
+        self._check_verification_status_off('audit', '')
 
     def test_course_mode_info(self):
         verified_mode = CourseModeFactory.create(
@@ -321,7 +329,12 @@ class DashboardTest(ModuleStoreTestCase):
             course_id=self.course.id
         )
         course_reg_code = shoppingcart.models.CourseRegistrationCode(
-            code="abcde", course_id=self.course.id, created_by=self.user, invoice=sale_invoice_1, invoice_item=invoice_item, mode_slug='honor'
+            code="abcde",
+            course_id=self.course.id,
+            created_by=self.user,
+            invoice=sale_invoice_1,
+            invoice_item=invoice_item,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG
         )
         course_reg_code.save()
 
@@ -339,7 +352,6 @@ class DashboardTest(ModuleStoreTestCase):
         #now activate the user by enrolling him/her to the course
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-
         response = self.client.get(reverse('dashboard'))
         self.assertIn('You can no longer access this course because payment has not yet been received', response.content)
         optout_object = Optout.objects.filter(user=self.user, course_id=self.course.id)
@@ -480,7 +492,7 @@ class DashboardTest(ModuleStoreTestCase):
             self.assertEquals(response_2.status_code, 200)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch.dict(settings.FEATURES, {"IS_EDX_DOMAIN": True})
+    @with_is_edx_domain(True)
     def test_dashboard_header_nav_has_find_courses(self):
         self.client.login(username="jack", password="test")
         response = self.client.get(reverse("dashboard"))
@@ -566,7 +578,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
             {
                 'course_id': course_key.to_deprecated_string(),
                 'user_id': user.pk,
-                'mode': 'honor'
+                'mode': CourseMode.DEFAULT_MODE_SLUG
             }
         )
         self.mock_tracker.reset_mock()
@@ -578,7 +590,7 @@ class EnrollmentEventTestMixin(EventTestMixin):
             {
                 'course_id': course_key.to_deprecated_string(),
                 'user_id': user.pk,
-                'mode': 'honor'
+                'mode': CourseMode.DEFAULT_MODE_SLUG
             }
         )
         self.mock_tracker.reset_mock()
@@ -754,18 +766,18 @@ class EnrollInCourseTest(EnrollmentEventTestMixin, TestCase):
         user = User.objects.create(username="justin", email="jh@fake.edx.org")
         course_id = SlashSeparatedCourseKey("edX", "Test101", "2013")
 
-        CourseEnrollment.enroll(user, course_id)
+        CourseEnrollment.enroll(user, course_id, "audit")
         self.assert_enrollment_event_was_emitted(user, course_id)
-
-        CourseEnrollment.enroll(user, course_id, "audit")
-        self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "audit")
-
-        # same enrollment mode does not emit an event
-        CourseEnrollment.enroll(user, course_id, "audit")
-        self.assert_no_events_were_emitted()
 
         CourseEnrollment.enroll(user, course_id, "honor")
         self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "honor")
+
+        # same enrollment mode does not emit an event
+        CourseEnrollment.enroll(user, course_id, "honor")
+        self.assert_no_events_were_emitted()
+
+        CourseEnrollment.enroll(user, course_id, "audit")
+        self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "audit")
 
 
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -789,7 +801,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         )
         return response
 
-    def test_enroll_as_honor(self):
+    def test_enroll_as_default(self):
         """Tests that a student can successfully enroll through this view"""
         response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 200)
@@ -797,7 +809,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             self.user, self.course.id
         )
         self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, u'honor')
+        self.assertEqual(enrollment_mode, CourseMode.DEFAULT_MODE_SLUG)
 
     def test_cannot_enroll_if_already_enrolled(self):
         """
@@ -810,14 +822,14 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 400)
 
-    def test_change_to_honor_if_verified(self):
+    def test_change_to_default_if_verified(self):
         """
         Tests that a student that is a currently enrolled verified student cannot
-        accidentally change their enrollment to verified
+        accidentally change their enrollment mode
         """
         CourseEnrollment.enroll(self.user, self.course.id, mode=u'verified')
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
-        # now try to enroll the student in the honor mode:
+        # now try to enroll the student in the default mode:
         response = self._enroll_through_view(self.course)
         self.assertEqual(response.status_code, 400)
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(
@@ -826,7 +838,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.assertTrue(is_active)
         self.assertEqual(enrollment_mode, u'verified')
 
-    def test_change_to_honor_if_verified_not_active(self):
+    def test_change_to_default_if_verified_not_active(self):
         """
         Tests that one can renroll for a course if one has already unenrolled
         """
@@ -847,7 +859,7 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
             self.user, self.course.id
         )
         self.assertTrue(is_active)
-        self.assertEqual(enrollment_mode, u'honor')
+        self.assertEqual(enrollment_mode, CourseMode.DEFAULT_MODE_SLUG)
 
 
 class AnonymousLookupTable(ModuleStoreTestCase):
@@ -887,6 +899,7 @@ class AnonymousLookupTable(ModuleStoreTestCase):
         self.assertEqual(anonymous_id, anonymous_id_for_user(self.user, course2.id, save=False))
 
 
+# TODO: Clean up these tests so that they use the ProgramsDataMixin.
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
@@ -917,8 +930,11 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
     def _create_program_data(self, data):
         """Dry method to create testing programs data."""
         programs = {}
+        _id = 0
+
         for course, program_status in data:
             programs[unicode(course)] = {
+                'id': _id,
                 'category': self.category,
                 'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                 'marketing_slug': 'fake-marketing-slug-xseries-1',
@@ -944,6 +960,8 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 'name': self.program_name
             }
 
+            _id += 1
+
         return programs
 
     @ddt.data(
@@ -955,9 +973,10 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
     @ddt.unpack
     def test_get_xseries_programs_method(self, program_status, course_codes, marketing_slug):
         """Verify that program data is parsed correctly for a given course"""
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = {
                 u'edx/demox/Run_1': {
+                    'id': 0,
                     'category': self.category,
                     'organization': {'display_name': 'Test Organization 1', 'key': 'edX'},
                     'marketing_slug': marketing_slug,
@@ -979,6 +998,7 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
                 self.assertEqual(
                     {
                         u'edx/demox/Run_1': {
+                            'program_id': 0,
                             'category': 'xseries',
                             'course_count': len(course_codes),
                             'display_name': self.program_name,
@@ -997,15 +1017,10 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         """
         CourseEnrollment.enroll(self.user, self.course_1.id)
         self.client.login(username="jack", password="test")
-        with patch('student.views.get_course_programs_for_dashboard') as mock_method:
-            mock_method.return_value = self._create_program_data(
-                [(self.course_1.id, 'active')]
-            )
+        with patch('student.views.get_programs_for_dashboard') as mock_method:
+            mock_method.return_value = self._create_program_data([])
             response = self.client.get(reverse('dashboard'))
 
-            # Verify that without the programs configuration the method
-            # 'get_course_programs_for_dashboard' should not be called
-            self.assertFalse(mock_method.called)
             self.assertEquals(response.status_code, 200)
             self.assertIn('Pursue a Certificate of Achievement to highlight', response.content)
             self._assert_responses(response, 0)
@@ -1020,9 +1035,9 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_2.id, mode=course_mode)
 
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_programs_config()
 
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
                 [(self.course_1.id, 'active'), (self.course_2.id, 'unpublished')]
             )
@@ -1053,10 +1068,10 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_1.id, mode='verified')
 
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_programs_config()
 
         with patch(
-            'student.views.get_course_programs_for_dashboard',
+            'student.views.get_programs_for_dashboard',
             return_value=self._create_program_data([(self.course_1.id, 'active')])
         ) as mock_get_programs:
             response = self.client.get(reverse('dashboard'))
@@ -1083,9 +1098,9 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
         CourseEnrollment.enroll(self.user, self.course_3.id, mode='honor')
 
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_programs_config()
 
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = self._create_program_data(
                 [(self.course_1.id, status_1),
                  (self.course_2.id, status_2),
@@ -1104,13 +1119,13 @@ class DashboardTestXSeriesPrograms(ModuleStoreTestCase, ProgramsApiConfigMixin):
 
         CourseEnrollment.enroll(self.user, self.course_1.id)
         self.client.login(username="jack", password="test")
-        self.create_config(enabled=True, enable_student_dashboard=True)
+        self.create_programs_config()
 
         program_data = self._create_program_data([(self.course_1.id, 'active')])
         if key_remove and key_remove in program_data[unicode(self.course_1.id)]:
             del program_data[unicode(self.course_1.id)][key_remove]
 
-        with patch('student.views.get_course_programs_for_dashboard') as mock_data:
+        with patch('student.views.get_programs_for_dashboard') as mock_data:
             mock_data.return_value = program_data
 
             response = self.client.get(reverse('dashboard'))

@@ -1,7 +1,7 @@
 """
 User Partitions Transformer
 """
-from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 
 from .split_test import SplitTestTransformer
 from .utils import get_field_on_block
@@ -66,12 +66,7 @@ class UserPartitionTransformer(BlockStructureTransformer):
 
     def transform(self, usage_info, block_structure):
         """
-        Mutates block_structure and block_data based on the given
-        usage_info.
-
-        Arguments:
-            usage_info (object)
-            block_structure (BlockStructureCollectedData)
+        Mutates block_structure based on the given usage_info.
         """
         SplitTestTransformer().transform(usage_info, block_structure)
 

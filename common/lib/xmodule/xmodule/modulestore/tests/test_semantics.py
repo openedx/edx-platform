@@ -5,6 +5,7 @@ Tests of modulestore semantics: How do the interfaces methods of ModuleStore rel
 import ddt
 import itertools
 from collections import namedtuple
+from xmodule.course_module import CourseSummary
 
 from xmodule.modulestore.tests.utils import (
     PureModulestoreTestCase, MongoModulestoreBuilder,
@@ -177,6 +178,20 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
         """
         self.assertNotParentOf(self.course.scope_ids.usage_id, block_usage_key, draft=draft)
 
+    def assertCourseSummaryFields(self, course_summaries):
+        """
+        Assert that the `course_summary` of a course has all expected fields.
+
+        Arguments:
+            course_summaries: list of CourseSummary class objects.
+        """
+        def verify_course_summery_fields(course_summary):
+            """ Verify that every `course_summary` object has all the required fields """
+            expected_fields = CourseSummary.course_info_fields + ['id', 'location']
+            return all([hasattr(course_summary, field) for field in expected_fields])
+
+        self.assertTrue(all(verify_course_summery_fields(course_summary) for course_summary in course_summaries))
+
     def is_detached(self, block_type):
         """
         Return True if ``block_type`` is a detached block.
@@ -258,6 +273,21 @@ class DirectOnlyCategorySemantics(PureModulestoreTestCase):
 
         self.assertCourseDoesntPointToBlock(block_usage_key)
         self.assertBlockDoesntExist(block_usage_key)
+
+    @ddt.data(ModuleStoreEnum.Branch.draft_preferred, ModuleStoreEnum.Branch.published_only)
+    def test_course_summaries(self, branch):
+        """ Test that `get_course_summaries` method in modulestore work as expected. """
+        with self.store.branch_setting(branch_setting=branch):
+            course_summaries = self.store.get_course_summaries()
+
+            # Verify course summaries
+            self.assertEqual(len(course_summaries), 1)
+
+            # Verify that all course summary objects have the required attributes.
+            self.assertCourseSummaryFields(course_summaries)
+
+            # Verify fetched accessible courses list is a list of CourseSummery instances
+            self.assertTrue(all(isinstance(course, CourseSummary) for course in course_summaries))
 
     @ddt.data(*itertools.product(['chapter', 'sequential'], [True, False]))
     @ddt.unpack

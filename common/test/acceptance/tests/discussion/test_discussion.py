@@ -3,9 +3,12 @@ Tests for discussion pages
 """
 
 import datetime
-from pytz import UTC
+from unittest import skip
 from uuid import uuid4
+
+from flaky import flaky
 from nose.plugins.attrib import attr
+from pytz import UTC
 
 from .helpers import BaseDiscussionTestCase
 from ..helpers import UniqueCourseTest
@@ -316,7 +319,7 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
 
     def test_page_scroll_on_thread_change_view(self):
         """
-        Check switching between threads changes the page to scroll to bottom
+        Check switching between threads changes the page focus
         """
         # verify threads are rendered on the page
         self.assertTrue(
@@ -327,8 +330,8 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
         self.thread_page_1.click_and_open_thread(thread_id=self.thread_ids[1])
         self.assertTrue(self.thread_page_2.is_browser_on_page())
 
-        # Verify that window is on top of page.
-        self.thread_page_2.check_window_is_on_top()
+        # Verify that the focus is changed
+        self.thread_page_2.check_focus_is_set(selector=".discussion-article")
 
 
 @attr('shard_2')
@@ -446,6 +449,145 @@ class DiscussionResponseEditTest(BaseDiscussionTestCase):
         page.set_response_editor_value(response_id, new_response)
         page.submit_response_edit(response_id, new_response)
 
+    def test_edit_response_add_link(self):
+        """
+        Scenario: User submits valid input to the 'add link' form
+            Given I am editing a response on a discussion page
+            When I click the 'add link' icon in the editor toolbar
+            And enter a valid url to the URL input field
+            And enter a valid string in the Description input field
+            And click the 'OK' button
+            Then the edited response should contain the new link
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+
+        response_id = "response_self_author"
+        url = "http://example.com"
+        description = "example"
+
+        page.start_response_edit(response_id)
+        page.set_response_editor_value(response_id, "")
+        page.add_content_via_editor_button(
+            "link", response_id, url, description)
+        page.submit_response_edit(response_id, description)
+
+        expected_response_html = (
+            '<p><a href="{}">{}</a></p>'.format(url, description)
+        )
+        actual_response_html = page.q(
+            css=".response_{} .response-body".format(response_id)
+        ).html[0]
+        self.assertEqual(expected_response_html, actual_response_html)
+
+    def test_edit_response_add_image(self):
+        """
+        Scenario: User submits valid input to the 'add image' form
+            Given I am editing a response on a discussion page
+            When I click the 'add image' icon in the editor toolbar
+            And enter a valid url to the URL input field
+            And enter a valid string in the Description input field
+            And click the 'OK' button
+            Then the edited response should contain the new image
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+
+        response_id = "response_self_author"
+        url = "http://www.example.com/something.png"
+        description = "image from example.com"
+
+        page.start_response_edit(response_id)
+        page.set_response_editor_value(response_id, "")
+        page.add_content_via_editor_button(
+            "image", response_id, url, description)
+        page.submit_response_edit(response_id, '')
+
+        expected_response_html = (
+            '<p><img src="{}" alt="{}" title=""></p>'.format(url, description)
+        )
+        actual_response_html = page.q(
+            css=".response_{} .response-body".format(response_id)
+        ).html[0]
+        self.assertEqual(expected_response_html, actual_response_html)
+
+    def test_edit_response_add_image_error_msg(self):
+        """
+        Scenario: User submits invalid input to the 'add image' form
+            Given I am editing a response on a discussion page
+            When I click the 'add image' icon in the editor toolbar
+            And enter an invalid url to the URL input field
+            And enter an empty string in the Description input field
+            And click the 'OK' button
+            Then I should be shown 2 error messages
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+        page.start_response_edit("response_self_author")
+        page.add_content_via_editor_button(
+            "image", "response_self_author", '', '')
+        page.verify_link_editor_error_messages_shown()
+
+    def test_edit_response_add_decorative_image(self):
+        """
+        Scenario: User submits invalid input to the 'add image' form
+            Given I am editing a response on a discussion page
+            When I click the 'add image' icon in the editor toolbar
+            And enter a valid url to the URL input field
+            And enter an empty string in the Description input field
+            And I check the 'image is decorative' checkbox
+            And click the 'OK' button
+            Then the edited response should contain the new image
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+
+        response_id = "response_self_author"
+        url = "http://www.example.com/something.png"
+        description = ""
+
+        page.start_response_edit(response_id)
+        page.set_response_editor_value(response_id, "Some content")
+        page.add_content_via_editor_button(
+            "image", response_id, url, description, is_decorative=True)
+        page.submit_response_edit(response_id, "Some content")
+
+        expected_response_html = (
+            '<p>Some content<img src="{}" alt="{}" title=""></p>'.format(
+                url, description)
+        )
+        actual_response_html = page.q(
+            css=".response_{} .response-body".format(response_id)
+        ).html[0]
+        self.assertEqual(expected_response_html, actual_response_html)
+
+    def test_edit_response_add_link_error_msg(self):
+        """
+        Scenario: User submits invalid input to the 'add link' form
+            Given I am editing a response on a discussion page
+            When I click the 'add link' icon in the editor toolbar
+            And enter an invalid url to the URL input field
+            And enter an empty string in the Description input field
+            And click the 'OK' button
+            Then I should be shown 2 error messages
+        """
+        self.setup_user()
+        self.setup_view()
+        page = self.create_single_thread_page("response_edit_test_thread")
+        page.visit()
+        page.start_response_edit("response_self_author")
+        page.add_content_via_editor_button(
+            "link", "response_self_author", '', '')
+        page.verify_link_editor_error_messages_shown()
+
     def test_edit_response_as_student(self):
         """
         Scenario: Students should be able to edit the response they created not responses of other users
@@ -556,6 +698,7 @@ class DiscussionCommentEditTest(BaseDiscussionTestCase):
         self.edit_comment(page, "comment_self_author")
         self.edit_comment(page, "comment_other_author")
 
+    @flaky  # TODO: TNL-4057
     def test_cancel_comment_edit(self):
         self.setup_user()
         self.setup_view()

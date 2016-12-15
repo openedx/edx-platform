@@ -42,6 +42,7 @@ from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DI
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location, navigation_index
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
     mongo_uses_error_check
 from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin, mock_tab_from_json
@@ -435,6 +436,68 @@ class TestMixedModuleStore(CommonMixedModuleStoreSetup):
                 self.course_locations[self.MONGO_COURSEID].course_key,
                 revision=ModuleStoreEnum.RevisionOption.draft_preferred
             )
+
+    @ddt.data((ModuleStoreEnum.Type.split, 2, False), (ModuleStoreEnum.Type.mongo, 3, True))
+    @ddt.unpack
+    def test_get_items_include_orphans(self, default_ms, expected_items_in_tree, orphan_in_items):
+        """
+        Test `include_orphans` option helps in returning only those items which are present in course tree.
+        It tests that orphans are not fetched when calling `get_item` with `include_orphans`.
+
+        Params:
+            expected_items_in_tree:
+                Number of items that will be returned after `get_items` would be called with `include_orphans`.
+                In split, it would not get orphan items.
+                In mongo, it would still get orphan items because `include_orphans` would not have any impact on mongo
+                    modulestore which will return same number of items as called without `include_orphans` kwarg.
+
+            orphan_in_items:
+                When `get_items` is called with `include_orphans` kwarg, then check if an orphan is returned or not.
+                False when called in split modulestore because in split get_items is expected to not retrieve orphans
+                    now because of `include_orphans`.
+                True when called in mongo modulstore because `include_orphans` does not have any effect on mongo.
+        """
+        self.initdb(default_ms)
+
+        test_course = self.store.create_course('testx', 'GreekHero', 'test_run', self.user_id)
+        course_key = test_course.id
+
+        items = self.store.get_items(course_key)
+        # Check items found are either course or about type
+        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items])))
+        # Assert that about is a detached category found in get_items
+        self.assertIn(
+            [item.location.block_type for item in items if item.location.block_type == 'about'][0],
+            DETACHED_XBLOCK_TYPES
+        )
+        self.assertEqual(len(items), 2)
+
+        # Check that orphans are not found
+        orphans = self.store.get_orphans(course_key)
+        self.assertEqual(len(orphans), 0)
+
+        # Add an orphan to test course
+        orphan = course_key.make_usage_key('chapter', 'OrphanChapter')
+        self.store.create_item(self.user_id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
+
+        # Check that now an orphan is found
+        orphans = self.store.get_orphans(course_key)
+        self.assertIn(orphan, orphans)
+        self.assertEqual(len(orphans), 1)
+
+        # Check now `get_items` retrieves an extra item added above which is an orphan.
+        items = self.store.get_items(course_key)
+        self.assertIn(orphan, [item.location for item in items])
+        self.assertEqual(len(items), 3)
+
+        # Check now `get_items` with `include_orphans` kwarg does not retrieves an orphan block.
+        items_in_tree = self.store.get_items(course_key, include_orphans=False)
+
+        # Check that course and about blocks are found in get_items
+        self.assertTrue(set(['course', 'about']).issubset(set([item.location.block_type for item in items_in_tree])))
+        # Check orphan is found or not - this is based on mongo/split modulestore. It should be found in mongo.
+        self.assertEqual(orphan in [item.location for item in items_in_tree], orphan_in_items)
+        self.assertEqual(len(items_in_tree), expected_items_in_tree)
 
     # draft: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)

@@ -2,24 +2,29 @@
 Declaration of CourseOverview model
 """
 import json
-from django.db import models, transaction
+import logging
 
+from django.db import models, transaction
 from django.db.models.fields import BooleanField, DateTimeField, DecimalField, TextField, FloatField, IntegerField
 from django.db.utils import IntegrityError
+from django.template import defaultfilters
 from django.utils.translation import ugettext
-from lms.djangoapps import django_comment_client
-from model_utils.models import TimeStampedModel
 
+from ccx_keys.locator import CCXLocator
+from model_utils.models import TimeStampedModel
 from opaque_keys.edx.keys import CourseKey
 
+from config_models.models import ConfigurationModel
+from lms.djangoapps import django_comment_client
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from util.date_utils import strftime_localized
 from xmodule import course_metadata_utils
-from xmodule.course_module import CourseDescriptor
+from xmodule.course_module import CourseDescriptor, DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule_django.models import CourseKeyField, UsageKeyField
 
-from ccx_keys.locator import CCXLocator
+log = logging.getLogger(__name__)
 
 
 class CourseOverview(TimeStampedModel):
@@ -28,14 +33,17 @@ class CourseOverview(TimeStampedModel):
 
     This model contains basic course metadata such as an ID, display name,
     image URL, and any other information that would be necessary to display
-    a course as part of a user dashboard or enrollment API.
+    a course as part of:
+        user dashboard (enrolled courses)
+        course catalog (courses to enroll in)
+        course about (meta data about the course)
     """
 
     class Meta(object):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 2
+    VERSION = 3
 
     # Cache entry versioning.
     version = IntegerField()
@@ -43,6 +51,7 @@ class CourseOverview(TimeStampedModel):
     # Course identification
     id = CourseKeyField(db_index=True, primary_key=True, max_length=255)
     _location = UsageKeyField(max_length=255)
+    org = TextField(max_length=255, default='outdated_entry')
     display_name = TextField(null=True)
     display_number_with_default = TextField()
     display_org_with_default = TextField()
@@ -51,6 +60,7 @@ class CourseOverview(TimeStampedModel):
     start = DateTimeField(null=True)
     end = DateTimeField(null=True)
     advertised_start = TextField(null=True)
+    announcement = DateTimeField(null=True)
 
     # URLs
     course_image_url = TextField()
@@ -82,6 +92,12 @@ class CourseOverview(TimeStampedModel):
     invitation_only = BooleanField(default=False)
     max_student_enrollments_allowed = IntegerField(null=True)
 
+    # Catalog information
+    catalog_visibility = TextField(null=True)
+    short_description = TextField(null=True)
+    course_video_url = TextField(null=True)
+    effort = TextField(null=True)
+
     @classmethod
     def _create_from_course(cls, course):
         """
@@ -97,7 +113,9 @@ class CourseOverview(TimeStampedModel):
             CourseOverview: overview extracted from the given course
         """
         from lms.djangoapps.certificates.api import get_active_web_certificate
-        from lms.djangoapps.courseware.courses import course_image_url
+        from openedx.core.lib.courses import course_image_url
+
+        log.info('Creating course overview for %s.', unicode(course.id))
 
         # Workaround for a problem discovered in https://openedx.atlassian.net/browse/TNL-2806.
         # If the course has a malformed grading policy such that
@@ -125,6 +143,7 @@ class CourseOverview(TimeStampedModel):
             version=cls.VERSION,
             id=course.id,
             _location=course.location,
+            org=course.location.org,
             display_name=display_name,
             display_number_with_default=course.display_number_with_default,
             display_org_with_default=course.display_org_with_default,
@@ -132,6 +151,7 @@ class CourseOverview(TimeStampedModel):
             start=start,
             end=end,
             advertised_start=course.advertised_start,
+            announcement=course.announcement,
 
             course_image_url=course_image_url(course),
             facebook_url=course.facebook_url,
@@ -156,6 +176,11 @@ class CourseOverview(TimeStampedModel):
             enrollment_domain=course.enrollment_domain,
             invitation_only=course.invitation_only,
             max_student_enrollments_allowed=max_student_enrollments_allowed,
+
+            catalog_visibility=course.catalog_visibility,
+            short_description=CourseDetails.fetch_about_attribute(course.id, 'short_description'),
+            effort=CourseDetails.fetch_about_attribute(course.id, 'effort'),
+            course_video_url=CourseDetails.fetch_video_url(course.id),
         )
 
     @classmethod
@@ -188,6 +213,8 @@ class CourseOverview(TimeStampedModel):
                             CourseOverviewTab(tab_id=tab.tab_id, course_overview=course_overview)
                             for tab in course.tabs
                         ])
+                        CourseOverviewImageSet.create_for_course(course_overview, course)
+
                 except IntegrityError:
                     # There is a rare race condition that will occur if
                     # CourseOverview.get_from_id is called while a
@@ -231,13 +258,20 @@ class CourseOverview(TimeStampedModel):
                 course from the module store.
         """
         try:
-            course_overview = cls.objects.get(id=course_id)
+            course_overview = cls.objects.select_related('image_set').get(id=course_id)
             if course_overview.version < cls.VERSION:
                 # Throw away old versions of CourseOverview, as they might contain stale data.
                 course_overview.delete()
                 course_overview = None
         except cls.DoesNotExist:
             course_overview = None
+
+        # Regenerate the thumbnail images if they're missing (either because
+        # they were never generated, or because they were flushed out after
+        # a change to CourseOverviewImageConfig.
+        if course_overview and not hasattr(course_overview, 'image_set'):
+            CourseOverviewImageSet.create_for_course(course_overview)
+
         return course_overview or cls.load_from_module_store(course_id)
 
     def clean_id(self, padding_char='='):
@@ -289,6 +323,20 @@ class CourseOverview(TimeStampedModel):
         Return reasonable display name for the course.
         """
         return course_metadata_utils.display_name_with_default(self)
+
+    @property
+    def display_name_with_default_escaped(self):
+        """
+        DEPRECATED: use display_name_with_default
+
+        Return html escaped reasonable display name for the course.
+
+        Note: This newly introduced method should not be used.  It was only
+        introduced to enable a quick search/replace and the ability to slowly
+        migrate and test switching to display_name_with_default, which is no
+        longer escaped.
+        """
+        return course_metadata_utils.display_name_with_default_escaped(self)
 
     def has_started(self):
         """
@@ -343,6 +391,42 @@ class CourseOverview(TimeStampedModel):
             strftime_localized
         )
 
+    @property
+    def sorting_score(self):
+        """
+        Returns a tuple that can be used to sort the courses according
+        the how "new" they are. The "newness" score is computed using a
+        heuristic that takes into account the announcement and
+        (advertised) start dates of the course if available.
+
+        The lower the number the "newer" the course.
+        """
+        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
+
+    @property
+    def start_type(self):
+        """
+        Returns the type of the course's 'start' field.
+        """
+        if self.advertised_start:
+            return u'string'
+        elif self.start != DEFAULT_START_DATE:
+            return u'timestamp'
+        else:
+            return u'empty'
+
+    @property
+    def start_display(self):
+        """
+        Returns the display value for the course's start date.
+        """
+        if self.advertised_start:
+            return self.advertised_start
+        elif self.start != DEFAULT_START_DATE:
+            return defaultfilters.date(self.start, "DATE_FORMAT")
+        else:
+            return None
+
     def may_certify(self):
         """
         Returns whether it is acceptable to show the student a certificate
@@ -360,6 +444,56 @@ class CourseOverview(TimeStampedModel):
         Returns a list of ID strings for this course's prerequisite courses.
         """
         return json.loads(self._pre_requisite_courses_json)
+
+    @classmethod
+    def get_select_courses(cls, course_keys):
+        """
+        Returns CourseOverview objects for the given course_keys.
+        """
+        course_overviews = []
+
+        log.info('Generating course overview for %d courses.', len(course_keys))
+        log.debug('Generating course overview(s) for the following courses: %s', course_keys)
+
+        for course_key in course_keys:
+            try:
+                course_overviews.append(CourseOverview.get_from_id(course_key))
+            except Exception as ex:  # pylint: disable=broad-except
+                log.exception(
+                    'An error occurred while generating course overview for %s: %s',
+                    unicode(course_key),
+                    ex.message,
+                )
+
+        log.info('Finished generating course overviews.')
+
+        return course_overviews
+
+    @classmethod
+    def get_all_courses(cls, org=None, filter_=None):
+        """
+        Returns all CourseOverview objects in the database.
+
+        Arguments:
+            org (string): Optional parameter that allows case-insensitive
+                filtering by organization.
+            filter_ (dict): Optional parameter that allows custom filtering.
+        """
+        # Note: If a newly created course is not returned in this QueryList,
+        # make sure the "publish" signal was emitted when the course was
+        # created. For tests using CourseFactory, use emit_signals=True.
+        course_overviews = CourseOverview.objects.all()
+
+        if org:
+            # In rare cases, courses belonging to the same org may be accidentally assigned
+            # an org code with a different casing (e.g., Harvardx as opposed to HarvardX).
+            # Case-insensitive exact matching allows us to deal with this kind of dirty data.
+            course_overviews = course_overviews.filter(org__iexact=org)
+
+        if filter_:
+            course_overviews = course_overviews.filter(**filter_)
+
+        return course_overviews
 
     @classmethod
     def get_all_course_keys(cls):
@@ -382,6 +516,45 @@ class CourseOverview(TimeStampedModel):
                 return True
         return False
 
+    @property
+    def image_urls(self):
+        """
+        Return a dict with all known URLs for this course image.
+
+        Current resolutions are:
+          raw = original upload from the user
+          small = thumbnail with dimensions CourseOverviewImageConfig.current().small
+          large = thumbnail with dimensions CourseOverviewImageConfig.current().large
+
+        If no thumbnails exist, the raw (originally uploaded) image will be
+        returned for all resolutions.
+        """
+        # This is either the raw image that the course team uploaded, or the
+        # settings.DEFAULT_COURSE_ABOUT_IMAGE_URL if they didn't specify one.
+        raw_image_url = self.course_image_url
+
+        # Default all sizes to return the raw image if there is no
+        # CourseOverviewImageSet associated with this CourseOverview. This can
+        # happen because we're disabled via CourseOverviewImageConfig.
+        urls = {
+            'raw': raw_image_url,
+            'small': raw_image_url,
+            'large': raw_image_url,
+        }
+
+        # If we do have a CourseOverviewImageSet, we still default to the raw
+        # images if our thumbnails are blank (might indicate that there was a
+        # processing error of some sort while trying to generate thumbnails).
+        if hasattr(self, 'image_set') and CourseOverviewImageConfig.current().enabled:
+            urls['small'] = self.image_set.small_url or raw_image_url
+            urls['large'] = self.image_set.large_url or raw_image_url
+
+        return urls
+
+    def __unicode__(self):
+        """Represent ourselves with the course key."""
+        return unicode(self.id)
+
 
 class CourseOverviewTab(models.Model):
     """
@@ -389,3 +562,174 @@ class CourseOverviewTab(models.Model):
     """
     tab_id = models.CharField(max_length=50)
     course_overview = models.ForeignKey(CourseOverview, db_index=True, related_name="tabs")
+
+
+class CourseOverviewImageSet(TimeStampedModel):
+    """
+    Model for Course overview images. Each column is an image type/size.
+
+    You should basically never use this class directly. Read from
+    CourseOverview.image_urls instead.
+
+    Special Notes on Deployment/Rollback/Changes:
+
+    1. By default, this functionality is disabled. To turn it on, you have to
+       create a CourseOverviewImageConfig entry via Django Admin and select
+       enabled=True.
+
+    2. If it is enabled in configuration, it will lazily create thumbnails as
+       individual CourseOverviews are requested. This is independent of the
+       CourseOverview's cls.VERSION scheme. This is to better support the use
+       case where someone might want to change the thumbnail resolutions for
+       their theme -- we didn't want to tie the code-based data schema of
+       CourseOverview to configuration changes.
+
+    3. A CourseOverviewImageSet is automatically deleted when the CourseOverview
+       it belongs to is deleted. So it will be regenerated whenever there's a
+       new publish or the CourseOverview schema version changes. It's not
+       particularly smart about this, and will just re-write the same thumbnails
+       over and over to the same location without checking to see if there were
+       changes.
+
+    4. Just because a CourseOverviewImageSet is successfully created does not
+       mean that any thumbnails exist. There might have been a processing error,
+       or there might simply be no source image to create a thumbnail out of.
+       In this case, accessing CourseOverview.image_urls will return the value
+       for course.course_image_url for all resolutions. CourseOverviewImageSet
+       will *not* try to regenerate if there is a model entry with blank values
+       for the URLs -- the assumption is that either there's no data there or
+       something has gone wrong and needs fixing in code.
+
+    5. If you want to change thumbnail resolutions, you need to create a new
+       CourseOverviewImageConfig with the desired dimensions and then wipe the
+       values in CourseOverviewImageSet.
+
+    Logical next steps that I punted on for this first cut:
+
+    1. Converting other parts of the app to use this.
+
+       Our first cut only affects About Pages and the Student Dashboard. But
+       most places that use course_image_url() should be converted -- e.g.
+       course discovery, mobile, etc.
+
+    2. Center cropping the image before scaling.
+
+       This is desirable, but it involves a few edge cases (what the rounding
+       policy is, what to do with undersized images, etc.) The behavior that
+       we implemented is at least no worse than what was already there in terms
+       of distorting images.
+
+    3. Automatically invalidating entries based on CourseOverviewImageConfig.
+
+       There are two basic paths I can think of for this. The first is to
+       completely wipe this table when the config changes. The second is to
+       actually tie the config as a foreign key from this model -- so you could
+       do the comparison to see if the image_set's config_id matched
+       CourseOverviewImageConfig.current() and invalidate it if they didn't
+       match. I punted on this mostly because it's just not something that
+       happens much at all in practice, there is an understood (if manual)
+       process to do it, and it can happen in a follow-on PR if anyone is
+       interested in extending this functionality.
+
+    """
+    course_overview = models.OneToOneField(CourseOverview, db_index=True, related_name="image_set")
+    small_url = models.TextField(blank=True, default="")
+    large_url = models.TextField(blank=True, default="")
+
+    @classmethod
+    def create_for_course(cls, course_overview, course=None):
+        """
+        Create thumbnail images for this CourseOverview.
+
+        This will save the CourseOverviewImageSet it creates before it returns.
+        """
+        from openedx.core.lib.courses import create_course_image_thumbnail
+
+        # If image thumbnails are not enabled, do nothing.
+        config = CourseOverviewImageConfig.current()
+        if not config.enabled:
+            return
+
+        # If a course object was provided, use that. Otherwise, pull it from
+        # CourseOverview's course_id. This happens because sometimes we are
+        # generated as part of the CourseOverview creation (course is available
+        # and passed in), and sometimes the CourseOverview already exists.
+        if not course:
+            course = modulestore().get_course(course_overview.id)
+
+        image_set = CourseOverviewImageSet(course_overview=course_overview)
+        if course.course_image:
+            # Try to create a thumbnails of the course image. If this fails for any
+            # reason (weird format, non-standard URL, etc.), the URLs will default
+            # to being blank. No matter what happens, we don't want to bubble up
+            # a 500 -- an image_set is always optional.
+            try:
+                image_set.small_url = create_course_image_thumbnail(course, config.small)
+                image_set.large_url = create_course_image_thumbnail(course, config.large)
+            except Exception:  # pylint: disable=broad-except
+                log.exception(
+                    "Could not create thumbnail for course %s with image %s (small=%s), (large=%s)",
+                    course.id,
+                    course.course_image,
+                    config.small,
+                    config.large
+                )
+
+        # Regardless of whether we created thumbnails or not, we need to save
+        # this record before returning. If no thumbnails were created (there was
+        # an error or the course has no source course_image), our url fields
+        # just keep their blank defaults.
+        try:
+            with transaction.atomic():
+                image_set.save()
+                course_overview.image_set = image_set
+        except (IntegrityError, ValueError):
+            # In the event of a race condition that tries to save two image sets
+            # to the same CourseOverview, we'll just silently pass on the one
+            # that fails. They should be the same data anyway.
+            #
+            # The ValueError above is to catch the following error that can
+            # happen in Django 1.8.4+ if the CourseOverview object fails to save
+            # (again, due to race condition).
+            #
+            # Example: ValueError: save() prohibited to prevent data loss due
+            #          to unsaved related object 'course_overview'.")
+            pass
+
+    def __unicode__(self):
+        return u"CourseOverviewImageSet({}, small_url={}, large_url={})".format(
+            self.course_overview_id, self.small_url, self.large_url
+        )
+
+
+class CourseOverviewImageConfig(ConfigurationModel):
+    """
+    This sets the size of the thumbnail images that Course Overviews will generate
+    to display on the about, info, and student dashboard pages. If you make any
+    changes to this, you will have to regenerate CourseOverviews in order for it
+    to take effect. You might want to do this if you're doing precise theming of
+    your install of edx-platform... but really, you probably don't want to do this
+    at all at the moment, given how new this is. :-P
+    """
+    # Small thumbnail, for things like the student dashboard
+    small_width = models.IntegerField(default=375)
+    small_height = models.IntegerField(default=200)
+
+    # Large thumbnail, for things like the about page
+    large_width = models.IntegerField(default=750)
+    large_height = models.IntegerField(default=400)
+
+    @property
+    def small(self):
+        """Tuple for small image dimensions in pixels -- (width, height)"""
+        return (self.small_width, self.small_height)
+
+    @property
+    def large(self):
+        """Tuple for large image dimensions in pixels -- (width, height)"""
+        return (self.large_width, self.large_height)
+
+    def __unicode__(self):
+        return u"CourseOverviewImageConfig(enabled={}, small={}, large={})".format(
+            self.enabled, self.small, self.large
+        )

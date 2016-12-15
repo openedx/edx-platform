@@ -19,8 +19,11 @@
                 <textarea id="certificate-description-<%= uniqueId %>" class="certificate-description-input text input-text" name="certificate-description" placeholder="<%= gettext("Description of the certificate") %>" aria-describedby="certificate-description-<%=uniqueId %>-tip"><%= description %></textarea>
                 <span id="certificate-description-<%= uniqueId %>-tip" class="tip tip-stacked"><%= gettext("Description of the certificate") %></span>
             </div>
-            <div class="field text actual-course-title">
-                <label class="actual-course-title"><b><%= gettext("Course Title") %></b></label>
+            <header>
+              <h2 class="title title-2"><%= gettext("Certificate Details") %></h2>
+            </header>
+            <div class="actual-course-title">
+                <span class="actual-course-title"><%= gettext("Course Title") %>: </span>
                 <span class="actual-title"><%= course.get('name') %></span>
             </div>
             <div class="input-wrap field text add-certificate-course-title">
@@ -30,8 +33,9 @@
             </div>
         </fieldset>
          <header>
-            <span class="title"><%= gettext("Certificate Signatories") %></legend>
+            <h2 class="title title-2"><%= gettext("Certificate Signatories") %></h2>
          </header>
+         <p class="instructions"><%= gettext("It is strongly recommended that you include four or fewer signatories. If you include additional signatories, preview the certificate in Print View to ensure the certificate will print correctly on one page.") %></p>
         <div class="signatory-edit-list"> </div>
         <span>
            <button class="action action-add-signatory" type="button"><%= gettext("Add Additional Signatory") %></button>

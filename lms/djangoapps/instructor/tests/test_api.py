@@ -9,7 +9,6 @@ import random
 import pytz
 import io
 import json
-import requests
 import shutil
 import tempfile
 from urllib import quote
@@ -30,6 +29,7 @@ from nose.tools import raises
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import UsageKey
+from xmodule.modulestore import ModuleStoreEnum
 
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
@@ -51,8 +51,6 @@ from student.models import (
 )
 from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -77,6 +75,7 @@ from certificates.tests.factories import GeneratedCertificateFactory
 from certificates.models import CertificateStatuses
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+from openedx.core.lib.xblock_utils import grade_histogram
 
 from .test_tools import msk_from_problem_urlname
 
@@ -726,7 +725,7 @@ class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @attr('shard_1')
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -935,13 +934,39 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
     def setUpClass(cls):
         super(TestInstructorAPIBulkAccountCreationAndEnrollment, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.url = reverse('register_and_enroll_students', kwargs={'course_id': cls.course.id.to_deprecated_string()})
+
+        # Create a course with mode 'audit'
+        cls.audit_course = CourseFactory.create()
+        CourseModeFactory(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
+
+        cls.url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': unicode(cls.course.id)}
+        )
+        cls.audit_course_url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': unicode(cls.audit_course.id)}
+        )
 
     def setUp(self):
         super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()
 
+        # Create a course with mode 'honor' and with price
+        self.white_label_course = CourseFactory.create()
+        self.white_label_course_mode = CourseModeFactory(
+            course_id=self.white_label_course.id,
+            mode_slug=CourseMode.HONOR,
+            min_price=10,
+            suggested_prices='10',
+        )
+
+        self.white_label_course_url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': unicode(self.white_label_course.id)}
+        )
+
         self.request = RequestFactory().request()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        self.audit_course_instructor = InstructorFactory(course_key=self.audit_course.id)
+        self.white_label_course_instructor = InstructorFactory(course_key=self.white_label_course.id)
+
         self.client.login(username=self.instructor.username, password='test')
 
         self.not_enrolled_student = UserFactory(
@@ -1168,7 +1193,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
                       "test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        with patch('instructor.views.api.create_and_enroll_user') as mock:
+        with patch('instructor.views.api.create_manual_course_enrollment') as mock:
             mock.side_effect = NonExistentCourseError()
             response = self.client.post(self.url, {'students_list': uploaded_file})
 
@@ -1227,6 +1252,89 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
 
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_audit_enrollment_mode(self):
+        """
+        Test that enrollment mode for audit courses (paid courses) is 'audit'.
+        """
+        # Login Audit Course instructor
+        self.client.login(username=self.audit_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.audit_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be 'audit'
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.AUDIT)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_honor_enrollment_mode(self):
+        """
+        Test that enrollment mode for unpaid honor courses is 'honor'.
+        """
+        # Remove white label course price
+        self.white_label_course_mode.min_price = 0
+        self.white_label_course_mode.suggested_prices = ''
+        self.white_label_course_mode.save()  # pylint: disable=no-member
+
+        # Login Audit Course instructor
+        self.client.login(username=self.white_label_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be 'honor'
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.HONOR)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_default_shopping_cart_enrollment_mode_for_white_label(self):
+        """
+        Test that enrollment mode for white label courses (paid courses) is DEFAULT_SHOPPINGCART_MODE_SLUG.
+        """
+        # Login white label course instructor
+        self.client.login(username=self.white_label_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
 
 
 @attr('shard_1')
@@ -1816,7 +1924,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         create paid course mode.
         """
         paid_course = CourseFactory.create()
-        CourseModeFactory.create(course_id=paid_course.id, min_price=50)
+        CourseModeFactory.create(course_id=paid_course.id, min_price=50, mode_slug=CourseMode.HONOR)
         CourseInstructorRole(paid_course.id).add_users(self.instructor)
         return paid_course
 
@@ -1946,7 +2054,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
     def test_unenroll_and_enroll_verified(self):
         """
         Test that unenrolling and enrolling a student from a verified track
-        results in that student being in an honor track
+        results in that student being in the default track
         """
         course_enrollment = CourseEnrollment.objects.get(
             user=self.enrolled_student, course_id=self.course.id
@@ -1963,7 +2071,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         course_enrollment = CourseEnrollment.objects.get(
             user=self.enrolled_student, course_id=self.course.id
         )
-        self.assertEqual(course_enrollment.mode, u'honor')
+        self.assertEqual(course_enrollment.mode, CourseMode.DEFAULT_MODE_SLUG)
 
     def _change_student_enrollment(self, user, course, action):
         """
@@ -2678,7 +2786,11 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
                                       company_contact_email='test@123', recipient_name='R1',
                                       recipient_email='', customer_reference_number='PO#23')
 
-        paid_course_reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        paid_course_reg_item = PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course.id,
+            mode_slug=CourseMode.HONOR
+        )
         # update the quantity of the cart item paid_course_reg_item
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': paid_course_reg_item.id, 'qty': '4'})
         self.assertEqual(resp.status_code, 200)
@@ -3583,6 +3695,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
 
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+@ddt.ddt
 class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can rescore student grades,
@@ -3650,6 +3763,29 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
             state=json.dumps({'attempts': 10, 'done': True}),
         )
         self.ee_modules = [ee_module_to_reset1.module_state_key, ee_module_to_reset2.module_state_key]
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_grade_histogram(self, store):
+        """
+        Verify that a histogram has been created.
+        """
+        course = CourseFactory.create(default_store=store)
+
+        usage_key = course.id.make_usage_key('problem', 'first_problem')
+        StudentModule.objects.create(
+            student_id=1,
+            grade=100,
+            module_state_key=usage_key
+        )
+        StudentModule.objects.create(
+            student_id=2,
+            grade=50,
+            module_state_key=usage_key
+        )
+
+        grades = grade_histogram(usage_key)
+        self.assertEqual(grades[0], (50.0, 1))
+        self.assertEqual(grades[1], (100.0, 1))
 
     def test_reset_entrance_exam_student_attempts_deletall(self):
         """ Make sure no one can delete all students state on entrance exam. """
@@ -3831,7 +3967,7 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 
 @attr('shard_1')
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -4081,7 +4217,7 @@ class TestInstructorAPITaskLists(SharedModuleStoreTestCase, LoginEnrollmentTestC
 
 
 @attr('shard_1')
-@patch.object(instructor_task.api, 'get_instructor_task_history')
+@patch.object(instructor_task.api, 'get_instructor_task_history', autospec=True)
 class TestInstructorEmailContentList(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test the instructor email content history endpoint.

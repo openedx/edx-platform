@@ -28,7 +28,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         return self.q(css=self.thread_selector + " " + selector)
 
     def is_browser_on_page(self):
-        return self.q(css=self.thread_selector).present
+        return self.q(css=self.thread_selector).visible
 
     def _get_element_text(self, selector):
         """
@@ -195,17 +195,58 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
         """Replace the contents of the response editor"""
         self._find_within(".response_{} .discussion-response .wmd-input".format(response_id)).fill(new_body)
 
+    def verify_link_editor_error_messages_shown(self):
+        """
+        Confirm that the error messages are displayed in the editor.
+        """
+        def errors_visible():
+            """
+            Returns True if both errors are visible, False otherwise.
+            """
+            return (
+                self.q(css="#new-url-input-field-message.has-error").visible and
+                self.q(css="#new-url-desc-input-field-message.has-error").visible
+            )
+
+        self.wait_for(errors_visible, "Form errors should be visible.")
+
+    def add_content_via_editor_button(self, content_type, response_id, url, description, is_decorative=False):
+        """Replace the contents of the response editor"""
+        self._find_within(
+            "#wmd-{}-button-edit-post-body-{}".format(
+                content_type,
+                response_id,
+            )
+        ).click()
+        self.q(css='#new-url-input').fill(url)
+        self.q(css='#new-url-desc-input').fill(description)
+
+        if is_decorative:
+            self.q(css='#img-is-decorative').click()
+
+        self.q(css='input[value="OK"]').click()
+
     def submit_response_edit(self, response_id, new_response_body):
         """Click the submit button on the response editor"""
-        self._find_within(".response_{} .discussion-response .post-update".format(response_id)).first.click()
-        EmptyPromise(
-            lambda: (
+
+        def submit_response_check_func():
+            """
+            Tries to click "Update post" and returns True if the post
+            was successfully updated, False otherwise.
+            """
+            self._find_within(
+                ".response_{} .discussion-response .post-update".format(
+                    response_id
+                )
+            ).first.click()
+
+            return (
                 not self.is_response_editor_visible(response_id) and
                 self.is_response_visible(response_id) and
                 self.get_response_body(response_id) == new_response_body
-            ),
-            "Comment edit succeeded"
-        ).fulfill()
+            )
+
+        self.wait_for(submit_response_check_func, "Comment edit succeeded")
 
     def is_show_comments_visible(self, response_id):
         """Returns true if the "show comments" link is visible for a response"""
@@ -277,6 +318,7 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
     def submit_comment_edit(self, comment_id, new_comment_body):
         """Click the submit button on the comment editor"""
         self._find_within("#comment_{} .post-update".format(comment_id)).first.click()
+        self.wait_for_ajax()
         EmptyPromise(
             lambda: (
                 not self.is_comment_editor_visible(comment_id) and
@@ -354,12 +396,11 @@ class DiscussionTabSingleThreadPage(CoursePage):
         with self.thread_page._secondary_action_menu_open(".forum-thread-main-wrapper"):
             self._find_within(".forum-thread-main-wrapper .action-close").first.click()
 
-    @wait_for_js
-    def is_window_on_top(self):
+    def is_focused_on_element(self, selector):
         """
-        Check if window's scroll is at top
+        Check if the focus is on element
         """
-        return self.browser.execute_script("return $('html, body').offset().top") == 0
+        return self.browser.execute_script("return $('{}').is(':focus')".format(selector))
 
     def _thread_is_rendered_successfully(self, thread_id):
         return self.q(css=".discussion-article[data-id='{}']".format(thread_id)).visible
@@ -381,13 +422,13 @@ class DiscussionTabSingleThreadPage(CoursePage):
         """
         return len(self.q(css=".forum-nav-thread").results) == thread_count
 
-    def check_window_is_on_top(self):
+    def check_focus_is_set(self, selector):
         """
-        Check window is on top of the page
+        Check focus is set
         """
         EmptyPromise(
-            self.is_window_on_top,
-            "Window is on top"
+            lambda: self.is_focused_on_element(selector),
+            "Focus is on other element"
         ).fulfill()
 
 

@@ -50,6 +50,7 @@ define('video/09_events_plugin.js', [], function() {
                 'destroy': this.destroy
             };
             this.bindHandlers();
+            this.emitPlayVideoEvent = true;
         },
 
         bindHandlers: function() {
@@ -61,15 +62,20 @@ define('video/09_events_plugin.js', [], function() {
         },
 
         onPlay: function () {
-            this.log('play_video', {currentTime: this.getCurrentTime()});
+            if (this.emitPlayVideoEvent) {
+                this.log('play_video', {currentTime: this.getCurrentTime()});
+                this.emitPlayVideoEvent = false;
+            }
         },
 
         onPause: function () {
             this.log('pause_video', {currentTime: this.getCurrentTime()});
+            this.emitPlayVideoEvent = true;
         },
 
         onEnded: function () {
             this.log('stop_video', {currentTime: this.getCurrentTime()});
+            this.emitPlayVideoEvent = true;
         },
 
         onSkip: function (event, doNotShowAgain) {

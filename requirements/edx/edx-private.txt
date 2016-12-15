@@ -1,8 +1,14 @@
 # Requirements for edx.org that aren't necessarily needed for Open edX.
+#
+# ***                                                                   ***
+# *** PLEASE READ THE INSTRUCTIONS in github.txt about how to properly  ***
+# *** write these references. Thanks.                                   ***
+# ***                                                                   ***
+
 
 # For Harvard courses:
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
--e git+https://github.com/open-craft/problem-builder.git@90b2ecd8e948f34162e558b22f60e90287385f32#egg=xblock-problem-builder
+git+https://github.com/open-craft/problem-builder.git@v2.0.2#egg=xblock-problem-builder==2.0.2
 
 # Oppia XBlock
 -e git+https://github.com/oppia/xblock.git@9f6b95b7eb7dbabb96b77198a3202604f96adf65#egg=oppia-xblock
@@ -20,10 +26,10 @@
 # edX.
 
 -e git+https://github.com/pmitros/ConceptXBlock.git@2376fde9ebdd83684b78dde77ef96361c3bd1aa0#egg=concept-xblock
--e git+https://github.com/pmitros/DoneXBlock.git@1ce0ac14d9f3df3083b951262ec82e84b58d16d1#egg=done-xblock
 -e git+https://github.com/pmitros/AudioXBlock.git@1fbf19cc21613aead62799469e1593adb037fdd9#egg=audio-xblock
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
-# Peer instruction xblock - prototype (from UBC; not for use on edx.org yet)
-ubcpi-xblock==0.4.4
+# Vector Drawing and ActiveTable XBlocks (Davidson)
+-e git+https://github.com/open-craft/xblock-vectordraw.git@ded76fc8f6c99ba4949ed57a7bf62a1f12e44683#egg=xblock-vectordraw
+-e git+https://github.com/open-craft/xblock-activetable.git@1786a2c8fc06ca3ecfac1972464048982bd486ff#egg=xblock-activetable

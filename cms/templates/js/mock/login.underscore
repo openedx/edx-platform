@@ -1,0 +1,12 @@
+<div class="wrapper-content wrapper">
+    <form id="login_form" method="post" action="login_post" onsubmit="return false;">
+        <input type="hidden" name="csrfmiddlewaretoken" value="csrf"/>
+        <input id="email" type="email" name="email" placeholder="'example: username@domain.com'"/>
+        <input id="password" type="password" name="password"/>
+
+        <div class="form-actions">
+            <button type="submit" id="submit" name="submit" class="action action-primary">Sign In</button>
+        </div>
+        <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
+    </form>
+</div>

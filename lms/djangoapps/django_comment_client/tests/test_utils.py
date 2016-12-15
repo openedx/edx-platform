@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import json
+import ddt
 import mock
 from nose.plugins.attrib import attr
 from pytz import UTC
@@ -23,6 +24,7 @@ from student.tests.factories import UserFactory, AdminFactory, CourseEnrollmentF
 from openedx.core.djangoapps.content.course_structures.models import CourseStructure
 from openedx.core.djangoapps.util.testing import ContentGroupTestCase
 from student.roles import CourseStaffRole
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MIXED_TOY_MODULESTORE
 from xmodule.modulestore.django import modulestore
@@ -108,6 +110,7 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.assertFalse(ret)
 
 
+@ddt.ddt
 @attr('shard_1')
 @mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))
 class CoursewareContextTestCase(ModuleStoreTestCase):
@@ -170,6 +173,32 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 
         assertThreadCorrect(threads[0], self.discussion1, "Chapter / Discussion 1")
         assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
+
+    @ddt.data((ModuleStoreEnum.Type.mongo, 2), (ModuleStoreEnum.Type.split, 1))
+    @ddt.unpack
+    def test_get_accessible_discussion_modules(self, modulestore_type, expected_discussion_modules):
+        """
+        Tests that the accessible discussion modules having no parents do not get fetched for split modulestore.
+        """
+        course = CourseFactory.create(default_store=modulestore_type)
+
+        # Create a discussion module.
+        test_discussion = self.store.create_child(self.user.id, course.location, 'discussion', 'test_discussion')
+
+        # Assert that created discussion module is not an orphan.
+        self.assertNotIn(test_discussion.location, self.store.get_orphans(course.id))
+
+        # Assert that there is only one discussion module in the course at the moment.
+        self.assertEqual(len(utils.get_accessible_discussion_modules(course, self.user)), 1)
+
+        # Add an orphan discussion module to that course
+        orphan = course.id.make_usage_key('discussion', 'orphan_discussion')
+        self.store.create_item(self.user.id, orphan.course_key, orphan.block_type, block_id=orphan.block_id)
+
+        # Assert that the discussion module is an orphan.
+        self.assertIn(orphan, self.store.get_orphans(course.id))
+
+        self.assertEqual(len(utils.get_accessible_discussion_modules(course, self.user)), expected_discussion_modules)
 
 
 @mock.patch('student.models.UserProfile.has_registered', mock.Mock(return_value=True))

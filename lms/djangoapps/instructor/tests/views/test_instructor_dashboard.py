@@ -10,7 +10,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 
-from ccx.tests.test_views import setup_students_and_grades
+from lms.djangoapps.ccx.tests.test_views import setup_students_and_grades
 from courseware.tabs import get_course_tab_list
 from courseware.tests.factories import UserFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
@@ -56,10 +56,12 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             display_name='<script>alert("XSS")</script>'
         )
 
-        self.course_mode = CourseMode(course_id=self.course.id,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=40)
+        self.course_mode = CourseMode(
+            course_id=self.course.id,
+            mode_slug=CourseMode.DEFAULT_MODE_SLUG,
+            mode_display_name=CourseMode.DEFAULT_MODE.name,
+            min_price=40
+        )
         self.course_mode.save()
         # Create instructor account
         self.instructor = AdminFactory.create()
@@ -111,7 +113,7 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
         with script tags.
         """
         response = self.client.get(self.url)
-        self.assert_xss(response, '<script>alert("XSS")</script>')
+        self.assert_no_xss(response, '<script>alert("XSS")</script>')
 
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
     def test_override_currency_settings_in_the_html_response(self):

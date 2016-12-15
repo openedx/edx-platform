@@ -15,6 +15,7 @@ from unittest import skip
 from django.conf import settings
 
 from course_modes.models import CourseMode
+from openedx.core.djangoapps.models.course_details import CourseDetails
 from xmodule.library_tools import normalize_key_for_search
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import SignalHandler, modulestore
@@ -191,26 +192,6 @@ class MixedWithOptionsTestCase(MixedSplitTestCase):
         """ update the item at the given location """
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
             store.update_item(item, ModuleStoreEnum.UserID.test)
-
-    def update_about_item(self, store, about_key, data):
-        """
-        Update the about item with the new data blob. If data is None, then
-        delete the about item.
-        """
-        temploc = self.course.id.make_usage_key('about', about_key)
-        if data is None:
-            try:
-                self.delete_item(store, temploc)
-            # Ignore an attempt to delete an item that doesn't exist
-            except ValueError:
-                pass
-        else:
-            try:
-                about_item = store.get_item(temploc)
-            except ItemNotFoundError:
-                about_item = store.create_xblock(self.course.runtime, self.course.id, 'about', about_key)
-            about_item.data = data
-            store.update_item(about_item, ModuleStoreEnum.UserID.test, allow_not_found=True)
 
 
 @ddt.ddt
@@ -487,7 +468,9 @@ class TestCoursewareSearchIndexer(MixedWithOptionsTestCase):
     def _test_course_about_store_index(self, store):
         """ Test that informational properties in the about store end up in the course_info index """
         short_description = "Not just anybody"
-        self.update_about_item(store, "short_description", short_description)
+        CourseDetails.update_about_item(
+            self.course, "short_description", short_description, ModuleStoreEnum.UserID.test, store
+        )
         self.reindex_course(store)
         response = self.searcher.search(
             doc_type=CourseAboutSearchIndexer.DISCOVERY_DOCUMENT_TYPE,

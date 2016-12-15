@@ -23,8 +23,8 @@
 // ====================
 $annotation-yellow: rgba(255,255,10,0.3);
 $color-copy-tip: rgb(100,100,100);
-$correct: $green-d1;
-$partiallycorrect: $green-d1;
+$correct: $green-d2;
+$partiallycorrect: $green-d2;
 $incorrect: $red;
 
 // +Extends - Capa
@@ -498,6 +498,11 @@ div.problem {
           border: 1px solid #e3e3e3;
           border-radius: 4px;
           background: #f1f1f1;
+
+          & span {
+            // Needed to fix mathjax rendering bug in chrome (TNL-4080)
+            border-left-style: none !important;
+          }
         }
       }
     }
@@ -1000,7 +1005,7 @@ div.problem {
   .detailed-solution {
     > p:first-child {
       @extend %t-strong;
-      color: #aaa;
+      color: $gray;
       text-transform: uppercase;
       font-style: normal;
       font-size: 0.9em;

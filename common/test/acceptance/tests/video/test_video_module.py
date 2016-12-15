@@ -132,7 +132,7 @@ class VideoBaseTest(UniqueCourseTest):
         self.auth_page.visit()
         self.user_info = self.auth_page.user_info
         self.course_info_page.visit()
-        self.tab_nav.go_to_tab('Courseware')
+        self.tab_nav.go_to_tab('Course')
 
     def _navigate_to_courseware_video_and_render(self):
         """ Wait for the video player to render """
@@ -212,9 +212,9 @@ class YouTubeVideoTest(VideoBaseTest):
         # Verify that video has rendered in "Youtube" mode
         self.assertTrue(self.video.is_video_rendered('youtube'))
 
-    def test_cc_button_wo_english_transcript(self):
+    def test_transcript_button_wo_english_transcript(self):
         """
-        Scenario: CC button works correctly w/o english transcript in Youtube mode
+        Scenario: Transcript button works correctly w/o english transcript in Youtube mode
         Given the course has a Video component in "Youtube" mode
         And I have defined a non-english transcript for the video
         And I have uploaded a non-english transcript file to assets
@@ -226,13 +226,38 @@ class YouTubeVideoTest(VideoBaseTest):
         self.navigate_to_video()
         self.video.show_captions()
 
-        # Verify that we see "好 各位同学" text in the captions
+        # Verify that we see "好 各位同学" text in the transcript
         unicode_text = "好 各位同学".decode('utf-8')
         self.assertIn(unicode_text, self.video.captions_text)
 
-    def test_cc_button_transcripts_and_sub_fields_empty(self):
+    def test_cc_button(self):
         """
-        Scenario: CC button works correctly if transcripts and sub fields are empty,
+        Scenario: CC button works correctly with transcript in YouTube mode
+        Given the course has a video component in "Youtube" mode
+        And I have defined a transcript for the video
+        Then I see the closed captioning element over the video
+        """
+        data = {'transcripts': {'zh': 'chinese_transcripts.srt'}}
+        self.metadata = self.metadata_for_mode('youtube', data)
+        self.assets.append('chinese_transcripts.srt')
+        self.navigate_to_video()
+
+        # Show captions and make sure they're visible and cookie is set
+        self.video.show_closed_captions()
+        self.video.wait_for_closed_captions()
+        self.assertTrue(self.video.is_closed_captions_visible)
+        self.video.reload_page()
+        self.assertTrue(self.video.is_closed_captions_visible)
+
+        # Hide captions and make sure they're hidden and cookie is unset
+        self.video.hide_closed_captions()
+        self.video.wait_for_closed_captions_to_be_hidden()
+        self.video.reload_page()
+        self.video.wait_for_closed_captions_to_be_hidden()
+
+    def test_transcript_button_transcripts_and_sub_fields_empty(self):
+        """
+        Scenario: Transcript button works correctly if transcripts and sub fields are empty,
             but transcript file exists in assets (Youtube mode of Video component)
         Given the course has a Video component in "Youtube" mode
         And I have uploaded a .srt.sjson file to assets
@@ -247,11 +272,11 @@ class YouTubeVideoTest(VideoBaseTest):
         # Verify that we see "Welcome to edX." text in the captions
         self.assertIn('Welcome to edX.', self.video.captions_text)
 
-    def test_cc_button_hidden_no_translations(self):
+    def test_transcript_button_hidden_no_translations(self):
         """
-        Scenario: CC button is hidden if no translations
+        Scenario: Transcript button is hidden if no translations
         Given the course has a Video component in "Youtube" mode
-        Then the "CC" button is hidden
+        Then the "Transcript" button is hidden
         """
         self.navigate_to_video()
         self.assertFalse(self.video.is_button_shown('transcript_button'))
@@ -522,6 +547,16 @@ class YouTubeVideoTest(VideoBaseTest):
             timeout=5
         )
 
+    def _verify_closed_caption_text(self, text):
+        """
+        Scenario: returns True if the captions are visible, False is else
+        """
+        self.video.wait_for(
+            lambda: (text in self.video.closed_captions_text),
+            u'Closed captions contain "{}" text'.format(text),
+            timeout=5
+        )
+
     def test_video_language_menu_working(self):
         """
         Scenario: Language menu works correctly in Video component
@@ -553,6 +588,43 @@ class YouTubeVideoTest(VideoBaseTest):
 
         self.video.select_language('en')
         self._verify_caption_text('Welcome to edX.')
+
+    def test_video_language_menu_working_closed_captions(self):
+        """
+        Scenario: Language menu works correctly in Video component, checks closed captions
+        Given the course has a Video component in "Youtube" mode
+        And I have defined multiple language transcripts for the videos
+        And I make sure captions are closed
+        And I see video menu "language" with correct items
+        And I select language with code "en"
+        Then I see "Welcome to edX." text in the closed captions
+        And I select language with code "zh"
+        Then I see "我们今天要讲的题目是" text in the closed captions
+        """
+        self.assets.extend(['chinese_transcripts.srt', 'subs_3_yD_cEKoCk.srt.sjson'])
+        data = {'transcripts': {"zh": "chinese_transcripts.srt"}, 'sub': '3_yD_cEKoCk'}
+        self.metadata = self.metadata_for_mode('youtube', additional_data=data)
+
+        # go to video
+        self.navigate_to_video()
+        self.video.show_closed_captions()
+
+        correct_languages = {'en': 'English', 'zh': 'Chinese'}
+        self.assertEqual(self.video.caption_languages, correct_languages)
+
+        # we start the video, then pause it to activate the transcript
+        self.video.click_player_button('play')
+        self.video.wait_for_position('0:01')
+        self.video.click_player_button('pause')
+
+        self.video.select_language('en')
+        self.video.click_first_line_in_transcript()
+        self._verify_closed_caption_text('Welcome to edX.')
+
+        self.video.select_language('zh')
+        unicode_text = "我们今天要讲的题目是".decode('utf-8')
+        self.video.click_first_line_in_transcript()
+        self._verify_closed_caption_text(unicode_text)
 
     def test_multiple_videos_in_sequentials_load_and_work(self):
         """
@@ -1083,7 +1155,7 @@ class YouTubeQualityTest(VideoBaseTest):
 
         self.video.click_player_button('play')
 
-        self.assertTrue(self.video.is_quality_button_visible)
+        self.video.wait_for(lambda: self.video.is_quality_button_visible, 'waiting for quality button to appear')
 
     @skip_if_browser('firefox')
     def test_quality_button_works_correctly(self):
@@ -1100,11 +1172,13 @@ class YouTubeQualityTest(VideoBaseTest):
 
         self.video.click_player_button('play')
 
+        self.video.wait_for(lambda: self.video.is_quality_button_visible, 'waiting for quality button to appear')
+
         self.assertFalse(self.video.is_quality_button_active)
 
         self.video.click_player_button('quality')
 
-        self.assertTrue(self.video.is_quality_button_active)
+        self.video.wait_for(lambda: self.video.is_quality_button_active, 'waiting for quality button activation')
 
 
 @attr('a11y')

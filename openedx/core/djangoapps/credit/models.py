@@ -25,6 +25,7 @@ from xmodule_django.models import CourseKeyField
 from django.utils.translation import ugettext_lazy
 
 
+CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
 log = logging.getLogger(__name__)
 
 
@@ -42,7 +43,7 @@ class CreditProvider(TimeStampedModel):
         unique=True,
         validators=[
             RegexValidator(
-                regex=r"^[a-z,A-Z,0-9,\-]+$",
+                regex=CREDIT_PROVIDER_ID_REGEX,
                 message="Only alphanumeric characters and hyphens (-) are allowed",
                 code="invalid_provider_id",
             )
@@ -498,10 +499,7 @@ def default_deadline_for_credit_eligibility():  # pylint: disable=invalid-name
 
 
 class CreditEligibility(TimeStampedModel):
-    """
-    A record of a user's eligibility for credit from a specific credit
-    provider for a specific course.
-    """
+    """ A record of a user's eligibility for credit for a specific course. """
     username = models.CharField(max_length=255, db_index=True)
     course = models.ForeignKey(CreditCourse, related_name="eligibilities")
 

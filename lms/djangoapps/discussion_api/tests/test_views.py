@@ -296,8 +296,8 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "abuse_flagged": False,
             "voted": True,
             "vote_count": 4,
-            "comment_count": 5,
-            "unread_comment_count": 3,
+            "comment_count": 6,
+            "unread_comment_count": 4,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -306,7 +306,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "has_endorsed": False,
         }]
         self.register_get_threads_response(source_threads, page=1, num_pages=2)
-        response = self.client.get(self.url, {"course_id": unicode(self.course.id)})
+        response = self.client.get(self.url, {"course_id": unicode(self.course.id), "following": ""})
         self.assert_response_correct(
             response,
             200,
@@ -360,7 +360,7 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_last_query_params({
             "user_id": [unicode(self.user.id)],
@@ -395,16 +395,15 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "text": ["test search string"],
         })
 
-    def test_following(self):
+    @ddt.data(True, "true", "1")
+    def test_following_true(self, following):
         self.register_get_user_response(self.user)
         self.register_subscribed_threads_response(self.user, [], page=1, num_pages=1)
         response = self.client.get(
             self.url,
             {
                 "course_id": unicode(self.course.id),
-                "page": "1",
-                "page_size": "4",
-                "following": "True",
+                "following": following,
             }
         )
         self.assert_response_correct(
@@ -415,6 +414,39 @@ class ThreadViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(
             urlparse(httpretty.last_request().path).path,
             "/api/v1/users/{}/subscribed_threads".format(self.user.id)
+        )
+
+    @ddt.data(False, "false", "0")
+    def test_following_false(self, following):
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": unicode(self.course.id),
+                "following": following,
+            }
+        )
+        self.assert_response_correct(
+            response,
+            400,
+            {"field_errors": {
+                "following": {"developer_message": "The value of the 'following' parameter must be true."}
+            }}
+        )
+
+    def test_following_error(self):
+        response = self.client.get(
+            self.url,
+            {
+                "course_id": unicode(self.course.id),
+                "following": "invalid-boolean",
+            }
+        )
+        self.assert_response_correct(
+            response,
+            400,
+            {"field_errors": {
+                "following": {"developer_message": "Invalid Boolean Value."}
+            }}
         )
 
     @ddt.data(
@@ -519,8 +551,8 @@ class ThreadViewSetCreateTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -634,6 +666,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 ],
                 "created_at": "Test Created Date",
                 "updated_at": "Test Updated Date",
+                "comment_count": 1,
             })
         )
         self.assertEqual(
@@ -650,6 +683,7 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "closed": ["False"],
                 "pinned": ["False"],
                 "read": ["False"],
+                "requested_user_id": [str(self.user.id)],
             }
         )
 
@@ -684,6 +718,8 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
                 "closed": True,
                 "abuse_flagged": value,
                 "editable_fields": ["abuse_flagged", "read"],
+                "comment_count": 1,
+                "unread_comment_count": 1,
             })
         )
 
@@ -700,6 +736,83 @@ class ThreadViewSetPartialUpdateTest(DiscussionAPIViewTestMixin, ModuleStoreTest
         request_data = {field: value}
         response = self.request_patch(request_data)
         self.assertEqual(response.status_code, 400)
+
+    def test_patch_read_owner_user(self):
+        self.register_get_user_response(self.user)
+        self.register_thread()
+        request_data = {"read": True}
+        response = self.request_patch(request_data)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(
+            response_data,
+            self.expected_response_data({
+                "comment_count": 1,
+                "read": True,
+                "editable_fields": [
+                    "abuse_flagged", "following", "raw_body", "read", "title", "topic_id", "type", "voted"
+                ],
+            })
+        )
+
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["original_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Original Title"],
+                "body": ["Original body"],
+                "user_id": [str(self.user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "closed": ["False"],
+                "pinned": ["False"],
+                "read": ["True"],
+                "requested_user_id": [str(self.user.id)],
+            }
+        )
+
+    def test_patch_read_non_owner_user(self):
+        self.register_get_user_response(self.user)
+        thread_owner_user = UserFactory.create(password=self.password)
+        CourseEnrollmentFactory.create(user=thread_owner_user, course_id=self.course.id)
+        self.register_get_user_response(thread_owner_user)
+        self.register_thread({"username": thread_owner_user.username, "user_id": str(thread_owner_user.id)})
+
+        request_data = {"read": True}
+        response = self.request_patch(request_data)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(
+            response_data,
+            self.expected_response_data({
+                "author": str(thread_owner_user.username),
+                "comment_count": 1,
+                "read": True,
+                "editable_fields": [
+                    "abuse_flagged", "following", "read", "voted"
+                ],
+            })
+        )
+
+        self.assertEqual(
+            httpretty.last_request().parsed_body,
+            {
+                "course_id": [unicode(self.course.id)],
+                "commentable_id": ["original_topic"],
+                "thread_type": ["discussion"],
+                "title": ["Original Title"],
+                "body": ["Original body"],
+                "user_id": [str(thread_owner_user.id)],
+                "anonymous": ["False"],
+                "anonymous_to_peers": ["False"],
+                "closed": ["False"],
+                "pinned": ["False"],
+                "read": ["True"],
+                "requested_user_id": [str(self.user.id)],
+            }
+        )
 
 
 @httpretty.activate
@@ -737,6 +850,7 @@ class ThreadViewSetDeleteTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
+@ddt.ddt
 @httpretty.activate
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
 class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
@@ -746,6 +860,15 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.author = UserFactory.create()
         self.url = reverse("comment-list")
         self.thread_id = "test_thread"
+
+    def make_minimal_cs_thread(self, overrides=None):
+        """
+        Create a thread with the given overrides, plus the course_id if not
+        already in overrides.
+        """
+        overrides = overrides.copy() if overrides else {}
+        overrides.setdefault("course_id", unicode(self.course.id))
+        return make_minimal_cs_thread(overrides)
 
     def test_thread_id_missing(self):
         response = self.client.get(self.url)
@@ -761,7 +884,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Thread not found."}
         )
 
     def test_basic(self):
@@ -853,7 +976,7 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
         self.assert_response_correct(
             response,
             404,
-            {"developer_message": "Not found."}
+            {"developer_message": "Page not found (No results on this page)."}
         )
         self.assert_query_params_equal(
             httpretty.httpretty.latest_requests[-2],
@@ -864,6 +987,64 @@ class CommentViewSetListTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase):
                 "user_id": [str(self.user.id)],
                 "mark_as_read": ["False"],
             }
+        )
+
+    @ddt.data(
+        (True, "endorsed_comment"),
+        ("true", "endorsed_comment"),
+        ("1", "endorsed_comment"),
+        (False, "non_endorsed_comment"),
+        ("false", "non_endorsed_comment"),
+        ("0", "non_endorsed_comment"),
+    )
+    @ddt.unpack
+    def test_question_content(self, endorsed, comment_id):
+        self.register_get_user_response(self.user)
+        thread = self.make_minimal_cs_thread({
+            "thread_type": "question",
+            "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment"})],
+            "non_endorsed_responses": [make_minimal_cs_comment({"id": "non_endorsed_comment"})],
+            "non_endorsed_resp_total": 1,
+        })
+        self.register_get_thread_response(thread)
+        response = self.client.get(self.url, {
+            "thread_id": thread["id"],
+            "endorsed": endorsed,
+        })
+        parsed_content = json.loads(response.content)
+        self.assertEqual(parsed_content["results"][0]["id"], comment_id)
+
+    def test_question_invalid_endorsed(self):
+        response = self.client.get(self.url, {
+            "thread_id": self.thread_id,
+            "endorsed": "invalid-boolean"
+        })
+        self.assert_response_correct(
+            response,
+            400,
+            {"field_errors": {
+                "endorsed": {"developer_message": "Invalid Boolean Value."}
+            }}
+        )
+
+    def test_question_missing_endorsed(self):
+        self.register_get_user_response(self.user)
+        thread = self.make_minimal_cs_thread({
+            "thread_type": "question",
+            "endorsed_responses": [make_minimal_cs_comment({"id": "endorsed_comment"})],
+            "non_endorsed_responses": [make_minimal_cs_comment({"id": "non_endorsed_comment"})],
+            "non_endorsed_resp_total": 1,
+        })
+        self.register_get_thread_response(thread)
+        response = self.client.get(self.url, {
+            "thread_id": thread["id"]
+        })
+        self.assert_response_correct(
+            response,
+            400,
+            {"field_errors": {
+                "endorsed": {"developer_message": "This field is required for question threads."}
+            }}
         )
 
 
@@ -1154,8 +1335,8 @@ class ThreadViewSetRetrieveTest(DiscussionAPIViewTestMixin, ModuleStoreTestCase)
             "pinned": False,
             "closed": False,
             "following": False,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,

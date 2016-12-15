@@ -12,7 +12,6 @@ import mock
 from pytz import UTC
 
 from django.core.exceptions import ValidationError
-from django.http import Http404
 from django.test.client import RequestFactory
 
 from rest_framework.exceptions import PermissionDenied
@@ -35,6 +34,7 @@ from discussion_api.api import (
     update_thread,
     get_thread,
 )
+from discussion_api.exceptions import DiscussionDisabledError, ThreadNotFoundError, CommentNotFoundError
 from discussion_api.tests.utils import (
     CommentsServiceMockMixin,
     make_minimal_cs_comment,
@@ -49,6 +49,7 @@ from django_comment_common.models import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.lib.exceptions import CourseNotFoundError, PageNotFoundError
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from util.testing import UrlResetMixin
 from xmodule.modulestore.django import modulestore
@@ -99,17 +100,17 @@ class GetCourseTest(UrlResetMixin, SharedModuleStoreTestCase):
         self.request.user = self.user
 
     def test_nonexistent_course(self):
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             get_course(self.request, CourseLocator.from_string("non/existent/course"))
 
     def test_not_enrolled(self):
         unenrolled_user = UserFactory.create()
         self.request.user = unenrolled_user
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             get_course(self.request, self.course.id)
 
     def test_discussions_disabled(self):
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             get_course(self.request, _discussion_disabled_course_for(self.user).id)
 
     def test_basic(self):
@@ -226,18 +227,18 @@ class GetCourseTopicsTest(UrlResetMixin, ModuleStoreTestCase):
         return node
 
     def test_nonexistent_course(self):
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             get_course_topics(self.request, CourseLocator.from_string("non/existent/course"))
 
     def test_not_enrolled(self):
         unenrolled_user = UserFactory.create()
         self.request.user = unenrolled_user
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             self.get_course_topics()
 
     def test_discussions_disabled(self):
         _remove_discussion_tab(self.course, self.user.id)
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             self.get_course_topics()
 
     def test_without_courseware(self):
@@ -523,16 +524,16 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
         return ret
 
     def test_nonexistent_course(self):
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             get_thread_list(self.request, CourseLocator.from_string("non/existent/course"), 1, 1)
 
     def test_not_enrolled(self):
         self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             self.get_thread_list([])
 
     def test_discussions_disabled(self):
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             self.get_thread_list([], course=_discussion_disabled_course_for(self.user))
 
     def test_empty(self):
@@ -644,7 +645,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 4,
-                "comment_count": 5,
+                "comment_count": 6,
                 "unread_comment_count": 3,
                 "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_0",
                 "endorsed_comment_list_url": None,
@@ -673,8 +674,8 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
                 "abuse_flagged": False,
                 "voted": False,
                 "vote_count": 9,
-                "comment_count": 18,
-                "unread_comment_count": 0,
+                "comment_count": 19,
+                "unread_comment_count": 1,
                 "comment_list_url": None,
                 "endorsed_comment_list_url": (
                     "http://testserver/api/discussion/v1/comments/?thread_id=test_thread_id_1&endorsed=True"
@@ -752,7 +753,7 @@ class GetThreadListTest(CommentsServiceMockMixin, UrlResetMixin, SharedModuleSto
 
         # Test page past the last one
         self.register_get_threads_response([], page=3, num_pages=3)
-        with self.assertRaises(Http404):
+        with self.assertRaises(PageNotFoundError):
             get_thread_list(self.request, self.course.id, page=4, page_size=10)
 
     @ddt.data(None, "rewritten search string")
@@ -952,21 +953,21 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
     def test_nonexistent_thread(self):
         thread_id = "nonexistent_thread"
         self.register_get_thread_error_response(thread_id, 404)
-        with self.assertRaises(Http404):
+        with self.assertRaises(ThreadNotFoundError):
             get_comment_list(self.request, thread_id, endorsed=False, page=1, page_size=1)
 
     def test_nonexistent_course(self):
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             self.get_comment_list(self.make_minimal_cs_thread({"course_id": "non/existent/course"}))
 
     def test_not_enrolled(self):
         self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             self.get_comment_list(self.make_minimal_cs_thread())
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             self.get_comment_list(
                 self.make_minimal_cs_thread(
                     overrides={"course_id": unicode(disabled_course.id)}
@@ -1023,7 +1024,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         try:
             self.get_comment_list(thread)
             self.assertFalse(expected_error)
-        except Http404:
+        except ThreadNotFoundError:
             self.assertTrue(expected_error)
 
     @ddt.data(True, False)
@@ -1255,7 +1256,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
             response_field: [],
             response_total_field: 5
         })
-        with self.assertRaises(Http404):
+        with self.assertRaises(PageNotFoundError):
             self.get_comment_list(thread, endorsed=endorsed_arg, page=2, page_size=5)
 
     def test_question_endorsed_pagination(self):
@@ -1327,7 +1328,7 @@ class GetCommentListTest(CommentsServiceMockMixin, SharedModuleStoreTestCase):
         )
 
         # Page past the end
-        with self.assertRaises(Http404):
+        with self.assertRaises(PageNotFoundError):
             self.get_comment_list(thread, endorsed=True, page=2, page_size=10)
 
 
@@ -1397,8 +1398,8 @@ class CreateThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_id",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -1561,22 +1562,19 @@ class CreateThreadTest(
         self.assertEqual(assertion.exception.message_dict, {"course_id": ["Invalid value."]})
 
     def test_nonexistent_course(self):
-        with self.assertRaises(ValidationError) as assertion:
+        with self.assertRaises(CourseNotFoundError):
             create_thread(self.request, {"course_id": "non/existent/course"})
-        self.assertEqual(assertion.exception.message_dict, {"course_id": ["Invalid value."]})
 
     def test_not_enrolled(self):
         self.request.user = UserFactory.create()
-        with self.assertRaises(ValidationError) as assertion:
+        with self.assertRaises(CourseNotFoundError):
             create_thread(self.request, self.minimal_data)
-        self.assertEqual(assertion.exception.message_dict, {"course_id": ["Invalid value."]})
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
         self.minimal_data["course_id"] = unicode(disabled_course.id)
-        with self.assertRaises(ValidationError) as assertion:
+        with self.assertRaises(DiscussionDisabledError):
             create_thread(self.request, self.minimal_data)
-        self.assertEqual(assertion.exception.message_dict, {"course_id": ["Invalid value."]})
 
     def test_invalid_field(self):
         data = self.minimal_data.copy()
@@ -1775,23 +1773,20 @@ class CreateCommentTest(
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("test_thread", 404)
-        with self.assertRaises(ValidationError) as assertion:
+        with self.assertRaises(ThreadNotFoundError):
             create_comment(self.request, self.minimal_data)
-        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
 
     def test_nonexistent_course(self):
         self.register_get_thread_response(
             make_minimal_cs_thread({"id": "test_thread", "course_id": "non/existent/course"})
         )
-        with self.assertRaises(ValidationError) as assertion:
+        with self.assertRaises(CourseNotFoundError):
             create_comment(self.request, self.minimal_data)
-        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
 
     def test_not_enrolled(self):
         self.request.user = UserFactory.create()
-        with self.assertRaises(ValidationError) as assertion:
+        with self.assertRaises(CourseNotFoundError):
             create_comment(self.request, self.minimal_data)
-        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
@@ -1802,9 +1797,8 @@ class CreateCommentTest(
                 "commentable_id": "test_topic",
             })
         )
-        with self.assertRaises(ValidationError) as assertion:
+        with self.assertRaises(DiscussionDisabledError):
             create_comment(self.request, self.minimal_data)
-        self.assertEqual(assertion.exception.message_dict, {"thread_id": ["Invalid value."]})
 
     @ddt.data(
         *itertools.product(
@@ -1845,12 +1839,8 @@ class CreateCommentTest(
         try:
             create_comment(self.request, data)
             self.assertFalse(expected_error)
-        except ValidationError as err:
+        except ThreadNotFoundError:
             self.assertTrue(expected_error)
-            self.assertEqual(
-                err.message_dict,
-                {"thread_id": ["Invalid value."]}
-            )
 
     def test_invalid_field(self):
         data = self.minimal_data.copy()
@@ -1943,7 +1933,7 @@ class UpdateThreadTest(
             "abuse_flagged": False,
             "voted": False,
             "vote_count": 0,
-            "comment_count": 0,
+            "comment_count": 1,
             "unread_comment_count": 0,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
@@ -1968,29 +1958,30 @@ class UpdateThreadTest(
                 "closed": ["False"],
                 "pinned": ["False"],
                 "read": ["False"],
+                "requested_user_id": [str(self.user.id)],
             }
         )
 
     def test_nonexistent_thread(self):
         self.register_get_thread_error_response("test_thread", 404)
-        with self.assertRaises(Http404):
+        with self.assertRaises(ThreadNotFoundError):
             update_thread(self.request, "test_thread", {})
 
     def test_nonexistent_course(self):
         self.register_thread({"course_id": "non/existent/course"})
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             update_thread(self.request, "test_thread", {})
 
     def test_not_enrolled(self):
         self.register_thread()
         self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             update_thread(self.request, "test_thread", {})
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
         self.register_thread(overrides={"course_id": unicode(disabled_course.id)})
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             update_thread(self.request, "test_thread", {})
 
     @ddt.data(
@@ -2028,7 +2019,7 @@ class UpdateThreadTest(
         try:
             update_thread(self.request, "test_thread", {})
             self.assertFalse(expected_error)
-        except Http404:
+        except ThreadNotFoundError:
             self.assertTrue(expected_error)
 
     @ddt.data(
@@ -2356,23 +2347,23 @@ class UpdateCommentTest(
 
     def test_nonexistent_comment(self):
         self.register_get_comment_error_response("test_comment", 404)
-        with self.assertRaises(Http404):
+        with self.assertRaises(CommentNotFoundError):
             update_comment(self.request, "test_comment", {})
 
     def test_nonexistent_course(self):
         self.register_comment(thread_overrides={"course_id": "non/existent/course"})
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             update_comment(self.request, "test_comment", {})
 
     def test_unenrolled(self):
         self.register_comment()
         self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             update_comment(self.request, "test_comment", {})
 
     def test_discussions_disabled(self):
         self.register_comment(course=_discussion_disabled_course_for(self.user))
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             update_comment(self.request, "test_comment", {})
 
     @ddt.data(
@@ -2415,7 +2406,7 @@ class UpdateCommentTest(
         try:
             update_comment(self.request, "test_comment", {})
             self.assertFalse(expected_error)
-        except Http404:
+        except ThreadNotFoundError:
             self.assertTrue(expected_error)
 
     @ddt.data(*itertools.product(
@@ -2689,24 +2680,24 @@ class DeleteThreadTest(
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("missing_thread", 404)
-        with self.assertRaises(Http404):
+        with self.assertRaises(ThreadNotFoundError):
             delete_thread(self.request, "missing_thread")
 
     def test_nonexistent_course(self):
         self.register_thread({"course_id": "non/existent/course"})
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             delete_thread(self.request, self.thread_id)
 
     def test_not_enrolled(self):
         self.register_thread()
         self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             delete_thread(self.request, self.thread_id)
 
     def test_discussions_disabled(self):
         disabled_course = _discussion_disabled_course_for(self.user)
         self.register_thread(overrides={"course_id": unicode(disabled_course.id)})
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             delete_thread(self.request, self.thread_id)
 
     @ddt.data(
@@ -2769,7 +2760,7 @@ class DeleteThreadTest(
         try:
             delete_thread(self.request, self.thread_id)
             self.assertFalse(expected_error)
-        except Http404:
+        except ThreadNotFoundError:
             self.assertTrue(expected_error)
 
 
@@ -2837,20 +2828,20 @@ class DeleteCommentTest(
 
     def test_comment_id_not_found(self):
         self.register_get_comment_error_response("missing_comment", 404)
-        with self.assertRaises(Http404):
+        with self.assertRaises(CommentNotFoundError):
             delete_comment(self.request, "missing_comment")
 
     def test_nonexistent_course(self):
         self.register_comment_and_thread(
             thread_overrides={"course_id": "non/existent/course"}
         )
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             delete_comment(self.request, self.comment_id)
 
     def test_not_enrolled(self):
         self.register_comment_and_thread()
         self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             delete_comment(self.request, self.comment_id)
 
     def test_discussions_disabled(self):
@@ -2859,7 +2850,7 @@ class DeleteCommentTest(
             thread_overrides={"course_id": unicode(disabled_course.id)},
             overrides={"course_id": unicode(disabled_course.id)}
         )
-        with self.assertRaises(Http404):
+        with self.assertRaises(DiscussionDisabledError):
             delete_comment(self.request, self.comment_id)
 
     @ddt.data(
@@ -2927,7 +2918,7 @@ class DeleteCommentTest(
         try:
             delete_comment(self.request, self.comment_id)
             self.assertFalse(expected_error)
-        except Http404:
+        except ThreadNotFoundError:
             self.assertTrue(expected_error)
 
 
@@ -2999,8 +2990,8 @@ class RetrieveThreadTest(
             "pinned": False,
             "closed": False,
             "following": False,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -3016,7 +3007,7 @@ class RetrieveThreadTest(
 
     def test_thread_id_not_found(self):
         self.register_get_thread_error_response("missing_thread", 404)
-        with self.assertRaises(Http404):
+        with self.assertRaises(ThreadNotFoundError):
             get_thread(self.request, "missing_thread")
 
     def test_nonauthor_enrolled_in_course(self):
@@ -3039,8 +3030,8 @@ class RetrieveThreadTest(
             "pinned": False,
             "closed": False,
             "following": False,
-            "comment_count": 0,
-            "unread_comment_count": 0,
+            "comment_count": 1,
+            "unread_comment_count": 1,
             "comment_list_url": "http://testserver/api/discussion/v1/comments/?thread_id=test_thread",
             "endorsed_comment_list_url": None,
             "non_endorsed_comment_list_url": None,
@@ -3061,7 +3052,7 @@ class RetrieveThreadTest(
     def test_not_enrolled_in_course(self):
         self.register_thread()
         self.request.user = UserFactory.create()
-        with self.assertRaises(Http404):
+        with self.assertRaises(CourseNotFoundError):
             get_thread(self.request, self.thread_id)
 
     @ddt.data(
@@ -3107,5 +3098,5 @@ class RetrieveThreadTest(
         try:
             get_thread(self.request, self.thread_id)
             self.assertFalse(expected_error)
-        except Http404:
+        except ThreadNotFoundError:
             self.assertTrue(expected_error)

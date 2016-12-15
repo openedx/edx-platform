@@ -94,19 +94,40 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.coupon_code = 'abcde'
         self.reg_code = 'qwerty'
         self.percentage_discount = 10
-        self.course_mode = CourseMode(course_id=self.course_key,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=self.cost)
+        self.course_mode = CourseMode(
+            course_id=self.course_key,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="honor cert",
+            min_price=self.cost
+        )
         self.course_mode.save()
 
         # Saving another testing course mode
         self.testing_cost = 20
-        self.testing_course_mode = CourseMode(course_id=self.testing_course.id,
-                                              mode_slug="honor",
-                                              mode_display_name="testing honor cert",
-                                              min_price=self.testing_cost)
+        self.testing_course_mode = CourseMode(
+            course_id=self.testing_course.id,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="testing honor cert",
+            min_price=self.testing_cost
+        )
         self.testing_course_mode.save()
+
+        # And for the XSS course
+        CourseMode(
+            course_id=self.xss_course_key,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="honor cert",
+            min_price=self.cost
+        ).save()
+
+        # And the verified course
+        self.verified_course_mode = CourseMode(
+            course_id=self.verified_course_key,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="honor cert",
+            min_price=self.cost
+        )
+        self.verified_course_mode.save()
 
         self.cart = Order.get_cart_for_user(self.user)
 
@@ -131,10 +152,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
                         percentage_discount=self.percentage_discount, created_by=self.user, is_active=is_active)
         coupon.save()
 
-    def add_reg_code(self, course_key, mode_slug='honor', is_valid=True):
+    def add_reg_code(self, course_key, mode_slug=None, is_valid=True):
         """
         add dummy registration code into models
         """
+        if mode_slug is None:
+            mode_slug = self.course_mode.mode_slug
         course_reg_code = CourseRegistrationCode(
             code=self.reg_code, course_id=course_key,
             created_by=self.user, mode_slug=mode_slug,
@@ -159,7 +182,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         adding course to user cart
         """
         self.login_user()
-        reg_item = PaidCourseRegistration.add_to_order(self.cart, course_key)
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, course_key, mode_slug=self.course_mode.mode_slug)
         return reg_item
 
     def login_user(self):
@@ -224,9 +247,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         test to check that that the same coupon code applied on multiple
         items in the cart.
         """
+
         self.login_user()
         # add first course to user cart
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
+        resp = self.client.post(
+            reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()])
+        )
         self.assertEqual(resp.status_code, 200)
         # add and apply the coupon code to course in the cart
         self.add_coupon(self.course_key, True, self.coupon_code)
@@ -237,7 +263,9 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_coupon(self.testing_course.id, True, self.coupon_code)
         #now add the second course to cart, the coupon code should be
         # applied when adding the second course to the cart
-        resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()]))
+        resp = self.client.post(
+            reverse('shoppingcart.views.add_course_to_cart', args=[self.testing_course.id.to_deprecated_string()])
+        )
         self.assertEqual(resp.status_code, 200)
         #now check the user cart and see that the discount has been applied on both the courses
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
@@ -586,7 +614,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.add_reg_code(course_key, mode_slug='verified')
 
         # Enroll as honor in the course with the current user.
-        CourseEnrollment.enroll(self.user, self.course_key)
+        CourseEnrollment.enroll(self.user, self.course_key, mode=CourseMode.HONOR)
         self.login_user()
         current_enrollment, __ = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_key)
         self.assertEquals('honor', current_enrollment)
@@ -753,8 +781,17 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_cart(self):
         self.login_user()
-        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        reg_item = PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course_key,
+            mode_slug=self.course_mode.mode_slug
+        )
+        cert_item = CertificateItem.add_to_order(
+            self.cart,
+            self.verified_course_key,
+            self.cost,
+            self.course_mode.mode_slug
+        )
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
@@ -860,7 +897,6 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         for __ in range(num_items):
             CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.cart.purchase()
-
         self.login_user()
         url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
         resp = self.client.get(url, HTTP_ACCEPT="application/json")
@@ -891,7 +927,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
                 'unit_cost': 40,
                 'quantity': 1,
                 'line_cost': 40,
-                'line_desc': 'Honor Code Certificate for course Test Course',
+                'line_desc': '{} for course Test Course'.format(self.verified_course_mode.mode_display_name),
                 'course_key': unicode(self.verified_course_key)
             })
 
@@ -902,7 +938,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         self.login_user()
         url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
         resp = self.client.get(url)
-        self.assert_xss(resp, '<script>alert("XSS")</script>')
+        self.assert_no_xss(resp, '<script>alert("XSS")</script>')
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_reg_code_xss(self):
@@ -918,12 +954,21 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
         redeem_url = reverse('register_code_redemption', args=[self.reg_code])
         redeem_response = self.client.get(redeem_url)
 
-        self.assert_xss(redeem_response, '<script>alert("XSS")</script>')
+        self.assert_no_xss(redeem_response, '<script>alert("XSS")</script>')
 
     def test_show_receipt_json_multiple_items(self):
         # Two different item types
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course_key,
+            mode_slug=self.course_mode.mode_slug
+        )
+        CertificateItem.add_to_order(
+            self.cart,
+            self.verified_course_key,
+            self.cost,
+            self.verified_course_mode.mode_slug
+        )
         self.cart.purchase()
 
         self.login_user()
@@ -950,7 +995,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
             'unit_cost': 40,
             'quantity': 1,
             'line_cost': 40,
-            'line_desc': 'Honor Code Certificate for course Test Course',
+            'line_desc': '{} for course Test Course'.format(self.verified_course_mode.mode_display_name),
             'course_key': unicode(self.verified_course_key)
         })
 
@@ -1011,7 +1056,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         self.client.login(username=self.instructor.username, password="test")
         cart = Order.get_cart_for_user(self.instructor)
-        PaidCourseRegistration.add_to_order(cart, self.course_key)
+        PaidCourseRegistration.add_to_order(cart, self.course_key, mode_slug=self.course_mode.mode_slug)
         cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course_key)
@@ -1058,8 +1103,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
         # Two courses in user shopping cart
         self.login_user()
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        item2 = PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key, mode_slug=self.course_mode.mode_slug)
+        item2 = PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.testing_course.id,
+            mode_slug=self.course_mode.mode_slug
+        )
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
@@ -1113,7 +1162,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success(self):
-        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        reg_item = PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course_key,
+            mode_slug=self.course_mode.mode_slug
+        )
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
@@ -1157,7 +1210,7 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_courseregcode_item_total_price(self):
         self.cart.order_type = 'business'
         self.cart.save()
-        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2, mode_slug=self.course_mode.mode_slug)
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         self.assertEquals(CourseRegCodeItem.get_total_amount_of_purchased_item(self.course_key), 80)
 
@@ -1165,7 +1218,12 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     def test_show_receipt_success_with_order_type_business(self):
         self.cart.order_type = 'business'
         self.cart.save()
-        reg_item = CourseRegCodeItem.add_to_order(self.cart, self.course_key, 2)
+        reg_item = CourseRegCodeItem.add_to_order(
+            self.cart,
+            self.course_key,
+            2,
+            mode_slug=self.course_mode.mode_slug
+        )
         self.cart.add_billing_details(company_name='T1Omega', company_contact_name='C1',
                                       company_contact_email='test@t1.com', recipient_email='test@t2.com')
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
@@ -1230,7 +1288,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_upgrade(self):
 
-        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        reg_item = PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course_key,
+            mode_slug=self.course_mode.mode_slug
+        )
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
 
@@ -1255,7 +1317,11 @@ class ShoppingCartViewsTests(SharedModuleStoreTestCase, XssTestMixin):
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_refund(self):
-        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        reg_item = PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course_key,
+            mode_slug=self.course_mode.mode_slug
+        )
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         cert_item.status = "refunded"
@@ -1493,10 +1559,12 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
 
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_key = self.course.id
-        self.course_mode = CourseMode(course_id=self.course_key,
-                                      mode_slug="honor",
-                                      mode_display_name="honor cert",
-                                      min_price=self.cost)
+        self.course_mode = CourseMode(
+            course_id=self.course_key,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="honor cert",
+            min_price=self.cost
+        )
         self.course_mode.save()
         self.testing_course = CourseFactory.create(
             org='Edx',
@@ -1504,6 +1572,13 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
             display_name='Testing Super Course',
             metadata={"invitation_only": False}
         )
+        self.testing_course_mode = CourseMode(
+            course_id=self.testing_course.id,
+            mode_slug=CourseMode.HONOR,
+            mode_display_name="honor cert",
+            min_price=self.cost
+        )
+        self.course_mode.save()
         self.percentage_discount = 20.0
         self.coupon_code = 'asdsad'
         self.course_mode = CourseMode(course_id=self.testing_course.id,
@@ -1570,8 +1645,16 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
 
     def test_to_check_that_cart_item_enrollment_is_closed_when_clicking_the_payment_button(self):
         self.login_user()
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
+        PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.course_key,
+            mode_slug=self.course_mode.mode_slug
+        )
+        PaidCourseRegistration.add_to_order(
+            self.cart,
+            self.testing_course.id,
+            mode_slug=self.testing_course_mode.mode_slug
+        )
 
         # update the testing_course enrollment dates
         self.testing_course.enrollment_start = self.tomorrow
@@ -1593,8 +1676,8 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.login_user()
         self.cart.order_type = 'business'
         self.cart.save()
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        CourseRegCodeItem.add_to_order(self.cart, self.testing_course.id, 2)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key, mode_slug=self.course_mode.mode_slug)
+        CourseRegCodeItem.add_to_order(self.cart, self.testing_course.id, 2, mode_slug=self.course_mode.mode_slug)
 
         # update the testing_course enrollment dates
         self.testing_course.enrollment_start = self.tomorrow
@@ -2039,7 +2122,7 @@ class CSVReportViewsTest(SharedModuleStoreTestCase):
         report_type = 'itemized_purchase_report'
         start_date = '1970-01-01'
         end_date = '2100-01-01'
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key, mode_slug=self.course_mode.mode_slug)
         self.cart.purchase()
         self.login_user()
         self.add_to_download_group(self.user)

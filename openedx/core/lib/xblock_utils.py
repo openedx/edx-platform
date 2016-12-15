@@ -5,9 +5,10 @@ Functions that can are used to modify XBlock fragments for use in the LMS and St
 import datetime
 import json
 import logging
+import markupsafe
+import re
 import static_replace
 import uuid
-import markupsafe
 from lxml import html, etree
 from contracts import contract
 
@@ -128,7 +129,7 @@ def wrap_xblock(
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
-        'display_name': block.display_name_with_default,
+        'display_name': block.display_name_with_default_escaped,
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
     }
@@ -145,7 +146,7 @@ def wrap_xblock(
 def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, context):  # pylint: disable=unused-argument
     """
     This will replace a link between courseware in the format
-    /jump_to/<id> with a URL for a page that will correctly redirect
+    /jump_to_id/<id> with a URL for a page that will correctly redirect
     This is similar to replace_course_urls, but much more flexible and
     durable for Studio authored courses. See more comments in static_replace.replace_jump_to_urls
 
@@ -156,7 +157,7 @@ def replace_jump_to_id_urls(course_id, jump_to_id_base_url, block, view, frag, c
         the end of this URL at re-write time
 
     output: a new :class:`~xblock.fragment.Fragment` that modifies `frag` with
-        content that has been update with /jump_to links replaced
+        content that has been update with /jump_to_id links replaced
     """
     return wrap_fragment(frag, static_replace.replace_jump_to_id_urls(frag.content, course_id, jump_to_id_base_url))
 
@@ -209,6 +210,14 @@ def grade_histogram(module_id):
     if len(grades) >= 1 and grades[0][0] is None:
         return []
     return grades
+
+
+def sanitize_html_id(html_id):
+    """
+    Template uses element_id in js function names, so can't allow dashes and colons.
+    """
+    sanitized_html_id = re.sub(r'[:-]', '_', html_id)
+    return sanitized_html_id
 
 
 @contract(user=User, has_instructor_access=bool, block=XBlock, view=basestring, frag=Fragment, context="dict|None")
@@ -293,13 +302,13 @@ def add_staff_markup(user, has_instructor_access, disable_staff_debug_info, bloc
     staff_context = {
         'fields': field_contents,
         'xml_attributes': getattr(block, 'xml_attributes', {}),
+        'tags': block._class_tags,  # pylint: disable=protected-access
         'location': block.location,
         'xqa_key': block.xqa_key,
         'source_file': source_file,
         'source_url': '%s/%s/tree/master/%s' % (giturl, data_dir, source_file),
         'category': str(block.__class__.__name__),
-        # Template uses element_id in js function names, so can't allow dashes
-        'element_id': block.location.html_id().replace('-', '_'),
+        'element_id': sanitize_html_id(block.location.html_id()),
         'edit_link': edit_link,
         'user': user,
         'xqa_server': settings.FEATURES.get('XQA_SERVER', "http://your_xqa_server.com"),

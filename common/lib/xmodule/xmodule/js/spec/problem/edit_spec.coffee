@@ -258,9 +258,9 @@ describe 'MarkdownEditingDescriptor', ->
         </problem>""")
     it 'converts multiple choice shuffle to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.
-        
+
         One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.
-        
+
         What Apple device competed with the portable CD player?
         (!x@) The iPad
         (@) Napster
@@ -268,16 +268,16 @@ describe 'MarkdownEditingDescriptor', ->
         ( ) The vegetable peeler
         ( ) Android
         (@) The Beatles
-        
+
         [Explanation]
         The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.
         [Explanation]
         """)
       expect(data).toEqual("""<problem>
         <p>A multiple choice problem presents radio buttons for student input. Students can only select a single option presented. Multiple Choice questions have been the subject of many areas of research due to the early invention and adoption of bubble sheets.</p>
-        
+
         <p>One of the main elements that goes into a good multiple choice question is the existence of good distractors. That is, each of the alternate responses presented to the student should be the result of a plausible mistake that a student might make.</p>
-        
+
         <p>What Apple device competed with the portable CD player?</p>
         <multiplechoiceresponse>
           <choicegroup type="MultipleChoice" shuffle="true">
@@ -289,11 +289,11 @@ describe 'MarkdownEditingDescriptor', ->
             <choice correct="false" fixed="true">The Beatles</choice>
           </choicegroup>
         </multiplechoiceresponse>
-        
+
         <solution>
         <div class="detailed-solution">
         <p>Explanation</p>
-        
+
         <p>The release of the iPod allowed consumers to carry their entire music library with them in a format that did not rely on fragile and energy-intensive spinning disks.</p>
 
         </div>
@@ -326,7 +326,7 @@ describe 'MarkdownEditingDescriptor', ->
             <choice correct="false">c</choice>
           </choicegroup>
         </multiplechoiceresponse>
-        
+
         <p>yatta</p>
         <multiplechoiceresponse>
           <choicegroup type="MultipleChoice">
@@ -335,7 +335,7 @@ describe 'MarkdownEditingDescriptor', ->
             <choice correct="true">z</choice>
           </choicegroup>
         </multiplechoiceresponse>
-        
+
         <p>testa</p>
         <multiplechoiceresponse>
           <choicegroup type="MultipleChoice" shuffle="true">
@@ -344,13 +344,13 @@ describe 'MarkdownEditingDescriptor', ->
             <choice correct="true">iii</choice>
           </choicegroup>
         </multiplechoiceresponse>
-        
+
         <solution>
         <div class="detailed-solution">
         <p>Explanation</p>
-        
+
         <p>When the student is ready, the explanation appears.</p>
-        
+
         </div>
         </solution>
         </problem>""")
@@ -513,25 +513,25 @@ describe 'MarkdownEditingDescriptor', ->
     <stringresponse answer="w*.?s*Luther Kings*.*" type="ci regexp" >
       <textline label="Who lead the civil right movement in the United States of America?" size="20"/>
     </stringresponse>
-    
+
     <solution>
     <div class="detailed-solution">
     <p>Explanation</p>
-    
+
     <p>Test Explanation.</p>
-    
+
     </div>
     </solution>
     </problem>""")
     it 'handles multiple questions with labels', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
         France is a country in Europe.
-        
+
         >>What is the capital of France?<<
         = Paris
-        
+
         Germany is a country in Europe, too.
-        
+
         >>What is the capital of Germany?<<
         ( ) Bonn
         ( ) Hamburg
@@ -540,14 +540,14 @@ describe 'MarkdownEditingDescriptor', ->
       """)
       expect(data).toEqual("""<problem>
     <p>France is a country in Europe.</p>
-    
+
     <p>What is the capital of France?</p>
     <stringresponse answer="Paris" type="ci" >
       <textline label="What is the capital of France?" size="20"/>
     </stringresponse>
-    
+
     <p>Germany is a country in Europe, too.</p>
-    
+
     <p>What is the capital of Germany?</p>
     <multiplechoiceresponse>
       <choicegroup label="What is the capital of Germany?" type="MultipleChoice">
@@ -557,8 +557,8 @@ describe 'MarkdownEditingDescriptor', ->
         <choice correct="false">Donut</choice>
       </choicegroup>
     </multiplechoiceresponse>
-    
-    
+
+
     </problem>""")
     it 'tests multiple questions with only one label', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
@@ -577,14 +577,14 @@ describe 'MarkdownEditingDescriptor', ->
         """)
       expect(data).toEqual("""<problem>
     <p>France is a country in Europe.</p>
-    
+
     <p>What is the capital of France?</p>
     <stringresponse answer="Paris" type="ci" >
       <textline label="What is the capital of France?" size="20"/>
     </stringresponse>
-    
+
     <p>Germany is a country in Europe, too.</p>
-    
+
     <p>What is the capital of Germany?</p>
     <multiplechoiceresponse>
       <choicegroup type="MultipleChoice">
@@ -594,8 +594,8 @@ describe 'MarkdownEditingDescriptor', ->
         <choice correct="false">Donut</choice>
       </choicegroup>
     </multiplechoiceresponse>
-    
-    
+
+
     </problem>""")
     it 'tests malformed labels', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
@@ -612,12 +612,12 @@ describe 'MarkdownEditingDescriptor', ->
       """)
       expect(data).toEqual("""<problem>
     <p>France is a country in Europe.</p>
-    
+
     <p>>>What is the capital of France?<</p>
     <stringresponse answer="Paris" type="ci" >
       <textline size="20"/>
     </stringresponse>
-    
+
     <p>blahWhat is the capital of Germany?</p>
     <multiplechoiceresponse>
       <choicegroup label="What is the capital of &lt;&lt;Germany?" type="MultipleChoice">
@@ -627,8 +627,8 @@ describe 'MarkdownEditingDescriptor', ->
         <choice correct="false">Donut</choice>
       </choicegroup>
     </multiplechoiceresponse>
-    
-    
+
+
     </problem>""")
     it 'adds labels to formulae', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
@@ -641,8 +641,8 @@ describe 'MarkdownEditingDescriptor', ->
       <responseparam type="tolerance" default=".02" />
       <formulaequationinput label="Enter the numerical value of Pi:" />
     </numericalresponse>
-    
-    
+
+
     </problem>""")
     it 'escapes entities in labels', ->
       data = MarkdownEditingDescriptor.markdownToXml("""
@@ -654,8 +654,8 @@ describe 'MarkdownEditingDescriptor', ->
     <stringresponse answer="Paris" type="ci" >
       <textline label="What is the &quot;capital&quot; of France &amp; the &apos;best&apos; &gt; place &lt; to live&quot;?" size="20"/>
     </stringresponse>
-    
-    
+
+
     </problem>""")
     # test oddities
     it 'converts headers and oddities to xml', ->
@@ -710,7 +710,7 @@ describe 'MarkdownEditingDescriptor', ->
         """)
       expect(data).toEqual("""<problem>
         <p>Not a header</p>
-        <h1>A header</h1>
+        <h3 class="problem-header">A header</h3>
 
         <p>Multiple choice w/ parentheticals</p>
         <multiplechoiceresponse>

@@ -4,9 +4,9 @@
 <%! from xmodule.util.date_utils import get_time_display %>
 
 <%namespace name='static' file='static_content.html'/>
-<h2 class="problem-header">
+<h3 class="problem-header">
   ${ problem['name'] }
-</h2>
+</h3>
 
 <div class="problem-progress"></div>
 
@@ -68,7 +68,7 @@
     </p>
     % endif
     % if answer_available:
-    <button class="show"><span class="show-label">${_('Show Answer')}</span> </button>
+    <button class="show"><span class='sr'>${_('Toggle Answer Visibility')}</span><span class="show-label">${_('Show Answer')}</span></button>
     % endif
     % if attempts_allowed and not problem_is_timed:
     <div class="submission_feedback" aria-live="polite">

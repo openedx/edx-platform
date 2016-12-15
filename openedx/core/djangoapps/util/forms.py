@@ -3,7 +3,7 @@ Custom forms-related types
 """
 
 from django.core.exceptions import ValidationError
-from django.forms import Field, MultipleHiddenInput
+from django.forms import Field, MultipleHiddenInput, NullBooleanField, Select
 
 
 class MultiValueField(Field):
@@ -42,3 +42,40 @@ class MultiValueField(Field):
         """
         if values and "" in values:
             raise ValidationError("This field cannot be empty.")
+
+
+class ExtendedNullBooleanField(NullBooleanField):
+    """
+    A field whose valid values are None, True, 'True', 'true', '1',
+    False, 'False', 'false' and '0'.
+    """
+
+    NULL_BOOLEAN_CHOICES = (
+        (None, ""),
+        (True, True),
+        (True, "True"),
+        (True, "true"),
+        (True, "1"),
+        (False, False),
+        (False, "False"),
+        (False, "false"),
+        (False, "0"),
+    )
+
+    widget = Select(choices=NULL_BOOLEAN_CHOICES)
+
+    def to_python(self, value):
+        """
+        Explicitly checks for the string 'True', 'False', 'true',
+        'false', '1' and '0' and returns boolean True or False.
+        Returns None if value is not passed at all and raises an
+        exception for any other value.
+        """
+        if value in (True, 'True', 'true', '1'):
+            return True
+        elif value in (False, 'False', 'false', '0'):
+            return False
+        elif not value:
+            return None
+        else:
+            raise ValidationError("Invalid Boolean Value.")

@@ -39,6 +39,7 @@ from student import auth
 from student.models import CourseEnrollmentAllowed
 from student.roles import (
     CourseBetaTesterRole,
+    CourseCcxCoachRole,
     CourseInstructorRole,
     CourseStaffRole,
     GlobalStaff,
@@ -63,7 +64,39 @@ from courseware.access_response import (
 )
 from courseware.access_utils import adjust_start_date, check_start_date, debug, ACCESS_GRANTED, ACCESS_DENIED
 
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
+from lms.djangoapps.ccx.models import CustomCourseForEdX
+
 log = logging.getLogger(__name__)
+
+
+def has_ccx_coach_role(user, course_key):
+    """
+    Check if user is a coach on this ccx.
+
+    Arguments:
+        user (User): the user whose descriptor access we are checking.
+        course_key (CCXLocator): Key to CCX.
+
+    Returns:
+        bool: whether user is a coach on this ccx or not.
+    """
+    if hasattr(course_key, 'ccx'):
+        ccx_id = course_key.ccx
+        role = CourseCcxCoachRole(course_key)
+
+        if role.has_user(user):
+            list_ccx = CustomCourseForEdX.objects.filter(
+                course_id=course_key.to_course_locator(),
+                coach=user
+            )
+            if list_ccx.exists():
+                coach_ccx = list_ccx[0]
+                return str(coach_ccx.id) == ccx_id
+    else:
+        raise CCXLocatorValidationException("Invalid CCX key. To verify that "
+                                            "user is a coach on CCX, you must provide key to CCX")
+    return False
 
 
 def has_access(user, action, obj, course_key=None):
@@ -106,10 +139,10 @@ def has_access(user, action, obj, course_key=None):
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
-        return _has_access_course_desc(user, action, obj)
+        return _has_access_course(user, action, obj)
 
     if isinstance(obj, CourseOverview):
-        return _has_access_course_overview(user, action, obj)
+        return _has_access_course(user, action, obj)
 
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, action, obj, course_key)
@@ -203,7 +236,7 @@ def _can_load_course_on_mobile(user, course):
     be checked by callers in *addition* to the return value of this function.
 
     Arguments:
-        user (User): the user whose course access  we are checking.
+        user (User): the user whose course access we are checking.
         course (CourseDescriptor|CourseOverview): the course for which we are
             checking access.
 
@@ -271,17 +304,22 @@ def _can_enroll_courselike(user, courselike):
     return ACCESS_DENIED
 
 
-def _has_access_course_desc(user, action, course):
+def _has_access_course(user, action, courselike):
     """
-    Check if user has access to a course descriptor.
+    Check if user has access to a course.
+
+    Arguments:
+        user (User): the user whose course access we are checking.
+        action (string): The action that is being checked.
+        courselike (CourseDescriptor or CourseOverview): The object
+            representing the course that the user wants to access.
 
     Valid actions:
 
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
     'load_mobile' -- can load from a mobile context
-    'enroll' -- enroll.  Checks for enrollment window,
-                  ACCESS_REQUIRE_STAFF_FOR_COURSE,
+    'enroll' -- enroll.  Checks for enrollment window.
     'see_exists' -- can see that the course exists.
     'staff' -- staff access to course.
     'see_in_catalog' -- user is able to see the course listed in the course catalog.
@@ -293,8 +331,15 @@ def _has_access_course_desc(user, action, course):
 
         NOTE: this is not checking whether user is actually enrolled in the course.
         """
-        # delegate to generic descriptor check to check start dates
-        return _has_access_descriptor(user, 'load', course, course.id)
+        response = (
+            _visible_to_nonstaff_users(courselike) and
+            _can_access_descriptor_with_start_date(user, courselike, courselike.id)
+        )
+
+        return (
+            ACCESS_GRANTED if (response or _has_staff_access_to_descriptor(user, courselike, courselike.id))
+            else response
+        )
 
     def can_load_forum():
         """
@@ -311,43 +356,27 @@ def _has_access_course_desc(user, action, course):
         Just a time boundary check, handles if start or stop were set to None
         """
         now = datetime.now(UTC())
-        start = course.enrollment_start
+        start = courselike.enrollment_start
         if start is not None:
             start = start.replace(tzinfo=pytz.UTC)
-        end = course.enrollment_end
+        end = courselike.enrollment_end
         if end is not None:
             end = end.replace(tzinfo=pytz.UTC)
 
         return (start is None or now > start) and (end is None or now < end)
 
     def can_enroll():
-        return _can_enroll_courselike(user, course)
+        """
+        Returns whether the user can enroll in the course.
+        """
+        return _can_enroll_courselike(user, courselike)
 
     def see_exists():
         """
         Can see if can enroll, but also if can load it: if user enrolled in a course and now
         it's past the enrollment period, they should still see it.
         """
-        # VS[compat] -- this setting should go away once all courses have
-        # properly configured enrollment_start times (if course should be
-        # staff-only, set enrollment_start far in the future.)
-        if settings.FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
-            dog_stats_api.increment(
-                DEPRECATION_VSCOMPAT_EVENT,
-                tags=(
-                    "location:has_access_course_desc_see_exists",
-                    u"course:{}".format(course),
-                )
-            )
-
-            # if this feature is on, only allow courses that have ispublic set to be
-            # seen by non-staff
-            if course.ispublic:
-                debug("Allow: ACCESS_REQUIRE_STAFF_FOR_COURSE and ispublic")
-                return ACCESS_GRANTED
-            return _has_staff_access_to_descriptor(user, course, course.id)
-
-        return ACCESS_GRANTED if (can_enroll() or can_load()) else ACCESS_DENIED
+        return ACCESS_GRANTED if (can_load() or can_enroll()) else ACCESS_DENIED
 
     def can_see_in_catalog():
         """
@@ -356,8 +385,8 @@ def _has_access_course_desc(user, action, course):
         but also allow course staff to see this.
         """
         return (
-            _has_catalog_visibility(course, CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
-            or _has_staff_access_to_descriptor(user, course, course.id)
+            _has_catalog_visibility(courselike, CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
+            or _has_staff_access_to_descriptor(user, courselike, courselike.id)
         )
 
     def can_see_about_page():
@@ -367,77 +396,27 @@ def _has_access_course_desc(user, action, course):
         but also allow course staff to see this.
         """
         return (
-            _has_catalog_visibility(course, CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
-            or _has_catalog_visibility(course, CATALOG_VISIBILITY_ABOUT)
-            or _has_staff_access_to_descriptor(user, course, course.id)
+            _has_catalog_visibility(courselike, CATALOG_VISIBILITY_CATALOG_AND_ABOUT)
+            or _has_catalog_visibility(courselike, CATALOG_VISIBILITY_ABOUT)
+            or _has_staff_access_to_descriptor(user, courselike, courselike.id)
         )
 
     checkers = {
         'load': can_load,
         'load_forum': can_load_forum,
         'view_courseware_with_prerequisites':
-            lambda: _can_view_courseware_with_prerequisites(user, course),
-        'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, course),
+            lambda: _can_view_courseware_with_prerequisites(user, courselike),
+        'load_mobile': lambda: can_load() and _can_load_course_on_mobile(user, courselike),
         'enroll': can_enroll,
         'see_exists': see_exists,
         'within_enrollment_period': within_enrollment_period,
-        'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
-        'instructor': lambda: _has_instructor_access_to_descriptor(user, course, course.id),
+        'staff': lambda: _has_staff_access_to_descriptor(user, courselike, courselike.id),
+        'instructor': lambda: _has_instructor_access_to_descriptor(user, courselike, courselike.id),
         'see_in_catalog': can_see_in_catalog,
         'see_about_page': can_see_about_page,
     }
 
-    return _dispatch(checkers, action, user, course)
-
-
-def _can_load_course_overview(user, course_overview):
-    """
-    Check if a user can load a course overview.
-
-    Arguments:
-        user (User): the user whose course access we are checking.
-        course_overview (CourseOverview): a course overview.
-
-    Note:
-        The user doesn't have to be enrolled in the course in order to have load
-        load access.
-    """
-    response = (
-        _visible_to_nonstaff_users(course_overview)
-        and _can_access_descriptor_with_start_date(user, course_overview, course_overview.id)
-    )
-
-    return (
-        ACCESS_GRANTED if (response or _has_staff_access_to_descriptor(user, course_overview, course_overview.id))
-        else response
-    )
-
-_COURSE_OVERVIEW_CHECKERS = {
-    'enroll': _can_enroll_courselike,
-    'load': _can_load_course_overview,
-    'load_mobile': lambda user, course_overview: (
-        _can_load_course_overview(user, course_overview)
-        and _can_load_course_on_mobile(user, course_overview)
-    ),
-    'view_courseware_with_prerequisites': _can_view_courseware_with_prerequisites
-}
-COURSE_OVERVIEW_SUPPORTED_ACTIONS = _COURSE_OVERVIEW_CHECKERS.keys()
-
-
-def _has_access_course_overview(user, action, course_overview):
-    """
-    Check if user has access to a course overview.
-
-    Arguments:
-        user (User): the user whose course access we are checking.
-        action (str): the action the user is trying to perform.
-            See COURSE_OVERVIEW_SUPPORTED_ACTIONS for valid values.
-        course_overview (CourseOverview): overview of the course in question.
-    """
-    if action in _COURSE_OVERVIEW_CHECKERS:
-        return _COURSE_OVERVIEW_CHECKERS[action](user, course_overview)
-    else:
-        raise ValueError(u"Unknown action for object type 'CourseOverview': '{}'".format(action))
+    return _dispatch(checkers, action, user, courselike)
 
 
 def _has_access_error_desc(user, action, descriptor, course_key):
