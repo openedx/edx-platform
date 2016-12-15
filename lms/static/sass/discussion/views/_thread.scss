@@ -37,6 +37,14 @@
     }
 }
 
+.thread-title {
+    display: block;
+    margin-bottom: $baseline;
+    font-size: $forum-x-large-font-size;
+    color: $gray-d3;
+    font-weight: 600;
+}
+
 .thread-responses-wrapper {
     padding: 0 ($baseline/2);
 }
@@ -55,7 +63,7 @@
         @include float(right);
         @include right($baseline);
         position: absolute;
-        top: $baseline;
+        top: ($baseline/2);
     }
 
     // response body

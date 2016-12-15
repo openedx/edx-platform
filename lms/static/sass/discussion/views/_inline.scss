@@ -31,19 +31,6 @@
         }
     }
 
-    .wmd-preview-container {
-        @include discussion-new-post-wmd-preview-container;
-        margin-bottom: $baseline;
-    }
-
-    .wmd-preview-label {
-        @include discussion-wmd-preview-label;
-    }
-
-    .wmd-preview {
-        @include discussion-wmd-preview;
-    }
-
    .new-post-article {
         position: relative;
         border: 1px solid $forum-color-border;
