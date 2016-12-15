@@ -1,14 +1,12 @@
 """
 Serializer for user API
 """
-from opaque_keys.edx.keys import CourseKey
 from rest_framework import serializers
 from rest_framework.reverse import reverse
-
 from courseware.access import has_access
-from student.models import CourseEnrollment, User
 from certificates.api import certificate_downloadable_status
-from util.course import get_lms_link_for_about_page
+from student.models import CourseEnrollment, User
+from util.course import get_link_for_about_page
 
 
 class CourseOverviewField(serializers.RelatedField):
@@ -52,7 +50,9 @@ class CourseOverviewField(serializers.RelatedField):
                 }
             },
             'course_image': course_overview.course_image_url,
-            'course_about': get_lms_link_for_about_page(CourseKey.from_string(course_id)),
+            'course_about': get_link_for_about_page(
+                course_overview.id, request.user, self.context.get('catalog_course_run')
+            ),
             'course_updates': reverse(
                 'course-updates-list',
                 kwargs={'course_id': course_id},
@@ -85,7 +85,9 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     certificate = serializers.SerializerMethodField()
 
     def get_certificate(self, model):
-        """Returns the information about the user's certificate in the course."""
+        """
+        Returns the information about the user's certificate in the course.
+        """
         certificate_info = certificate_downloadable_status(model.user, model.course_id)
         if certificate_info['is_downloadable']:
             return {
