@@ -25,8 +25,9 @@ from lms.djangoapps.ccx.tasks import send_ccx_course_published
 class TestSendCCXCoursePublished(ModuleStoreTestCase):
     """unit tests for the send ccx course published task
     """
-
     MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
+
+    ENABLED_SIGNALS = ['course_published']
 
     def setUp(self):
         """

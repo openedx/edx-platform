@@ -57,6 +57,86 @@ log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
 
 
+class SwitchedSignal(django.dispatch.Signal):
+    """
+    SwitchedSignal is like a normal Django signal, except that you can turn it
+    on and off. This is especially useful for tests where we want to be able to
+    isolate signals and disable expensive operations that are irrelevant to
+    what's being tested (like everything that triggers off of a course publish).
+
+    SwitchedSignals default to being on. You should be very careful if you ever
+    turn one off -- the only instances of this class are shared class attributes
+    of `SignalHandler`. You have to make sure that you re-enable the signal when
+    you're done, or else you may permanently turn that signal off for that
+    process. I can't think of any reason you'd want to disable signals outside
+    of running tests.
+    """
+    def __init__(self, name, *args, **kwargs):
+        """
+        The `name` parameter exists only to make debugging more convenient.
+
+        All other args are passed to the constructor for django.dispatch.Signal.
+        """
+        super(SwitchedSignal, self).__init__(*args, **kwargs)
+        self.name = name
+        self._allow_signals = True
+
+    def disable(self):
+        """
+        Turn off signal sending.
+
+        All calls to send/send_robust will no-op.
+        """
+        self._allow_signals = False
+
+    def enable(self):
+        """
+        Turn on signal sending.
+
+        Calls to send/send_robust will behave like normal Django Signals.
+        """
+        self._allow_signals = True
+
+    def send(self, *args, **kwargs):
+        """
+        See `django.dispatch.Signal.send()`
+
+        This method will no-op and return an empty list if the signal has been
+        disabled.
+        """
+        log.debug(
+            "SwitchedSignal %s's send() called with args %s, kwargs %s - %s",
+            self.name,
+            args,
+            kwargs,
+            "ALLOW" if self._allow_signals else "BLOCK"
+        )
+        if self._allow_signals:
+            return super(SwitchedSignal, self).send(*args, **kwargs)
+        return []
+
+    def send_robust(self, *args, **kwargs):
+        """
+        See `django.dispatch.Signal.send_robust()`
+
+        This method will no-op and return an empty list if the signal has been
+        disabled.
+        """
+        log.debug(
+            "SwitchedSignal %s's send_robust() called with args %s, kwargs %s - %s",
+            self.name,
+            args,
+            kwargs,
+            "ALLOW" if self._allow_signals else "BLOCK"
+        )
+        if self._allow_signals:
+            return super(SwitchedSignal, self).send_robust(*args, **kwargs)
+        return []
+
+    def __repr__(self):
+        return u"SwitchedSignal('{}')".format(self.name)
+
+
 class SignalHandler(object):
     """
     This class is to allow the modulestores to emit signals that can be caught
@@ -88,22 +168,33 @@ class SignalHandler(object):
        almost no work. Its main job is to kick off the celery task that will
        do the actual work.
     """
-    pre_publish = django.dispatch.Signal(providing_args=["course_key"])
-    course_published = django.dispatch.Signal(providing_args=["course_key"])
-    course_deleted = django.dispatch.Signal(providing_args=["course_key"])
-    library_updated = django.dispatch.Signal(providing_args=["library_key"])
-    item_deleted = django.dispatch.Signal(providing_args=["usage_key", "user_id"])
+
+    # If you add a new signal, please don't forget to add it to the _mapping
+    # as well.
+    pre_publish = SwitchedSignal("pre_publish", providing_args=["course_key"])
+    course_published = SwitchedSignal("course_published", providing_args=["course_key"])
+    course_deleted = SwitchedSignal("course_deleted", providing_args=["course_key"])
+    library_updated = SwitchedSignal("library_updated", providing_args=["library_key"])
+    item_deleted = SwitchedSignal("item_deleted", providing_args=["usage_key", "user_id"])
 
     _mapping = {
-        "pre_publish": pre_publish,
-        "course_published": course_published,
-        "course_deleted": course_deleted,
-        "library_updated": library_updated,
-        "item_deleted": item_deleted,
+        signal.name: signal
+        for signal
+        in [pre_publish, course_published, course_deleted, library_updated, item_deleted]
     }
 
     def __init__(self, modulestore_class):
         self.modulestore_class = modulestore_class
+
+    @classmethod
+    def all_signals(cls):
+        """Return a list with all our signals in it."""
+        return cls._mapping.values()
+
+    @classmethod
+    def signal_by_name(cls, signal_name):
+        """Given a signal name, return the appropriate signal."""
+        return cls._mapping[signal_name]
 
     def send(self, signal_name, **kwargs):
         """

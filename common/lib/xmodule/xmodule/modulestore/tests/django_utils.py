@@ -194,7 +194,46 @@ TEST_DATA_SPLIT_MODULESTORE = functools.partial(
 )
 
 
-class ModuleStoreIsolationMixin(CacheIsolationMixin):
+class SignalIsolationMixin(object):
+    """
+    Simple utility mixin class to toggle ModuleStore signals on and off. This
+    class operates on `SwitchedSignal` objects on the modulestore's
+    `SignalHandler`.
+    """
+    @classmethod
+    def disable_all_signals(cls):
+        """Disable all signals in the modulestore's SignalHandler."""
+        for signal in SignalHandler.all_signals():
+            signal.disable()
+
+    @classmethod
+    def enable_all_signals(cls):
+        """Enable all signals in the modulestore's SignalHandler."""
+        for signal in SignalHandler.all_signals():
+            signal.enable()
+
+    @classmethod
+    def enable_signals_by_name(cls, *signal_names):
+        """
+        Enable specific signals in the modulestore's SignalHandler.
+
+        Arguments:
+            signal_names (list of `str`): Names of signals to enable.
+        """
+        for signal_name in signal_names:
+            try:
+                signal = SignalHandler.signal_by_name(signal_name)
+            except KeyError:
+                all_signal_names = sorted(s.name for s in SignalHandler.all_signals())
+                err_msg = (
+                    "You tried to enable signal '{}', but I don't recognize that "
+                    "signal name. Did you mean one of these?: {}"
+                )
+                raise ValueError(err_msg.format(signal_name, all_signal_names))
+            signal.enable()
+
+
+class ModuleStoreIsolationMixin(CacheIsolationMixin, SignalIsolationMixin):
     """
     A mixin to be used by TestCases that want to isolate their use of the
     Modulestore.
@@ -205,6 +244,8 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
 
             MODULESTORE = <settings for the modulestore to test>
 
+            ENABLED_SIGNALS = ['course_published']
+
             def my_test(self):
                 self.start_modulestore_isolation()
                 self.addCleanup(self.end_modulestore_isolation)
@@ -213,10 +254,21 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
                 ...
 
     """
-
     MODULESTORE = functools.partial(mixed_store_config, mkdtemp_clean(), {})
     CONTENTSTORE = functools.partial(contentstore_config)
     ENABLED_CACHES = ['default', 'mongo_metadata_inheritance', 'loc_cache']
+
+    # List of modulestore signals enabled for this test. Defaults to an empty
+    # list. The list of signals available is found on the SignalHandler class,
+    # in /common/lib/xmodule/xmodule/modulestore/django.py
+    #
+    # You must use the signal itself, and not its name. So for example:
+    #
+    # class MyPublishTestCase(ModuleStoreTestCase):
+    #     ENABLED_SIGNALS = ['course_published', 'pre_publish']
+    #
+    ENABLED_SIGNALS = []
+
     __settings_overrides = []
     __old_modulestores = []
     __old_contentstores = []
@@ -228,6 +280,8 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         :py:meth:`end_modulestore_isolation` is called, this modulestore will
         be flushed (all content will be deleted).
         """
+        cls.disable_all_signals()
+        cls.enable_signals_by_name(*cls.ENABLED_SIGNALS)
         cls.start_cache_isolation()
         override = override_settings(
             MODULESTORE=cls.MODULESTORE(),
@@ -256,6 +310,7 @@ class ModuleStoreIsolationMixin(CacheIsolationMixin):
         assert settings.MODULESTORE == cls.__old_modulestores.pop()
         assert settings.CONTENTSTORE == cls.__old_contentstores.pop()
         cls.end_cache_isolation()
+        cls.enable_all_signals()
 
 
 class SharedModuleStoreTestCase(ModuleStoreIsolationMixin, CacheIsolationTestCase):
@@ -384,6 +439,14 @@ class ModuleStoreTestCase(ModuleStoreIsolationMixin, TestCase):
     # Tell Django to clean out all databases, not just default
     multi_db = True
 
+    @classmethod
+    def setUpClass(cls):
+        super(ModuleStoreTestCase, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(ModuleStoreTestCase, cls).tearDownClass()
+
     def setUp(self):
         """
         Creates a test User if `self.CREATE_USER` is True.
@@ -399,8 +462,6 @@ class ModuleStoreTestCase(ModuleStoreIsolationMixin, TestCase):
         OverrideFieldData.provider_classes = None
 
         super(ModuleStoreTestCase, self).setUp()
-
-        SignalHandler.course_published.disconnect(trigger_update_xblocks_cache_task)
 
         self.store = modulestore()
 

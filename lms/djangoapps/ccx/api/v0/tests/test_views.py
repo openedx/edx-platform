@@ -52,7 +52,6 @@ from student.roles import (
 )
 from student.tests.factories import AdminFactory
 
-
 USER_PASSWORD = 'test'
 AUTH_ATTRS = ('auth', 'auth_header_oauth2_provider')
 
@@ -183,6 +182,8 @@ class CcxListTest(CcxRestApiTest):
     """
     Test for the CCX REST APIs
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @classmethod
     def setUpClass(cls):
         super(CcxListTest, cls).setUpClass()
@@ -892,6 +893,8 @@ class CcxDetailTest(CcxRestApiTest):
     """
     Test for the CCX REST APIs
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Set up tests

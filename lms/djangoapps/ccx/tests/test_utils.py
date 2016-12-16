@@ -75,6 +75,8 @@ class TestGetCourseChapters(CcxTestCase):
     """
     Tests for the `get_course_chapters` util function
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         """
         Set up tests

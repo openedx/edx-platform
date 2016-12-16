@@ -69,6 +69,7 @@ class CertificateManagementTest(ModuleStoreTestCase):
 @ddt.ddt
 class ResubmitErrorCertificatesTest(CertificateManagementTest):
     """Tests for the resubmit_error_certificates management command. """
+    ENABLED_SIGNALS = ['course_published']
 
     @ddt.data(CourseMode.HONOR, CourseMode.VERIFIED)
     def test_resubmit_error_certificate(self, mode):

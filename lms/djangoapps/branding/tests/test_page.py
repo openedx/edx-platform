@@ -117,6 +117,8 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase, Mi
     Test to simulate and verify fix for disappearing courses in
     course catalog when using pre-requisite courses
     """
+    ENABLED_SIGNALS = ['course_published']
+
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True})
     def test_course_with_prereq(self):
         """
@@ -160,6 +162,8 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     """
     Test for Index page course cards sorting
     """
+    ENABLED_SIGNALS = ['course_published']
+
     def setUp(self):
         super(IndexPageCourseCardsSortingTests, self).setUp()
         self.starting_later = CourseFactory.create(

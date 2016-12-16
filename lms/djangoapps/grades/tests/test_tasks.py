@@ -37,6 +37,8 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
     """
     Ensures that the recalculate subsection grade task functions as expected when run.
     """
+    ENABLED_SIGNALS = ['course_published', 'pre_publish']
+
     def setUp(self):
         super(RecalculateSubsectionGradeTest, self).setUp()
         self.user = UserFactory()
