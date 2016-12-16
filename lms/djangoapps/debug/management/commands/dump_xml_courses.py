@@ -31,7 +31,7 @@ class Command(BaseCommand):
 
         xml_module_store = XMLModuleStore(
             data_dir=settings.DATA_DIR,
-            default_class='xmodule.hidden_module.HiddenDescriptor',
+            default_class='xmodule.hidden_block.HiddenBlock',
             load_error_modules=True,
             xblock_mixins=settings.XBLOCK_MIXINS,
             xblock_select=settings.XBLOCK_SELECT_FUNCTION,

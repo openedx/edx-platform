@@ -32,7 +32,6 @@ XMODULES = [
     "videoannotation = xmodule.videoannotation_module:VideoAnnotationDescriptor",
     "imageannotation = xmodule.imageannotation_module:ImageAnnotationDescriptor",
     "word_cloud = xmodule.word_cloud_module:WordCloudDescriptor",
-    "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
@@ -40,6 +39,7 @@ XBLOCKS = [
     "library = xmodule.library_root_xblock:LibraryRoot",
     "vertical = xmodule.vertical_block:VerticalBlock",
     "wrapper = xmodule.wrapper_module:WrapperBlock",
+    "hidden = xmodule.hidden_block:HiddenBlock",
 ]
 XBLOCKS_ASIDES = [
     'tagging_aside = cms.lib.xblock.tagging:StructuredTagsAside',
