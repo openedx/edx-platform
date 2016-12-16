@@ -194,6 +194,16 @@ TEST_DATA_SPLIT_MODULESTORE = functools.partial(
 )
 
 
+# class SuppressSignalsMixin(object):
+#
+#     SIGNALS_TO_SUPPRESS = []
+#
+#
+#     @classmethod
+#     def suppress_signals(cls):
+#         pass
+
+
 class ModuleStoreIsolationMixin(CacheIsolationMixin):
     """
     A mixin to be used by TestCases that want to isolate their use of the
@@ -384,6 +394,20 @@ class ModuleStoreTestCase(ModuleStoreIsolationMixin, TestCase):
     # Tell Django to clean out all databases, not just default
     multi_db = True
 
+    receivers_suppressed = []
+
+    @classmethod
+    def setUpClass(cls):
+        super(ModuleStoreTestCase, cls).setUpClass()
+        for signal in SignalHandler.all_signals():
+            signal.mute()
+
+    @classmethod
+    def tearDownClass(cls):
+        for signal in SignalHandler.all_signals():
+            signal.unmute()
+        super(ModuleStoreTestCase, cls).tearDownClass()
+
     def setUp(self):
         """
         Creates a test User if `self.CREATE_USER` is True.
@@ -400,7 +424,7 @@ class ModuleStoreTestCase(ModuleStoreIsolationMixin, TestCase):
 
         super(ModuleStoreTestCase, self).setUp()
 
-        SignalHandler.course_published.disconnect(trigger_update_xblocks_cache_task)
+        # SignalHandler.course_published.disconnect(trigger_update_xblocks_cache_task)
 
         self.store = modulestore()
 

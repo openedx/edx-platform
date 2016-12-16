@@ -57,6 +57,30 @@ log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
 
 
+class MutableSignal(django.dispatch.Signal):
+
+    def __init__(self, *args, **kwargs):
+        super(MutableSignal, self).__init__(*args, **kwargs)
+        self._mute = False
+
+    def mute(self):
+        self._mute = True
+
+    def unmute(self):
+        self._mute = False
+
+    def send(self, *args, **kwargs):
+        if self._mute:
+            return []
+
+        return super(MutableSignal, self).send(*args, **kwargs)
+
+    def send_robust(self, *args, **kwargs):
+        if self._mute:
+            return []
+        return super(MutableSignal, self).send_robust(*args, **kwargs)
+
+
 class SignalHandler(object):
     """
     This class is to allow the modulestores to emit signals that can be caught
@@ -88,11 +112,11 @@ class SignalHandler(object):
        almost no work. Its main job is to kick off the celery task that will
        do the actual work.
     """
-    pre_publish = django.dispatch.Signal(providing_args=["course_key"])
-    course_published = django.dispatch.Signal(providing_args=["course_key"])
-    course_deleted = django.dispatch.Signal(providing_args=["course_key"])
-    library_updated = django.dispatch.Signal(providing_args=["library_key"])
-    item_deleted = django.dispatch.Signal(providing_args=["usage_key", "user_id"])
+    pre_publish = MutableSignal(providing_args=["course_key"])
+    course_published = MutableSignal(providing_args=["course_key"])
+    course_deleted = MutableSignal(providing_args=["course_key"])
+    library_updated = MutableSignal(providing_args=["library_key"])
+    item_deleted = MutableSignal(providing_args=["usage_key", "user_id"])
 
     _mapping = {
         "pre_publish": pre_publish,
@@ -104,6 +128,16 @@ class SignalHandler(object):
 
     def __init__(self, modulestore_class):
         self.modulestore_class = modulestore_class
+
+    @classmethod
+    def all_signals(cls):
+        return [
+            cls.pre_publish,
+            cls.course_published,
+            cls.course_deleted,
+            cls.library_updated,
+            cls.item_deleted
+        ]
 
     def send(self, signal_name, **kwargs):
         """
