@@ -22,6 +22,7 @@ from edxmako.shortcuts import render_to_response
 import pytz
 
 from commerce.models import CommerceConfiguration
+from lms.djangoapps.commerce.utils import EcommerceService
 from openedx.core.djangoapps.external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
@@ -316,7 +317,7 @@ def _external_auth_intercept(request, mode):
 def get_user_orders(user):
     """Given a user, get the detail of all the orders from the Ecommerce service.
 
-    Arguments:
+    Args:
         user (User): The user to authenticate as when requesting ecommerce.
 
     Returns:
@@ -351,7 +352,7 @@ def get_user_orders(user):
                                     'order_date': strftime_localized(
                                         date_placed.replace(tzinfo=pytz.UTC), 'SHORT_DATE'
                                     ),
-                                    'receipt_url': commerce_configuration.receipt_page + order['number']
+                                    'receipt_url': EcommerceService().get_receipt_page_url(order['number'])
                                 }
                                 user_orders.append(order_data)
                             except KeyError:
