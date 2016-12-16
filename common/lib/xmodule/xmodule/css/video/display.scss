@@ -11,6 +11,11 @@
 
 // the html target is necessary for xblocks and xmodules, but works across the board
 
+$secondary-dark: rgb(142, 62, 99); // UXPL secondary dark
+$secondary-base: rgb(203, 89, 141); // UXPL secondary base
+$secondary-light: rgb(219, 139, 175); // UXPL secondary light
+$cool-dark: rgb(79, 89, 93); // UXPL cool dark
+
 & {
     margin-bottom: ($baseline*1.5);
 }
@@ -329,6 +334,7 @@
         @include clearfix();
         @include transform-origin(bottom left);
         @include transition(height .7s ease-in-out 0s);
+        box-sizing: border-box;
         position: absolute;
         bottom: 100%;
         left: 0;
@@ -336,13 +342,16 @@
         z-index: 1;
         height: ($baseline / 4);
         margin-left: 0;
-        border: 0;
+        border: 1px solid $cool-dark;
         border-radius: 0;
-        background: rgb(79, 89, 93); // UXPL grayscale-cool dark
+        background: $cool-dark;
 
         .ui-widget-header {
-          background: rgb(142, 62, 99); // UXPL secondary dark
+          background: $secondary-dark;
+          border: 1px solid $secondary-dark;
           box-shadow: none;
+          top: -1px;
+          left: -1px;
         }
 
         .ui-corner-all.slider-range {
@@ -354,19 +363,21 @@
           @extend %ui-fake-link;
           @include transform-origin(bottom left);
           @include transition(all .7s ease-in-out 0s);
-          top: 0;
+          box-sizing: border-box;
+          top: -1px;
           height: ($baseline / 4);
           width: ($baseline / 4);
           margin-left: -($baseline / 8); // center-center causes the control to be beyond the end of the sider
-          border: 0;
+          border: 1px solid $secondary-base;
           border-radius: ($baseline / 5);
           padding: 0;
-          background: rgb(203, 89, 141); // UXPL secondary base
+          background: $secondary-base;
           box-shadow: none;
 
           &:focus,
           &:hover {
-            background-color: rgb(219, 139, 175); // UXPL secondary light
+            background-color: $secondary-light;
+            border-color: $secondary-light;
           }
         }
       }
@@ -609,29 +620,35 @@
               height: 100px;
               width: ($baseline / 4);
               margin: 14px auto;
-              border: 0;
-              background: rgb(79, 89, 93); // UXPL grayscale-cool dark
+              box-sizing: border-box;
+              border: 1px solid $cool-dark;
+              background: $cool-dark;
 
               .ui-slider-handle {
                 @extend %ui-fake-link;
                 @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
                 @include left(-5px);
-                height: 15px;
-                width: 15px;
-                border: 0;
+                box-sizing: border-box;
+                height: 13px;
+                width: 13px;
+                border: 1px solid $secondary-base;
                 border-radius: ($baseline / 5);
                 padding: 0;
-                background: rgb(203, 89, 141); // UXPL secondary base
+                background: $secondary-base;
                 box-shadow: none;
 
                 &:hover,
                 &:focus {
-                  background: rgb(219, 139, 175); // UXPL secondary light
+                  background: $secondary-light;
+                  border-color: $secondary-light;
                 }
               }
 
               .ui-slider-range {
-                background: rgb(142, 62, 99); // UXPL secondary dark
+                background: $secondary-dark;
+                border: 1px solid $secondary-dark;
+                left: -1px;
+                bottom: -1px;
               }
             }
           }
