@@ -662,13 +662,14 @@ section.self-assessment {
   }
 }
 
-.unauth-tos {
+.container .unauth-tos {
   position: relative;
+  max-width: 1150px;
   margin: 30px auto 0 auto;
+  padding: 15px;
+  border: none;
   background-color: $black;
   color: $white;
-  border-radius: 5px;
-  padding: 15px;
   font-weight: bold;
   text-align: center;
 }
