@@ -100,7 +100,7 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(AUDIT, _('Audit'), 0, '', 'usd', None, None, None)
+    DEFAULT_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None)
     DEFAULT_MODE_SLUG = AUDIT
 
     # Modes that allow a student to pursue a verified certificate
