@@ -127,35 +127,6 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
     js_module_name = "HTMLEditingDescriptor"
     css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/html/edit.scss')]}
 
-    # VS[compat] TODO (cpennington): Delete this method once all fall 2012 course
-    # are being edited in the cms
-    @classmethod
-    def backcompat_paths(cls, filepath):
-        """
-        Get paths for html and xml files.
-        """
-
-        dog_stats_api.increment(
-            DEPRECATION_VSCOMPAT_EVENT,
-            tags=["location:html_descriptor_backcompat_paths"]
-        )
-
-        if filepath.endswith('.html.xml'):
-            filepath = filepath[:-9] + '.html'  # backcompat--look for html instead of xml
-        if filepath.endswith('.html.html'):
-            filepath = filepath[:-5]  # some people like to include .html in filenames..
-        candidates = []
-        while os.sep in filepath:
-            candidates.append(filepath)
-            _, _, filepath = filepath.partition(os.sep)
-
-        # also look for .html versions instead of .xml
-        new_candidates = []
-        for candidate in candidates:
-            if candidate.endswith('.xml'):
-                new_candidates.append(candidate[:-4] + '.html')
-        return candidates + new_candidates
-
     @classmethod
     def filter_templates(cls, template, course):
         """
@@ -219,28 +190,7 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
                 url_path=name_to_pathname(location.name)
             )
             base = path(pointer_path).dirname()
-            # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
             filepath = "{base}/{name}.html".format(base=base, name=filename)
-            # log.debug("looking for html file for {0} at {1}".format(location, filepath))
-
-            # VS[compat]
-            # TODO (cpennington): If the file doesn't exist at the right path,
-            # give the class a chance to fix it up. The file will be written out
-            # again in the correct format.  This should go away once the CMS is
-            # online and has imported all current (fall 2012) courses from xml
-            if not system.resources_fs.exists(filepath):
-
-                dog_stats_api.increment(
-                    DEPRECATION_VSCOMPAT_EVENT,
-                    tags=["location:html_descriptor_load_definition"]
-                )
-
-                candidates = cls.backcompat_paths(filepath)
-                # log.debug("candidates = {0}".format(candidates))
-                for candidate in candidates:
-                    if system.resources_fs.exists(candidate):
-                        filepath = candidate
-                        break
 
             try:
                 with system.resources_fs.open(filepath) as infile:
@@ -252,10 +202,6 @@ class HtmlDescriptor(HtmlBlock, XmlDescriptor, EditingDescriptor):  # pylint: di
                         system.error_tracker("Warning: " + msg)
 
                     definition = {'data': html}
-
-                    # TODO (ichuang): remove this after migration
-                    # for Fall 2012 LMS migration: keep filename (and unmangled filename)
-                    definition['filename'] = [filepath, filename]
 
                     return definition, []
 
