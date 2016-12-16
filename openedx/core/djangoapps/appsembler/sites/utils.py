@@ -22,8 +22,8 @@ def get_initial_sass_variables():
 
 
 def get_branding_values_from_file():
-    sass_var_file = os.path.join(settings.ENV_ROOT, "themes",
-                                 settings.THEME_NAME, 'customer_specific', 'lms', 'static',
+    sass_var_file = os.path.join(settings.COMPREHENSIVE_THEME_DIR,
+                                 settings.DEFAULT_SITE_THEME, 'customer_specific', 'lms', 'static',
                                  'sass', 'base', '_branding-basics.scss')
     with open(sass_var_file, 'r') as f:
         contents = f.read()
@@ -43,9 +43,10 @@ def get_branding_labels_from_file(custom_branding=None):
 
 
 def compile_sass(sass_file, custom_branding=None):
-    sass_var_file = os.path.join(settings.ENV_ROOT, "themes",
-                                 settings.THEME_NAME, 'lms', 'static', 'sass', sass_file)
-    customer_specific_includes = os.path.join(settings.ENV_ROOT, "themes", settings.THEME_NAME,
+    sass_var_file = os.path.join(settings.COMPREHENSIVE_THEME_DIR,
+                                 settings.DEFAULT_SITE_THEME, 'lms', 'static', 'sass', sass_file)
+    customer_specific_includes = os.path.join(settings.COMPREHENSIVE_THEME_DIR,
+                                              settings.DEFAULT_SITE_THEME,
                                               'customer_specific', 'lms', 'static', 'sass')
     importers = None
     if custom_branding:
@@ -57,10 +58,12 @@ def compile_sass(sass_file, custom_branding=None):
     )
     return css_output
 
+
 def get_full_branding_list():
     values = get_branding_values_from_file()
     labels = get_branding_labels_from_file()
     return [(val[0], (val[1], lab[1])) for val, lab in izip(values, labels)]
+
 
 def get_initial_page_elements():
     return {
@@ -166,7 +169,7 @@ def bootstrap_site(site, organization_slug=None, user_email=None, password=None)
     # don't use create because we need to call save() to set some values automatically
     site_config = SiteConfiguration(site=site, enabled=True)
     site_config.save()
-    SiteTheme.objects.create(site=site, theme_dir_name=settings.THEME_NAME)
+    SiteTheme.objects.create(site=site, theme_dir_name=settings.DEFAULT_SITE_THEME)
     site.configuration_id = site_config.id
     # temp workarounds while old staging is still up and running
     if organization_slug:
