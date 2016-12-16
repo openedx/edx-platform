@@ -70,3 +70,14 @@ class Program(factory.Factory):
     banner_image = {
         size: BannerImage() for size in ['large', 'medium', 'small', 'x-small']
     }
+
+
+class ProgramType(factory.Factory):
+    """
+    Factory for stubbing ProgramType resources from the catalog API.
+    """
+    class Meta(object):
+        model = dict
+
+    name = FuzzyText()
+    logo_image = FuzzyText(prefix='https://example.com/program/logo')

@@ -127,6 +127,7 @@ from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
+from openedx.core.djangoapps.catalog.utils import get_programs_data
 
 
 log = logging.getLogger("edx.student")
@@ -173,6 +174,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     if extra_context is None:
         extra_context = {}
 
+    programs_list = []
     courses = get_courses(user)
 
     if configuration_helpers.get_value(
@@ -205,6 +207,16 @@ def index(request, extra_context=None, user=AnonymousUser()):
 
     # Insert additional context for use in the template
     context.update(extra_context)
+
+    # Getting all the programs from course-catalog service. The programs_list is being added to the context but it's
+    # not being used currently in lms/templates/index.html. To use this list, you need to create a custom theme that
+    # overrides index.html. The modifications to index.html to display the programs will be done after the support
+    # for edx-pattern-library is added.
+    if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
+                                       settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
+        programs_list = get_programs_data(user)
+
+    context["programs_list"] = programs_list
 
     return render_to_response('index.html', context)
 

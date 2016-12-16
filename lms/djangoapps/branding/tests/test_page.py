@@ -2,6 +2,7 @@
 Tests for branding page
 """
 
+import mock
 import datetime
 
 from django.conf import settings
@@ -287,3 +288,37 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][0].id, self.starting_later.id)
         self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+
+
+@attr(shard=1)
+class IndexPageProgramsTests(ModuleStoreTestCase):
+    """
+    Tests for Programs List in Marketing Pages.
+    """
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False})
+    def test_get_programs_not_called(self):
+        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
+            # check the /dashboard
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 0)
+
+        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
+            # check the /courses view
+            response = self.client.get(reverse('branding.views.courses'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 0)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': True})
+    def test_get_programs_called(self):
+        with mock.patch("student.views.get_programs_data") as patched_get_programs_data:
+            # check the /dashboard
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 1)
+
+        with mock.patch("courseware.views.views.get_programs_data") as patched_get_programs_data:
+            # check the /courses view
+            response = self.client.get(reverse('branding.views.courses'))
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(patched_get_programs_data.call_count, 1)
