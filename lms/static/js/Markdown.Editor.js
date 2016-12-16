@@ -1061,10 +1061,15 @@
             }
         };
 
+        // Checks validity of input element
+        var checkValidity = function (element) {
+            return (typeof element.checkValidity === "undefined") ? true : element.checkValidity();
+        };
+
         var clearFormErrorMessages = function () {
-            urlInput.classList.remove('has-error');
+            $(urlInput).removeClass('has-error');
             urlErrorMsg.style.display = 'none';
-            descInput.classList.remove('has-error');
+            $(descInput).removeClass('has-error');
             descErrorMsg.style.display = 'none';
         };
 
@@ -1092,8 +1097,8 @@
 
             var isValidUrl = util.isValidUrl(url),
                 isValidDesc = (
-                    descInput.checkValidity() &&
-                    (descInput.required ? description.length : true)
+                    checkValidity(descInput) &&
+                    ($(descInput).attr('required') ? description.length : true)
                 );
 
             if ((isValidUrl && isValidDesc) || isCancel) {
@@ -1102,11 +1107,11 @@
             } else {
                 var errorCount = 0;
                 if (!isValidUrl) {
-                    urlInput.classList.add('has-error');
+                    $(urlInput).addClass('has-error');
                     urlErrorMsg.style.display = 'inline-block';
                     errorCount += 1;
                 } if (!isValidDesc) {
-                    descInput.classList.add('has-error');
+                    $(descInput).addClass('has-error');
                     descErrorMsg.style.display = 'inline-block';
                     errorCount += 1;
                 }
