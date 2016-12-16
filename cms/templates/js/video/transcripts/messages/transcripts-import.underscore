@@ -1,0 +1,16 @@
+<div class="transcripts-message-status status-error"><span class="icon fa fa-remove" aria-hidden="true"></span><%= gettext("No EdX Timed Transcript") %></div>
+<p class="transcripts-message">
+<%= gettext("EdX doesn't have a timed transcript for this video in Studio, but we found a transcript on YouTube. You can import the YouTube transcript or upload your own .srt transcript file.") %>
+</p>
+<div class="transcripts-file-uploader"></div>
+<p class="transcripts-error-message is-invisible">
+<%= gettext("Error.") %>
+</p>
+<div class="wrapper-transcripts-buttons">
+    <button class="action setting-import" type="button" name="setting-import" value="<%= gettext("Import YouTube Transcript") %>" data-tooltip="<%= gettext("Import YouTube Transcript") %>">
+        <span><%= gettext("Import YouTube Transcript") %></span>
+    </button>
+    <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Transcript") %>" data-tooltip="<%= gettext("Upload New .srt Transcript") %>">
+        <span><%= gettext("Upload New Transcript") %></span>
+    </button>
+</div>

@@ -1,0 +1,209 @@
+// edX theme: LMS Footer
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+
+$edx-footer-link-color: $link-color;
+$edx-footer-bg-color: rgb(252,252,252);
+
+
+// Aggressively scoped for Drupal
+// ==============================
+// These styles are being loaded on Drupal, LMS and WordPress
+// sites so the scope has to be aggressive to override default
+// CMS styles
+footer#footer-edx-v3 {
+  background: $edx-footer-bg-color;
+  padding: 20px;
+  border-top: 1px solid $courseware-button-border-color;
+
+  // To match the Pattern Library
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  .footer-content-wrapper {
+    @include outer-container;
+    @include box-sizing(border-box);
+  }
+
+  p {
+    @include font-size(14);
+    @include line-height(14);
+    font-family: $sans-serif;
+  }
+
+  .site-nav,
+  .legal-notices {
+    a {
+      @include font-size(14);
+      @include line-height(14);
+      @include margin-right(20px);
+      color: $edx-footer-link-color;
+
+      &:last-of-type {
+        @include margin-right(0);
+      }
+
+      &:hover,
+      &:focus {
+        border: none;
+      }
+    }
+  }
+
+  .footer-logo,
+  .site-details,
+  .external-links {
+    @include span-columns(12);
+  }
+
+  .site-details,
+  .external-links {
+    margin-top: 5px;
+  }
+
+  .footer-logo {
+    margin-bottom: 30px;
+  }
+
+  .legal-notices {
+    margin: 20px 0 30px;
+  }
+
+  .openedx-link {
+    @include margin(10px, 0, 30px, -8px);
+    width: 141px;
+
+    a {
+      display: inline-block;
+    }
+
+    img {
+      width: 100%;
+    }
+  }
+  
+  .social-media-links,
+  .mobile-app-links {
+      @extend %ui-no-list;
+      
+      .list-item {
+          display: inline-block;
+      }
+  }
+
+  .mobile-app-links {
+    @include clearfix();
+    position: relative;
+    width: 260px;
+    height: 42px;
+  }
+
+  .social-media-links {
+    @include clearfix();
+    margin-bottom: 30px;
+  }
+
+  a.sm-link {
+    @include float(left);
+    @include margin(0, 0, 10px, 10px);
+    @include font-size(28);
+    @include line-height(28);
+    width: 35px;
+    height: 30px;
+    line-height: 1;
+    position: relative;
+    display: inline;
+    background: none;
+    text-align: left;
+
+    &:first-of-type {
+      @include margin-left(0);
+    }
+
+    &:hover,
+    &:focus {
+      opacity: 0.7;
+      border: none;
+    }
+
+    .icon {
+      font-family: 'FontAwesome';
+      color: $edx-footer-link-color;
+    }
+  }
+
+  .app-link {
+
+    &:first-of-type {
+      @include left(0);
+    }
+
+    &:last-of-type {
+      @include right(0);
+    }
+
+    img {
+      height: 40px;
+      max-width: 200px;
+    }
+  }
+
+  .site-nav,
+  .legal-notices,
+  .footer-logo,
+  .external-links {
+    @extend %ui-print-excluded;
+  }
+
+  @media print {
+    .site-details p {
+      @include float(left);
+    }
+
+    .openedx-link {
+      margin: 0;
+      @include float(right);
+    }
+  }
+
+  @include media( $edx-bp-large ) {
+    padding: 20px 10px;
+
+    .site-details {
+      @include span-columns(8);
+    }
+
+    .external-links {
+      @include span-columns(4);
+    }
+
+    .social-media-links,
+    .mobile-app-links {
+      @include float(right);
+    }
+
+    .social-media-links {
+      margin-bottom: 40px;
+    }
+  }
+
+  @include media( $edx-bp-huge ) {
+    .footer-logo {
+      @include span-columns(2);
+    }
+
+    .site-details {
+      @include span-columns(7);
+    }
+
+    .external-links {
+      @include span-columns(3);
+    }
+
+    .social-media-links {
+      margin-bottom: 50px;
+    }
+  }
+}

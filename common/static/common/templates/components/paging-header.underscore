@@ -1,0 +1,21 @@
+<% if (!_.isUndefined(srInfo)) { %>
+  <h2 class="sr" id="<%- srInfo.id %>"><%- srInfo.text %></h2>
+<% } %>
+<div class="search-tools listing-tools">
+    <span class="search-count listing-count">
+        <%- message %>
+    </span>
+    <% if (showSortControls) { %>
+      |
+      <span class="field listing-sort">
+          <label class="field-label" for="paging-header-select"><%- gettext("Sorted by") %></label>
+          <select id="paging-header-select" name="paging-header-select" class="field-input input-select listing-sort-select">
+              <% _.each(sortableFields, function (option, key) { %>
+                <option value="<%- key %>" <% if (key === sortOrder) { %> selected="true" <% } %>>
+                  <%- option.displayName %>
+                </option>
+              <% }) %>
+          </select>
+      </span>
+    <% } %>
+</div>

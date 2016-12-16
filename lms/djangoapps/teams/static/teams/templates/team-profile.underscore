@@ -1,0 +1,57 @@
+<div class="team-profile">
+    <div class="page-content-main">
+        <div class="discussion-module" data-course-id="<%- courseID %>" data-discussion-id="<%- discussionTopicID %>"
+                data-read-only="<%- readOnly %>"
+                data-user-create-comment="<%- !readOnly %>"
+                data-user-create-subcomment="<%- !readOnly %>">
+        </div>
+    </div>
+
+    <div class="page-content-secondary">
+        <h4 class="team-detail-header"><%- gettext("Team Details") %></h4>
+        <% if (isMember) { %>
+            <div class="team-user-membership-status">
+                <p><%- gettext("You are a member of this team.") %></p>
+            </div>
+        <% } %>
+        <div class="team-members">
+            <% if (hasMembers) { %>
+                <span class="sr"><%- gettext("Team member profiles") %></span>
+            <% } %>
+            <ul class="members-info"></ul>
+        </div>
+
+        <div class="team-capacity">
+            <span class="sr"><%- gettext("Team capacity") %></span>
+            <span><%- membershipText %></span>
+        </div>
+
+        <% if (country) { %>
+            <div class="team-country">
+                <span class="sr"><%- gettext("The country that team members primarily identify with.") %></span>
+                <span class="icon fa fa-globe fa-fw" aria-hidden="true"></span>
+                <span>
+                    <%- gettext(country) %>
+                </span>
+            </div>
+        <% } %>
+        <% if (language) { %>
+            <div class="team-language">
+                <span class="sr"><%- gettext("The language that team members primarily use to communicate with each other.") %></span>
+                <span class="icon fa fa-comment-o fa-fw" aria-hidden="true"></span>
+                <span>
+                    <%- gettext(language) %>
+                </span>
+            </div>
+        <% } %>
+
+        <% if (isMember) { %>
+            <div class="leave-team">
+                <button class="btn btn-link leave-team-link"><%- gettext("Leave Team") %></button>
+            </div>
+
+            <div class="divider-lv1"></div>
+
+        <% } %>
+    </div>
+</div>

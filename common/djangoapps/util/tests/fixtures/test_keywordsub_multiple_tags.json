@@ -1,0 +1,10 @@
+{
+    "basic_test": {
+        "test_string": "The user with id %%USER_ID%% is named %%USER_FULLNAME%%",
+        "expected": "The user with id 123456789 is named Test User"
+    },
+    "invalid_tags": {
+        "test_string": "The user with id %%user-id%% is named %%USER_FULLNAME%% and is in %%COURSE_DISPLAY_NAME",
+        "expected": "The user with id %%user-id%% is named Test User and is in %%COURSE_DISPLAY_NAME"
+    }
+}

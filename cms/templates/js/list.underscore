@@ -1,0 +1,21 @@
+<% if (length === 0) { %>
+    <div class="no-content">
+        <p>
+            <%- emptyMessage %>
+            <a href="#" class="button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span>
+            <%- interpolate(
+                gettext("%(new_item_message)s"), {new_item_message: newItemMessage}, true
+            ) %></a>
+        </p>
+    </div>
+<% } else { %>
+    <div class="list-items"></div>
+    <% if (!isEditing) { %>
+        <button class="action action-add <% if(!canCreateNewItem) {%> action-add-hidden <% }%>" >
+            <span class="icon fa fa-plus" aria-hidden="true"></span>
+            <%- interpolate(
+                gettext('New %(item_type)s'), {item_type: itemCategoryDisplayName}, true
+            ) %>
+        </button>
+    <% } %>
+<% } %>

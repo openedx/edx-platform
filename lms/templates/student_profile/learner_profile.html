@@ -1,0 +1,33 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%def name="online_help_token()"><% return "profile" %></%def>
+<%namespace name='static' file='/static_content.html'/>
+<%!
+import json
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+%>
+
+<%block name="pagetitle">${_("Learner Profile")}</%block>
+
+<%block name="bodyclass">view-profile</%block>
+
+<div class="message-banner" aria-live="polite"></div>
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="wrapper-profile">
+        <div class="ui-loading-indicator">
+            <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
+        </div>
+    </div>
+</main>
+<%block name="headextra">
+    <%static:css group='style-course'/>
+</%block>
+
+<%block name="js_extra">
+<%static:require_module module_name="js/student_profile/views/learner_profile_factory" class_name="LearnerProfileFactory">
+    var options = ${data | n, dump_js_escaped_json};
+    LearnerProfileFactory(options);
+</%static:require_module>
+</%block>

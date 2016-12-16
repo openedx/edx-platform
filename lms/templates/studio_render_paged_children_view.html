@@ -1,0 +1,24 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%namespace name='static' file='static_content.html'/>
+
+<div class="xblock-container-paging-parameters"
+     data-start="${first_displayed}"
+     data-displayed="${displayed_children}"
+     data-total="${total_children}"
+     data-previews="${'true' if previews else 'false'}"
+></div>
+
+<div class="container-paging-header"></div>
+
+<div>
+% for item in items:
+    ${item['content']}
+% endfor
+</div>
+
+% if can_add:
+    <div class="add-xblock-component new-component-item adding"></div>
+% endif
+
+<div class="container-paging-footer"></div>

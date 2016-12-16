@@ -1,0 +1,12 @@
+<course advanced_modules="[&quot;annotatable&quot;, &quot;lti&quot;, &quot;word_cloud&quot;]" display_name="Manual Smoke Test Course 1" lti_passports="[&quot;ims:12345:secret&quot;]" pdf_textbooks="[{&quot;tab_title&quot;: &quot;An Example Paper&quot;, &quot;id&quot;: &quot;0An_Example_Paper&quot;, &quot;chapters&quot;: [{&quot;url&quot;: &quot;/static/1.pdf&quot;, &quot;title&quot;: &quot;Introduction &quot;}]}]" show_calculator="true" show_chat="true" start="2014-06-26T00:00:00Z">
+  <chapter url_name="a64a6f63f75d430aa71e6ce113c5b4d2"/>
+  <chapter url_name="ab97a6dbfafd48868c36bed4c8c5391d"/>
+  <chapter url_name="5bb7a5ab824f460580a756a4f347377c"/>
+  <chapter url_name="ce2fd991d84b4a5ca75350eb8e350627"/>
+  <chapter url_name="be8a64868f2f460ea490e001a25e588d"/>
+  <chapter url_name="3d216a50442f4cd5a1d4171c68f13f58"/>
+  <chapter url_name="a0178ff300514e24829e239604dce12c"/>
+  <chapter url_name="2df1fe87253549199f30cabb19e14b7c"/>
+  <chapter url_name="60989ac1589241ed9dbca0f2070276fd"/>
+  <wiki slug="ManTestX.ManTest1.2014"/>
+</course>

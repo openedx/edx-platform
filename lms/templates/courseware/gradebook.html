@@ -1,0 +1,143 @@
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/jquery.gradebook.js')}"></script>
+</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
+  <style type="text/css">
+  % for (grade, _), color in zip(ordered_grades, ['green', 'Chocolate']):
+  .grade_${grade} {color:${color};}
+  % endfor
+  % for (grade, _) in ordered_grades[2:]:
+  .grade_${grade} {color:DarkSlateGray;}
+  % endfor
+  .grade_F {color:DimGray;}
+  .grade_None {color:LightGray;}
+  </style>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      var gradebook = new Gradebook($('.gradebook-content'));
+    });
+  </script>
+
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page=''" />
+
+<section class="container">
+<div class="gradebook-wrapper">
+  <section class="gradebook-content">
+    <h1>${_("Gradebook")}</h1>
+
+    <table class="student-table">
+      <thead>
+        <tr>
+          <th>
+            <form class="student-search">
+              <input type="search" class="student-search-field" placeholder="${_('Search students')}" />
+            </form>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        %for student in students:
+        <tr>
+          <td>
+            <a href="${reverse('student_progress', kwargs=dict(course_id=course_id.to_deprecated_string(), student_id=student['id']))}">${student['username']}</a>
+          </td>
+        </tr>
+        %endfor
+      </tbody>
+    </table>
+
+
+
+    %if len(students) > 0:
+    <div class="grades">
+      <table class="grade-table">
+        <%
+        templateSummary = students[0]['grade_summary']
+        %>
+        <thead>
+          <tr> <!-- Header Row -->
+            %for section in templateSummary['section_breakdown']:
+              <%
+                tooltip_str = section['detail']
+                # We are making header labels from the first student record. So for tool tip (title),
+                # I am processing this string ```section['detail']``` from student record and removing
+                # all student related data i.e marks, percentage etc to get only the title of homework.
+                if "=" in section['detail']:
+                    tooltip_str = section['detail'][0: section['detail'].rfind('=')]
+
+                if "-" in tooltip_str:
+                    tooltip_str = tooltip_str[0: tooltip_str.rfind('-')]
+              %>
+              <th title="${tooltip_str}"><div class="assignment-label">${section['label']}</div></th>
+            %endfor
+            <th title="${_('Total')}"><div class="assignment-label">${_('Total')}</div></th>
+          </tr>
+        </thead>
+
+        <%def name="percent_data(fraction, label)">
+          <%
+            letter_grade = 'None'
+            if fraction > 0:
+              letter_grade = 'F'
+              for (grade, cutoff) in ordered_grades:
+                if fraction >= cutoff:
+                  letter_grade = grade
+                  break
+
+            data_class = "grade_" + letter_grade
+          %>
+          <td class="${data_class}" data-percent="${fraction}" title="${label}">${ "{0:.0f}".format( 100 * fraction ) }</td>
+        </%def>
+
+        <tbody>
+          %for student in students:
+          <tr>
+            %for section in student['grade_summary']['section_breakdown']:
+              ${percent_data( section['percent'], section['detail'] )}
+            %endfor
+            ${percent_data( student['grade_summary']['percent'], _('Total'))}
+          </tr>
+          %endfor
+        </tbody>
+      </table>
+    </div>
+    <span class="grade-book-footer">
+        %if page["previous_offset"] is not None:
+          <a href="${page_url}?offset=${page['previous_offset']}"
+             class="sequence-nav-button button-previous">
+            <span class="icon fa fa-chevron-left" aria-hidden="true"></span><span class="sr">${_('previous page')}</span>
+          </a>
+        %endif
+
+        ${_('Page')} ${page["page_num"]} ${_('of')} ${page["total_pages"]}
+
+        %if page["next_offset"] is not None:
+          <a href="${page_url}?offset=${page['next_offset']}"
+             class="sequence-nav-button button-next">
+            <span class="icon fa fa-chevron-right" aria-hidden="true"></span><span class="sr">${_('next page')}</span>
+          </a>
+        %endif
+    </span>
+    %endif
+  </section>
+</div>
+</section>
+
+

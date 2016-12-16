@@ -1,0 +1,408 @@
+// studio - elements - global header
+// ====================
+
+.wrapper-header {
+  @extend %ui-depth3;
+  position: relative;
+  width: 100%;
+  box-shadow: 0 1px 2px 0 $shadow-l1;
+  margin: 0;
+  padding: 0 $baseline;
+  background: $white;
+
+  header.primary {
+    @include box-sizing(border-box);
+    @include clearfix();
+    max-width: $fg-max-width;
+    min-width: $fg-min-width;
+    width: flex-grid(12);
+    margin: 0 auto;
+  }
+
+  // ====================
+
+  // basic layout
+  .wrapper-l, .wrapper-r {
+    background: $white;
+  }
+
+  .wrapper-l {
+    @include float(left);
+    width: flex-grid(7,12);
+  }
+
+  .wrapper-r {
+    @include float(right);
+    width: flex-grid(4,12);
+    @include text-align(right);
+  }
+
+  .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
+    @include box-sizing(border-box);
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .user-language-selector {
+    width: 120px;
+    display: inline-block;
+    margin: 0 10px 0 5px;
+    vertical-align: sub;
+
+    .language-selector {
+      width: 120px;
+    }
+  }
+
+  .nav-account {
+    width: auto;
+  }
+
+  // basic layout - nav items
+  nav {
+
+    > ol > .nav-item {
+      @extend %t-action3;
+      @extend %t-strong;
+      display: inline-block;
+      vertical-align: middle;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .nav-item a {
+      color: $gray-d1;
+
+      &:hover {
+        color: $uxpl-blue-hover-active;
+      }
+    }
+  }
+
+  // basic layout - dropdowns
+  .nav-dd {
+
+    .title {
+      @extend %t-action2;
+      @extend %ui-btn-dd-nav-primary;
+      @include transition(all $tmg-f2 ease-in-out 0s);
+
+      .label, .fa-caret-down {
+
+      }
+
+      .label {
+
+      }
+
+      .fa-caret-down {
+        opacity: 0.25;
+      }
+
+      &:hover {
+
+        .fa-caret-down {
+          opacity: 1.0;
+        }
+      }
+
+      .nav-sub .nav-item {
+
+        .icon {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - branding
+  .branding {
+    padding: ($baseline*0.75) 0;
+
+    a {
+      display: block;
+
+      img {
+        max-height: ($baseline*2);
+        display: block;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - course name/info
+  .info-course {
+    @include margin-right(flex-gutter());
+    @include border-right(1px solid $gray-l4);
+    padding: ($baseline*0.75) flex-gutter() ($baseline*0.75) 0;
+
+    .course-org, .course-number {
+      @extend %t-action4;
+      display: inline-block;
+      vertical-align: middle;
+      max-width: 45%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      opacity: 1.0;
+      color: $gray-d3;
+    }
+
+    .course-org {
+      @include margin-right($baseline/4);
+    }
+
+    .course-title {
+      @extend %t-action2;
+      @extend %t-strong;
+      display: block;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    // entire link
+    .course-link {
+      @include transition(color $tmg-f2 ease-in-out 0s);
+      display: block;
+      color: $gray-d3;
+
+      &:hover {
+        color: $uxpl-blue-hover-active;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - course nav
+  .nav-course {
+    padding: ($baseline*0.75) 0;
+  }
+
+  // ====================
+
+  // specific elements - account-based nav
+  .nav-account {
+    position: relative;
+    padding: ($baseline*0.75) 0;
+
+    .nav-sub {
+      @include text-align(left);
+    }
+
+    .nav-account-help {
+
+      .wrapper-nav-sub {
+        width: ($baseline*10);
+      }
+    }
+
+    .nav-account-user {
+
+      .title {
+        max-width: ($baseline*6.5);
+
+        > .label {
+          display: inline-block;
+          max-width: 84%;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .settings-language-form {
+      margin-top: 4px;
+      .language-selector {
+        width: 130px;
+      }
+    }
+  }
+
+  // ====================
+
+  // specific elements - pitch/how it works nav
+  .nav-pitch {
+    position: relative;
+    padding: ($baseline*0.75) 0;
+
+    .nav-sub {
+      text-align: left;
+    }
+  }
+}
+
+// ====================
+
+// CASE: user signed in
+.is-signedin {
+
+  .wrapper-l {
+    width: flex-grid(8,12);
+  }
+
+  .wrapper-r {
+    width: flex-grid(4,12);
+  }
+
+  .branding {
+    @include margin-right(2%);
+  }
+
+  .nav-account {
+    top: ($baseline/4);
+  }
+}
+
+// ====================
+
+// CASE: in course {
+.is-signedin.course {
+
+  .wrapper-header {
+
+    .wrapper-l {
+      width: flex-grid(8,12);
+    }
+
+    .wrapper-r {
+      width: flex-grid(4,12);
+    }
+
+    .branding {
+      @include margin-right(2%);
+    }
+
+    .info-course {
+      width: 25%;
+      margin-right: 2%;
+    }
+
+    .nav-course {
+      width: 45%;
+    }
+  }
+}
+
+// ====================
+
+// CASE: user not signed in
+.not-signedin,
+.view-util {
+
+  .wrapper-header {
+
+    .wrapper-l {
+      width: flex-grid(2,12);
+    }
+
+    .wrapper-r {
+      width: flex-grid(10,12);
+    }
+
+    .branding {
+      width: 100%;
+    }
+
+    .nav-pitch {
+      top: ($baseline/4);
+
+      .nav-item {
+        margin-right: ($baseline/2);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      .action-signup {
+        @include blue-button();
+        @extend %t-action3;
+        @extend %t-strong;
+        padding: ($baseline/4) ($baseline/2);
+        text-transform: uppercase;
+      }
+
+      .action-signin {
+        @include white-button();
+        @extend %t-action3;
+        @extend %t-strong;
+        padding: ($baseline/4) ($baseline/2);
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+// ====================
+
+// STATE: active/current nav states
+
+.nav-item.is-current,
+body.howitworks .nav-not-signedin-hiw,
+
+// dashboard
+body.dashboard .nav-account-dashboard,
+
+// course content
+body.course.view-outline .nav-course-courseware .title,
+body.course.view-updates .nav-course-courseware .title,
+body.course.view-static-pages .nav-course-courseware .title,
+body.course.view-uploads .nav-course-courseware .title,
+body.course.view-textbooks .nav-course-courseware .title,
+body.course.view-video-uploads .nav-course-courseware .title,
+
+body.course.view-outline .nav-course-courseware-outline,
+body.course.view-updates .nav-course-courseware-updates,
+body.course.view-static-pages .nav-course-courseware-pages,
+body.course.view-uploads .nav-course-courseware-uploads,
+body.course.view-textbooks .nav-course-courseware-textbooks,
+body.course.view-video-uploads .nav-course-courseware-videos,
+
+// course settings
+body.course.schedule .nav-course-settings .title,
+body.course.grading .nav-course-settings .title,
+body.course.view-team .nav-course-settings .title,
+body.course.view-group-configurations .nav-course-settings .title,
+body.course.advanced .nav-course-settings .title,
+body.course.view-certificates .nav-course-settings .title,
+
+body.course.schedule .nav-course-settings-schedule,
+body.course.grading .nav-course-settings-grading,
+body.course.view-team .nav-course-settings-team,
+body.course.view-group-configurations .nav-course-settings-group-configurations,
+body.course.advanced .nav-course-settings-advanced,
+body.course.view-certificates .nav-course-settings-certificates,
+
+// course tools
+body.course.view-import .nav-course-tools .title,
+body.course.view-export .nav-course-tools .title,
+body.course.view-export-git .nav-course-tools .title,
+
+body.course.view-import .nav-course-tools-import,
+body.course.view-export .nav-course-tools-export,
+body.course.view-export-git .nav-course-tools-export-git,
+
+// content library settings
+body.course.view-team .nav-library-settings .title,
+
+body.course.view-team .nav-library-settings-team,
+
+{
+  color: $uxpl-blue-base;
+
+  a {
+    color: $uxpl-blue-base;
+    pointer-events: none;
+  }
+}

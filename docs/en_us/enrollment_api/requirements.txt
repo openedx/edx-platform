@@ -1,0 +1,9 @@
+path.py
+Django >=1.4,<1.5
+pytz
+-e git+https://github.com/edx/XBlock.git#egg=XBlock
+lxml
+sphinxcontrib-napoleon==0.2.6
+stevedore==0.14.1
+djangorestframework==2.3.14
+PyYAML>=3.10
