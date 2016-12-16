@@ -127,7 +127,7 @@ class UnitTestLibraries(CourseTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': False})
     def test_lib_create_permission_no_course_creator_role_and_no_course_creator_group(self):
         """
-        Users who are not given course creator roles should still be able to create libraries if COURSE_CREATOR_GROUP is not enabled
+        Users who are not given course creator roles should still be able to create libraries if ENABLE_CREATOR_GROUP is not enabled.
         """
         self.client.logout()
         ns_user, password = self.create_non_staff_user()
@@ -140,7 +140,7 @@ class UnitTestLibraries(CourseTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True})
     def test_lib_create_permission_no_course_creator_role_and_course_creator_group(self):
         """
-        Users who are not given course creator roles should not be able to create libraries if COURSE_CREATOR_GROUP is enabled.
+        Users who are not given course creator roles should not be able to create libraries if ENABLE_CREATOR_GROUP is enabled.
         """
         self.client.logout()
         ns_user, password = self.create_non_staff_user()
