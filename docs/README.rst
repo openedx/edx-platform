@@ -22,7 +22,7 @@ By moving documentation to its own repository, we will be better able to
 develop workflows, manage versioning, create translations, and automate
 testing, without complicating ongoing development of the edX Platform.
 
-.. _edx_documentation: https://github.com/edx/edx-documentation
+.. _edx-documentation: https://github.com/edx/edx-documentation
 
 ******************************
 View Published Documentation
