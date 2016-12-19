@@ -139,6 +139,44 @@
   > form > input[type="file"] {
     margin-bottom: 18px;
   }
+
+  .field-group .field .field-hint {
+    @include margin-left(0);
+    width: 100%;
+  }
+
+  .field-input-label {
+    font-size: $forum-base-font-size;
+  }
+
+  .input-text {
+    width: calc(100% - 175px); // minus choose file button width
+    height: 40px; // align with choose file button
+
+    &.has-error {
+      border-color: $forum-color-error;
+    }
+  }
+
+  .field-message.has-error {
+    width: calc(100% - 175px); // align with input-text
+    background-color: $forum-color-error;
+    color: $white;
+    padding: $baseline / 2;
+    box-sizing: border-box;
+  }
+
+  .field-label {
+    cursor: pointer;
+  }
+
+  .input-checkbox {
+    @include margin-right($baseline / 5);
+  }
+
+  #new-url-input {
+    direction: ltr; // http url is always English
+  }
 }
 
 .wmd-button-row {
