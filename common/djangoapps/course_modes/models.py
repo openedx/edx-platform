@@ -101,7 +101,7 @@ class CourseMode(models.Model):
     CREDIT_MODE = "credit"
 
     DEFAULT_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None)
-    DEFAULT_MODE_SLUG = AUDIT
+    DEFAULT_MODE_SLUG = HONOR
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
