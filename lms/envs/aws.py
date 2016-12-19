@@ -605,6 +605,9 @@ if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     # dict with an arbitrary 'secret_key' and a 'url'.
     THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS = AUTH_TOKENS.get('THIRD_PARTY_AUTH_CUSTOM_AUTH_FORMS', {})
 
+    # when SSO is enabled via SCORM shell we need allow frames from SCORM cloud
+    THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL = ENV_TOKENS.get('THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL')
+
 ##### OAUTH2 Provider ##############
 if FEATURES.get('ENABLE_OAUTH2_PROVIDER'):
     OAUTH_OIDC_ISSUER = ENV_TOKENS['OAUTH_OIDC_ISSUER']
