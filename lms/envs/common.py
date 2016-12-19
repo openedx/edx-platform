@@ -2085,6 +2085,7 @@ INSTALLED_APPS = (
 
     # Enables default site and redirects
     'django_sites_extensions',
+    'openedx.core.djangoapps.appsembler.sites',
 
     # Email marketing integration
     'email_marketing',
