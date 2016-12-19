@@ -437,6 +437,11 @@ def account_settings_context(request):
         # it will be broken if exception raised
         user_orders = []
 
+    time_zone_choices = sorted(
+        [(tz, get_display_time_zone(tz)) for tz in pytz.common_timezones],
+        key=lambda tz_tuple: tz_tuple[1]
+    )
+
     context = {
         'auth': {},
         'duplicate_provider': None,
@@ -457,7 +462,7 @@ def account_settings_context(request):
             }, 'preferred_language': {
                 'options': all_languages(),
             }, 'time_zone': {
-                'options': TIME_ZONE_CHOICES,
+                'options': time_zone_choices,
             }
         },
         'platform_name': configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME),
