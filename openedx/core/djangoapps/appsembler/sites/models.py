@@ -2,7 +2,6 @@
 
 from django.core.cache import cache
 from django.http.request import split_domain_port
-from django.db.models.signals import post_save
 from django.contrib.sites.models import Site, SiteManager, SITE_CACHE
 from django.core.exceptions import ImproperlyConfigured
 import django
@@ -92,6 +91,4 @@ SiteManager.get_current = patched_get_current
 SiteManager.clear_cache = patched_clear_cache
 SiteManager._get_site_by_id = patched_get_site_by_id  # pylint: disable=protected-access
 SiteManager._get_site_by_request = patched_get_site_by_request  # pylint: disable=protected-access
-
-post_save.connect(patched_clear_site_cache, sender=Site)
 
