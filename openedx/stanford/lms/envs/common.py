@@ -19,6 +19,10 @@ COURSE_MODE_DEFAULTS = {
 # Set to True for systems where students are auto-registered on login
 DISABLE_REGISTER_BUTTON = False
 DISPLAY_COURSE_TILES = True
+EXTRA_MIMETYPES = {
+    # map file extensions to mimetypes, e.g.
+    # '.woff': 'application/font-woff',
+}
 FEATURES.update({
     'ENABLE_CHAT': False,
     'ENABLE_COURSE_SORTING_BY_START_DATE': False,

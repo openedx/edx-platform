@@ -16,6 +16,8 @@ def add_mimetypes():
     mimetypes.add_type('application/x-font-opentype', '.otf')
     mimetypes.add_type('application/x-font-ttf', '.ttf')
     mimetypes.add_type('application/font-woff', '.woff')
+    for extension, mimetype in settings.EXTRA_MIMETYPES.iteritems():
+        mimetypes.add_type(mimetype, extension)
 
 
 def autostartup():
