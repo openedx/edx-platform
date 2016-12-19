@@ -15,7 +15,7 @@ class Command(NoArgsCommand):
         s = Site.objects.get(id=settings.SITE_ID)
 
         try:
-            if SiteConfiguration.objects.get(site=s).exists():
+            if SiteConfiguration.objects.filter(site=s).exists():
                 print("Default SiteConfiguration already exists. Doing nothing.")
             else:
                 sc = SiteConfiguration(
