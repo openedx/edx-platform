@@ -35,6 +35,10 @@ $post-image-dimension: ($baseline*3) !default;  // image size  + margin
 $response-image-dimension: ($baseline*2.5) !default; // image size  + margin
 $comment-image-dimension: ($baseline*2) !default; // image size  + margin
 
+// action-dropdown
+$actions-dropdown-width: 145px; // best estimate in RU
+$actions-dropdown-offset: 100px; // actions dropdown expanded more menu
+
 // font sizes
 $forum-base-font-size: font-size(small);
 $forum-x-large-font-size: font-size(x-large);

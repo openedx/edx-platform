@@ -141,7 +141,7 @@
 }
 
 .discussion-response .response-body {
-    @include padding(($baseline/2), $baseline, 0, 0); //ensures content doesn't overlap on post or response actions.
+    @include padding(($baseline / 2), ($baseline * 1.5), 0, 0); //ensures content doesn't overlap on post or response actions.
     margin-bottom: 0.2em;
     font-size: $forum-base-font-size;
 }
@@ -151,7 +151,7 @@
     @include clearfix();
 
     .post-header-content {
-        max-width: calc(100% - 100px);
+        max-width: calc(100% - #{$actions-dropdown-offset});
 
         // post title
         .post-title {
@@ -164,6 +164,7 @@
     .post-body {
         @extend %t-copy-sub1;
         padding: ($baseline/2) 0;
+        max-width: calc(100% - #{$actions-dropdown-offset});
     }
 
     // post context
