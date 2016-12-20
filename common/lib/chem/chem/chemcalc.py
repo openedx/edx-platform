@@ -2,8 +2,7 @@ from __future__ import division
 from fractions import Fraction
 
 from pyparsing import (Literal, StringEnd, OneOrMore, ParseException)
-import nltk
-from nltk.tree import Tree
+#from nltk.tree import Tree
 
 ARROWS = ('<->', '->')
 
@@ -239,6 +238,7 @@ def _get_final_tree(s):
 
     Raises pyparsing.ParseException if s is invalid.
     '''
+    import nltk
     global parser
     if parser is None:
         parser = nltk.ChartParser(nltk.parse_cfg(grammar))
