@@ -272,13 +272,15 @@ class UserCourseEnrollmentsList(APIView):
         Returns a list of courses enrolled by user.
         """
         queryset = CourseEnrollment.objects.all()
-        course_ids = set(queryset.values_list('course_id', flat=True))
+        enrollments = list(
+            queryset.filter(
+                user__username=username,
+                is_active=True
+            ).order_by('created').reverse()
+        )
+        course_ids = [enrollment.course_id for enrollment in enrollments]
         catalog_course_runs_against_course_keys = get_course_runs(course_ids, request.user)
 
-        enrollments = queryset.filter(
-            user__username=username,
-            is_active=True
-        ).order_by('created').reverse()
         org = request.query_params.get('org', None)
 
         return Response([
