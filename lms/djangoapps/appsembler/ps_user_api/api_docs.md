@@ -1,13 +1,15 @@
 # User API endpoints
 
 ## Authentication
-The API requires OAuth auth for grant access to the endpoints and actions.
+The API requires OAuth authentication to grant access to the endpoints and actions.
 
 All endpoints can return the following response errors if there some problem with the authentication process:
+
 ### Credentials not provided
 * Code: 401 UNAUTHORIZED
 * Content: `{ detail : "Authentication credentials were not provided." }`
 * Reason: Authentication credentials were not provided.
+
 ### Invalid Token
 * Code: 401 UNAUTHORIZED
 * Content: `{ detail : "Invalid Token." }`
@@ -15,7 +17,7 @@ All endpoints can return the following response errors if there some problem wit
 
 ## Create User Account
 
-This endpoint allows to create a new edX user.
+This endpoint creates a new edX user.
 
 * URL: `/api/user_api/v1/accounts/create`
 * Method: `POST`
@@ -58,9 +60,9 @@ Cache-Control: no-cache
 }
 ```
 
-## Create User Account
+## Check Existing Username
 
-This endpoint is a tool for check if an user exists given the username.
+This endpoint is a tool to check if an user exists given the username.
 
 * URL: `/api/user_api/v1/accounts/(?P<username>[\w.+-]+)`
 * Method: `GET`
