@@ -1,13 +1,15 @@
 # Analytics API endpoints
 
 ## Authentication
-The API requires OAuth auth for grant access to the endpoints and actions.
+The API requires OAuth authentication to grant access to the endpoints and actions.
 
-All endpoints can return the following response errors if there some problem with the authentication process:
+All endpoints can return the following response errors if there are problems with the authentication process:
+
 ### Credentials not provided
 * Code: 401 UNAUTHORIZED
 * Content: `{ detail : "Authentication credentials were not provided." }`
 * Reason: Authentication credentials were not provided.
+
 ### Invalid Token
 * Code: 401 UNAUTHORIZED
 * Content: `{ detail : "Invalid Token." }`
@@ -15,7 +17,7 @@ All endpoints can return the following response errors if there some problem wit
 
 ## Accounts
 
-This endpoint provide information about user accounts. Can be user with filter for start date and end data, also can be called without parameters for get all registered accounts information.
+This endpoint provides information about user accounts. Can be called with filters for start date and end date, or can be called without parameters in order to get information for all registered accounts.
 
 * URL: `api/jitterbit/v1/accounts/batch`
 * Method: `GET`
@@ -28,11 +30,11 @@ This endpoint provide information about user accounts. Can be user with filter f
 	* Content:
 	```
 	  {
-    "username": "annewuser",
+    "username": "anewuser",
     "date_joined": "2016-12-17T23:45:47Z",
     "is_active": true,
     "id": 29,
-    "email": "annewuser@example.com"
+    "email": "anewuser@example.com"
   },
   {
     "username": "newtest",
@@ -50,7 +52,7 @@ This endpoint provide information about user accounts. Can be user with filter f
 
 ## Enrollments
 
-This endpoint provide information about enrollment. Can be user with filter for course, start date and end data, also can be called without parameters for get all enrollments.
+This endpoint provides information about course enrollment. Can be called with filters for course, start date, and end date, or can be called without parameters to get information for all enrollments.
 
 * URL: `api/jitterbit/v1/accounts/batch`
 * Method: `GET`
