@@ -2,14 +2,16 @@
 Asynchronous tasks related to the Course Blocks sub-application.
 """
 import logging
+
 from capa.responsetypes import LoncapaProblemError
 from celery.task import task
 from django.conf import settings
-from edxval.api import ValInternalError
 from lxml.etree import XMLSyntaxError
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.exceptions import ItemNotFoundError
 
+from edxval.api import ValInternalError
+from opaque_keys.edx.keys import CourseKey
+
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from openedx.core.djangoapps.content.block_structure import api
 
 log = logging.getLogger('edx.celery.task')
@@ -31,14 +33,13 @@ def update_course_in_cache(course_id):
         course_key = CourseKey.from_string(course_id)
         api.update_course_in_cache(course_key)
     except NO_RETRY_TASKS as exc:
-        log.info("update_course_in_cache encountered unrecoverable error: {}".format(exc))
+        # Known unrecoverable errors
         raise
     except RETRY_TASKS as exc:
-        log.info("update_course_in_cache encounted expected error, retrying.")
+        log.exception("update_course_in_cache encounted expected error, retrying.")
         raise update_course_in_cache.retry(args=[course_id], exc=exc)
     except Exception as exc:   # pylint: disable=broad-except
-        log.info("update_course_in_cache encounted unknown error. Retry #{}, Exception: {}".format(
+        log.exception("update_course_in_cache encounted unknown error. Retry #{}".format(
             update_course_in_cache.request.retries,
-            repr(exc)
         ))
         raise update_course_in_cache.retry(args=[course_id], exc=exc)
