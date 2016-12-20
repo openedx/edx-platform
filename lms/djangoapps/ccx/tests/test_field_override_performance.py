@@ -60,6 +60,7 @@ class FieldOverridePerformanceTestCase(FieldOverrideTestMixin, ProceduralCourseT
         self.request_factory = RequestFactory()
         self.student = UserFactory.create()
         self.request = self.request_factory.get("foo")
+        self.request.session = {}
         self.request.user = self.student
 
         patcher = mock.patch('edxmako.request_context.get_current_request', return_value=self.request)
