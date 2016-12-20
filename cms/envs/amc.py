@@ -5,6 +5,10 @@ APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
 
 APPSEMBLER_SECRET_KEY = AUTH_TOKENS.get("APPSEMBLER_SECRET_KEY")
 
+INSTALLED_APPS += (
+    'openedx.core.djangoapps.appsembler.sites',
+)
+
 EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
 MAILGUN_ACCESS_KEY = AUTH_TOKENS.get("MAILGUN_ACCESS_KEY")
 MAILGUN_SERVER_NAME = AUTH_TOKENS.get("MAILGUN_SERVER_NAME")
