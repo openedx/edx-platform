@@ -193,7 +193,7 @@ def issued_certificates(course_key, features):
 
     report_run_date = datetime.date.today().strftime("%B %d, %Y")
     certificate_features = [x for x in CERTIFICATE_FEATURES if x in features]
-    generated_certificates = list(GeneratedCertificate.objects.filter(
+    generated_certificates = list(GeneratedCertificate.eligible_certificates.filter(
         course_id=course_key,
         status=CertificateStatuses.downloadable
     ).values(*certificate_features).annotate(total_issued_certificate=Count('mode')))

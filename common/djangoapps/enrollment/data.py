@@ -8,11 +8,12 @@ from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 
 from enrollment.errors import (
-    CourseNotFoundError, CourseEnrollmentClosedError, CourseEnrollmentFullError,
+    CourseEnrollmentClosedError, CourseEnrollmentFullError,
     CourseEnrollmentExistsError, UserNotFoundError, InvalidEnrollmentAttribute
 )
 from enrollment.serializers import CourseEnrollmentSerializer, CourseSerializer
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
+from openedx.core.lib.exceptions import CourseNotFoundError
 from student.models import (
     CourseEnrollment, NonExistentCourseError, EnrollmentClosedError,
     CourseFullError, AlreadyEnrolledError, CourseEnrollmentAttribute

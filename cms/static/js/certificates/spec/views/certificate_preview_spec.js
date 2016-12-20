@@ -49,7 +49,7 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
             appendSetFixtures('<div class="preview-certificate nav-actions"></div>');
             this.view = new CertificatePreview({
                 el: $('.preview-certificate'),
-                course_modes: ['test1', 'test2', 'test3', 'audit'],
+                course_modes: ['test1', 'test2', 'test3'],
                 certificate_web_view_url: '/users/1/courses/orgX/009/2016?preview=test1',
                 certificate_activation_handler_url: '/certificates/activation/'+ window.course.id,
                 is_active: true
@@ -58,11 +58,6 @@ function(_, $, Course, CertificatePreview, TemplateHelpers, ViewHelpers, AjaxHel
         });
 
         describe('Certificate preview', function() {
-
-            it('course mode "audit" should not be render in preview list', function () {
-                expect(this.view.course_modes.indexOf('audit') < 0).toBe(true);
-            });
-
             it('course mode event should call when user choose a new mode', function () {
                 spyOn(this.view, 'courseModeChanged');
                 this.view.delegateEvents();

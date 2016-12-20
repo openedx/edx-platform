@@ -92,7 +92,8 @@ function (VideoPlayer) {
                         showinfo: 0,
                         enablejsapi: 1,
                         modestbranding: 1,
-                        html5: 1
+                        html5: 1,
+                        cc_load_policy: 0
                     },
                     videoId: 'cogebirgzzM',
                     events: events
@@ -118,7 +119,8 @@ function (VideoPlayer) {
                         rel: 0,
                         showinfo: 0,
                         enablejsapi: 1,
-                        modestbranding: 1
+                        modestbranding: 1,
+                        cc_load_policy: 0
                     },
                     videoId: 'abcdefghijkl',
                     events: jasmine.any(Object)

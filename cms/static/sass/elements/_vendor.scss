@@ -165,3 +165,35 @@
     }
   }
 }
+
+.ui-autocomplete {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  cursor: default;
+  @include linear-gradient($gray-l5, $white);
+  border-right: 1px solid $gray-l2;
+  border-bottom: 1px solid $gray-l2;
+  border-left: 1px solid $gray-l2;
+  background-color: $gray-l5;
+  box-shadow: inset 0 1px 2px $shadow-l1;
+  color: $color-copy-emphasized;
+
+  li.ui-menu-item{
+    padding: 0;
+    margin: 0;
+
+    a {
+      color: $color-copy-emphasized;
+    }
+
+    a.ui-state-focus{
+      border: none;
+      background-color: $blue;
+      background: $blue;
+      color: $white;
+    }
+  }
+}

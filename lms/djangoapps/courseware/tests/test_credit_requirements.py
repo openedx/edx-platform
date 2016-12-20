@@ -4,6 +4,7 @@ Tests for credit requirement display on the progress page.
 
 import datetime
 
+import ddt
 from mock import patch
 from pytz import UTC
 
@@ -15,11 +16,13 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import get_time_display, DEFAULT_SHORT_DATE_FORMAT
 
+from course_modes.models import CourseMode
 from openedx.core.djangoapps.credit import api as credit_api
 from openedx.core.djangoapps.credit.models import CreditCourse
 
 
 @patch.dict(settings.FEATURES, {"ENABLE_CREDIT_ELIGIBILITY": True})
+@ddt.ddt
 class ProgressPageCreditRequirementsTest(ModuleStoreTestCase):
     """
     Tests for credit requirement display on the progress page.
@@ -132,6 +135,28 @@ class ProgressPageCreditRequirementsTest(ModuleStoreTestCase):
             "{}, you are no longer eligible for credit in this course.".format(self.USER_FULL_NAME)
         )
         self.assertContains(response, "Verification Failed")
+
+    @ddt.data(
+        (CourseMode.VERIFIED, True),
+        (CourseMode.CREDIT_MODE, True),
+        (CourseMode.HONOR, False),
+        (CourseMode.AUDIT, False),
+        (CourseMode.PROFESSIONAL, False),
+        (CourseMode.NO_ID_PROFESSIONAL_MODE, False)
+    )
+    @ddt.unpack
+    def test_credit_requirements_on_progress_page(self, enrollment_mode, is_requirement_displayed):
+        """Test the progress table is only displayed to the verified and credit students."""
+        self.enrollment.mode = enrollment_mode
+        self.enrollment.save()  # pylint: disable=no-member
+
+        response = self._get_progress_page()
+        # Verify the requirements are shown only if the user is in a credit-eligible mode.
+        classes = ('credit-eligibility', 'eligibility-heading')
+        method = self.assertContains if is_requirement_displayed else self.assertNotContains
+
+        for _class in classes:
+            method(response, _class)
 
     def _get_progress_page(self):
         """Load the progress page for the course the user is enrolled in. """

@@ -41,16 +41,6 @@ MODULE_DIR = path(__file__).dirname()
 DATA_DIR = MODULE_DIR.parent.parent.parent.parent / "test" / "data"
 
 
-open_ended_grading_interface = {
-    'url': 'blah/',
-    'username': 'incorrect_user',
-    'password': 'incorrect_pass',
-    'staff_grading': 'staff_grading',
-    'peer_grading': 'peer_grading',
-    'grading_controller': 'grading_controller',
-}
-
-
 class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
@@ -150,7 +140,6 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         anonymous_student_id='student',
-        open_ended_grading_interface=open_ended_grading_interface,
         course_id=course_id,
         error_descriptor_class=ErrorDescriptor,
         get_user_role=Mock(name='get_test_system.get_user_role', is_staff=False),

@@ -1,3 +1,4 @@
+# pylint: disable=arguments-differ
 """ Models for the shopping cart and assorted purchase types """
 
 from collections import namedtuple
@@ -1473,7 +1474,7 @@ class PaidCourseRegistration(OrderItem):
         app_label = "shoppingcart"
 
     course_id = CourseKeyField(max_length=128, db_index=True)
-    mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
+    mode = models.SlugField(default=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
     course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
 
     @classmethod
@@ -1526,7 +1527,8 @@ class PaidCourseRegistration(OrderItem):
 
     @classmethod
     @transaction.atomic
-    def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):
+    def add_to_order(cls, order, course_id, mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG,
+                     cost=None, currency=None):  # pylint: disable=arguments-differ
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -1561,7 +1563,7 @@ class PaidCourseRegistration(OrderItem):
         course_mode = CourseMode.mode_for_course(course_id, mode_slug)
         if not course_mode:
             # user could have specified a mode that's not set, in that case return the DEFAULT_MODE
-            course_mode = CourseMode.DEFAULT_MODE
+            course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE
         if not cost:
             cost = course_mode.min_price
         if not currency:
@@ -1576,7 +1578,7 @@ class PaidCourseRegistration(OrderItem):
         item.unit_cost = cost
         item.list_price = cost
         item.line_desc = _(u'Registration for Course: {course_name}').format(
-            course_name=course.display_name_with_default)
+            course_name=course.display_name_with_default_escaped)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments
@@ -1660,7 +1662,7 @@ class CourseRegCodeItem(OrderItem):
         app_label = "shoppingcart"
 
     course_id = CourseKeyField(max_length=128, db_index=True)
-    mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
+    mode = models.SlugField(default=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
 
     @classmethod
     def get_bulk_purchased_seat_count(cls, course_key, status='purchased'):
@@ -1706,7 +1708,8 @@ class CourseRegCodeItem(OrderItem):
 
     @classmethod
     @transaction.atomic
-    def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_MODE_SLUG, cost=None, currency=None):  # pylint: disable=arguments-differ
+    def add_to_order(cls, order, course_id, qty, mode_slug=CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG,
+                     cost=None, currency=None):  # pylint: disable=arguments-differ
         """
         A standardized way to create these objects, with sensible defaults filled in.
         Will update the cost if called on an order that already carries the course.
@@ -1736,8 +1739,8 @@ class CourseRegCodeItem(OrderItem):
         ### handle default arguments for mode_slug, cost, currency
         course_mode = CourseMode.mode_for_course(course_id, mode_slug)
         if not course_mode:
-            # user could have specified a mode that's not set, in that case return the DEFAULT_MODE
-            course_mode = CourseMode.DEFAULT_MODE
+            # user could have specified a mode that's not set, in that case return the DEFAULT_SHOPPINGCART_MODE
+            course_mode = CourseMode.DEFAULT_SHOPPINGCART_MODE
         if not cost:
             cost = course_mode.min_price
         if not currency:
@@ -1752,7 +1755,7 @@ class CourseRegCodeItem(OrderItem):
         item.list_price = cost
         item.qty = qty
         item.line_desc = _(u'Enrollment codes for Course: {course_name}').format(
-            course_name=course.display_name_with_default)
+            course_name=course.display_name_with_default_escaped)
         item.currency = currency
         order.currency = currency
         item.report_comments = item.csv_report_comments
@@ -1984,7 +1987,10 @@ class CertificateItem(OrderItem):
 
     def additional_instruction_text(self):
         verification_reminder = ""
+        refund_reminder_msg = _("You can unenroll in the course and receive a full refund for 14 days after the course "
+                                "start date. ")
         is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()
+        is_professional_mode_verified = self.course_enrollment.is_professional_enrollment()
 
         if is_enrollment_mode_verified:
             domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
@@ -1995,12 +2001,17 @@ class CertificateItem(OrderItem):
                 "If you haven't verified your identity yet, please start the verification process ({verification_url})."
             ).format(verification_url=verification_url)
 
+        if is_professional_mode_verified:
+            refund_reminder_msg = _("You can unenroll in the course and receive a full refund for 2 days after the "
+                                    "course start date. ")
+
         refund_reminder = _(
-            "You have up to two weeks into the course to unenroll and receive a full refund."
+            "{refund_reminder_msg}"
             "To receive your refund, contact {billing_email}. "
             "Please include your order number in your email. "
             "Please do NOT include your credit card information."
         ).format(
+            refund_reminder_msg=refund_reminder_msg,
             billing_email=settings.PAYMENT_SUPPORT_EMAIL
         )
 

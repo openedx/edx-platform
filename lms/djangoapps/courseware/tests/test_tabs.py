@@ -20,12 +20,12 @@ from courseware.views import get_static_tab_contents, static_tab
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from util.milestones_helpers import (
-    seed_milestone_relationship_types,
     get_milestone_relationship_types,
     add_milestone,
     add_course_milestone,
     add_course_content_milestone
 )
+from milestones.tests.utils import MilestonesTestCaseMixin
 from xmodule import tabs as xmodule_tabs
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
@@ -310,7 +310,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
 @attr('shard_1')
 @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': True, 'MILESTONES_APP': True})
-class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase, MilestonesTestCaseMixin):
     """
     Validate tab behavior when dealing with Entrance Exams
     """
@@ -339,7 +339,6 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.setup_user()
         self.enroll(self.course)
         self.user.is_staff = True
-        seed_milestone_relationship_types()
         self.relationship_types = get_milestone_relationship_types()
 
     def test_get_course_tabs_list_entrance_exam_enabled(self):
@@ -484,9 +483,10 @@ class TabListTestCase(TabTestCase):
             [{'type': CoursewareTab.type}],
             # missing course_info
             [{'type': CoursewareTab.type}, {'type': 'discussion', 'name': 'fake_name'}],
+            [{'type': 'unknown_type'}],
             # incorrect order
-            [{'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
-            [{'type': 'unknown_type'}]
+            [{'type': 'discussion', 'name': 'fake_name'},
+             {'type': CourseInfoTab.type, 'name': 'fake_name'}, {'type': CoursewareTab.type}],
         ]
 
         # valid tabs

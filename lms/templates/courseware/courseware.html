@@ -3,10 +3,10 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escapejs
-from microsite_configuration import page_title_breadcrumbs
 from django.conf import settings
 from edxnotes.helpers import is_feature_enabled as is_edxnotes_enabled
 from student.models import UserProfile
+from pipeline_mako import render_require_js_path_overrides
 %>
 <%
   include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
@@ -16,15 +16,21 @@ from student.models import UserProfile
 </%def>
 
 <%block name="bodyclass">view-in-course view-courseware courseware ${course.css_class or ''}</%block>
+
+<%block name="js_overrides">
+${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
+</%block>
+
 <%block name="title"><title>
     % if section_title:
-${page_title_breadcrumbs(section_title, course_name())}
+${static.get_page_title_breadcrumbs(section_title, course_name())}
     % else:
-${page_title_breadcrumbs(course_name())}
+${static.get_page_title_breadcrumbs(course_name())}
     %endif
 </title></%block>
 
 <%block name="header_extras">
+
 % for template_name in ["image-modal"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="common/templates/${template_name}.underscore" />
@@ -75,10 +81,14 @@ ${page_title_breadcrumbs(course_name())}
   <%static:js group='discussion'/>
   % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     <%static:require_module module_name="js/search/course/course_search_factory" class_name="CourseSearchFactory">
-        var courseId = $('#courseware-search-results').data('courseId');
+        var courseId = $('.courseware-results').data('courseId');
         CourseSearchFactory(courseId);
     </%static:require_module>
   % endif
+
+  <%static:require_module module_name="js/bookmarks/bookmarks_factory" class_name="BookmarksFactory">
+    BookmarksFactory();
+  </%static:require_module>
 
   <%include file="../discussion/_js_body_dependencies.html" />
   % if staff_access:
@@ -117,6 +127,8 @@ ${fragment.foot_html()}
 
 </%block>
 
+<div class="message-banner" aria-live="polite"></div>
+
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />
 % else:
@@ -128,22 +140,33 @@ ${fragment.foot_html()}
 
 % if disable_accordion is UNDEFINED or not disable_accordion:
     <div class="course-index">
-      % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-        <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
-          <form>
-            <label for="course-search-input" class="sr">${_('Course Search')}</label>
-            <div class="search-field-wrapper">
-              <input id="course-search-input" type="text" class="search-field"/>
-              <button type="submit" class="search-button">
-                ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+
+      <div class="wrapper-course-modes">
+
+          <div class="courseware-bookmarks-button" data-bookmarks-api-url="${bookmarks_api_url}">
+              <button type="button" class="bookmarks-list-button is-inactive" aria-pressed="false">
+                  ${_('Bookmarks')}
               </button>
-              <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
-                <i class="icon fa fa-remove" aria-hidden="true"></i>
-              </button>
+          </div>
+
+          % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+            <div id="courseware-search-bar" class="search-bar courseware-search-bar" role="search" aria-label="Course">
+              <form>
+                <label for="course-search-input" class="sr">${_('Course Search')}</label>
+                <div class="search-field-wrapper">
+                  <input id="course-search-input" type="text" class="search-field"/>
+                  <button type="submit" class="search-button">
+                    ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+                    <i class="icon fa fa-remove" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
-      % endif
+          % endif
+
+      </div>
 
       <div class="accordion">
         <nav class="course-navigation" aria-label="${_('Course')}">
@@ -190,10 +213,13 @@ ${fragment.foot_html()}
 
       ${fragment.body_html()}
     </section>
-    % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-      <section id="courseware-search-results" class="search-results courseware-search-results" data-course-id="${course.id}">
-      </section>
-    % endif
+
+    <section class="courseware-results-wrapper">
+      <div id="loading-message" aria-live="polite" aria-relevant="all"></div>
+      <div id="error-message" aria-live="polite"></div>
+      <div class="courseware-results search-results" data-course-id="${course.id}" data-lang-code="${language_preference}"></div>
+    </section>
+
   </div>
   % if course and user.is_authenticated() and not UserProfile.has_registered(user):
     <div class="unauth-tos">

@@ -1,31 +1,5 @@
-<% if (certificates.length === 0) { %>
-    <p><%- gettext("No results") %></p>
-<% } else { %>
-    <table>
-        <thead>
-            <th><%- gettext("Name") %></th>
-            <th><%- gettext("User ID") %></th>
-            <th><%- gettext("User Email") %></th>
-            <th class='date-column'><%- gettext("Date Exception Granted") %></th>
-            <th><%- gettext("Notes") %></th>
-        </thead>
-        <tbody>
-        <% for (var i = 0; i < certificates.length; i++) {
-            var cert = certificates[i];
-        %>
-        <tr>
-            <td><%- cert.get("user_name") %></td>
-            <td><%- cert.get("user_id") %></td>
-            <td><%- cert.get("user_email") %></td>
-            <td><%- cert.get("created") %></td>
-            <td><%- cert.get("notes") %></td>
-        </tr>
-        <% } %>
-        </tbody>
-    </table>
-<% } %>
-
-<br/>
+<h3><%= gettext("Generate Exception Certificates") %></h3>
+<p class="under-heading">
 <label>
     <input type='radio' name='generate-exception-certificates-radio' checked="checked" value='new' aria-describedby='generate-exception-certificates-radio-new-tip'>
     <span id='generate-exception-certificates-radio-new-tip'><%- gettext('Generate a Certificate for all ') %><strong><%- gettext('New') %></strong> <%- gettext('additions to the Exception list') %></span>
@@ -35,5 +9,35 @@
     <input type='radio' name='generate-exception-certificates-radio' value='all' aria-describedby='generate-exception-certificates-radio-all-tip'>
     <span id='generate-exception-certificates-radio-all-tip'><%- gettext('Generate a Certificate for all users on the Exception list') %></span>
 </label>
+</p>
+<button id="generate-exception-certificates" class="btn-blue" type="button"><%= gettext('Generate Exception Certificates') %></button>
 <br/>
-<input type="button" id="generate-exception-certificates" value="<%- gettext('Generate Exception Certificates') %>" />
+<% if (certificates.length === 0) { %>
+    <p><%- gettext("No results") %></p>
+<% } else { %>
+    <table>
+        <thead>
+            <th class='user-name'><%- gettext("Name") %></th>
+            <th class='user-email'><%- gettext("User Email") %></th>
+            <th class='date'><%- gettext("Exception Granted") %></th>
+            <th class='date'><%- gettext("Certificate Generated") %></th>
+            <th class='notes'><%- gettext("Notes") %></th>
+            <th class='action'><%- gettext("Action") %></th>
+        </thead>
+        <tbody>
+        <% for (var i = 0; i < certificates.length; i++) {
+            var cert = certificates[i];
+        %>
+        <tr>
+            <td><%- cert.get("user_name") %></td>
+            <td><%- cert.get("user_email") %></td>
+            <td><%- cert.get("created") %></td>
+            <td><%- cert.get("certificate_generated") %></td>
+            <td><%- cert.get("notes") %></td>
+            <td><button class='delete-exception' data-user_id='<%- cert.get("user_id") %>'><%- gettext("Remove from List") %></button></td>
+        </tr>
+        <% } %>
+        </tbody>
+    </table>
+    <div class='message hidden'></div>
+<% } %>

@@ -4,7 +4,7 @@ ${_("Dear student,")}
 
 ${_("You have been invited to join {course_name} at {site_name} by a "
 	"member of the course staff.").format(
-		course_name=course.display_name_with_default,
+		course_name=course.display_name_with_default_escaped,
 		site_name=site_name
 	)}
 
@@ -16,7 +16,7 @@ ${_("To finish your registration, please visit {registration_url} and fill "
 % if auto_enroll:
 ${_("Once you have registered and activated your account, you will see "
 	"{course_name} listed on your dashboard.").format(
-		course_name=course.display_name_with_default
+		course_name=course.display_name_with_default_escaped
 	)}
 % else:
 ${_("Once you have registered and activated your account, visit {course_about_url} "

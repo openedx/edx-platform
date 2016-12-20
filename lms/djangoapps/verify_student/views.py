@@ -423,7 +423,9 @@ class PayAndVerifyView(View):
             'verification_good_until': verification_good_until,
             'capture_sound': staticfiles_storage.url("audio/camera_capture.wav"),
             'nav_hidden': True,
+            'is_ab_testing': 'begin-flow' in request.path,
         }
+
         return render_to_response("verify_student/pay_and_verify.html", context)
 
     def _redirect_if_necessary(
@@ -1148,7 +1150,7 @@ def _compose_message_reverification_email(
         subject = "Re-verification Status"
         context = {
             "status": status,
-            "course_name": course.display_name_with_default,
+            "course_name": course.display_name_with_default_escaped,
             "assessment": reverification_block.related_assessment
         }
 
@@ -1429,7 +1431,7 @@ class InCourseReverifyView(View):
 
         context = {
             'course_key': unicode(course_key),
-            'course_name': course.display_name_with_default,
+            'course_name': course.display_name_with_default_escaped,
             'checkpoint_name': checkpoint.checkpoint_name,
             'platform_name': settings.PLATFORM_NAME,
             'usage_id': usage_id,

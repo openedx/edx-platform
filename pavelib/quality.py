@@ -50,8 +50,7 @@ def find_fixme(options):
         apps_list = ' '.join(top_python_dirs(system))
 
         pythonpath_prefix = (
-            "PYTHONPATH={system}:{system}/lib"
-            "common/djangoapps:common/lib".format(
+            "PYTHONPATH={system}/djangoapps:common/djangoapps:common/lib".format(
                 system=system
             )
         )
@@ -105,8 +104,7 @@ def run_pylint(options):
         apps_list = ' '.join(top_python_dirs(system))
 
         pythonpath_prefix = (
-            "PYTHONPATH={system}:{system}/djangoapps:{system}/"
-            "lib:common/djangoapps:common/lib".format(
+            "PYTHONPATH={system}/djangoapps:common/djangoapps:common/lib".format(
                 system=system
             )
         )
@@ -446,7 +444,7 @@ def run_quality(options):
     jshint_reports = u' '.join(jshint_files)
 
     pythonpath_prefix = (
-        "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:lms/lib:cms:cms/djangoapps:cms/lib:"
+        "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:cms:cms/djangoapps:"
         "common:common/djangoapps:common/lib"
     )
 

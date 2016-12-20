@@ -2,100 +2,106 @@
 Views related to operations on course objects
 """
 import copy
-from django.shortcuts import redirect
 import json
-import random
 import logging
-import string
-from django.utils.translation import ugettext as _
-import django.utils
-from django.contrib.auth.decorators import login_required
+import random
+import string  # pylint: disable=deprecated-module
+
 from django.conf import settings
-from django.views.decorators.http import require_http_methods, require_GET
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
-from smtplib import SMTPException
-from util.json_request import JsonResponse, JsonResponseBadRequest
-from util.date_utils import get_default_time_display
-from edxmako.shortcuts import render_to_response
-from edxmako.shortcuts import render_to_string
-
-from xmodule.course_module import DEFAULT_START_DATE
-from xmodule.error_module import ErrorDescriptor
-from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.content import StaticContent
-from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
-from openedx.core.lib.course_tabs import CourseTabPluginManager
-from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
-from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
-from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
-from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
-from xmodule.modulestore import EdxJSONEncoder
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import Location
-from opaque_keys.edx.keys import CourseKey
-
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound, Http404
+from django.shortcuts import redirect
+import django.utils
+from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_http_methods, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
-from openedx.core.lib.js_utils import escape_json_dumps
-from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
+from smtplib import SMTPException
+
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
+
+from .component import (
+    ADVANCED_COMPONENT_TYPES,
+)
+from .item import create_xblock_info
+from .library import LIBRARIES_ENABLED
+from contentstore import utils
 from contentstore.course_group_config import (
+    COHORT_SCHEME,
     GroupConfiguration,
     GroupConfigurationsValidationError,
     RANDOM_SCHEME,
-    COHORT_SCHEME
 )
+from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
+from contentstore.push_notification import push_notification_enabled
+from contentstore.tasks import rerun_course
 from contentstore.utils import (
     add_instructor,
     initialize_permissions,
     get_lms_link_for_item,
+    remove_all_instructors,
     reverse_course_url,
     reverse_library_url,
     reverse_usage_url,
     reverse_url,
-    remove_all_instructors,
 )
-from models.settings.course_details import CourseDetails, CourseSettingsEncoder
-from models.settings.course_grading import CourseGradingModel
-from models.settings.course_metadata import CourseMetadata
-from util.json_request import expect_json
-from util.keyword_substitution import get_keywords_supported, substitute_keywords_with_data
-from util.string_utils import _has_non_ascii_characters
-from student.auth import has_studio_write_access, has_studio_read_access
-from .component import (
-    SPLIT_TEST_COMPONENT_TYPE,
-    ADVANCED_COMPONENT_TYPES,
-)
-from contentstore.tasks import rerun_course
 from contentstore.views.entrance_exam import (
     create_entrance_exam,
+    delete_entrance_exam,
     update_entrance_exam,
-    delete_entrance_exam
 )
-
-from .library import LIBRARIES_ENABLED
-from .item import create_xblock_info
-from contentstore.push_notification import push_notification_enabled
+from course_action_state.managers import CourseActionStateItemNotFoundError
+from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
-from contentstore import utils
+from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_string
+from microsite_configuration import microsite
+from models.settings.course_grading import CourseGradingModel
+from models.settings.course_metadata import CourseMetadata
+from models.settings.encoder import CourseSettingsEncoder
+from openedx.core.djangoapps.content.course_structures.api.v0 import api, errors
+from openedx.core.djangoapps.credit.api import is_credit_course, get_credit_requirements
+from openedx.core.djangoapps.credit.tasks import update_credit_course_requirements
+from openedx.core.djangoapps.models.course_details import CourseDetails
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.utils import get_programs
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.lib.course_tabs import CourseTabPluginManager
+from openedx.core.lib.courses import course_image_url
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from student import auth
+from student.auth import has_course_author_access, has_studio_write_access, has_studio_read_access
 from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff, UserBasedRole
 )
-from student import auth
-from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
-from course_action_state.managers import CourseActionStateItemNotFoundError
-from microsite_configuration import microsite
-from xmodule.course_module import CourseFields
-from student.auth import has_course_author_access
-
+from util.date_utils import get_default_time_display
+from util.json_request import JsonResponse, JsonResponseBadRequest, expect_json
+from util.keyword_substitution import get_keywords_supported, substitute_keywords_with_data
 from util.milestones_helpers import (
-    set_prerequisite_courses,
-    is_valid_course_key,
+    is_entrance_exams_enabled,
     is_prerequisite_courses_enabled,
-    is_entrance_exams_enabled
+    is_valid_course_key,
+    set_prerequisite_courses,
 )
+from util.organizations_helpers import (
+    add_organization_course,
+    get_organization_by_short_name,
+    organizations_enabled,
+)
+from util.string_utils import _has_non_ascii_characters
+from xmodule.contentstore.content import StaticContent
+from xmodule.course_module import CourseFields
+from xmodule.course_module import DEFAULT_START_DATE
+from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore import EdxJSONEncoder
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
+from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
+
 
 log = logging.getLogger(__name__)
 
@@ -223,6 +229,7 @@ def _dismiss_notification(request, course_action_state_id):  # pylint: disable=u
     return JsonResponse({'success': True})
 
 
+# pylint: disable=unused-argument
 @login_required
 def course_handler(request, course_key_string=None):
     """
@@ -321,10 +328,10 @@ def course_search_index_handler(request, course_key_string):
         try:
             reindex_course_and_check_access(course_key, request.user)
         except SearchIndexingError as search_err:
-            return HttpResponse(escape_json_dumps({
+            return HttpResponse(dump_js_escaped_json({
                 "user_message": search_err.error_list
             }), content_type=content_type, status=500)
-        return HttpResponse(escape_json_dumps({
+        return HttpResponse(dump_js_escaped_json({
             "user_message": _("Course has been successfully reindexed.")
         }), content_type=content_type, status=200)
 
@@ -340,6 +347,39 @@ def _course_outline_json(request, course_module):
         include_children_predicate=lambda xblock: not xblock.category == 'vertical',
         user=request.user
     )
+
+
+def get_in_process_course_actions(request):
+    """
+     Get all in-process course actions
+    """
+    return [
+        course for course in
+        CourseRerunState.objects.find_all(
+            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
+        )
+        if has_studio_read_access(request.user, course.course_key)
+    ]
+
+
+def _accessible_courses_summary_list(request):
+    """
+    List all courses available to the logged in user by iterating through all the courses
+    """
+    def course_filter(course_summary):
+        """
+        Filter out unusable and inaccessible courses
+        """
+        # pylint: disable=fixme
+        # TODO remove this condition when templates purged from db
+        if course_summary.location.course == 'templates':
+            return False
+
+        return has_studio_read_access(request.user, course_summary.id)
+
+    courses_summary = filter(course_filter, modulestore().get_course_summaries())
+    in_process_course_actions = get_in_process_course_actions(request)
+    return courses_summary, in_process_course_actions
 
 
 def _accessible_courses_list(request):
@@ -361,13 +401,8 @@ def _accessible_courses_list(request):
         return has_studio_read_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
-    in_process_course_actions = [
-        course for course in
-        CourseRerunState.objects.find_all(
-            exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
-        )
-        if has_studio_read_access(request.user, course.course_key)
-    ]
+
+    in_process_course_actions = get_in_process_course_actions(request)
     return courses, in_process_course_actions
 
 
@@ -426,6 +461,13 @@ def course_listing(request):
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
     libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
 
+    programs_config = ProgramsApiConfig.current()
+    raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
+
+    # Sort programs alphabetically by name.
+    # TODO: Support ordering in the Programs API itself.
+    programs = sorted(raw_programs, key=lambda p: p['name'].lower())
+
     def format_in_process_course_view(uca):
         """
         Return a dict of the data which the view requires for each unsucceeded course
@@ -474,7 +516,10 @@ def course_listing(request):
         'course_creator_status': _get_course_creator_status(request.user),
         'rerun_creator_status': GlobalStaff().has_user(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True)
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
+        'programs': programs,
+        'program_authoring_url': reverse('programs'),
     })
 
 
@@ -580,14 +625,14 @@ def get_courses_accessible_to_user(request):
     """
     if GlobalStaff().has_user(request.user):
         # user has global access so no need to get courses from django groups
-        courses, in_process_course_actions = _accessible_courses_list(request)
+        courses, in_process_course_actions = _accessible_courses_summary_list(request)
     else:
         try:
             courses, in_process_course_actions = _accessible_courses_list_from_groups(request)
         except AccessListFallback:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
-            courses, in_process_course_actions = _accessible_courses_list(request)
+            courses, in_process_course_actions = _accessible_courses_summary_list(request)
     return courses, in_process_course_actions
 
 
@@ -600,11 +645,13 @@ def _remove_in_process_courses(courses, in_process_course_actions):
         """
         Return a dict of the data which the view requires for each course
         """
+        course_key = course.id
+        course_module = modulestore().get_course(course_key, depth=0)
         return {
             'display_name': course.display_name,
             'course_key': unicode(course.location.course_key),
             'url': reverse_course_url('course_handler', course.id),
-            'lms_link': get_lms_link_for_item(course.location),
+            'lms_link': get_lms_link_for_item(course_module.location),
             'rerun_link': _get_rerun_link_for_item(course.id),
             'org': course.display_org_with_default,
             'number': course.display_number_with_default,
@@ -613,9 +660,9 @@ def _remove_in_process_courses(courses, in_process_course_actions):
 
     in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
     courses = [
-        format_course_for_view(c)
-        for c in courses
-        if not isinstance(c, ErrorDescriptor) and (c.id not in in_process_action_course_keys)
+        format_course_for_view(course)
+        for course in courses
+        if not isinstance(course, ErrorDescriptor) and (course.id not in in_process_action_course_keys)
     ]
     return courses
 
@@ -730,8 +777,17 @@ def _create_new_course(request, org, number, run, fields):
     Returns the URL for the course overview page.
     Raises DuplicateCourseError if the course already exists
     """
+    org_data = get_organization_by_short_name(org)
+    if not org_data and organizations_enabled():
+        return JsonResponse(
+            {'error': _('You must link this course to an organization in order to continue. '
+                        'Organization you selected does not exist in the system, '
+                        'you will need to add it to the system')},
+            status=400
+        )
     store_for_new_course = modulestore().default_modulestore.get_modulestore_type()
     new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
+    add_organization_course(org_data, new_course.id)
     return JsonResponse({
         'url': reverse_course_url('course_handler', new_course.id),
         'course_key': unicode(new_course.id),
@@ -809,6 +865,7 @@ def _rerun_course(request, org, number, run, fields):
     })
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
@@ -842,6 +899,7 @@ def course_info_handler(request, course_key_string):
             return HttpResponseBadRequest("Only supports html requests")
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
@@ -965,7 +1023,7 @@ def settings_handler(request, course_key_string):
                 'context_course': course_module,
                 'course_locator': course_key,
                 'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_key),
-                'course_image_url': utils.course_image_url(course_module),
+                'course_image_url': course_image_url(course_module),
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
@@ -1583,8 +1641,8 @@ def are_content_experiments_enabled(course):
     Returns True if content experiments have been enabled for the course.
     """
     return (
-        SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
-        SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+        'split_test' in ADVANCED_COMPONENT_TYPES and
+        'split_test' in course.advanced_modules
     )
 
 

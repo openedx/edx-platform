@@ -2,12 +2,11 @@
 <%block name="review_highlight">class="active"</%block>
 
 <%!
-from courseware.courses import course_image_url, get_course_about_section
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import marketing_link
 from django.utils.translation import ugettext as _
 from django.utils.translation import ungettext
-
+from openedx.core.lib.courses import course_image_url
 %>
 
 <section class="wrapper confirm-enrollment shopping-cart cart-view">
@@ -67,7 +66,7 @@ from django.utils.translation import ungettext
         <div class="clearfix">
         <div class="image">
           <img class="item-image" src="${course_image_url(course)}"
-              alt="${course.display_number_with_default | h} ${get_course_about_section(request, course, 'title')} ${_('Cover Image')}" />
+              alt="${course.display_number_with_default | h} ${course.display_name_with_default_escaped} ${_('Cover Image')}" />
         </div>
         <div class="data-input">
           ## Translators: "Registration for:" is followed by a course name
@@ -109,11 +108,11 @@ from django.utils.translation import ungettext
                   </div>
                   <button class="inc button" data-operation="inc">
                     <i class="icon fa fa-caret-up" aria-hidden="true"><span>+</span></i>
-                    <span class="sr">Increase</span>
+                    <span class="sr">${_('Increase')}</span>
                   </button>
                   <button class="dec button" data-operation="dec">
                     <i class="icon fa fa-caret-down"></i>
-                    <span class="sr">Decrease</span>
+                    <span class="sr">${_('Decrease')}</span>
                   </button>
                       <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                   <span class="error-text hidden" id="students-${item.id}"></span>
@@ -123,7 +122,7 @@ from django.utils.translation import ungettext
               <div class="col-3">
                  <button href="#" class="btn-remove" data-item-id="${item.id}">
                   <i class="icon fa fa-times-circle" aria-hidden="true"></i>
-                  <span class="sr">Remove</span>
+                  <span class="sr">${_('Remove')}</span>
                 </button>
               </div>
           </div>
@@ -137,7 +136,7 @@ from django.utils.translation import ungettext
             <div class="code-text">
             % if not discount_applied:
               <div class="code-input" aria-live="polite">
-                <label for="input_code" class="sr">Discount or activation code</label>
+                <label for="input_code" class="sr">${_('Discount or activation code')}</label>
                 <input type="text" placeholder="${_('discount or activation code')}" id="input_code">
                 <button type="submit" class="blue" id="submit-code">${_('Apply')}</button>
                 <span class="error-text hidden" id="code"></span>

@@ -92,13 +92,18 @@ def get_profile_image_urls_for_user(user, request=None):
         dictionary of {size_display_name: url} for each image.
 
     """
-    if user.profile.has_profile_image:
-        urls = _get_profile_image_urls(
-            _make_profile_image_name(user.username),
-            get_profile_image_storage(),
-            version=user.profile.profile_image_uploaded_at.strftime("%s"),
-        )
-    else:
+    try:
+        if user.profile.has_profile_image:
+            urls = _get_profile_image_urls(
+                _make_profile_image_name(user.username),
+                get_profile_image_storage(),
+                version=user.profile.profile_image_uploaded_at.strftime("%s"),
+            )
+        else:
+            urls = _get_default_profile_image_urls()
+    except UserProfile.DoesNotExist:
+        # when user does not have profile it raises exception, when exception
+        # occur we can simply get default image.
         urls = _get_default_profile_image_urls()
 
     if request:

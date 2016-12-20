@@ -45,6 +45,8 @@ class TeamsTabBase(EventsTestMixin, UniqueCourseTest):
         self.tab_nav = TabNavPage(self.browser)
         self.course_info_page = CourseInfoPage(self.browser, self.course_id)
         self.teams_page = TeamsPage(self.browser, self.course_id)
+        # TODO: Refactor so resetting events database is not necessary
+        self.reset_event_tracking()
 
     def create_topics(self, num_topics):
         """Create `num_topics` test topics."""
@@ -296,6 +298,7 @@ class TeamsTabTest(TeamsTabBase):
                     team_id=team['id']
                 ))
         )
+        self.teams_page.wait_for_page()
         self.teams_page.wait_for_ajax()
         self.assertTrue(self.teams_page.q(css=selector).present)
         self.assertTrue(self.teams_page.q(css=selector).visible)
@@ -810,7 +813,6 @@ class BrowseTeamsWithinTopicTest(TeamsTabBase):
         self.browse_teams_page.click_browse_all_teams_link()
         self.assertTrue(self.topics_page.is_browser_on_page())
 
-    @flaky  # TODO: fix flaky test. See TNL-3489
     def test_search(self):
         """
         Scenario: User should be able to search for a team
@@ -1381,7 +1383,10 @@ class EditTeamTest(TeamFormActions):
                 }
             },
         ]
-        with self.assert_events_match_during(event_filter=self.only_team_events, expected_events=expected_events):
+        with self.assert_events_match_during(
+            event_filter=self.only_team_events,
+            expected_events=expected_events,
+        ):
             self.team_management_page.submit_form()
 
         self.team_page.wait_for_page()

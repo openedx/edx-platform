@@ -28,7 +28,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
-from xmodule.video_module import VideoDescriptor, create_youtube_string, get_video_from_cdn
+from xmodule.video_module import VideoDescriptor, create_youtube_string
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
 from . import LogicTest
 from .test_import import DummySystem
@@ -317,9 +317,9 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         })
 
     @ddt.data(
-        ('course-v1:test_course+test_org+test_run',
-         '/asset-v1:test_course+test_org+test_run+type@asset+block@test.png'),
-        ('test_course/test_org/test_run', '/c4x/test_course/test_org/asset/test.png')
+        ('course-v1:test_org+test_course+test_run',
+         '/asset-v1:test_org+test_course+test_run+type@asset+block@test.png'),
+        ('test_org/test_course/test_run', '/c4x/test_org/test_course/asset/test.png')
     )
     @ddt.unpack
     def test_from_xml_when_handout_is_course_asset(self, course_id_string, expected_handout_link):
@@ -338,7 +338,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
-              <handout src="/asset-v1:test_course_1+test_org_1+test_run_1+type@asset+block@test.png"/>
+              <handout src="/asset-v1:test_org_1+test_course_1+test_run_1+type@asset+block@test.png"/>
               <transcript language="uk" src="ukrainian_translation.srt" />
               <transcript language="de" src="german_translation.srt" />
             </video>
@@ -740,36 +740,6 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         # Check that download_video field is also set to default (False) in xml for backward compatibility
         expected = '<video url_name="SampleProblem" download_video="false"/>\n'
         self.assertEquals(expected, etree.tostring(xml, pretty_print=True))
-
-
-class VideoCdnTest(unittest.TestCase):
-    """
-    Tests for Video CDN.
-    """
-    @patch('requests.get')
-    def test_get_video_success(self, cdn_response):
-        """
-        Test successful CDN request.
-        """
-        original_video_url = "http://www.original_video.com/original_video.mp4"
-        cdn_response_video_url = "http://www.cdn_video.com/cdn_video.mp4"
-        cdn_response_content = '{{"sources":["{cdn_url}"]}}'.format(cdn_url=cdn_response_video_url)
-        cdn_response.return_value = Mock(status_code=200, content=cdn_response_content)
-        fake_cdn_url = 'http://fake_cdn.com/'
-        self.assertEqual(
-            get_video_from_cdn(fake_cdn_url, original_video_url),
-            cdn_response_video_url
-        )
-
-    @patch('requests.get')
-    def test_get_no_video_exists(self, cdn_response):
-        """
-        Test if no alternative video in CDN exists.
-        """
-        original_video_url = "http://www.original_video.com/original_video.mp4"
-        cdn_response.return_value = Mock(status_code=404)
-        fake_cdn_url = 'http://fake_cdn.com/'
-        self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
 
 
 class VideoDescriptorIndexingTestCase(unittest.TestCase):

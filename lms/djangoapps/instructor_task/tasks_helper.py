@@ -1595,7 +1595,11 @@ def generate_students_certificates(
     task_progress.update_task_state(extra_meta=current_step)
 
     statuses_to_regenerate = task_input.get('statuses_to_regenerate', [])
-    students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
+    if students is not None and not statuses_to_regenerate:
+        # We want to skip 'filtering students' only when students are given and statuses to regenerate are not
+        students_require_certs = enrolled_students
+    else:
+        students_require_certs = students_require_certificate(course_id, enrolled_students, statuses_to_regenerate)
 
     if statuses_to_regenerate:
         # Mark existing generated certificates as 'unavailable' before regenerating
@@ -1679,8 +1683,7 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
                 continue
 
             try:
-                with outer_atomic():
-                    add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
+                add_user_to_cohort(cohorts_status[cohort_name]['cohort'], username_or_email)
                 cohorts_status[cohort_name]['Students Added'] += 1
                 task_progress.succeeded += 1
             except User.DoesNotExist:
@@ -1755,7 +1758,7 @@ def invalidate_generated_certificates(course_id, enrolled_students, certificate_
     :param enrolled_students: (queryset or list) students enrolled in the course
     :param certificate_statuses: certificates statuses for whom to remove generated certificate
     """
-    certificates = GeneratedCertificate.objects.filter(
+    certificates = GeneratedCertificate.objects.filter(  # pylint: disable=no-member
         user__in=enrolled_students,
         course_id=course_id,
         status__in=certificate_statuses,

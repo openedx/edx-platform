@@ -5,7 +5,7 @@
           <span class="sr action-button-text"><%= gettext("Delete") %></span>
        </a>
        <% } %>
-       <div class="signatory-panel-header">Signatory <%= signatory_number %></div>
+       <div class="signatory-panel-header"><%= gettext("Signatory") %> <%= signatory_number %></div>
        <div class="signatory-panel-body">
          <fieldset class="collection-fields signatory-fields">
             <legend class="sr"><%= gettext("Certificate Signatory Configuration") %></legend>
@@ -43,7 +43,7 @@
                     <input id="signatory-signature-<%= signatory_number %>" class="collection-name-input input-text signatory-signature-input" name="signatory-signature-url" type="text" placeholder="<%= gettext("Path to Signature Image") %>" value="<%= signature_image_path %>"  aria-describedby="signatory-signature-<%= signatory_number %>-tip" readonly />
                     <span id="signatory-signature-<%= signatory_number %>-tip" class="tip tip-stacked"><%= gettext("Image must be in PNG format") %></span>
                   </div>
-                  <button type="button" class="action action-upload-signature">Upload Signature Image</button>
+                  <button type="button" class="action action-upload-signature"><%= gettext("Upload Signature Image") %></button>
                 </div>
             </div>
          </fieldset>

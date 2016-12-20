@@ -99,6 +99,36 @@
       &:last-child {
         margin-bottom: 0;
       }
+      .settings-tabs-header {
+        margin-bottom: $baseline;
+        border-bottom: 1px solid $gray-l3;
+
+        li.settings-tab-buttons {
+          display: inline-block;
+          margin-right: $baseline;
+
+          .settings-tab-button {
+            @extend %t-copy-sub1;
+            @extend %t-regular;
+            background-image: none;
+            background-color: $white;
+            color: $mediumGrey;
+            border-radius: 0;
+            box-shadow: none;
+            border: 0;
+            padding: ($baseline/4) ($baseline/2);
+            text-transform: uppercase;
+            &:hover {
+              background-color: $white;
+              color: $blue;
+            }
+            &.active {
+              border-bottom: 4px solid $blue-d2;
+              color: $offBlack;
+            }
+          }
+        }
+      }
     }
 
     .modal-section-title {
@@ -532,8 +562,9 @@
   .wrapper-modal-window-bulkpublish-subsection,
   .wrapper-modal-window-bulkpublish-unit,
   .course-outline-modal {
-    .exam-time-list-fields {
-      margin: 0 0 ($baseline/2) ($baseline/2);
+    .exam-time-list-fields,
+    .exam-review-rules-list-fields {
+      margin: 0 0 ($baseline/2) 0;
     }
     .list-fields {
       .field-message {
@@ -712,6 +743,13 @@
       // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
       .checkbox-cosmetic .label {
         margin-bottom: 0;
+      }
+    }
+
+    // UI: Access settings section
+    .edit-settings-access {
+      .gating-prereq {
+        margin-bottom: 10px;
       }
     }
   }

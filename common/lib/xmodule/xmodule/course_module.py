@@ -1,30 +1,27 @@
 """
 Django module container for classes and operations related to the "Course Module" content type
 """
+import json
 import logging
 from cStringIO import StringIO
-from math import exp
+from datetime import datetime
+
+import requests
+from django.utils.timezone import UTC
+from lazy import lazy
 from lxml import etree
 from path import Path as path
-import requests
-from datetime import datetime
-import dateutil.parser
-from lazy import lazy
+from xblock.core import XBlock
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 
 from xmodule import course_metadata_utils
 from xmodule.course_metadata_utils import DEFAULT_START_DATE
 from xmodule.exceptions import UndefinedContext
-from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
-from xmodule.tabs import CourseTabList, InvalidTabsException
 from xmodule.mixin import LicenseMixin
-import json
-
-from xblock.core import XBlock
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
+from xmodule.seq_module import SequenceDescriptor, SequenceModule
+from xmodule.tabs import CourseTabList, InvalidTabsException
 from .fields import Date
-from django.utils.timezone import UTC
-
 
 log = logging.getLogger(__name__)
 
@@ -388,15 +385,25 @@ class CourseFields(object):
         # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
         # his students.
         display_name=_("Enable CCX"),
-        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
-        # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
-        # his students.
         help=_(
+            # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content. CCX Coach is
+            # a role created by a course Instructor to enable a person (the "Coach") to manage the custom course for
+            # his students.
             "Allow course instructors to assign CCX Coach roles, and allow coaches to manage Custom Courses on edX."
             " When false, Custom Courses cannot be created, but existing Custom Courses will be preserved."
         ),
         default=False,
         scope=Scope.settings
+    )
+    ccx_connector = String(
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        display_name=_("CCX Connector URL"),
+        # Translators: Custom Courses for edX (CCX) is an edX feature for re-using course content.
+        help=_(
+            "URL for CCX Connector application for managing creation of CCXs. (optional)."
+            " Ignored unless 'Enable CCX' is set to 'true'."
+        ),
+        scope=Scope.settings, default=""
     )
     allow_anonymous = Boolean(
         display_name=_("Allow Anonymous Discussion Posts"),
@@ -417,252 +424,13 @@ class CourseFields(object):
         scope=Scope.settings
     )
     has_children = True
-    checklists = List(
-        help=_("Checklist to Follow When Developing a Course"),
-        scope=Scope.settings,
-        default=[
-            {
-                "short_description": "Putting the structure in place",
-                "items": [
-                    {
-                        "short_description": "Add course team members",
-                        "long_description": "Give other users staff access so they can edit course material.",
-                        "is_checked": False,
-                        "action_url": "ManageUsers",
-                        "action_text": _("Edit Course Team"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Set enrollment and launch dates",
-                        "long_description": "Set the start and end dates that students can enroll in the course, and the launch date for the course.",
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": "Edit Course Schedule &amp; Details",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Create grading policy",
-                        "long_description": "Set up your assignment types and grading policy even if you haven't created all your assignments.",
-                        "is_checked": False,
-                        "action_url": "SettingsGrading",
-                        "action_text": "Edit Grading Settings",
-                        "action_external": False,
-                    },
-                ],
-            },
-            {
-                "short_description": "Populating your course with content",
-                "items": [
-                    {
-                        "short_description": "Create sections, subsections, and units",
-                        "long_description": "Use your course outline to create the structure that will hold course content.",
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": "Create Course Outline",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Add your content to the outline",
-                        "long_description": "Systematically go through your sections and subsections, and add your content.",
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": "Add your Content",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Create any static pages",
-                        "long_description": "These appear as 'tabs' horizontally at the top of your course.",
-                        "is_checked": False,
-                        "action_url": "StaticPages",
-                        "action_text": "Add Static Pages",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Configure graded items",
-                        "long_description": "Set grading categories for subsections, decide on settings for problems.",
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": "Set Up Graded Items",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Request course 'tab' changes",
-                        "long_description": "Some of the tabs in your course are optional and renamable (e.g. 'Progress').",
-                        "is_checked": False,
-                        "action_url": "http://stanfordonline.zendesk.com",
-                        "action_text": "File a ticket",
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": "Give items meaningful names",
-                        "long_description": "Make sure any usage report items (e.g. videos, problems, etc...), have meaningful names (e.g. 'Matrix multiplication' rather than 'Video 16').",
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": "Edit Content Names",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "(MOOCs only) Incorporate Pre/Post Course Surveys",
-                        "long_description": "Work with courseops to create and incorporate pre/post course surveys",
-                        "is_checked": False,
-                        "action_url": "http://stanfordonline.zendesk.com",
-                        "action_text": "File a ticket",
-                        "action_external": True,
-                    },
-                ],
-            },
-            {
-                "short_description": "Special handling for videos",
-                "items": [
-                    {
-                        "short_description": "Upload videos to YouTube",
-                        "long_description": "Log on to YouTube and upload high-resolution videos to a course account.",
-                        "is_checked": False,
-                        "action_url": "http://www.youtube.com",
-                        "action_text": "Add Videos",
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": "Request an account for creating captions",
-                        "long_description": "You'll want captions for your videos.",
-                        "is_checked": False,
-                        "action_url": "http://stanfordonline.zendesk.com",
-                        "action_text": "File a Ticket",
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": "Upload YouTube video links to caption provider",
-                        "long_description": "",
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Check and Update Captions",
-                        "long_description": "Check that all videos have up-to-date captions, and update if they don't.",
-                        "is_checked": False,
-                        "action_url": "CaptionUtility",
-                        "action_text": "Go to the Caption Utility",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Create smaller versions of videos for download",
-                        "long_description": "",
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Upload downloadable videos",
-                        "long_description": "Upload downloadable videos to an appropriate file hosting location (e.g. to stanford.box.com)",
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Create download links for smaller videos",
-                        "long_description": "",
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                ],
-            },
-            {
-                "short_description": "Getting ready to allow enrollment (MOOC only)",
-                "items": [
-                    {
-                        "short_description": "Confirm enrollment policy is correct",
-                        "long_description": "Make sure the enrollment policy is correct for your course (public? SUnet ID? Invite only?).",
-                        "is_checked": False,
-                        "action_url": "http://stanfordonline.zendesk.com",
-                        "action_text": "File a Ticket",
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": "Populate the 'About' page for your course",
-                        "long_description": "Add any information about your course for your perspective students to read before registering (Course description, Staff bios, Syllabus, FAQs, Promo video, Course image, Start date, End date, Effort estimate, and Prerequisites).",
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": "Edit About Page",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Add short description for course 'Tile'",
-                        "long_description": "Create 150-character 'Mouseover' description for home page",
-                        "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": "Edit Mouseover Text",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Request listing your course on lagunita.stanford.edu ",
-                        "long_description": "Contact CourseOps to get your course listed on the Stanford Lagunita home page (1 week lead time).",
-                        "is_checked": False,
-                        "action_url": "http://stanfordonline.zendesk.com",
-                        "action_text": "File a Ticket",
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": "Set up any other social media ",
-                        "long_description": "You may want to create a Facebook page, twitter hashtag, etc.",
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                ],
-            },
-            {
-                "short_description": "Getting ready to launch",
-                "items": [
-                    {
-                        "short_description": "Forum topics",
-                        "long_description": "Forum topics are created/edited in the Advanced Settings. Let us know if you need assistance.",
-                        "is_checked": False,
-                        "action_url": "SettingsAdvanced",
-                        "action_text": "Edit Advanced Settings",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "Inline Discussion Sections",
-                        "long_description": "Decide on whether and where to include in-line discussion links, and create them.",
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": "Edit Course Outline",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": "The Course Wiki",
-                        "long_description": "Create initial wiki post to welcome students.",
-                        "is_checked": False,
-                        "action_url": "Wiki",
-                        "action_text": "Create initial wiki post",
-                        "action_external": True,
-                    },
-                    {
-                        "short_description": "The Course Forum",
-                        "long_description": "Create forum welcome post to set forum tone for students.",
-                        "is_checked": False,
-                        "action_url": "Forum",
-                        "action_text": "Create forum welcome post",
-                        "action_external": True,
-                    },
-                ],
-            },
-        ],
-    )
     info_sidebar_name = String(
-        display_name=_("Course Info Sidebar Name"),
+        display_name=_("Course Home Sidebar Name"),
         help=_(
-            "Enter the heading that you want students to see above your course handouts on the Course Info page. "
+            "Enter the heading that you want students to see above your course handouts on the Course Home page. "
             "Your course handouts appear in the right panel of the page."
         ),
-        scope=Scope.settings, default='Course Handouts')
+        scope=Scope.settings, default=_('Course Handouts'))
     show_timezone = Boolean(
         help=_(
             "True if timezones should be shown on dates in the courseware. "
@@ -728,9 +496,9 @@ class CourseFields(object):
     ## Course level Certificate Name overrides.
     cert_name_short = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the short name of the course to use on the certificate that "
-            "students receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the short name of the type of certificate that '
+            'students receive when they complete the course. For instance, "Certificate".'
         ),
         display_name=_("Certificate Name (Short)"),
         scope=Scope.settings,
@@ -738,9 +506,9 @@ class CourseFields(object):
     )
     cert_name_long = String(
         help=_(
-            "Use this setting only when generating PDF certificates. "
-            "Between quotation marks, enter the long name of the course to use on the certificate that students "
-            "receive when they complete the course."
+            'Use this setting only when generating PDF certificates. '
+            'Between quotation marks, enter the long name of the type of certificate that students '
+            'receive when they complete the course. For instance, "Certificate of Achievement".'
         ),
         display_name=_("Certificate Name (Long)"),
         scope=Scope.settings,
@@ -934,12 +702,24 @@ class CourseFields(object):
 
     teams_configuration = Dict(
         display_name=_("Teams Configuration"),
+        # Translators: please don't translate "id".
         help=_(
-            "Enter configuration for the teams feature. Expects two entries: max_team_size and topics, where "
-            "topics is a list of topics."
+            'Specify the maximum team size and topics for teams inside the provided set of curly braces. '
+            'Make sure that you enclose all of the sets of topic values within a set of square brackets, '
+            'with a comma after the closing curly brace for each topic, and another comma after the '
+            'closing square brackets. '
+            'For example, to specify that teams should have a maximum of 5 participants and provide a list of '
+            '2 topics, enter the configuration in this format: {example_format}. '
+            'In "id" values, the only supported special characters are underscore, hyphen, and period.'
+        ).format(
+            # Put the sample JSON into a format variable so that translators
+            # don't muck with it.
+            example_format=(
+                '{"topics": [{"name": "Topic1Name", "description": "Topic1Description", "id": "Topic1ID"}, '
+                '{"name": "Topic2Name", "description": "Topic2Description", "id": "Topic2ID"}], "max_team_size": 5}'
+            ),
         ),
         scope=Scope.settings,
-        deprecated=True,  # Deprecated until the teams feature is made generally available
     )
 
     enable_proctored_exams = Boolean(
@@ -982,6 +762,17 @@ class CourseFields(object):
         scope=Scope.settings
     )
 
+    enable_subsection_gating = Boolean(
+        display_name=_("Enable Subsection Prerequisites"),
+        help=_(
+            "Enter true or false. If this value is true, you can hide a "
+            "subsection until learners earn a minimum score in another, "
+            "prerequisite subsection."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
+
 
 class CourseModule(CourseFields, SequenceModule):  # pylint: disable=abstract-method
     """
@@ -1003,6 +794,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
         _ = self.runtime.service(self, "i18n").ugettext
+
+        self._gating_prerequisites = None
 
         if self.wiki_slug is None:
             self.wiki_slug = self.location.course
@@ -1300,7 +1093,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         flag = self.is_new
         if flag is None:
             # Use a heuristic if the course has not been flagged
-            announcement, start, now = self._sorting_dates()
+            announcement, start, now = course_metadata_utils.sorting_dates(
+                self.start, self.advertised_start, self.announcement
+            )
             if announcement and (now - announcement).days < 30:
                 # The course has been announced for less that month
                 return True
@@ -1320,41 +1115,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
         Returns a tuple that can be used to sort the courses according
         the how "new" they are. The "newness" score is computed using a
         heuristic that takes into account the announcement and
-        (advertized) start dates of the course if available.
+        (advertised) start dates of the course if available.
 
         The lower the number the "newer" the course.
         """
-        # Make courses that have an announcement date shave a lower
-        # score than courses than don't, older courses should have a
-        # higher score.
-        announcement, start, now = self._sorting_dates()
-        scale = 300.0  # about a year
-        if announcement:
-            days = (now - announcement).days
-            score = -exp(-days / scale)
-        else:
-            days = (now - start).days
-            score = exp(days / scale)
-        return score
-
-    def _sorting_dates(self):
-        # utility function to get datetime objects for dates used to
-        # compute the is_new flag and the sorting_score
-
-        announcement = self.announcement
-        if announcement is not None:
-            announcement = announcement
-
-        try:
-            start = dateutil.parser.parse(self.advertised_start)
-            if start.tzinfo is None:
-                start = start.replace(tzinfo=UTC())
-        except (ValueError, AttributeError):
-            start = self.start
-
-        now = datetime.now(UTC())
-
-        return announcement, start, now
+        return course_metadata_utils.sorting_score(self.start, self.advertised_start, self.announcement)
 
     @lazy
     def grading_context(self):
@@ -1637,3 +1402,56 @@ class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
           bool: False if the course has already started, True otherwise.
         """
         return datetime.now(UTC()) <= self.start
+
+
+class CourseSummary(object):
+    """
+    A lightweight course summary class, which constructs split/mongo course summary without loading
+    the course. It is used at cms for listing courses to global staff user.
+    """
+    course_info_fields = ['display_name', 'display_coursenumber', 'display_organization']
+
+    def __init__(self, course_locator, display_name=u"Empty", display_coursenumber=None, display_organization=None):
+        """
+        Initialize and construct course summary
+
+        Arguments:
+        course_locator (CourseLocator):  CourseLocator object of the course.
+
+        display_name (unicode): display name of the course. When you create a course from console, display_name
+        isn't set (course block has no key `display_name`). "Empty" name is returned when we load the course.
+        If `display_name` isn't present in the course block, use the `Empty` as default display name.
+        We can set None as a display_name in Course Advance Settings; Do not use "Empty" when display_name is
+        set to None.
+
+        display_coursenumber (unicode|None): Course number that is specified & appears in the courseware
+
+        display_organization (unicode|None): Course organization that is specified & appears in the courseware
+
+        """
+        self.display_coursenumber = display_coursenumber
+        self.display_organization = display_organization
+        self.display_name = display_name
+
+        self.id = course_locator  # pylint: disable=invalid-name
+        self.location = course_locator.make_usage_key('course', 'course')
+
+    @property
+    def display_org_with_default(self):
+        """
+        Return a display organization if it has been specified, otherwise return the 'org' that
+        is in the location
+        """
+        if self.display_organization:
+            return self.display_organization
+        return self.location.org
+
+    @property
+    def display_number_with_default(self):
+        """
+        Return a display course number if it has been specified, otherwise return the 'course' that
+        is in the location
+        """
+        if self.display_coursenumber:
+            return self.display_coursenumber
+        return self.location.course

@@ -11,7 +11,7 @@ from the same directory.
 """
 
 # Start with the common settings
-from .common import *  # pylint: disable=wildcard-import, unused-wildcard-import
+from openedx.stanford.cms.envs.common import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 # Use an in-memory database since this settings file is only used for updating assets
 DATABASES = {

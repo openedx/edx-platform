@@ -4,12 +4,12 @@ API for initiating and tracking requests for credit from a provider.
 
 import datetime
 import logging
-import pytz
 import uuid
 
+import pytz
 from django.db import transaction
-from lms.djangoapps.django_comment_client.utils import JsonResponse
 
+from lms.djangoapps.django_comment_client.utils import JsonResponse
 from openedx.core.djangoapps.credit.exceptions import (
     UserIsNotEligible,
     CreditProviderNotConfigured,
@@ -27,6 +27,8 @@ from openedx.core.djangoapps.credit.signature import signature, get_shared_secre
 from student.models import User
 from util.date_utils import to_timestamp
 
+
+# TODO: Cleanup this mess! ECOM-2908
 
 log = logging.getLogger(__name__)
 
@@ -257,12 +259,10 @@ def create_credit_request(course_key, provider_id, username):
             final_grade = unicode(final_grade)
 
     except (CreditRequirementStatus.DoesNotExist, TypeError, KeyError):
-        log.exception(
-            "Could not retrieve final grade from the credit eligibility table "
-            "for user %s in course %s.",
-            user.id, course_key
-        )
-        raise UserIsNotEligible
+        msg = 'Could not retrieve final grade from the credit eligibility table for ' \
+              'user [{user_id}] in course [{course_key}].'.format(user_id=user.id, course_key=course_key)
+        log.exception(msg)
+        raise UserIsNotEligible(msg)
 
     parameters = {
         "request_uuid": credit_request.uuid,

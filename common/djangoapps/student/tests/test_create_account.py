@@ -118,6 +118,7 @@ class TestCreateAccount(TestCase):
     @mock.patch('student.views.analytics.identify')
     def test_segment_tracking(self, mock_segment_identify, _):
         year = datetime.now().year
+        year_of_birth = year - 14
         self.params.update({
             "level_of_education": "a",
             "gender": "o",
@@ -125,7 +126,7 @@ class TestCreateAccount(TestCase):
             "city": "Exampleton",
             "country": "US",
             "goals": "To test this feature",
-            "year_of_birth": str(year),
+            "year_of_birth": str(year_of_birth),
             "extra1": "extra_value1",
             "extra2": "extra_value2",
         })
@@ -134,7 +135,7 @@ class TestCreateAccount(TestCase):
             'email': self.params['email'],
             'username': self.params['username'],
             'name': self.params['name'],
-            'age': 0,
+            'age': 13,
             'education': 'Associate degree',
             'address': self.params['mailing_address'],
             'gender': 'Other/Prefer Not to Say',
@@ -372,6 +373,36 @@ class TestCreateAccountValidation(TestCase):
         # Invalid
         params["email"] = "not_an_email_address"
         assert_email_error("A properly formatted e-mail is required")
+
+    @override_settings(
+        REGISTRATION_EMAIL_PATTERNS_ALLOWED=[
+            r'.*@edx.org',  # Naive regex omitting '^', '$' and '\.' should still work.
+            r'^.*@(.*\.)?example\.com$',
+            r'^(^\w+\.\w+)@school.tld$',
+        ]
+    )
+    @ddt.data(
+        ('bob@we-are.bad', False),
+        ('bob@edx.org.we-are.bad', False),
+        ('staff@edx.org', True),
+        ('student@example.com', True),
+        ('student@sub.example.com', True),
+        ('mr.teacher@school.tld', True),
+        ('student1234@school.tld', False),
+    )
+    @ddt.unpack
+    def test_email_pattern_requirements(self, email, expect_success):
+        """
+        Test the REGISTRATION_EMAIL_PATTERNS_ALLOWED setting, a feature which
+        can be used to only allow people register if their email matches a
+        against a whitelist of regexs.
+        """
+        params = dict(self.minimal_params)
+        params["email"] = email
+        if expect_success:
+            self.assert_success(params)
+        else:
+            self.assert_error(params, "email", "Unauthorized email address.")
 
     def test_password(self):
         params = dict(self.minimal_params)

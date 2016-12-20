@@ -4,27 +4,32 @@ Tests for Blocks Views
 
 from django.core.urlresolvers import reverse
 from string import join
+from urllib import urlencode
+from urlparse import urlunparse
 
+from course_blocks.tests.helpers import EnableTransformerRegistryMixin
 from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
-from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from student.tests.factories import AdminFactory, CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
-from .test_utils import deserialize_usage_key
+from .helpers import deserialize_usage_key
 
 
-class TestBlocksViewMixin(object):
+class TestBlocksView(EnableTransformerRegistryMixin, SharedModuleStoreTestCase):
     """
-    Mixin class for test helpers for BlocksView related classes
+    Test class for BlocksView
     """
+    requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field']
+
     @classmethod
-    def setup_course(cls):
-        """
-        Create a sample course
-        """
-        cls.course_key = ToyCourseFactory.create().id
+    def setUpClass(cls):
+        super(TestBlocksView, cls).setUpClass()
 
+        # create a toy course
+        cls.course_key = ToyCourseFactory.create().id
+        cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
         cls.non_orphaned_block_usage_keys = set(
             unicode(item.location)
             for item in cls.store.get_items(cls.course_key)
@@ -32,34 +37,39 @@ class TestBlocksViewMixin(object):
             if cls.store.get_parent_location(item.location) or item.category == 'course'
         )
 
-    def setup_user(self):
-        """
-        Create a user, enrolled in the sample course
-        """
-        self.user = UserFactory.create()  # pylint: disable=attribute-defined-outside-init
-        self.client.login(username=self.user.username, password='test')
+    def setUp(self):
+        super(TestBlocksView, self).setUp()
 
+        # create a user, enrolled in the toy course
+        self.user = UserFactory.create()
+        self.client.login(username=self.user.username, password='test')
         CourseEnrollmentFactory.create(user=self.user, course_id=self.course_key)
+
+        # default values for url and query_params
+        self.url = reverse(
+            'blocks_in_block_tree',
+            kwargs={'usage_key_string': unicode(self.course_usage_key)}
+        )
+        self.query_params = {'depth': 'all', 'username': self.user.username}
 
     def verify_response(self, expected_status_code=200, params=None, url=None):
         """
-        Ensure that the sending a GET request to the specified URL (or self.url)
-        returns the expected status code (200 by default).
+        Ensure that sending a GET request to the specified URL returns the
+        expected status code.
 
         Arguments:
-            expected_status_code: (default 200)
-            params:
-                query parameters to include in the request (includes
-                username=[self.user.username]&depth=all by default)
-            url: (default [self.url])
+            expected_status_code: The status_code that is expected in the
+                response.
+            params: Parameters to add to self.query_params to include in the
+                request.
+            url: The URL to send the GET request.  Default is self.url.
 
         Returns:
             response: The HttpResponse returned by the request
         """
-        query_params = {'username': self.user.username, 'depth': 'all'}
         if params:
-            query_params.update(params)
-        response = self.client.get(url or self.url, query_params)
+            self.query_params.update(params)
+        response = self.client.get(url or self.url, self.query_params)
         self.assertEquals(response.status_code, expected_status_code)
         return response
 
@@ -80,8 +90,6 @@ class TestBlocksViewMixin(object):
             set(response.data['blocks'].iterkeys()),
             self.non_orphaned_block_usage_keys,
         )
-
-    requested_fields = ['graded', 'format', 'student_view_multi_device', 'children', 'not_a_field']
 
     def verify_response_with_requested_fields(self, response):
         """
@@ -132,26 +140,6 @@ class TestBlocksViewMixin(object):
         else:
             self.assertFalse(expression)
 
-
-# pylint: disable=no-member
-class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):
-    """
-    Test class for BlocksView
-    """
-    @classmethod
-    def setUpClass(cls):
-        super(TestBlocksView, cls).setUpClass()
-        cls.setup_course()
-        cls.course_usage_key = cls.store.make_course_usage_key(cls.course_key)
-        cls.url = reverse(
-            'blocks_in_block_tree',
-            kwargs={'usage_key_string': unicode(cls.course_usage_key)}
-        )
-
-    def setUp(self):
-        super(TestBlocksView, self).setUp()
-        self.setup_user()
-
     def test_not_authenticated(self):
         self.client.logout()
         self.verify_response(401)
@@ -167,6 +155,21 @@ class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):
             kwargs={'usage_key_string': unicode(usage_key)}
         )
         self.verify_response(403, url=url)
+
+    def test_no_user_non_staff(self):
+        self.query_params.pop('username')
+        self.query_params['all_blocks'] = True
+        self.verify_response(403)
+
+    def test_no_user_staff_not_all_blocks(self):
+        self.query_params.pop('username')
+        self.verify_response(400)
+
+    def test_no_user_staff_all_blocks(self):
+        self.client.login(username=AdminFactory.create().username, password='test')
+        self.query_params.pop('username')
+        self.query_params['all_blocks'] = True
+        self.verify_response()
 
     def test_basic(self):
         response = self.verify_response()
@@ -217,42 +220,34 @@ class TestBlocksView(TestBlocksViewMixin, SharedModuleStoreTestCase):
         )
         self.verify_response_with_requested_fields(response)
 
+    def test_with_list_field_url(self):
+        query = urlencode(self.query_params.items() + [
+            ('requested_fields', self.requested_fields[0]),
+            ('requested_fields', self.requested_fields[1]),
+            ('requested_fields', join(self.requested_fields[1:], ',')),
+        ])
+        self.query_params = None
+        response = self.verify_response(
+            url=urlunparse(("", "", self.url, "", query, ""))
+        )
+        self.verify_response_with_requested_fields(response)
 
-class TestBlocksInCourseView(TestBlocksViewMixin, SharedModuleStoreTestCase):
+
+class TestBlocksInCourseView(TestBlocksView):  # pylint: disable=test-inherits-tests
     """
     Test class for BlocksInCourseView
     """
-    @classmethod
-    def setUpClass(cls):
-        super(TestBlocksInCourseView, cls).setUpClass()
-        cls.setup_course()
-        cls.url = reverse('blocks_in_course')
-
     def setUp(self):
         super(TestBlocksInCourseView, self).setUp()
-        self.setup_user()
-
-    def test_basic(self):
-        response = self.verify_response(params={'course_id': unicode(self.course_key)})
-        self.verify_response_block_dict(response)
+        self.url = reverse('blocks_in_course')
+        self.query_params['course_id'] = unicode(self.course_key)
 
     def test_no_course_id(self):
+        self.query_params.pop('course_id')
         self.verify_response(400)
 
     def test_invalid_course_id(self):
         self.verify_response(400, params={'course_id': 'invalid_course_id'})
 
-    def test_with_list_field_url(self):
-        url = '{base_url}?course_id={course_id}&username={username}&depth=all'.format(
-            course_id=unicode(self.course_key),
-            base_url=self.url.format(),
-            username=self.user.username,
-        )
-        url += '&requested_fields={0}&requested_fields={1}&requested_fields={2}'.format(
-            self.requested_fields[0],
-            self.requested_fields[1],
-            join(self.requested_fields[1:], ','),
-        )
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
-        self.verify_response_with_requested_fields(response)
+    def test_non_existent_course(self):
+        self.verify_response(403, params={'course_id': unicode(CourseLocator('non', 'existent', 'course'))})

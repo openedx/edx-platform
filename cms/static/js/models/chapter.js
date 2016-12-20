@@ -1,4 +1,4 @@
-define(["backbone", "backbone.associations"], function(Backbone) {
+define(["backbone", "gettext", "backbone.associations"], function(Backbone, gettext) {
     var Chapter = Backbone.AssociatedModel.extend({
         defaults: function() {
             return {
@@ -32,17 +32,17 @@ define(["backbone", "backbone.associations"], function(Backbone) {
         validate: function(attrs, options) {
             if(!attrs.name && !attrs.asset_path) {
                 return {
-                    message: "Chapter name and asset_path are both required",
+                    message: gettext("Chapter name and asset_path are both required"),
                     attributes: {name: true, asset_path: true}
                 };
             } else if(!attrs.name) {
                 return {
-                    message: "Chapter name is required",
+                    message: gettext("Chapter name is required"),
                     attributes: {name: true}
                 };
             } else if (!attrs.asset_path) {
                 return {
-                    message: "asset_path is required",
+                    message: gettext("asset_path is required"),
                     attributes: {asset_path: true}
                 };
             }

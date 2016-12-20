@@ -7,6 +7,7 @@
   },
   "devDependencies": {
     "jshint": "^2.7.0",
-    "edx-custom-a11y-rules": "edx/edx-custom-a11y-rules"
+    "edx-custom-a11y-rules": "edx/edx-custom-a11y-rules",
+    "plato": "1.2.2"
   }
 }

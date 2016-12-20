@@ -31,33 +31,21 @@ from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 
-__all__ = ['OPEN_ENDED_COMPONENT_TYPES',
-           'ADVANCED_COMPONENT_POLICY_KEY',
-           'container_handler',
-           'component_handler'
-           ]
+__all__ = [
+    'container_handler',
+    'component_handler'
+]
 
 log = logging.getLogger(__name__)
 
-# NOTE: it is assumed that this list is disjoint from ADVANCED_COMPONENT_TYPES
+# NOTE: This list is disjoint from ADVANCED_COMPONENT_TYPES
 COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 # Constants for determining if these components should be enabled for this course
-SPLIT_TEST_COMPONENT_TYPE = 'split_test'
-OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
-NOTE_COMPONENT_TYPES = ['notes']
-
-if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
-    ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
-else:
-    ADVANCED_COMPONENT_TYPES = settings.ADVANCED_COMPONENT_TYPES
 XBLOCKS_ALWAYS_IN_STUDIO = getattr(settings, 'XBLOCKS_ALWAYS_IN_STUDIO', [])
-
-ADVANCED_COMPONENT_CATEGORY = 'advanced'
-ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
+ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
-
 
 CONTAINER_TEMPLATES = [
     "basic-modal", "modal-button", "edit-xblock-modal",

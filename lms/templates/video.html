@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 % if display_name is not UNDEFINED and display_name is not None:
-    <h2>${display_name}</h2>
+    <h3>${display_name}</h3>
 % endif
 
 <div
@@ -23,9 +23,10 @@
           <div class="video-player-pre"></div>
           <section class="video-player">
               <div id="${id}"></div>
-              <h3 class="hidden">${_('No playable video sources found.')}</h3>
+              <h4 class="video-error hidden">${_('No playable video sources found.')}</h4>
           </section>
           <div class="video-player-post"></div>
+          <div class="closed-captions"></div>
           <section class="video-controls is-hidden">
               <div>
                   <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>

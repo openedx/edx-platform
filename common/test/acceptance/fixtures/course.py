@@ -298,8 +298,8 @@ class CourseFixture(XBlockContainerFixture):
             self._course_key = response.json()['course_key']
         else:
             raise FixtureError(
-                "Could not create course {0}.  Status was {1}".format(
-                    self._course_dict, response.status_code))
+                "Could not create course {0}.  Status was {1}\nResponse content was: {2}".format(
+                    self._course_dict, response.status_code, response.content))
 
     def _configure_course(self):
         """

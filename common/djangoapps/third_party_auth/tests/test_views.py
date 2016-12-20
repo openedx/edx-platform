@@ -129,3 +129,17 @@ class SAMLMetadataTest(SAMLTestCase):
         self.assertEqual(support_name_node.text, support_name)
         support_email_node = support_node.find(etree.QName(SAML_XML_NS, 'EmailAddress'))
         self.assertEqual(support_email_node.text, support_email)
+
+
+@unittest.skipUnless(AUTH_FEATURE_ENABLED, 'third_party_auth not enabled')
+class SAMLAuthTest(SAMLTestCase):
+    """
+    Test the SAML auth views
+    """
+    LOGIN_URL = '/auth/login/tpa-saml/'
+
+    def test_login_without_idp(self):
+        """ Accessing the login endpoint without an idp query param should return 302 """
+        self.enable_saml()
+        response = self.client.get(self.LOGIN_URL)
+        self.assertEqual(response.status_code, 302)

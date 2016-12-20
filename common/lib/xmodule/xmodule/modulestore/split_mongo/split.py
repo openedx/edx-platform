@@ -66,13 +66,14 @@ from bson.objectid import ObjectId
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
+from xmodule.course_module import CourseSummary
 from xmodule.errortracker import null_error_tracker
 from opaque_keys.edx.locator import (
     BlockUsageLocator, DefinitionLocator, CourseLocator, LibraryLocator, VersionTree, LocalId,
 )
 from ccx_keys.locator import CCXLocator, CCXBlockUsageLocator
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
-    DuplicateCourseError
+    DuplicateCourseError, MultipleCourseBlocksFound
 from xmodule.modulestore import (
     inheritance, ModuleStoreWriteBase, ModuleStoreEnum,
     BulkOpsRecord, BulkOperationsMixin, SortedAssetList, BlockData
@@ -82,6 +83,7 @@ from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.store_utilities import DETACHED_XBLOCK_TYPES
 from xmodule.error_module import ErrorDescriptor
 from collections import defaultdict
 from types import NoneType
@@ -539,6 +541,17 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         return indexes
 
+    def find_course_blocks_by_id(self, ids):
+        """
+        Find all structures that specified in `ids`. Filter the course blocks to only return whose
+        `block_type` is `course`
+
+        Arguments:
+            ids (list): A list of structure ids
+        """
+        ids = set(ids)
+        return self.db_connection.find_course_blocks_by_id(list(ids))
+
     def find_structures_by_id(self, ids):
         """
         Return all structures that specified in ``ids``.
@@ -849,15 +862,39 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # add it in the envelope for the structure.
         return CourseEnvelope(course_key.replace(version_guid=version_guid), entry)
 
+    def _get_course_blocks_for_branch(self, branch, **kwargs):
+        """
+        Internal generator for fetching lists of courses without loading them.
+        """
+        version_guids, id_version_map = self.collect_ids_from_matching_indexes(branch, **kwargs)
+
+        if not version_guids:
+            return
+
+        for entry in self.find_course_blocks_by_id(version_guids):
+            for course_index in id_version_map[entry['_id']]:
+                yield entry, course_index
+
     def _get_structures_for_branch(self, branch, **kwargs):
         """
         Internal generator for fetching lists of courses, libraries, etc.
         """
+        version_guids, id_version_map = self.collect_ids_from_matching_indexes(branch, **kwargs)
 
-        # if we pass in a 'org' parameter that means to
-        # only get the course which match the passed in
-        # ORG
+        if not version_guids:
+            return
 
+        for entry in self.find_structures_by_id(version_guids):
+            for course_index in id_version_map[entry['_id']]:
+                yield entry, course_index
+
+    def collect_ids_from_matching_indexes(self, branch, **kwargs):
+        """
+        Find the course_indexes which have the specified branch. if `kwargs` contains `org`
+        to apply an ORG filter to return only the courses that are part of that ORG. Extract `version_guids`
+        from the course_indexes.
+
+        """
         matching_indexes = self.find_matching_course_indexes(
             branch,
             search_targets=None,
@@ -871,13 +908,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             version_guid = course_index['versions'][branch]
             version_guids.append(version_guid)
             id_version_map[version_guid].append(course_index)
-
-        if not version_guids:
-            return
-
-        for entry in self.find_structures_by_id(version_guids):
-            for course_index in id_version_map[entry['_id']]:
-                yield entry, course_index
+        return version_guids, id_version_map
 
     def _get_structures_for_branch_and_locator(self, branch, locator_factory, **kwargs):
 
@@ -932,6 +963,50 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         # get the blocks for each course index (s/b the root)
         return self._get_structures_for_branch_and_locator(branch, self._create_course_locator, **kwargs)
+
+    @autoretry_read()
+    def get_course_summaries(self, branch, **kwargs):
+        """
+        Returns a list of `CourseSummary` which matching any given qualifiers.
+
+        qualifiers should be a dict of keywords matching the db fields or any
+        legal query for mongo to use against the active_versions collection.
+
+        Note, this is to find the current head of the named branch type.
+        To get specific versions via guid use get_course.
+
+        :param branch: the branch for which to return courses.
+        """
+        def extract_course_summary(course):
+            """
+            Extract course information from the course block for split.
+            """
+            return {
+                field: course.fields[field]
+                for field in CourseSummary.course_info_fields
+                if field in course.fields
+            }
+
+        courses_summaries = []
+        for entry, structure_info in self._get_course_blocks_for_branch(branch, **kwargs):
+            course_locator = self._create_course_locator(structure_info, branch=None)
+            course_block = [
+                block_data
+                for block_key, block_data in entry['blocks'].items()
+                if block_key.type == "course"
+            ]
+            if not course_block:
+                raise ItemNotFoundError
+
+            if len(course_block) > 1:
+                raise MultipleCourseBlocksFound(
+                    "Expected 1 course block to be found in the course, but found {0}".format(len(course_block))
+                )
+            course_summary = extract_course_summary(course_block[0])
+            courses_summaries.append(
+                CourseSummary(course_locator, **course_summary)
+            )
+        return courses_summaries
 
     def get_libraries(self, branch="library", **kwargs):
         """
@@ -1059,7 +1134,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 log.debug("Found more than one item for '{}'".format(usage_key))
             return items[0]
 
-    def get_items(self, course_locator, settings=None, content=None, qualifiers=None, **kwargs):
+    def get_items(self, course_locator, settings=None, content=None, qualifiers=None, include_orphans=True, **kwargs):
         """
         Returns:
             list of XModuleDescriptor instances for the matching items within the course with
@@ -1079,6 +1154,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 For substring matching pass a regex object.
                 For split,
                 you can search by ``edited_by``, ``edited_on`` providing a function testing limits.
+            include_orphans (boolean): Returns all items in a course, including orphans if present.
+                True - This would return all items irrespective of course in tree checking. It may fetch orphans
+                if present in the course.
+                False - if we want only those items which are in the course tree. This would ensure no orphans are
+                fetched.
         """
         if not isinstance(course_locator, CourseLocator) or course_locator.deprecated:
             # The supplied CourseKey is of the wrong type, so it can't possibly be stored in this modulestore.
@@ -1110,7 +1190,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             block_name = qualifiers.pop('name')
             block_ids = []
             for block_id, block in course.structure['blocks'].iteritems():
-                if block_name == block_id.id and _block_matches_all(block):
+                # Do an in comparison on the name qualifier
+                # so that a list can be used to filter on block_id
+                if block_id.id in block_name and _block_matches_all(block):
                     block_ids.append(block_id)
 
             return self._load_items(course, block_ids, **kwargs)
@@ -1121,31 +1203,85 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # don't expect caller to know that children are in fields
         if 'children' in qualifiers:
             settings['children'] = qualifiers.pop('children')
+
+        # No need of these caches unless include_orphans is set to False
+        path_cache = None
+        parents_cache = None
+
+        if not include_orphans:
+            path_cache = {}
+            parents_cache = self.build_block_key_to_parents_mapping(course.structure)
+
         for block_id, value in course.structure['blocks'].iteritems():
             if _block_matches_all(value):
-                items.append(block_id)
+                if not include_orphans:
+                    if (  # pylint: disable=bad-continuation
+                        block_id.type in DETACHED_XBLOCK_TYPES or
+                        self.has_path_to_root(block_id, course, path_cache, parents_cache)
+                    ):
+                        items.append(block_id)
+                else:
+                    items.append(block_id)
 
         if len(items) > 0:
             return self._load_items(course, items, depth=0, **kwargs)
         else:
             return []
 
-    def has_path_to_root(self, block_key, course):
+    def build_block_key_to_parents_mapping(self, structure):
+        """
+        Given a structure, builds block_key to parents mapping for all block keys in structure
+        and returns it
+
+        :param structure: db json of course structure
+
+        :return dict: a dictionary containing mapping of block_keys against their parents.
+        """
+        children_to_parents = defaultdict(list)
+        for parent_key, value in structure['blocks'].iteritems():
+            for child_key in value.fields.get('children', []):
+                children_to_parents[child_key].append(parent_key)
+
+        return children_to_parents
+
+    def has_path_to_root(self, block_key, course, path_cache=None, parents_cache=None):
         """
         Check recursively if an xblock has a path to the course root
 
         :param block_key: BlockKey of the component whose path is to be checked
         :param course: actual db json of course from structures
+        :param path_cache: a dictionary that records which modules have a path to the root so that we don't have to
+        double count modules if we're computing this for a list of modules in a course.
+        :param parents_cache: a dictionary containing mapping of block_key to list of its parents. Optionally, this
+        should be built for course structure to make this method faster.
 
         :return Bool: whether or not component has path to the root
         """
 
-        xblock_parents = self._get_parents_from_structure(block_key, course.structure)
+        if path_cache and block_key in path_cache:
+            return path_cache[block_key]
+
+        if parents_cache is None:
+            xblock_parents = self._get_parents_from_structure(block_key, course.structure)
+        else:
+            xblock_parents = parents_cache[block_key]
+
         if len(xblock_parents) == 0 and block_key.type in ["course", "library"]:
             # Found, xblock has the path to the root
+            if path_cache is not None:
+                path_cache[block_key] = True
+
             return True
 
-        return any(self.has_path_to_root(xblock_parent, course) for xblock_parent in xblock_parents)
+        has_path = any(
+            self.has_path_to_root(xblock_parent, course, path_cache, parents_cache)
+            for xblock_parent in xblock_parents
+        )
+
+        if path_cache is not None:
+            path_cache[block_key] = has_path
+
+        return has_path
 
     def get_parent_location(self, locator, **kwargs):
         """
@@ -2452,6 +2588,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             if isinstance(usage_locator.course_key, LibraryLocator):
                 self._flag_library_updated_event(usage_locator.course_key)
+
+            self._emit_item_deleted_signal(usage_locator, user_id)
 
             return result
 

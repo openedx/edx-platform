@@ -16,7 +16,7 @@ defined in the environment:
 
 import yaml
 
-from .common import *
+from openedx.stanford.cms.envs.common import *
 from openedx.core.lib.logsettings import get_logger_config
 from util.config_parse import convert_tokens
 import os
@@ -247,3 +247,7 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
                                             CELERY_BROKER_PASSWORD,
                                             CELERY_BROKER_HOSTNAME,
                                             CELERY_BROKER_VHOST)
+
+######################## CUSTOM COURSES for EDX CONNECTOR ######################
+if FEATURES.get('CUSTOM_COURSES_EDX'):
+    INSTALLED_APPS += ('openedx.core.djangoapps.ccxcon',)

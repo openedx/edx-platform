@@ -1,7 +1,7 @@
 """
 Student View Transformer
 """
-from openedx.core.lib.block_cache.transformer import BlockStructureTransformer
+from openedx.core.lib.block_structure.transformer import BlockStructureTransformer
 
 
 class StudentViewTransformer(BlockStructureTransformer):

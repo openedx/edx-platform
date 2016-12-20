@@ -722,7 +722,7 @@ class CapaMixin(CapaFields):
             end_time_to_display = min(self.due, end_time_to_display)
 
         content = {
-            'name': self.display_name_with_default,
+            'name': self.display_name_with_default_escaped,
             'html': html,
             'weight': self.weight,
         }
@@ -1227,17 +1227,15 @@ class CapaMixin(CapaFields):
 
         if dog_stats_api:
             dog_stats_api.increment(metric_name('checks'), tags=[u'result:success'])
-            dog_stats_api.histogram(
-                metric_name('correct_pct'),
-                float(published_grade['grade']) / published_grade['max_grade'],
-            )
+            if published_grade['max_grade'] != 0:
+                dog_stats_api.histogram(
+                    metric_name('correct_pct'),
+                    float(published_grade['grade']) / published_grade['max_grade'],
+                )
             dog_stats_api.histogram(
                 metric_name('attempts'),
                 self.attempts,
             )
-
-        if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.runtime.psychometrics_handler(self.get_state_for_lcp())
 
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
@@ -1485,10 +1483,6 @@ class CapaMixin(CapaFields):
         event_info['success'] = success
         event_info['attempts'] = self.attempts
         self.track_function_unmask('problem_rescore', event_info)
-
-        # psychometrics should be called on rescoring requests in the same way as check-problem
-        if hasattr(self.runtime, 'psychometrics_handler'):  # update PsychometricsData using callback
-            self.runtime.psychometrics_handler(self.get_state_for_lcp())
 
         return {'success': success}
 

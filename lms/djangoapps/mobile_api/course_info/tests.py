@@ -10,13 +10,15 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_course_from_xml
 
+from milestones.tests.utils import MilestonesTestCaseMixin
+
 from ..testutils import (
     MobileAPITestCase, MobileCourseAccessTestMixin, MobileAuthTestMixin
 )
 
 
 @ddt.ddt
-class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
+class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/updates
     """
@@ -82,7 +84,7 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTest
             self.assertIn("Update" + str(num), update_data['content'])
 
 
-class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin):
+class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMixin, MilestonesTestCaseMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/handouts
     """

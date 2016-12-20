@@ -1,10 +1,15 @@
 """ Tests paginator methods """
+
+from collections import namedtuple
+
 import ddt
 from mock import Mock, MagicMock
 from unittest import TestCase
 from django.http import Http404
+from django.test import RequestFactory
+from rest_framework import serializers
 
-from openedx.core.lib.api.paginators import paginate_search_results
+from openedx.core.lib.api.paginators import NamespacedPageNumberPagination, paginate_search_results
 
 
 @ddt.ddt
@@ -102,8 +107,7 @@ class PaginateSearchResultsTestCase(TestCase):
         id_range = get_object_range(page_number, page_size)
         db_objects = [build_mock_object(obj_id) for obj_id in id_range]
         self.mock_model.objects.filter = MagicMock(return_value=db_objects)
-
-        page = paginate_search_results(self.mock_model, self.search_results, self.default_size, 'last')
+        page = paginate_search_results(self.mock_model, self.search_results, page_size, 'last')
 
         self.mock_model.objects.filter.assert_called_with(pk__in=id_range)
         self.assertEquals(db_objects, page.object_list)
@@ -116,6 +120,50 @@ class PaginateSearchResultsTestCase(TestCase):
         """
         with self.assertRaises(Http404):
             paginate_search_results(self.mock_model, self.search_results, self.default_size, page_num)
+
+
+class NamespacedPaginationTestCase(TestCase):
+    """
+    Test behavior of `NamespacedPageNumberPagination`
+    """
+
+    TestUser = namedtuple('TestUser', ['username', 'email'])
+
+    class TestUserSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+        """
+        Simple serializer to paginate results from
+        """
+        username = serializers.CharField()
+        email = serializers.CharField()
+
+    expected_data = {
+        'results': [
+            {'username': 'user_5', 'email': 'user_5@example.com'},
+            {'username': 'user_6', 'email': 'user_6@example.com'},
+            {'username': 'user_7', 'email': 'user_7@example.com'},
+            {'username': 'user_8', 'email': 'user_8@example.com'},
+            {'username': 'user_9', 'email': 'user_9@example.com'},
+        ],
+        'pagination': {
+            'next': 'http://testserver/endpoint?page=3&page_size=5',
+            'previous': 'http://testserver/endpoint?page_size=5',
+            'count': 25,
+            'num_pages': 5,
+        }
+    }
+
+    def setUp(self):
+        super(NamespacedPaginationTestCase, self).setUp()
+        self.paginator = NamespacedPageNumberPagination()
+        self.users = [self.TestUser('user_{}'.format(idx), 'user_{}@example.com'.format(idx)) for idx in xrange(25)]
+        self.request_factory = RequestFactory()
+
+    def test_basic_pagination(self):
+        request = self.request_factory.get('/endpoint', data={'page': 2, 'page_size': 5})
+        request.query_params = {'page': 2, 'page_size': 5}
+        paged_users = self.paginator.paginate_queryset(self.users, request)
+        results = self.TestUserSerializer(paged_users, many=True).data
+        self.assertEqual(self.expected_data, self.paginator.get_paginated_response(results).data)
 
 
 def build_mock_object(obj_id):

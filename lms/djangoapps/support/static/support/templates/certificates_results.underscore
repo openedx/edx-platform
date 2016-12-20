@@ -29,12 +29,21 @@
         <td><%- cert.get("grade") %></td>
         <td><%- cert.get("modified") %></td>
         <td>
+            <% if (cert.get("regenerate")) { %>
             <button
                 class="btn-cert-regenerate btn-disable-on-submit"
                 data-username="<%- cert.get("username") %>"
                 data-course-key="<%- cert.get("course_key") %>"
             ><%- gettext("Regenerate") %></button>
             <span class="sr"><%- gettext("Regenerate the user's certificate") %></span>
+             <% } else { %>
+             <button
+                class="btn-cert-generate btn-disable-on-submit"
+                data-username="<%- cert.get("username") %>"
+                data-course-key="<%- cert.get("course_key") %>"
+            ><%- gettext("Generate") %></button>
+            <span class="sr"><%- gettext("Generate the user's certificate") %></span>
+            <% } %>
         </td>
     </tr>
     <% } %>

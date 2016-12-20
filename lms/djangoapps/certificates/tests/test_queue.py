@@ -9,6 +9,7 @@ from nose.plugins.attrib import attr
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from course_modes.models import CourseMode
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
@@ -22,13 +23,14 @@ from xmodule.modulestore.tests.factories import CourseFactory
 # in our `XQueueCertInterface` implementation.
 from capa.xqueue_interface import XQueueInterface
 
-from certificates.queue import XQueueCertInterface
 from certificates.models import (
     ExampleCertificateSet,
     ExampleCertificate,
     GeneratedCertificate,
     CertificateStatuses,
 )
+from certificates.queue import XQueueCertInterface
+from certificates.tests.factories import CertificateWhitelistFactory, GeneratedCertificateFactory
 from lms.djangoapps.verify_student.tests.factories import SoftwareSecurePhotoVerificationFactory
 
 
@@ -74,7 +76,7 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
 
         # Verify that add_cert method does not add message to queue
         self.assertFalse(mock_send.called)
-        certificate = GeneratedCertificate.objects.get(user=self.user, course_id=self.course.id)
+        certificate = GeneratedCertificate.eligible_certificates.get(user=self.user, course_id=self.course.id)
         self.assertEqual(certificate.status, CertificateStatuses.downloadable)
         self.assertIsNotNone(certificate.verify_uuid)
 
@@ -84,7 +86,11 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
         template_name = 'certificate-template-{id.org}-{id.course}.pdf'.format(
             id=self.course.id
         )
-        self.assert_queue_response(mode, mode, template_name)
+        mock_send = self.add_cert_to_queue(mode)
+        if CourseMode.is_eligible_for_certificate(mode):
+            self.assert_certificate_generated(mock_send, mode, template_name)
+        else:
+            self.assert_ineligible_certificate_generated(mock_send, mode)
 
     @ddt.data('credit', 'verified')
     def test_add_cert_with_verified_certificates(self, mode):
@@ -95,10 +101,40 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             id=self.course.id
         )
 
-        self.assert_queue_response(mode, 'verified', template_name)
+        mock_send = self.add_cert_to_queue(mode)
+        self.assert_certificate_generated(mock_send, 'verified', template_name)
 
-    def assert_queue_response(self, mode, expected_mode, expected_template_name):
-        """Dry method for course enrollment and adding request to queue."""
+    def test_ineligible_cert_whitelisted(self):
+        """Test that audit mode students can receive a certificate if they are whitelisted."""
+        # Enroll as audit
+        CourseEnrollmentFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            is_active=True,
+            mode='audit'
+        )
+        # Whitelist student
+        CertificateWhitelistFactory(course_id=self.course.id, user=self.user_2)
+
+        # Generate certs
+        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
+                mock_send.return_value = (0, None)
+                self.xqueue.add_cert(self.user_2, self.course.id)
+
+        # Assert cert generated correctly
+        self.assertTrue(mock_send.called)
+        certificate = GeneratedCertificate.certificate_for_student(self.user_2, self.course.id)
+        self.assertIsNotNone(certificate)
+        self.assertEqual(certificate.mode, 'audit')
+
+    def add_cert_to_queue(self, mode):
+        """
+        Dry method for course enrollment and adding request to
+        queue. Returns a mock object containing information about the
+        `XQueueInterface.send_to_queue` method, which can be used in other
+        assertions.
+        """
         CourseEnrollmentFactory(
             user=self.user_2,
             course_id=self.course.id,
@@ -109,18 +145,103 @@ class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
             with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
                 mock_send.return_value = (0, None)
                 self.xqueue.add_cert(self.user_2, self.course.id)
+                return mock_send
 
+    def assert_certificate_generated(self, mock_send, expected_mode, expected_template_name):
+        """
+        Assert that a certificate was generated with the correct mode and
+        template type.
+        """
         # Verify that the task was sent to the queue with the correct callback URL
         self.assertTrue(mock_send.called)
         __, kwargs = mock_send.call_args_list[0]
 
         actual_header = json.loads(kwargs['header'])
         self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
-        certificate = GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id)
-        self.assertEqual(certificate.mode, expected_mode)
 
         body = json.loads(kwargs['body'])
         self.assertIn(expected_template_name, body['template_pdf'])
+
+        certificate = GeneratedCertificate.eligible_certificates.get(user=self.user_2, course_id=self.course.id)
+        self.assertEqual(certificate.mode, expected_mode)
+
+    def assert_ineligible_certificate_generated(self, mock_send, expected_mode):
+        """
+        Assert that an ineligible certificate was generated with the
+        correct mode.
+        """
+        # Ensure the certificate was not generated
+        self.assertFalse(mock_send.called)
+
+        certificate = GeneratedCertificate.objects.get(  # pylint: disable=no-member
+            user=self.user_2,
+            course_id=self.course.id
+        )
+
+        self.assertIn(certificate.status, (CertificateStatuses.audit_passing, CertificateStatuses.audit_notpassing))
+        self.assertEqual(certificate.mode, expected_mode)
+
+    @ddt.data(
+        (CertificateStatuses.restricted, False),
+        (CertificateStatuses.deleting, False),
+        (CertificateStatuses.generating, True),
+        (CertificateStatuses.unavailable, True),
+        (CertificateStatuses.deleted, True),
+        (CertificateStatuses.error, True),
+        (CertificateStatuses.notpassing, True),
+        (CertificateStatuses.downloadable, True),
+        (CertificateStatuses.auditing, True),
+    )
+    @ddt.unpack
+    def test_add_cert_statuses(self, status, should_generate):
+        """
+        Test that certificates can or cannot be generated with the given
+        certificate status.
+        """
+        with patch('certificates.queue.certificate_status_for_student', Mock(return_value={'status': status})):
+            mock_send = self.add_cert_to_queue('verified')
+            if should_generate:
+                self.assertTrue(mock_send.called)
+            else:
+                self.assertFalse(mock_send.called)
+
+    @ddt.data(
+        (CertificateStatuses.downloadable, 'Pass', CertificateStatuses.generating),
+        (CertificateStatuses.audit_passing, 'Pass', CertificateStatuses.audit_passing),
+        (CertificateStatuses.audit_notpassing, 'Pass', CertificateStatuses.audit_passing),
+        (CertificateStatuses.audit_notpassing, None, CertificateStatuses.audit_notpassing),
+    )
+    @ddt.unpack
+    def test_regen_audit_certs_eligibility(self, status, grade, expected_status):
+        """
+        Test that existing audit certificates remain eligible even if cert
+        generation is re-run.
+        """
+        # Create an existing audit enrollment and certificate
+        CourseEnrollmentFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            is_active=True,
+            mode=CourseMode.AUDIT,
+        )
+        GeneratedCertificateFactory(
+            user=self.user_2,
+            course_id=self.course.id,
+            grade='1.0',
+            status=status,
+            mode=GeneratedCertificate.MODES.audit,
+        )
+
+        # Run grading/cert generation again
+        with patch('courseware.grades.grade', Mock(return_value={'grade': grade, 'percent': 0.75})):
+            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
+                mock_send.return_value = (0, None)
+                self.xqueue.add_cert(self.user_2, self.course.id)
+
+        self.assertEqual(
+            GeneratedCertificate.objects.get(user=self.user_2, course_id=self.course.id).status,  # pylint: disable=no-member
+            expected_status
+        )
 
 
 @attr('shard_1')

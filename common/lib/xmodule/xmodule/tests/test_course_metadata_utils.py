@@ -11,6 +11,7 @@ from xmodule.course_metadata_utils import (
     clean_course_key,
     url_name_for_course_location,
     display_name_with_default,
+    display_name_with_default_escaped,
     number_for_course_location,
     has_course_started,
     has_course_ended,
@@ -133,11 +134,17 @@ class CourseMetadataUtilsTestCase(TestCase):
                 TestScenario((self.demo_course.location,), self.demo_course.location.name),
                 TestScenario((self.html_course.location,), self.html_course.location.name),
             ]),
-            FunctionTest(display_name_with_default, [
+            FunctionTest(display_name_with_default_escaped, [
                 # Test course with no display name.
                 TestScenario((self.demo_course,), "Empty"),
                 # Test course with a display name that contains characters that need escaping.
                 TestScenario((self.html_course,), "Intro to &lt;html&gt;"),
+            ]),
+            FunctionTest(display_name_with_default, [
+                # Test course with no display name.
+                TestScenario((self.demo_course,), "Empty"),
+                # Test course with a display name that contains characters that need escaping.
+                TestScenario((self.html_course,), "Intro to <html>"),
             ]),
             FunctionTest(number_for_course_location, [
                 TestScenario((self.demo_course.location,), "DemoX.1"),

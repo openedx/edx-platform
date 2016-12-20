@@ -9,11 +9,12 @@ else:
 </%def>
 <%!
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
-from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
-from markupsafe import Markup as HTML, escape as HTML_ESCAPE
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+from openedx.core.djangolib.markup import HTML, ugettext as _
 %>
-<%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock) | h}</%block>
+<%block name="title">${xblock.display_name_with_default_escaped} ${xblock_type_display_name(xblock) | h}</%block>
 <%block name="bodyclass">is-signedin course container view-container</%block>
 
 <%namespace name='static' file='static_content.html'/>
@@ -33,11 +34,11 @@ from markupsafe import Markup as HTML, escape as HTML_ESCAPE
 <%block name="requirejs">
     require(["js/factories/container"], function(ContainerFactory) {
         ContainerFactory(
-            ${ escape_json_dumps(component_templates) | n },
-            ${ escape_json_dumps(xblock_info) | n },
-            "${action | h}",
+            ${component_templates | n, dump_js_escaped_json},
+            ${xblock_info | n, dump_js_escaped_json},
+            "${action | n, js_escaped_string}",
             {
-                isUnitPage: ${ escape_json_dumps(is_unit_page) | n },
+                isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
                 canEdit: true
             }
         );
@@ -56,15 +57,15 @@ from markupsafe import Markup as HTML, escape as HTML_ESCAPE
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                        <a href="${ancestor_url | h}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                        <a href="${ancestor_url | h}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default_escaped | h}</a>
                     % else:
-                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
+                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default_escaped | h}</span>
                     % endif
                 % endfor
             </small>
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
-                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default | h}</span></h1>
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default_escaped | h}</span></h1>
             </div>
         </div>
 
@@ -111,10 +112,16 @@ from markupsafe import Markup as HTML, escape as HTML_ESCAPE
                 % if xblock.category == 'split_test':
                     <div class="bit">
                         <h3 class="title-3">${_("Adding components")}</h3>
-                        <p>${_(HTML_ESCAPE("Select a component type under {em_start}Add New Component{em_end}. Then select a template.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
+                        <p>${_("Select a component type under {strong_start}Add New Component{strong_end}. Then select a template.").format(
+                                    strong_start=HTML('<strong>'),
+                                    strong_end=HTML("</strong>"),
+                            )}</p>
                         <p>${_("The new component is added at the bottom of the page or group. You can then edit and move the component.")}</p>
                         <h3 class="title-3">${_("Editing components")}</h3>
-                        <p>${_(HTML_ESCAPE("Click the {em_start}Edit{em_end} icon in a component to edit its content.")).format(em_start=HTML('<strong>'), em_end=HTML("</strong>"))}</p>
+                        <p>${_("Click the {strong_start}Edit{strong_end} icon in a component to edit its content.").format(
+                                    strong_start=HTML('<strong>'),
+                                    strong_end=HTML("</strong>"),
+                            )}</p>
                         <h3 class="title-3">${_("Reorganizing components")}</h3>
                         <p>${_("Drag components to new locations within this component.")}</p>
                         <p>${_("For content experiments, you can drag components to other groups.")}</p>

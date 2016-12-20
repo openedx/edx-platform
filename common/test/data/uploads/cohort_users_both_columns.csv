@@ -1,4 +1,0 @@
-username,email,ignored_column,cohort
-instructor_user,,June,ManualCohort1
-,student_user@example.com,Spring,AutoCohort1
-other_student_user,,Fall,ManualCohort1

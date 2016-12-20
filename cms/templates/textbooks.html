@@ -3,7 +3,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
-from openedx.core.lib.js_utils import escape_json_dumps
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
 %>
 
 <%block name="title">${_("Textbooks")}</%block>
@@ -28,7 +28,7 @@ CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 </%block>
 <%block name="requirejs">
     require(["js/factories/textbooks"], function(TextbooksFactory) {
-        TextbooksFactory(${escape_json_dumps(textbooks) | n});
+        TextbooksFactory(${textbooks | n, dump_js_escaped_json});
     });
 </%block>
 

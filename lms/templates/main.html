@@ -5,9 +5,8 @@ from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
-from microsite_configuration import microsite
-from microsite_configuration import page_title_breadcrumbs
 from branding import api as branding_api
+from microsite_configuration import microsite
 %>
 <!DOCTYPE html>
 <!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
@@ -29,7 +28,7 @@ from branding import api as branding_api
 <%def name="pagetitle()" />
   <%block name="title">
       <title>
-       ${page_title_breadcrumbs(self.pagetitle())}
+       ${static.get_page_title_breadcrumbs(self.pagetitle())}
       </title>
   </%block>
 
@@ -44,12 +43,26 @@ from branding import api as branding_api
       </script>
   % endif
 
-  <script type="text/javascript" src="/i18n.js"></script>
+  <%
+    jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+  %>
 
-  <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
+  <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+
+  <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  <%static:css group='style-main'/>
+  ## We could do <%static:css group='style-main'/>, but that's only useful
+  ## if the group contains multiple files, and the 'style-main' group doesn't.
+  ## Instead, we'll construct this <link> element manually, to improve clarity.
+  ## When nothing in the system is referencing the 'style-main' group, it can
+  ## be removed from the environment file.
+  <%
+  application_css_path = "css/lms-main{rtl}.css".format(
+    rtl="-rtl" if get_language_bidi() else "",
+  )
+  %>
+  <link rel="stylesheet" href="${static.url(application_css_path)}" type="text/css" media="all" />
 
   % if disable_courseware_js:
     <%static:js group='base_vendor'/>
@@ -57,7 +70,6 @@ from branding import api as branding_api
   % else:
     <%static:js group='main_vendor'/>
     <%static:js group='application'/>
-    <%static:js group='module-js'/>
   % endif
 
   <script>
@@ -70,54 +82,47 @@ from branding import api as branding_api
   </script>
   <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
 
+  <%
+    header_extra_file = None
+    google_analytics_file = None
+    self.homepage_overlay_file = None
+    self.homepage_promo_video_file = None
+    self.course_about_sidebar_extra_file = None
+    self.course_about_social_sharing_file = None
+    self.course_info_extra_file = None
+    self.dashboard_extra_file = None
+    self.register_honor_link = marketing_link('TOS') + '#honor'
+    self.register_sidebar_extra_file = None
+
+    if theme_enabled() and not is_microsite():
+      header_extra_file = 'theme-head-extra.html'
+      google_analytics_file = 'theme-google-analytics.html'
+      self.homepage_overlay_file = 'theme-homepage_overlay.html'
+      self.homepage_promo_video_file = 'theme-promo_video.html'
+      self.course_about_sidebar_extra_file = 'theme-course_about-sidebar_extra.html'
+      self.course_about_social_sharing_file = 'theme-course_about-social_sharing.html'
+      self.course_info_extra_file = 'theme-course_info_extra.html'
+      self.dashboard_extra_file = 'theme-dashboard_extra.html'
+      self.register_honor_link = marketing_link('TOS') + '#honor'
+      self.register_sidebar_extra_file = 'theme-register_sidebar.html' # TODO: This is hardcoded in register_sidebar.html because it doesn't inherit this file right now.
+  %>
+  <%block name="js_overrides">
+  </%block>
+
+  % if not disable_courseware_js:
+    <%static:js group='module-js'/>
+  % endif
+
   <%block name="headextra"/>
 
-<%
-  self.homepage_overlay_file = None
-  self.homepage_promo_video_file = None
-  self.homepage_extra_content_file = None
-  self.course_about_sidebar_extra_file = None
-  self.course_about_social_sharing_file = None
-  self.course_index_overlay_file = None
-  self.course_info_extra_file = None
-  self.dashboard_extra_file = None
-  self.register_honor_link = None
-  self.register_sidebar_extra_file = None
-
-  if theme_enabled() and not is_microsite():
-    header_extra_file = 'theme-head-extra.html'
-    header_file = 'theme-header.html'
-    google_analytics_file = 'theme-google-analytics.html'
-
-    style_overrides_file = None
-
-    self.homepage_overlay_file = 'theme-homepage_overlay.html'
-    self.homepage_promo_video_file = 'theme-promo_video.html'
-    self.homepage_extra_content_file = 'theme-extra_home_content.html'
-    self.course_about_sidebar_extra_file = 'theme-course_about-sidebar_extra.html'
-    self.course_about_social_sharing_file = 'theme-course_about-social_sharing.html'
-    self.course_index_overlay_file = 'theme-course_index_overlay.html'
-    self.course_info_extra_file = 'theme-course_info_extra.html'
-    self.dashboard_extra_file = 'theme-dashboard_extra.html'
-    self.register_honor_link = marketing_link('TOS') + "#honor"
-    self.register_sidebar_extra_file = 'theme-register_sidebar.html' # TODO: This is hardcoded in register_sidebar.html because it doesn't inherit this file right now.
-  else:
-    header_extra_file = microsite.get_template_path('header_extra.html')
-
-    if settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
-        header_file = microsite.get_template_path('navigation-edx.html')
-    else:
-        header_file = microsite.get_template_path('navigation.html')
-
-    google_analytics_file = microsite.get_template_path('google_analytics.html')
-
-    style_overrides_file = microsite.get_value('css_overrides_file')
-  google_tag_manager_file = microsite.get_template_path('google_tag_manager.html')
-%>
 
   % if header_extra_file:
     <%include file="${header_extra_file}" />
   % endif
+  % if google_analytics_file:
+    <%include file="${google_analytics_file}" />
+  % endif
+  <%static:optional_include_mako file="head-extra.html" is_theming_enabled="True" />
 
   <%include file="widgets/optimizely.html" />
   <%include file="widgets/segment-io.html" />
@@ -125,16 +130,25 @@ from branding import api as branding_api
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
-  <%include file="${google_analytics_file}" />
+<% ga_acct = static.get_value("GOOGLE_ANALYTICS_ACCOUNT", settings.GOOGLE_ANALYTICS_ACCOUNT) %>
+% if ga_acct:
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', '${ga_acct}']);
+    _gaq.push(['_trackPageview']);
 
-% if style_overrides_file:
-  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
 % endif
 
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-<%include file="${google_tag_manager_file}" />
+<%static:optional_include_mako file="body-initial.html" is_theming_enabled="True" />
 <div id="page-prompt"></div>
 % if not disable_window_wrap:
   <div class="window-wrap" dir="${static.dir_rtl()}">
@@ -142,7 +156,7 @@ from branding import api as branding_api
     <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
 
     % if not disable_header:
-        <%include file="${header_file}" />
+        <%include file="${static.get_template_path('header.html')}" />
     % endif
 
     <div class="content-wrapper" id="content">
@@ -151,16 +165,7 @@ from branding import api as branding_api
     </div>
 
     % if not disable_footer:
-        <%block name="footer">
-          ## Can be overridden by child templates wanting to hide the footer.
-          % if theme_enabled() and not is_microsite():
-            <%include file="theme-footer.html" />
-          % elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
-              <%include file="footer-edx-v3.html" />
-          % else:
-            <%include file="${microsite.get_template_path('footer.html')}" />
-          % endif
-        </%block>
+        <%include file="themable-footer.html" />
     % endif
 
 % if not disable_window_wrap:
@@ -171,6 +176,7 @@ from branding import api as branding_api
   <%include file="widgets/segment-io-footer.html" />
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
   <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
+  <%static:optional_include_mako file="body-extra.html" is_theming_enabled="True" />
 </body>
 </html>
 

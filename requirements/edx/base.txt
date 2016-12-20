@@ -26,14 +26,18 @@ django-oauth-plus==2.2.8
 django-sekizai==0.8.2
 django-ses==0.7.0
 django-simple-history==1.6.3
+django-statici18n==1.1.5
 django-storages-redux==1.3
 django-method-override==0.1.0
 # We need a fix to DRF 3.2.x, for now use it from our own cherry-picked repo
 #djangorestframework>=3.1,<3.2
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
 django==1.8.15
+djangorestframework-jwt==1.7.2
+edx-opaque-keys==0.2.1
+edx-organizations==0.3.1
 edx-rest-api-client==1.2.1
-elasticsearch==0.4.5
+edx-search==0.1.2
 facebook-sdk==0.4.0
 feedparser==5.1.3
 firebase-token-generator==1.3.2
@@ -54,12 +58,13 @@ nose-xunitmp==0.3.2
 oauthlib==0.7.2
 paramiko==1.9.0
 path.py==7.2
+piexif==1.0.2
 Pillow==2.7.0
 polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
 pygraphviz==1.1
-PyJWT==1.0.1
+PyJWT==1.4.0
 pymongo==2.9.1
 pyparsing==2.0.1
 python-memcached==1.48
@@ -68,6 +73,7 @@ python-dateutil==2.1
 
 # This module gets monkey-patched in third_party_auth.py to fix a Django 1.8 incompatibility.
 # When this dependency gets upgraded, the monkey patch should be removed, if possible.
+# We can also remove the fix to auth_url in third_party_auth/saml.py when that fix is included upstream.
 python-social-auth==0.2.12
 
 pytz==2015.2
@@ -89,6 +95,7 @@ unicodecsv==0.9.4
 django-require==1.0.6
 pyuca==1.1
 wrapt==1.10.5
+zendesk==1.1.1
 
 # This needs to be installed *after* Cython, which is in pre.txt
 lxml==3.4.4
@@ -124,9 +131,8 @@ django-cors-headers==1.1.0
 django_debug_toolbar==1.5
 
 # Used for testing
-astroid==1.3.8
 before_after==0.1.3
-bok-choy==0.4.7
+bok-choy==0.4.10
 chrono==1.0.2
 coverage==4.0.2
 ddt==0.8.0
@@ -152,6 +158,7 @@ rednose==0.4.3
 selenium==2.42.1
 splinter==0.5.4
 testtools==0.9.34
+testfixtures==4.5.0
 
 # Used for Segment analytics
 analytics-python==1.1.0

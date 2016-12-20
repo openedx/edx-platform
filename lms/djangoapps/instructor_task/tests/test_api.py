@@ -26,7 +26,7 @@ from instructor_task.api import (
     submit_calculate_may_enroll_csv,
     submit_executive_summary_report,
     submit_course_survey_report,
-    generate_certificates_for_all_students,
+    generate_certificates_for_students,
     regenerate_certificates
 )
 
@@ -38,7 +38,7 @@ from instructor_task.tests.test_base import (InstructorTaskTestCase,
                                              InstructorTaskModuleTestCase,
                                              TestReportMixin,
                                              TEST_COURSE_KEY)
-from certificates.models import CertificateStatuses
+from certificates.models import CertificateStatuses, CertificateGenerationHistory
 
 
 class InstructorTaskReportTest(InstructorTaskTestCase):
@@ -173,7 +173,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         self._test_submit_task(submit_delete_problem_state_for_all_students)
 
 
-@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 
@@ -309,7 +309,7 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
         """
         Tests certificates generation task submission api
         """
-        api_call = lambda: generate_certificates_for_all_students(
+        api_call = lambda: generate_certificates_for_students(
             self.create_task_request(self.instructor),
             self.course.id
         )
@@ -329,3 +329,36 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
                 [CertificateStatuses.downloadable, CertificateStatuses.generating]
             )
         self._test_resubmission(api_call)
+
+    def test_certificate_generation_history(self):
+        """
+        Tests that a new record is added whenever certificate generation/regeneration task is submitted.
+        """
+        instructor_task = generate_certificates_for_students(
+            self.create_task_request(self.instructor),
+            self.course.id
+        )
+        certificate_generation_history = CertificateGenerationHistory.objects.filter(
+            course_id=self.course.id,
+            generated_by=self.instructor,
+            instructor_task=instructor_task,
+            is_regeneration=False
+        )
+
+        # Validate that record was added to CertificateGenerationHistory
+        self.assertTrue(certificate_generation_history.exists())
+
+        instructor_task = regenerate_certificates(
+            self.create_task_request(self.instructor),
+            self.course.id,
+            [CertificateStatuses.downloadable, CertificateStatuses.generating]
+        )
+        certificate_generation_history = CertificateGenerationHistory.objects.filter(
+            course_id=self.course.id,
+            generated_by=self.instructor,
+            instructor_task=instructor_task,
+            is_regeneration=True
+        )
+
+        # Validate that record was added to CertificateGenerationHistory
+        self.assertTrue(certificate_generation_history.exists())

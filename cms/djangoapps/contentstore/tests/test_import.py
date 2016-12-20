@@ -219,26 +219,6 @@ class ContentStoreImportTest(SignalDisconnectTestMixin, ModuleStoreTestCase):
             conditional_module.show_tag_list
         )
 
-    def test_rewrite_reference(self):
-        module_store = modulestore()
-        target_id = module_store.make_course_key('testX', 'peergrading_copy', 'copy_run')
-        import_course_from_xml(
-            module_store,
-            self.user.id,
-            TEST_DATA_DIR,
-            ['open_ended'],
-            target_id=target_id,
-            create_if_not_present=True
-        )
-        peergrading_module = module_store.get_item(
-            target_id.make_usage_key('peergrading', 'PeerGradingLinked')
-        )
-        self.assertIsNotNone(peergrading_module)
-        self.assertEqual(
-            target_id.make_usage_key('combinedopenended', 'SampleQuestion'),
-            peergrading_module.link_to_location
-        )
-
     def test_rewrite_reference_value_dict_published(self):
         """
         Test rewriting references in ReferenceValueDict, specifically with published content.

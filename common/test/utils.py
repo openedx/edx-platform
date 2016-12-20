@@ -34,7 +34,7 @@ class XssTestMixin(object):
     Mixin for testing XSS vulnerabilities.
     """
 
-    def assert_xss(self, response, xss_content):
+    def assert_no_xss(self, response, xss_content):
         """Assert that `xss_content` is not present in the content of
         `response`, and that its escaped version is present. Uses the
         same `markupsafe.escape` function as Mako templates.

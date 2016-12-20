@@ -198,6 +198,9 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='refundable course'
         )
+        self.course.cert_html_view_enabled = True
+        self.course.save()
+        self.store.update_item(self.course, self.user.id)
         self.course_id = self.course.location.course_key
         self.user = UserFactory.create(
             email='joe_user@edx.org',
@@ -207,15 +210,14 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self.user.profile.name = "Joe User"
         self.user.profile.save()
         self.client.login(username=self.user.username, password='foo')
-        self.cert = GeneratedCertificate.objects.create(
+        self.cert = GeneratedCertificate.eligible_certificates.create(
             user=self.user,
             course_id=self.course_id,
-            verify_uuid=uuid4(),
             download_uuid=uuid4(),
             grade="0.95",
             key='the_key',
             distinction=True,
-            status='generated',
+            status='downloadable',
             mode='honor',
             name=self.user.profile.name,
         )
@@ -303,7 +305,9 @@ class MicrositeCertificatesViewsTests(ModuleStoreTestCase):
         self._add_course_certificates(count=1, signatory_count=2)
         response = self.client.get(test_url, HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
         self.assertIn('platform_microsite', response.content)
-        self.assertIn('http://www.microsite.org', response.content)
+
+        # logo url is taken from microsite configuration setting
+        self.assertIn('http://test_microsite.localhost', response.content)
         self.assertIn('This is special microsite aware company_about_description content', response.content)
         self.assertIn('Microsite title', response.content)
 

@@ -1198,6 +1198,10 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(len(matches), 3)
         matches = modulestore().get_items(locator, qualifiers={'category': 'garbage'})
         self.assertEqual(len(matches), 0)
+        matches = modulestore().get_items(locator, qualifiers={'name': 'chapter1'})
+        self.assertEqual(len(matches), 1)
+        matches = modulestore().get_items(locator, qualifiers={'name': ['chapter1', 'chapter2']})
+        self.assertEqual(len(matches), 2)
         matches = modulestore().get_items(
             locator,
             qualifiers={'category': 'chapter'},

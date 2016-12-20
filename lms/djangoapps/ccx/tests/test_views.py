@@ -16,8 +16,6 @@ from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tabs import get_course_tab_list
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.core.urlresolvers import reverse, resolve
 from django.utils.timezone import UTC
 from django.test.utils import override_settings
@@ -52,6 +50,12 @@ from ccx_keys.locator import CCXLocator
 from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import get_override_for_ccx, override_field_for_ccx
 from lms.djangoapps.ccx.tests.factories import CcxFactory
+from lms.djangoapps.ccx.tests.utils import (
+    CcxTestCase,
+    flatten,
+)
+from lms.djangoapps.ccx.utils import is_email
+from lms.djangoapps.ccx.views import get_date
 
 
 def intercept_renderer(path, context):
@@ -113,96 +117,24 @@ def setup_students_and_grades(context):
                     )
 
 
-def is_email(identifier):
-    """
-    Checks if an `identifier` string is a valid email
-    """
-    try:
-        validate_email(identifier)
-    except ValidationError:
-        return False
-    return True
-
-
 @attr('shard_1')
 @ddt.ddt
-class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
     """
     Tests for Custom Courses views.
     """
-    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
 
     @classmethod
     def setUpClass(cls):
         super(TestCoachDashboard, cls).setUpClass()
-        cls.course = course = CourseFactory.create()
-
-        # Create a course outline
-        cls.mooc_start = start = datetime.datetime(
-            2010, 5, 12, 2, 42, tzinfo=pytz.UTC
-        )
-        cls.mooc_due = due = datetime.datetime(
-            2010, 7, 7, 0, 0, tzinfo=pytz.UTC
-        )
-
-        cls.chapters = [
-            ItemFactory.create(start=start, parent=course) for _ in xrange(2)
-        ]
-        cls.sequentials = flatten([
-            [
-                ItemFactory.create(parent=chapter) for _ in xrange(2)
-            ] for chapter in cls.chapters
-        ])
-        cls.verticals = flatten([
-            [
-                ItemFactory.create(
-                    start=start, due=due, parent=sequential, graded=True, format='Homework', category=u'vertical'
-                ) for _ in xrange(2)
-            ] for sequential in cls.sequentials
-        ])
-
-        # Trying to wrap the whole thing in a bulk operation fails because it
-        # doesn't find the parents. But we can at least wrap this part...
-        with cls.store.bulk_operations(course.id, emit_signals=False):
-            blocks = flatten([  # pylint: disable=unused-variable
-                [
-                    ItemFactory.create(parent=vertical) for _ in xrange(2)
-                ] for vertical in cls.verticals
-            ])
 
     def setUp(self):
         """
         Set up tests
         """
         super(TestCoachDashboard, self).setUp()
-
-        # Create instructor account
-        self.coach = coach = AdminFactory.create()
-        self.client.login(username=coach.username, password="test")
-        # create an instance of modulestore
-        self.mstore = modulestore()
-
-    def make_coach(self):
-        """
-        create coach user
-        """
-        role = CourseCcxCoachRole(self.course.id)
-        role.add_users(self.coach)
-
-    def make_ccx(self, max_students_allowed=settings.CCX_MAX_STUDENTS_ALLOWED):
-        """
-        create ccx
-        """
-        ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
-        override_field_for_ccx(ccx, self.course, 'max_student_enrollments_allowed', max_students_allowed)
-        return ccx
-
-    def get_outbox(self):
-        """
-        get fake outbox
-        """
-        from django.core import mail
-        return mail.outbox
+        # Login with the instructor account
+        self.client.login(username=self.coach.username, password="test")
 
     def assert_elements_in_schedule(self, url, n_chapters=2, n_sequentials=4, n_verticals=8):
         """
@@ -286,6 +218,25 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         course_enrollments = get_override_for_ccx(ccx, self.course, 'max_student_enrollments_allowed')
         self.assertEqual(course_enrollments, settings.CCX_MAX_STUDENTS_ALLOWED)
 
+        # assert ccx creator has role=ccx_coach
+        role = CourseCcxCoachRole(course_key)
+        self.assertTrue(role.has_user(self.coach))
+
+    def test_get_date(self):
+        """
+        Assert that get_date returns valid date.
+        """
+        ccx = self.make_ccx()
+        for section in self.course.get_children():
+            self.assertEqual(get_date(ccx, section, 'start'), self.mooc_start)
+            self.assertEqual(get_date(ccx, section, 'due'), None)
+            for subsection in section.get_children():
+                self.assertEqual(get_date(ccx, subsection, 'start'), self.mooc_start)
+                self.assertEqual(get_date(ccx, subsection, 'due'), self.mooc_due)
+                for unit in subsection.get_children():
+                    self.assertEqual(get_date(ccx, unit, 'start', parent_node=subsection), self.mooc_start)
+                    self.assertEqual(get_date(ccx, unit, 'due', parent_node=subsection), self.mooc_due)
+
     @SharedModuleStoreTestCase.modifies_courseware
     @patch('ccx.views.render_to_response', intercept_renderer)
     @patch('ccx.views.TODAY')
@@ -337,15 +288,24 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': CCXLocator.from_course_locator(self.course.id, ccx.id)})
         response = self.client.get(url)
         schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
+
         self.assertEqual(len(schedule), 2)
         self.assertEqual(schedule[0]['hidden'], False)
-        self.assertEqual(schedule[0]['start'], None)
-        self.assertEqual(schedule[0]['children'][0]['start'], None)
-        self.assertEqual(schedule[0]['due'], None)
-        self.assertEqual(schedule[0]['children'][0]['due'], None)
+        # If a coach does not override dates, then dates will be imported from master course.
         self.assertEqual(
-            schedule[0]['children'][0]['children'][0]['due'], None
+            schedule[0]['start'],
+            self.chapters[0].start.strftime('%Y-%m-%d %H:%M')
         )
+        self.assertEqual(
+            schedule[0]['children'][0]['start'],
+            self.sequentials[0].start.strftime('%Y-%m-%d %H:%M')
+        )
+
+        if self.sequentials[0].due:
+            expected_due = self.sequentials[0].due.strftime('%Y-%m-%d %H:%M')
+        else:
+            expected_due = None
+        self.assertEqual(schedule[0]['children'][0]['due'], expected_due)
 
         url = reverse(
             'save_ccx',
@@ -388,7 +348,7 @@ class TestCoachDashboard(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         # scheduled chapter
         ccx = CustomCourseForEdX.objects.get()
         course_start = get_override_for_ccx(ccx, self.course, 'start')
-        self.assertEqual(str(course_start)[:-9], u'2014-11-20 00:00')
+        self.assertEqual(str(course_start)[:-9], self.chapters[0].start.strftime('%Y-%m-%d %H:%M'))
 
         # Make sure grading policy adjusted
         policy = get_override_for_ccx(ccx, self.course, 'grading_policy',
@@ -976,23 +936,3 @@ class TestStudentDashboardWithCCX(ModuleStoreTestCase):
         response = self.client.get(reverse('dashboard'))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search('Test CCX', response.content))
-
-
-def flatten(seq):
-    """
-    For [[1, 2], [3, 4]] returns [1, 2, 3, 4].  Does not recurse.
-    """
-    return [x for sub in seq for x in sub]
-
-
-def iter_blocks(course):
-    """
-    Returns an iterator over all of the blocks in a course.
-    """
-    def visit(block):
-        """ get child blocks """
-        yield block
-        for child in block.get_children():
-            for descendant in visit(child):  # wish they'd backport yield from
-                yield descendant
-    return visit(course)

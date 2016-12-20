@@ -201,17 +201,17 @@ def uninstall_python_packages():
 
         # Uninstall South
         if any(line.startswith("South") for line in frozen):
-            sh("pip uninstall -y South")
+            sh("pip uninstall --disable-pip-version-check -y South")
             uninstalled = True
 
         # Uninstall edx-val
         if any("edxval" in line for line in frozen):
-            sh("pip uninstall -y edxval")
+            sh("pip uninstall --disable-pip-version-check -y edxval")
             uninstalled = True
 
         # Uninstall django-storages
         if any("django-storages==" in line for line in frozen):
-            sh("pip uninstall -y django-storages")
+            sh("pip uninstall --disable-pip-version-check -y django-storages")
             uninstalled = True
 
         if not uninstalled:

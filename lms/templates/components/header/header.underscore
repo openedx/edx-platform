@@ -9,7 +9,7 @@
             <% }) %>
             </nav>
         <% } %>
-        <h2 class="page-title"><%- title %></h2>
+        <h3 class="page-title"><%- title %></h3>
         <p class="page-description"><%- description %></p>
     </div>
     <div class="page-header-secondary"></div>

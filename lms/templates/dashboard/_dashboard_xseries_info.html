@@ -25,7 +25,8 @@
             if enrollment_mode == "verified":
                 xseries_btn_class = "xseries-base-btn";
         %>
-        <a class="btn ${xseries_btn_class}" href="${course_program_info['program_marketing_url']}" target="_blank">
+        <a class="btn ${xseries_btn_class}" href="${course_program_info['program_marketing_url']}" target="_blank"
+           data-program-id="${course_program_info['program_id']}" >
             <i class="action-xseries-icon"></i>
             <span>
                 ${_("View {category} Details").format(category=course_program_info['display_category'])}

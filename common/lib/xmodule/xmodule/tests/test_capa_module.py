@@ -733,6 +733,20 @@ class CapaModuleTest(unittest.TestCase):
         # Expect an AJAX alert message in 'success'
         self.assertIn(error_msg, result['success'])
 
+    def test_check_problem_zero_max_grade(self):
+        """
+        Test that a capa problem with a max grade of zero doesn't generate an error.
+        """
+        # Create the module
+        module = CapaFactory.create(attempts=1)
+
+        # Override the problem score to have a total of zero.
+        module.lcp.get_score = lambda: {'score': 0, 'total': 0}
+
+        # Check the problem
+        get_request_dict = {CapaFactory.input_key(): '3.14'}
+        module.check_problem(get_request_dict)
+
     def test_check_problem_error_nonascii(self):
 
         # Try each exception that capa_module should handle

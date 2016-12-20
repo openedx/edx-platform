@@ -1,14 +1,14 @@
-import os
-import sys
-import re
 import copy
-import logging
-import textwrap
-from django.contrib.auth.models import User
-from lxml import etree
-from path import Path as path
+from datetime import datetime
 from fs.errors import ResourceNotFoundError
+import logging
+from lxml import etree
+import os
+from path import Path as path
 from pkg_resources import resource_string
+import re
+import sys
+import textwrap
 
 from util.date_utils import get_default_time_display
 
@@ -78,10 +78,10 @@ class HtmlBlock(object):
         return Fragment(self.get_html())
 
     def get_html(self):
-        """
-        When we switch this to an XBlock, we can merge this with student_view,
-        but for now the XModule mixin requires that this method be defined.
-        """
+        """ Returns html required for rendering XModule. """
+
+        # When we switch this to an XBlock, we can merge this with student_view,
+        # but for now the XModule mixin requires that this method be defined.
         # pylint: disable=no-member
         if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
@@ -436,6 +436,35 @@ class CourseInfoModule(CourseInfoFields, HtmlModuleMixin):
     # statuses
     STATUS_VISIBLE = 'visible'
     STATUS_DELETED = 'deleted'
+    TEMPLATE_DIR = 'courseware'
+
+    @XBlock.supports("multi_device")
+    def student_view(self, _context):
+        """
+        Return a fragment that contains the html for the student view
+        """
+        return Fragment(self.get_html())
+
+    def get_html(self):
+        """ Returns html required for rendering XModule. """
+
+        # When we switch this to an XBlock, we can merge this with student_view,
+        # but for now the XModule mixin requires that this method be defined.
+        # pylint: disable=no-member
+        if self.data != "":
+            if self.system.anonymous_student_id:
+                return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+            return self.data
+        else:
+            course_updates = [item for item in self.items if item.get('status') == self.STATUS_VISIBLE]
+            course_updates.sort(key=lambda item: datetime.strptime(item['date'], '%B %d, %Y'), reverse=True)
+
+            context = {
+                'visible_updates': course_updates[:3],
+                'hidden_updates': course_updates[3:],
+            }
+
+            return self.system.render_template("{0}/course_updates.html".format(self.TEMPLATE_DIR), context)
 
 
 @XBlock.tag("detached")

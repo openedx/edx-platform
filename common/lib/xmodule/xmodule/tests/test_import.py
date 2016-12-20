@@ -614,22 +614,6 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertRaises(etree.XMLSyntaxError, system.process_xml, bad_xml)
 
-    def test_graphicslidertool_import(self):
-        '''
-        Check to see if definition_from_xml in gst_module.py
-        works properly.  Pulls data from the graphic_slider_tool directory
-        in the test data directory.
-        '''
-        modulestore = XMLModuleStore(DATA_DIR, source_dirs=['graphic_slider_tool'])
-
-        sa_id = SlashSeparatedCourseKey("edX", "gst_test", "2012_Fall")
-        location = sa_id.make_usage_key("graphical_slider_tool", "sample_gst")
-        gst_sample = modulestore.get_item(location)
-        render_string_from_sample_gst_xml = """
-        <slider var="a" style="width:400px;float:left;"/>\
-<plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertIn(render_string_from_sample_gst_xml, gst_sample.data)
-
     def test_word_cloud_import(self):
         modulestore = XMLModuleStore(DATA_DIR, source_dirs=['word_cloud'])
 

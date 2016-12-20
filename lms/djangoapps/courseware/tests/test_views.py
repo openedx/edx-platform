@@ -8,8 +8,7 @@ import ddt
 import json
 import itertools
 import unittest
-import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 from HTMLParser import HTMLParser
 from nose.plugins.attrib import attr
 
@@ -34,12 +33,15 @@ from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
 from certificates.tests.factories import GeneratedCertificateFactory
 from course_modes.models import CourseMode
+from course_modes.tests.factories import CourseModeFactory
 from courseware.model_data import set_score
 from courseware.testutils import RenderXBlockTestMixin
 from courseware.tests.factories import StudentModuleFactory
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.tests import mako_middleware_process_request
+from milestones.tests.utils import MilestonesTestCaseMixin
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.lib.gating import api as gating_api
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, UserFactory, CourseEnrollmentFactory
 from student.tests.factories import NonRegisteredUserFactory
@@ -186,14 +188,15 @@ class ViewsTestCase(ModuleStoreTestCase):
     """
     def setUp(self):
         super(ViewsTestCase, self).setUp()
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(display_name=u'teꜱᴛ course')
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
         self.vertical = ItemFactory.create(category='vertical', parent_location=self.section.location)
         self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
 
         self.course_key = self.course.id
-        self.user = UserFactory(username='dummy', password='123456', email='test@mit.edu')
+        self.password = '123456'
+        self.user = UserFactory(username='dummy', password=self.password, email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
@@ -273,7 +276,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             'f'
         ])
-        self.client.login(username=self.user.username, password="123456")
+        self.client.login(username=self.user.username, password=self.password)
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
@@ -286,7 +289,7 @@ class ViewsTestCase(ModuleStoreTestCase):
             self.section.location.name,
             '1'
         ]
-        self.client.login(username=self.user.username, password="123456")
+        self.client.login(username=self.user.username, password=self.password)
         for idx, val in enumerate(url_parts):
             url_parts_copy = url_parts[:]
             url_parts_copy[idx] = val + u'χ'
@@ -435,7 +438,8 @@ class ViewsTestCase(ModuleStoreTestCase):
             'location': unicode(usage_key),
         })
         response = self.client.get(url)
-        response_content = HTMLParser().unescape(response.content)
+        response_content = HTMLParser().unescape(response.content.decode('utf-8'))
+
         # We have update the state 4 times: twice to change content, and twice
         # to set the scores. We'll check that the identifying content from each is
         # displayed (but not the order), and also the indexes assigned in the output
@@ -487,6 +491,138 @@ class ViewsTestCase(ModuleStoreTestCase):
         else:
             # Verify that the email opt-in checkbox does not appear
             self.assertNotContains(response, checkbox_html, html=True)
+
+    def test_financial_assistance_page(self):
+        self.client.login(username=self.user.username, password=self.password)
+        url = reverse('financial_assistance')
+        response = self.client.get(url)
+        # This is a static page, so just assert that it is returned correctly
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Financial Assistance Application', response.content)
+
+    def test_financial_assistance_form(self):
+        non_verified_course = CourseFactory.create().id
+        verified_course_verified_track = CourseFactory.create().id
+        verified_course_audit_track = CourseFactory.create().id
+        verified_course_deadline_passed = CourseFactory.create().id
+        unenrolled_course = CourseFactory.create().id
+
+        enrollments = (
+            (non_verified_course, CourseMode.AUDIT, None),
+            (verified_course_verified_track, CourseMode.VERIFIED, None),
+            (verified_course_audit_track, CourseMode.AUDIT, None),
+            (verified_course_deadline_passed, CourseMode.AUDIT, datetime.now(UTC) - timedelta(days=1))
+        )
+        for course, mode, expiration in enrollments:
+            CourseModeFactory(mode_slug=CourseMode.AUDIT, course_id=course)
+            if course != non_verified_course:
+                CourseModeFactory(mode_slug=CourseMode.VERIFIED, course_id=course, expiration_datetime=expiration)
+            CourseEnrollmentFactory(course_id=course, user=self.user, mode=mode)
+
+        self.client.login(username=self.user.username, password=self.password)
+        url = reverse('financial_assistance_form')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Ensure that the user can only apply for assistance in
+        # courses which have a verified mode which hasn't expired yet,
+        # where the user is not already enrolled in verified mode
+        self.assertIn(str(verified_course_audit_track), response.content)
+        for course in (
+                non_verified_course,
+                verified_course_verified_track,
+                verified_course_deadline_passed,
+                unenrolled_course
+        ):
+            self.assertNotIn(str(course), response.content)
+
+    def _submit_financial_assistance_form(self, data):
+        """Submit a financial assistance request."""
+        self.client.login(username=self.user.username, password=self.password)
+        url = reverse('submit_financial_assistance_request')
+        return self.client.post(url, json.dumps(data), content_type='application/json')
+
+    @patch.object(views, '_record_feedback_in_zendesk')
+    def test_submit_financial_assistance_request(self, mock_record_feedback):
+        username = self.user.username
+        course = unicode(self.course_key)
+        legal_name = 'Jesse Pinkman'
+        country = 'United States'
+        income = '1234567890'
+        reason_for_applying = "It's just basic chemistry, yo."
+        goals = "I don't know if it even matters, but... work with my hands, I guess."
+        effort = "I'm done, okay? You just give me my money, and you and I, we're done."
+        data = {
+            'username': username,
+            'course': course,
+            'name': legal_name,
+            'email': self.user.email,
+            'country': country,
+            'income': income,
+            'reason_for_applying': reason_for_applying,
+            'goals': goals,
+            'effort': effort,
+            'mktg-permission': False,
+        }
+        response = self._submit_financial_assistance_form(data)
+        self.assertEqual(response.status_code, 204)
+
+        __, ___, ticket_subject, ticket_body, tags, additional_info = mock_record_feedback.call_args[0]
+        mocked_kwargs = mock_record_feedback.call_args[1]
+        group_name = mocked_kwargs['group_name']
+        require_update = mocked_kwargs['require_update']
+        private_comment = '\n'.join(additional_info.values())
+        for info in (country, income, reason_for_applying, goals, effort, username, legal_name, course):
+            self.assertIn(info, private_comment)
+
+        self.assertEqual(additional_info['Allowed for marketing purposes'], 'No')
+
+        self.assertEqual(
+            ticket_subject,
+            u'Financial assistance request for learner {username} in course {course}'.format(
+                username=username,
+                course=self.course.display_name
+            )
+        )
+        self.assertDictContainsSubset({'course_id': course}, tags)
+        self.assertIn('Client IP', additional_info)
+        self.assertEqual(group_name, 'Financial Assistance')
+        self.assertTrue(require_update)
+
+    @patch.object(views, '_record_feedback_in_zendesk', return_value=False)
+    def test_zendesk_submission_failed(self, _mock_record_feedback):
+        response = self._submit_financial_assistance_form({
+            'username': self.user.username,
+            'course': unicode(self.course.id),
+            'name': '',
+            'email': '',
+            'country': '',
+            'income': '',
+            'reason_for_applying': '',
+            'goals': '',
+            'effort': '',
+            'mktg-permission': False,
+        })
+        self.assertEqual(response.status_code, 500)
+
+    @ddt.data(
+        ({}, 400),
+        ({'username': 'wwhite'}, 403),
+        ({'username': 'dummy', 'course': 'bad course ID'}, 400)
+    )
+    @ddt.unpack
+    def test_submit_financial_assistance_errors(self, data, status):
+        response = self._submit_financial_assistance_form(data)
+        self.assertEqual(response.status_code, status)
+
+    def test_financial_assistance_login_required(self):
+        for url in (
+                reverse('financial_assistance'),
+                reverse('financial_assistance_form'),
+                reverse('submit_financial_assistance_request')
+        ):
+            response = self.client.get(url)
+            self.assertRedirects(response, reverse('signin_user') + '?next=' + url)
 
 
 @attr('shard_1')
@@ -759,7 +895,7 @@ class ProgressPageTests(ModuleStoreTestCase):
             )
 
         # Enroll student into course
-        CourseEnrollment.enroll(self.user, self.course.id, mode='honor')
+        CourseEnrollment.enroll(self.user, self.course.id)
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string(), student_id=self.user.id)
         # Assert that valid 'student_id' returns 200 status
         self.assertEqual(resp.status_code, 200)
@@ -827,10 +963,7 @@ class ProgressPageTests(ModuleStoreTestCase):
         self.assertContains(resp, u"View Certificate")
 
         self.assertContains(resp, u"You can keep working for a higher grade")
-        cert_url = certs_api.get_certificate_url(
-            user_id=self.user.id,
-            course_id=self.course.id
-        )
+        cert_url = certs_api.get_certificate_url(course_id=self.course.id, uuid=certificate.verify_uuid)
         self.assertContains(resp, cert_url)
 
         # when course certificate is not active
@@ -1181,6 +1314,55 @@ class TestIndexView(ModuleStoreTestCase):
 
         response = views.index(request, unicode(course.id), chapter=chapter.url_name, section=section.url_name)
         self.assertIn("Activate Block ID: test_block_id", response.content)
+
+
+class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
+    """
+    Test the index view for a course with gated content
+    """
+    def setUp(self):
+        """
+        Set up the initial test data
+        """
+        super(TestIndexViewWithGating, self).setUp()
+
+        self.user = UserFactory()
+        self.course = CourseFactory.create()
+        self.course.enable_subsection_gating = True
+        self.course.save()
+        self.store.update_item(self.course, 0)
+        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
+        self.open_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Open Sequential")
+        self.gated_seq = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Gated Sequential")
+        gating_api.add_prerequisite(self.course.id, self.open_seq.location)
+        gating_api.set_required_content(self.course.id, self.gated_seq.location, self.open_seq.location, 100)
+
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def test_index_with_gated_sequential(self):
+        """
+        Test index view with a gated sequential raises Http404
+        """
+        request = RequestFactory().get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.gated_seq.url_name,
+                }
+            )
+        )
+        request.user = self.user
+        mako_middleware_process_request(request)
+
+        with self.assertRaises(Http404):
+            __ = views.index(
+                request,
+                unicode(self.course.id),
+                chapter=self.chapter.url_name,
+                section=self.gated_seq.url_name
+            )
 
 
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):

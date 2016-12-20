@@ -15,6 +15,7 @@
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/pagination';
 @import 'elements/creative-commons';
 
 // shared - course
@@ -41,7 +42,6 @@
 @import 'multicourse/press_release';
 @import 'multicourse/error-pages';
 @import 'multicourse/help';
-@import 'multicourse/edge';
 @import 'multicourse/survey-page';
 @import 'multicourse/sysadmin';
 
@@ -54,6 +54,8 @@
 @import 'views/shoppingcart';
 @import 'views/homepage';
 @import 'views/support';
+@import "views/financial-assistance";
+@import 'views/bookmarks';
 @import 'course/auto-cert';
 
 // app - discussion

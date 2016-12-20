@@ -222,18 +222,14 @@ class LTIFields(object):
     ask_to_send_username = Boolean(
         display_name=_("Request user's username"),
         # Translators: This is used to request the user's username for a third party service.
-        help=_(
-            "Select True to request the user's username."
-        ),
+        help=_("Select True to request the user's username."),
         default=False,
         scope=Scope.settings
     )
     ask_to_send_email = Boolean(
         display_name=_("Request user's email"),
         # Translators: This is used to request the user's email for a third party service.
-        help=_(
-            "Select True to request the user's email address."
-        ),
+        help=_("Select True to request the user's email address."),
         default=False,
         scope=Scope.settings
     )

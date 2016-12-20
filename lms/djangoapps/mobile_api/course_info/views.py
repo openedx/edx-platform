@@ -37,7 +37,7 @@ class CourseUpdatesList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):
-        course_updates_module = get_course_info_section_module(request, course, 'updates')
+        course_updates_module = get_course_info_section_module(request, request.user, course, 'updates')
         update_items = get_course_update_items(course_updates_module)
 
         updates_to_show = [
@@ -77,7 +77,7 @@ class CourseHandoutsList(generics.ListAPIView):
 
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):
-        course_handouts_module = get_course_info_section_module(request, course, 'handouts')
+        course_handouts_module = get_course_info_section_module(request, request.user, course, 'handouts')
         if course_handouts_module:
             handouts_html = course_handouts_module.data
             handouts_html = replace_static_urls(

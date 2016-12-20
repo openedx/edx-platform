@@ -9,13 +9,12 @@ import urllib
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
 from django.core.urlresolvers import reverse
 
-from courseware.courses import course_image_url
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
@@ -23,6 +22,7 @@ from eventtracking import tracker
 from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.lib.courses import course_image_url
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.views import handle_500
@@ -34,10 +34,13 @@ from certificates.api import (
     get_certificate_url,
     emit_certificate_event,
     has_html_certificates_enabled,
-    get_certificate_template
+    get_certificate_template,
+    get_certificate_header_context,
+    get_certificate_footer_context,
 )
 from certificates.models import (
     GeneratedCertificate,
+    CertificateStatuses,
     CertificateHtmlViewConfiguration,
     CertificateSocialNetworks,
     BadgeAssertion
@@ -150,7 +153,7 @@ def _update_context_with_basic_info(context, course_id, platform_name, configura
 
     # Translators:  'All rights reserved' is a legal term used in copyrighting to protect published content
     reserved = _("All rights reserved")
-    context['copyright_text'] = '&copy; {year} {platform_name}. {reserved}.'.format(
+    context['copyright_text'] = u'&copy; {year} {platform_name}. {reserved}.'.format(
         year=settings.COPYRIGHT_YEAR,
         platform_name=platform_name,
         reserved=reserved
@@ -247,9 +250,9 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     """
     Updates context dictionary with info required for social sharing.
     """
-    share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+    share_settings = microsite.get_value("SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS)
     context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
-    context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
+    context['facebook_app_id'] = microsite.get_value("FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID)
     context['facebook_share_text'] = share_settings.get(
         'CERTIFICATE_FACEBOOK_TEXT',
         _("I completed the {course_title} course on {platform_name}.").format(
@@ -265,12 +268,7 @@ def _update_social_context(request, context, course, user, user_certificate, pla
         )
     )
 
-    share_url = request.build_absolute_uri(
-        reverse(
-            'certificates:html_view',
-            kwargs=dict(user_id=str(user.id), course_id=unicode(course.id))
-        )
-    )
+    share_url = request.build_absolute_uri(get_certificate_url(course_id=course.id, uuid=user_certificate.verify_uuid))
     context['share_url'] = share_url
     twitter_url = ''
     if context.get('twitter_share_enabled', False):
@@ -284,18 +282,13 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     # Clicking this button sends the user to LinkedIn where they
     # can add the certificate information to their profile.
     linkedin_config = LinkedInAddToProfileConfiguration.current()
-
-    # posting certificates to LinkedIn is not currently
-    # supported in microsites/White Labels
-    if linkedin_config.enabled and not microsite.is_request_in_microsite():
+    linkedin_share_enabled = share_settings.get('CERTIFICATE_LINKEDIN', linkedin_config.enabled)
+    if linkedin_share_enabled:
         context['linked_in_url'] = linkedin_config.add_to_profile_url(
             course.id,
             course.display_name,
             user_certificate.mode,
-            smart_str(request.build_absolute_uri(get_certificate_url(
-                user_id=user.id,
-                course_id=unicode(course.id)
-            )))
+            smart_str(share_url)
         )
 
 
@@ -335,33 +328,25 @@ def _get_user_certificate(request, user, course_key, course, preview_mode=None):
     Returns None if there is no certificate generated for given user
     otherwise returns `GeneratedCertificate` instance.
     """
-    try:
-        # Attempt to load the user's generated certificate data
-        if preview_mode:
-            user_certificate = GeneratedCertificate.objects.get(
-                user=user,
-                course_id=course_key,
-                mode=preview_mode
-            )
-        else:
-            user_certificate = GeneratedCertificate.objects.get(
-                user=user,
-                course_id=course_key
-            )
-
-    # If there's no generated certificate data for this user, we need to see if we're in 'preview' mode...
-    # If we are, we'll need to create a mock version of the user_certificate container for previewing
-    except GeneratedCertificate.DoesNotExist:
-        if preview_mode and (
-                has_access(request.user, 'instructor', course) or
-                has_access(request.user, 'staff', course)):
+    user_certificate = None
+    if preview_mode:
+        # certificate is being previewed from studio
+        if has_access(request.user, 'instructor', course) or has_access(request.user, 'staff', course):
             user_certificate = GeneratedCertificate(
                 mode=preview_mode,
                 verify_uuid=unicode(uuid4().hex),
                 modified_date=datetime.now().date()
             )
-        else:
-            return None
+    else:
+        # certificate is being viewed by learner or public
+        try:
+            user_certificate = GeneratedCertificate.eligible_certificates.get(
+                user=user,
+                course_id=course_key,
+                status=CertificateStatuses.downloadable
+            )
+        except GeneratedCertificate.DoesNotExist:
+            pass
 
     return user_certificate
 
@@ -467,13 +452,27 @@ def _update_organization_context(context, course):
     context['organization_logo'] = organization_logo
 
 
+def render_cert_by_uuid(request, certificate_uuid):
+    """
+    This public view generates an HTML representation of the specified certificate
+    """
+    try:
+        certificate = GeneratedCertificate.eligible_certificates.get(
+            verify_uuid=certificate_uuid,
+            status=CertificateStatuses.downloadable
+        )
+        return render_html_view(request, certificate.user.id, unicode(certificate.course_id))
+    except GeneratedCertificate.DoesNotExist:
+        raise Http404
+
+
 @handle_500(
     template_path="certificates/server-error.html",
     test_func=lambda request: request.GET.get('preview', None)
 )
 def render_html_view(request, user_id, course_id):
     """
-    This public view generates an HTML representation of the specified student's certificate
+    This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
     """
     preview_mode = request.GET.get('preview', None)
@@ -534,6 +533,10 @@ def render_html_view(request, user_id, course_id):
 
     # Append microsite overrides
     _update_microsite_context(context, configuration)
+
+    # Add certificate header/footer data to current context
+    context.update(get_certificate_header_context(is_secure=request.is_secure()))
+    context.update(get_certificate_footer_context())
 
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
     context.update(course.cert_html_view_overrides)
