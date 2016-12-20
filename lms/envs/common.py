@@ -1246,6 +1246,7 @@ MIDDLEWARE_CLASSES = (
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
 X_FRAME_OPTIONS = 'ALLOW'
+THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL = ''
 
 ############################### Pipeline #######################################
 

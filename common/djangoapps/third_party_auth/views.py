@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseServerError, Http404
 from django.shortcuts import redirect, render
 from social.apps.django_app.utils import load_strategy, load_backend
 from .models import SAMLConfiguration
+from .decorators import allow_frame_from_whitelisted_url
 
 
 def inactive_user_view(request):
@@ -38,6 +39,7 @@ def saml_metadata_view(request):
     return HttpResponseServerError(content=', '.join(errors))
 
 
+@allow_frame_from_whitelisted_url
 def post_to_custom_auth_form(request):
     """
     Redirect to a custom login/register page.
