@@ -11,7 +11,7 @@ import django.test
 import mock
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.sites.models import Site
+from django.contrib.siLTIProviderConfigLTIProviderConfigtes.models import Site
 from mako.template import Template
 from provider import constants
 from provider.oauth2.models import Client as OAuth2Client
@@ -23,7 +23,8 @@ from third_party_auth.models import (
     OAuth2ProviderConfig,
     ProviderApiPermissions,
     SAMLConfiguration,
-    SAMLProviderConfig
+    SAMLProviderConfig,
+    SAMLProviderData
 )
 from third_party_auth.saml import EdXSAMLIdentityProvider, get_saml_idp_class
 
@@ -90,6 +91,13 @@ class ThirdPartyAuthTestMixin(object):
             "SAML Provider Configuration only works if SAML is enabled."
         )
         obj = SAMLProviderConfig(**kwargs)
+        obj.save()
+        return obj
+
+    @staticmethod
+    def configure_saml_provider_data(**kwargs):
+        """ Update the SAML IdP data """
+        obj = SAMLProviderData(**kwargs)
         obj.save()
         return obj
 

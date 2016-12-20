@@ -14,6 +14,7 @@ from student.models import UserProfile
 from student.views import compose_and_send_activation_email
 
 from .models import SAMLConfiguration
+from .decorators import allow_frame_from_whitelisted_url
 
 URL_NAMESPACE = getattr(settings, setting_name('URL_NAMESPACE'), None) or 'social'
 
@@ -66,6 +67,7 @@ def lti_login_and_complete_view(request, backend, *args, **kwargs):
     return complete(request, backend, *args, **kwargs)
 
 
+@allow_frame_from_whitelisted_url
 def post_to_custom_auth_form(request):
     """
     Redirect to a custom login/register page.
