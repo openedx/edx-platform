@@ -55,7 +55,7 @@ define(['backbone',
                     groupOptions: [{
                         groupTitle: gettext('All Time Zones'),
                         selectOptions: FieldViewsSpecHelpers.SELECT_OPTIONS,
-                        blankTitle: 'Default (Local Time Zone)'
+                        nullValueOptionLabel: 'Default (Local Time Zone)'
                     }],
                     persistChanges: true,
                     required: true
