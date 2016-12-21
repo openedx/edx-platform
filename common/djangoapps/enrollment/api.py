@@ -37,8 +37,9 @@ def get_enrollments(user_id):
                 "mode": "honor",
                 "is_active": True,
                 "user": "Bob",
-                "course": {
+                "course_details": {
                     "course_id": "edX/DemoX/2014T2",
+                    "course_name": "edX Demonstration Course",
                     "enrollment_end": "2014-12-20T20:18:00Z",
                     "enrollment_start": "2014-10-15T20:18:00Z",
                     "course_start": "2015-02-03T00:00:00Z",
@@ -64,8 +65,9 @@ def get_enrollments(user_id):
                 "mode": "verified",
                 "is_active": True,
                 "user": "Bob",
-                "course": {
+                "course_details": {
                     "course_id": "edX/edX-Insider/2014T2",
+                    "course_name": "edX Insider Course",
                     "enrollment_end": "2014-12-20T20:18:00Z",
                     "enrollment_start": "2014-10-15T20:18:00Z",
                     "course_start": "2015-02-03T00:00:00Z",
@@ -111,8 +113,9 @@ def get_enrollment(user_id, course_id):
             "mode": "honor",
             "is_active": True,
             "user": "Bob",
-            "course": {
+            "course_details": {
                 "course_id": "edX/DemoX/2014T2",
+                "course_name": "edX Demonstration Course",
                 "enrollment_end": "2014-12-20T20:18:00Z",
                 "enrollment_start": "2014-10-15T20:18:00Z",
                 "course_start": "2015-02-03T00:00:00Z",
@@ -163,8 +166,9 @@ def add_enrollment(user_id, course_id, mode=None, is_active=True):
             "mode": "audit",
             "is_active": True,
             "user": "Bob",
-            "course": {
+            "course_details": {
                 "course_id": "edX/DemoX/2014T2",
+                "course_name": "edX Demonstration Course",
                 "enrollment_end": "2014-12-20T20:18:00Z",
                 "enrollment_start": "2014-10-15T20:18:00Z",
                 "course_start": "2015-02-03T00:00:00Z",
@@ -217,8 +221,9 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None, enrollment_
             "mode": "honor",
             "is_active": True,
             "user": "Bob",
-            "course": {
+            "course_details": {
                 "course_id": "edX/DemoX/2014T2",
+                "course_name": "edX Demonstration Course",
                 "enrollment_end": "2014-12-20T20:18:00Z",
                 "enrollment_start": "2014-10-15T20:18:00Z",
                 "course_start": "2015-02-03T00:00:00Z",
@@ -282,6 +287,7 @@ def get_course_enrollment_details(course_id, include_expired=False):
         >>> get_course_enrollment_details("edX/DemoX/2014T2")
         {
             "course_id": "edX/DemoX/2014T2",
+            "course_name": "edX Demonstration Course",
             "enrollment_end": "2014-12-20T20:18:00Z",
             "enrollment_start": "2014-10-15T20:18:00Z",
             "course_start": "2015-02-03T00:00:00Z",
