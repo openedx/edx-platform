@@ -80,22 +80,38 @@ site_status_msg = get_site_status_msg(course_id)
       % if user.is_authenticated():
         <ol class="left nav-global list-inline authenticated">
         <%block name="navigation_global_links_authenticated">
-          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing:
-            <li class="item nav-global-01">
-              <a href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
-            </li>
-          % endif
-          % if show_program_listing:
-            <li class="tab-nav-item">
-              <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
-                ${_("Courses")}
-              </a>
-            </li>
-            <li class="tab-nav-item">
-              <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
-                ${_("Programs")}
-              </a>
-            </li>
+          % if settings.FEATURES.get('COURSES_ARE_BROWSABLE_AND_SHOW_PROGRAM_LISTING_NAVIGATE') and context.get('threads') == None:
+              <li class="item nav-global-01 nav-global-01-xseries-style">
+                <a class="${'active ' if marketing_link('COURSES') == request.path else ''}tab-nav-link" href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
+              </li>
+              <li class="tab-nav-item">
+                <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+                  ${_("Courses")}
+                </a>
+              </li>
+              <li class="tab-nav-item">
+                <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+                  ${_("Programs")}
+                </a>
+              </li>
+          % else:
+            % if settings.FEATURES.get('COURSES_ARE_BROWSABLE') and not show_program_listing and context.get('threads') == None:
+              <li class="item nav-global-01">
+                <a href="${marketing_link('COURSES')}">${_('Explore courses')}</a>
+              </li>
+            % endif
+            % if show_program_listing:
+              <li class="tab-nav-item">
+                <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+                  ${_("Courses")}
+                </a>
+              </li>
+              <li class="tab-nav-item">
+                <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+                  ${_("Programs")}
+                </a>
+              </li>
+            % endif
           % endif
           %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
             <li class="item">
