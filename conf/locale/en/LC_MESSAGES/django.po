@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-08 18:16+0000\n"
-"PO-Revision-Date: 2016-12-08 18:16:30.652885\n"
+"POT-Creation-Date: 2016-12-15 12:33+0000\n"
+"PO-Revision-Date: 2016-12-15 12:33:13.411493\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -374,6 +374,10 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid "You must consent to data sharing to register."
 msgstr ""
 
 #: common/djangoapps/student/forms.py
@@ -1190,6 +1194,19 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"I agree to allow {platform_name} to share data about my enrollment, "
+"completion and performance in all {platform_name} courses and programs where"
+" my enrollment is sponsored by {ec_name}."
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"To link your account with {ec_name}, you are required to consent to data "
+"sharing."
 msgstr ""
 
 #: common/djangoapps/util/file.py
@@ -4185,6 +4202,10 @@ msgstr ""
 msgid "Powered by Open edX"
 msgstr ""
 
+#: lms/djangoapps/branding/api.py
+msgid "{platform_name} for Business"
+msgstr ""
+
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
 msgid "Blog"
 msgstr ""
@@ -4215,11 +4236,6 @@ msgid "Donate"
 msgstr ""
 
 #: lms/djangoapps/branding/api.py
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr ""
-
-#: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
 msgstr ""
 
@@ -4241,6 +4257,11 @@ msgstr ""
 
 #: lms/djangoapps/branding/api.py
 msgid "Sitemap"
+msgstr ""
+
+#: lms/djangoapps/branding/api.py
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
@@ -9310,11 +9331,11 @@ msgid "Could not find user by email address '{email}'."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "User {email} has registered but has not yet activated his/her account."
+msgid "No `role` specified."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "No `role` specified."
+msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
@@ -9823,7 +9844,6 @@ msgid "Add a Post"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion thread list"
 msgstr ""
 
@@ -9832,8 +9852,20 @@ msgid "New topic form"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "User Profile"
-msgstr ""
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s discussion started"
+msgid_plural "%s discussions started"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s comment"
+msgid_plural "%s comments"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance.html
 msgid "Discussion unavailable"
@@ -11138,10 +11170,6 @@ msgstr ""
 
 #: lms/templates/user_dropdown.html
 msgid "Profile"
-msgstr ""
-
-#: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
 msgstr ""
 
 #: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
@@ -13350,20 +13378,6 @@ msgstr ""
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
 msgstr ""
-
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s discussion started"
-msgid_plural "%s discussions started"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s comment"
-msgid_plural "%s comments"
-msgstr[0] ""
-msgstr[1] ""
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -17007,11 +17021,9 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid ""
-"After you have configured and previewed your certificate, ask your edX "
-"partner manager to activate your certificate. When your certificate has been"
-" activated, you can begin issuing certificates to learners. Course team "
-"members without the Admin role cannot edit or delete an activated "
-"certificate."
+"To begin issuing certificates, a course team member with the Admin role "
+"selects {em_start}Activate{em_end}. Only course team members with the Admin "
+"role can edit or delete an activated certificate."
 msgstr ""
 
 #: cms/templates/certificates.html
@@ -19569,7 +19581,7 @@ msgstr ""
 #: cms/templates/videos_index.html
 msgid ""
 "For a video to play on different devices, it needs to be available in "
-"multiple formats. After you upload an original video file in .mp4 or .mov "
+"multiple formats. After you upload an original video file in {file_formats} "
 "format on this page, an automated process creates those additional formats "
 "and stores them for you."
 msgstr ""
@@ -19620,13 +19632,13 @@ msgstr ""
 
 #: cms/templates/videos_index.html
 msgid ""
-"When status for a file is {em_start}Ready{em_end}, you can add that video to"
-" a component in your course. Copy the unique video ID. In another browser "
-"window, on the Course Outline page, create or locate a video component to "
-"play this video. Edit the video component to paste the ID into the Advanced "
-"{em_start}Video ID{em_end} field. The video can play in the LMS as soon as "
-"its status is {em_start}Ready{em_end}, although processing may not be "
-"complete for all encodings and all video hosting sites."
+"When the status for a file is {em_start}Ready{em_end}, you can add that "
+"video to a component in your course. Copy the unique video ID. In another "
+"browser window, on the Course Outline page, create or locate a video "
+"component to play this video. Edit the video component to paste the ID into "
+"the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS"
+" as soon as its status is {em_start}Ready{em_end}, although processing may "
+"not be complete for all encodings and all video hosting sites."
 msgstr ""
 
 #: cms/templates/visibility_editor.html

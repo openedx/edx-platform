@@ -80,27 +80,11 @@ li[class*=forum-nav-thread-label-] {
   }
 }
 
-// -------------
-// new post form
-// -------------
-
-.forum-new-post-form,
-.edit-post-form {
-  // Override global label rules
-  .post-type {
-    text-shadow: none;
-  }
-
-  .post-type {
-    margin-bottom: 0;
-  }
-}
-
 // -------
 // Actions
 // -------
 
-.discussion.container, .discussion-module {
+.discussion {
 
   // Override courseware
   .post-actions-list, .response-actions-list, .comment-actions-list {

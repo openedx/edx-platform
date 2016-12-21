@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-01 16:15+0000\n"
+"POT-Creation-Date: 2016-12-08 18:46+0000\n"
 "PO-Revision-Date: 2016-10-30 14:15+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -1578,14 +1578,6 @@ msgstr "(שורת קוד מקור אינה זמינה)"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "ראה שורת XML מקור {sourcenum}."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "JavaScript Input"
-msgstr "קלט JavaScript"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Execution of unsafe Javascript code is not allowed."
-msgstr "אין הרשאה להפעלת קוד לא בטוח של Javascript. "
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html

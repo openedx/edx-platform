@@ -1,9 +1,15 @@
-<label class="field-label">
-    <span class="field-label-text">
-        <%- gettext("Topic Area:") %>
-    </span><select class="post-topic field-input" aria-describedby="field_help_topic_area" required>
-        <%= edx.HtmlUtils.ensureHtml(topics_html) %>
-    </select>
-</label><span class="field-help" id="field_help_topic_area">
-    <%- gettext("Add your post to a relevant topic to help others find it.") %>
-</span>
+<div class="post-field">
+    <label class="field-label">
+        <span class="field-label-text">
+            <%- gettext("Topic area") %>
+        </span>
+        <div class="field-help" id="field_help_topic_area">
+            <%- gettext("Add your post to a relevant topic to help others find it.") %>
+        </div>
+        <div class="field-input">
+            <select class="post-topic field-input" aria-describedby="field_help_topic_area" required>
+                <%= edx.HtmlUtils.ensureHtml(topics_html) %>
+            </select>
+        </div>
+    </label>
+</div>

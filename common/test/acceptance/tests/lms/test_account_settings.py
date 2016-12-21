@@ -421,7 +421,7 @@ class AccountSettingsPageTest(AccountSettingsTestMixin, AcceptanceTest):
         self._test_dropdown_field(
             u'time_zone',
             u'Time Zone',
-            u'',
+            u'Default (Local Time Zone)',
             [
                 u'Europe/Kiev ({abbr}, UTC{offset})'.format(abbr=kiev_abbr, offset=kiev_offset),
                 u'US/Pacific ({abbr}, UTC{offset})'.format(abbr=pacific_abbr, offset=pacific_offset),

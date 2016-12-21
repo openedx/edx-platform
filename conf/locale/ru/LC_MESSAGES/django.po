@@ -195,7 +195,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-01 16:15+0000\n"
+"POT-Creation-Date: 2016-12-08 18:46+0000\n"
 "PO-Revision-Date: 2016-05-09 11:27+0000\n"
 "Last-Translator: Liubov Fomicheva <liubov.nelapa@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/open-edx/edx-platform/language/ru/)\n"
@@ -1730,14 +1730,6 @@ msgstr "(Строка исходного кода недоступна)"
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "Показать исходную строку XML {sourcenum}."
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "JavaScript Input"
-msgstr "Ввод JavaScript"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Execution of unsafe Javascript code is not allowed."
-msgstr "Не разрешается исполнение небезопасного Javascript кода."
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
