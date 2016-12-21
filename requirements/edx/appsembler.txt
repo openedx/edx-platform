@@ -1,6 +1,7 @@
 django-extensions==1.5.9
-django-mailgun==0.8.0
 libsass==0.11.1
 python-intercom==0.2.13
 raven==5.21.0
 requests==2.8.1
+django-anymail==0.6.1
+

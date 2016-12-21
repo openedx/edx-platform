@@ -9,9 +9,14 @@ INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
 )
 
-EMAIL_BACKEND = 'django_mailgun.MailgunBackend'
-MAILGUN_ACCESS_KEY = AUTH_TOKENS.get("MAILGUN_ACCESS_KEY")
-MAILGUN_SERVER_NAME = AUTH_TOKENS.get("MAILGUN_SERVER_NAME")
+MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
+
+if MANDRILL_API_KEY:
+    EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', 'anymail.backends.mandrill.MandrillBackend')
+    ANYMAIL = {
+        "MANDRILL_API_KEY": MANDRILL_API_KEY,
+    }
+    INSTALLED_APPS += ("anymail",)
 
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
