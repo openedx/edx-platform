@@ -1981,6 +1981,61 @@ class TestIndexViewWithGating(ModuleStoreTestCase, MilestonesTestCaseMixin):
         self.assertEquals(response.status_code, 404)
 
 
+class TestRenderVerticalXBlock(ModuleStoreTestCase):
+    """
+    Test rendering Vertical XBlock.
+    """
+
+    def setUp(self):
+        """
+        Set up the initial test data
+        """
+        super(TestRenderVerticalXBlock, self).setUp()
+
+        self.user = UserFactory()
+
+        self.course = CourseFactory.create()
+        self.chapter = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.course.location, category='chapter', display_name="Chapter"
+        )
+        self.section = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.chapter.location, category='sequential', display_name="Sequence"
+        )
+        self.vertical = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.section.location, category='vertical', display_name="Vertical"
+        )
+        self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.vertical.location, category='html', data="Test HTML Content"
+        )
+
+        CourseEnrollmentFactory(user=self.user, course_id=self.course.id)
+
+    def get_response(self):
+        """ Returns the HTML for the page with vertical block"""
+
+        self.assertTrue(self.client.login(username=self.user.username, password='test'))
+        return self.client.get(
+            reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(self.course.id),
+                    'chapter': self.chapter.url_name,
+                    'section': self.section.url_name,
+                }
+            )
+        )
+
+    def test_bookmark_available(self):
+        """
+        Check that vertical block contains bookmarks section
+        """
+        response = self.get_response()
+        self.assertContains(response, self.html_block.data, status_code=200)
+
+        response_content = HTMLParser().unescape(response.content.decode('utf-8'))
+        self.assertIn(RenderXBlockTestMixin.BOOKMARK_HTML_ELEMENT, response_content)
+
+
 class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
     """
     Tests for the courseware.render_xblock endpoint.
@@ -1992,7 +2047,7 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
 
-    def get_response(self, url_encoded_params=None):
+    def get_response(self, url_encoded_params=None, usage_id=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
@@ -2000,6 +2055,33 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)
+
+    def test_vertical_block_chromeless_view(self):
+        """
+        Test that vertical block doesn't contain bookmarks.
+        """
+        self.course = CourseFactory.create()
+        self.setup_user(admin=True, enroll=True, login=True)
+
+        self.chapter = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.course.location, category='chapter', display_name="Chapter"
+        )
+        self.section = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.chapter.location, category='sequential', display_name="Sequence"
+        )
+        self.vertical = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.section.location, category='vertical', display_name="Vertical"
+        )
+        self.html_block = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent_location=self.vertical.location, category='html', data="Test HTML Content"
+        )
+
+        url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.vertical.location)})
+        response = self.client.get(url)
+
+        for chrome_element in [self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS]:
+            self.assertNotContains(response, chrome_element)
+        self.assertNotContains(response, self.BOOKMARK_HTML_ELEMENT)
 
 
 class TestRenderXBlockSelfPaced(TestRenderXBlock):
