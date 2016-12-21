@@ -5,9 +5,7 @@ Tests for users API
 import datetime
 
 import ddt
-import httpretty
 from mock import patch
-import mock
 from nose.plugins.attrib import attr
 import pytz
 from django.conf import settings
@@ -28,9 +26,6 @@ from courseware.access_response import (
 )
 from course_modes.models import CourseMode
 from lms.djangoapps.grades.tests.utils import mock_passing_grade
-from openedx.core.djangoapps.catalog.tests import factories
-from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
-from openedx.core.djangoapps.catalog.utils import get_course_runs
 from openedx.core.lib.courses import course_image_url
 from student.models import CourseEnrollment
 from util.milestones_helpers import set_prerequisite_courses
@@ -468,8 +463,7 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin,
 @attr(shard=2)
 @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
 @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
-@httpretty.activate
-class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin, CatalogIntegrationMixin):
+class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin):
     """
     Test the course enrollment serializer
     """
@@ -478,13 +472,6 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin,
         self.login_and_enroll()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
-        self.catalog_integration = self.create_catalog_integration(
-            internal_api_url="http://catalog.example.com:443/api/v1",
-            cache_ttl=1
-        )
-        self.course_id_string = unicode(self.course.id)
-        self.course_run = factories.CourseRun(key=self.course_id_string)
-        self.course_keys = [self.course_id_string]
 
     def test_success(self):
         serialized = CourseEnrollmentSerializer(
@@ -506,41 +493,3 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin,
         ).data
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
         self.assertEqual(serialized['course']['org'], self.course.display_organization)
-
-    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
-    def test_course_about_marketing_url(self):
-        self.register_catalog_course_run_response(self.course_keys, [self.course_run])
-        catalog_course_runs_against_course_keys = get_course_runs(self.course_keys, self.request.user)
-        enrollment = CourseEnrollment.enrollments_for_user(self.user)[0]
-        serialized = CourseEnrollmentSerializer(
-            enrollment,
-            context={
-                'request': self.request,
-                "catalog_course_run": (
-                    catalog_course_runs_against_course_keys[unicode(enrollment.course_id)]
-                    if unicode(enrollment.course_id) in catalog_course_runs_against_course_keys else None
-                )
-            },
-        ).data
-        self.assertEqual(
-            serialized['course']['course_about'], self.course_run["marketing_url"]
-        )
-
-    @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False})
-    def test_course_about_lms_url(self):
-        self.register_catalog_course_run_response(self.course_keys, [self.course_run])
-        catalog_course_runs_against_course_keys = get_course_runs(self.course_keys, self.request.user)
-        enrollment = CourseEnrollment.enrollments_for_user(self.user)[0]
-        serialized = CourseEnrollmentSerializer(
-            enrollment,
-            context={
-                'request': self.request,
-                "catalog_course_run": (
-                    catalog_course_runs_against_course_keys[unicode(enrollment.course_id)]
-                    if unicode(enrollment.course_id) in catalog_course_runs_against_course_keys else None
-                )
-            },
-        ).data
-        self.assertEqual(
-            serialized['course']['course_about'], "http://localhost:8000/courses/{}/about".format(self.course_id_string)
-        )
