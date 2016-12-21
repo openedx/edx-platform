@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 from courseware.access import has_access
 from certificates.api import certificate_downloadable_status
 from student.models import CourseEnrollment, User
-from util.course import get_link_for_about_page
+from util.course import get_link_for_about_page_from_cache
 
 
 class CourseOverviewField(serializers.RelatedField):
@@ -50,8 +50,8 @@ class CourseOverviewField(serializers.RelatedField):
                 }
             },
             'course_image': course_overview.course_image_url,
-            'course_about': get_link_for_about_page(
-                course_overview.id, request.user, self.context.get('catalog_course_run')
+            'course_about': get_link_for_about_page_from_cache(
+                course_overview.id, self.context.get('catalog_course_run')
             ),
             'course_updates': reverse(
                 'course-updates-list',
