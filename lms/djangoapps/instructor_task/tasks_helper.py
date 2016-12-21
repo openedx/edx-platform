@@ -28,6 +28,7 @@ from lms.djangoapps.instructor.paidcourse_enrollment_report import PaidCourseEnr
 from lms.djangoapps.teams.models import CourseTeamMembership
 from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from pytz import UTC
+from track import contexts
 from xmodule.modulestore.django import modulestore
 from xmodule.split_test_module import get_split_user_partitions
 
@@ -573,20 +574,24 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
                 result['new_raw_possible'],
                 module_descriptor.weight,
             )
-            tracker.emit(
-                unicode(GRADES_RESCORE_EVENT_TYPE),
-                {
-                    'course_id': unicode(course_id),
-                    'user_id': unicode(student.id),
-                    'problem_id': unicode(usage_key),
-                    'new_weighted_earned': new_weighted_earned,
-                    'new_weighted_possible': new_weighted_possible,
-                    'only_if_higher': task_input['only_if_higher'],
-                    'instructor_id': unicode(xmodule_instance_args['request_info']['user_id']),
-                    'event_transaction_id': unicode(event_transaction_id),
-                    'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
-                }
-            )
+
+            # TODO: remove this context manager after completion of AN-6134
+            context = contexts.course_context_from_course_id(course_id)
+            with tracker.get_tracker().context(GRADES_RESCORE_EVENT_TYPE, context):
+                tracker.emit(
+                    unicode(GRADES_RESCORE_EVENT_TYPE),
+                    {
+                        'course_id': unicode(course_id),
+                        'user_id': unicode(student.id),
+                        'problem_id': unicode(usage_key),
+                        'new_weighted_earned': new_weighted_earned,
+                        'new_weighted_possible': new_weighted_possible,
+                        'only_if_higher': task_input['only_if_higher'],
+                        'instructor_id': unicode(xmodule_instance_args['request_info']['user_id']),
+                        'event_transaction_id': unicode(event_transaction_id),
+                        'event_transaction_type': unicode(GRADES_RESCORE_EVENT_TYPE),
+                    }
+                )
 
         return UPDATE_STATUS_SUCCEEDED
 
