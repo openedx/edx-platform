@@ -1,7 +1,8 @@
 """
 Tests for ContentLibraryTransformer.
 """
-import mock
+import ddt
+
 from student.tests.factories import CourseEnrollmentFactory
 
 from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
@@ -23,6 +24,7 @@ class MockedModule(object):
         self.state = state
 
 
+@ddt.ddt
 class ContentLibraryTransformerTestCase(CourseStructureTestCase):
     """
     ContentLibraryTransformer Test
@@ -138,14 +140,14 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
 
         vertical2_selected = self.get_block_key_set(self.blocks, 'vertical2').pop() in trans_keys
         vertical3_selected = self.get_block_key_set(self.blocks, 'vertical3').pop() in trans_keys
-        self.assertTrue(vertical2_selected or vertical3_selected)
 
-        # Check course structure again, with mocked selected modules for a user.
-        with mock.patch(
-            'lms.djangoapps.course_blocks.transformers.library_content.ContentLibraryTransformer._get_student_module',
-            return_value=MockedModule('{"selected": [["vertical", "vertical_vertical2"]]}'),
-        ):
-            clear_course_from_cache(self.course.id)
+        self.assertNotEquals(vertical2_selected, vertical3_selected)  # only one of them should be selected
+        selected_vertical = 'vertical2' if vertical2_selected else 'vertical3'
+        selected_child = 'html1' if vertical2_selected else 'html2'
+
+        # Check course structure again.
+        clear_course_from_cache(self.course.id)
+        for i in range(5):
             trans_block_structure = get_course_blocks(
                 self.user,
                 self.course.location,
@@ -160,7 +162,8 @@ class ContentLibraryTransformerTestCase(CourseStructureTestCase):
                     'lesson1',
                     'vertical1',
                     'library_content1',
-                    'vertical2',
-                    'html1'
-                )
+                    selected_vertical,
+                    selected_child,
+                ),
+                "Expected 'selected' equality failed in iteration {}.".format(i)
             )
