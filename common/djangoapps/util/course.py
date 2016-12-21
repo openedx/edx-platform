@@ -20,8 +20,9 @@ def get_link_for_about_page(course_key, user, catalog_course_run=None):
     if settings.FEATURES.get('ENABLE_MKTG_SITE'):
         if catalog_course_run:
             marketing_url = catalog_course_run.get('marketing_url')
-        else:
-            marketing_url = get_run_marketing_url(course_key, user)
+        # TODO MA-3052 Getting the course runs from the catalog service doesn't scale.
+        # else:
+        #     marketing_url = get_run_marketing_url(course_key, user)
         if marketing_url:
             return marketing_url
 

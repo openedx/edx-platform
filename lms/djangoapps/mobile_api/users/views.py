@@ -278,8 +278,10 @@ class UserCourseEnrollmentsList(APIView):
                 is_active=True
             ).order_by('created').reverse()
         )
-        course_ids = [enrollment.course_id for enrollment in enrollments]
-        catalog_course_runs_against_course_keys = get_course_runs(course_ids, request.user)
+        # TODO MA-3052 Getting the course runs from the catalog service doesn't scale.
+        # course_ids = [enrollment.course_id for enrollment in enrollments]
+        # catalog_course_runs_against_course_keys = get_course_runs(course_ids, request.user)
+        catalog_course_runs_against_course_keys = {}
 
         org = request.query_params.get('org', None)
 
