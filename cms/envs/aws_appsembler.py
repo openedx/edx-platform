@@ -24,3 +24,4 @@ if SENTRY_DSN:
 
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
 
+CUSTOM_LOGOUT_REDIRECT_URL = ENV_TOKENS.get('CUSTOM_LOGOUT_REDIRECT_URL', '/')
