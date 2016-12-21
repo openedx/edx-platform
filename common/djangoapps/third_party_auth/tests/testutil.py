@@ -19,6 +19,7 @@ from third_party_auth.models import (
     OAuth2ProviderConfig,
     SAMLProviderConfig,
     SAMLConfiguration,
+    SAMLProviderData,
     LTIProviderConfig,
     cache as config_cache,
     ProviderApiPermissions,
@@ -84,6 +85,13 @@ class ThirdPartyAuthTestMixin(object):
         """ Update the settings for a SAML-based third party auth provider """
         self.assertTrue(SAMLConfiguration.is_enabled(), "SAML Provider Configuration only works if SAML is enabled.")
         obj = SAMLProviderConfig(**kwargs)
+        obj.save()
+        return obj
+
+    @staticmethod
+    def configure_saml_provider_data(**kwargs):
+        """ Update the SAML IdP data """
+        obj = SAMLProviderData(**kwargs)
         obj.save()
         return obj
 
