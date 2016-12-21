@@ -22,8 +22,8 @@
         <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-help-message-<%- id %>">
             <% _.each(groupOptions, function(groupOption) { %>
                 <% if (showBlankOption) { %>
-                    <% if (groupOption.blankTitle) { %>
-                        <option value=""><%- groupOption.blankTitle %></option>
+                    <% if (groupOption.nullValueOptionLabel) { %>
+                        <option value=""><%- groupOption.nullValueOptionLabel %></option>
                     <% } else { %>
                         <option value=""></option>
                     <% } %>
