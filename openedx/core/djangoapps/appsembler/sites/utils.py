@@ -722,7 +722,117 @@ def get_initial_page_elements():
                 }
               ]
             }
-          }
+          },
+            {
+                "element-type": "layout-single-col",
+                "element-path": "page-builder/layouts/_single-col.html",
+                "options": {
+                    "layout-bg-image": "",
+                    "bg-color": "#fff",
+                    "margin-right": "marg-r-0",
+                    "margin-bottom": "marg-b-0",
+                    "layout-bg-image-size": "bg-img-size--cover",
+                    "text-color": "#000",
+                    "margin-top": "marg-t-0",
+                    "padding-right": "padd-r-0",
+                    "margin-left": "marg-l-0",
+                    "padding-bottom": "padd-b-20",
+                    "align-content": "align-content-center",
+                    "text-alignment": "text-align--left",
+                    "padding-top": "padd-t-20",
+                    "padding-left": "padd-l-0"
+                },
+                "children": {
+                    "column-1": [
+                        {
+                            "element-type": "layout-single-col",
+                            "element-path": "page-builder/layouts/_single-col.html",
+                            "options": {
+                                "layout-bg-image": "",
+                                "bg-color": "#34495e",
+                                "margin-right": "marg-r-0",
+                                "margin-bottom": "marg-b-0",
+                                "layout-bg-image-size": "bg-img-size--cover",
+                                "text-color": "#000",
+                                "margin-top": "marg-t-0",
+                                "padding-right": "padd-r-0",
+                                "margin-left": "marg-l-0",
+                                "padding-bottom": "padd-b-0",
+                                "align-content": "align-content-center",
+                                "text-alignment": "text-align--left",
+                                "padding-top": "padd-t-5",
+                                "padding-left": "padd-l-0"
+                            },
+                            "children": {
+                                "column-1": []
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "element-type": "layout-single-col",
+                "element-path": "page-builder/layouts/_single-col.html",
+                "options": {
+                    "layout-bg-image": "",
+                    "bg-color": "#fff",
+                    "margin-right": "marg-r-0",
+                    "margin-bottom": "marg-b-50",
+                    "layout-bg-image-size": "bg-img-size--cover",
+                    "text-color": "#000",
+                    "margin-top": "marg-t-0",
+                    "padding-right": "padd-r-0",
+                    "margin-left": "marg-l-0",
+                    "padding-bottom": "padd-b-100",
+                    "align-content": "align-content-center",
+                    "text-alignment": "text-align--left",
+                    "padding-top": "padd-t-75",
+                    "padding-left": "padd-l-0"
+                },
+                "children": {
+                    "column-1": [
+                        {
+                            "element-type": "heading",
+                            "element-path": "page-builder/elements/_heading.html",
+                            "options": {
+                                "font-size": "font-size--32px",
+                                "margin-right": "marg-r-0",
+                                "margin-bottom": "marg-b-20",
+                                "text-color": "#0090c1",
+                                "margin-top": "marg-t-0",
+                                "margin-left": "marg-l-0",
+                                "text-content": "Here's an example of courses listing:",
+                                "font-family": "font--primary--regular",
+                                "text-alignment": "text-align--left"
+                            }
+                        },
+                        {
+                            "element-type": "paragraph-text",
+                            "element-path": "page-builder/elements/_paragraph.html",
+                            "options": {
+                                "font-size": "font-size--14px",
+                                "margin-right": "marg-r-0",
+                                "margin-bottom": "marg-b-30",
+                                "text-color": "#323232",
+                                "margin-top": "marg-t-5",
+                                "margin-left": "marg-l-0",
+                                "text-content": "You can list a number of your latest courses on the Index page using the \"Courses Listing\" page element that you can add through our Page editor. Please note that this element can only be added to the Index page.",
+                                "font-family": "font--primary--regular",
+                                "text-alignment": "text-align--left"
+                            }
+                        },
+                        {
+                            "element-type": "courses-listing",
+                            "element-path": "page-builder/elements/_courses-listing.html",
+                            "options": {
+                                "tile-type": "course-tile-01",
+                                "num-of-courses": "4",
+                                "text-alignment": "text-align--left"
+                            }
+                        }
+                    ]
+                }
+            }
         ]
       },
       "about":{
