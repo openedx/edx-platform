@@ -1,5 +1,5 @@
 """
-Test grading event across apps.
+Test grading events across apps.
 """
 # pylint: disable=protected-access
 
