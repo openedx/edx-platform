@@ -19,7 +19,8 @@
   .discussion-article {
     position: relative;
 
-    a {
+    a,
+    p {
       word-wrap: break-word;
     }
   }

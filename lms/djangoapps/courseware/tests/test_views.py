@@ -1992,11 +1992,19 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
 
-    def get_response(self, url_encoded_params=None):
+    def test_render_xblock_with_invalid_usage_key(self):
+        """
+        Test XBlockRendering with invalid usage key
+        """
+        response = self.get_response(usage_key='some_invalid_usage_key')
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('Page not found', response.content)
+
+    def get_response(self, url_encoded_params=None, usage_key=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
-        url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        url = reverse('render_xblock', kwargs={'usage_key_string': unicode(usage_key)})
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)

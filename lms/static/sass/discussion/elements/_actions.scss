@@ -58,7 +58,7 @@
     position: absolute;
     top: 100%;
     pointer-events: none;
-    min-width: ($baseline*6.5);
+    min-width: $actions-dropdown-width;
 
     &.is-expanded {
       display: block;
