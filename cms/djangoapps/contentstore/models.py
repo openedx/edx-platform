@@ -2,6 +2,7 @@
 Models for contentstore
 """
 
+from django.db import models
 from django.db.models.fields import TextField
 
 from config_models.models import ConfigurationModel
@@ -22,3 +23,16 @@ class VideoUploadConfig(ConfigurationModel):
 
 class PushNotificationConfig(ConfigurationModel):
     """Configuration for mobile push notifications."""
+
+
+class ManagementCommand(models.Model):
+    """
+    Management commands for escalation dashboard.
+    """
+    name = models.CharField(max_length=30, blank=True)
+    slug = models.CharField(max_length=30, blank=True)
+    short_desc = models.CharField(max_length=50, blank=True)
+    desc = models.CharField(max_length=200, blank=True)
+
+    def __unicode__(self):
+        return self.name

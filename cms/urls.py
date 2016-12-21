@@ -93,6 +93,17 @@ urlpatterns += patterns(
     url(r'^course_rerun/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_rerun_handler', name='course_rerun_handler'),
     url(r'^container/{}$'.format(settings.USAGE_KEY_PATTERN), 'container_handler'),
     url(r'^orphan/{}$'.format(settings.COURSE_KEY_PATTERN), 'orphan_handler'),
+    ### Management Dashboard
+    url(r'^manage/{}/draft_orphans'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.print_draft_orphans'),
+    url(r'^manage/{}/published_orphans'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.print_published_orphans'),
+    url(r'^manage/{}/force_publish'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.force_publish_course'),
+    url(r'^manage/{}/export_course'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.export_course'),
+    url(r'^manage/{}/import_course'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.import_course'),
+    url(r'^manage/{}/fix_not_found'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.fix_not_found'),
+    url(r'^manage/{}/delete_orphans'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.delete_orphans'),
+    url(r'^manage/{}/delete_course'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.delete_course'),
+    url(r'^manage/{}/$'.format(settings.COURSE_KEY_PATTERN), 'management_dashboard.dashboard'),
+
     url(r'^assets/{}/{}?$'.format(settings.COURSE_KEY_PATTERN, settings.ASSET_KEY_PATTERN), 'assets_handler'),
     url(r'^import/{}$'.format(COURSELIKE_KEY_PATTERN), 'import_handler'),
     url(r'^import_status/{}/(?P<filename>.+)$'.format(COURSELIKE_KEY_PATTERN), 'import_status_handler'),
