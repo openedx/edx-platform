@@ -12,6 +12,7 @@ from django.core.management.base import CommandError
 from django.conf import settings
 from django.utils.six import StringIO
 
+from requests import exceptions
 from requests.models import Response
 
 from third_party_auth.tests.factories import SAMLConfigurationFactory, SAMLProviderConfigFactory
@@ -119,10 +120,11 @@ class TestSAMLCommand(TestCase):
         # Create enabled configurations
         self.__create_saml_configurations__()
 
-        # Capture command output log for testing.
-        call_command("saml", pull=True, stdout=self.stdout)
+        with self.assertRaisesRegexp(CommandError, r"HTTPError: 404 Client Error"):
+            # Capture command output log for testing.
+            call_command("saml", pull=True, stdout=self.stdout)
 
-        self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
 
     @mock.patch("requests.get", mock_get(status_code=200))
     def test_fetch_multiple_providers_data(self):
@@ -160,7 +162,85 @@ class TestSAMLCommand(TestCase):
             }
         )
 
-        # Capture command output log for testing.
-        call_command("saml", pull=True, stdout=self.stdout)
+        with self.assertRaisesRegexp(CommandError, r"MetadataParseError: Can't find EntityDescriptor for entityID"):
+            # Capture command output log for testing.
+            call_command("saml", pull=True, stdout=self.stdout)
 
-        self.assertIn('Done. Fetched 3 total. 2 were updated and 1 failed.', self.stdout.getvalue())
+            self.assertIn('Done. Fetched 3 total. 2 were updated and 1 failed.', self.stdout.getvalue())
+
+    @mock.patch("requests.get")
+    def test_saml_request_exceptions(self, mocked_get):
+        """
+        Test that management command errors out in case of fatal exceptions instead of failing silently.
+        """
+        # Create enabled configurations
+        self.__create_saml_configurations__()
+
+        mocked_get.side_effect = exceptions.SSLError
+
+        with self.assertRaisesRegexp(CommandError, "SSLError:"):
+            # Capture command output log for testing.
+            call_command("saml", pull=True, stdout=self.stdout)
+
+            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+
+        mocked_get.side_effect = exceptions.ConnectionError
+
+        with self.assertRaisesRegexp(CommandError, "ConnectionError:"):
+            # Capture command output log for testing.
+            call_command("saml", pull=True, stdout=self.stdout)
+
+            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+
+        mocked_get.side_effect = exceptions.HTTPError
+
+        with self.assertRaisesRegexp(CommandError, "HTTPError:"):
+            # Capture command output log for testing.
+            call_command("saml", pull=True, stdout=self.stdout)
+
+            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+
+    @mock.patch("requests.get", mock_get(status_code=200))
+    def test_saml_parse_exceptions(self):
+        """
+        Test that management command errors out in case of fatal exceptions instead of failing silently.
+        """
+        # Create enabled configurations, this configuration will raise MetadataParseError.
+        self.__create_saml_configurations__(
+            saml_config={
+                "site__domain": "third.testserver.fake",
+            },
+            saml_provider_config={
+                "site__domain": "third.testserver.fake",
+                "idp_slug": "third-test-shib",
+                # Note: This entity id will not be present in returned response and will cause failed update.
+                "entity_id": "https://idp.testshib.org/idp/non-existent-shibboleth",
+                "metadata_source": "https://www.testshib.org/metadata/third/testshib-providers.xml",
+            }
+        )
+
+        with self.assertRaisesRegexp(CommandError, "MetadataParseError: Can't find EntityDescriptor for entityID"):
+            # Capture command output log for testing.
+            call_command("saml", pull=True, stdout=self.stdout)
+
+            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())
+
+    @mock.patch("requests.get")
+    def test_xml_parse_exceptions(self, mocked_get):
+        """
+        Test that management command errors out in case of fatal exceptions instead of failing silently.
+        """
+        response = Response()
+        response._content = ""  # pylint: disable=protected-access
+        response.status_code = 200
+
+        mocked_get.return_value = response
+
+        # create enabled configuration
+        self.__create_saml_configurations__()
+
+        with self.assertRaisesRegexp(CommandError, "XMLSyntaxError:"):
+            # Capture command output log for testing.
+            call_command("saml", pull=True, stdout=self.stdout)
+
+            self.assertIn('Done. Fetched 1 total. 0 were updated and 1 failed.', self.stdout.getvalue())

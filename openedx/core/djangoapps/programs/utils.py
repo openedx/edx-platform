@@ -145,9 +145,6 @@ def attach_program_detail_url(programs):
     Returns:
         list, containing extended program dicts
     """
-    programs_config = ProgramsApiConfig.current()
-    marketing_url = get_program_marketing_url(programs_config)
-
     for program in programs:
         base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
         slug = slugify(program['name'])

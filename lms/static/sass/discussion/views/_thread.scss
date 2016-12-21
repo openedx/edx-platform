@@ -13,37 +13,40 @@
 .discussion-post {
     padding: 0 ($baseline/2);
 
-    .wrapper-post-header {
-        padding-bottom: 0;
-    }
-
-    .post-header-content {
-        display: inline-block;
-        width: flex-grid(9,12);
-    }
-
     .post-header-actions {
         @include float(right);
     }
+}
 
-    .post-body {
-        width: flex-grid(10,12);
+// post article
+.discussion-article {
+    .posted-details {
+        @extend %t-copy-sub2;
+        @extend %t-light;
+        margin: ($baseline/5) 0;
+        color: $forum-color-copy-light;
+
+        .username {
+            @extend %t-strong;
+            display: inline;
+        }
+
+        .timeago, .top-post-status {
+            color: inherit;
+        }
     }
 }
 
-.posted-details {
-    @extend %t-copy-sub2;
-    margin: ($baseline/5) 0;
-    color: $gray-d1;
+.thread-title {
+    display: block;
+    margin-bottom: $baseline;
+    font-size: $forum-x-large-font-size;
+    color: $gray-d3;
+    font-weight: 600;
+}
 
-    .username {
-        @extend %t-strong;
-        display: inline;
-    }
-
-    .timeago, .top-post-status {
-        color: inherit;
-    }
+.thread-responses-wrapper {
+    padding: 0 ($baseline/2);
 }
 
 // response layout
@@ -60,7 +63,12 @@
         @include float(right);
         @include right($baseline);
         position: absolute;
-        top: $baseline;
+        top: ($baseline/2);
+    }
+
+    // response body
+    .response-body {
+        @extend %t-copy-sub1;
     }
 }
 
@@ -74,7 +82,7 @@
         width: flex-grid(10,12);
 
         p + p {
-            margin-top: 12px;
+            margin-top: ($baseline/2);
         }
     }
 
@@ -94,58 +102,56 @@
 }
 
 // +thread - elements - shared styles
-body.discussion {
+.discussion-post, .discussion-response, .discussion-comment {
+    @include clearfix();
 
-    .discussion-post, .discussion-response, .discussion-comment {
-        @include clearfix();
+    // thread - images
+    .author-image {
+        @include margin-right($baseline/2);
+        display: inline-block;
+        vertical-align: top;
 
-        // thread - images
-        .author-image {
-            @include margin-right($baseline/2);
-            display: inline-block;
-            vertical-align: top;
-
-            // STATE: No profile image
-            &:empty {
-                display: none;
-            }
-
-            // CASE: post image
-            &.level-post {
-                height: $post-image-dimension;
-                width: $post-image-dimension;
-            }
-
-            // CASE: response image
-            &.level-response {
-                height: $response-image-dimension;
-                width: $response-image-dimension;
-            }
-
-            // CASE: comment image
-            &.level-comment {
-                height: $comment-image-dimension;
-                width: $comment-image-dimension;
-            }
-
-            img {
-                border-radius: $forum-border-radius;
-            }
+        // STATE: No profile image
+        &:empty {
+            display: none;
         }
-    }
 
-    .discussion-response .response-body {
-        @include padding-right($baseline); //ensures content doesn't overlap on post or response actions.
+        // CASE: post image
+        &.level-post {
+            height: $post-image-dimension;
+            width: $post-image-dimension;
+        }
+
+        // CASE: response image
+        &.level-response {
+            height: $response-image-dimension;
+            width: $response-image-dimension;
+        }
+
+        // CASE: comment image
+        &.level-comment {
+            height: $comment-image-dimension;
+            width: $comment-image-dimension;
+        }
+
+        img {
+            border-radius: $forum-border-radius;
+        }
     }
 }
 
+.discussion-response .response-body {
+    @include padding(($baseline/2), $baseline, 0, 0); //ensures content doesn't overlap on post or response actions.
+    margin-bottom: 0.2em;
+    font-size: $forum-base-font-size;
+}
+
 // +post - individual element styling
-// NOTE: discussion-article is used for inline discussion modules.
-.discussion-post,
-.discussion-article {
+.discussion-post {
     @include clearfix();
 
     .post-header-content {
+        max-width: calc(100% - 100px);
 
         // post title
         .post-title {
@@ -157,23 +163,18 @@ body.discussion {
     // post body
     .post-body {
         @extend %t-copy-sub1;
-        // clear: both; //TO-DO: confirm that removing this is ok for all cases of discussion posts.
+        padding: ($baseline/2) 0;
     }
 
     // post context
     .post-context {
         @extend %t-copy-sub2;
-        margin-top: $baseline;
-        color: $gray-d1;
+        @extend %t-light;
+        color: $forum-color-copy-light;
 
         // CASE: no courseware context or cohort visibility rules
         &:empty {
             display: none;
-        }
-
-        // post visibility - cohorts
-        .group-visibility-label {
-            margin-top: ($baseline/4);
         }
     }
 }
@@ -186,10 +187,6 @@ body.discussion {
 
     p {
         margin-bottom: 0;
-    }
-
-    .thread-main-wrapper, .thread-responses-wrapper {
-        padding: $baseline;
     }
 
     .discussion-article {
@@ -239,11 +236,6 @@ body.discussion {
                         font-size: $forum-large-font-size;
                     }
                 }
-
-                .response-body {
-                    margin-bottom: 0.2em;
-                    font-size: $forum-base-font-size;
-                }
             }
 
             .discussion-reply-new {
@@ -282,13 +274,6 @@ body.discussion {
                 }
             }
         }
-    }
-}
-
-// Custom styling for the list of user threads
-.discussion-user-threads {
-    .discussion-post {
-        padding: $baseline/2;
     }
 }
 

@@ -1,8 +1,18 @@
-define(
-    ['jquery', 'underscore', 'backbone', 'js/models/active_video_upload', 'js/views/baseview', 'js/views/active_video_upload', 'jquery.fileupload'],
-    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'js/models/active_video_upload',
+    'js/views/baseview',
+    'js/views/active_video_upload',
+    'common/js/components/views/feedback_notification',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'text!templates/active-video-upload-list.underscore',
+    'jquery.fileupload'
+],
+    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, NotificationView, HtmlUtils,
+             activeVideoUploadListTemplate) {
         'use strict';
-
         var ActiveVideoUploadListView = BaseView.extend({
             tagName: 'div',
             events: {
@@ -12,20 +22,26 @@ define(
             },
 
             initialize: function(options) {
-                this.template = this.loadTemplate('active-video-upload-list');
+                this.template = HtmlUtils.template(activeVideoUploadListTemplate)({});
                 this.collection = new Backbone.Collection();
                 this.itemViews = [];
                 this.listenTo(this.collection, 'add', this.addUpload);
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
+                this.videoSupportedFileFormats = options.videoSupportedFileFormats;
                 this.onFileUploadDone = options.onFileUploadDone;
                 if (options.uploadButton) {
                     options.uploadButton.click(this.chooseFile.bind(this));
                 }
+                // error message modal for file uploads
+                this.fileErrorMsg = null;
             },
 
             render: function() {
-                this.$el.html(this.template());
+                HtmlUtils.setHtml(
+                    this.$el,
+                    this.template
+                );
                 _.each(this.itemViews, this.renderUploadView.bind(this));
                 this.$uploadForm = this.$('.file-upload-form');
                 this.$dropZone = this.$uploadForm.find('.file-drop-area');
@@ -80,6 +96,8 @@ define(
 
             chooseFile: function(event) {
                 event.preventDefault();
+                // hide error message if any present.
+                this.hideErrorMessage();
                 this.$uploadForm.find('.js-file-input').click();
             },
 
@@ -101,41 +119,52 @@ define(
             // indicate that the correct upload url has already been retrieved
             fileUploadAdd: function(event, uploadData) {
                 var view = this,
-                    model;
-                if (uploadData.redirected) {
-                    model = new ActiveVideoUpload({fileName: uploadData.files[0].name, videoId: uploadData.videoId});
-                    this.collection.add(model);
-                    uploadData.cid = model.cid;
-                    uploadData.submit();
+                    model,
+                    errorMsg;
+
+                // Validate file
+                errorMsg = view.validateFile(uploadData);
+                if (errorMsg) {
+                    view.showErrorMessage(errorMsg);
                 } else {
-                    $.ajax({
-                        url: this.postUrl,
-                        contentType: 'application/json',
-                        data: JSON.stringify({
-                            files: _.map(
-                                uploadData.files,
-                                function(file) {
-                                    return {'file_name': file.name, 'content_type': file.type};
+                    if (uploadData.redirected) {
+                        model = new ActiveVideoUpload({
+                            fileName: uploadData.files[0].name,
+                            videoId: uploadData.videoId
+                        });
+                        this.collection.add(model);
+                        uploadData.cid = model.cid; // eslint-disable-line no-param-reassign
+                        uploadData.submit();
+                    } else {
+                        $.ajax({
+                            url: this.postUrl,
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                files: _.map(
+                                    uploadData.files,
+                                    function(file) {
+                                        return {file_name: file.name, content_type: file.type};
+                                    }
+                                )
+                            }),
+                            dataType: 'json',
+                            type: 'POST'
+                        }).done(function(responseData) {
+                            _.each(
+                                responseData.files,
+                                function(file, index) {
+                                    view.$uploadForm.fileupload('add', {
+                                        files: [uploadData.files[index]],
+                                        url: file.upload_url,
+                                        videoId: file.edx_video_id,
+                                        multipart: false,
+                                        global: false,  // Do not trigger global AJAX error handler
+                                        redirected: true
+                                    });
                                 }
-                            )
-                        }),
-                        dataType: 'json',
-                        type: 'POST'
-                    }).done(function(responseData) {
-                        _.each(
-                            responseData['files'],
-                            function(file, index) {
-                                view.$uploadForm.fileupload('add', {
-                                    files: [uploadData.files[index]],
-                                    url: file['upload_url'],
-                                    videoId: file.edx_video_id,
-                                    multipart: false,
-                                    global: false,  // Do not trigger global AJAX error handler
-                                    redirected: true
-                                });
-                            }
-                        );
-                    });
+                            );
+                        });
+                    }
                 }
             },
 
@@ -169,6 +198,52 @@ define(
                 this.setStatus(data.cid, ActiveVideoUpload.STATUS_FAILED);
             },
 
+            hideErrorMessage: function() {
+                if (this.fileErrorMsg) {
+                    this.fileErrorMsg.hide();
+                    this.fileErrorMsg = null;
+                }
+            },
+
+            readMessages: function(messages) {
+                if ($(window).prop('SR') !== undefined) {
+                    $(window).prop('SR').readTexts(messages);
+                }
+            },
+
+            showErrorMessage: function(errorMsg) {
+                var titleMsg = gettext('Your file could not be uploaded');
+                this.fileErrorMsg = new NotificationView.Error({
+                    title: titleMsg,
+                    message: errorMsg
+                });
+                this.fileErrorMsg.show();
+                this.readMessages([titleMsg, errorMsg]);
+            },
+
+            validateFile: function(data) {
+                var self = this,
+                    error = '',
+                    fileName,
+                    fileType;
+
+                $.each(data.files, function(index, file) {  // eslint-disable-line consistent-return
+                    fileName = file.name;
+                    fileType = fileName.substr(fileName.lastIndexOf('.'));
+                    // validate file type
+                    if (!_.contains(self.videoSupportedFileFormats, fileType)) {
+                        error = gettext(
+                            '{filename} is not in a supported file format. ' +
+                            'Supported file formats are {supportedFileFormats}.'
+                        )
+                        .replace('{filename}', fileName)
+                        .replace('{supportedFileFormats}', self.videoSupportedFileFormats.join(' and '));
+                        return false;
+                    }
+                });
+                return error;
+            },
+
             removeViewAt: function(index) {
                 this.itemViews.splice(index);
                 this.$('.active-video-upload-list li').eq(index).remove();
@@ -197,9 +272,7 @@ define(
                 // Alert screen readers that the uploads were successful
                 if (completedMessages.length) {
                     completedMessages.push(gettext('Previous Uploads table has been updated.'));
-                    if ($(window).prop('SR') !== undefined) {
-                        $(window).prop('SR').readTexts(completedMessages);
-                    }
+                    this.readMessages(completedMessages);
                 }
             }
         });

@@ -51,6 +51,7 @@ class Thread(ContentFactory):
     group_id = None
     pinned = False
     read = False
+    context = "course"
 
 
 class Comment(ContentFactory):

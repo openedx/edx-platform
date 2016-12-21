@@ -9,7 +9,7 @@
         <div class="post-extended-content thread-responses-wrapper">
             <% if (!readOnly) { %>
                 <div class="add-response">
-                    <button class="btn-brand btn-small add-response-btn">
+                    <button class="btn btn-small add-response-btn">
                         <%- gettext("Add a Response") %>
                     </button>
                 </div>
@@ -26,14 +26,10 @@
                 <ul class="discussion-errors"></ul>
                 <div class="reply-body" data-id="<%- id %>"></div>
                 <div class="reply-post-control">
-                    <button class="btn-brand discussion-submit-post control-button"><%- gettext("Submit") %></button>
+                    <button class="btn discussion-submit-post control-button"><%- gettext("Submit") %></button>
                 </div>
             </form>
             <% } %>
         </div>
-    </div>
-    <div class="post-tools">
-        <button class="btn-link forum-thread-expand"><span class="icon fa fa-plus" aria-hidden="true"/><%- gettext("Expand discussion") %></button>
-        <button class="btn-link forum-thread-collapse"><span class="icon fa fa-minus" aria-hidden="true"/><%- gettext("Collapse discussion") %></button>
     </div>
 </article>

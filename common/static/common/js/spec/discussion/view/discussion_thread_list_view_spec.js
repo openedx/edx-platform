@@ -188,12 +188,11 @@
         renderSingleThreadWithProps = function(props) {
             return makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render();
         };
-        makeView = function(discussion, options) {
-            var opts = options || {};
+        makeView = function(discussion) {
             return new DiscussionThreadListView({
                 el: $('#fixture-element'),
                 collection: discussion,
-                showThreadPreview: opts.showThreadPreview || true,
+                showThreadPreview: true,
                 courseSettings: new DiscussionCourseSettings({
                     is_cohorted: true
                 })
@@ -551,7 +550,7 @@
             it('does not add a search alert when no alternate term was searched', function() {
                 testCorrection(this.view, null);
                 expect(this.view.addSearchAlert.calls.count()).toEqual(1);
-                return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no threads matched/i);
+                return expect(this.view.addSearchAlert.calls.mostRecent().args[0]).toMatch(/no posts matched/i);
             });
 
             it('clears search alerts when a new search is performed', function() {
@@ -676,10 +675,8 @@
             it('should not be shown when showThreadPreview is false', function() {
                 var view,
                     discussion = new Discussion([]),
-                    options = {
-                        showThreadPreview: false
-                    };
-                view = makeView(discussion, options);
+                    showThreadPreview = false;
+                view = makeView(discussion, showThreadPreview);
                 view.render();
                 expect(view.$el.find('.thread-preview-body').length).toEqual(0);
             });

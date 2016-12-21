@@ -31,6 +31,7 @@ from student.cookies import set_logged_in_cookies
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
+from util.enterprise_helpers import insert_enterprise_fields
 from .preferences.api import get_country_time_zones, update_email_opt_in
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
@@ -278,6 +279,9 @@ class RegistrationView(APIView):
                     form_desc,
                     required=self._is_field_required(field_name)
                 )
+
+        # Add any Enterprise fields if the app is enabled
+        insert_enterprise_fields(request, form_desc)
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 

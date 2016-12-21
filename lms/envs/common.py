@@ -249,10 +249,14 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
-    # When a user goes to the homepage ('/') the user see the
+    # When a user goes to the homepage ('/') the user sees the
     # courses listed in the announcement dates order - this is default Open edX behavior.
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
+
+    # When set to True, a list of programs is displayed along with the list of courses
+    # when the user visits the homepage or the find courses page.
+    'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
@@ -361,6 +365,9 @@ FEATURES = {
     # Note: This has no effect unless ANALYTICS_DASHBOARD_URL is already set,
     #       because without that setting, the tab does not show up for any courses.
     'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
+
+    # Set this to False to facilitate cleaning up invalid xml from your modulestore.
+    'ENABLE_XBLOCK_XML_VALIDATION': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -2662,7 +2669,6 @@ OPTIONAL_APPS = (
 
     # Enterprise App (http://github.com/edx/edx-enterprise)
     'enterprise',
-
     # Required by the Enterprise App
     'django_object_actions',  # https://github.com/crccheck/django-object-actions
 )

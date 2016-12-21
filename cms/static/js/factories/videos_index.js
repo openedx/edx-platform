@@ -9,12 +9,14 @@ define([
         encodingsDownloadUrl,
         concurrentUploadLimit,
         uploadButton,
-        previousUploads
+        previousUploads,
+        videoSupportedFileFormats
     ) {
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
                 uploadButton: uploadButton,
+                videoSupportedFileFormats: videoSupportedFileFormats,
                 onFileUploadDone: function(activeVideos) {
                     $.ajax({
                         url: videoHandlerUrl,

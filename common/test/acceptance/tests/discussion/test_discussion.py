@@ -33,7 +33,8 @@ from common.test.acceptance.fixtures.discussion import (
     Response,
     Comment,
     SearchResult,
-    MultipleThreadFixture)
+    MultipleThreadFixture,
+)
 
 from common.test.acceptance.tests.discussion.helpers import BaseDiscussionMixin
 from common.test.acceptance.tests.helpers import skip_if_browser
@@ -416,7 +417,7 @@ class DiscussionTabSingleThreadTest(BaseDiscussionTestCase, DiscussionResponsePa
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
 
 
-class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
+class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase, BaseDiscussionMixin):
     """
     Tests for the discussion page with multiple threads
     """
@@ -440,19 +441,6 @@ class DiscussionTabMultipleThreadTest(BaseDiscussionTestCase):
             self.thread_ids[1]
         )
         self.thread_page_1.visit()
-
-    @attr(shard=2)
-    def setup_multiple_threads(self, thread_count):
-        threads = []
-        for i in range(thread_count):
-            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
-            thread_body = "Dummy Long text body." * 50
-            threads.append(
-                Thread(id=thread_id, commentable_id=self.discussion_id, body=thread_body),
-            )
-            self.thread_ids.append(thread_id)
-        view = MultipleThreadFixture(threads)
-        view.push()
 
     @attr('a11y')
     def test_page_accessibility(self):
@@ -1031,41 +1019,32 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
-        self.assertEqual(self.discussion_page.get_num_displayed_threads(), 1)
-        self.thread_page = InlineDiscussionThreadPage(self.browser, thread_id)  # pylint: disable=attribute-defined-outside-init
-        self.thread_page.expand()
+        self.discussion_page.show_thread(thread_id)
+        self.thread_page = self.discussion_page.thread_page  # pylint: disable=attribute-defined-outside-init
 
-    def setup_multiple_inline_threads(self, thread_count):
+    @attr('a11y')
+    def test_inline_a11y(self):
         """
-        Set up multiple treads on the page by passing 'thread_count'
+        Tests Inline Discussion for accessibility issues.
         """
-        threads = []
-        for i in range(thread_count):
-            thread_id = "test_thread_{}_{}".format(i, uuid4().hex)
-            threads.append(
-                Thread(id=thread_id, commentable_id=self.discussion_id),
-            )
-            self.thread_ids.append(thread_id)
-        thread_fixture = MultipleThreadFixture(threads)
-        thread_fixture.add_response(
-            Response(id="response1"),
-            [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)],
-            threads[0]
-        )
-        thread_fixture.push()
+        self.setup_multiple_threads(thread_count=3)
 
-    def test_page_while_expanding_inline_discussion(self):
-        """
-        Tests for the Inline Discussion page with multiple treads. Page should not focus 'thread-wrapper'
-        after loading responses.
-        """
-        self.setup_multiple_inline_threads(thread_count=3)
+        # First test the a11y of the expanded list of threads
         self.discussion_page.expand_discussion()
-        thread_page = InlineDiscussionThreadPage(self.browser, self.thread_ids[0])
-        thread_page.expand()
+        self.discussion_page.a11y_audit.config.set_rules({
+            'ignore': [
+                'section'
+            ]
+        })
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
 
-        # Check if 'thread-wrapper' is focused after expanding thread
-        self.assertFalse(thread_page.check_if_selector_is_focused(selector='.thread-wrapper'))
+        # Now show the first thread and test the a11y again
+        self.discussion_page.show_thread(self.thread_ids[0])
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
+
+        # Finally show the new post form and test its a11y
+        self.discussion_page.click_new_post_button()
+        self.discussion_page.a11y_audit.check_for_accessibility_errors()
 
     def test_add_a_post_is_present_if_can_create_thread_when_expanded(self):
         self.discussion_page.expand_discussion()
@@ -1083,7 +1062,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         thread = Thread(id=uuid4().hex, anonymous_to_peers=True, commentable_id=self.discussion_id)
         thread_fixture = SingleThreadViewFixture(thread)
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
         self.assertEqual(self.thread_page.is_thread_anonymous(), not is_staff)
 
     def test_anonymous_to_peers_threads_as_staff(self):
@@ -1116,41 +1095,66 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
             Response(id="response1"),
             [Comment(id="comment1", user_id="other"), Comment(id="comment2", user_id=self.user_id)])
         thread_fixture.push()
-        self.setup_thread_page(thread.get("id"))
+        self.setup_thread_page(thread.get("id"))  # pylint: disable=no-member
         self.assertFalse(self.thread_page.has_add_response_button())
         self.assertFalse(self.thread_page.is_element_visible("action-more"))
 
     def test_dual_discussion_xblock(self):
         """
         Scenario: Two discussion xblocks in one unit shouldn't override their actions
-        Given that I'm on courseware page where there are two inline discussion
-        When I click on one discussion xblock new post button
-        Then it should add new post form of that xblock in DOM
-        And I should be shown new post form of that xblock
-        And I shouldn't be shown second discussion xblock new post form
-        And I click on second discussion xblock new post button
-        Then it should add new post form of second xblock in DOM
-        And I should be shown second discussion new post form
-        And I shouldn't be shown first discussion xblock new post form
-        And I have two new post form in the DOM
-        When I click back on first xblock new post button
-        And I should be shown new post form of that xblock
-        And I shouldn't be shown second discussion xblock new post form
+        Given that I'm on a courseware page where there are two inline discussion
+        When I click on the first discussion block's new post button
+        Then I should be shown only the new post form for the first block
+        When I click on the second discussion block's new post button
+        Then I should be shown both new post forms
+        When I cancel the first form
+        Then I should be shown only the new post form for the second block
+        When I cancel the second form
+        And I click on the first discussion block's new post button
+        Then I should be shown only the new post form for the first block
+        When I cancel the first form
+        Then I should be shown none of the forms
         """
         self.discussion_page.wait_for_page()
         self.additional_discussion_page.wait_for_page()
+
+        # Expand the first discussion, click to add a post
         self.discussion_page.expand_discussion()
         self.discussion_page.click_new_post_button()
-        with self.discussion_page.handle_alert():
-            self.discussion_page.click_cancel_new_post()
+
+        # Verify that only the first discussion's form is shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+        # Expand the second discussion, click to add a post
         self.additional_discussion_page.expand_discussion()
         self.additional_discussion_page.click_new_post_button()
-        self.assertFalse(self.discussion_page._is_element_visible(".new-post-article"))
-        with self.additional_discussion_page.handle_alert():
-            self.additional_discussion_page.click_cancel_new_post()
-        self.discussion_page.expand_discussion()
+
+        # Verify that both discussion's forms are shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNotNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the first form
+        self.discussion_page.click_cancel_new_post()
+
+        # Verify that only the second discussion's form is shown
+        self.assertIsNone(self.discussion_page.new_post_form)
+        self.assertIsNotNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the second form and click to show the first one
+        self.additional_discussion_page.click_cancel_new_post()
         self.discussion_page.click_new_post_button()
-        self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
+
+        # Verify that only the first discussion's form is shown
+        self.assertIsNotNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
+
+        # Cancel the first form
+        self.discussion_page.click_cancel_new_post()
+
+        # Verify that neither discussion's forms are shwon
+        self.assertIsNone(self.discussion_page.new_post_form)
+        self.assertIsNone(self.additional_discussion_page.new_post_form)
 
 
 @attr(shard=2)
@@ -1188,11 +1192,18 @@ class DiscussionUserProfileTest(UniqueCourseTest):
             roles_str = ','.join(roles)
         return AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str, **user_info).visit().get_user_id()
 
-    def check_pages(self, num_threads):
-        # set up the stub server to return the desired amount of thread results
-        threads = [Thread(id=uuid4().hex) for _ in range(num_threads)]
-        UserProfileViewFixture(threads).push()
-        # navigate to default view (page 1)
+    def test_redirects_to_learner_profile(self):
+        """
+        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
+
+        Given that I am on discussion forum user's profile page.
+        And I can see a username on the page
+        When I click on my username.
+        Then I will be navigated to Learner Profile page.
+        And I can my username on Learner Profile page
+        """
+        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
+
         page = DiscussionUserProfilePage(
             self.browser,
             self.course_id,
@@ -1200,90 +1211,6 @@ class DiscussionUserProfileTest(UniqueCourseTest):
             self.PROFILED_USERNAME
         )
         page.visit()
-
-        current_page = 1
-        total_pages = max(num_threads - 1, 1) / self.PAGE_SIZE + 1
-        all_pages = range(1, total_pages + 1)
-        return page
-
-        def _check_page():
-            # ensure the page being displayed as "current" is the expected one
-            self.assertEqual(page.get_current_page(), current_page)
-            # ensure the expected threads are being shown in the right order
-            threads_expected = threads[(current_page - 1) * self.PAGE_SIZE:current_page * self.PAGE_SIZE]
-            self.assertEqual(page.get_shown_thread_ids(), [t["id"] for t in threads_expected])
-            # ensure the clickable page numbers are the expected ones
-            self.assertEqual(page.get_clickable_pages(), [
-                p for p in all_pages
-                if p != current_page
-                and p - 2 <= current_page <= p + 2
-                or (current_page > 2 and p == 1)
-                or (current_page < total_pages and p == total_pages)
-            ])
-            # ensure the previous button is shown, but only if it should be.
-            # when it is shown, make sure it works.
-            if current_page > 1:
-                self.assertTrue(page.is_prev_button_shown(current_page - 1))
-                page.click_prev_page()
-                self.assertEqual(page.get_current_page(), current_page - 1)
-                page.click_next_page()
-                self.assertEqual(page.get_current_page(), current_page)
-            else:
-                self.assertFalse(page.is_prev_button_shown())
-            # ensure the next button is shown, but only if it should be.
-            if current_page < total_pages:
-                self.assertTrue(page.is_next_button_shown(current_page + 1))
-            else:
-                self.assertFalse(page.is_next_button_shown())
-
-        # click all the way up through each page
-        for __ in range(current_page, total_pages):
-            _check_page()
-            if current_page < total_pages:
-                page.click_on_page(current_page + 1)
-                current_page += 1
-
-        # click all the way back down
-        for __ in range(current_page, 0, -1):
-            _check_page()
-            if current_page > 1:
-                page.click_on_page(current_page - 1)
-                current_page -= 1
-
-    def test_0_threads(self):
-        self.check_pages(0)
-
-    def test_1_thread(self):
-        self.check_pages(1)
-
-    def test_20_threads(self):
-        self.check_pages(20)
-
-    def test_21_threads(self):
-        self.check_pages(21)
-
-    def test_151_threads(self):
-        self.check_pages(151)
-
-    def test_pagination_window_reposition(self):
-        page = self.check_pages(50)
-        page.click_next_page()
-        page.wait_for_ajax()
-        self.assertTrue(page.is_window_on_top())
-
-    def test_redirects_to_learner_profile(self):
-        """
-        Scenario: Verify that learner-profile link is present on forum discussions page and we can navigate to it.
-
-        Given that I am on discussion forum user's profile page.
-        And I can see a username on left sidebar
-        When I click on my username.
-        Then I will be navigated to Learner Profile page.
-        And I can my username on Learner Profile page
-        """
-        learner_profile_page = LearnerProfilePage(self.browser, self.PROFILED_USERNAME)
-
-        page = self.check_pages(1)
         page.click_on_sidebar_username()
 
         learner_profile_page.wait_for_page()
@@ -1301,7 +1228,13 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         )
 
         # Visit the page and verify the roles are listed correctly.
-        page = self.check_pages(1)
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
         student_roles = page.get_user_roles()
         self.assertEqual(student_roles, ', '.join(expected_student_roles))
 
@@ -1321,7 +1254,13 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
         # Visit the user profile in course discussion page of Course-B. Make sure the
         # roles are listed correctly.
-        page = self.check_pages(1)
+        page = DiscussionUserProfilePage(
+            self.browser,
+            self.course_id,
+            self.profiled_user_id,
+            self.PROFILED_USERNAME
+        )
+        page.visit()
         self.assertEqual(page.get_user_roles(), u'Student')
 
 
@@ -1357,7 +1296,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     def test_no_rewrite(self):
         self.setup_corrected_text(None)
         self.page.perform_search()
-        self.check_search_alert_messages(["no threads"])
+        self.check_search_alert_messages(["no posts"])
 
     @attr(shard=2)
     def test_rewrite_dismiss(self):
@@ -1379,7 +1318,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
 
         self.setup_corrected_text(None)
         self.page.perform_search()
-        self.check_search_alert_messages(["no threads"])
+        self.check_search_alert_messages(["no posts"])
 
     @attr(shard=2)
     def test_rewrite_and_user(self):
@@ -1391,7 +1330,7 @@ class DiscussionSearchAlertTest(UniqueCourseTest):
     def test_user_only(self):
         self.setup_corrected_text(None)
         self.page.perform_search(self.SEARCHED_USERNAME)
-        self.check_search_alert_messages(["no threads", self.SEARCHED_USERNAME])
+        self.check_search_alert_messages(["no posts", self.SEARCHED_USERNAME])
         # make sure clicking the link leads to the user profile page
         UserProfileViewFixture([]).push()
         self.page.get_search_alert_links().first.click()

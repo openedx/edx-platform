@@ -11,7 +11,7 @@
 // * +comments styling
 
 // +wrapper - response list
-.container .discussion-body .responses {
+.discussion .responses {
   @extend %ui-no-list;
 
   &:empty {
@@ -42,8 +42,7 @@
 }
 
 // +base - single response element
-.container .discussion-response {
-
+.discussion-response {
   .response-header-content {
 
     // CASE: larger username for responses 
@@ -61,7 +60,7 @@
 }
 
 // +element - add response area
-.container .discussion-body .add-response {
+.discussion .add-response {
   display: inline;
   padding: $baseline/2;
 }
@@ -79,7 +78,7 @@
 
 // +response - labels and banners
 // NOTE - these styles seem to no longer be in use. They have been isolated here, but should be ideally removed or fixed. 
-.container .discussion-body .responses .forum-response {
+.discussion .responses .forum-response {
 
   // CASE: label - staff response
   &.staff {
@@ -136,7 +135,7 @@
 }
 
 // +comments styling
-.container .discussion-body .comments {
+.discussion .comments {
   @extend %ui-no-list;
   @include border-radius(0, 0, $forum-border-radius, $forum-border-radius);
   background: $gray-l6;
@@ -149,7 +148,7 @@
   }
 
   blockquote {
-    background: $gray-l4;
+    background: $forum-color-background-light;
     border-radius: $forum-border-radius;
     padding: ($baseline/4) ($baseline/2);
     font-size: $forum-base-font-size;
@@ -157,6 +156,7 @@
 
   .comment-form {
     @include clearfix();
+    padding: ($baseline/2) 0;
 
     .comment-form-input {
       padding: ($baseline/4) ($baseline/2);
@@ -170,11 +170,41 @@
     }
 
     .wmd-input {
+      @include transition(all .2s linear 0s);
       height: 40px;
     }
 
     .discussion-errors {
       margin: 0;
     }
+  }
+}
+
+.response-count {
+  @include float(right);
+  color: $forum-color-response-count;
+  font-size: $forum-base-font-size;
+}
+
+.response-pagination {
+  visibility: visible;
+  padding: 0 ($baseline/2);
+
+  &:empty {
+    visibility: hidden;
+  }
+
+  .response-display-count {
+    display: block;
+    padding: ($baseline/2) 0;
+    color: $forum-color-response-count;
+    font-size: $forum-base-font-size;
+  }
+
+  .load-response-button {
+    @include text-align(left);
+    position: relative;
+    margin: ($baseline/2) 0;
+    width: 100%;
   }
 }

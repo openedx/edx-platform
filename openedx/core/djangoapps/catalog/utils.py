@@ -2,6 +2,7 @@
 from urlparse import urlparse
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from edx_rest_api_client.client import EdxRestApiClient
 from opaque_keys.edx.keys import CourseKey
 
@@ -19,7 +20,20 @@ def create_catalog_api_client(user, catalog_integration):
     return EdxRestApiClient(catalog_integration.internal_api_url, jwt=jwt)
 
 
-def get_programs(user, uuid=None, type=None):  # pylint: disable=redefined-builtin
+def _get_service_user(user, service_username):
+    """
+    Retrieve and return the Catalog Integration Service User Object
+    if the passed user is None or anonymous
+    """
+    if not user or user.is_anonymous():
+        try:
+            user = User.objects.get(username=service_username)
+        except User.DoesNotExist:
+            user = None
+    return user
+
+
+def get_programs(user=None, uuid=None, type=None):  # pylint: disable=redefined-builtin
     """Retrieve marketable programs from the catalog service.
 
     Keyword Arguments:
@@ -31,8 +45,11 @@ def get_programs(user, uuid=None, type=None):  # pylint: disable=redefined-built
         dict, if a specific program is requested.
     """
     catalog_integration = CatalogIntegration.current()
-
     if catalog_integration.enabled:
+        user = _get_service_user(user, catalog_integration.service_username)
+        if not user:
+            return []
+
         api = create_catalog_api_client(user, catalog_integration)
 
         cache_key = '{base}.programs{type}'.format(
@@ -43,6 +60,7 @@ def get_programs(user, uuid=None, type=None):  # pylint: disable=redefined-built
         querystring = {
             'marketable': 1,
             'exclude_utm': 1,
+            'published_course_runs_only': 1,
         }
         if type:
             querystring['type'] = type
@@ -58,6 +76,46 @@ def get_programs(user, uuid=None, type=None):  # pylint: disable=redefined-built
         )
     else:
         return []
+
+
+def get_program_types(user=None):  # pylint: disable=redefined-builtin
+    """Retrieve all program types from the catalog service.
+
+    Returns:
+        list of dict, representing program types.
+    """
+    catalog_integration = CatalogIntegration.current()
+    if catalog_integration.enabled:
+        user = _get_service_user(user, catalog_integration.service_username)
+        if not user:
+            return []
+
+        api = create_catalog_api_client(user, catalog_integration)
+        cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
+
+        return get_edx_api_data(
+            catalog_integration,
+            user,
+            'program_types',
+            cache_key=cache_key if catalog_integration.is_cache_enabled else None,
+            api=api
+        )
+    else:
+        return []
+
+
+def get_programs_data(user=None):
+    """Return the list of Programs after adding the ProgramType Logo Image"""
+
+    programs_list = get_programs(user)
+    program_types = get_program_types(user)
+
+    program_types_lookup_dict = {program_type["name"]: program_type for program_type in program_types}
+
+    for program in programs_list:
+        program["logo_image"] = program_types_lookup_dict[program["type"]]["logo_image"]
+
+    return programs_list
 
 
 def munge_catalog_program(catalog_program):

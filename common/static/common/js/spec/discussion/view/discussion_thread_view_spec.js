@@ -118,7 +118,7 @@
         };
         describe('closed and open Threads', function() {
             var checkCommentForm, checkVoteDisplay, createDiscussionThreadView;
-            createDiscussionThreadView = function(originallyClosed, mode) {
+            createDiscussionThreadView = function(originallyClosed) {
                 var discussion, thread, threadData, view;
                 threadData = DiscussionViewSpecHelper.makeThreadWithProps({
                     closed: originallyClosed
@@ -128,63 +128,58 @@
                 view = new DiscussionThreadView({
                     model: thread,
                     el: $('#fixture-element'),
-                    mode: mode,
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
                 renderWithTestResponses(view, 1);
-                if (mode === 'inline') {
-                    view.expand();
-                }
                 spyOn(DiscussionUtil, 'updateWithUndo').and.callFake(function(model, updates) {
                     return model.set(updates);
                 });
                 return view;
             };
-            checkCommentForm = function(originallyClosed, mode) {
+            checkCommentForm = function(originallyClosed) {
                 var view;
-                view = createDiscussionThreadView(originallyClosed, mode);
+                view = createDiscussionThreadView(originallyClosed);
                 expect(view.$('.comment-form').closest('li').is(':visible')).toBe(!originallyClosed);
                 expect(view.$('.discussion-reply-new').is(':visible')).toBe(!originallyClosed);
                 view.$('.action-close').click();
                 expect(view.$('.comment-form').closest('li').is(':visible')).toBe(originallyClosed);
                 return expect(view.$('.discussion-reply-new').is(':visible')).toBe(originallyClosed);
             };
-            checkVoteDisplay = function(originallyClosed, mode) {
+            checkVoteDisplay = function(originallyClosed) {
                 var view;
-                view = createDiscussionThreadView(originallyClosed, mode);
+                view = createDiscussionThreadView(originallyClosed);
                 expect(view.$('.thread-main-wrapper .action-vote').is(':visible')).toBe(!originallyClosed);
                 expect(view.$('.thread-main-wrapper .display-vote').is(':visible')).toBe(originallyClosed);
                 view.$('.action-close').click();
                 expect(view.$('.action-vote').is(':visible')).toBe(originallyClosed);
                 return expect(view.$('.display-vote').is(':visible')).toBe(!originallyClosed);
             };
-            return _.each(['tab', 'inline'], function(mode) {
+            return function() {
                 it(
-                    'Test that in ' + mode + ' mode when a closed thread is opened the comment form is displayed',
-                    function() { return checkCommentForm(true, mode); }
+                    'Test that when a closed thread is opened the comment form is displayed',
+                    function() { return checkCommentForm(true); }
                 );
                 it(
-                    'Test that in ' + mode + ' mode when a open thread is closed the comment form is hidden',
-                    function() { return checkCommentForm(false, mode); }
+                    'Test that  when a open thread is closed the comment form is hidden',
+                    function() { return checkCommentForm(false); }
                 );
                 it(
-                    'Test that in ' + mode + ' mode when a closed thread is opened the vote button is displayed and ' +
+                    'Test that  when a closed thread is opened the vote button is displayed and ' +
                     'vote count is hidden',
-                    function() { return checkVoteDisplay(true, mode); }
+                    function() { return checkVoteDisplay(true); }
                 );
                 it(
-                    'Test that in ' + mode + ' mode when a open thread is closed the vote button is hidden and ' +
+                    'Test that  when a open thread is closed the vote button is hidden and ' +
                     'vote count is displayed',
-                    function() { return checkVoteDisplay(false, mode); }
+                    function() { return checkVoteDisplay(false); }
                 );
-            });
+            };
         });
-        describe('tab mode', function() {
+        describe('thread responses', function() {
             beforeEach(function() {
                 this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $('#fixture-element'),
-                    mode: 'tab',
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
             });
@@ -276,119 +271,6 @@
                 });
             });
         });
-        describe('inline mode', function() {
-            beforeEach(function() {
-                this.view = new DiscussionThreadView({
-                    model: this.thread,
-                    el: $('#fixture-element'),
-                    mode: 'inline',
-                    course_settings: DiscussionSpecHelper.createTestCourseSettings()
-                });
-            });
-            describe('render', function() {
-                it('shows content that should be visible when collapsed', function() {
-                    this.view.render();
-                    return assertExpandedContentVisible(this.view, false);
-                });
-                it('does not render any responses by default', function() {
-                    this.view.render();
-                    expect($.ajax).not.toHaveBeenCalled();
-                    return expect(this.view.$el.find('.responses li').length).toEqual(0);
-                });
-            });
-            describe('focus', function() {
-                it('sends focus to the conversation when opened', function(done) {
-                    var self;
-                    DiscussionViewSpecHelper.setNextResponseContent({
-                        resp_total: 0,
-                        children: []
-                    });
-                    this.view.render();
-                    this.view.expand();
-                    self = this;
-                    return jasmine.waitUntil(function() {
-                        var article;
-                        article = self.view.$el.find('.discussion-article');
-                        return article[0] === article[0].ownerDocument.activeElement;
-                    }).then(function() {
-                        return done();
-                    });
-                });
-            });
-            describe('expand/collapse', function() {
-                it('shows/hides appropriate content', function() {
-                    DiscussionViewSpecHelper.setNextResponseContent({
-                        resp_total: 0,
-                        children: []
-                    });
-                    this.view.render();
-                    this.view.expand();
-                    assertExpandedContentVisible(this.view, true);
-                    this.view.collapse();
-                    return assertExpandedContentVisible(this.view, false);
-                });
-                it('switches between the abbreviated and full body', function() {
-                    var expectedAbbreviation, longBody;
-                    DiscussionViewSpecHelper.setNextResponseContent({
-                        resp_total: 0,
-                        children: []
-                    });
-                    longBody = new Array(100).join('test ');
-                    expectedAbbreviation = DiscussionUtil.abbreviateString(longBody, 140);
-                    this.thread.set('body', longBody);
-                    this.view.render();
-                    expect($('.post-body').text()).toEqual(expectedAbbreviation);
-                    expect(DiscussionThreadShowView.prototype.convertMath).toHaveBeenCalled();
-                    DiscussionThreadShowView.prototype.convertMath.calls.reset();
-                    this.view.expand();
-                    expect($('.post-body').text()).toEqual(longBody);
-                    expect(DiscussionThreadShowView.prototype.convertMath).toHaveBeenCalled();
-                    DiscussionThreadShowView.prototype.convertMath.calls.reset();
-                    this.view.collapse();
-                    expect($('.post-body').text()).toEqual(expectedAbbreviation);
-                    return expect(DiscussionThreadShowView.prototype.convertMath).toHaveBeenCalled();
-                });
-                it('strips script tags appropriately', function() {
-                    var longMaliciousBody, maliciousAbbreviation;
-                    DiscussionViewSpecHelper.setNextResponseContent({
-                        resp_total: 0,
-                        children: []
-                    });
-                    longMaliciousBody = new Array(100).join(
-                        "<script>alert('Until they think warm days will never cease');</script>\n"
-                    );
-                    this.thread.set('body', longMaliciousBody);
-                    maliciousAbbreviation = DiscussionUtil.abbreviateString(this.thread.get('body'), 140);
-                    this.view.render();
-                    expect($('.post-body').html()).not.toEqual(maliciousAbbreviation);
-                    expect($('.post-body').text()).toEqual(maliciousAbbreviation);
-                    expect($('.post-body').html()).not.toContain('<script');
-                    this.view.expand();
-                    expect($('.post-body').html()).not.toEqual(longMaliciousBody);
-                    expect($('.post-body').text()).toEqual(longMaliciousBody);
-                    expect($('.post-body').html()).not.toContain('<script');
-                    this.view.collapse();
-                    expect($('.post-body').html()).not.toEqual(maliciousAbbreviation);
-                    expect($('.post-body').text()).toEqual(maliciousAbbreviation);
-                    return expect($('.post-body').html()).not.toContain('<script');
-                });
-                it('re-renders the show view correctly when leaving the edit view', function() {
-                    DiscussionViewSpecHelper.setNextResponseContent({
-                        resp_total: 0,
-                        children: []
-                    });
-                    this.view.render();
-                    this.view.expand();
-                    assertExpandedContentVisible(this.view, true);
-                    this.view.edit();
-                    assertContentVisible(this.view, '.edit-post-body', true);
-                    expect(this.view.$el.find('.post-actions-list').length).toBe(0);
-                    this.view.closeEditView(DiscussionSpecHelper.makeEventSpy());
-                    expect(this.view.$el.find('.edit-post-body').length).toBe(0);
-                    return assertContentVisible(this.view, '.post-actions-list', true);
-                });
-            });
-        });
         describe('for question threads', function() {
             var generateContent, renderTestCase;
             beforeEach(function() {
@@ -396,7 +278,6 @@
                 this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $('#fixture-element'),
-                    mode: 'tab',
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
             });
@@ -464,7 +345,6 @@
                 this.view = new DiscussionThreadView({
                     model: this.thread,
                     el: $('#fixture-element'),
-                    mode: 'tab',
                     course_settings: DiscussionSpecHelper.createTestCourseSettings()
                 });
             });
