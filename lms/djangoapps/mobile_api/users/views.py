@@ -11,14 +11,12 @@ from rest_framework.response import Response
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys import InvalidKeyError
-from rest_framework.views import APIView
 
 from courseware.access import is_mobile_available_for_user
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.views.index import save_positions_recursively_up
 from courseware.views.views import get_current_child
-from openedx.core.djangoapps.catalog.utils import get_course_runs
 from student.models import CourseEnrollment, User
 
 from xblock.fields import Scope
@@ -206,7 +204,7 @@ class UserCourseStatus(views.APIView):
 
 
 @mobile_view(is_user=True)
-class UserCourseEnrollmentsList(APIView):
+class UserCourseEnrollmentsList(generics.ListAPIView):
     """
     **Use Case**
 
@@ -260,6 +258,17 @@ class UserCourseEnrollmentsList(APIView):
           certified).
         * url: URL to the downloadable version of the certificate, if exists.
     """
+    queryset = CourseEnrollment.objects.all()
+    serializer_class = CourseEnrollmentSerializer
+    lookup_field = 'username'
+
+    # In Django Rest Framework v3, there is a default pagination
+    # class that transmutes the response data into a dictionary
+    # with pagination information.  The original response data (a list)
+    # is stored in a "results" value of the dictionary.
+    # For backwards compatibility with the existing API, we disable
+    # the default behavior by setting the pagination_class to None.
+    pagination_class = None
 
     def is_org(self, check_org, course_org):
         """
@@ -267,36 +276,17 @@ class UserCourseEnrollmentsList(APIView):
         """
         return check_org is None or (check_org.lower() == course_org.lower())
 
-    def get(self, request, username):
-        """
-        Returns a list of courses enrolled by user.
-        """
-        queryset = CourseEnrollment.objects.all()
-        enrollments = list(
-            queryset.filter(
-                user__username=username,
-                is_active=True
-            ).order_by('created').reverse()
-        )
-        course_ids = [enrollment.course_id for enrollment in enrollments]
-        catalog_course_runs_against_course_keys = get_course_runs(course_ids, request.user)
-
-        org = request.query_params.get('org', None)
-
-        return Response([
-            CourseEnrollmentSerializer(
-                enrollment,
-                context={
-                    "request": request,
-                    "catalog_course_run": (
-                        catalog_course_runs_against_course_keys[unicode(enrollment.course_id)]
-                        if unicode(enrollment.course_id) in catalog_course_runs_against_course_keys else None
-                    )
-                }
-            ).data for enrollment in enrollments
+    def get_queryset(self):
+        enrollments = self.queryset.filter(
+            user__username=self.kwargs['username'],
+            is_active=True
+        ).order_by('created').reverse()
+        org = self.request.query_params.get('org', None)
+        return [
+            enrollment for enrollment in enrollments
             if enrollment.course_overview and self.is_org(org, enrollment.course_overview.org) and
-            is_mobile_available_for_user(request.user, enrollment.course_overview)
-        ])
+            is_mobile_available_for_user(self.request.user, enrollment.course_overview)
+        ]
 
 
 @api_view(["GET"])
