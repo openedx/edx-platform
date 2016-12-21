@@ -1,6 +1,4 @@
 """Helper functions for working with the catalog service."""
-from urlparse import urlparse
-
 from django.conf import settings
 from django.contrib.auth.models import User
 from edx_rest_api_client.client import EdxRestApiClient
