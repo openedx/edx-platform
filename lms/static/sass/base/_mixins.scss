@@ -217,3 +217,18 @@
     text-decoration: underline !important;
   }
 }
+
+//Program details page
+/* Box shadow mixin */
+// example: @include box-shadow( 2px, 3px, 6px, rgba(0, 0, 0, 0.3) );
+@mixin box-shadow($x, $y, $blur, $color, $inset: false) {
+    @if $inset {
+        -webkit-box-shadow: inset $x $y $blur $color;
+        -moz-box-shadow: inset $x $y $blur $color;
+        box-shadow: inset $x $y $blur $color;
+    } @else {
+        -webkit-box-shadow: $x $y $blur $color;
+        -moz-box-shadow: $x $y $blur $color;
+        box-shadow: $x $y $blur $color;
+    }
+}
