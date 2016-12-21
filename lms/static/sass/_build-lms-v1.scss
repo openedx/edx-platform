@@ -43,6 +43,7 @@
 @import 'multicourse/account';
 @import 'multicourse/courses';
 @import 'multicourse/course_about';
+@import 'multicourse/program_about';
 @import 'multicourse/jobs';
 @import 'multicourse/media-kit';
 @import 'multicourse/about_pages';
@@ -68,6 +69,9 @@
 
 // search
 @import 'search/search';
+
+//slick library
+@import 'vendor/slick';
 
 // news
 @import 'news';
