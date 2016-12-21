@@ -15,22 +15,6 @@ def _cache_key_for_site_host(site_host):
     return 'site:host:%s' % (site_host,)
 
 
-def patched_get_current(self, request=None):
-    from django.conf import settings
-    if getattr(settings, 'SITE_ID', ''):
-        site_id = settings.SITE_ID
-        return self._get_site_by_id(site_id)
-    elif request:
-        return self._get_site_by_request(request)
-
-    raise ImproperlyConfigured(
-        "You're using the Django \"sites framework\" without having "
-        "set the SITE_ID setting. Create a site in your database and "
-        "set the SITE_ID setting or pass a request to "
-        "Site.objects.get_current() to fix this error."
-    )
-
-
 def patched_get_site_by_id(self, site_id):
     key = _cache_key_for_site_id(site_id)
     site = cache.get(key)
@@ -87,7 +71,6 @@ def patched_clear_site_cache(sender, **kwargs):
 
 
 django.contrib.sites.models.clear_site_cache = patched_clear_site_cache
-SiteManager.get_current = patched_get_current
 SiteManager.clear_cache = patched_clear_cache
 SiteManager._get_site_by_id = patched_get_site_by_id  # pylint: disable=protected-access
 SiteManager._get_site_by_request = patched_get_site_by_request  # pylint: disable=protected-access

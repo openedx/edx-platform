@@ -12,4 +12,3 @@ class SitesConfig(AppConfig):
         from openedx.core.djangoapps.appsembler.sites import models
 
         post_save.connect(models.patched_clear_site_cache, sender=Site)
-
