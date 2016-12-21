@@ -12,15 +12,15 @@
         border-radius: $forum-border-radius;
 
         .forum-nav-bar {
+            padding: ($baseline / 2) ($baseline / 4);
             color: $forum-color-navigation-bar;
-            padding: ($baseline / 2) $baseline;
             position: relative;
 
             .all-posts-btn {
                 color: $forum-color-primary;
 
                 .icon {
-                    @include margin-left(-15px);
+                    @include margin-left($baseline / 2);
                 }
             }
         }

@@ -130,17 +130,23 @@ class SubsectionGrade(object):
         Compute score for the given block. If persisted_values
         is provided, it is used for possible and weight.
         """
-        block = course_structure[block_key]
-
-        if getattr(block, 'has_score', False):
-            problem_score = get_score(
-                submissions_scores,
-                csm_scores,
-                persisted_block,
-                block,
-            )
-            if problem_score:
-                self.locations_to_scores[block_key] = problem_score
+        try:
+            block = course_structure[block_key]
+        except KeyError:
+            # It's possible that the user's access to that
+            # block has changed since the subsection grade
+            # was last persisted.
+            pass
+        else:
+            if getattr(block, 'has_score', False):
+                problem_score = get_score(
+                    submissions_scores,
+                    csm_scores,
+                    persisted_block,
+                    block,
+                )
+                if problem_score:
+                    self.locations_to_scores[block_key] = problem_score
 
     def _persisted_model_params(self, student):
         """

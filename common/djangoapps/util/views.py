@@ -19,7 +19,7 @@ import calc
 
 from opaque_keys import InvalidKeyError
 
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
@@ -44,6 +44,26 @@ def ensure_valid_course_key(view_func):
         if course_key is not None:
             try:
                 CourseKey.from_string(course_key)
+            except InvalidKeyError:
+                raise Http404
+
+        response = view_func(request, *args, **kwargs)
+        return response
+
+    return inner
+
+
+def ensure_valid_usage_key(view_func):
+    """
+    This decorator should only be used with views which have argument usage_key_string.
+    If usage_key_string is not valid raise 404.
+    """
+    @wraps(view_func)
+    def inner(request, *args, **kwargs):  # pylint: disable=missing-docstring
+        usage_key = kwargs.get('usage_key_string')
+        if usage_key is not None:
+            try:
+                UsageKey.from_string(usage_key)
             except InvalidKeyError:
                 raise Http404
 

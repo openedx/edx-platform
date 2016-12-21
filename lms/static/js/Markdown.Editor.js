@@ -26,7 +26,7 @@
 
     // The text that appears on the dialog box when entering links.
     var linkDialogText = gettext('Insert Hyperlink'),
-        linkUrlHelpText = gettext("e.g. 'http://google.com/'"),
+        linkUrlHelpText = gettext("e.g. 'http://google.com'"),
         linkDestinationLabel = gettext('Link Description'),
         linkDestinationHelpText = gettext("e.g. 'google'"),
         linkDestinationError = gettext('Please provide a description of the link destination.'),
@@ -1108,6 +1108,7 @@
                     imageIsDecorativeLabel: imageIsDecorativeLabel,
                     imageUploadHandler: imageUploadHandler
                 });
+            dialog.setAttribute('dir', doc.head.getAttribute('dir'));
             dialog.setAttribute('role', 'dialog');
             dialog.setAttribute('tabindex', '-1');
             dialog.setAttribute('aria-labelledby', 'editorDialogTitle');

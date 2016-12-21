@@ -41,12 +41,13 @@ class RenderXBlockTestMixin(object):
     ]
 
     @abstractmethod
-    def get_response(self, url_encoded_params=None):
+    def get_response(self, url_encoded_params=None, usage_key=None):
         """
         Abstract method to get the response from the endpoint that is being tested.
 
         Arguments:
             url_encoded_params - URL encoded parameters that should be appended to the requested URL.
+            usage_key - course usage key.
         """
         pass   # pragma: no cover
 
@@ -96,7 +97,7 @@ class RenderXBlockTestMixin(object):
         """
         if url_params:
             url_params = urlencode(url_params)
-        response = self.get_response(url_params)
+        response = self.get_response(url_params, self.html_block.location)
         if expected_response_code == 200:
             self.assertContains(response, self.html_block.data, status_code=expected_response_code)
             for chrome_element in [self.COURSEWARE_CHROME_HTML_ELEMENTS + self.XBLOCK_REMOVED_HTML_ELEMENTS]:
