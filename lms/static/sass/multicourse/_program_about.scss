@@ -1,0 +1,506 @@
+.tbl-view {
+    display: table;
+    width: 100%;
+
+    > .tbl-row {
+        display: table-row;
+    }
+
+    .tbl-col {
+        display: table-cell;
+        vertical-align: top;
+
+        &.col-full-sm {
+            @media (max-width: $mobile) {
+                display: block;
+            }
+        }
+    }
+}
+
+.visible-sm {
+    @media (min-width: $tablet) {
+        display: none !important;
+    }
+}
+
+.hidden-sm {
+    @media (max-width: $mobile) {
+        display: none !important;
+    }
+}
+
+#program-details-page {
+    color: $gray;
+
+    > .grid-manual {
+
+        > .row {
+            align-items: stretch;
+
+            [class*='col'] {
+                @media (max-width: $mobile) {
+                    margin: 0 auto;
+                    width: 100%;
+                    padding: 0;
+                }
+            }
+        }
+    }
+
+    .left-col,
+    .right-col {
+        padding: 15px 0;
+    }
+
+    .left-col {
+
+        @media (min-width: $tablet) {
+            border-right: 1px solid #979797;
+            padding-right: 30px;
+        }
+        @media (min-width: $desktop) {
+            padding-right: 50px;
+        }
+    }
+
+    .right-col {
+        @media (min-width: $tablet) {
+            padding-left: 20px;
+        }
+        @media (min-width: $desktop) {
+            padding-left: 30px;
+        }
+    }
+
+    .instructor-profiles {
+        margin-bottom: 30px;
+
+        .profile-item {
+            @extend .tbl-view;
+            margin-bottom: 20px;
+
+            .avatar,
+            .details {
+                @extend .tbl-col;
+                vertical-align: middle;
+            }
+
+            .avatar {
+                width: 60px;
+
+                .img-holder {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    border: 2px solid $blue;
+                    overflow: hidden;
+
+                    img {
+                        max-width: 100%;
+                    }
+                }
+            }
+
+            .details {
+                padding-left: 15px;
+
+                .name {
+                    color: $blue;
+                    font-size: .9em;
+                    margin-bottom: 5px;
+                }
+                .dept {
+                    font-size: .8em;
+                    line-height: 1.5em;
+                }
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+#course-trailer {
+
+    .trailer-link {
+        color: white;
+        font-weight: bold;
+
+        span {
+            text-decoration: underline;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}
+
+.program-quote {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    line-height: 1.4em;
+    font-size: .8em;
+    @media (min-width: $tablet) {
+        line-height: 1.8em;
+        font-size: 1em;
+    }
+
+    span {
+        display: block;
+        margin-bottom: 10px;
+        @media (min-width: $tablet) {
+            display: inline;
+        }
+
+        &.writer {
+            font-weight: bold;
+            padding-left: 50px;
+            @media (min-width: $tablet) {
+                padding-left: 0;
+            }
+
+            &:before {
+                @media (min-width: $tablet) {
+                    //content: '&#8212;';
+                    content: '\2014';
+                    margin-right: 3px;
+                    margin-left: 5px;
+                }
+            }
+        }
+    }
+}
+
+#accordion-group {
+
+    .accordion-item {
+
+        .accordion-head {
+            background: #004165;
+            padding: 18px;
+            color: white;
+            border-radius: 0;
+            border:none;
+            margin: 0;
+
+            &:hover,
+            &.active {
+                cursor: pointer;
+            }
+
+            &:before {
+                content: "\f054";
+                font-family: FontAwesome;
+                margin-right: 25px;
+            }
+
+            &.active {
+                &:before {
+                    content: "\f078";
+                }
+            }
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 15px;
+            background: #f6f6f6;
+            border: none;
+        }
+
+        &.show {
+            .accordion-content {
+                display: block;
+            }
+        }
+
+        &:nth-of-type(2) .accordion-head {
+            background: #004a74;
+        }
+        &:nth-of-type(3) .accordion-head {
+            background: #00527f;
+        }
+        &:nth-of-type(4) .accordion-head {
+            background: #015d91;
+        }
+        &:nth-of-type(5) .accordion-head {
+            background: #016fad;
+        }
+    }
+}
+
+.course-card {
+    background: white;
+    padding: 15px;
+    margin-bottom: 30px;
+    @include box-shadow(0, 1px, 5px, rgba(0, 0, 0, 0.4));
+    border-radius: 4px;
+    @media (min-width: $tablet) {
+        padding: 20px;
+        border: 1px solid #979797;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+    .title {
+        color: #005686;
+        margin-bottom: 20px;
+        font-size: 1.3em;
+        text-decoration: underline;
+        @media (min-width: $tablet) {
+            font-size: 1.7em;
+        }
+
+        small {
+            color: #4a4a4a;
+            display: block;
+            font-size: 0;
+            margin-top: 5px;
+
+            > span {
+                display: inline-block;
+                text-decoration: none;
+                font-size: 14px;
+                @media (min-width: $tablet) {
+                    font-size: 16px;
+                }
+
+                &:first-child {
+                    border-right: 1px solid #4a4a4a;
+                    padding-right: 8px;
+                    margin-right: 8px;
+                    @media (min-width: $tablet) {
+                        padding-right: 10px;
+                        margin-right: 10px;
+                    }
+                }
+            }
+        }
+    }
+
+    p {
+        margin-bottom: 0;
+        font-weight: normal;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.courses-in-program {
+    display: block;
+    padding: 20px 0;
+    background: #ececec;
+    @media (min-width: $tablet) {
+        background: white;
+        padding: 20px;
+    }
+
+    .slick-track {
+        padding-top: 5px;
+    }
+
+    > .hd {
+        padding-left: 20px;
+        @media (min-width: $tablet) {
+            padding: 0;
+        }
+    }
+
+    .course-card {
+        margin-bottom: 20px;
+        min-height: 200px;
+        @media (max-width: $mobile) {
+            min-height: 300px;
+            margin-left: 5px;
+            margin-right: 5px;
+            padding-bottom: 50px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tbl-view {
+
+            .tbl-col {
+
+                .btn-enroll-now {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    width: 100%;
+                    border-radius: 0;
+                    line-height: 22px;
+                    background: #0f8012;
+                    @media (min-width: $tablet) {
+                        position: relative;
+                        border: 1px solid #ccc;
+                        max-width: 200px;
+                    }
+                }
+
+                &:first-child {
+                    @media (min-width: $tablet) {
+                        width: 75%;
+                    }
+
+                    p {
+                        @media (min-width: $tablet) {
+                            max-width: 500px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .pagingInfo {
+        display: block;
+        text-align: center;
+    }
+}
+
+/* Custom SCSS */
+.main-banner {
+    height: 260px;
+    background: #005686;
+    margin-bottom: 20px;
+    @media (min-width: $tablet) {
+        height: 333px;
+        background: $black;
+        margin-bottom: 50px;
+    }
+
+    .org-logo {
+        display: inline-block;
+        margin-bottom: 8px;
+        background: rgba(255, 255, 255, .8);
+        @include box-shadow(0, 3px, 4px, rgba(0, 0, 0, 0.5));
+        @media (max-width: $mobile) {
+            margin-bottom: 12px;
+            max-width: 120px;
+            box-shadow: none;
+        }
+
+        img {
+            max-width: 100%;
+        }
+    }
+
+    .banner-title,
+    .banner-description {
+        color: white;
+    }
+
+    .banner-title {
+        font-size: 1.3em;
+        font-weight: 600;
+        text-align: left;
+        letter-spacing: inherit;
+        margin-bottom: 10px;
+        @media (min-width: $tablet) {
+            font-size: 2.25em;
+        }
+    }
+
+    .banner-description {
+        min-height: 60px;
+        font-size: .8em;
+        font-weight: 600;
+        line-height: 1.35;
+        @media (max-width: $mobile) {
+            margin-bottom: 14px;
+        }
+        @media (min-width: $tablet) {
+            font-size: 1.1em;
+        }
+        @media (min-width: $desktop) {
+            font-size: 1.25em;
+        }
+    }
+}
+
+.grid-container,
+.grid-manual {
+
+    [class*='col-'] {
+    }
+}
+
+.program-desc-tbl {
+
+    @extend .tbl-view;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    @media (min-width: $tablet) {
+        border: 2px solid #126f9a;
+        border-radius: 0;
+        padding: 5px 15px;
+    }
+    @media (min-width: $desktop) {
+        padding: 8px 15px;
+    }
+
+    .item {
+        padding: 10px 10px 12px !important;
+        font-size: .9em;
+        border-color: #d0d0d0;
+        margin: 0;
+        @media (min-width: $tablet) {
+            font-size: 1em;
+            padding: 15px 0 !important;
+        }
+        @media (min-width: $desktop) {
+            font-size: 1.1em;
+            padding: 15px !important;
+        }
+
+        > span {
+            @extend .tbl-col;
+            display: block;
+            width: 100%;
+            color: #4a4a4a;
+            line-height: 1.2em;
+
+            @media (min-width: $tablet) {
+                display: inline-block;
+                width: 50%;
+            }
+
+            .fa {
+                display: none;
+                margin-right: 15px;
+                @media (min-width: $desktop) {
+                    display: inline-block;
+                }
+            }
+
+            + a {
+                @media (max-width: $mobile) {
+                    color: #4a4a4a;
+                }
+            }
+
+            &:first-child {
+                color: #005686;
+                margin-bottom: 5px;
+
+                @media (min-width: $tablet) {
+                    width: 48%;
+                    color: #4a4a4a;
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+}
+
+.ui-state-default .ui-icon {
+    display: none;
+}
