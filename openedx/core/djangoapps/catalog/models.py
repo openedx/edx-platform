@@ -6,7 +6,9 @@ from config_models.models import ConfigurationModel
 
 
 class CatalogIntegration(ConfigurationModel):
-    """Manages configuration for connecting to the catalog service and using its API."""
+    """
+    Manages configuration for connecting to the catalog service and using its API.
+    """
     API_NAME = 'catalog'
     CACHE_KEY = 'catalog.api.data'
 
@@ -25,6 +27,14 @@ class CatalogIntegration(ConfigurationModel):
         )
     )
 
+    course_run_cache_ttl = models.PositiveIntegerField(
+        verbose_name=_('Cache Time To Live for Course Run Data'),
+        default=0,
+        help_text=_(
+            'Specified in seconds. Enable caching of Course Run API response by setting this to a value greater than 0.'
+        )
+    )
+
     service_username = models.CharField(
         max_length=100,
         default="lms_catalog_service_user",
@@ -37,8 +47,17 @@ class CatalogIntegration(ConfigurationModel):
 
     @property
     def is_cache_enabled(self):
-        """Whether responses from the catalog API will be cached."""
+        """
+        Whether responses from the catalog API will be cached.
+        """
         return self.cache_ttl > 0
+
+    @property
+    def is_course_run_cache_enabled(self):
+        """
+        Whether responses from the catalog course run API will be cached.
+        """
+        return self.course_run_cache_ttl > 0
 
     def __unicode__(self):
         return self.internal_api_url

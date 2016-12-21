@@ -331,7 +331,7 @@ class CatalogCacheUtility(object):
         cache.set(
             cls._get_cache_key_name(catalog_course_run["key"]),
             catalog_course_run,
-            CatalogIntegration.current().cache_ttl
+            CatalogIntegration.current().course_run_cache_ttl
         )
 
     @classmethod

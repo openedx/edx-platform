@@ -33,7 +33,7 @@ class CourseAboutLinkTestCase(CatalogIntegrationMixin, CacheIsolationTestCase):
 
         self.catalog_integration = self.create_catalog_integration(
             internal_api_url="http://catalog.example.com:443/api/v1",
-            cache_ttl=1
+            course_run_cache_ttl=60
         )
         self.course_cache_key = "{}{}".format(CatalogCacheUtility.CACHE_KEY_PREFIX, self.course_key_string)
 
