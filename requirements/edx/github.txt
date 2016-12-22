@@ -92,6 +92,7 @@ git+https://github.com/edx/xblock-utils.git@v1.0.3#egg=xblock-utils==1.0.3
 git+https://github.com/edx/edx-user-state-client.git@1.0.1#egg=edx-user-state-client==1.0.1
 git+https://github.com/edx/xblock-lti-consumer.git@v1.1.0#egg=xblock-lti-consumer==1.1.0
 git+https://github.com/edx/edx-proctoring.git@0.17.0#egg=edx-proctoring==0.17.0
+-e git+https://github.com/edx/pa11ycrawler.git@855469429d61af1e94f41ce65cc341b430e7fbd8#egg=pa11ycrawler
 
 # Third Party XBlocks
 -e git+https://github.com/mitodl/edx-sga@172a90fd2738f8142c10478356b2d9ed3e55334a#egg=edx-sga

@@ -21,8 +21,8 @@ SELENIUM_BROWSER=phantomjs paver test_a11y --with-xunitmp
 echo "Generating coverage report..."
 paver a11y_coverage
 
-if [ "$RUN_PA11YCRAWLER" = "1" ]
-then
+# if [ "$RUN_PA11YCRAWLER" = "1" ]
+# then
     # The settings that we use are installed with the pa11ycrawler module
     export SCRAPY_SETTINGS_MODULE='pa11ycrawler.settings'
 
@@ -31,4 +31,4 @@ then
 
     echo "Generating coverage report..."
     paver pa11ycrawler_coverage
-fi
+# fi
