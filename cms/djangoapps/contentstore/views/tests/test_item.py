@@ -20,7 +20,8 @@ from contentstore.views.component import (
 )
 
 from contentstore.views.item import (
-    create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name, add_container_page_publishing_info
+    create_xblock_info, _get_module_info, ALWAYS, VisibilityState, _xblock_type_and_display_name,
+    add_container_page_publishing_info
 )
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
@@ -383,6 +384,59 @@ class GetItemTest(ItemTest):
             }
         ])
         self.assertEqual(result["group_access"], {})
+
+    @ddt.data('ancestorInfo', '')
+    def test_ancestor_info(self, field_type):
+        """
+        Test that we get correct ancestor info.
+
+        Arguments:
+            field_type (string): If field_type=ancestorInfo, fetch ancestor info of the XBlock otherwise not.
+        """
+
+        # Create a parent chapter
+        chap1 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter1', category='chapter')
+        chapter_usage_key = self.response_usage_key(chap1)
+
+        # create a sequential
+        seq1 = self.create_xblock(parent_usage_key=chapter_usage_key, display_name='seq1', category='sequential')
+        seq_usage_key = self.response_usage_key(seq1)
+
+        # create a vertical
+        vert1 = self.create_xblock(parent_usage_key=seq_usage_key, display_name='vertical1', category='vertical')
+        vert_usage_key = self.response_usage_key(vert1)
+
+        # create problem and an html component
+        problem1 = self.create_xblock(parent_usage_key=vert_usage_key, display_name='problem1', category='problem')
+        problem_usage_key = self.response_usage_key(problem1)
+
+        def assert_xblock_info(xblock, xblock_info):
+            """
+            Assert we have correct xblock info.
+
+            Arguments:
+                xblock (XBlock): An XBlock item.
+                xblock_info (dict): A dict containing xblock information.
+            """
+            self.assertEqual(unicode(xblock.location), xblock_info['id'])
+            self.assertEqual(xblock.display_name, xblock_info['display_name'])
+            self.assertEqual(xblock.category, xblock_info['category'])
+
+        for usage_key in (problem_usage_key, vert_usage_key, seq_usage_key, chapter_usage_key):
+            xblock = self.get_item_from_modulestore(usage_key)
+            url = reverse_usage_url('xblock_handler', usage_key) + '?fields={field_type}'.format(field_type=field_type)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            response = json.loads(response.content)
+            if field_type == 'ancestorInfo':
+                self.assertIn('ancestors', response)
+                for ancestor_info in response['ancestors']:
+                    parent_xblock = xblock.get_parent()
+                    assert_xblock_info(parent_xblock, ancestor_info)
+                    xblock = parent_xblock
+            else:
+                self.assertNotIn('ancestors', response)
+                self.assertEqual(_get_module_info(xblock), response)
 
 
 @ddt.ddt
