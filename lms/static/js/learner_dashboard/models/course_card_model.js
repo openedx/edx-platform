@@ -4,15 +4,14 @@
 (function(define) {
     'use strict';
     define([
-        'backbone',
-        'edx-ui-toolkit/js/utils/date-utils'
+        'backbone'
     ],
-        function(Backbone, DateUtils) {
+        function(Backbone) {
             return Backbone.Model.extend({
                 initialize: function(data) {
                     if (data) {
                         this.context = data;
-                        this.setActiveRunMode(this.getRunMode(data.run_modes), data.user_preferences);
+                        this.setActiveRunMode(this.getRunMode(data.run_modes));
                     }
                 },
 
@@ -32,7 +31,7 @@
                     var enrolled_mode = _.findWhere(runModes, {is_enrolled: true}),
                         openEnrollmentRunModes = this.getEnrollableRunModes(),
                         desiredRunMode;
-                    // We populate our model by looking at the run modes.
+                // We populate our model by looking at the run modes.
                     if (enrolled_mode) {
                     // If the learner is already enrolled in a run mode, return that one.
                         desiredRunMode = enrolled_mode;
@@ -65,44 +64,15 @@
                     });
                 },
 
-                formatDate: function(date, userPreferences) {
-                    var context,
-                        userTimezone = '',
-                        userLanguage = '';
-                    if (userPreferences !== undefined) {
-                        userTimezone = userPreferences.time_zone;
-                        userLanguage = userPreferences['pref-lang'];
-                    }
-                    context = {
-                        datetime: date,
-                        timezone: userTimezone,
-                        language: userLanguage,
-                        format: DateUtils.dateFormatEnum.shortDate
-                    };
-                    return DateUtils.localize(context);
-                },
-
-                setActiveRunMode: function(runMode, userPreferences) {
-                    var startDateString;
+                setActiveRunMode: function(runMode) {
                     if (runMode) {
-                        if (runMode.advertised_start !== undefined && runMode.advertised_start !== 'None') {
-                            startDateString = runMode.advertised_start;
-                        } else {
-                            startDateString = this.formatDate(
-                                runMode.start_date,
-                                userPreferences
-                            );
-                        }
                         this.set({
                             certificate_url: runMode.certificate_url,
                             course_image_url: runMode.course_image_url || '',
                             course_key: runMode.course_key,
                             course_url: runMode.course_url || '',
                             display_name: this.context.display_name,
-                            end_date: this.formatDate(
-                                runMode.end_date,
-                                userPreferences
-                            ),
+                            end_date: runMode.end_date,
                             enrollable_run_modes: this.getEnrollableRunModes(),
                             is_course_ended: runMode.is_course_ended,
                             is_enrolled: runMode.is_enrolled,
@@ -111,12 +81,13 @@
                             marketing_url: runMode.marketing_url,
                             mode_slug: runMode.mode_slug,
                             run_key: runMode.run_key,
-                            start_date: startDateString,
+                            start_date: runMode.start_date,
                             upcoming_run_modes: this.getUpcomingRunModes(),
                             upgrade_url: runMode.upgrade_url
                         });
                     }
                 },
+
                 setUnselected: function() {
                 // Called to reset the model back to the unselected state.
                     var unselectedMode = this.getUnselectedRunMode(this.get('enrollable_run_modes'));

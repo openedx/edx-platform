@@ -74,6 +74,10 @@ from openedx.core.lib.courses import course_image_url
             <span class="course-registration-title">${_('Registration for:')}</span>
             <span class="course-display-name">${ course.display_name }</span>
           </h3>
+          <p class="course-meta-info" aria-describedby="course-title">
+            <span class="course-dates-title">${_('Course Dates:')}</span>
+            <span class="course-display-dates">${ course.start_datetime_text() } - ${ course.end_datetime_text() }</span>
+          </p>
           <hr>
           <div class="three-col">
               <div class="col-1">

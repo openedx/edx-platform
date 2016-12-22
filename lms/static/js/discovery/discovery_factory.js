@@ -5,23 +5,17 @@
         'js/discovery/views/search_form', 'js/discovery/views/courses_listing',
         'js/discovery/views/filter_bar', 'js/discovery/views/refine_sidebar'],
         function(Backbone, SearchState, Filters, SearchForm, CoursesListing, FilterBar, RefineSidebar) {
-            return function(meanings, searchQuery, userLanguage, userTimezone) {
+            return function(meanings, searchQuery) {
                 var dispatcher = _.extend({}, Backbone.Events);
                 var search = new SearchState();
                 var filters = new Filters();
+                var listing = new CoursesListing({model: search.discovery});
                 var form = new SearchForm();
                 var filterBar = new FilterBar({collection: filters});
                 var refineSidebar = new RefineSidebar({
                     collection: search.discovery.facetOptions,
                     meanings: meanings
                 });
-                var listing;
-                var courseListingModel = search.discovery;
-                courseListingModel.userPreferences = {
-                    userLanguage: userLanguage,
-                    userTimezone: userTimezone
-                };
-                listing = new CoursesListing({model: courseListingModel});
 
                 dispatcher.listenTo(form, 'search', function(query) {
                     filters.reset();
