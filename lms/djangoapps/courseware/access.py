@@ -156,9 +156,6 @@ def has_access(user, action, obj, course_key=None):
     if isinstance(obj, XBlock):
         return _has_access_descriptor(user, action, obj, course_key)
 
-    if isinstance(obj, CCXLocator):
-        return _has_access_ccx_key(user, action, obj)
-
     if isinstance(obj, CourseKey):
         return _has_access_course_key(user, action, obj)
 
@@ -619,16 +616,6 @@ def _has_access_course_key(user, action, course_key):
     }
 
     return _dispatch(checkers, action, user, course_key)
-
-
-def _has_access_ccx_key(user, action, ccx_key):
-    """Check if user has access to the course for this ccx_key
-
-    Delegates checking to _has_access_course_key
-    Valid actions: same as for that function
-    """
-    course_key = ccx_key.to_course_locator()
-    return _has_access_course_key(user, action, course_key)
 
 
 def _has_access_string(user, action, perm):
