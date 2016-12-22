@@ -4,18 +4,39 @@ define(
         'jquery',
         'js/models/active_video_upload',
         'js/views/active_video_upload_list',
+        'edx-ui-toolkit/js/utils/string-utils',
         'common/js/spec_helpers/template_helpers',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'accessibility',
         'mock-ajax'
     ],
-    function($, ActiveVideoUpload, ActiveVideoUploadListView, TemplateHelpers) {
+    function($, ActiveVideoUpload, ActiveVideoUploadListView, StringUtils, TemplateHelpers, AjaxHelpers) {
         'use strict';
-        var concurrentUploadLimit = 2;
+        var concurrentUploadLimit = 2,
+            POST_URL = '/test/post/url',
+            VIDEO_ID = 'video101',
+            UPLOAD_STATUS = {
+                s3Fail: 's3_upload_failed',
+                fail: 'upload_failed',
+                success: 'upload_completed'
+            },
+            makeUploadUrl,
+            getSentRequests,
+            verifyUploadViewInfo,
+            getStatusUpdateRequest,
+            verifyStatusUpdateRequest,
+            sendUploadPostResponse,
+            verifyA11YMessage,
+            verifyUploadPostRequest;
 
         describe('ActiveVideoUploadListView', function() {
             beforeEach(function() {
-                TemplateHelpers.installTemplate('active-video-upload', true);
+                setFixtures(
+                    '<div id="page-prompt"></div><div id="page-notification"></div><div id="reader-feedback"></div>'
+                );
+                TemplateHelpers.installTemplate('active-video-upload');
                 TemplateHelpers.installTemplate('active-video-upload-list');
-                this.postUrl = '/test/post/url';
+                this.postUrl = POST_URL;
                 this.uploadButton = $('<button>');
                 this.videoSupportedFileFormats = ['.mp4', '.mov'];
                 this.videoUploadMaxFileSizeInGB = 5;
@@ -51,41 +72,235 @@ define(
                 expect(this.view.onBeforeUnload()).toBeUndefined();
             });
 
-            var makeUploadUrl = function(fileName) {
+            makeUploadUrl = function(fileName) {
                 return 'http://www.example.com/test_url/' + fileName;
             };
 
-            var getSentRequests = function() {
+            getSentRequests = function() {
                 return jasmine.Ajax.requests.filter(function(request) {
                     return request.readyState > 0;
                 });
             };
 
-            describe('supported file formats', function() {
-                it('should not show unsupported file format notification for supported files', function() {
-                    var supportedFiles = {
-                        files: [
-                            {name: 'test-1.mp4', size: 0},
-                            {name: 'test-1.mov', size: 0}
-                        ]
-                    };
-                    this.view.$uploadForm.fileupload('add', supportedFiles);
-                    expect(this.view.fileErrorMsg).toBeNull();
+            verifyUploadViewInfo = function(view, expectedTitle, expectedMessage) {
+                expect(view.$('.video-detail-status').text().trim()).toEqual('Upload failed');
+                expect(view.$('.more-details-action').contents().get(0).nodeValue.trim()).toEqual('Read More');
+                expect(view.$('.more-details-action .sr').text().trim()).toEqual('details about the failure');
+                view.$('a.more-details-action').click();
+                expect($('#prompt-warning-title').text().trim()).toEqual(expectedTitle);
+                expect($('#prompt-warning-description').text().trim()).toEqual(expectedMessage);
+            };
+
+            getStatusUpdateRequest = function() {
+                var sentRequests = getSentRequests();
+                return sentRequests.filter(function(request) {
+                    return request.method === 'POST' && _.has(
+                        JSON.parse(request.params)[0], 'status'
+                    );
+                })[0];
+            };
+
+            verifyStatusUpdateRequest = function(videoId, status, message, expectedRequest) {
+                var request = expectedRequest || getStatusUpdateRequest(),
+                    expectedData = JSON.stringify({
+                        edxVideoId: videoId,
+                        status: status,
+                        message: message
+                    });
+                expect(request.method).toEqual('POST');
+                expect(request.url).toEqual(POST_URL);
+                if (_.has(request, 'requestBody')) {
+                    expect(_.isMatch(request.requestBody, expectedData)).toBeTruthy();
+                } else {
+                    expect(_.isMatch(request.params, expectedData)).toBeTruthy();
+                }
+            };
+
+            verifyUploadPostRequest = function(requestParams) {
+                // get latest requestParams.length requests
+                var postRequests = getSentRequests().slice(-requestParams.length);
+                _.each(postRequests, function(postRequest, index) {
+                    expect(postRequest.method).toEqual('POST');
+                    expect(postRequest.url).toEqual(POST_URL);
+                    expect(postRequest.params).toEqual(requestParams[index]);
                 });
-                it('should show invalid file format notification for unspoorted files', function() {
-                    var unSupportedFiles = {
-                        files: [
+            };
+
+            verifyA11YMessage = function(message) {
+                expect($('#reader-feedback').text().trim()).toEqual(message);
+            };
+
+            sendUploadPostResponse = function(request, fileNames, url) {
+                request.respondWith({
+                    status: 200,
+                    responseText: JSON.stringify({
+                        files: _.map(
+                            fileNames,
+                            function(fileName) {
+                                return {
+                                    edx_video_id: VIDEO_ID,
+                                    file_name: fileName,
+                                    upload_url: url || makeUploadUrl(fileName)
+                                };
+                            }
+                        )
+                    })
+                });
+            };
+
+            describe('errors', function() {
+                it('should show error notification for status update request in case of server error', function() {
+                    this.view.sendStatusUpdate([
+                        {
+                            edxVideoId: '101',
+                            status: 'upload_completed',
+                            message: 'Uploaded completed'
+                        }
+                    ]);
+                    getStatusUpdateRequest().respondWith(
+                        {
+                            status: 500,
+                            responseText: JSON.stringify({
+                                error: '500 server errror'
+                            })
+                        }
+                    );
+                    expect($('#notification-error-title').text().trim()).toEqual(
+                        "Studio's having trouble saving your work"
+                    );
+                    expect($('#notification-error-description').text().trim()).toEqual('500 server errror');
+                });
+
+                it('should correctly parse and show S3 error response xml', function() {
+                    var fileInfo = {name: 'video.mp4', size: 10000},
+                        videos = {
+                            files: [
+                                fileInfo
+                            ]
+                        },
+                        S3Url = 'http://s3.aws.com/upload/videos/' + fileInfo.name,
+                        requests;
+
+                    // this is required so that we can use AjaxHelpers ajax mock utils instead of jasmine mock-ajax.js
+                    jasmine.Ajax.uninstall();
+
+                    requests = AjaxHelpers.requests(this);
+
+                    this.view.$uploadForm.fileupload('add', videos);
+                    AjaxHelpers.respond(requests, {
+                        status: 200,
+                        body: {
+                            files: [{
+                                edx_video_id: VIDEO_ID,
+                                file_name: fileInfo.name,
+                                upload_url: S3Url
+                            }]
+                        }
+                    });
+                    expect(requests.length).toEqual(2);
+                    AjaxHelpers.respond(
+                        requests,
+                        {
+                            statusCode: 403,
+                            contentType: 'application/xml',
+                            body: '<Error><Message>Invalid access key.</Message></Error>'
+                        }
+                    );
+                    verifyUploadViewInfo(
+                        this.view.itemViews[0],
+                        'Your file could not be uploaded',
+                        'Invalid access key.'
+                    );
+                    verifyStatusUpdateRequest(
+                        VIDEO_ID,
+                        UPLOAD_STATUS.s3Fail,
+                        'Invalid access key.',
+                        AjaxHelpers.currentRequest(requests)
+                    );
+                    verifyA11YMessage(
+                        StringUtils.interpolate('Upload failed for video {fileName}', {fileName: fileInfo.name})
+                    );
+
+                    // this is required otherwise mock-ajax will throw an exception when it tries to uninstall Ajax in
+                    // outer afterEach
+                    jasmine.Ajax.install();
+                });
+            });
+
+            describe('upload cancelled', function() {
+                it('should send correct status update request', function() {
+                    var fileInfo = {name: 'video.mp4'},
+                        videos = {
+                            files: [
+                                fileInfo
+                            ]
+                        },
+                        sentRequests,
+                        uploadCancelledRequest;
+
+                    this.view.$uploadForm.fileupload('add', videos);
+                    sendUploadPostResponse(getSentRequests()[0], [fileInfo.name]);
+                    sentRequests = getSentRequests();
+
+                    // no upload cancel request should be sent because `uploading` attribute is not set on model
+                    this.view.onUnload();
+                    expect(getSentRequests().length).toEqual(sentRequests.length);
+
+                    // set `uploading` attribute on each model
+                    this.view.collection.each(function(model) {
+                        model.set('uploading', true);
+                    });
+
+                    // upload_cancelled request should be sent
+                    this.view.onUnload();
+                    uploadCancelledRequest = jasmine.Ajax.requests.mostRecent();
+                    expect(uploadCancelledRequest.params).toEqual(
+                        JSON.stringify(
+                            [{
+                                edxVideoId: VIDEO_ID,
+                                status: 'upload_cancelled',
+                                message: 'User cancelled video upload'
+                            }]
+                        )
+                    );
+                });
+            });
+
+            describe('file formats', function() {
+                it('should not fail upload for supported file formats', function() {
+                    var supportedFiles = {
+                            files: [
+                                {name: 'test-1.mp4'},
+                                {name: 'test-1.mov'}
+                            ]
+                        },
+                        requestParams = _.map(supportedFiles.files, function(file) {
+                            return JSON.stringify({files: [{file_name: file.name}]});
+                        });
+                    this.view.$uploadForm.fileupload('add', supportedFiles);
+                    verifyUploadPostRequest(requestParams);
+                });
+                it('should fail upload for unspported file formats', function() {
+                    var files = [
                             {name: 'test-3.txt', size: 0},
                             {name: 'test-4.png', size: 0}
-                        ]
-                    };
+                        ],
+                        unSupportedFiles = {
+                            files: files
+                        },
+                        self = this;
+
                     this.view.$uploadForm.fileupload('add', unSupportedFiles);
-                    expect(this.view.fileErrorMsg).toBeDefined();
-                    expect(this.view.fileErrorMsg.options.title).toEqual('Your file could not be uploaded');
-                    expect(this.view.fileErrorMsg.options.message).toEqual(
-                        'test-3.txt is not in a supported file format. Supported file formats are ' +
-                        this.videoSupportedFileFormats.join(' and ') + '.'
-                    );
+                    _.each(this.view.itemViews, function(uploadView, index) {
+                        verifyUploadViewInfo(
+                            uploadView,
+                            'Your file could not be uploaded',
+                            StringUtils.interpolate(
+                                '{fileName} is not in a supported file format. Supported file formats are {supportedFormats}.',  // eslint-disable-line max-len
+                                {fileName: files[index].name, supportedFormats: self.videoSupportedFileFormats.join(' and ')}  // eslint-disable-line max-len
+                            )
+                        );
+                    });
                 });
             });
 
@@ -104,17 +319,43 @@ define(
                                     files: [
                                         {name: 'file.mp4', size: fileSize}
                                     ]
-                                };
+                                },
+                                requestParams = _.map(fileToUpload.files, function(file) {
+                                    return JSON.stringify({files: [{file_name: file.name}]});
+                                }),
+                                uploadView;
                             this.view.$uploadForm.fileupload('add', fileToUpload);
                             if (fileSize > maxFileSizeInBytes) {
-                                expect(this.view.fileErrorMsg).toBeDefined();
-                                expect(this.view.fileErrorMsg.options.title).toEqual('Your file could not be uploaded');
-                                expect(this.view.fileErrorMsg.options.message).toEqual(
+                                uploadView = this.view.itemViews[0];
+                                verifyUploadViewInfo(
+                                    uploadView,
+                                    'Your file could not be uploaded',
                                     'file.mp4 exceeds maximum size of ' + this.videoUploadMaxFileSizeInGB + ' GB.'
                                 );
+                                verifyA11YMessage(
+                                    StringUtils.interpolate(
+                                        'Upload failed for video {fileName}', {fileName: 'file.mp4'}
+                                    )
+                                );
                             } else {
-                                this.view.$uploadForm.fileupload('add', fileToUpload);
-                                expect(this.view.fileErrorMsg).toBeNull();
+                                verifyUploadPostRequest(requestParams);
+                                sendUploadPostResponse(
+                                    getSentRequests()[0],
+                                    [fileToUpload.files[0].name]
+                                );
+                                getSentRequests()[1].respondWith(
+                                    {status: 200}
+                                );
+                                verifyStatusUpdateRequest(
+                                    VIDEO_ID,
+                                    UPLOAD_STATUS.success,
+                                    'Uploaded completed'
+                                );
+                                verifyA11YMessage(
+                                    StringUtils.interpolate(
+                                        'Upload completed for video {fileName}', {fileName: fileToUpload.files[0].name}
+                                    )
+                                );
                             }
                         });
                     }
@@ -140,7 +381,7 @@ define(
                             // that jQuery-File-Upload uses to retrieve it.
                             var realProp = $.prop;
                             spyOn($, 'prop').and.callFake(function(el, propName) {
-                                if (arguments.length == 2 && propName == 'files') {
+                                if (arguments.length === 2 && propName === 'files') {
                                     return _.map(
                                         fileNames,
                                         function(fileName) { return {name: fileName}; }
@@ -169,29 +410,10 @@ define(
                             });
                         });
 
-                        it('should trigger the notification error handler on server error', function() {
-                            this.request.respondWith({status: 500});
-                            expect(this.view.fileErrorMsg).toBeDefined();
-                            expect(this.view.fileErrorMsg.options.title).toEqual('Your file could not be uploaded');
-                        });
-
                         describe('and successful server response', function() {
                             beforeEach(function() {
                                 jasmine.Ajax.requests.reset();
-                                this.request.respondWith({
-                                    status: 200,
-                                    responseText: JSON.stringify({
-                                        files: _.map(
-                                            fileNames,
-                                            function(fileName) {
-                                                return {
-                                                    'file_name': fileName,
-                                                    'upload_url': makeUploadUrl(fileName)
-                                                };
-                                            }
-                                        )
-                                    })
-                                });
+                                sendUploadPostResponse(this.request, fileNames);
                                 this.$uploadElems = this.view.$('.active-video-upload');
                             });
 
@@ -276,6 +498,13 @@ define(
                                                     getSentRequests()[0].respondWith(
                                                         {status: subCaseInfo.responseStatus}
                                                     );
+                                                    // after successful upload, status update request is sent to server
+                                                    // we re-render views after success response is received from server
+                                                    if (subCaseInfo.statusText === ActiveVideoUpload.STATUS_COMPLETED) {
+                                                        getStatusUpdateRequest().respondWith(
+                                                            {status: 200}
+                                                        );
+                                                    }
                                                 });
 
                                                 it('should update status and progress', function() {
@@ -305,15 +534,17 @@ define(
                                                     }
                                                 });
 
-                                                it('should not trigger the notification error handler', function() {
-                                                    expect(this.view.fileErrorMsg).toBeNull();
-                                                });
-
                                                 if (caseInfo.numFiles > concurrentUploadLimit) {
                                                     it('should start a new upload', function() {
                                                         var $uploadElem = $(this.$uploadElems[concurrentUploadLimit]);
+
+                                                        // we try to upload 3 files. 2 files(2 requests) will start
+                                                        // uploading immediately and third one will be queued, after
+                                                        // an upload is completed, queued file(3rd request) will start
+                                                        // uploading, 4th request will be sent to server to update
+                                                        // status for completed upload
                                                         expect(getSentRequests().length).toEqual(
-                                                            concurrentUploadLimit + 1
+                                                            concurrentUploadLimit + 1 + 1
                                                         );
                                                         expect(
                                                             $.trim($uploadElem.find('.video-detail-status').text())
