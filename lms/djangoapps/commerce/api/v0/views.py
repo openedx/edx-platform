@@ -22,7 +22,7 @@ from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 from openedx.core.lib.log_utils import audit_log
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, RegistrationCookieConfiguration
 from util.json_request import JsonResponse
 
 
@@ -150,13 +150,11 @@ class BasketsView(APIView):
         # Make the API call
         try:
             # Pass along Sailthru campaign id
-            campaign_cookie = request.COOKIES.get(SAILTHRU_CAMPAIGN_COOKIE)
-            if campaign_cookie:
-                cookie = {SAILTHRU_CAMPAIGN_COOKIE: campaign_cookie}
-                if api_session.cookies:
-                    requests.utils.add_dict_to_cookiejar(api_session.cookies, cookie)
-                else:
-                    api_session.cookies = requests.utils.cookiejar_from_dict(cookie)
+            self._add_request_cookie_to_api_session(api_session, request, SAILTHRU_CAMPAIGN_COOKIE)
+
+            # Pass along UTM tracking info
+            utm_cookie_name = RegistrationCookieConfiguration.current().utm_cookie_name
+            self._add_request_cookie_to_api_session(api_session, request, utm_cookie_name)
 
             response_data = api.baskets.post({
                 'products': [{'sku': default_enrollment_mode.sku}],
@@ -193,6 +191,18 @@ class BasketsView(APIView):
 
         self._handle_marketing_opt_in(request, course_key, user)
         return response
+
+    def _add_request_cookie_to_api_session(self, server_session, request, cookie_name):
+        """ Add cookie from user request into server session """
+        user_cookie = None
+        if cookie_name:
+            user_cookie = request.COOKIES.get(cookie_name)
+            if user_cookie:
+                server_cookie = {cookie_name: user_cookie}
+                if server_session.cookies:
+                    requests.utils.add_dict_to_cookiejar(server_session.cookies, server_cookie)
+                else:
+                    server_session.cookies = requests.utils.cookiejar_from_dict(server_cookie)
 
 
 class BasketOrderView(APIView):
