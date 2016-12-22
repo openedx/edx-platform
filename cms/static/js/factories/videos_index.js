@@ -10,13 +10,15 @@ define([
         concurrentUploadLimit,
         uploadButton,
         previousUploads,
-        videoSupportedFileFormats
+        videoSupportedFileFormats,
+        videoUploadMaxFileSizeInGB
     ) {
         var activeView = new ActiveVideoUploadListView({
                 postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
                 uploadButton: uploadButton,
                 videoSupportedFileFormats: videoSupportedFileFormats,
+                videoUploadMaxFileSizeInGB: videoUploadMaxFileSizeInGB,
                 onFileUploadDone: function(activeVideos) {
                     $.ajax({
                         url: videoHandlerUrl,
