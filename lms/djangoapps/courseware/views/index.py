@@ -348,7 +348,7 @@ class CoursewareIndex(View):
         sets up the runtime, which binds the request user to the section.
         """
         # Pre-fetch all descendant data
-        self.section = modulestore().get_item(self.section.location, depth=None)
+        self.section = modulestore().get_item(self.section.location, depth=None, lazy=False)
         self.field_data_cache.add_descriptor_descendents(self.section, depth=None)
 
         # Bind section to user
