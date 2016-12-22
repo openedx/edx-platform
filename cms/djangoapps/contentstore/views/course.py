@@ -338,11 +338,16 @@ def _course_outline_json(request, course_module):
     """
     Returns a JSON representation of the course module and recursively all of its children.
     """
+    is_concise = request.GET.get('formats') == 'concise'
+    include_children_predicate = lambda xblock: not xblock.category == 'vertical'
+    if is_concise:
+        include_children_predicate = lambda xblock: xblock.has_children
     return create_xblock_info(
         course_module,
         include_child_info=True,
-        course_outline=True,
-        include_children_predicate=lambda xblock: not xblock.category == 'vertical',
+        course_outline=False if is_concise else True,
+        include_children_predicate=include_children_predicate,
+        is_concise=is_concise,
         user=request.user
     )
 

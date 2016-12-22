@@ -334,11 +334,16 @@ class TestCourseOutline(CourseTestCase):
             parent_location=self.vertical.location, category="video", display_name="My Video"
         )
 
-    def test_json_responses(self):
+    @ddt.data(True, False)
+    def test_json_responses(self, is_concise):
         """
         Verify the JSON responses returned for the course.
+
+        Arguments:
+            is_concise (Boolean) : If True, fetch concise version of course outline.
         """
         outline_url = reverse_course_url('course_handler', self.course.id)
+        outline_url = outline_url + '?format=concise' if is_concise else outline_url
         resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
 
@@ -346,8 +351,9 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(json_response['category'], 'course')
         self.assertEqual(json_response['id'], unicode(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
-        self.assertTrue(json_response['published'])
-        self.assertIsNone(json_response['visibility_state'])
+        if not is_concise:
+            self.assertTrue(json_response['published'])
+            self.assertIsNone(json_response['visibility_state'])
 
         # Now verify the first child
         children = json_response['child_info']['children']
@@ -356,24 +362,26 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
-        self.assertTrue(json_response['published'])
-        self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
+        if not is_concise:
+            self.assertTrue(json_response['published'])
+            self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
         self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
         # Finally, validate the entire response for consistency
-        self.assert_correct_json_response(json_response)
+        self.assert_correct_json_response(json_response, is_concise)
 
-    def assert_correct_json_response(self, json_response):
+    def assert_correct_json_response(self, json_response, is_concise=False):
         """
         Asserts that the JSON response is syntactically consistent
         """
         self.assertIsNotNone(json_response['display_name'])
         self.assertIsNotNone(json_response['id'])
         self.assertIsNotNone(json_response['category'])
-        self.assertTrue(json_response['published'])
+        if not is_concise:
+            self.assertTrue(json_response['published'])
         if json_response.get('child_info', None):
             for child_response in json_response['child_info']['children']:
-                self.assert_correct_json_response(child_response)
+                self.assert_correct_json_response(child_response, is_concise)
 
     def test_course_outline_initial_state(self):
         course_module = modulestore().get_item(self.course.location)
