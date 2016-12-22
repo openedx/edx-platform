@@ -33,8 +33,7 @@
                      this.options = options;
                      this.programModel = new Backbone.Model(this.options.programData);
                      this.courseCardCollection = new CourseCardCollection(
-                        this.programModel.get('course_codes'),
-                        this.options.userPreferences
+                        this.programModel.get('course_codes')
                     );
                      this.render();
                  },

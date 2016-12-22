@@ -75,6 +75,7 @@ var edx = edx || {};
             'payment-confirmation-step': {
                 courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
+                courseStartDate: el.data('course-start-date'),
                 coursewareUrl: el.data('courseware-url'),
                 platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
@@ -93,6 +94,7 @@ var edx = edx || {};
             },
             'enrollment-confirmation-step': {
                 courseName: el.data('course-name'),
+                courseStartDate: el.data('course-start-date'),
                 coursewareUrl: el.data('courseware-url'),
                 platformName: el.data('platform-name')
             }

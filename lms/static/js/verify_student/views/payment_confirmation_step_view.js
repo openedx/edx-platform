@@ -16,6 +16,7 @@ var edx = edx || {};
             return {
                 courseKey: '',
                 courseName: '',
+                courseStartDate: '',
                 coursewareUrl: '',
                 platformName: '',
                 requirements: []
