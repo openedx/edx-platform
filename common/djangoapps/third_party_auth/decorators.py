@@ -26,8 +26,9 @@ def allow_frame_from_whitelisted_url(view_func):  # pylint: disable=invalid-name
             if referer is not None:
                 sso_urls = SAMLProviderData.objects.values_list('sso_url', flat=True)
                 if referer in sso_urls:
-                    x_frame_option = 'ALLOW-FROM %s' % settings.THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL
-                    content_security_policy = "frame-ancestors %s" % settings.THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL
+                    allowed_urls = ' '.join(settings.THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL)
+                    x_frame_option = 'ALLOW-FROM {}'.format(allowed_urls)
+                    content_security_policy = "frame-ancestors {}".format(allowed_urls)
         resp['X-Frame-Options'] = x_frame_option
         resp['Content-Security-Policy'] = content_security_policy
         return resp
