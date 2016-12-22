@@ -6,6 +6,7 @@ import datetime
 from uuid import uuid4
 
 from nose.plugins.attrib import attr
+from nose.tools import nottest
 from pytz import UTC
 from flaky import flaky
 
@@ -1022,7 +1023,9 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.discussion_page.show_thread(thread_id)
         self.thread_page = self.discussion_page.thread_page  # pylint: disable=attribute-defined-outside-init
 
+    # This test is too flaky to run at all. TNL-6215
     @attr('a11y')
+    @nottest
     def test_inline_a11y(self):
         """
         Tests Inline Discussion for accessibility issues.
