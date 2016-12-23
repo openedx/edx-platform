@@ -106,6 +106,7 @@ def bootstrap_site(site, organization_slug=None, user_email=None, password=None)
             'short_name': organization_slug
         })
         organization = Organization.objects.get(id=organization_data.get('id'))
+        organization.sites.add(site)
         site_config.values['course_org_filter'] = organization_slug
         site_config.save()
     else:

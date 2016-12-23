@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.files.storage import DefaultStorage
 from rest_framework import generics, views, viewsets
@@ -11,8 +13,17 @@ from .utils import delete_site
 
 
 class SiteViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Site.objects.exclude(configuration=None)
+    queryset = Site.objects.all()
     serializer_class = SiteSerializer
+
+    def get_queryset(self):
+        queryset = Site.objects.exclude(id=settings.SITE_ID)
+        user_email = self.request.query_params.get('user_email')
+        if not user_email:
+            return Response(status=400)
+        user = User.objects.get(email=user_email)
+        queryset = queryset.filter(organizations=user.organizations.first())
+        return queryset
 
 
 class SiteConfigurationViewSet(viewsets.ModelViewSet):
