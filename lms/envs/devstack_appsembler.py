@@ -10,10 +10,7 @@ for cache_key in CACHES.keys():
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 INSTALLED_APPS += (
-    'appsembler',
-    'appsembler.enrollment_api',
-    'appsembler.ps_user_api',
-    'appsembler.jitterbit_api'
+    'appsembler_api',
 )
 
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context_processors.intercom',)

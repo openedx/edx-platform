@@ -4,10 +4,7 @@ from .aws import *
 from .appsembler import *
 
 INSTALLED_APPS += (
-    'appsembler',
-    'appsembler.enrollment_api',
-    'appsembler.ps_user_api',
-    'appsembler.jitterbit_api'
+    'appsembler_api',
 )
 
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context_processors.intercom',)

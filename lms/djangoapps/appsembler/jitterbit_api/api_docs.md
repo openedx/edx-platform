@@ -54,7 +54,7 @@ This endpoint provides information about user accounts. Can be called with filte
 
 This endpoint provides information about course enrollment. Can be called with filters for course, start date, and end date, or can be called without parameters to get information for all enrollments.
 
-* URL: `api/jitterbit/v1/accounts/batch`
+* URL: `api/jitterbit/v1/enrollment/batch`
 * Method: `GET`
 * Optional URL Params:
 	* `course_id` (course-v1:Org+Course+Run)

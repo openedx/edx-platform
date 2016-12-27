@@ -77,7 +77,7 @@ urlpatterns = (
 
     # Enrollment API RESTful endpoints
     url(r'^api/enrollment/v1/', include('enrollment.urls')),
-    url(r'^api/enrollment/v1/', include('appsembler.enrollment_api.urls')),
+    url(r'^appsembler_api/v0/', include('appsembler_api.urls')),
 
     # Courseware search endpoints
     url(r'^search/', include('search.urls')),
@@ -90,10 +90,6 @@ urlpatterns = (
 
     # User API endpoints
     url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
-    url(r'^api/ps_user_api/', include('appsembler.ps_user_api.urls')),
-
-    # Jitterbit API endpoints
-    url(r'^api/jitterbit/', include('appsembler.jitterbit_api.urls')),
 
     # Bookmarks API endpoints
     url(r'^api/bookmarks/', include('openedx.core.djangoapps.bookmarks.urls')),
