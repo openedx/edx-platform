@@ -110,6 +110,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
      */
         var _videoLinkParser = (function() {
             var cache = {};
+            var maxVideoNameLength = 150;
 
             return function(url) {
                 if (typeof url !== 'string') {
@@ -129,7 +130,10 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                 match = link.pathname.match(/\/{1}([^\/]+)\.([^\/]+)$/);
                 if (match) {
                     cache[url] = {
-                        video: match[1],
+                        /* avoid too long video name, as it will be used as filename for video's transcript
+                        and a filename can not be more that 255 chars, limiting here to 150.
+                        */
+                        video: match[1].slice(0, maxVideoNameLength),
                         type: match[2]
                     };
                 } else {
@@ -139,7 +143,7 @@ define(['jquery', 'underscore', 'jquery.ajaxQueue'], function($) {
                     match = link.pathname.match(/\/{1}([^\/\.]+)$/);
                     if (match) {
                         cache[url] = {
-                            video: match[1],
+                            video: match[1].slice(0, maxVideoNameLength),
                             type: 'other'
                         };
                     }
