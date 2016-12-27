@@ -156,4 +156,5 @@ class IsStaffOrOwner(permissions.BasePermission):
         user = request.user
         return user.is_staff \
             or (user.username == request.GET.get('username')) \
-            or (user.username == getattr(request, 'data', {}).get('username'))
+            or (user.username == getattr(request, 'data', {}).get('username')) \
+            or (user.username == getattr(view, 'kwargs', {}).get('username'))

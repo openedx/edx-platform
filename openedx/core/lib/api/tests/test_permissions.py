@@ -5,6 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.test import TestCase, RequestFactory
 from nose.plugins.attrib import attr
+from rest_framework.generics import GenericAPIView
 
 from student.roles import CourseStaffRole, CourseInstructorRole
 from openedx.core.lib.api.permissions import (
@@ -159,6 +160,15 @@ class IsStaffOrOwnerTests(TestCase):
         request.user = user
         self.assertTrue(self.permission.has_permission(request, None))
 
+    def test_has_permission_with_view_kwargs_as_owner_with_get(self):
+        """ Owners always have permission to make GET actions. """
+        user = UserFactory.create()
+        request = RequestFactory().get('/')
+        request.user = user
+        view = GenericAPIView()
+        view.kwargs = {'username': user.username}
+        self.assertTrue(self.permission.has_permission(request, view))
+
     @ddt.data('patch', 'post', 'put')
     def test_has_permission_as_owner_with_edit(self, action):
         """ Owners always have permission to edit. """
@@ -176,3 +186,12 @@ class IsStaffOrOwnerTests(TestCase):
         request = RequestFactory().get('/?username={}'.format(user.username))
         request.user = UserFactory.create()
         self.assertFalse(self.permission.has_permission(request, None))
+
+    def test_has_permission_with_view_kwargs_as_non_owner(self):
+        """ Non-owners should not have permission. """
+        user = UserFactory.create()
+        request = RequestFactory().get('/')
+        request.user = user
+        view = GenericAPIView()
+        view.kwargs = {'username': UserFactory.create().username}
+        self.assertFalse(self.permission.has_permission(request, view))
