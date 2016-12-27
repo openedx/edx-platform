@@ -31,11 +31,14 @@ define(['backbone',
 
                 var fieldData = FieldViewsSpecHelpers.createFieldData(AccountSettingsFieldViews.PasswordFieldView, {
                     linkHref: '/password_reset',
-                    emailAttribute: 'email'
+                    emailAttribute: 'email',
+                    valueAttribute: 'password'
                 });
 
                 var view = new AccountSettingsFieldViews.PasswordFieldView(fieldData).render();
+                expect(view.$('.u-field-value > button').is(':disabled')).toBe(false);
                 view.$('.u-field-value > button').click();
+                expect(view.$('.u-field-value > button').is(':disabled')).toBe(true);
                 AjaxHelpers.expectRequest(requests, 'POST', '/password_reset', 'email=legolas%40woodland.middlearth');
                 AjaxHelpers.respondWithJson(requests, {'success': 'true'});
                 FieldViewsSpecHelpers.expectMessageContains(
