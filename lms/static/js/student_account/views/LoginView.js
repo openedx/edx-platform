@@ -5,9 +5,11 @@
         'underscore',
         'gettext',
         'edx-ui-toolkit/js/utils/html-utils',
-        'js/student_account/views/FormView'
+        'js/student_account/views/FormView',
+        'text!templates/student_account/form_success.underscore',
+        'text!templates/student_account/form_status.underscore'
     ],
-        function($, _, gettext, HtmlUtils, FormView) {
+        function($, _, gettext, HtmlUtils, FormView, formSuccessTpl, formStatusTpl) {
             return FormView.extend({
                 el: '#login-form',
                 tpl: '#login-tpl',
@@ -19,12 +21,17 @@
                 formType: 'login',
                 requiredStr: '',
                 submitButton: '.js-login',
+                formSuccessTpl: formSuccessTpl,
+                formStatusTpl: formStatusTpl,
+                authWarningJsHook: 'js-auth-warning',
+                passwordResetSuccessJsHook: 'js-password-reset-success',
+                defaultFormErrorsTitle: gettext('We couldn\'t sign you in.'),
 
                 preRender: function(data) {
                     this.providers = data.thirdPartyAuth.providers || [];
                     this.hasSecondaryProviders = (
-                    data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
-                );
+                        data.thirdPartyAuth.secondaryProviders && data.thirdPartyAuth.secondaryProviders.length
+                    );
                     this.currentProvider = data.thirdPartyAuth.currentProvider || '';
                     this.errorMessage = data.thirdPartyAuth.errorMessage || '';
                     this.platformName = data.platformName;
@@ -44,7 +51,6 @@
                         context: {
                             fields: fields,
                             currentProvider: this.currentProvider,
-                            errorMessage: this.errorMessage,
                             providers: this.providers,
                             hasSecondaryProviders: this.hasSecondaryProviders,
                             platformName: this.platformName
@@ -57,19 +63,23 @@
                 },
 
                 postRender: function() {
+                    var formErrorsTitle;
                     this.$container = $(this.el);
-
                     this.$form = this.$container.find('form');
-                    this.$errors = this.$container.find('.submission-error');
-                    this.$resetSuccess = this.$container.find('.js-reset-success');
-                    this.$authError = this.$container.find('.already-authenticated-msg');
+                    this.$formFeedback = this.$container.find('.js-form-feedback');
                     this.$submitButton = this.$container.find(this.submitButton);
 
-                /* If we're already authenticated with a third-party
-                 * provider, try logging in.  The easiest way to do this
-                 * is to simply submit the form.
-                 */
-                    if (this.currentProvider) {
+                    if (this.errorMessage) {
+                        formErrorsTitle = _.sprintf(
+                            gettext('An error occurred when signing you in to %s.'),
+                            this.platformName
+                        );
+                        this.renderErrors(formErrorsTitle, [this.errorMessage]);
+                    } else if (this.currentProvider) {
+                        /* If we're already authenticated with a third-party
+                         * provider, try logging in. The easiest way to do this
+                         * is to simply submit the form.
+                         */
                         this.model.save();
                     }
                 },
@@ -78,37 +88,39 @@
                     event.preventDefault();
 
                     this.trigger('password-help');
-                    this.element.hide(this.$resetSuccess);
+                    this.clearPasswordResetSuccess();
                 },
 
                 postFormSubmission: function() {
-                    this.element.hide(this.$resetSuccess);
+                    this.clearPasswordResetSuccess();
                 },
 
                 resetEmail: function() {
                     var email = $('#password-reset-email').val(),
-                        successMessage;
-                    this.element.hide(this.$errors);
-                    this.resetMessage = this.$resetSuccess.find('.message-copy');
+                        successTitle = gettext('Check Your Email'),
+                        successMessageHtml = HtmlUtils.interpolateHtml(
+                            gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password reset instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len
+                            '{paragraphStart}If you do not receive a password reset message, verify that you entered the correct email address, or check your spam folder.{paragraphEnd}' + // eslint-disable-line max-len
+                            '{paragraphStart}If you need further assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}'), { // eslint-disable-line max-len
+                                boldStart: HtmlUtils.HTML('<b>'),
+                                boldEnd: HtmlUtils.HTML('</b>'),
+                                paragraphStart: HtmlUtils.HTML('<p>'),
+                                paragraphEnd: HtmlUtils.HTML('</p>'),
+                                email: email,
+                                platform_name: this.platformName,
+                                anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
+                                anchorEnd: HtmlUtils.HTML('</a>')
+                            }
+                        );
 
-                    successMessage = HtmlUtils.interpolateHtml(
-                        gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password reset instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len
-                        '{paragraphStart}If you do not receive a password reset message, verify that you entered the correct email address, or check your spam folder.{paragraphEnd}' + // eslint-disable-line max-len
-                        '{paragraphStart}If you need further assistance, {anchorStart}contact technical support{anchorEnd}.{paragraphEnd}'), { // eslint-disable-line max-len
-                            boldStart: HtmlUtils.HTML('<b>'),
-                            boldEnd: HtmlUtils.HTML('</b>'),
-                            paragraphStart: HtmlUtils.HTML('<p>'),
-                            paragraphEnd: HtmlUtils.HTML('</p>'),
-                            email: email,
-                            platform_name: this.platformName,
-                            anchorStart: HtmlUtils.HTML('<a href="' + this.supportURL + '">'),
-                            anchorEnd: HtmlUtils.HTML('</a>')
-                        });
+                    this.clearFormErrors();
+                    this.clearPasswordResetSuccess();
 
-                    if (this.resetMessage.find('p').length === 0) {
-                        this.resetMessage.append(HtmlUtils.joinHtml(successMessage).toString());
-                    }
-                    this.element.show(this.$resetSuccess);
+                    this.renderFormFeedback(this.formSuccessTpl, {
+                        jsHook: this.passwordResetSuccessJsHook,
+                        title: successTitle,
+                        messageHtml: successMessageHtml
+                    });
                 },
 
                 thirdPartyAuth: function(event) {
@@ -121,7 +133,7 @@
 
                 saveSuccess: function() {
                     this.trigger('auth-complete');
-                    this.element.hide(this.$resetSuccess);
+                    this.clearPasswordResetSuccess();
                 },
 
                 saveError: function(error) {
@@ -132,8 +144,7 @@
                         msg = gettext('An error has occurred. Try refreshing the page, or check your Internet connection.');
                     }
                     this.errors = ['<li>' + msg + '</li>'];
-                    this.setErrors();
-                    this.element.hide(this.$resetSuccess);
+                    this.clearPasswordResetSuccess();
 
                 /* If we've gotten a 403 error, it means that we've successfully
                  * authenticated with a third-party provider, but we haven't
@@ -144,13 +155,37 @@
                     if (error.status === 403 &&
                      error.responseText === 'third-party-auth' &&
                      this.currentProvider) {
-                        this.element.show(this.$authError);
-                        this.element.hide(this.$errors);
+                        this.clearFormErrors();
+                        this.renderAuthWarning();
                     } else {
-                        this.element.hide(this.$authError);
-                        this.element.show(this.$errors);
+                        this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                     }
                     this.toggleDisableButton(false);
+                },
+
+                renderAuthWarning: function() {
+                    var message = _.sprintf(
+                        gettext('You have successfully signed into %(currentProvider)s, but your %(currentProvider)s' +
+                                ' account does not have a linked %(platformName)s account. To link your accounts,' +
+                                ' sign in now using your %(platformName)s password.'),
+                        {currentProvider: this.currentProvider, platformName: this.platformName}
+                    );
+
+                    this.clearAuthWarning();
+                    this.renderFormFeedback(this.formStatusTpl, {
+                        jsHook: this.authWarningJsHook,
+                        message: message
+                    });
+                },
+
+                clearPasswordResetSuccess: function() {
+                    var query = '.' + this.passwordResetSuccessJsHook;
+                    this.clearFormFeedbackItems(query);
+                },
+
+                clearAuthWarning: function() {
+                    var query = '.' + this.authWarningJsHook;
+                    this.clearFormFeedbackItems(query);
                 }
             });
         });

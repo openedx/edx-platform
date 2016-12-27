@@ -26,15 +26,6 @@
                     this.listenTo(this.model, 'sync', this.saveSuccess);
                 },
 
-                toggleErrorMsg: function(show) {
-                    if (show) {
-                        this.setErrors();
-                        this.toggleDisableButton(false);
-                    } else {
-                        this.element.hide(this.$errors);
-                    }
-                },
-
                 saveSuccess: function() {
                     this.trigger('password-email-sent');
 
