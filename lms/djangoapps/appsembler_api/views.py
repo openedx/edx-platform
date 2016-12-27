@@ -366,7 +366,10 @@ class GetBatchEnrollmentDataView(APIView):
 
         updated_min = request.GET.get('updated_min', '')
         updated_max = request.GET.get('updated_max', '')
-        course_id = request.GET.get('course_id').replace(' ', '+')
+        course_id = request.GET.get('course_id')
+
+        if course_id:
+            course_id= course_id.replace(' ', '+')
         # the replace function is because Django encodes '+' or '%2B' as spaces
         enrollments = CourseEnrollment.objects.all()
 
