@@ -2535,7 +2535,12 @@ class LogoutView(TemplateView):
     template_name = 'logout.html'
 
     # Keep track of the page to which the user should ultimately be redirected.
-    target = reverse_lazy('cas-logout') if settings.FEATURES.get('AUTH_USE_CAS') else '/'
+    if settings.FEATURES.get('AUTH_USE_CAS'):
+        target = reverse_lazy('cas-logout')
+    elif settings.APPSEMBLER_FEATURES.get('ENABLE_CUSTOM_REDIRECT_AFTER_LOGOUT', False) and hasattr(settings, 'CUSTOM_LOGOUT_REDIRECT_URL'):
+        target = settings.CUSTOM_LOGOUT_REDIRECT_URL
+    else:
+        target = '/'
 
     def dispatch(self, request, *args, **kwargs):  # pylint: disable=missing-docstring
         # We do not log here, because we have a handler registered to perform logging on successful logouts.
