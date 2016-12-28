@@ -3,10 +3,14 @@ Django models for site configurations.
 """
 import collections
 
-from django.db import models
+from analytics import Client as SegmentClient
+from django.conf import settings
 from django.contrib.sites.models import Site
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
 
 from django_extensions.db.models import TimeStampedModel
 from jsonfield.fields import JSONField
@@ -32,12 +36,67 @@ class SiteConfiguration(models.Model):
         blank=True,
         load_kwargs={'object_pairs_hook': collections.OrderedDict}
     )
+    analytics_configuration = JSONField(
+        verbose_name=_('Analytics tracking configuration'),
+        help_text=_('JSON string containing settings related to analytics event tracking.'),
+        null=False,
+        blank=False,
+        default={
+            'SEGMENT': {
+                'DEFAULT_WRITE_KEY': None,
+                'ADDITIONAL_WRITE_KEYS': [],
+            },
+            'GOOGLE_ANALYTICS': {
+                'TRACKING_IDS': [],
+            },
+        }
+    )
 
     def __unicode__(self):
         return u"<SiteConfiguration: {site} >".format(site=self.site)
 
     def __repr__(self):
         return self.__unicode__()
+
+    @cached_property
+    def google_analytics_tracking_ids(self):
+        return self.analytics_configuration.get('GOOGLE_ANALYTICS', {}).get('TRACKING_IDS')
+
+    @cached_property
+    def default_segment_key(self):
+        return self.analytics_configuration.get('SEGMENT', {}).get('DEFAULT_WRITE_KEY') or \
+            getattr(settings, 'LMS_SEGMENT_KEY', None) or \
+            getattr(settings, 'CMS_SEGMENT_KEY', None)
+
+    @cached_property
+    def segment_clients(self):
+        """
+        Returns a list of SegmentClient objects for each of the Segment keys configured for this site.
+
+        Returns:
+            list: List of SegmentClient objects
+        """
+        segment_clients = []
+
+        # Segment allows for only a single key to be used client-side, however multiple keys can be
+        # used for server-side tracking. The default Segment key will be used for both client-side
+        # and server-side tracking. Additional Google Analytics trackers can be configured to overcome
+        # the client-side limitation.
+        default_key = self.default_segment_key
+        additional_keys = self.analytics_configuration.get('SEGMENT', {}).get('ADDITIONAL_WRITE_KEYS', [])
+        if default_key:
+            segment_clients.append(SegmentClient(default_key, debug=settings.DEBUG))
+        for key in additional_keys:
+            segment_clients.append(SegmentClient(key, debug=settings.DEBUG))
+
+        return segment_clients
+
+    def track_analytics_event(self, *args, **kwargs):
+        """
+        Sends server-side events to Segment sources.
+        """
+        for client in self.segment_clients:
+            client.track(*args, **kwargs)
 
     def get_value(self, name, default=None):
         """
