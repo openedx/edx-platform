@@ -14,13 +14,14 @@ from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
 
+from opaque_keys import InvalidKeyError
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
 
 from contentstore.views.item import (
-    create_xblock_info, _get_module_info, ALWAYS, VisibilityState, _xblock_type_and_display_name,
+    create_xblock_info, _get_source_index, _get_module_info, ALWAYS, VisibilityState, _xblock_type_and_display_name,
     add_container_page_publishing_info
 )
 from contentstore.tests.utils import CourseTestCase
@@ -732,6 +733,235 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
 
         # Now send a custom display name for the duplicate.
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
+
+
+class TestMoveItem(ItemTest):
+    """
+    Tests for move item.
+    """
+    def setUp(self):
+        """
+        Creates the test course structure to build course outline tree.
+        """
+        super(TestMoveItem, self).setUp()
+
+        # Create a parent chapter
+        chap1 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter1', category='chapter')
+        self.chapter_usage_key = self.response_usage_key(chap1)
+
+        chap2 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter2', category='chapter')
+        self.chapter2_usage_key = self.response_usage_key(chap2)
+
+        # create a sequential
+        seq1 = self.create_xblock(parent_usage_key=self.chapter_usage_key, display_name='seq1', category='sequential')
+        self.seq_usage_key = self.response_usage_key(seq1)
+
+        seq2 = self.create_xblock(parent_usage_key=self.chapter_usage_key, display_name='seq2', category='sequential')
+        self.seq2_usage_key = self.response_usage_key(seq2)
+
+        # create a vertical
+        vert1 = self.create_xblock(parent_usage_key=self.seq_usage_key, display_name='vertical1', category='vertical')
+        self.vert_usage_key = self.response_usage_key(vert1)
+
+        vert2 = self.create_xblock(parent_usage_key=self.seq_usage_key, display_name='vertical2', category='vertical')
+        self.vert2_usage_key = self.response_usage_key(vert2)
+
+        # create problem and an html component
+        problem1 = self.create_xblock(parent_usage_key=self.vert_usage_key, display_name='problem1', category='problem')
+        self.problem_usage_key = self.response_usage_key(problem1)
+
+        html1 = self.create_xblock(parent_usage_key=self.vert_usage_key, display_name='html1', category='html')
+        self.html_usage_key = self.response_usage_key(html1)
+
+    def _move_component(self, source_usage_key, target_usage_key, target_index=None):
+        """
+        Helper method to send move request and returns the response.
+
+        Arguments:
+            source_usage_key (BlockUsageLocator): Locator of source item.
+            target_usage_key (BlockUsageLocator): Locator of target parent.
+            target_index (int): If provided, insert source item at the provided index location in target_usage_key item.
+
+        Returns:
+            resp (JsonResponse): Response after the move operation is complete.
+        """
+        data = {
+            'move_source_locator': unicode(source_usage_key),
+            'parent_locator': unicode(target_usage_key)
+        }
+        if target_index is not None:
+            data['target_index'] = target_index
+
+        return self.client.patch(
+            reverse('contentstore.views.xblock_handler'),
+            json.dumps(data),
+            content_type='application/json'
+        )
+
+    def assert_move_item(self, source_usage_key, target_usage_key, target_index=None):
+        """
+        Assert move component.
+
+        Arguments:
+            source_usage_key (BlockUsageLocator): Locator of source item.
+            target_usage_key (BlockUsageLocator): Locator of target parent.
+            target_index (int): If provided, insert source item at the provided index location in target_usage_key item.
+        """
+        parent_loc = self.store.get_parent_location(source_usage_key)
+        parent = self.get_item_from_modulestore(parent_loc)
+        source_index = _get_source_index(source_usage_key, parent)
+        expected_index = target_index if target_index is not None else source_index
+        response = self._move_component(source_usage_key, target_usage_key, target_index)
+        self.assertEqual(response.status_code, 200)
+        response = json.loads(response.content)
+        self.assertEqual(response['move_source_locator'], unicode(source_usage_key))
+        self.assertEqual(response['parent_locator'], unicode(target_usage_key))
+        self.assertEqual(response['source_index'], expected_index)
+        new_parent_loc = self.store.get_parent_location(source_usage_key)
+        self.assertEqual(new_parent_loc, target_usage_key)
+        self.assertNotEqual(parent_loc, new_parent_loc)
+
+    def test_move_component(self):
+        """
+        Test move component with different xblock types.
+        """
+        for source_usage_key, target_usage_key in [
+                (self.html_usage_key, self.vert2_usage_key),
+                (self.vert_usage_key, self.seq2_usage_key),
+                (self.seq_usage_key, self.chapter2_usage_key)
+        ]:
+            self.assert_move_item(source_usage_key, target_usage_key)
+
+    def test_move_source_index(self):
+        """
+        Test moving an item to a particular index.
+        """
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        children = parent.get_children()
+        self.assertEqual(len(children), 2)
+
+        # Create a component within vert2.
+        resp = self.create_xblock(parent_usage_key=self.vert2_usage_key, display_name='html2', category='html')
+        html2_usage_key = self.response_usage_key(resp)
+
+        # Move html2_usage_key inside vert_usage_key at second position.
+        self.assert_move_item(html2_usage_key, self.vert_usage_key, 1)
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        children = parent.get_children()
+        self.assertEqual(len(children), 3)
+        self.assertEqual(children[1].location, html2_usage_key)
+
+    def test_move_undo(self):
+        """
+        Test move a component and move it back (undo).
+        """
+        # Get the initial index of the component
+        parent = self.get_item_from_modulestore(self.vert_usage_key)
+        original_index = _get_source_index(self.html_usage_key, parent)
+
+        # Move component and verify that response contains initial index
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key)
+        response = json.loads(response.content)
+        self.assertEquals(original_index, response['source_index'])
+
+        # Verify that new parent has the moved component at the last index.
+        parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        self.assertEqual(self.html_usage_key, parent.children[-1])
+
+        # Verify original and new index is different now.
+        source_index = _get_source_index(self.html_usage_key, parent)
+        self.assertNotEquals(original_index, source_index)
+
+        # Undo Move to the original index, use the source index fetched from the response.
+        response = self._move_component(self.html_usage_key, self.vert_usage_key, response['source_index'])
+        response = json.loads(response.content)
+        self.assertEquals(original_index, response['source_index'])
+
+    def test_move_large_target_index(self):
+        """
+        Test moving an item at a large index would generate an error message.
+        """
+        parent = self.get_item_from_modulestore(self.vert2_usage_key)
+        parent_children_length = len(parent.children)
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key, parent_children_length + 10)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        expected_error = 'You can not move {usage_key} at an invalid index ({target_index}).'.format(
+            usage_key=self.html_usage_key,
+            target_index=parent_children_length + 10
+        )
+        self.assertEqual(expected_error, response['error'])
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, self.vert_usage_key)
+
+    def test_invalid_move(self):
+        """
+        Test invalid move.
+        """
+        parent_loc = self.store.get_parent_location(self.chapter_usage_key)
+        response = self._move_component(self.chapter_usage_key, self.usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        expected_error = 'You can not move {source_type} into {target_type}.'.format(
+            source_type=self.chapter_usage_key.block_type,
+            target_type=self.usage_key.block_type
+        )
+        self.assertEqual(expected_error, response['error'])
+        new_parent_loc = self.store.get_parent_location(self.chapter_usage_key)
+        self.assertEqual(new_parent_loc, parent_loc)
+
+    def test_move_current_parent(self):
+        """
+        Test that a component can not be moved to it's current parent.
+        """
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(parent_loc, self.vert_usage_key)
+        response = self._move_component(self.html_usage_key, self.vert_usage_key)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        self.assertEqual(response['error'], 'You can not move an item into the same parent.')
+        self.assertEqual(self.store.get_parent_location(self.html_usage_key), parent_loc)
+
+    def test_move_invalid_source_index(self):
+        """
+        Test moving an item to an invalid index.
+        """
+        target_index = 'test_index'
+        parent_loc = self.store.get_parent_location(self.html_usage_key)
+        response = self._move_component(self.html_usage_key, self.vert2_usage_key, target_index)
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+
+        error = 'You must provide target_index ({target_index}) as an integer.'.format(target_index=target_index)
+        self.assertEqual(response['error'], error)
+        new_parent_loc = self.store.get_parent_location(self.html_usage_key)
+        self.assertEqual(new_parent_loc, parent_loc)
+
+    def test_move_no_target_locator(self):
+        """
+        Test move an item without specifying the target location.
+        """
+        data = {'move_source_locator': unicode(self.html_usage_key)}
+        with self.assertRaises(InvalidKeyError):
+            self.client.patch(
+                reverse('contentstore.views.xblock_handler'),
+                json.dumps(data),
+                content_type='application/json'
+            )
+
+    def test_no_move_source_locator(self):
+        """
+        Test patch request without providing a move source locator.
+        """
+        response = self.client.patch(
+            reverse('contentstore.views.xblock_handler')
+        )
+        self.assertEqual(response.status_code, 400)
+        response = json.loads(response.content)
+        self.assertEqual(response['error'], 'Patch request did not recognise any parameters to handle.')
 
 
 class TestDuplicateItemWithAsides(ItemTest, DuplicateHelper):
