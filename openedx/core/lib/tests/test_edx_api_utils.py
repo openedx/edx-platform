@@ -69,8 +69,8 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         # Verify the API was actually hit (not the cache)
         self._assert_num_requests(1)
 
-    def test_get_paginated_data(self):
-        """Verify that paginated data can be retrieved."""
+    def test_get_page_number_paginated_data(self):
+        """Verify that page-number based DRF paginated data can be retrieved."""
         program_config = self.create_programs_config()
 
         expected_collection = ['some', 'test', 'data']
@@ -80,6 +80,32 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         for page, record in enumerate(expected_collection, start=1):
             data = {
                 'next': url.format(page + 1) if page < len(expected_collection) else None,
+                'results': [record],
+            }
+
+            body = json.dumps(data)
+            responses.append(
+                httpretty.Response(body=body, content_type='application/json')
+            )
+
+        self._mock_programs_api(responses)
+
+        actual_collection = get_edx_api_data(program_config, self.user, 'programs')
+        self.assertEqual(actual_collection, expected_collection)
+
+        self._assert_num_requests(len(expected_collection))
+
+    def test_get_limit_offset_paginated_data(self):
+        """Verify that limit-offset based DRF paginated data can be retrieved."""
+        program_config = self.create_programs_config()
+
+        expected_collection = ['some', 'test', 'data']
+        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/?limit=1&offset={}'
+
+        responses = []
+        for offset, record in enumerate(expected_collection, start=1):
+            data = {
+                'next': url.format(offset + 1) if offset < len(expected_collection) else None,
                 'results': [record],
             }
 

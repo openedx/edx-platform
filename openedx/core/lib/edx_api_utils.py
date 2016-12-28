@@ -1,6 +1,7 @@
 """Helper functions to get data from APIs"""
 from __future__ import unicode_literals
 import logging
+import urlparse
 
 from django.conf import settings
 from django.core.cache import cache
@@ -78,7 +79,7 @@ def get_edx_api_data(api_config, user, resource,
         if resource_id:
             results = response
         else:
-            results = _traverse_pagination(response, endpoint, querystring, no_data)
+            results = _traverse_pagination(response, endpoint, no_data)
     except:  # pylint: disable=bare-except
         log.exception('Failed to retrieve data from the %s API.', api_config.API_NAME)
         return no_data
@@ -89,18 +90,15 @@ def get_edx_api_data(api_config, user, resource,
     return results
 
 
-def _traverse_pagination(response, endpoint, querystring, no_data):
-    """Traverse a paginated API response.
-
+def _traverse_pagination(response, endpoint, no_data):
+    """
+    Traverse a paginated API response.
     Extracts and concatenates "results" (list of dict) returned by DRF-powered APIs.
     """
     results = response.get('results', no_data)
-
-    page = 1
     next_page = response.get('next')
     while next_page:
-        page += 1
-        querystring['page'] = page
+        querystring = urlparse.parse_qs(urlparse.urlparse(next_page).query)
         response = endpoint.get(**querystring)
         results += response.get('results', no_data)
         next_page = response.get('next')
