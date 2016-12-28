@@ -11,6 +11,7 @@ from django.test import Client
 from rest_framework import status
 from openedx.core.djangoapps.labster.tests.base import CCXCourseTestBase
 from xmodule.modulestore.tests.factories import ItemFactory
+from lms.djangoapps.ccx.overrides import get_override_for_ccx
 
 
 class TestSetLicense(CCXCourseTestBase):
@@ -85,6 +86,41 @@ class TestSetLicense(CCXCourseTestBase):
         self.assertFalse(sequential.visible_to_staff_only)
         verticals = sequential.get_children()
         self.assertEqual([False, False, False, True, True], [i.visible_to_staff_only for i in verticals])
+
+    @mock.patch('labster_course_license.views.get_licensed_simulations')
+    @mock.patch('labster_course_license.views.get_consumer_secret')
+    def test_correctly_updates_visibility(self, mock_get_consumer_secret, mock_get_licensed_simulations):
+        """
+        Ensure hides only unlicensed simulations.
+        """
+        mock_get_consumer_secret.return_value = ('123', '__secret_key__')
+        mock_get_licensed_simulations.return_value = ['a0Kw0000001']
+
+        data = ('https://example.com/simulation/a0Kw0000000/', 'LTI0')
+
+        chapter = ItemFactory.create(parent=self.course, category='chapter')
+        sequential = ItemFactory.create(parent=chapter, category='sequential')
+        vertical = ItemFactory.create(parent=sequential, category='vertical')
+
+        block = ItemFactory.create(
+            parent=vertical,
+            category='lti', modulestore=self.store, display_name=data[1],
+            metadata={'lti_id': 'correct_lti_id', 'launch_url': data[0]}
+        )
+
+        self.inject_field_overrides()
+        res = self.client.post(self.url, data=self.data, follow=True)
+        vertical = self.ccx.course.get_children()[0].get_children()[0].get_children()[0]
+        self.assertTrue(vertical.visible_to_staff_only)
+
+        mock_get_licensed_simulations.return_value = ['a0Kw0000000']
+
+        res = self.client.post(self.url, data=self.data, follow=True)
+        vertical = self.ccx.course.get_children()[0].get_children()[0].get_children()[0]
+        self.assertIsNone(get_override_for_ccx(self.ccx, vertical, 'visible_to_staff_only'))
+        # Flush field cache to make sure it returns most actual value.
+        vertical._field_data_cache = {}  # pylint: disable=protected-access
+        self.assertFalse(vertical.visible_to_staff_only)
 
     @mock.patch('labster_course_license.views.get_licensed_simulations')
     @mock.patch('labster_course_license.views.get_consumer_secret')

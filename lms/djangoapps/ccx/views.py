@@ -56,6 +56,7 @@ from lms.djangoapps.ccx.models import CustomCourseForEdX
 from lms.djangoapps.ccx.overrides import (
     get_override_for_ccx,
     override_field_for_ccx,
+    clear_override_for_ccx,
     clear_ccx_field_info_from_ccx_map,
     bulk_delete_ccx_override_fields,
 )
@@ -263,8 +264,10 @@ def save_ccx(request, course, ccx=None):
 
         for unit in data:
             block = blocks[unit['location']]
-            override_field_for_ccx(
-                ccx, block, 'visible_to_staff_only', unit['hidden'])
+            if unit['hidden']:  # start changes by labster
+                override_field_for_ccx(ccx, block, 'visible_to_staff_only', unit['hidden'])
+            else:
+                clear_override_for_ccx(ccx, block, 'visible_to_staff_only')  # end changes by labster
 
             start = parse_date(unit['start'])
             if start:

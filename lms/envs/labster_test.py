@@ -6,13 +6,20 @@ LABSTER_FEATURES = {
     "ENABLE_VOUCHERS": False,
 }
 
-INSTALLED_APPS += (
+LABSTER_APPS = (
     'labster_course_license',
     'labster_vouchers',
 )
 
+INSTALLED_APPS += LABSTER_APPS
+
+MIGRATION_MODULES.update({
+    app: "app.migrations_not_used_in_tests" for app in LABSTER_APPS
+})
+
 FEATURES['SHOW_LABSTER_NOTIFICATION'] = False
 LABSTER_WIKI_LINK = 'https://theory.example.com/'
+
 LABSTER_API_AUTH_TOKEN = ''
 
 LABSTER_API_URL = ''
