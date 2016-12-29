@@ -134,6 +134,7 @@ class SubmitFeedbackTest(TestCase):
         self.assertEqual(resp.status_code, 200)
 
     def _assert_datadog_called(self, datadog_mock, tags):
+        """Assert that datadog was called with the correct tags."""
         expected_datadog_calls = [
             mock.call.increment(views.DATADOG_FEEDBACK_METRIC, tags=tags)
         ]
