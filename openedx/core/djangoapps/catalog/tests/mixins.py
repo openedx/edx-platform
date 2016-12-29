@@ -27,18 +27,22 @@ class CatalogIntegrationMixin(object):
 
         return CatalogIntegration.current()
 
-    def register_catalog_course_run_response(self, course_keys, catalog_course_run_data):
+    def register_catalog_course_run_response(self, course_keys, catalog_course_run_data, offset=None):
         """
         Register a mock response for GET on the catalog course run endpoint.
         """
+        course_run_url = "http://catalog.example.com:443/api/v1/course_runs/?keys={}&exclude_utm=1&limit=20"
+        if offset:
+            course_run_url = course_run_url + "&offset={}".format(offset)
+        next_page_url = course_run_url + "&offset={}".format(offset + 1) if offset else ""
         httpretty.register_uri(
             httpretty.GET,
-            "http://catalog.example.com:443/api/v1/course_runs/?keys={}&exclude_utm=1".format(
+            course_run_url.format(
                 urllib.quote_plus(",".join(course_keys))
             ),
             body=json.dumps({
                 "results": catalog_course_run_data,
-                "next": ""
+                "next": next_page_url
             }),
             content_type='application/json',
             status=200
