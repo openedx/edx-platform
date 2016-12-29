@@ -514,8 +514,8 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
                 loc=usage_key,
                 student=student
             )
-            TASK_LOG.debug(msg)
-            raise UpdateProblemModuleStateError(msg)
+            TASK_LOG.warning(msg)
+            return UPDATE_STATUS_FAILED
 
         if not hasattr(instance, 'rescore_problem'):
             # This should also not happen, since it should be already checked in the caller,
