@@ -280,8 +280,6 @@ def _record_feedback_in_zendesk(
         }
     }
 
-    # TODO: Determine whether or not the custom fields should be set like this or in a private
-    # update, as is done with additional_info beginning on line 309.
     if zendesk_custom_fields:
         new_ticket["ticket"]["custom_fields"] = zendesk_custom_fields
 
