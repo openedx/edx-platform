@@ -32,7 +32,7 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
     ZENDESK_URL="dummy",
     ZENDESK_USER="dummy",
     ZENDESK_API_KEY="dummy",
-    ZENDESK_CUSTOM_FIELDS={"course_id": 01234, "enrollment_mode": 56789}
+    ZENDESK_CUSTOM_FIELDS={"course_id": 1234, "enrollment_mode": 56789}
 )
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
@@ -295,7 +295,7 @@ class SubmitFeedbackTest(TestCase):
                         "comment": {"body": "some details"},
                         "tags": ["test_issue", "LMS"],
                         "custom_fields": [
-                            {"id": 01234, "value": course_id},
+                            {"id": 1234, "value": course_id},
                             {"id": 56789, "value": enrollment.mode}
                         ]
                     }
@@ -350,7 +350,7 @@ class SubmitFeedbackTest(TestCase):
                         "comment": {"body": "some details"},
                         "tags": ["test_issue", "LMS"],
                         "custom_fields": [
-                            {"id": 01234, "value": course_id}
+                            {"id": 1234, "value": course_id}
                         ]
                     }
                 }
