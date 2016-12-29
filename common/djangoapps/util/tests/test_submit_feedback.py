@@ -28,8 +28,12 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
 
 
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
-@mock.patch.dict("django.conf.settings.ZENDESK_CUSTOM_FIELDS", {"course_id": "01234", "enrollment_mode": "56789"})
-@override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy")
+@override_settings(
+    ZENDESK_URL="dummy",
+    ZENDESK_USER="dummy",
+    ZENDESK_API_KEY="dummy",
+    ZENDESK_CUSTOM_FIELDS={"course_id": "01234", "enrollment_mode": "56789"}
+)
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
 class SubmitFeedbackTest(TestCase):
@@ -468,7 +472,7 @@ class SubmitFeedbackTest(TestCase):
         self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
         self._assert_datadog_called(datadog_mock, ["issue_type:test_issue"])
 
-    @mock.patch.dict("django.conf.settings.ZENDESK_CUSTOM_FIELDS", values={}, clear=True)
+    @override_settings(ZENDESK_CUSTOM_FIELDS={})
     def test_valid_request_auth_user_with_course_id_but_no_custom_field_config(self, zendesk_mock_class, datadog_mock):
         """
         Test a valid request from an authenticated user which includes the optional
