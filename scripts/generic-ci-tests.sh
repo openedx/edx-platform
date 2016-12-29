@@ -176,11 +176,11 @@ case "$TEST_SUITE" in
                 paver test_bokchoy $PAVER_ARGS
                 ;;
 
-            [1-8])
+            [1-9]|10)
                 paver test_bokchoy --attr="shard=$SHARD" $PAVER_ARGS
                 ;;
 
-            9|"noshard")
+            11|"noshard")
                 paver test_bokchoy --attr='!shard,a11y=False' $PAVER_ARGS
                 ;;
 

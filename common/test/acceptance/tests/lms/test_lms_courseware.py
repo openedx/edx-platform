@@ -26,6 +26,7 @@ from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
 
 
+@attr(shard=9)
 class CoursewareTest(UniqueCourseTest):
     """
     Test courseware.
@@ -125,6 +126,7 @@ class CoursewareTest(UniqueCourseTest):
             self.assertEqual(courseware_page_breadcrumb, expected_breadcrumb)
 
 
+@attr(shard=9)
 @ddt.ddt
 class ProctoredExamTest(UniqueCourseTest):
     """
@@ -375,6 +377,7 @@ class ProctoredExamTest(UniqueCourseTest):
         self.assertFalse(self.course_outline.exam_review_rules_field_visible())
 
 
+@attr(shard=9)
 class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
     """
     Test courseware with multiple verticals
@@ -661,6 +664,7 @@ class CoursewareMultipleVerticalsTest(UniqueCourseTest, EventsTestMixin):
         self.courseware_page.a11y_audit.check_for_accessibility_errors()
 
 
+@attr(shard=9)
 class ProblemStateOnNavigationTest(UniqueCourseTest):
     """
     Test courseware with problems in multiple verticals.
@@ -821,6 +825,7 @@ class ProblemStateOnNavigationTest(UniqueCourseTest):
         self.assertEqual(before_meta, after_meta)
 
 
+@attr(shard=9)
 class SubsectionHiddenAfterDueDateTest(UniqueCourseTest):
     """
     Tests the "hide after due date" setting for

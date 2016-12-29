@@ -65,6 +65,7 @@ class ProblemsTest(UniqueCourseTest):
         return XBlockFixtureDesc('sequential', 'Test Subsection')
 
 
+@attr(shard=9)
 class ProblemClarificationTest(ProblemsTest):
     """
     Tests the <clarification> element that can be used in problem XML.
@@ -107,6 +108,7 @@ class ProblemClarificationTest(ProblemsTest):
         self.assertNotIn('strong', tooltip_text)
 
 
+@attr(shard=9)
 class ProblemHintTest(ProblemsTest, EventsTestMixin):
     """
     Base test class for problem hint tests.
@@ -169,6 +171,7 @@ class ProblemHintTest(ProblemsTest, EventsTestMixin):
         raise NotImplementedError()
 
 
+@attr(shard=9)
 class ProblemNotificationTests(ProblemsTest):
     """
     Tests that the notifications are visible when expected.
@@ -225,6 +228,7 @@ class ProblemNotificationTests(ProblemsTest):
         self.assertFalse(problem_page.is_save_notification_visible())
 
 
+@attr(shard=9)
 class ProblemFeedbackNotificationTests(ProblemsTest):
     """
     Tests that the feedback notifications are visible when expected.
@@ -262,6 +266,7 @@ class ProblemFeedbackNotificationTests(ProblemsTest):
         self.assertFalse(problem_page.is_feedback_message_notification_visible())
 
 
+@attr(shard=9)
 class ProblemSaveStatusUpdateTests(ProblemsTest):
     """
     Tests the problem status updates correctly with an answer change and save.
@@ -313,6 +318,7 @@ class ProblemSaveStatusUpdateTests(ProblemsTest):
         self.assertTrue(problem_page.is_save_notification_visible())
 
 
+@attr(shard=9)
 class ProblemSubmitButtonMaxAttemptsTest(ProblemsTest):
     """
     Tests that the Submit button disables after the number of max attempts is reached.
@@ -361,6 +367,7 @@ class ProblemSubmitButtonMaxAttemptsTest(ProblemsTest):
         problem_page.wait_for_submit_disabled()
 
 
+@attr(shard=9)
 class ProblemSubmitButtonPastDueTest(ProblemsTest):
     """
     Tests that the Submit button is disabled if it is past the due date.
@@ -405,6 +412,7 @@ class ProblemSubmitButtonPastDueTest(ProblemsTest):
         problem_page.wait_for_submit_disabled()
 
 
+@attr(shard=9)
 class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
     """
     Test that extended hint features plumb through to the page html and tracking log.
@@ -465,6 +473,7 @@ class ProblemExtendedHintTest(ProblemHintTest, EventsTestMixin):
         )
 
 
+@attr(shard=9)
 class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
     """
     Tests that hints containing html get rendered properly
@@ -525,6 +534,7 @@ class ProblemHintWithHtmlTest(ProblemHintTest, EventsTestMixin):
         )
 
 
+@attr(shard=9)
 class ProblemWithMathjax(ProblemsTest):
     """
     Tests the <MathJax> used in problem
@@ -584,6 +594,7 @@ class ProblemWithMathjax(ProblemsTest):
         problem_page.verify_mathjax_rendered_in_hint()
 
 
+@attr(shard=9)
 class ProblemPartialCredit(ProblemsTest):
     """
     Makes sure that the partial credit is appearing properly.
@@ -618,6 +629,7 @@ class ProblemPartialCredit(ProblemsTest):
         self.assertTrue(problem_page.simpleprob_is_partially_correct())
 
 
+@attr(shard=9)
 class LogoutDuringAnswering(ProblemsTest):
     """
     Tests for the scenario where a user is logged out (their session expires
@@ -700,6 +712,7 @@ class LogoutDuringAnswering(ProblemsTest):
         self.assertEqual(problem_page.problem_name, 'TEST PROBLEM')
 
 
+@attr(shard=9)
 class ProblemQuestionDescriptionTest(ProblemsTest):
     """TestCase Class to verify question and description rendering."""
     descriptions = [

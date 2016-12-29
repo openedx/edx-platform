@@ -124,6 +124,7 @@ class ProgressPageBaseTest(UniqueCourseTest):
             self.logout_page.visit()
 
 
+@attr(shard=9)
 @ddt.ddt
 @js_defined('window.jQuery')
 class PersistentGradesTest(ProgressPageBaseTest):
@@ -271,6 +272,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
+@attr(shard=9)
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     Tests changing a subsection's 'graded' field

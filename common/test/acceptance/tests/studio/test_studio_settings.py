@@ -565,6 +565,7 @@ class StudioSubsectionSettingsA11yTest(StudioCourseTest):
         self.course_outline.a11y_audit.check_for_accessibility_errors()
 
 
+@attr(shard=1)
 class StudioSettingsImageUploadTest(StudioCourseTest):
     """
     Class to test course settings image uploads.
@@ -602,6 +603,7 @@ class StudioSettingsImageUploadTest(StudioCourseTest):
         self.assertIn(file_to_upload, self.settings_page.get_uploaded_image_path('#video-thumbnail-image'))
 
 
+@attr(shard=1)
 class CourseSettingsTest(StudioCourseTest):
     """
     Class to test course settings.
