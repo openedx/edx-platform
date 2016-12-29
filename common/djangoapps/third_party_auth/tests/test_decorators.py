@@ -114,7 +114,7 @@ class TestXFrameWhitelistDecoratorForSAML(TestCase):
         )
     )
     def test_x_frame_options(self, url, expected_headers):
-        with self.settings(THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL=SCORM_CLOUD_URL):
+        with self.settings(THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL=[SCORM_CLOUD_URL]):
             request = self.construct_request(url)
             response = allow_frame_from_whitelisted_url(mock_view)(request)
             for header, value in expected_headers.items():
