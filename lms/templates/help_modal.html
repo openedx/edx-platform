@@ -249,7 +249,7 @@ $(document).ready(function() {
     % endif
 
     % if course:
-        currentCourseId = "${unicode(course.id)}";
+        currentCourseId = "${unicode(course.id) | n, js_escaped_string}";
     % endif
 
     DialogTabControls.setKeydownListener($helpModal, $closeButton);
