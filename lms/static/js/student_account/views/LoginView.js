@@ -96,7 +96,7 @@
                 },
 
                 resetEmail: function() {
-                    var email = $('#password-reset-email').val(),
+                    var email = this.resetModel.get('email'),
                         successTitle = gettext('Check Your Email'),
                         successMessageHtml = HtmlUtils.interpolateHtml(
                             gettext('{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email address is associated with your {platform_name} account, we will send a message with password reset instructions to this email address.{paragraphEnd}' + // eslint-disable-line max-len

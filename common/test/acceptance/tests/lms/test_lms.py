@@ -83,6 +83,33 @@ class ForgotPasswordPageTest(UniqueCourseTest):
         # Expect that we're shown a success message
         self.assertIn("Check Your Email", self.reset_password_page.get_success_message())
 
+    def test_reset_password_correct_email_display(self):
+        another_email_address = 'test@example.com'
+
+        # Navigate to the password reset page
+        self.reset_password_page.visit()
+
+        # Navigate to the password reset form and try to submit it
+        self.reset_password_page.fill_password_reset_form(self.user_info['email'])
+
+        self.reset_password_page.is_success_visible(".submission-success")
+
+        # Expect that we're shown a success message
+        self.assertIn('You entered {}'.format(self.user_info['email']),
+                      self.reset_password_page.reset_password_success_message)
+
+        # Navigate to the password reset page again by clicking the Forgot Password link
+        self.reset_password_page.click_forgot_password_link()
+
+        # Navigate to the password reset form and try to submit it
+        self.reset_password_page.fill_password_reset_form(another_email_address)
+
+        self.reset_password_page.is_success_visible(".submission-success")
+
+        # Expect that we're shown a success message
+        self.assertIn('You entered {}'.format(another_email_address),
+                      self.reset_password_page.reset_password_success_message)
+
 
 @attr(shard=8)
 class LoginFromCombinedPageTest(UniqueCourseTest):

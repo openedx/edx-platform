@@ -106,6 +106,19 @@ class ResetPasswordPage(PageObject):
         """
         return self.q(css=".submission-success h4").text
 
+    @property
+    def reset_password_success_message(self):
+        """
+        Return a reset password message displayed to the user
+        """
+        return self.q(css=".submission-success .message-copy").text[0]
+
+    def click_forgot_password_link(self):
+        """
+        Click the Forgot Password link
+        """
+        self.q(css="button.forgot-password").click()
+
 
 class CombinedLoginAndRegisterPage(PageObject):
     """Interact with combined login and registration page.
