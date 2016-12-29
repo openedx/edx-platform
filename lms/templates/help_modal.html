@@ -162,10 +162,10 @@ $(document).ready(function() {
         showFeedback = function(event, issue_type, title, subject_label, details_label) {
             event.preventDefault();
             DialogTabControls.initializeTabKeyValues("#feedback_form_wrapper", $closeButton);
-            $("#feedback_form input[name='issue_type']").val(_.escape(issue_type));
-            $("#feedback_form_wrapper header").html("<h2>" + _.escape(title) + "</h2><hr>");
-            $("#feedback_form_wrapper label[data-field='subject']").html(_.escape(subject_label));
-            $("#feedback_form_wrapper label[data-field='details']").html(_.escape(details_label));
+            $("#feedback_form input[name='issue_type']").val(issue_type);
+            $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
+            $("#feedback_form_wrapper label[data-field='subject']").html(subject_label);
+            $("#feedback_form_wrapper label[data-field='details']").html(details_label);
             $("#help_wrapper").css("display", "none");
             $("#feedback_form_wrapper").css("display", "block");
             if (userAuthenticated && finishedLoadingCourseOptions && courseOptions.length > 1) {
@@ -189,7 +189,7 @@ $(document).ready(function() {
                         courseName,
                         courseId,
                         option,
-                        defaultOptionText = '${_("- Select -")}',
+                        defaultOptionText = '${_("- Select -") | n, js_escaped_string}',
                         markedSelectedOption = false;
 
                     // Make sure courseOptions is empty before we begin pushing options into it.
