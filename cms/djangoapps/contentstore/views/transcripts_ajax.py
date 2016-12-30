@@ -165,7 +165,7 @@ def download_transcripts(request):
         log.debug('transcripts are supported only for video" modules.')
         raise Http404
 
-    filename = 'subs_{0}.srt.sjson'.format(subs_id)
+    filename = u'subs_{0}.srt.sjson'.format(subs_id)
     content_location = StaticContent.compute_location(item.location.course_key, filename)
     try:
         sjson_transcripts = contentstore().find(content_location)
