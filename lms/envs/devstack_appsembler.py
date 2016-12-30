@@ -10,6 +10,7 @@ for cache_key in CACHES.keys():
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 INSTALLED_APPS += (
+    'appsembler',
     'appsembler_api',
 )
 
