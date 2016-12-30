@@ -430,7 +430,7 @@ if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF
     #
     # new settings to allow CROSS_DOMAIN_CSRF_COOKIE insecure for testing
     # purposes
-    CROSS_DOMAIN_CSRF_COOKIE_SECURE = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_SECURE')
+    CROSS_DOMAIN_CSRF_COOKIE_SECURE = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_SECURE', False)
 
 
 # Field overrides. To use the IDDE feature, add
