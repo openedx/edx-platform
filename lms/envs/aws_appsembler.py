@@ -4,6 +4,7 @@ from .aws import *
 from .appsembler import *
 
 INSTALLED_APPS += (
+    'appsembler',
     'appsembler_api',
 )
 
