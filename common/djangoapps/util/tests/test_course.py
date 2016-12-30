@@ -11,7 +11,7 @@ from openedx.core.djangoapps.catalog.utils import CatalogCacheUtility
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory
-from util.course import get_link_for_about_page
+from util.course import get_link_for_about_page, get_link_for_about_page_from_cache
 
 
 @httpretty.activate
@@ -45,6 +45,9 @@ class CourseAboutLinkTestCase(CatalogIntegrationMixin, CacheIsolationTestCase):
             self.assertEquals(
                 get_link_for_about_page(self.course_key, self.user), self.lms_course_about_url
             )
+            self.assertEquals(
+                get_link_for_about_page_from_cache(self.course_key, self.course_run), self.lms_course_about_url
+            )
         with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             self.register_catalog_course_run_response(
                 [self.course_key_string], [{"key": self.course_key_string, "marketing_url": None}]
@@ -68,6 +71,6 @@ class CourseAboutLinkTestCase(CatalogIntegrationMixin, CacheIsolationTestCase):
     @mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True})
     def test_about_page_marketing_url_cached(self):
         self.assertEquals(
-            get_link_for_about_page(self.course_key, self.user, self.course_run),
+            get_link_for_about_page_from_cache(self.course_key, self.course_run),
             self.course_run["marketing_url"]
         )
