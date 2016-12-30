@@ -9,6 +9,7 @@ import ddt
 from django.conf import settings
 from django.db.utils import IntegrityError
 from mock import patch, MagicMock
+import os
 import pytz
 from util.date_utils import to_timestamp
 from unittest import skip
@@ -53,9 +54,16 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         if not enable_subsection_grades:
             PersistentGradesEnabledFlag.objects.create(enabled=False)
 
-        self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
-        self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
-        self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='Problem')
+
+        with modulestore().bulk_operations(self.course.id):
+            self.chapter = ItemFactory.create(parent=self.course, category="chapter", display_name="Chapter")
+            self.sequential = ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential1")
+            self.SEQ_COUNT = int(os.environ.get('SEQS', 0))
+            self.sequentials = [
+                ItemFactory.create(parent=self.chapter, category='sequential', display_name="Sequential%d" % i)
+                for i in xrange(2, self.SEQ_COUNT+2)
+            ]
+            self.problem = ItemFactory.create(parent=self.sequential, category='problem', display_name='Problem')
 
         self.frozen_now_datetime = datetime.now().replace(tzinfo=pytz.UTC)
         self.frozen_now_timestamp = to_timestamp(self.frozen_now_datetime)
@@ -129,7 +137,7 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         with self.store.default_store(default_store):
             self.set_up_course()
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(22 + added_queries):
+            with check_mongo_calls(2) and self.assertNumQueries(22 + 3 + (2 * self.SEQ_COUNT) + added_queries):
                 self._apply_recalculate_subsection_grade()
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
