@@ -17,13 +17,14 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from opaque_keys.edx.keys import UsageKey
 import xmodule.graders as xmgraders
-from student.models import CourseEnrollmentAllowed
+from student.models import CourseEnrollmentAllowed, CourseEnrollment
 from edx_proctoring.api import get_all_exam_attempts
 from courseware.models import StudentModule
 from certificates.models import GeneratedCertificate
 from django.db.models import Count
 from certificates.models import CertificateStatuses
 from lms.djangoapps.grades.context import grading_context_for_course
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 
@@ -213,6 +214,8 @@ def enrolled_students_features(course_key, features):
     """
     include_cohort_column = 'cohort' in features
     include_team_column = 'team' in features
+    include_enrollment_mode = 'enrollment_mode' in features
+    include_verification_status = 'verification_status' in features
 
     students = User.objects.filter(
         courseenrollment__course_id=course_key,
@@ -256,7 +259,7 @@ def enrolled_students_features(course_key, features):
                                 for feature in profile_features)
             student_dict.update(profile_dict)
 
-            # now featch the requested meta fields
+            # now fetch the requested meta fields
             meta_dict = json.loads(profile.meta) if profile.meta else {}
             for meta_feature, meta_key in meta_features:
                 student_dict[meta_feature] = meta_dict.get(meta_key)
@@ -275,6 +278,18 @@ def enrolled_students_features(course_key, features):
                 (team.name for team in student.teams.all() if team.course_id == course_key),
                 UNAVAILABLE
             )
+
+        if include_enrollment_mode or include_verification_status:
+            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_key)[0]
+            if include_verification_status:
+                student_dict['verification_status'] = SoftwareSecurePhotoVerification.verification_status_for_user(
+                    student,
+                    course_key,
+                    enrollment_mode
+                )
+            if include_enrollment_mode:
+                student_dict['enrollment_mode'] = enrollment_mode
+
         return student_dict
 
     return [extract_student(student, features) for student in students]
