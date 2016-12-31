@@ -83,6 +83,8 @@ class ProgressTab(EnrolledTab):
 
     @classmethod
     def is_enabled(cls, course, user=None):
+        if getattr(settings, 'DISABLE_PROGRESS_TAB', False):  # Disabled by labster.
+            return False
         if not super(ProgressTab, cls).is_enabled(course, user=user):
             return False
         return not course.hide_progress_tab

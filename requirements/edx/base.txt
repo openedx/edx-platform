@@ -13,7 +13,7 @@ celery==3.1.18
 cssselect==0.9.1
 dealer==2.0.4
 defusedxml==0.4.1
-django-babel-underscore==0.4.2
+django-babel-underscore==0.5.1
 django-celery==3.1.16
 django-countries==3.3
 django-extensions==1.5.9

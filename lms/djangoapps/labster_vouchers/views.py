@@ -14,6 +14,7 @@ from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_http_methods
+from django.http import Http404
 
 from edxmako.shortcuts import render_to_response
 from enrollment.api import add_enrollment
@@ -57,6 +58,9 @@ def enter_voucher(request):
     """
     Enter Voucher View.
     """
+    if not getattr(settings, 'LABSTER_FEATURES', {}).get('ENABLE_VOUCHERS'):
+        raise Http404
+
     context = {'user': request.user}
     return render_to_response('labster/enter_voucher.html', context)
 
@@ -68,6 +72,9 @@ def activate_voucher(request):
     """
     Gets license code from API, fetches related course_id and enrolls student.
     """
+    if not getattr(settings, 'LABSTER_FEATURES', {}).get('ENABLE_VOUCHERS'):
+        raise Http404
+
     enter_voucher_url = reverse('enter_voucher')
 
     if not request.user.is_active:

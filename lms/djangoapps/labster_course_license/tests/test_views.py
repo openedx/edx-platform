@@ -145,7 +145,7 @@ class TestSetLicense(CCXCourseTestBase):
         resp = self.client.post(self.url, data=self.data, follow=True)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(7, resp.content.count('Enter a valid value.'))
+        self.assertEqual(7, resp.content.count('Enter a valid URL.'))
         self.assertEqual(5, resp.content.count('Enter a valid simulation id.'))
 
         for item in data:

@@ -1,18 +1,18 @@
 from .test import *  # pylint: disable=wildcard-import, unused-wildcard-import
-import urlparse
 
 
-FEATURES['SHOW_LABSTER_NOTIFICATION'] = True
 LABSTER_FEATURES = {
-    "ENABLE_WIKI": True,
-    "ENABLE_VOUCHERS": True,
+    "ENABLE_WIKI": False,
+    "ENABLE_VOUCHERS": False,
 }
 
 INSTALLED_APPS += (
     'labster_course_license',
+    'labster_vouchers',
 )
 
-LABSTER_WIKI_LINK = 'https://theory.labster.com/'
+FEATURES['SHOW_LABSTER_NOTIFICATION'] = False
+LABSTER_WIKI_LINK = 'https://theory.example.com/'
 LABSTER_API_AUTH_TOKEN = ''
 
 LABSTER_API_URL = ''
@@ -23,4 +23,5 @@ LABSTER_ENDPOINTS = {
     'voucher_activate': 'https://example.com/voucher/activate/',
 }
 
+DISABLE_PROGRESS_TAB = False
 LABSTER_DEFAULT_LTI_ID = 'MC'

@@ -277,7 +277,7 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         )
         # Test an item from user info
         self.assertIn(
-            "{fullname}, you've earned a certificate!".format(fullname=self.user.profile.name),
+            "{fullname}, you earned a certificate!".format(fullname=self.user.profile.name),
             response.content
         )
         # Test an item from social info
@@ -292,8 +292,8 @@ class CertificatesViewsTests(ModuleStoreTestCase, EventTrackingTestCase):
         # Test an item from certificate/org info
         self.assertIn(
             "a course of study offered by {partner_short_name}, "
-            "an online learning initiative of {partner_long_name} "
-            "through {platform_name}.".format(
+            "an online learning initiative of "
+            "{partner_long_name}.".format(
                 partner_short_name=short_org_name,
                 partner_long_name=long_org_name,
                 platform_name='Test Microsite'
