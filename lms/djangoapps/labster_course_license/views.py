@@ -24,7 +24,7 @@ from labster_course_license.utils import LtiPassport, course_tree_info, Simulati
 from labster_course_license.models import CourseLicense
 from ccx_keys.locator import CCXLocator
 from ccx.views import coach_dashboard, get_ccx_for_coach
-from ccx.overrides import get_override_for_ccx, override_field_for_ccx
+from ccx.overrides import get_override_for_ccx, override_field_for_ccx, clear_override_for_ccx
 
 
 log = logging.getLogger(__name__)
@@ -81,15 +81,22 @@ def dashboard(request, course, ccx):
     return render_to_response('labster/course_license.html', context)
 
 
-def update_course(ccx, course_info, descriptors):
+def apply_field_overrides(ccx, course_info, descriptors):
     """
-    Updates all the descriptors.
+    Applies field overrides for the given descriptors.
     """
-    hidden = 'visible_to_staff_only'
+    field_name = 'visible_to_staff_only'
     for descriptor in descriptors:
         info = course_info[descriptor]
-        override_field_for_ccx(ccx, descriptor, hidden, info.is_hidden)
-        update_course(ccx, course_info, info.children)
+        if info.is_hidden:
+            override_field_for_ccx(ccx, descriptor, field_name, info.is_hidden)
+        else:
+            # In case, when the block should be visible field overrides are removed
+            # to get most actual values from Master course.
+            # It fixes the issue when the block is hidden in Master Course, but is still
+            # displayed in CCX that causes Permission Denied error for end users.
+            clear_override_for_ccx(ccx, descriptor, field_name)
+        apply_field_overrides(ccx, course_info, info.children)
 
 
 def _send_request(url, data):
@@ -203,38 +210,42 @@ def set_license(request, course, ccx):
     if not update_course_structure:
         return redirect(url)
 
-    # Getting a list of licensed simulations
-    consumer_keys = [LtiPassport(passport_str).consumer_key for passport_str in passports]
     try:
-        licensed_simulations = get_licensed_simulations(consumer_keys)
+        update_course(ccx, course_key, passports)
     except (LabsterApiError, ItemNotFoundError):
         messages.error(
             request, _('Your license is successfully applied, but there was an error with updating your course.')
         )
         return redirect(url)
+    except SimulationValidationError as err:
+        msg = _((
+            'Please verify LTI URLs are correct for the following simulations:<br><br> {}'
+        ).format(
+            '<br><br>'.join(
+                'Simulation name is "{}"<br>Simulation id is "{}"<br>Error message: <b>{}</b>'.format(
+                    sim_name, sim_id, err_msg
+                ) for sim_name, sim_id, err_msg in err.message
+            )
+        ))
+        messages.error(request, mark_safe(msg))
+        return redirect(url)
 
+    url = reverse('labster_license_handler', kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)})
+    return redirect(url)
+
+
+def update_course(ccx, course_key, passports):
+    """
+    Updates the course to show/hide blocks depends on the available simulations.
+    """
+    # Getting a list of licensed simulations
+    consumer_keys = [LtiPassport(passport_str).consumer_key for passport_str in passports]
     # Updating the course: hides unlicensed simulations.
+    licensed_simulations = get_licensed_simulations(consumer_keys)
     store = modulestore()
     with store.bulk_operations(course_key):
         lti_blocks = store.get_items(course_key, qualifiers={'category': 'lti'})
         # Filter a list of lti blocks to get only blocks with simulations.
         simulations = (block for block in lti_blocks if '/simulation/' in block.launch_url)
-        try:
-            course_info, chapters = course_tree_info(store, simulations, licensed_simulations)
-        except SimulationValidationError as err:
-            msg = _((
-                'Please verify LTI URLs are correct for the following simulations:<br><br> {}'
-            ).format(
-                '<br><br>'.join(
-                    'Simulation name is "{}"<br>Simulation id is "{}"<br>Error message: <b>{}</b>'.format(
-                        sim_name, sim_id, err_msg
-                    ) for sim_name, sim_id, err_msg in err.message
-                )
-            ))
-            messages.error(request, mark_safe(msg))
-            return redirect(url)
-
-        update_course(ccx, course_info, chapters)
-
-    url = reverse('labster_license_handler', kwargs={'course_id': CCXLocator.from_course_locator(course.id, ccx.id)})
-    return redirect(url)
+        course_info, chapters = course_tree_info(store, simulations, licensed_simulations)
+        apply_field_overrides(ccx, course_info, chapters)
