@@ -70,45 +70,17 @@ END
 }
 case "$TEST_SUITE" in
 
-    "quality")
-        echo "Finding fixme's and storing report..."
-        paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
-        echo "Finding pep8 violations and storing report..."
-        paver run_pep8 > pep8.log || { cat pep8.log; EXIT=1; }
-        echo "Finding pylint violations and storing in report..."
-        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
-
-        mkdir -p reports
-
-        echo "Finding ESLint violations and storing report..."
-        paver run_eslint -l $ESLINT_THRESHOLD > eslint.log || { cat eslint.log; EXIT=1; }
-        echo "Running code complexity report (python)."
-        paver run_complexity > reports/code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
-        echo "Running safe template linter report."
-        paver run_safelint -t $SAFELINT_THRESHOLDS > safelint.log || { cat safelint.log; EXIT=1; }
-        echo "Running safe commit linter report."
-        paver run_safecommit_report > safecommit.log || { cat safecommit.log; EXIT=1; }
-        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-        echo "Running diff quality."
-        paver run_quality -p 100 || EXIT=1
-
-        # Need to create an empty test result so the post-build
-        # action doesn't fail the build.
-        emptyxunit "quality"
-        exit $EXIT
-        ;;
-
     "lms-unit")
-        PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' -v --with-xunitmp"
+        PAVER_ARGS="--with-flaky --processes=-1 --cov-args='-p' --verbosity=4 --with-xunitmp"
         case "$SHARD" in
             "all")
                 paver test_system -s lms $PAVER_ARGS
                 ;;
             [1-3])
-                paver test_system -s lms --attr="shard=$SHARD" $PAVER_ARGS
+                COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s lms --attr="shard=$SHARD" --with-flaky --processes=-1 --cov-args="-p" -v --with-xunitmp
                 ;;
             4|"noshard")
-                paver test_system -s lms --attr='!shard' $PAVER_ARGS
+                COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s lms --attr='!shard' --with-flaky --processes=-1 --cov-args="-p" -v --with-xunitmp
                 ;;
             *)
                 # If no shard is specified, rather than running all tests, create an empty xunit file. This is a
@@ -122,82 +94,16 @@ case "$TEST_SUITE" in
         ;;
 
     "cms-unit")
-        paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
+        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_system -s cms --with-flaky --cov-args="-p" -v --with-xunitmp
         ;;
+
 
     "commonlib-unit")
-        paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
+        COVERAGE_DEBUG_FILE=reports/coverage_debug.log paver test_lib --with-flaky --cov-args="-p" -v --with-xunit
         ;;
 
-    "js-unit")
-        paver test_js --coverage
-        paver diff_coverage
+    *)
+        echo "DEBUG: SKIPPING"
         ;;
 
-    "commonlib-js-unit")
-        paver test_js --coverage --skip-clean || { EXIT=1; }
-        paver test_lib --skip-clean --with-flaky --cov-args="-p" --with-xunitmp || { EXIT=1; }
-
-        # This is to ensure that the build status of the shard is properly set.
-        # Because we are running two paver commands in a row, we need to capture
-        # their return codes in order to exit with a non-zero code if either of
-        # them fail. We put the || clause there because otherwise, when a paver
-        # command fails, this entire script will exit, and not run the second
-        # paver command in this case statement. So instead of exiting, the value
-        # of a variable named EXIT will be set to 1 if either of the paver
-        # commands fail. We then use this variable's value as our exit code.
-        # Note that by default the value of this variable EXIT is not set, so if
-        # neither command fails then the exit command resolves to simply exit
-        # which is considered successful.
-        exit $EXIT
-        ;;
-
-    "lms-acceptance")
-        paver test_acceptance -s lms -vvv --with-xunit
-        ;;
-
-    "cms-acceptance")
-        paver test_acceptance -s cms -vvv --with-xunit
-        ;;
-
-    "bok-choy")
-
-        # Back compatibility support for firefox upgrade:
-        # Copy newer firefox version to project root,
-        # set that as the path for bok-choy to use.
-        cp -R $HOME/firefox/ firefox/
-        export SELENIUM_FIREFOX_PATH=firefox/firefox
-
-        PAVER_ARGS="-n $NUMBER_OF_BOKCHOY_THREADS --with-flaky --with-xunit"
-
-        case "$SHARD" in
-
-            "all")
-                paver test_bokchoy $PAVER_ARGS
-                ;;
-
-            [1-8])
-                paver test_bokchoy --attr="shard=$SHARD" $PAVER_ARGS
-                ;;
-
-            9|"noshard")
-                paver test_bokchoy --attr='!shard,a11y=False' $PAVER_ARGS
-                ;;
-
-            # Default case because if we later define another bok-choy shard on Jenkins
-            # (e.g. Shard 10) in the multi-config project and expand this file
-            # with an additional case condition, old branches without that commit
-            # would not execute any tests on the worker assigned to that shard
-            # and thus their build would fail.
-            # This way they will just report 1 test executed and passed.
-            *)
-                # Need to create an empty test result so the post-build
-                # action doesn't fail the build.
-                # May be unnecessary if we changed the "Skip if there are no test files"
-                # option to True in the jenkins job definitions.
-                mkdir -p reports/bok_choy
-                emptyxunit "bok_choy/nosetests"
-                ;;
-        esac
-        ;;
 esac
