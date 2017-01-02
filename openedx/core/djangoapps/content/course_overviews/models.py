@@ -12,6 +12,7 @@ from django.template import defaultfilters
 
 from ccx_keys.locator import CCXLocator
 from model_utils.models import TimeStampedModel
+from jsonfield.fields import JSONField
 from opaque_keys.edx.keys import CourseKey
 
 from config_models.models import ConfigurationModel
@@ -43,7 +44,7 @@ class CourseOverview(TimeStampedModel):
         app_label = 'course_overviews'
 
     # IMPORTANT: Bump this whenever you modify this model and/or add a migration.
-    VERSION = 4
+    VERSION = 5
 
     # Cache entry versioning.
     version = IntegerField()
@@ -97,6 +98,7 @@ class CourseOverview(TimeStampedModel):
     course_video_url = TextField(null=True)
     effort = TextField(null=True)
     self_paced = BooleanField(default=False)
+    instructor_info = JSONField(null=False, blank=False)
 
     @classmethod
     def _create_from_course(cls, course):
@@ -181,6 +183,7 @@ class CourseOverview(TimeStampedModel):
             effort=CourseDetails.fetch_about_attribute(course.id, 'effort'),
             course_video_url=CourseDetails.fetch_video_url(course.id),
             self_paced=course.self_paced,
+            instructor_info=course.instructor_info,
         )
 
     @classmethod
