@@ -75,10 +75,13 @@ class RegistrationSerializer(serializers.Serializer):
         initial_values = validated_data.get('initial_values', {})
         if initial_values:
             site_configuration.values['platform_name'] = initial_values.get('platform_name')
+            site_configuration.values['logo_positive'] = initial_values.get('logo_positive')
+            site_configuration.values['logo_negative'] = initial_values.get('logo_negative')
             site_configuration.set_sass_variables({
                 '$brand-primary-color': initial_values.get('primary_brand_color'),
                 '$base-text-color': initial_values.get('base_text_color'),
-                '$cta-button-bg': initial_values.get('cta_button_bg')
+                '$cta-button-bg': initial_values.get('cta_button_bg'),
+                '$primary-font-name': '"{}"'.format(initial_values.get('font')),
             })
             site_configuration.save()
         return {

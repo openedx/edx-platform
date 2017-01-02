@@ -171,7 +171,7 @@ class SiteConfiguration(models.Model):
         for index, entry in enumerate(self.sass_variables):
             var_name = entry[0]
             if var_name in entries:
-                new_value = (var_name, (entries[var_name], entries[var_name]))
+                new_value = (var_name, [entries[var_name], entries[var_name]])
                 self.sass_variables[index] = new_value
 
     def _formatted_sass_variables(self):
