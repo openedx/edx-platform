@@ -12,7 +12,6 @@ from openedx.core.djangoapps.catalog.utils import get_programs as get_catalog_pr
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs import utils
-from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
 
 
 @login_required
@@ -76,8 +75,7 @@ def program_details(request, program_id):
         'show_program_listing': programs_config.show_program_listing,
         'nav_hidden': True,
         'disable_courseware_js': True,
-        'uses_pattern_library': True,
-        'user_preferences': get_user_preferences(request.user)
+        'uses_pattern_library': True
     }
 
     return render_to_response('learner_dashboard/program_details.html', context)

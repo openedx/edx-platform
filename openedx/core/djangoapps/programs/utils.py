@@ -6,9 +6,10 @@ from urlparse import urljoin
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 from opaque_keys.edx.keys import CourseKey
-from pytz import utc
+import pytz
 
 from course_modes.models import CourseMode
 from lms.djangoapps.certificates import api as certificate_api
@@ -29,7 +30,7 @@ from util.organizations_helpers import get_organization_by_short_name
 log = logging.getLogger(__name__)
 
 # The datetime module's strftime() methods require a year >= 1900.
-DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
+DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=pytz.UTC)
 
 
 def get_programs(user, program_id=None):
@@ -382,30 +383,27 @@ class ProgramDataExtender(object):
         run_mode['course_url'] = reverse('course_root', args=[self.course_key])
 
     def _attach_run_mode_end_date(self, run_mode):
-        run_mode['end_date'] = self.course_overview.end
+        run_mode['end_date'] = self.course_overview.end_datetime_text()
 
     def _attach_run_mode_enrollment_open_date(self, run_mode):
         run_mode['enrollment_open_date'] = strftime_localized(self.enrollment_start, 'SHORT_DATE')
 
     def _attach_run_mode_is_course_ended(self, run_mode):
-        end_date = self.course_overview.end or datetime.datetime.max.replace(tzinfo=utc)
-        run_mode['is_course_ended'] = end_date < datetime.datetime.now(utc)
+        end_date = self.course_overview.end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
+        run_mode['is_course_ended'] = end_date < timezone.now()
 
     def _attach_run_mode_is_enrolled(self, run_mode):
         run_mode['is_enrolled'] = CourseEnrollment.is_enrolled(self.user, self.course_key)
 
     def _attach_run_mode_is_enrollment_open(self, run_mode):
-        enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=utc)
-        run_mode['is_enrollment_open'] = self.enrollment_start <= datetime.datetime.now(utc) < enrollment_end
+        enrollment_end = self.course_overview.enrollment_end or datetime.datetime.max.replace(tzinfo=pytz.UTC)
+        run_mode['is_enrollment_open'] = self.enrollment_start <= timezone.now() < enrollment_end
 
     def _attach_run_mode_marketing_url(self, run_mode):
         run_mode['marketing_url'] = get_run_marketing_url(self.course_key, self.user)
 
     def _attach_run_mode_start_date(self, run_mode):
-        run_mode['start_date'] = self.course_overview.start
-
-    def _attach_run_mode_advertised_start(self, run_mode):
-        run_mode['advertised_start'] = self.course_overview.advertised_start
+        run_mode['start_date'] = self.course_overview.start_datetime_text()
 
     def _attach_run_mode_upgrade_url(self, run_mode):
         required_mode_slug = run_mode['mode_slug']

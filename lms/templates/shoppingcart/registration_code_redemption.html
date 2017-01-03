@@ -34,6 +34,11 @@ from openedx.core.lib.courses import course_image_url
         <div class="course-title">
           <h1>
             ${course.display_name | h}
+              <span class="course-dates">
+                ${course.start_datetime_text()}
+                -
+                ${course.end_datetime_text()}
+              </span>
           </h1>
         </div>
         <hr>

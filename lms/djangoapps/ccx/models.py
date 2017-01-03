@@ -12,6 +12,7 @@ from pytz import utc
 from lazy import lazy
 
 from ccx_keys.locator import CCXLocator
+from openedx.core.lib.time_zone_utils import get_time_zone_abbr
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField, LocationKeyField
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
@@ -82,6 +83,36 @@ class CustomCourseForEdX(models.Model):
             return False
 
         return datetime.now(utc) > self.due
+
+    def start_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
+        """Returns the desired text representation of the CCX start datetime
+
+        The returned value is in specified time zone, defaulted to UTC.
+        """
+        i18n = self.course.runtime.service(self.course, "i18n")
+        strftime = i18n.strftime
+        value = strftime(self.start.astimezone(time_zone), format_string)
+        if format_string == 'DATE_TIME':
+            value += ' ' + get_time_zone_abbr(time_zone, self.start)
+        return value
+
+    def end_datetime_text(self, format_string="SHORT_DATE", time_zone=utc):
+        """Returns the desired text representation of the CCX due datetime
+
+        If the due date for the CCX is not set, the value returned is the empty
+        string.
+
+        The returned value is in specified time zone, defaulted to UTC.
+        """
+        if self.due is None:
+            return ''
+
+        i18n = self.course.runtime.service(self.course, "i18n")
+        strftime = i18n.strftime
+        value = strftime(self.due.astimezone(time_zone), format_string)
+        if format_string == 'DATE_TIME':
+            value += ' ' + get_time_zone_abbr(time_zone, self.due)
+        return value
 
     @property
     def structure(self):
