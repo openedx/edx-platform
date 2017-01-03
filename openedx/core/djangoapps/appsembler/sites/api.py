@@ -22,7 +22,8 @@ class SiteViewSet(viewsets.ReadOnlyModelViewSet):
         if not user_email:
             return Response(status=400)
         user = User.objects.get(email=user_email)
-        queryset = queryset.filter(organizations=user.organizations.first())
+        if not user.is_superuser:
+            queryset = queryset.filter(organizations=user.organizations.first())
         return queryset
 
 
