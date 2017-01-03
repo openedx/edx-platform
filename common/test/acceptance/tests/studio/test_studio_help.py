@@ -2,7 +2,7 @@
 Test the Studio help links.
 """
 
-from flaky import flaky
+from nose.plugins.attrib import attr
 from unittest import skip
 
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -36,6 +36,7 @@ from common.test.acceptance.pages.studio.import_export import ExportLibraryPage,
 from common.test.acceptance.pages.studio.auto_auth import AutoAuthPage
 
 
+@attr(shard=10)
 class StudioHelpTest(StudioCourseTest):
     """Tests for Studio help."""
 
@@ -75,6 +76,7 @@ class StudioHelpTest(StudioCourseTest):
             )
 
 
+@attr(shard=10)
 class SignInHelpTest(AcceptanceTest):
     """
     Tests help links on 'Sign In' page
@@ -107,6 +109,7 @@ class SignInHelpTest(AcceptanceTest):
         )
 
 
+@attr(shard=10)
 class SignUpHelpTest(AcceptanceTest):
     """
     Tests help links on 'Sign Up' page.
@@ -139,6 +142,7 @@ class SignUpHelpTest(AcceptanceTest):
         )
 
 
+@attr(shard=10)
 class HomeHelpTest(StudioCourseTest):
     """
     Tests help links on 'Home'(Courses tab) page.
@@ -191,6 +195,7 @@ class HomeHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class NewCourseHelpTest(AcceptanceTest):
     """
     Test help links while creating a new course.
@@ -247,6 +252,7 @@ class NewCourseHelpTest(AcceptanceTest):
         )
 
 
+@attr(shard=10)
 class NewLibraryHelpTest(AcceptanceTest):
     """
     Test help links while creating a new library
@@ -303,6 +309,7 @@ class NewLibraryHelpTest(AcceptanceTest):
         )
 
 
+@attr(shard=10)
 class LibraryTabHelpTest(AcceptanceTest):
     """
     Test help links on the library tab present at dashboard.
@@ -337,6 +344,7 @@ class LibraryTabHelpTest(AcceptanceTest):
         )
 
 
+@attr(shard=10)
 class LibraryHelpTest(StudioLibraryTest):
     """
     Test help links on a Library page.
@@ -415,6 +423,7 @@ class LibraryHelpTest(StudioLibraryTest):
         )
 
 
+@attr(shard=10)
 class LibraryImportHelpTest(StudioLibraryTest):
     """
     Test help links on a Library import and export pages.
@@ -466,6 +475,7 @@ class LibraryImportHelpTest(StudioLibraryTest):
         )
 
 
+@attr(shard=10)
 class LibraryExportHelpTest(StudioLibraryTest):
     """
     Test help links on a Library export pages.
@@ -517,6 +527,7 @@ class LibraryExportHelpTest(StudioLibraryTest):
         )
 
 
+@attr(shard=10)
 class NewProgramHelpTest(ProgramsConfigMixin, AcceptanceTest):
     """
     Test help links on a 'New Program' page
@@ -550,6 +561,7 @@ class NewProgramHelpTest(ProgramsConfigMixin, AcceptanceTest):
         )
 
 
+@attr(shard=10)
 class CourseOutlineHelpTest(StudioCourseTest):
     """
     Tests help links on course outline page.
@@ -606,6 +618,7 @@ class CourseOutlineHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CourseUpdateHelpTest(StudioCourseTest):
     """
     Test help links on Course Update page
@@ -640,6 +653,7 @@ class CourseUpdateHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class AssetIndexHelpTest(StudioCourseTest):
     """
     Test help links on Course 'Files & Uploads' page
@@ -694,6 +708,7 @@ class AssetIndexHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CoursePagesHelpTest(StudioCourseTest):
     """
     Test help links on Course 'Pages' page
@@ -728,6 +743,7 @@ class CoursePagesHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class UploadTextbookHelpTest(StudioCourseTest):
     """
     Test help links on Course 'Textbooks' page
@@ -782,6 +798,7 @@ class UploadTextbookHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class StudioUnitHelpTest(ContainerBase):
     """
     Tests help links on Unit page.
@@ -831,6 +848,7 @@ class StudioUnitHelpTest(ContainerBase):
         )
 
 
+@attr(shard=10)
 class SettingsHelpTest(StudioCourseTest):
     """
     Tests help links on Schedule and Details Settings page
@@ -867,6 +885,7 @@ class SettingsHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class GradingPageHelpTest(StudioCourseTest):
     """
     Tests help links on Grading page
@@ -903,6 +922,7 @@ class GradingPageHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CourseTeamSettingsHelpTest(StudioCourseTest):
     """
     Tests help links on Course Team settings page
@@ -939,6 +959,7 @@ class CourseTeamSettingsHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CourseGroupConfigurationHelpTest(StudioCourseTest):
     """
     Tests help links on course Group Configurations settings page
@@ -997,6 +1018,7 @@ class CourseGroupConfigurationHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class AdvancedSettingHelpTest(StudioCourseTest):
     """
     Tests help links on course Advanced Settings page.
@@ -1033,6 +1055,7 @@ class AdvancedSettingHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class CertificatePageHelpTest(StudioCourseTest):
     """
     Tests help links on course Certificate settings page.
@@ -1089,6 +1112,7 @@ class CertificatePageHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class GroupExperimentConfigurationHelpTest(ContainerBase):
     """
     Tests help links on course Group Configurations settings page
@@ -1139,6 +1163,7 @@ class GroupExperimentConfigurationHelpTest(ContainerBase):
         )
 
 
+@attr(shard=10)
 class ToolsImportHelpTest(StudioCourseTest):
     """
     Tests help links on tools import pages.
@@ -1195,6 +1220,7 @@ class ToolsImportHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class ToolsExportHelpTest(StudioCourseTest):
     """
     Tests help links on tools export pages.
@@ -1251,6 +1277,7 @@ class ToolsExportHelpTest(StudioCourseTest):
         )
 
 
+@attr(shard=10)
 class StudioWelcomeHelpTest(AcceptanceTest):
     """
     Tests help link on 'Welcome' page ( User not logged in)

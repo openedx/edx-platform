@@ -17,7 +17,7 @@ from xmodule.partitions.partitions import Group
 from textwrap import dedent
 
 
-@attr(shard=3)
+@attr(shard=10)
 class StaffViewTest(UniqueCourseTest):
     """
     Tests that verify the staff view.
@@ -55,7 +55,7 @@ class StaffViewTest(UniqueCourseTest):
         return staff_page
 
 
-@attr(shard=3)
+@attr(shard=10)
 class CourseWithoutContentGroupsTest(StaffViewTest):
     """
     Setup for tests that have no content restricted to specific content groups.
@@ -86,7 +86,7 @@ class CourseWithoutContentGroupsTest(StaffViewTest):
         )
 
 
-@attr(shard=3)
+@attr(shard=10)
 class StaffViewToggleTest(CourseWithoutContentGroupsTest):
     """
     Tests for the staff view toggle button.
@@ -103,7 +103,7 @@ class StaffViewToggleTest(CourseWithoutContentGroupsTest):
         self.assertFalse(course_page.has_tab('Instructor'))
 
 
-@attr(shard=3)
+@attr(shard=10)
 class StaffDebugTest(CourseWithoutContentGroupsTest):
     """
     Tests that verify the staff debug info.
@@ -303,7 +303,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
             )
         )
 
-    @attr(shard=3)
+    @attr(shard=10)
     def test_staff_sees_all_problems(self):
         """
         Scenario: Staff see all problems
