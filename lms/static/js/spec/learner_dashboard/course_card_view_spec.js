@@ -30,9 +30,8 @@ define([
                     context.run_modes[0].marketing_url
                 );
                 expect(view.$('.course-details .course-text .course-key').html()).toEqual(context.key);
-                expect(view.$('.course-details .course-text .run-period').html()).toEqual(
-                    context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date
-                );
+                expect(view.$('.course-details .course-text .run-period').html())
+                    .toEqual(context.run_modes[0].start_date + ' - ' + context.run_modes[0].end_date);
             };
 
         beforeEach(function() {
@@ -91,15 +90,6 @@ define([
                 is_enrolled: true
             });
             validateCourseInfoDisplay();
-        });
-
-        it('should show the course advertised start date', function() {
-            var advertisedStart = 'This is an advertised start';
-            context.run_modes[0].advertised_start = advertisedStart;
-            setupView(context, false);
-            expect(view.$('.course-details .course-text .run-period').html()).toEqual(
-                advertisedStart + ' - ' + context.run_modes[0].end_date
-            );
         });
 
         it('should only show certificate status section if a certificate has been earned', function() {

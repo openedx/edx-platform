@@ -119,7 +119,7 @@
                                 groupOptions: [{
                                     groupTitle: gettext('All Time Zones'),
                                     selectOptions: fieldsData.time_zone.options,
-                                    blankTitle: gettext('Default (Local Time Zone)')
+                                    nullValueOptionLabel: gettext('Default (Local Time Zone)')
                                 }],
                                 persistChanges: true
                             })

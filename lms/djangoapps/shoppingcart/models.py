@@ -332,7 +332,7 @@ class Order(models.Model):
         """
         this function generates the csv file
         """
-        course_names = []
+        course_info = []
         csv_file = StringIO.StringIO()
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(['Course Name', 'Registration Code', 'URL'])
@@ -340,15 +340,15 @@ class Order(models.Model):
             course_id = item.course_id
             course = get_course_by_id(item.course_id, depth=0)
             registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id, order=self)
-            course_names.append(course.display_name)
+            course_info.append((course.display_name, ' (' + course.start_datetime_text() + '-' + course.end_datetime_text() + ')'))
             for registration_code in registration_codes:
                 redemption_url = reverse('register_code_redemption', args=[registration_code.code])
                 url = '{base_url}{redemption_url}'.format(base_url=site_name, redemption_url=redemption_url)
                 csv_writer.writerow([unicode(course.display_name).encode("utf-8"), registration_code.code, url])
 
-        return csv_file, course_names
+        return csv_file, course_info
 
-    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, pdf_file, site_name, course_names):
+    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, pdf_file, site_name, courses_info):
         """
         send confirmation e-mail
         """
@@ -358,7 +358,8 @@ class Order(models.Model):
         joined_course_names = ""
         if self.recipient_email:
             recipient_list.append((self.recipient_name, self.recipient_email, 'email_recipient'))
-            joined_course_names = " " + ", ".join(course_names)
+            courses_names_with_dates = [course_info[0] + course_info[1] for course_info in courses_info]
+            joined_course_names = " " + ", ".join(courses_names_with_dates)
 
         if not is_order_type_business:
             subject = _("Order Payment Confirmation")
@@ -386,7 +387,7 @@ class Order(models.Model):
                         'recipient_type': recipient[2],
                         'site_name': site_name,
                         'order_items': orderitems,
-                        'course_names': ", ".join(course_names),
+                        'course_names': ", ".join([course_info[0] for course_info in courses_info]),
                         'dashboard_url': dashboard_url,
                         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
                         'order_placed_by': '{username} ({email})'.format(
@@ -476,13 +477,13 @@ class Order(models.Model):
             item.purchase_item()
 
         csv_file = None
-        course_names = []
+        courses_info = []
         if self.order_type == OrderTypes.BUSINESS:
             #
             # Generate the CSV file that contains all of the RegistrationCodes that have already been
             # generated when the purchase has transacted
             #
-            csv_file, course_names = self.generate_registration_codes_csv(orderitems, site_name)
+            csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
 
         try:
             pdf_file = self.generate_pdf_receipt(orderitems)
@@ -493,7 +494,7 @@ class Order(models.Model):
         try:
             self.send_confirmation_emails(
                 orderitems, self.order_type == OrderTypes.BUSINESS,
-                csv_file, pdf_file, site_name, course_names
+                csv_file, pdf_file, site_name, courses_info
             )
         except Exception:  # pylint: disable=broad-except
             # Catch all exceptions here, since the Django view implicitly

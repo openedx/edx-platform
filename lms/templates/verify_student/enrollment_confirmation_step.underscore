@@ -13,14 +13,16 @@
             <thead>
               <tr>
                 <th scope="col" ><%- gettext( "Course" ) %></th>
-                <th scope="col" ></th>
+                <th scope="col" ><%- gettext( "Status" ) %></th>
               </tr>
             </thead>
 
             <tbody>
               <tr>
                 <td><%- courseName %></td>
-                <td></td>
+                <td>
+                   <%- _.sprintf( gettext( "Starts: %(start)s" ), { start: courseStartDate } ) %>
+                </td>
               </tr>
             </tbody>
 
