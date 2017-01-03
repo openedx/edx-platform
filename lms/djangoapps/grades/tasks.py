@@ -158,42 +158,44 @@ def _update_subsection_grades(
     that those subsection grades were updated.
     """
     student = User.objects.get(id=user_id)
-    course_structure = get_course_blocks(student, modulestore().make_course_usage_key(course_key))
-    subsections_to_update = course_structure.get_transformer_block_field(
-        scored_block_usage_key,
-        GradesTransformer,
-        'subsections',
-        set(),
-    )
-
-    course = modulestore().get_course(course_key, depth=0)
-    subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)
-
-    try:
-        for subsection_usage_key in subsections_to_update:
-            if subsection_usage_key in course_structure:
-                subsection_grade = subsection_grade_factory.update(
-                    course_structure[subsection_usage_key],
-                    only_if_higher,
-                )
-                SUBSECTION_SCORE_CHANGED.send(
-                    sender=recalculate_subsection_grade,
-                    course=course,
-                    course_structure=course_structure,
-                    user=student,
-                    subsection_grade=subsection_grade,
-                )
-
-    except DatabaseError as exc:
-        raise _retry_recalculate_subsection_grade(
-            user_id,
-            course_id,
-            usage_id,
-            only_if_higher,
-            expected_modified_time,
-            score_deleted,
-            exc,
+    store = modulestore()
+    with store.bulk_operations(course_key):
+        course_structure = get_course_blocks(student, store.make_course_usage_key(course_key))
+        subsections_to_update = course_structure.get_transformer_block_field(
+            scored_block_usage_key,
+            GradesTransformer,
+            'subsections',
+            set(),
         )
+
+        course = store.get_course(course_key, depth=0)
+        subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)
+
+        try:
+            for subsection_usage_key in subsections_to_update:
+                if subsection_usage_key in course_structure:
+                    subsection_grade = subsection_grade_factory.update(
+                        course_structure[subsection_usage_key],
+                        only_if_higher,
+                    )
+                    SUBSECTION_SCORE_CHANGED.send(
+                        sender=recalculate_subsection_grade,
+                        course=course,
+                        course_structure=course_structure,
+                        user=student,
+                        subsection_grade=subsection_grade,
+                    )
+
+        except DatabaseError as exc:
+            raise _retry_recalculate_subsection_grade(
+                user_id,
+                course_id,
+                usage_id,
+                only_if_higher,
+                expected_modified_time,
+                score_deleted,
+                exc,
+            )
 
 
 def _retry_recalculate_subsection_grade(

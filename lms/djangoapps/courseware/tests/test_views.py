@@ -191,6 +191,48 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
+class IndexQueryTestCase(ModuleStoreTestCase):
+    """
+    Tests for query count.
+    """
+    CREATE_USER = False
+    NUM_PROBLEMS = 20
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 8),
+        (ModuleStoreEnum.Type.split, 4),
+    )
+    @ddt.unpack
+    def test_index_query_counts(self, store_type, expected_query_count):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            with self.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+                for _ in range(self.NUM_PROBLEMS):
+                    ItemFactory.create(category='problem', parent_location=vertical.location)
+
+        password = 'test'
+        self.user = UserFactory(password=password)
+        self.client.login(username=self.user.username, password=password)
+        CourseEnrollment.enroll(self.user, course.id)
+
+        with check_mongo_calls(expected_query_count):
+            url = reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(course.id),
+                    'chapter': unicode(chapter.location.name),
+                    'section': unicode(section.location.name),
+                }
+            )
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+
+@attr(shard=2)
+@ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.

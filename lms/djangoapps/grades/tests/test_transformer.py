@@ -17,7 +17,7 @@ from xmodule.modulestore.tests.factories import check_mongo_calls
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.course_blocks.transformers.tests.helpers import CourseStructureTestCase
-from openedx.core.djangoapps.content.block_structure.api import get_cache
+from openedx.core.djangoapps.content.block_structure.api import clear_course_from_cache
 from ..transformer import GradesTransformer
 
 
@@ -390,6 +390,7 @@ class GradesTransformerTestCase(CourseStructureTestCase):
         )
 
 
+@ddt.ddt
 class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModuleStoreTestCase):
     """
     Test mongo usage in GradesTransformer.
@@ -403,7 +404,12 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
         self.student = UserFactory.create(is_staff=False, username=u'test_student', password=password)
         self.client.login(username=self.student.username, password=password)
 
-    def test_modulestore_performance(self):
+    @ddt.data(
+        (ModuleStoreEnum.Type.split, 3),
+        (ModuleStoreEnum.Type.mongo, 2),
+    )
+    @ddt.unpack
+    def test_modulestore_performance(self, store_type, expected_mongo_queries):
         """
         Test that a constant number of mongo calls are made regardless of how
         many grade-related blocks are in the course.
@@ -437,7 +443,8 @@ class MultiProblemModulestoreAccessTestCase(CourseStructureTestCase, SharedModul
                         </problem>'''.format(number=problem_number),
                 }
             )
-        blocks = self.build_course(course)
-        get_cache().clear()
-        with check_mongo_calls(2):
+        with self.store.default_store(store_type):
+            blocks = self.build_course(course)
+        clear_course_from_cache(blocks[u'course'].id)
+        with check_mongo_calls(expected_mongo_queries):
             get_course_blocks(self.student, blocks[u'course'].location, self.transformers)

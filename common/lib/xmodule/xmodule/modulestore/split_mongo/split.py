@@ -432,9 +432,11 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         if len(ids):
             # Query the db for the definitions.
-            defs_from_db = self.db_connection.get_definitions(list(ids), course_key)
+            defs_from_db = list(self.db_connection.get_definitions(list(ids), course_key))
+            defs_dict = {d.get('_id'): d for d in defs_from_db}
             # Add the retrieved definitions to the cache.
-            bulk_write_record.definitions.update({d.get('_id'): d for d in defs_from_db})
+            bulk_write_record.definitions_in_db.update(defs_dict.iterkeys())
+            bulk_write_record.definitions.update(defs_dict)
             definitions.extend(defs_from_db)
         return definitions
 
@@ -772,11 +774,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Load the definitions into each block if lazy is in kwargs and is False;
         otherwise, do not load the definitions - they'll be loaded later when needed.
         """
+        lazy = kwargs.pop('lazy', True)
+        should_cache_items = not lazy
+
         runtime = self._get_cache(course_entry.structure['_id'])
         if runtime is None:
-            lazy = kwargs.pop('lazy', True)
             runtime = self.create_runtime(course_entry, lazy)
             self._add_cache(course_entry.structure['_id'], runtime)
+            should_cache_items = True
+
+        if should_cache_items:
             self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
 
         return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
