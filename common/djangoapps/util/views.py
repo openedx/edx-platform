@@ -223,6 +223,26 @@ class _ZendeskApi(object):
         return None
 
 
+def _format_zendesk_additional_info(additional_info):
+    """
+    Format the data in the additional_info dictionary for use in the Zendesk API by first extracting any
+    information that can be stored in Zendesk custom fields and then by constructing a string with the remaining
+    info. The custom field information will be sent to Zendesk with the initial request to create the ticket. The
+    string of remaining info will be sent as a private ticket update after the ticket is created.
+    """
+    custom_fields = []
+    other_info = []
+    for key, value in sorted(additional_info.items()):
+        if value is None:
+            continue
+        elif key in settings.ZENDESK_CUSTOM_FIELDS:
+            custom_fields.append({"id": settings.ZENDESK_CUSTOM_FIELDS[key], "value": value})
+        else:
+            other_info.append("{}: {}".format(key, value))
+    other_info = u"Additional information:\n\n" + u"\n".join(other_info)
+    return (custom_fields, other_info)
+
+
 def _record_feedback_in_zendesk(
         realname,
         email,
@@ -249,18 +269,7 @@ def _record_feedback_in_zendesk(
     which the user will not see in followup emails from support.
     """
     zendesk_api = _ZendeskApi()
-
-    # Extract information that can be stored in custom fields from the additional_info dictionary.
-    zendesk_custom_fields = []
-    zendesk_additional_info = []
-    for key, value in sorted(additional_info.items()):
-        if value is None:
-            continue
-        elif key in settings.ZENDESK_CUSTOM_FIELDS:
-            zendesk_custom_fields.append({"id": settings.ZENDESK_CUSTOM_FIELDS[key], "value": value})
-        else:
-            zendesk_additional_info.append("{}: {}".format(key, value))
-    zendesk_additional_info = u"Additional information:\n\n" + u"\n".join(zendesk_additional_info)
+    zendesk_custom_fields, zendesk_additional_info = _format_zendesk_additional_info(additional_info)
 
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
     zendesk_tags = list(tags.values()) + ["LMS"]
@@ -319,9 +328,19 @@ def _record_feedback_in_zendesk(
     return True
 
 
+def _format_datadog_tags(tags, course_id=None):
+    """
+    Format a list of tags for use with the Datadog API.
+    """
+    # Avoid modifying the original tags dictionary
+    tags = dict(tags)
+    if course_id is not None:
+        tags["course_id"] = course_id
+    return [u"{k}:{v}".format(k=k, v=v) for k, v in sorted(tags.items())]
+
+
 def _record_feedback_in_datadog(tags):
-    datadog_tags = [u"{k}:{v}".format(k=k, v=v) for k, v in sorted(tags.items())]
-    dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
+    dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=tags)
 
 
 def get_feedback_form_context(request):
@@ -443,14 +462,8 @@ def submit_feedback(request):
             support_email=context["support_email"]
         )
 
-    # TODO: Determine if this info is actually used/needed.
-    #
-    # We need to add course_id back to the tags dictionary before we can send them to datadog. This is necessary
-    # because we no longer send course_id to Zendesk as a tag. We use Zendesk custom fields instead.
-    tags = dict(context["tags"])
-    if "course_id" in context["additional_info"]:
-        tags["course_id"] = context["additional_info"]["course_id"]
-    _record_feedback_in_datadog(tags)
+    datadog_tags = _format_datadog_tags(context["tags"], context["additional_info"].get("course_id"))
+    _record_feedback_in_datadog(datadog_tags)
 
     return HttpResponse(status=(200 if success else 500))
 
