@@ -1,4 +1,7 @@
 ## mako
-<%page expression_filter="h" args="online_help_token"/>
+<%page expression_filter="h" args="online_help_token,doc_base_url"/>
 <%namespace name='static' file='static_content.html'/>
-<%include file="${static.get_template_path(relative_path='navigation.html')}"  args="online_help_token=online_help_token"  />
+<%include
+    file="${static.get_template_path(relative_path='navigation.html')}"
+    args="online_help_token=online_help_token,doc_base_url=doc_base_url"
+/>
