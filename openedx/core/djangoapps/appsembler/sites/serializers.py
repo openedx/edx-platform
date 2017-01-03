@@ -78,11 +78,13 @@ class RegistrationSerializer(serializers.Serializer):
             site_configuration.values['logo_positive'] = initial_values.get('logo_positive')
             site_configuration.values['logo_negative'] = initial_values.get('logo_negative')
             site_configuration.values['primary-font'] = '"{}"'.format(initial_values.get('font'))
+            site_configuration.values['accent-font'] = '"Delius Unicase"'
             site_configuration.set_sass_variables({
                 '$brand-primary-color': initial_values.get('primary_brand_color'),
                 '$base-text-color': initial_values.get('base_text_color'),
                 '$cta-button-bg': initial_values.get('cta_button_bg'),
                 '$primary-font-name': '"{}"'.format(initial_values.get('font')),
+                '$accent-font-name': '"Delius Unicase"',
             })
             site_configuration.save()
         return {
