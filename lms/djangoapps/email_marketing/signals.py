@@ -15,7 +15,7 @@ from student.views import REGISTER_USER
 from email_marketing.models import EmailMarketingConfiguration
 from util.model_utils import USER_FIELD_CHANGED
 from lms.djangoapps.email_marketing.tasks import (
-    update_user, update_user_email, update_course_enrollment
+    update_user_v2, update_user_email, update_course_enrollment
 )
 
 from sailthru.sailthru_client import SailthruClient
@@ -153,7 +153,7 @@ def email_marketing_register_user(sender, user=None, profile=None,
         return
 
     # perform update asynchronously
-    update_user.delay(
+    update_user_v2.delay(
         _create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(), new_user=True
     )
 
@@ -193,8 +193,8 @@ def email_marketing_user_field_changed(sender, user=None, table=None, setting=No
             return
 
         # perform update asynchronously, flag if activation
-        update_user.delay(_create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(),
-                          new_user=False, activation=(setting == 'is_active') and new_value is True)
+        update_user_v2.delay(_create_sailthru_user_vars(user, user.profile), user.email, site=_get_current_site(),
+                             new_user=False, activation=(setting == 'is_active') and new_value is True)
 
     elif setting == 'email':
         # email update is special case
