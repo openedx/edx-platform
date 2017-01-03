@@ -64,7 +64,7 @@ class TestBlockSerializerBase(SharedModuleStoreTestCase):
         )
         self.assertEquals(
             set(serialized_block.iterkeys()),
-            {'id', 'type', 'lms_web_url', 'student_view_url'},
+            {'id', 'block_id', 'type', 'lms_web_url', 'student_view_url'},
         )
 
     def add_additional_requested_fields(self, context=None):
