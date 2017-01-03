@@ -141,14 +141,8 @@ class UserAPITestCase(APITestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
-@patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
-    {'full': 50, 'small': 10},
-    clear=True
-)
 @attr(shard=2)
-class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
+class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
@@ -156,47 +150,46 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestAccountAPI, self).setUp()
+        super(TestOwnUsernameAPI, self).setUp()
 
-        self.url = reverse("account_api")
+        self.url = reverse("own_username_api")
 
-    def test_get_account_default(self):
+    def _verify_get_own_username(self, queries, expected_status=200):
         """
-        Test that a client (logged in) can get her own account information (using default legacy profile information,
-        as created by the test UserFactory).
+        Internal helper to perform the actual assertion
         """
-        def verify_get_own_information(queries):
-            """
-            Internal helper to perform the actual assertions
-            """
-            with self.assertNumQueries(queries):
-                response = self.send_get(self.client)
+        with self.assertNumQueries(queries):
+            response = self.send_get(self.client, expected_status=expected_status)
+        if expected_status == 200:
             data = response.data
-            self.assertEqual(17, len(data))
+            self.assertEqual(1, len(data))
             self.assertEqual(self.user.username, data["username"])
-            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
-                self.assertIsNone(data[empty_field])
-            self.assertIsNone(data["country"])
-            self.assertEqual("m", data["gender"])
-            self.assertEqual("Learn a lot", data["goals"])
-            self.assertEqual(self.user.email, data["email"])
-            self.assertIsNotNone(data["date_joined"])
-            self.assertEqual(self.user.is_active, data["is_active"])
-            self._verify_profile_image_data(data, False)
-            self.assertTrue(data["requires_parental_consent"])
-            self.assertEqual([], data["language_proficiencies"])
-            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
-            # Badges aren't on by default, so should not be present.
-            self.assertEqual(False, data["accomplishments_shared"])
 
+    def test_get_username(self):
+        """
+        Test that a client (logged in) can get her own username.
+        """
         self.client.login(username=self.user.username, password=self.test_password)
-        verify_get_own_information(17)
+        self._verify_get_own_username(15)
 
-        # Now make sure that the user can get the same information, even if not active
+    def test_get_username_inactive(self):
+        """
+        Test that a logged-in client can get their
+        username, even if inactive.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(11)
+        self._verify_get_own_username(15)
+
+    def test_get_username_not_logged_in(self):
+        """
+        Test that a client (not logged in) gets a 401
+        when trying to retrieve their username.
+        """
+
+        # verify that the endpoint is inaccessible when not logged in
+        self._verify_get_own_username(12, expected_status=401)
 
 
 @ddt.ddt
@@ -365,6 +358,45 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         # Verify how the view parameter changes the fields that are returned.
         response = self.send_get(client, query_parameters='view=shared')
         verify_fields_visible_to_all_users(response)
+
+    def test_get_account_default(self):
+        """
+        Test that a client (logged in) can get her own account information (using default legacy profile information,
+        as created by the test UserFactory).
+        """
+
+        def verify_get_own_information(queries):
+            """
+            Internal helper to perform the actual assertions
+            """
+            with self.assertNumQueries(queries):
+                response = self.send_get(self.client)
+            data = response.data
+            self.assertEqual(17, len(data))
+            self.assertEqual(self.user.username, data["username"])
+            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
+            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
+                self.assertIsNone(data[empty_field])
+            self.assertIsNone(data["country"])
+            self.assertEqual("m", data["gender"])
+            self.assertEqual("Learn a lot", data["goals"])
+            self.assertEqual(self.user.email, data["email"])
+            self.assertIsNotNone(data["date_joined"])
+            self.assertEqual(self.user.is_active, data["is_active"])
+            self._verify_profile_image_data(data, False)
+            self.assertTrue(data["requires_parental_consent"])
+            self.assertEqual([], data["language_proficiencies"])
+            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
+            # Badges aren't on by default, so should not be present.
+            self.assertEqual(False, data["accomplishments_shared"])
+
+        self.client.login(username=self.user.username, password=self.test_password)
+        verify_get_own_information(17)
+
+        # Now make sure that the user can get the same information, even if not active
+        self.user.is_active = False
+        self.user.save()
+        verify_get_own_information(11)
 
     def test_get_account_empty_string(self):
         """
