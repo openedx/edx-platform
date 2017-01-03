@@ -241,6 +241,16 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self._apply_recalculate_subsection_grade(mock_score=None)
         self._assert_retry_called(mock_retry)
 
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
+    def test_retry_subsection_grade_on_no_sub_score(self, mock_retry):
+        self.set_up_course()
+        with patch('lms.djangoapps.grades.tasks.sub_api.get_score') as mock_sub_score:
+            mock_sub_score.return_value = None
+            self._apply_recalculate_subsection_grade(
+                mock_score=MagicMock(module_type='openassessment')
+            )
+        self._assert_retry_called(mock_retry)
+
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
     def test_retry_first_time_only(self, mock_update, mock_course_signal):
