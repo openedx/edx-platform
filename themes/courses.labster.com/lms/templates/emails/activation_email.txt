@@ -2,7 +2,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 ${_("Thank you for signing up for {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
 
-${_("Change your life and start learning today by activating your "
+${_("Start learning today by activating your "
     "{platform_name} account. Click on the link below or copy and "
     "paste it into your browser's address bar.").format(
       platform_name=settings.PLATFORM_NAME
@@ -14,7 +14,8 @@ https://${ site }/activate/${ key }
 http://${ site }/activate/${ key }
 % endif
 
-${_("If you didn't request this, you don't need to do anything; you won't "
-"receive any more email from us. Please do not reply to this e-mail; "
-"if you require assistance, check the help section of the "
-"{platform_name} website.").format(platform_name=settings.PLATFORM_NAME)}
+${_("If you have any questions please contact: {support_email}").format(
+    support_email=settings.BUGS_EMAIL
+)}
+${_("If you did not request this mail, you do not need to do anything further. "
+"You will not receive any further communications from {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
