@@ -31,12 +31,15 @@
             },
 
             renderItems: function() {
+                /* eslint no-param-reassign: [2, { "props": true }] */
                 var latest = this.model.latest();
                 var items = latest.map(function(result) {
+                    result.userPreferences = this.model.userPreferences;
                     var item = new CourseCardView({model: result});
                     return item.render().el;
                 }, this);
                 this.$list.append(items);
+                /* eslint no-param-reassign: [2, { "props": false }] */
             },
 
             attachScrollHandler: function() {
