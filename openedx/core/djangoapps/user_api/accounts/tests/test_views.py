@@ -160,43 +160,29 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
 
         self.url = reverse("account_api")
 
-    def test_get_account_default(self):
+    def test_get_username_default(self):
         """
-        Test that a client (logged in) can get her own account information (using default legacy profile information,
-        as created by the test UserFactory).
+        Test that a client (logged in) can get her own username.
         """
-        def verify_get_own_information(queries):
+        def verify_get_own_username(queries, expected_status=200):
             """
-            Internal helper to perform the actual assertions
+            Internal helper to perform the actual assertion
             """
             with self.assertNumQueries(queries):
-                response = self.send_get(self.client)
-            data = response.data
-            self.assertEqual(17, len(data))
-            self.assertEqual(self.user.username, data["username"])
-            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
-                self.assertIsNone(data[empty_field])
-            self.assertIsNone(data["country"])
-            self.assertEqual("m", data["gender"])
-            self.assertEqual("Learn a lot", data["goals"])
-            self.assertEqual(self.user.email, data["email"])
-            self.assertIsNotNone(data["date_joined"])
-            self.assertEqual(self.user.is_active, data["is_active"])
-            self._verify_profile_image_data(data, False)
-            self.assertTrue(data["requires_parental_consent"])
-            self.assertEqual([], data["language_proficiencies"])
-            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
-            # Badges aren't on by default, so should not be present.
-            self.assertEqual(False, data["accomplishments_shared"])
+                response = self.send_get(self.client, expected_status=expected_status)
+            if expected_status == 200:
+                data = response.data
+                self.assertEqual(self.user.username, data)
 
+        # verify that the endpoint is inaccessible when not logged in
+        verify_get_own_username(12, expected_status=401)
         self.client.login(username=self.user.username, password=self.test_password)
-        verify_get_own_information(17)
+        verify_get_own_username(9)
 
         # Now make sure that the user can get the same information, even if not active
         self.user.is_active = False
         self.user.save()
-        verify_get_own_information(11)
+        verify_get_own_username(9)
 
 
 @ddt.ddt

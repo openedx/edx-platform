@@ -152,13 +152,7 @@ class AccountViewSet(ViewSet):
         """
         GET /api/user/v1/me
         """
-        try:
-            account_settings = get_account_settings(
-                request, [request.user.username], view=request.query_params.get('view'))
-        except UserNotFound:
-            return Response(status=status.HTTP_403_FORBIDDEN if request.user.is_staff else status.HTTP_404_NOT_FOUND)
-
-        return Response(account_settings[0])
+        return Response(request.user.username)
 
     def list(self, request):
         """
