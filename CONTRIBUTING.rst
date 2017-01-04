@@ -2,6 +2,7 @@
 Contributing to Open edX
 ############################
 
+
 Contributions to Open edX are very welcome, and strongly encouraged! We've
 put together `some documentation that describes our contribution process`_,
 but here's a step-by-step guide that should help you get started.
