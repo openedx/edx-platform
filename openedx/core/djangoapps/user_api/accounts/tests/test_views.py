@@ -353,6 +353,45 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
         response = self.send_get(client, query_parameters='view=shared')
         verify_fields_visible_to_all_users(response)
 
+    def test_get_account_default(self):
+        """
+        Test that a client (logged in) can get her own account information (using default legacy profile information,
+        as created by the test UserFactory).
+        """
+
+        def verify_get_own_information(queries):
+            """
+            Internal helper to perform the actual assertions
+            """
+            with self.assertNumQueries(queries):
+                response = self.send_get(self.client)
+            data = response.data
+            self.assertEqual(17, len(data))
+            self.assertEqual(self.user.username, data["username"])
+            self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
+            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
+                self.assertIsNone(data[empty_field])
+            self.assertIsNone(data["country"])
+            self.assertEqual("m", data["gender"])
+            self.assertEqual("Learn a lot", data["goals"])
+            self.assertEqual(self.user.email, data["email"])
+            self.assertIsNotNone(data["date_joined"])
+            self.assertEqual(self.user.is_active, data["is_active"])
+            self._verify_profile_image_data(data, False)
+            self.assertTrue(data["requires_parental_consent"])
+            self.assertEqual([], data["language_proficiencies"])
+            self.assertEqual(PRIVATE_VISIBILITY, data["account_privacy"])
+            # Badges aren't on by default, so should not be present.
+            self.assertEqual(False, data["accomplishments_shared"])
+
+        self.client.login(username=self.user.username, password=self.test_password)
+        verify_get_own_information(17)
+
+        # Now make sure that the user can get the same information, even if not active
+        self.user.is_active = False
+        self.user.save()
+        verify_get_own_information(11)
+
     def test_get_account_empty_string(self):
         """
         Test the conversion of empty strings to None for certain fields.
