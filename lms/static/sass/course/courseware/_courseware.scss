@@ -417,6 +417,12 @@ html.video-fullscreen {
         padding-bottom: 0;
         border-bottom: none;
       }
+
+      .loading-spinner {
+        margin: 100px 0;
+        text-align: center;
+        color: $gray-d1;
+      }
     }
 
     .vert-mod {
