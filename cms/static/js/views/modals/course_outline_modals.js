@@ -25,7 +25,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
         options: $.extend({}, BaseModal.prototype.options, {
             modalName: 'course-outline',
             modalType: 'edit-settings',
-            addSaveButton: true,
+            addPrimaryActionButton: true,
             modalSize: 'med',
             viewSpecificClasses: 'confirm',
             editors: []
