@@ -2,12 +2,14 @@
 """
 Unit tests for video-related REST APIs.
 """
+from datetime import datetime
 import csv
 import ddt
 import json
 import dateutil.parser
 import re
 from StringIO import StringIO
+import pytz
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -16,7 +18,7 @@ from mock import Mock, patch
 from edxval.api import create_profile, create_video, get_video_info
 
 from contentstore.models import VideoUploadConfig
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings
+from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, StatusDisplayStrings, convert_video_status
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -49,6 +51,7 @@ class VideoUploadTestMixin(object):
 
         # course ids for videos
         course_ids = [unicode(self.course.id), unicode(self.course2.id)]
+        created = datetime.now(pytz.utc)
 
         self.profiles = ["profile1", "profile2"]
         self.previous_uploads = [
@@ -59,6 +62,7 @@ class VideoUploadTestMixin(object):
                 "status": "upload",
                 "courses": course_ids,
                 "encoded_videos": [],
+                "created": created
             },
             {
                 "edx_video_id": "test2",
@@ -66,6 +70,7 @@ class VideoUploadTestMixin(object):
                 "duration": 128.0,
                 "status": "file_complete",
                 "courses": course_ids,
+                "created": created,
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -87,6 +92,7 @@ class VideoUploadTestMixin(object):
                 "duration": 256.0,
                 "status": "transcode_active",
                 "courses": course_ids,
+                "created": created,
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -105,6 +111,7 @@ class VideoUploadTestMixin(object):
                 "duration": 3.14,
                 "status": status,
                 "courses": course_ids,
+                "created": created,
                 "encoded_videos": [],
             }
             for status in (
@@ -184,7 +191,7 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 self.assertEqual(response_video[field], original_video[field])
             self.assertEqual(
                 response_video["status"],
-                StatusDisplayStrings.get(original_video["status"])
+                convert_video_status(original_video)
             )
 
     def test_get_html(self):
@@ -442,6 +449,67 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self._assert_video_removal(self.url, edx_video_id, 1)
         self._assert_video_removal(self.get_url_for_course_key(self.course2.id), edx_video_id, 0)
 
+    def test_convert_video_status(self):
+        """
+        Verifies that convert_video_status works as expected.
+        """
+        video = self.previous_uploads[0]
+
+        # video status should be failed if it's in upload state for more than 24 hours
+        video['created'] = datetime(2016, 1, 1, 10, 10, 10, 0, pytz.UTC)
+        status = convert_video_status(video)
+        self.assertEqual(status, StatusDisplayStrings.get('upload_failed'))
+
+        # `invalid_token` should be converted to `youtube_duplicate`
+        video['created'] = datetime.now(pytz.UTC)
+        video['status'] = 'invalid_token'
+        status = convert_video_status(video)
+        self.assertEqual(status, StatusDisplayStrings.get('youtube_duplicate'))
+
+        # for all other status, there should not be any conversion
+        statuses = StatusDisplayStrings._STATUS_MAP.keys()  # pylint: disable=protected-access
+        statuses.remove('invalid_token')
+        for status in statuses:
+            video['status'] = status
+            new_status = convert_video_status(video)
+            self.assertEqual(new_status, StatusDisplayStrings.get(status))
+
+    def assert_video_status(self, url, edx_video_id, status):
+        """
+        Verifies that video with `edx_video_id` has `status`
+        """
+        response = self.client.get_json(url)
+        self.assertEqual(response.status_code, 200)
+        videos = json.loads(response.content)["videos"]
+        for video in videos:
+            if video['edx_video_id'] == edx_video_id:
+                return self.assertEqual(video['status'], status)
+
+        # Test should fail if video not found
+        self.assertEqual(True, False, 'Invalid edx_video_id')
+
+    def test_video_status_update_request(self):
+        """
+        Verifies that video status update request works as expected.
+        """
+        url = self.get_url_for_course_key(self.course.id)
+        edx_video_id = 'test1'
+
+        self.assert_video_status(url, edx_video_id, 'Uploading')
+
+        response = self.client.post(
+            url,
+            json.dumps([{
+                'edxVideoId': edx_video_id,
+                'status': 'upload_failed',
+                'message': 'server down'
+            }]),
+            content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 204)
+
+        self.assert_video_status(url, edx_video_id, 'Failed')
+
 
 @patch.dict("django.conf.settings.FEATURES", {"ENABLE_VIDEO_UPLOAD_PIPELINE": True})
 @override_settings(VIDEO_UPLOAD_PIPELINE={"BUCKET": "test_bucket", "ROOT_PATH": "test_root"})
@@ -486,7 +554,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
-            self.assertEqual(response_video["Status"], StatusDisplayStrings.get(original_video["status"]))
+            self.assertEqual(response_video["Status"], convert_video_status(original_video))
             for profile in expected_profiles:
                 response_profile_url = response_video["{} URL".format(profile)]
                 original_encoded_for_profile = next(

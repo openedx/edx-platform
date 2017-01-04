@@ -65,9 +65,13 @@
           font-size: 90%;
         }
 
-        .video-detail-status {
+        .video-detail-status, .more-details-action {
           @include font-size(12);
           @include line-height(12);
+        }
+
+        .more-details-action, .upload-failure {
+          display: none;
         }
 
         .video-detail-progress {
@@ -105,7 +109,7 @@
         }
 
         &.error {
-          .video-detail-status {
+          .video-upload-status {
             color: $color-error;
           }
 
@@ -117,10 +121,20 @@
           .video-detail-progress::-moz-progress-bar {
             background-color: $color-error;
           }
+
+          .more-details-action, .upload-failure {
+            display: inline-block;
+            color: $color-error;
+          }
+
+          .more-details-action {
+            margin-top: ($baseline/5);
+            float: right;
+          }
         }
 
         &.success {
-          .video-detail-status {
+          .video-upload-status {
             color: $color-ready;
           }
         }
