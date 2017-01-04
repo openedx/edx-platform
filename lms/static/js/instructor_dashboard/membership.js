@@ -380,7 +380,7 @@ such that the value can be defined later than this assignment (file load order).
             this.$container = $container;
             this.$identifier_input = this.$container.find("textarea[name='student-ids-for-beta']");
             this.$btn_beta_testers = this.$container.find("input[name='beta-testers']");
-            this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll']");
+            this.$checkbox_autoenroll = this.$container.find("input[name='auto-enroll-beta']");
             this.$checkbox_emailstudents = this.$container.find("input[name='email-students-beta']");
             this.$task_response = this.$container.find('.request-response');
             this.$request_response_error = this.$container.find('.request-response-error');
