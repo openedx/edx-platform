@@ -2,8 +2,7 @@ from __future__ import division
 from fractions import Fraction
 
 from pyparsing import (Literal, StringEnd, OneOrMore, ParseException)
-import nltk
-from nltk.tree import Tree
+#from nltk.tree import Tree
 
 ARROWS = ('<->', '->')
 
@@ -51,8 +50,8 @@ grammar = """
 
   suffixed -> unsuffixed | unsuffixed suffix
 """
-parser = nltk.ChartParser(nltk.parse_cfg(grammar))
-
+# This will be lazily loaded...
+parser = None
 
 def _clean_parse_tree(tree):
     ''' The parse tree contains a lot of redundant
@@ -239,6 +238,11 @@ def _get_final_tree(s):
 
     Raises pyparsing.ParseException if s is invalid.
     '''
+    import nltk
+    global parser
+    if parser is None:
+        parser = nltk.ChartParser(nltk.parse_cfg(grammar))
+
     tokenized = tokenizer.parseString(s)
     parsed = parser.parse(tokenized)
     merged = _merge_children(parsed, {'S', 'group'})

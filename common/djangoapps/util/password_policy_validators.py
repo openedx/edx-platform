@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-import nltk
+#import nltk
 
 
 def validate_password_strength(value):

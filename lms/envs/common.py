@@ -38,7 +38,7 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
-import dealer.git
+#import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.mixin import LicenseMixin
@@ -829,12 +829,14 @@ MANAGERS = ADMINS
 EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
 
 if not EDX_PLATFORM_REVISION:
-    try:
-        # Get git revision of the current file
-        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
-    except TypeError:
-        # Not a git repository
-        EDX_PLATFORM_REVISION = 'unknown'
+    EDX_PLATFORM_REVISION = 'unknown'
+
+#    try:
+#        # Get git revision of the current file
+#        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
+#    except TypeError:
+#        # Not a git repository
+#        EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
 STATIC_URL = '/static/'

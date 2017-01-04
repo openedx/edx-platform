@@ -5,7 +5,6 @@ This file contains utility functions which will responsible for sending emails.
 import os
 
 import logging
-import pynliner
 import urlparse
 import uuid
 import HTMLParser
@@ -99,6 +98,11 @@ def send_credit_notifications(username, course_key):
     email_body_plain = render_to_string('credit_notifications/credit_eligibility_email.txt', context)
     msg_alternative.attach(SafeMIMEText(email_body_plain, _subtype='plain', _charset='utf-8'))
 
+    # Moving this import to be inline because it is very expensive (it does
+    # a bunch of regexp creation), and almost never used. Putting it here keeps
+    # it out of the critical path for things like just starting the LMS.
+    import pynliner
+
     # add alternative html message
     email_body_content = cache.get('credit.email.css-email-body')
     if email_body_content is None:
@@ -109,7 +113,7 @@ def send_credit_notifications(username, course_key):
                 # use html parser to unescape html characters which are changed
                 # by the 'pynliner' while adding inline css to html content
                 html_parser = HTMLParser.HTMLParser()
-                email_body_content = html_parser.unescape(with_inline_css(cur_text))
+                email_body_content = html_parser.unescape(with_inline_css(cur_text, pynliner))
                 # cache the email body content before rendering it since the
                 # email context will change for each user e.g., 'full_name'
                 cache.set('credit.email.css-email-body', email_body_content, settings.CREDIT_NOTIFICATION_CACHE_TIMEOUT)
@@ -133,7 +137,7 @@ def send_credit_notifications(username, course_key):
     msg.send()
 
 
-def with_inline_css(html_without_css):
+def with_inline_css(html_without_css, pynliner):
     """Returns html with inline css if the css file path exists
     else returns html with out the inline css.
     """

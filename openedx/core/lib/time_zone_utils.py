@@ -44,9 +44,3 @@ def get_display_time_zone(time_zone_name):
     tz_offset = get_time_zone_offset(time_zone)
 
     return "{name} ({abbr}, UTC{offset})".format(name=time_zone, abbr=tz_abbr, offset=tz_offset).replace("_", " ")
-
-
-TIME_ZONE_CHOICES = sorted(
-    [(tz, get_display_time_zone(tz)) for tz in common_timezones],
-    key=lambda tz_tuple: tz_tuple[1]
-)
