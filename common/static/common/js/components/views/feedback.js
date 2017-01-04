@@ -78,16 +78,17 @@
                     return this;
                 },
 
-                inFocus: function() {
+                inFocus: function(wrapperElementSelector) {
+                    var wrapper = wrapperElementSelector || '.wrapper',
+                        tabbables;
                     this.options.outFocusElement = this.options.outFocusElement || document.activeElement;
 
                     // Set focus to the container.
-                    this.$('.wrapper').first().focus();
-
+                    this.$(wrapper).first().focus();
 
                     // Make tabs within the prompt loop rather than setting focus
                     // back to the main content of the page.
-                    var tabbables = this.$(tabbable_elements.join());
+                    tabbables = this.$(tabbable_elements.join());
                     tabbables.on('keydown', function(event) {
                         // On tab backward from the first tabbable item in the prompt
                         if (event.which === 9 && event.shiftKey && event.target === tabbables.first()[0]) {
