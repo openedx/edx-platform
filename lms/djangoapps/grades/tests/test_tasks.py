@@ -262,6 +262,32 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self._apply_recalculate_subsection_grade()
         self.assertEquals(mock_course_signal.call_count, 1)
 
+    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
+    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    def test_log_unknown_error(self, mock_update, mock_retry, mock_log):
+        """
+        Ensures that unknown errors are logged before a retry.
+        """
+        self.set_up_course()
+        mock_update.side_effect = Exception("General exception with no further detail!")
+        self._apply_recalculate_subsection_grade()
+        self.assertIn("General exception with no further detail!", mock_log.info.call_args[0][0])
+        self._assert_retry_called(mock_retry)
+
+    @patch('lms.djangoapps.grades.tasks.log')
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
+    @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
+    def test_no_log_known_error(self, mock_update, mock_retry, mock_log):
+        """
+        Ensures that known errors are not logged before a retry.
+        """
+        self.set_up_course()
+        mock_update.side_effect = IntegrityError("race condition oh noes")
+        self._apply_recalculate_subsection_grade()
+        self.assertFalse(mock_log.info.called)
+        self._assert_retry_called(mock_retry)
+
     def _apply_recalculate_subsection_grade(
             self,
             mock_score=MagicMock(modified=datetime.utcnow().replace(tzinfo=pytz.UTC) + timedelta(days=1))
