@@ -152,7 +152,7 @@ class AccountViewSet(ViewSet):
         """
         GET /api/user/v1/me
         """
-        return Response(request.user.username)
+        return Response({'username': request.user.username})
 
     def list(self, request):
         """

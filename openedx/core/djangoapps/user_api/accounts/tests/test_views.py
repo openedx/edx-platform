@@ -172,7 +172,8 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
                 response = self.send_get(self.client, expected_status=expected_status)
             if expected_status == 200:
                 data = response.data
-                self.assertEqual(self.user.username, data)
+                self.assertEqual(1, len(data))
+                self.assertEqual(self.user.username, data["username"])
 
         # verify that the endpoint is inaccessible when not logged in
         verify_get_own_username(12, expected_status=401)
