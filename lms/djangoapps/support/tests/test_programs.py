@@ -4,17 +4,14 @@ from django.test import TestCase
 import mock
 from edx_oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from student.tests.factories import UserFactory
 
 
-class IssueProgramCertificatesViewTests(TestCase, ProgramsApiConfigMixin):
+class IssueProgramCertificatesViewTests(TestCase):
     password = 'password'
 
     def setUp(self):
         super(IssueProgramCertificatesViewTests, self).setUp()
-
-        self.create_programs_config()
 
         self.path = reverse('support:programs-certify')
         self.user = UserFactory(password=self.password, is_staff=True)
@@ -56,12 +53,6 @@ class IssueProgramCertificatesViewTests(TestCase, ProgramsApiConfigMixin):
         self.user.save()  # pylint: disable=no-member
 
         self._verify_response(403)
-
-    def test_certification_disabled(self):
-        """Verify that the endpoint returns a 400 when program certification is disabled."""
-        self.create_programs_config(enable_certification=False)
-
-        self._verify_response(400)
 
     def test_username_required(self):
         """Verify that the endpoint returns a 400 when a username isn't provided."""

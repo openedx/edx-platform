@@ -151,7 +151,7 @@ def munge_catalog_program(catalog_program):
                     # The Programs schema only supports one organization here.
                     'display_name': course['owners'][0]['name'],
                     'key': course['owners'][0]['key']
-                },
+                } if course['owners'] else {},
                 'run_modes': [
                     {
                         'course_key': run['key'],

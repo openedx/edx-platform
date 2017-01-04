@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Helper functions for working with Programs."""
 import datetime
-import logging
 from urlparse import urljoin
 
 from django.conf import settings
@@ -26,13 +25,11 @@ from util.date_utils import strftime_localized
 from util.organizations_helpers import get_organization_by_short_name
 
 
-log = logging.getLogger(__name__)
-
 # The datetime module's strftime() methods require a year >= 1900.
 DEFAULT_ENROLLMENT_START_DATE = datetime.datetime(1900, 1, 1, tzinfo=utc)
 
 
-def get_programs(user, program_id=None):
+def get_programs(user, program_id=None, use_catalog=False):
     """Given a user, get programs from the Programs service.
 
     Returned value is cached depending on user permissions. Staff users making requests
@@ -49,49 +46,25 @@ def get_programs(user, program_id=None):
         list of dict, representing programs returned by the Programs service.
         dict, if a specific program is requested.
     """
-    programs_config = ProgramsApiConfig.current()
 
-    # Bypass caching for staff users, who may be creating Programs and want
-    # to see them displayed immediately.
-    cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
+    if use_catalog:
+        programs = [munge_catalog_program(program) for program in get_catalog_programs(user)]
+    else:
+        programs_config = ProgramsApiConfig.current()
 
-    programs = get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
+        # Bypass caching for staff users, who may be creating Programs and want
+        # to see them displayed immediately.
+        cache_key = programs_config.CACHE_KEY if programs_config.is_cache_enabled and not user.is_staff else None
 
-    # Mix in munged MicroMasters data from the catalog.
-    if not program_id:
-        programs += [
-            munge_catalog_program(micromaster) for micromaster in get_catalog_programs(user, type='MicroMasters')
-        ]
+        programs = get_edx_api_data(programs_config, user, 'programs', resource_id=program_id, cache_key=cache_key)
+
+        # Mix in munged MicroMasters data from the catalog.
+        if not program_id:
+            programs += [
+                munge_catalog_program(micromaster) for micromaster in get_catalog_programs(user, type='MicroMasters')
+            ]
 
     return programs
-
-
-def get_programs_for_credentials(user, programs_credentials):
-    """ Given a user and an iterable of credentials, get corresponding programs
-    data and return it as a list of dictionaries.
-
-    Arguments:
-        user (User): The user to authenticate as for requesting programs.
-        programs_credentials (list): List of credentials awarded to the user
-            for completion of a program.
-
-    Returns:
-        list, containing programs dictionaries.
-    """
-    certificate_programs = []
-
-    programs = get_programs(user)
-    if not programs:
-        log.debug('No programs for user %d.', user.id)
-        return certificate_programs
-
-    for program in programs:
-        for credential in programs_credentials:
-            if program['id'] == credential['credential']['program_id']:
-                program['credential_url'] = credential['certificate_url']
-                certificate_programs.append(program)
-
-    return certificate_programs
 
 
 def get_programs_by_run(programs, enrollments):
@@ -147,7 +120,6 @@ def attach_program_detail_url(programs):
     for program in programs:
         base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
         slug = slugify(program['name'])
-
         program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
 
     return programs
@@ -182,13 +154,14 @@ class ProgramProgressMeter(object):
     Keyword Arguments:
         enrollments (list): List of the user's enrollments.
     """
-    def __init__(self, user, enrollments=None):
+    def __init__(self, user, enrollments=None, use_catalog=False):
         self.user = user
         self.enrollments = enrollments
         self.course_ids = None
         self.course_certs = None
+        self.use_catalog = use_catalog
 
-        self.programs = attach_program_detail_url(get_programs(self.user))
+        self.programs = attach_program_detail_url(get_programs(self.user, use_catalog=use_catalog))
 
     def engaged_programs(self, by_run=False):
         """Derive a list of programs in which the given user is engaged.
@@ -279,7 +252,6 @@ class ProgramProgressMeter(object):
             bool, whether the course code is complete.
         """
         self.course_certs = self.course_certs or get_completed_courses(self.user)
-
         return any(self._parse(run_mode) in self.course_certs for run_mode in course_code['run_modes'])
 
     def _is_course_code_in_progress(self, course_code):

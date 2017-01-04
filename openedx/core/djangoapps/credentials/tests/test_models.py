@@ -17,11 +17,11 @@ class TestCredentialsApiConfig(CredentialsApiConfigMixin, TestCase):
 
         self.assertEqual(
             credentials_config.internal_api_url,
-            credentials_config.internal_service_url.strip('/') + '/api/v1/')
+            credentials_config.internal_service_url.strip('/') + '/api/v2/')
 
         self.assertEqual(
             credentials_config.public_api_url,
-            credentials_config.public_service_url.strip('/') + '/api/v1/')
+            credentials_config.public_service_url.strip('/') + '/api/v2/')
 
     def test_is_learner_issuance_enabled(self):
         """

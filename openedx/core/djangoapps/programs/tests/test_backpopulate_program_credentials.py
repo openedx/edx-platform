@@ -4,17 +4,15 @@ import json
 import ddt
 from django.core.management import call_command, CommandError
 from django.test import TestCase
-from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
 import mock
-from provider.constants import CONFIDENTIAL
 
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFactory
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
+from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
 from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
@@ -26,7 +24,7 @@ COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopul
 @httpretty.activate
 @mock.patch(COMMAND_MODULE + '.award_program_certificates.delay')
 @skip_unless_lms
-class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
+class BackpopulateProgramCredentialsTests(CatalogIntegrationMixin, CredentialsApiConfigMixin, TestCase):
     """Tests for the backpopulate_program_credentials management command."""
     course_id, alternate_course_id = 'org/course/run', 'org/alternate/run'
 
@@ -35,24 +33,20 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
 
         self.alice = UserFactory()
         self.bob = UserFactory()
-        self.oauth2_user = UserFactory()
-        self.oauth2_client = ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
         # Disable certification to prevent the task from being triggered when
         # setting up test data (i.e., certificates with a passing status), thereby
         # skewing mock call counts.
-        self.create_programs_config(enable_certification=False)
+        self.create_credentials_config(enable_learner_issuance=False)
 
-    def _link_oauth2_user(self):
-        """Helper to link user and OAuth2 client."""
-        self.oauth2_client.user = self.oauth2_user
-        self.oauth2_client.save()  # pylint: disable=no-member
+        self.catalog_integration = self.create_catalog_integration()
+        self.service_user = UserFactory(username=self.catalog_integration.service_username)
 
     def _mock_programs_api(self, data):
-        """Helper for mocking out Programs API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
+        """Helper for mocking out Catalog API URLs."""
+        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Catalog API calls.')
 
-        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
+        url = self.catalog_integration.internal_api_url.strip('/') + '/programs/'
         body = json.dumps({'results': data})
 
         httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
@@ -71,7 +65,6 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             ),
         ]
         self._mock_programs_api(data)
-        self._link_oauth2_user()
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -141,7 +134,6 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
     def test_handle_flatten(self, data, mock_task):
         """Verify that program structures are flattened correctly."""
         self._mock_programs_api(data)
-        self._link_oauth2_user()
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -179,7 +171,6 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             ),
         ]
         self._mock_programs_api(data)
-        self._link_oauth2_user()
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -215,7 +206,6 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             ),
         ]
         self._mock_programs_api(data)
-        self._link_oauth2_user()
 
         GeneratedCertificateFactory(
             user=self.alice,
@@ -248,7 +238,6 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             ),
         ]
         self._mock_programs_api(data)
-        self._link_oauth2_user()
 
         passing_status = CertificateStatuses.downloadable
         failing_status = CertificateStatuses.notpassing
@@ -276,27 +265,10 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
 
         mock_task.assert_called_once_with(self.alice.username)
 
-    def test_handle_unlinked_oauth2_user(self, mock_task):
-        """Verify that the command fails when no user is associated with the OAuth2 client."""
-        data = [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=self.course_id),
-                    ]),
-                ]
-            ),
-        ]
-        self._mock_programs_api(data)
+    def test_handle_missing_service_user(self, mock_task):
+        """Verify that the command fails when no service user exists."""
 
-        GeneratedCertificateFactory(
-            user=self.alice,
-            course_id=self.course_id,
-            mode=MODES.verified,
-            status=CertificateStatuses.downloadable,
-        )
-
+        self.catalog_integration = self.create_catalog_integration(service_username='test')
         with self.assertRaises(CommandError):
             call_command('backpopulate_program_credentials')
 
@@ -323,7 +295,6 @@ class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
             ),
         ]
         self._mock_programs_api(data)
-        self._link_oauth2_user()
 
         GeneratedCertificateFactory(
             user=self.alice,

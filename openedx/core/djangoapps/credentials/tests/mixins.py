@@ -37,16 +37,12 @@ class CredentialsDataMixin(object):
             factories.UserCredential(
                 id=1,
                 username='test',
-                credential=factories.ProgramCredential(
-                    program_id=1
-                )
+                credential=factories.ProgramCredential()
             ),
             factories.UserCredential(
                 id=2,
                 username='test',
-                credential=factories.ProgramCredential(
-                    program_id=2
-                )
+                credential=factories.ProgramCredential()
             ),
             factories.UserCredential(
                 id=3,
@@ -99,8 +95,7 @@ class CredentialsDataMixin(object):
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Credentials API calls.')
         internal_api_url = CredentialsApiConfig.current().internal_api_url.strip('/')
 
-        url = internal_api_url + '/user_credentials/?username=' + user.username
-
+        url = internal_api_url + '/credentials/?status=awarded&username=' + user.username
         if reset_url:
             httpretty.reset()
 
@@ -110,7 +105,7 @@ class CredentialsDataMixin(object):
         body = json.dumps(data)
 
         if is_next_page:
-            next_page_url = internal_api_url + '/user_credentials/?page=2&username=' + user.username
+            next_page_url = internal_api_url + '/credentials/?page=2&status=awarded&username=' + user.username
             self.CREDENTIALS_NEXT_API_RESPONSE['next'] = next_page_url
             next_page_body = json.dumps(self.CREDENTIALS_NEXT_API_RESPONSE)
             httpretty.register_uri(

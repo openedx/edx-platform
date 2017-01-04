@@ -2,8 +2,8 @@
 from __future__ import unicode_literals
 import logging
 
+from openedx.core.djangoapps.catalog.utils import get_programs
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
-from openedx.core.djangoapps.programs.utils import get_programs_for_credentials
 from openedx.core.lib.edx_api_utils import get_edx_api_data
 
 
@@ -19,16 +19,39 @@ def get_user_credentials(user):
         service.
     """
     credential_configuration = CredentialsApiConfig.current()
-    user_query = {'username': user.username}
+    user_query = {'status': 'awarded', 'username': user.username}
     # Bypass caching for staff users, who may be generating credentials and
     # want to see them displayed immediately.
     use_cache = credential_configuration.is_cache_enabled and not user.is_staff
     cache_key = credential_configuration.CACHE_KEY + '.' + user.username if use_cache else None
 
     credentials = get_edx_api_data(
-        credential_configuration, user, 'user_credentials', querystring=user_query, cache_key=cache_key
+        credential_configuration, user, 'credentials', querystring=user_query, cache_key=cache_key
     )
     return credentials
+
+
+def get_programs_for_credentials(user, programs_credentials):
+    """ Given a user and an iterable of credentials, get corresponding programs
+    data and return it as a list of dictionaries.
+
+    Arguments:
+        user (User): The user to authenticate as for requesting programs.
+        programs_credentials (list): List of credentials awarded to the user
+            for completion of a program.
+
+    Returns:
+        list, containing programs dictionaries.
+    """
+    certified_programs = []
+    programs = get_programs(user)
+    for program in programs:
+        for credential in programs_credentials:
+            if program['uuid'] == credential['credential']['program_uuid']:
+                program['credential_url'] = credential['certificate_url']
+                certified_programs.append(program)
+
+    return certified_programs
 
 
 def get_user_program_credentials(user):
@@ -55,7 +78,7 @@ def get_user_program_credentials(user):
     programs_credentials = []
     for credential in credentials:
         try:
-            if 'program_id' in credential['credential'] and credential['status'] == 'awarded':
+            if 'program_uuid' in credential['credential']:
                 programs_credentials.append(credential)
         except KeyError:
             log.exception('Invalid credential structure: %r', credential)
@@ -84,7 +107,7 @@ def get_programs_credentials(user):
     for program in programs_credentials:
         try:
             program_data = {
-                'display_name': program['name'],
+                'display_name': program['title'],
                 'subtitle': program['subtitle'],
                 'credential_url': program['credential_url'],
             }
