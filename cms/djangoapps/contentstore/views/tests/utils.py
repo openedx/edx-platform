@@ -54,9 +54,10 @@ class StudioPageTestCase(CourseTestCase):
 
         # Verify that there are no action buttons for public blocks
         expected_button_html = [
-            '<a href="#" class="edit-button action-button">',
-            '<a href="#" data-tooltip="Delete" class="delete-button action-button">',
-            '<a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">'
+            '<button class="btn-default edit-button action-button">',
+            '<button data-tooltip="Delete" class="btn-default delete-button action-button">',
+            '<button data-tooltip="Duplicate" class="btn-default duplicate-button action-button">',
+            '<button data-tooltip="Move" class="btn-default move-button action-button">'
         ]
         for button_html in expected_button_html:
             self.assertIn(button_html, html)
