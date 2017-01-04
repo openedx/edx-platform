@@ -12,5 +12,7 @@ def configuration_context(request):  # pylint: disable=unused-argument
     Configuration context for django templates.
     """
     return {
-        'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME)
+        'google_analytics_tracking_ids': request.site.siteconfiguration.google_analytics_tracking_ids,
+        'platform_name': configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
+        'segment_key': request.site.siteconfiguration.default_segment_key,
     }
