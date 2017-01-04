@@ -4,6 +4,7 @@ This is the main edX platform which consists of LMS and Studio.
 Installation
 ------------
 
+
 Please refer to the following wiki pages in our `configuration repo`_ to
 install edX:
 
