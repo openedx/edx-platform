@@ -322,7 +322,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview', 'common/js/compo
              */
             handleDuplicateEvent: function(event) {
                 var self = this,
-                    xblockType = XBlockViewUtils.getXBlockType(self.model.get('category'), self.parentView.model, true),
+                    xblockType = XBlockViewUtils.getXBlockType(self.model.get('category'), self.parentView.model),
                     xblockElement = $(event.currentTarget).closest('.outline-item'),
                     parentElement = self.getParentElement(xblockElement, xblockType);
 

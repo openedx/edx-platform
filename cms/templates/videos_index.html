@@ -34,7 +34,8 @@
             ${concurrent_upload_limit | n, dump_js_escaped_json},
             $(".nav-actions .upload-button"),
             $contentWrapper.data("previous-uploads"),
-            ${video_supported_file_formats | n, dump_js_escaped_json}
+            ${video_supported_file_formats | n, dump_js_escaped_json},
+            ${video_upload_max_file_size | n, dump_js_escaped_json}
         );
     });
 </%block>
@@ -70,7 +71,10 @@
                     file_formats=' or '.join(video_supported_file_formats)
                 )}</p>
                 <h3 class="title-3">${_("Maximum Video File Size")}</h3>
-                <p>${_("The maximum size for each video file that you upload is 5 GB. The upload process fails for larger files.")}</p>
+                <p>${Text(_("The maximum size for each video file that you upload is {em_start}5 GB{em_end}. The upload process fails for larger files.")).format(
+                    em_start=HTML('<strong>'),
+                    em_end=HTML('</strong>')
+                )}</p>
                 <h3 class="title-3">${_("Monitoring files as they upload")}</h3>
                 <p>${_("Each video file that you upload needs to reach the video processing servers successfully before additional work can begin. You can monitor the progress of files as they upload, and try again if the upload fails.")}</p>
                 <h3 class="title-3">${_("Managing uploaded files")}</h3>

@@ -95,7 +95,7 @@ class BulkEmailTest(BaseInstructorDashboardTest):
         self.send_email_page.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+@attr(shard=10)
 class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Auto-Registration and enrollment functionality via CSV file.
@@ -213,7 +213,7 @@ class AutoEnrollmentWithCSVTest(BaseInstructorDashboardTest):
         self.auto_enroll_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+@attr(shard=10)
 class ProctoredExamsTest(BaseInstructorDashboardTest):
     """
     End-to-end tests for Proctoring Sections of the Instructor Dashboard.
@@ -403,7 +403,7 @@ class ProctoredExamsTest(BaseInstructorDashboardTest):
         self.assertFalse(exam_attempts_section.is_student_attempt_visible)
 
 
-@attr(shard=7)
+@attr(shard=10)
 @ddt.ddt
 class EntranceExamGradeTest(BaseInstructorDashboardTest):
     """
@@ -551,7 +551,7 @@ class EntranceExamGradeTest(BaseInstructorDashboardTest):
         self.entrance_exam_admin.wait_for_task_history_table()
 
 
-@attr(shard=7)
+@attr(shard=10)
 class DataDownloadsTest(BaseInstructorDashboardTest):
     """
     Bok Choy tests for the "Data Downloads" tab.
@@ -669,7 +669,7 @@ class DataDownloadsTest(BaseInstructorDashboardTest):
         self.data_download_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+@attr(shard=10)
 @ddt.ddt
 class CertificatesTest(BaseInstructorDashboardTest):
     """
@@ -995,7 +995,7 @@ class CertificatesTest(BaseInstructorDashboardTest):
         self.certificates_section.a11y_audit.check_for_accessibility_errors()
 
 
-@attr(shard=7)
+@attr(shard=10)
 class CertificateInvalidationTest(BaseInstructorDashboardTest):
     """
     Tests for Certificates functionality on instructor dashboard.

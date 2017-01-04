@@ -18,16 +18,16 @@ define(
                 this.postUrl = '/test/post/url';
                 this.uploadButton = $('<button>');
                 this.videoSupportedFileFormats = ['.mp4', '.mov'];
+                this.videoUploadMaxFileSizeInGB = 5;
                 this.view = new ActiveVideoUploadListView({
                     concurrentUploadLimit: concurrentUploadLimit,
                     postUrl: this.postUrl,
                     uploadButton: this.uploadButton,
-                    videoSupportedFileFormats: this.videoSupportedFileFormats
+                    videoSupportedFileFormats: this.videoSupportedFileFormats,
+                    videoUploadMaxFileSizeInGB: this.videoUploadMaxFileSizeInGB
                 });
                 this.view.render();
                 jasmine.Ajax.install();
-                this.globalAjaxError = jasmine.createSpy();
-                $(document).ajaxError(this.globalAjaxError);
             });
 
             // Remove window unload handler triggered by the upload requests
@@ -89,6 +89,38 @@ define(
                 });
             });
 
+            describe('Upload file', function() {
+                _.each(
+                    [
+                        {desc: 'larger than', additionalBytes: 1},
+                        {desc: 'equal to', additionalBytes: 0},
+                        {desc: 'smaller than', additionalBytes: - 1}
+                    ],
+                    function(caseInfo) {
+                        it(caseInfo.desc + 'max file size', function() {
+                            var maxFileSizeInBytes = this.view.getMaxFileSizeInBytes(),
+                                fileSize = maxFileSizeInBytes + caseInfo.additionalBytes,
+                                fileToUpload = {
+                                    files: [
+                                        {name: 'file.mp4', size: fileSize}
+                                    ]
+                                };
+                            this.view.$uploadForm.fileupload('add', fileToUpload);
+                            if (fileSize > maxFileSizeInBytes) {
+                                expect(this.view.fileErrorMsg).toBeDefined();
+                                expect(this.view.fileErrorMsg.options.title).toEqual('Your file could not be uploaded');
+                                expect(this.view.fileErrorMsg.options.message).toEqual(
+                                    'file.mp4 exceeds maximum size of ' + this.videoUploadMaxFileSizeInGB + ' GB.'
+                                );
+                            } else {
+                                this.view.$uploadForm.fileupload('add', fileToUpload);
+                                expect(this.view.fileErrorMsg).toBeNull();
+                            }
+                        });
+                    }
+                );
+            });
+
             _.each(
                 [
                     {desc: 'a single file', numFiles: 1},
@@ -122,21 +154,25 @@ define(
                         });
 
                         it('should trigger the correct request', function() {
-                            expect(this.request.url).toEqual(this.postUrl);
-                            expect(this.request.method).toEqual('POST');
-                            expect(this.request.requestHeaders['Content-Type']).toEqual('application/json');
-                            expect(this.request.requestHeaders['Accept']).toContain('application/json');
-                            expect(JSON.parse(this.request.params)).toEqual({
-                                'files': _.map(
-                                    fileNames,
-                                    function(fileName) { return {'file_name': fileName}; }
-                                )
+                            var request,
+                                self = this;
+                            expect(jasmine.Ajax.requests.count()).toEqual(caseInfo.numFiles);
+                            _.each(_.range(caseInfo.numFiles), function(index) {
+                                request = jasmine.Ajax.requests.at(index);
+                                expect(request.url).toEqual(self.postUrl);
+                                expect(request.method).toEqual('POST');
+                                expect(request.requestHeaders['Content-Type']).toEqual('application/json');
+                                expect(request.requestHeaders.Accept).toContain('application/json');
+                                expect(JSON.parse(request.params)).toEqual({
+                                    files: [{file_name: fileNames[index]}]
+                                });
                             });
                         });
 
-                        it('should trigger the global AJAX error handler on server error', function() {
+                        it('should trigger the notification error handler on server error', function() {
                             this.request.respondWith({status: 500});
-                            expect(this.globalAjaxError).toHaveBeenCalled();
+                            expect(this.view.fileErrorMsg).toBeDefined();
+                            expect(this.view.fileErrorMsg.options.title).toEqual('Your file could not be uploaded');
                         });
 
                         describe('and successful server response', function() {
@@ -269,8 +305,8 @@ define(
                                                     }
                                                 });
 
-                                                it('should not trigger the global AJAX error handler', function() {
-                                                    expect(this.globalAjaxError).not.toHaveBeenCalled();
+                                                it('should not trigger the notification error handler', function() {
+                                                    expect(this.view.fileErrorMsg).toBeNull();
                                                 });
 
                                                 if (caseInfo.numFiles > concurrentUploadLimit) {

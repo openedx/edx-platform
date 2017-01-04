@@ -1,6 +1,7 @@
 define([
     'jquery',
     'underscore',
+    'underscore.string',
     'backbone',
     'js/models/active_video_upload',
     'js/views/baseview',
@@ -10,10 +11,12 @@ define([
     'text!templates/active-video-upload-list.underscore',
     'jquery.fileupload'
 ],
-    function($, _, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, NotificationView, HtmlUtils,
+    function($, _, str, Backbone, ActiveVideoUpload, BaseView, ActiveVideoUploadView, NotificationView, HtmlUtils,
              activeVideoUploadListTemplate) {
         'use strict';
-        var ActiveVideoUploadListView = BaseView.extend({
+        var ActiveVideoUploadListView,
+            CONVERSION_FACTOR_GBS_TO_BYTES = 1000 * 1000 * 1000;
+        ActiveVideoUploadListView = BaseView.extend({
             tagName: 'div',
             events: {
                 'click .file-drop-area': 'chooseFile',
@@ -29,6 +32,7 @@ define([
                 this.concurrentUploadLimit = options.concurrentUploadLimit || 0;
                 this.postUrl = options.postUrl;
                 this.videoSupportedFileFormats = options.videoSupportedFileFormats;
+                this.videoUploadMaxFileSizeInGB = options.videoUploadMaxFileSizeInGB;
                 this.onFileUploadDone = options.onFileUploadDone;
                 if (options.uploadButton) {
                     options.uploadButton.click(this.chooseFile.bind(this));
@@ -136,34 +140,48 @@ define([
                         uploadData.cid = model.cid; // eslint-disable-line no-param-reassign
                         uploadData.submit();
                     } else {
-                        $.ajax({
-                            url: this.postUrl,
-                            contentType: 'application/json',
-                            data: JSON.stringify({
-                                files: _.map(
-                                    uploadData.files,
-                                    function(file) {
-                                        return {file_name: file.name, content_type: file.type};
+                        _.each(
+                            uploadData.files,
+                            function(file) {
+                                $.ajax({
+                                    url: view.postUrl,
+                                    contentType: 'application/json',
+                                    data: JSON.stringify({
+                                        files: [{file_name: file.name, content_type: file.type}]
+                                    }),
+                                    dataType: 'json',
+                                    type: 'POST',
+                                    global: false   // Do not trigger global AJAX error handler
+                                }).done(function(responseData) {
+                                    _.each(
+                                        responseData.files,
+                                        function(file) { // eslint-disable-line no-shadow
+                                            view.$uploadForm.fileupload('add', {
+                                                files: _.filter(uploadData.files, function(fileObj) {
+                                                    return file.file_name === fileObj.name;
+                                                }),
+                                                url: file.upload_url,
+                                                videoId: file.edx_video_id,
+                                                multipart: false,
+                                                global: false,  // Do not trigger global AJAX error handler
+                                                redirected: true
+                                            });
+                                        }
+                                    );
+                                }).fail(function(response) {
+                                    if (response.responseText) {
+                                        try {
+                                            errorMsg = JSON.parse(response.responseText).error;
+                                        } catch (error) {
+                                            errorMsg = str.truncate(response.responseText, 300);
+                                        }
+                                    } else {
+                                        errorMsg = gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.');  // eslint-disable-line max-len
                                     }
-                                )
-                            }),
-                            dataType: 'json',
-                            type: 'POST'
-                        }).done(function(responseData) {
-                            _.each(
-                                responseData.files,
-                                function(file, index) {
-                                    view.$uploadForm.fileupload('add', {
-                                        files: [uploadData.files[index]],
-                                        url: file.upload_url,
-                                        videoId: file.edx_video_id,
-                                        multipart: false,
-                                        global: false,  // Do not trigger global AJAX error handler
-                                        redirected: true
-                                    });
-                                }
-                            );
-                        });
+                                    view.showErrorMessage(errorMsg);
+                                });
+                            }
+                        );
                     }
                 }
             },
@@ -198,6 +216,10 @@ define([
                 this.setStatus(data.cid, ActiveVideoUpload.STATUS_FAILED);
             },
 
+            getMaxFileSizeInBytes: function() {
+                return this.videoUploadMaxFileSizeInGB * CONVERSION_FACTOR_GBS_TO_BYTES;
+            },
+
             hideErrorMessage: function() {
                 if (this.fileErrorMsg) {
                     this.fileErrorMsg.hide();
@@ -212,13 +234,16 @@ define([
             },
 
             showErrorMessage: function(errorMsg) {
-                var titleMsg = gettext('Your file could not be uploaded');
-                this.fileErrorMsg = new NotificationView.Error({
-                    title: titleMsg,
-                    message: errorMsg
-                });
-                this.fileErrorMsg.show();
-                this.readMessages([titleMsg, errorMsg]);
+                var titleMsg;
+                if (!this.fileErrorMsg) {
+                    titleMsg = gettext('Your file could not be uploaded');
+                    this.fileErrorMsg = new NotificationView.Error({
+                        title: titleMsg,
+                        message: errorMsg
+                    });
+                    this.fileErrorMsg.show();
+                    this.readMessages([titleMsg, errorMsg]);
+                }
             },
 
             validateFile: function(data) {
@@ -238,6 +263,14 @@ define([
                         )
                         .replace('{filename}', fileName)
                         .replace('{supportedFileFormats}', self.videoSupportedFileFormats.join(' and '));
+                        return false;
+                    }
+                    if (file.size > self.getMaxFileSizeInBytes()) {
+                        error = gettext(
+                            '{filename} exceeds maximum size of {maxFileSizeInGB} GB.'
+                        )
+                        .replace('{filename}', fileName)
+                        .replace('{maxFileSizeInGB}', self.videoUploadMaxFileSizeInGB);
                         return false;
                     }
                 });

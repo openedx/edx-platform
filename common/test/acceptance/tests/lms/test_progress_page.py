@@ -3,9 +3,10 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
-from contextlib import contextmanager
 import ddt
-import flaky
+
+from bok_choy.javascript import js_defined
+from contextlib import contextmanager
 from nose.plugins.attrib import attr
 
 from ..helpers import (
@@ -123,7 +124,9 @@ class ProgressPageBaseTest(UniqueCourseTest):
             self.logout_page.visit()
 
 
+@attr(shard=9)
 @ddt.ddt
+@js_defined('window.jQuery')
 class PersistentGradesTest(ProgressPageBaseTest):
     """
     Test that grades for completed assessments are persisted
@@ -225,7 +228,6 @@ class PersistentGradesTest(ProgressPageBaseTest):
         _change_subsection_structure,
         _change_weight_for_problem
     )
-    @flaky.flaky  # TNL-6040
     def test_content_changes_do_not_change_score(self, edit):
         with self._logged_in_session():
             self.courseware_page.visit()
@@ -270,6 +272,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
+@attr(shard=9)
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     Tests changing a subsection's 'graded' field

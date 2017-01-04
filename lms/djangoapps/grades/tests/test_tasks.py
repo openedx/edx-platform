@@ -121,16 +121,17 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self.assertTrue(mock_subsection_signal.called)
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1),
-        (ModuleStoreEnum.Type.split, 0),
+        (ModuleStoreEnum.Type.mongo, 1, 23),
+        (ModuleStoreEnum.Type.split, 3, 22),
     )
     @ddt.unpack
-    def test_subsection_grade_updated(self, default_store, added_queries):
+    def test_subsection_grade_updated(self, default_store, num_mongo_calls, num_sql_calls):
         with self.store.default_store(default_store):
             self.set_up_course()
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(22 + added_queries):
-                self._apply_recalculate_subsection_grade()
+            with check_mongo_calls(num_mongo_calls):
+                with self.assertNumQueries(num_sql_calls):
+                    self._apply_recalculate_subsection_grade()
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')
     def test_other_inaccessible_subsection(self, mock_subsection_signal):
@@ -166,27 +167,38 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
             self._apply_recalculate_subsection_grade()
             self.assertEquals(mock_block_structure_create.call_count, 1)
 
+    # TODO (TNL-6225) Fix the number of SQL queries so they
+    # don't grow linearly with the number of sequentials.
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 1),
-        (ModuleStoreEnum.Type.split, 0),
+        (ModuleStoreEnum.Type.mongo, 1, 46),
+        (ModuleStoreEnum.Type.split, 3, 45),
     )
     @ddt.unpack
-    def test_query_count_does_not_change_with_more_problems(self, default_store, added_queries):
+    def test_query_count_does_not_change_with_more_content(self, default_store, num_mongo_calls, num_sql_calls):
         with self.store.default_store(default_store):
             self.set_up_course()
             self.assertTrue(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            ItemFactory.create(parent=self.sequential, category='problem', display_name='problem2')
-            ItemFactory.create(parent=self.sequential, category='problem', display_name='problem3')
-            with check_mongo_calls(2) and self.assertNumQueries(22 + added_queries):
-                self._apply_recalculate_subsection_grade()
+
+            num_problems = 10
+            for _ in range(num_problems):
+                ItemFactory.create(parent=self.sequential, category='problem')
+
+            num_sequentials = 10
+            for _ in range(num_sequentials):
+                ItemFactory.create(parent=self.chapter, category='sequential')
+
+            with check_mongo_calls(num_mongo_calls):
+                with self.assertNumQueries(num_sql_calls):
+                    self._apply_recalculate_subsection_grade()
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_subsection_grades_not_enabled_on_course(self, default_store):
         with self.store.default_store(default_store):
             self.set_up_course(enable_subsection_grades=False)
             self.assertFalse(PersistentGradesEnabledFlag.feature_enabled(self.course.id))
-            with check_mongo_calls(2) and self.assertNumQueries(0):
-                self._apply_recalculate_subsection_grade()
+            with check_mongo_calls(0):
+                with self.assertNumQueries(0):
+                    self._apply_recalculate_subsection_grade()
 
     @skip("Pending completion of TNL-5089")
     @ddt.data(
@@ -200,8 +212,9 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         PersistentGradesEnabledFlag.objects.create(enabled=feature_flag)
         with self.store.default_store(default_store):
             self.set_up_course()
-            with check_mongo_calls(0) and self.assertNumQueries(3 if feature_flag else 2):
-                self._apply_recalculate_subsection_grade()
+            with check_mongo_calls(0):
+                with self.assertNumQueries(3 if feature_flag else 2):
+                    self._apply_recalculate_subsection_grade()
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
     @patch('lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory.update')
@@ -226,6 +239,16 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
     def test_retry_subsection_grade_on_no_score(self, mock_retry):
         self.set_up_course()
         self._apply_recalculate_subsection_grade(mock_score=None)
+        self._assert_retry_called(mock_retry)
+
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
+    def test_retry_subsection_grade_on_no_sub_score(self, mock_retry):
+        self.set_up_course()
+        with patch('lms.djangoapps.grades.tasks.sub_api.get_score') as mock_sub_score:
+            mock_sub_score.return_value = None
+            self._apply_recalculate_subsection_grade(
+                mock_score=MagicMock(module_type='openassessment')
+            )
         self._assert_retry_called(mock_retry)
 
     @patch('lms.djangoapps.grades.signals.signals.SUBSECTION_SCORE_CHANGED.send')

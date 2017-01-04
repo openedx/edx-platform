@@ -4,9 +4,11 @@
         'jquery',
         'underscore',
         'backbone',
-        'common/js/utils/edx.utils.validate'
+        'common/js/utils/edx.utils.validate',
+        'edx-ui-toolkit/js/utils/html-utils',
+        'text!templates/student_account/form_errors.underscore'
     ],
-        function($, _, Backbone, EdxUtilsValidate) {
+        function($, _, Backbone, EdxUtilsValidate, HtmlUtils, formErrorsTpl) {
             return Backbone.View.extend({
                 tagName: 'form',
 
@@ -15,6 +17,12 @@
                 tpl: '',
 
                 fieldTpl: '#form_field-tpl',
+
+                formErrorsTpl: formErrorsTpl,
+
+                formErrorsJsHook: 'js-form-errors',
+
+                defaultFormErrorsTitle: gettext('An error occurred.'),
 
                 events: {},
 
@@ -66,7 +74,7 @@
                 postRender: function() {
                     var $container = $(this.el);
                     this.$form = $container.find('form');
-                    this.$errors = $container.find('.submission-error');
+                    this.$formFeedback = $container.find('.js-form-feedback');
                     this.$submitButton = $container.find(this.submitButton);
                 },
 
@@ -126,21 +134,6 @@
                     return obj;
                 },
 
-                focusFirstError: function() {
-                    var $error = this.$form.find('.error').first(),
-                        $field = {},
-                        $parent = {};
-
-                    if ($error.is('label')) {
-                        $parent = $error.parent('.form-field');
-                        $error = $parent.find('input') || $parent.find('select');
-                    } else {
-                        $field = $error;
-                    }
-
-                    $error.focus();
-                },
-
                 forgotPassword: function(event) {
                     event.preventDefault();
 
@@ -185,32 +178,34 @@
 
                 saveError: function(error) {
                     this.errors = ['<li>' + error.responseText + '</li>'];
-                    this.setErrors();
+                    this.renderErrors(this.defaultFormErrorsTitle, this.errors);
                     this.toggleDisableButton(false);
                 },
 
-                setErrors: function() {
-                    var $msg = this.$errors.find('.message-copy'),
-                        html = [],
-                        errors = this.errors,
-                        i,
-                        len = errors.length;
+            /* Wrapper for renderFormFeedback provided for convenience since the majority of
+             * our calls to renderFormFeedback are for rendering error messages.
+             */
+                renderErrors: function(title, errorMessages) {
+                    this.clearFormErrors();
 
-                    for (i = 0; i < len; i++) {
-                        html.push(errors[i]);
-                    }
+                    this.renderFormFeedback(this.formErrorsTpl, {
+                        jsHook: this.formErrorsJsHook,
+                        title: title,
+                        messagesHtml: HtmlUtils.HTML(errorMessages.join(''))
+                    });
+                },
 
-                    $msg.html(html.join(''));
+                renderFormFeedback: function(template, context) {
+                    var tpl = HtmlUtils.template(template);
+                    HtmlUtils.prepend(this.$formFeedback, tpl(context));
 
-                    this.element.show(this.$errors);
-
-                // Scroll to error messages
+                // Scroll to feedback container
                     $('html,body').animate({
-                        scrollTop: this.$errors.offset().top
+                        scrollTop: this.$formFeedback.offset().top
                     }, 'slow');
 
-                // Focus on first error field
-                    this.focusFirstError();
+                // Focus on the feedback container to ensure screen readers see the messages.
+                    this.$formFeedback.focus();
                 },
 
             /* Allows extended views to add non-form attributes
@@ -233,9 +228,10 @@
                         data = this.setExtraData(data);
                         this.model.set(data);
                         this.model.save();
-                        this.toggleErrorMsg(false);
+                        this.clearFormErrors();
                     } else {
-                        this.toggleErrorMsg(true);
+                        this.renderErrors(this.defaultFormErrorsTitle, this.errors);
+                        this.toggleDisableButton(false);
                     }
 
                     this.postFormSubmission();
@@ -248,12 +244,15 @@
                     return true;
                 },
 
-                toggleErrorMsg: function(show) {
-                    if (show) {
-                        this.setErrors();
-                        this.toggleDisableButton(false);
-                    } else {
-                        this.element.hide(this.$errors);
+                clearFormErrors: function() {
+                    var query = '.' + this.formErrorsJsHook;
+                    this.clearFormFeedbackItems(query);
+                },
+
+                clearFormFeedbackItems: function(query) {
+                    var $items = this.$formFeedback.find(query);
+                    if ($items.length > 0) {
+                        $items.remove();
                     }
                 },
 

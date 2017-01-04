@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import itertools
 from fs.memoryfs import MemoryFS
 from mock import Mock, patch
-from pytz import timezone, utc
+from pytz import utc
 from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 import xmodule.course_module
@@ -209,36 +209,6 @@ class IsNewCourseTestCase(unittest.TestCase):
         (xmodule.course_module.CourseFields.start.default, 'January 2014', 'January 2014', False, 'January 2014'),
     ]
 
-    @patch('xmodule.course_metadata_utils.datetime.now')
-    def test_start_date_text(self, gmtime_mock):
-        gmtime_mock.return_value = NOW
-        for s in self.start_advertised_settings:
-            d = get_dummy_course(start=s[0], advertised_start=s[1])
-            print "Checking start=%s advertised=%s" % (s[0], s[1])
-            self.assertEqual(d.start_datetime_text(), s[2])
-
-    @patch('xmodule.course_metadata_utils.datetime.now')
-    def test_start_date_time_text(self, gmtime_mock):
-        gmtime_mock.return_value = NOW
-        for setting in self.start_advertised_settings:
-            course = get_dummy_course(start=setting[0], advertised_start=setting[1])
-            print "Checking start=%s advertised=%s" % (setting[0], setting[1])
-            self.assertEqual(course.start_datetime_text("DATE_TIME"), setting[4])
-
-    @ddt.data(("2015-11-01T08:59", 'Nov 01, 2015', u'Nov 01, 2015 at 01:59 PDT'),
-              ("2015-11-01T09:00", 'Nov 01, 2015', u'Nov 01, 2015 at 01:00 PST'))
-    @ddt.unpack
-    def test_start_date_time_zone(self, course_date, expected_short_date, expected_date_time):
-        """
-        Test that start datetime text correctly formats datetimes
-        for normal daylight hours and daylight savings hours
-        """
-        time_zone = timezone('America/Los_Angeles')
-
-        course = get_dummy_course(start=course_date, advertised_start=course_date)
-        self.assertEqual(course.start_datetime_text(time_zone=time_zone), expected_short_date)
-        self.assertEqual(course.start_datetime_text("DATE_TIME", time_zone), expected_date_time)
-
     def test_start_date_is_default(self):
         for s in self.start_advertised_settings:
             d = get_dummy_course(start=s[0], advertised_start=s[1])
@@ -275,36 +245,6 @@ class IsNewCourseTestCase(unittest.TestCase):
 
         descriptor = get_dummy_course(start='2012-12-31T12:00')
         assert descriptor.is_newish is True
-
-    def test_end_date_text(self):
-        # No end date set, returns empty string.
-        d = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual('', d.end_datetime_text())
-
-        d = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
-        self.assertEqual('Sep 04, 2014', d.end_datetime_text())
-
-    def test_end_date_time_text(self):
-        # No end date set, returns empty string.
-        course = get_dummy_course('2012-12-02T12:00')
-        self.assertEqual('', course.end_datetime_text("DATE_TIME"))
-
-        course = get_dummy_course('2012-12-02T12:00', end='2014-9-04T12:00')
-        self.assertEqual('Sep 04, 2014 at 12:00 UTC', course.end_datetime_text("DATE_TIME"))
-
-    @ddt.data(("2015-11-01T08:59", 'Nov 01, 2015', u'Nov 01, 2015 at 01:59 PDT'),
-              ("2015-11-01T09:00", 'Nov 01, 2015', u'Nov 01, 2015 at 01:00 PST'))
-    @ddt.unpack
-    def test_end_date_time_zone(self, course_date, expected_short_date, expected_date_time):
-        """
-        Test that end datetime text correctly formats datetimes
-        for normal daylight hours and daylight savings hours
-        """
-        time_zone = timezone('America/Los_Angeles')
-        course = get_dummy_course(course_date, end=course_date)
-
-        self.assertEqual(course.end_datetime_text(time_zone=time_zone), expected_short_date)
-        self.assertEqual(course.end_datetime_text("DATE_TIME", time_zone), expected_date_time)
 
 
 class DiscussionTopicsTestCase(unittest.TestCase):

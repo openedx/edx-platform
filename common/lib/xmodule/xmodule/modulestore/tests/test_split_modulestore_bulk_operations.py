@@ -1,3 +1,7 @@
+"""
+Tests for bulk operations in Split Modulestore.
+"""
+# pylint: disable=protected-access
 import copy
 import ddt
 import unittest
@@ -443,6 +447,17 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
                 self.assertIn(db_definition(_id), results)
             else:
                 self.assertNotIn(db_definition(_id), results)
+
+    def test_get_definitions_doesnt_update_db(self):
+        test_ids = [1, 2]
+        db_definition = lambda _id: {'db': 'definition', '_id': _id}
+
+        db_definitions = [db_definition(_id) for _id in test_ids]
+        self.conn.get_definitions.return_value = db_definitions
+        self.bulk._begin_bulk_operation(self.course_key)
+        self.bulk.get_definitions(self.course_key, test_ids)
+        self.bulk._end_bulk_operation(self.course_key)
+        self.assertFalse(self.conn.insert_definition.called)
 
     def test_no_bulk_find_structures_derived_from(self):
         ids = [Mock(name='id')]

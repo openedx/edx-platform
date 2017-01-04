@@ -45,10 +45,14 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
         if context:
             child_context = copy(context)
         else:
-            child_context = {
-                'bookmarked': self.runtime.service(self, 'bookmarks').is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
-                'username': self.runtime.service(self, 'user').get_current_user().opt_attrs['edx-platform.username']
-            }
+            child_context = {}
+
+        if 'bookmarked' not in child_context:
+            bookmarks_service = self.runtime.service(self, 'bookmarks')
+            child_context['bookmarked'] = bookmarks_service.is_bookmarked(usage_key=self.location),  # pylint: disable=no-member
+        if 'username' not in child_context:
+            user_service = self.runtime.service(self, 'user')
+            child_context['username'] = user_service.get_current_user().opt_attrs['edx-platform.username']
 
         child_context['child_of_vertical'] = True
 
@@ -68,7 +72,7 @@ class VerticalBlock(SequenceFields, XModuleFields, StudioEditableBlock, XmlParse
             'items': contents,
             'xblock_context': context,
             'unit_title': self.display_name_with_default if not is_child_of_vertical else None,
-            'show_bookmark_button': not is_child_of_vertical,
+            'show_bookmark_button': child_context.get('show_bookmark_button', not is_child_of_vertical),
             'bookmarked': child_context['bookmarked'],
             'bookmark_id': u"{},{}".format(child_context['username'], unicode(self.location))
         }))

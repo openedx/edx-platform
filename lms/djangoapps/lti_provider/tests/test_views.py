@@ -170,7 +170,13 @@ class LtiLaunchTestRender(LtiTestMixin, RenderXBlockTestMixin, ModuleStoreTestCa
     This class overrides the get_response method, which is used by
     the tests defined in RenderXBlockTestMixin.
     """
-    def get_response(self, url_encoded_params=None, usage_key=None):
+    def setUp(self):
+        """
+        Set up tests
+        """
+        super(LtiLaunchTestRender, self).setUp()
+
+    def get_response(self, usage_key, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """

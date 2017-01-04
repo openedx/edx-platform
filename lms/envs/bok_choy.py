@@ -210,6 +210,7 @@ ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 ECOMMERCE_API_SIGNING_KEY = 'ecommerce-key'
 
 LMS_ROOT_URL = "http://localhost:8000"
+DOC_LINK_BASE_URL = 'http://edx.readthedocs.io/projects/edx-guide-for-students'
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
