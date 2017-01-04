@@ -39,3 +39,19 @@ class CourseSerializer(serializers.Serializer):
     def get_image_url(self, course):
         """ Get the course image URL """
         return course_image_url(course)
+
+
+class CourseSummarySerializer(CourseSerializer):
+    """ Serializer for CourseSummary """
+
+    def get_org(self, course):
+        """ Gets the course org """
+        return course.location.org
+
+    def get_run(self, course):
+        """ Gets the course run """
+        return course.location.run
+
+    def get_course(self, course):
+        """ Gets the course """
+        return course.location.course
