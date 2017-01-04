@@ -137,7 +137,7 @@ def get_initial_page_elements():
             "element-type":"layout-single-col",
             "element-path":"page-builder/layouts/_single-col.html",
             "options":{
-              "layout-bg-image": static("{}/images/example-assets/Screen%20Shot%202016-12-07%20at%2012.31.01_aFeMCtH.png".format(settings.DEFAULT_SITE_THEME)),
+              "layout-bg-image": static("{}/images/example-assets/default_hero_image.png".format(settings.DEFAULT_SITE_THEME)),
               "bg-color":"#fff",
               "margin-right":"marg-r-0",
               "margin-bottom":"marg-b-0",
