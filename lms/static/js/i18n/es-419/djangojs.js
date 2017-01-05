@@ -392,7 +392,7 @@
     "Confirm": "Confirmar", 
     "Confirm Timed Transcript": "Confirmar la transcripci\u00f3n", 
     "Congratulations! You are now verified on %(platformName)s!": "Felicitaciones! Ya se encuentra verificado en %(platformName)s!", 
-    "Congratulations! You have earned a certificate for this course.": "Felicitaciones! Usted a ganado un certificado de este curso.", 
+    "Congratulations! You have earned a certificate for this course.": "\u00a1Felicitaciones! Usted ha obtenido un certificado de este curso.", 
     "Constrain proportions": "Restringir proporciones", 
     "Contains staff only content": "Contiene solo contenido del equipo del curso", 
     "Contains {count} group": [
