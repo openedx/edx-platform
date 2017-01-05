@@ -4,6 +4,22 @@
 (function(requirejs, requireSerial) {
     'use strict';
 
+    if (window) {
+        define('add-a11y-deps',
+            [
+                'underscore',
+                'underscore.string',
+                'edx-ui-toolkit/js/utils/html-utils',
+                'edx-ui-toolkit/js/utils/string-utils'
+            ], function(_, str, HtmlUtils, StringUtils) {
+                window._ = _;
+                window._.str = str;
+                window.edx = window.edx || {};
+                window.edx.HtmlUtils = HtmlUtils;
+                window.edx.StringUtils = StringUtils;
+            });
+    }
+
     var i, specHelpers, testFiles;
 
     requirejs.config({
@@ -168,6 +184,10 @@
                     });
                     return window.MathJax.Hub.Configured();
                 }
+            },
+            'accessibility': {
+                exports: 'accessibility',
+                deps: ['add-a11y-deps']
             },
             'URI': {
                 exports: 'URI'
