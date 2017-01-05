@@ -141,14 +141,8 @@ class UserAPITestCase(APITestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
-@patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
-    {'full': 50, 'small': 10},
-    clear=True
-)
 @attr(shard=2)
-class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
+class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     """
     Unit tests for the Accounts API.
     """
@@ -156,34 +150,46 @@ class TestAccountAPI(CacheIsolationTestCase, UserAPITestCase):
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestAccountAPI, self).setUp()
+        super(TestOwnUsernameAPI, self).setUp()
 
-        self.url = reverse("account_api")
+        self.url = reverse("own_username_api")
 
-    def test_get_username_default(self):
+    def _verify_get_own_username(self, queries, expected_status=200):
+        """
+        Internal helper to perform the actual assertion
+        """
+        with self.assertNumQueries(queries):
+            response = self.send_get(self.client, expected_status=expected_status)
+        if expected_status == 200:
+            data = response.data
+            self.assertEqual(1, len(data))
+            self.assertEqual(self.user.username, data["username"])
+
+    def test_get_username(self):
         """
         Test that a client (logged in) can get her own username.
         """
-        def verify_get_own_username(queries, expected_status=200):
-            """
-            Internal helper to perform the actual assertion
-            """
-            with self.assertNumQueries(queries):
-                response = self.send_get(self.client, expected_status=expected_status)
-            if expected_status == 200:
-                data = response.data
-                self.assertEqual(1, len(data))
-                self.assertEqual(self.user.username, data["username"])
-
-        # verify that the endpoint is inaccessible when not logged in
-        verify_get_own_username(12, expected_status=401)
         self.client.login(username=self.user.username, password=self.test_password)
-        verify_get_own_username(9)
+        self._verify_get_own_username(15)
 
-        # Now make sure that the user can get the same information, even if not active
+    def test_get_username_inactive(self):
+        """
+        Test that a logged-in client can get their
+        username, even if inactive.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
         self.user.is_active = False
         self.user.save()
-        verify_get_own_username(9)
+        self._verify_get_own_username(15)
+
+    def test_get_username_not_logged_in(self):
+        """
+        Test that a client (not logged in) gets a 401
+        when trying to retrieve their username.
+        """
+
+        # verify that the endpoint is inaccessible when not logged in
+        self._verify_get_own_username(12, expected_status=401)
 
 
 @ddt.ddt

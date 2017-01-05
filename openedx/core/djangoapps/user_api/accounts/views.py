@@ -35,7 +35,16 @@ class AccountViewSet(ViewSet):
 
             PATCH /api/user/v1/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
-        **Response Values for GET**
+        **Response Values for GET requests to the /me endpoint**
+            If the user is not logged in, an HTTP 401 "Not Authorized" response
+            is returned.
+
+            Otherwise, an HTTP 200 "OK" response is returned. The response
+            contains the following value:
+
+            * username: The username associated with the account.
+
+        **Response Values for GET requests to /accounts endpoints**
 
             If no user exists with the specified username, an HTTP 404 "Not
             Found" response is returned.
