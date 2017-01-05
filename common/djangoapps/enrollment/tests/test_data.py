@@ -71,6 +71,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         # Confirm the returned enrollment and the data match up.
         self.assertEqual(course_mode, enrollment['mode'])
         self.assertEqual(is_active, enrollment['is_active'])
+        self.assertEqual(self.course.display_name_with_default, enrollment['course_details']['course_name'])
 
     def test_unenroll(self):
         # Enroll the user in the course
