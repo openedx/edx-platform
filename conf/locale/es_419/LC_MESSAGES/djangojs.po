@@ -52,6 +52,7 @@
 # Felipe Schmidt M <fschmidt@cercano.cl>, 2015
 # Felix Antonio Valdez Noverola <felix@itesm.mx>, 2015
 # Fernando Abramowitz <ferabra@gmail.com>, 2014
+# Francisco Palm <francisco.palm@gmail.com>, 2017
 # gildardo lasso bañol <gildardolasso@hotmail.com>, 2016
 # Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
@@ -7694,7 +7695,7 @@ msgstr "Certificados de programa"
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "Congratulations! You have earned a certificate for this course."
-msgstr "Felicitaciones! Usted a ganado un certificado de este curso."
+msgstr "¡Felicitaciones! Usted ha obtenido un certificado de este curso."
 
 #: lms/templates/learner_dashboard/certificate_status.underscore
 msgid "View Certificate"

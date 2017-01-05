@@ -22,6 +22,8 @@
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # AzizAhmed <dr.zezo@gmail.com>, 2014
+# e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Karim Mohamed <karim.mohamed.eg@gmail.com>, 2016
@@ -37,7 +39,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2015-2016
-# omarithawi <oithawi@qrf.org>, 2014-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
@@ -90,6 +92,7 @@
 # baraahadri <baraahadri@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Hani <hani0a@hotmail.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
@@ -105,7 +108,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Ned Batchelder <ned@edx.org>, 2016
-# omarithawi <oithawi@qrf.org>, 2014-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2014-2017
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
@@ -126,6 +129,7 @@
 # AR C2 <e2f458fd4s512@outlook.com>, 2016
 # A <smart.9922@hotmail.com>, 2014
 # طاهر <charaf.le.prince@gmail.com>, 2014
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Safaa_fadl <fadlaoui_safaa@yahoo.fr>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
@@ -135,7 +139,7 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Ned Batchelder <ned@edx.org>, 2016
-# omarithawi <oithawi@qrf.org>, 2015-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016

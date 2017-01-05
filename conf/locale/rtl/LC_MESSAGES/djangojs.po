@@ -1,33 +1,33 @@
 # #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 # #-#-#-#-#  djangojs-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 # #-#-#-#-#  underscore.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 # #-#-#-#-#  underscore-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-15 12:30+0000\n"
-"PO-Revision-Date: 2016-12-15 12:33:14.465029\n"
+"POT-Creation-Date: 2017-01-05 16:46+0000\n"
+"PO-Revision-Date: 2017-01-05 16:47:32.840143\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1514,6 +1514,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/course-instructor-details.underscore
 #: cms/templates/js/signatory-details.underscore
+#: common/static/common/templates/discussion/new-post.underscore
+#: common/static/common/templates/discussion/thread-edit.underscore
 msgid "Title"
 msgstr "فهفمث"
 
@@ -3553,8 +3555,8 @@ msgid "Insert Hyperlink"
 msgstr "هرسثقف اغحثقمهرن"
 
 #: lms/static/js/Markdown.Editor.js
-msgid "e.g. 'http://google.com/'"
-msgstr "ث.ل. 'اففح://لخخلمث.ذخو/'"
+msgid "e.g. 'http://google.com'"
+msgstr "ث.ل. 'اففح://لخخلمث.ذخو'"
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Link Description"
@@ -3976,6 +3978,10 @@ msgid "[no tags]"
 msgstr "[رخ فشلس]"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Unable to submit application"
+msgstr "عرشزمث فخ سعزوهف شححمهذشفهخر"
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An error has occurred. Check your Internet connection and try again."
 msgstr "شر ثققخق اشس خذذعققثي. ذاثذن غخعق هرفثقرثف ذخررثذفهخر شري فقغ شلشهر."
@@ -4395,6 +4401,25 @@ msgstr "شييهرل فاث سثمثذفثي ذخعقسث فخ غخعق ذشقف
 msgid "Loading your courses"
 msgstr "مخشيهرل غخعق ذخعقسثس"
 
+#: lms/static/js/student_account/views/FormView.js
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "An error occurred."
+msgstr "شر ثققخق خذذعققثي."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "We couldn't sign you in."
+msgstr "صث ذخعمير'ف سهلر غخع هر."
+
+#: lms/static/js/student_account/views/LoginView.js
+#, c-format
+msgid "An error occurred when signing you in to %s."
+msgstr "شر ثققخق خذذعققثي صاثر سهلرهرل غخع هر فخ %s."
+
+#: lms/static/js/student_account/views/LoginView.js
+#: lms/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr "ذاثذن غخعق ثوشهم"
+
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
@@ -4414,6 +4439,30 @@ msgid ""
 msgstr ""
 "شر ثققخق اشس خذذعققثي. فقغ قثبقثساهرل فاث حشلث, خق ذاثذن غخعق هرفثقرثف "
 "ذخررثذفهخر."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"You have successfully signed into %(currentProvider)s, but your "
+"%(currentProvider)s"
+msgstr ""
+"غخع اشدث سعذذثسسبعممغ سهلرثي هرفخ %(currentProvider)s, زعف غخعق "
+"%(currentProvider)s"
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "We couldn't create your account."
+msgstr "صث ذخعمير'ف ذقثشفث غخعق شذذخعرف."
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "You've successfully signed into %(currentProvider)s."
+msgstr "غخع'دث سعذذثسسبعممغ سهلرثي هرفخ %(currentProvider)s."
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
+msgstr ""
+"صث تعسف رثثي ش مهففمث وخقث هربخقوشفهخر زثبخقث غخع سفشقف مثشقرهرل صهفا "
+"%(platformName)s."
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -4513,6 +4562,10 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
 msgstr "شمم فهوث ظخرثس"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Default (Local Time Zone)"
+msgstr "يثبشعمف (مخذشم فهوث ظخرث)"
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -4956,7 +5009,7 @@ msgstr "رعوزثق خب سفعيثرفس"
 msgid "Overall Score"
 msgstr "خدثقشمم سذخقث"
 
-#: cms/static/cms/js/main.js
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -5484,6 +5537,10 @@ msgstr "غخعق بهمث ذخعمي رخف زث عحمخشيثي"
 #: cms/static/js/views/active_video_upload_list.js
 msgid "{filename} is not in a supported file format. "
 msgstr "{filename} هس رخف هر ش سعححخقفثي بهمث بخقوشف. "
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} exceeds maximum size of {maxFileSizeInGB} GB."
+msgstr "{filename} ثطذثثيس وشطهوعو سهظث خب {maxFileSizeInGB} لز."
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid ": video upload complete."
@@ -6227,7 +6284,6 @@ msgstr "حقثدهخعس"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "سفشفعس"
 
@@ -6331,12 +6387,8 @@ msgid "Add a Post"
 msgstr "شيي ش حخسف"
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible To:"
-msgstr "دهسهزمث فخ:"
-
-#: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
-msgstr "شمم لقخعحس"
+msgid "Visible to"
+msgstr "دهسهزمث فخ"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid ""
@@ -6347,9 +6399,8 @@ msgstr ""
 "سفعيثرفس خق سحثذهبغ ش سهرلمث ذخاخقف."
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Title:"
-msgstr "فهفمث:"
+msgid "All Groups"
+msgstr "شمم لقخعحس"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -6357,8 +6408,8 @@ msgid "Add a clear and descriptive title to encourage participation."
 msgstr "شيي ش ذمثشق شري يثسذقهحفهدث فهفمث فخ ثرذخعقشلث حشقفهذهحشفهخر."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Enter your question or comment."
-msgstr "ثرفثق غخعق ضعثسفهخر خق ذخووثرف."
+msgid "Your question or idea"
+msgstr "غخعق ضعثسفهخر خق هيثش"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6373,8 +6424,11 @@ msgid "post anonymously to classmates"
 msgstr "حخسف شرخرغوخعسمغ فخ ذمشسسوشفثس"
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Add Post"
-msgstr "شيي حخسف"
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "سعزوهف"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
@@ -6499,12 +6553,6 @@ msgstr[1] "ساخص ذخووثرفس (%(num_comments)s)"
 msgid "Add a comment"
 msgstr "شيي ش ذخووثرف"
 
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "سعزوهف"
-
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
@@ -6529,16 +6577,8 @@ msgid "This post is visible to everyone."
 msgstr "فاهس حخسف هس دهسهزمث فخ ثدثقغخرث."
 
 #: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type:"
-msgstr "حخسف فغحث:"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Question"
-msgstr "ضعثسفهخر"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Discussion"
-msgstr "يهسذعسسهخر"
+msgid "Post type"
+msgstr "حخسف فغحث"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
@@ -6547,6 +6587,14 @@ msgid ""
 msgstr ""
 "ضعثسفهخرس قشهسث هسسعثس فاشف رثثي شرسصثقس. يهسذعسسهخرس ساشقث هيثشس شري سفشقف "
 "ذخردثقسشفهخرس."
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Question"
+msgstr "ضعثسفهخر"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Discussion"
+msgstr "يهسذعسسهخر"
 
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
@@ -6557,8 +6605,8 @@ msgid "Add a response:"
 msgstr "شيي ش قثسحخرسث:"
 
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Topic Area:"
-msgstr "فخحهذ شقثش:"
+msgid "Topic area"
+msgstr "فخحهذ شقثش"
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
@@ -7119,10 +7167,6 @@ msgstr "خقيثق يثفشهمس"
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
 msgstr "بهرشرذهشم شسسهسفشرذث شححمهذشفهخر"
-
-#: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Unable to submit application"
-msgstr "عرشزمث فخ سعزوهف شححمهذشفهخر"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
@@ -7715,31 +7759,6 @@ msgid "Register through edX"
 msgstr "قثلهسفثق فاقخعلا ثيط"
 
 #: lms/templates/student_account/login.underscore
-#, python-format
-msgid ""
-"You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account."
-" To link your accounts, sign in now using your %(platformName)s password."
-msgstr ""
-"غخع اشدث سعذذثسسبعممغ سهلرثي هرفخ %(currentProvider)s, زعف غخعق "
-"%(currentProvider)s شذذخعرف يخثس رخف اشدث ش مهرنثي %(platformName)s شذذخعرف."
-" فخ مهرن غخعق شذذخعرفس, سهلر هر رخص عسهرل غخعق %(platformName)s حشسسصخقي."
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr "ذاثذن غخعق ثوشهم"
-
-#: lms/templates/student_account/login.underscore
-msgid "We couldn't sign you in."
-msgstr "صث ذخعمير'ف سهلر غخع هر."
-
-#: lms/templates/student_account/login.underscore
-#, python-format
-msgid "An error occurred when signing you in to %(platformName)s."
-msgstr "شر ثققخق خذذعققثي صاثر سهلرهرل غخع هر فخ %(platformName)s."
-
-#: lms/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -7779,11 +7798,6 @@ msgid "Create an account"
 msgstr "ذقثشفث شر شذذخعرف"
 
 #: lms/templates/student_account/password_reset.underscore
-#: lms/templates/student_account/register.underscore
-msgid "An error occurred."
-msgstr "شر ثققخق خذذعققثي."
-
-#: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
 msgstr "حشسسصخقي شسسهسفشرذث"
 
@@ -7798,24 +7812,6 @@ msgstr ""
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset my password"
 msgstr "قثسثف وغ حشسسصخقي"
-
-#: lms/templates/student_account/register.underscore
-msgid "We couldn't create your account."
-msgstr "صث ذخعمير'ف ذقثشفث غخعق شذذخعرف."
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid "You've successfully signed into %(currentProvider)s."
-msgstr "غخع'دث سعذذثسسبعممغ سهلرثي هرفخ %(currentProvider)s."
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid ""
-"We just need a little more information before you start learning with "
-"%(platformName)s."
-msgstr ""
-"صث تعسف رثثي ش مهففمث وخقث هربخقوشفهخر زثبخقث غخع سفشقف مثشقرهرل صهفا "
-"%(platformName)s."
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -7934,11 +7930,6 @@ msgstr "ش مهسف خب ذخعقسثس غخع اشدث تعسف ثرقخممث�
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgstr "ذخعقسث"
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#, python-format
-msgid "Starts: %(start)s"
-msgstr "سفشقفس: %(start)s"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
