@@ -100,16 +100,14 @@
             *   'problem_id' is problem id.
             *   'new_content_state' is the updated content of the problem.
             *   'new_state' is the updated state of the problem.
-            * initialize for the current sequence if there isn't any updated problem
-            * for this position.
             */
 
+            // initialize for the current sequence if there isn't any updated problem for this position.
             if (!this.anyUpdatedProblems(this.position)) {
                 this.updatedProblems[this.position] = {};
             }
 
             // Now, put problem content and score against problem id for current active sequence.
-
             this.updatedProblems[this.position][problemId] = [newContentState, newState];
         };
 
@@ -133,19 +131,10 @@
             this.$(buttonClass).addClass('disabled').attr('disabled', true);
         };
 
-        Sequence.prototype.setButtonLabel = function(buttonClass, buttonLabel) {
-            this.$(buttonClass + ' .sr').html(buttonLabel);
-        };
-
-        Sequence.prototype.updateButtonState = function(
-            buttonClass, buttonAction, actionLabelPrefix, isAtBoundary, boundaryUrl
-        ) {
-            var buttonLabel;
+        Sequence.prototype.updateButtonState = function(buttonClass, buttonAction, isAtBoundary, boundaryUrl) {
             if (isAtBoundary && boundaryUrl === 'None') {
                 this.disableButton(buttonClass);
             } else {
-                buttonLabel = actionLabelPrefix + (isAtBoundary ? ' Subsection' : ' Unit');
-                this.setButtonLabel(buttonClass, buttonLabel);
                 this.enableButton(buttonClass, buttonAction);
             }
         };
@@ -158,13 +147,13 @@
             // previous button
             isFirstTab = this.position === 1;
             previousButtonClass = '.sequence-nav-button.button-previous';
-            this.updateButtonState(previousButtonClass, this.selectPrevious, 'Previous', isFirstTab, this.prevUrl);
+            this.updateButtonState(previousButtonClass, this.selectPrevious, isFirstTab, this.prevUrl);
 
             // next button
             // use inequality in case contents.length is 0 and position is 1.
             isLastTab = this.position >= this.contents.length;
             nextButtonClass = '.sequence-nav-button.button-next';
-            this.updateButtonState(nextButtonClass, this.selectNext, 'Next', isLastTab, this.nextUrl);
+            this.updateButtonState(nextButtonClass, this.selectNext, isLastTab, this.nextUrl);
         };
 
         Sequence.prototype.render = function(newPosition) {
