@@ -11,8 +11,10 @@ from util import views
 from zendesk import ZendeskError
 import json
 import mock
+from ddt import ddt, data, unpack
 
 from student.tests.test_configuration_overrides import fake_get_value
+from student.tests.factories import CourseEnrollmentFactory
 
 
 def fake_support_backend_values(name, default=None):  # pylint: disable=unused-argument
@@ -26,8 +28,9 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
     return config_dict[name]
 
 
+@ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
-@override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy")
+@override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy", ZENDESK_CUSTOM_FIELDS={})
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
 class SubmitFeedbackTest(TestCase):
@@ -44,14 +47,12 @@ class SubmitFeedbackTest(TestCase):
             username="test",
             profile__name="Test User"
         )
-        # This contains issue_type and course_id to ensure that tags are submitted correctly
         self._anon_fields = {
             "email": "test@edx.org",
             "name": "Test User",
             "subject": "a subject",
             "details": "some details",
-            "issue_type": "test_issue",
-            "course_id": "test_course"
+            "issue_type": "test_issue"
         }
         # This does not contain issue_type nor course_id to ensure that they are optional
         self._auth_fields = {"subject": "a subject", "details": "some details"}
@@ -130,13 +131,9 @@ class SubmitFeedbackTest(TestCase):
         resp = self._build_and_run_request(user, fields)
         self.assertEqual(resp.status_code, 200)
 
-    def _assert_datadog_called(self, datadog_mock, with_tags):
-        expected_datadog_calls = [
-            mock.call.increment(
-                views.DATADOG_FEEDBACK_METRIC,
-                tags=(["course_id:test_course", "issue_type:test_issue"] if with_tags else [])
-            )
-        ]
+    def _assert_datadog_called(self, datadog_mock, tags):
+        """Assert that datadog was called with the correct tags."""
+        expected_datadog_calls = [mock.call.increment(views.DATADOG_FEEDBACK_METRIC, tags=tags)]
         self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
 
     def test_bad_request_anon_user_no_name(self, zendesk_mock_class, datadog_mock):
@@ -184,7 +181,7 @@ class SubmitFeedbackTest(TestCase):
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
-                        "tags": ["test_course", "test_issue", "LMS"]
+                        "tags": ["test_issue", "LMS"]
                     }
                 }
             ),
@@ -206,7 +203,7 @@ class SubmitFeedbackTest(TestCase):
             )
         ]
         self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
-        self._assert_datadog_called(datadog_mock, with_tags=True)
+        self._assert_datadog_called(datadog_mock, ["issue_type:test_issue"])
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_valid_request_anon_user_configuration_override(self, zendesk_mock_class, datadog_mock):
@@ -228,7 +225,7 @@ class SubmitFeedbackTest(TestCase):
                         "requester": {"name": "Test User", "email": "test@edx.org"},
                         "subject": "a subject",
                         "comment": {"body": "some details"},
-                        "tags": ["test_course", "test_issue", "LMS", "whitelabel_fakeorg"]
+                        "tags": ["test_issue", "LMS", "whitelabel_fakeorg"]
                     }
                 }
             ),
@@ -250,7 +247,69 @@ class SubmitFeedbackTest(TestCase):
             )
         ]
         self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
-        self._assert_datadog_called(datadog_mock, with_tags=True)
+        self._assert_datadog_called(datadog_mock, ["issue_type:test_issue"])
+
+    @data("course-v1:testOrg+testCourseNumber+testCourseRun", "", None)
+    @override_settings(ZENDESK_CUSTOM_FIELDS={"course_id": 1234, "enrollment_mode": 5678})
+    def test_valid_request_anon_user_with_custom_fields(self, course_id, zendesk_mock, datadog_mock):
+        """
+        Test a valid request from an anonymous user when configured to use Zendesk Custom Fields.
+
+        The response should have a 200 (success) status code, and a ticket with
+        the given information should have been submitted via the Zendesk API. When course_id is
+        present, it should be sent to Zendesk via a custom field. When course_id is blank or missing,
+        the request should still be processed successfully.
+        """
+        zendesk_mock_instance = zendesk_mock.return_value
+        zendesk_mock_instance.create_ticket.return_value = 42
+
+        fields = self._anon_fields.copy()
+
+        expected_zendesk_tags = None
+        expected_datadog_tags = None
+        if course_id is not None:
+            fields["course_id"] = course_id
+            expected_zendesk_tags = [course_id, "test_issue", "LMS"]
+            expected_datadog_tags = ["course_id:{}".format(course_id), "issue_type:test_issue"]
+        else:
+            expected_zendesk_tags = ["test_issue", "LMS"]
+            expected_datadog_tags = ["issue_type:test_issue"]
+
+        expected_create_ticket_request = {
+            "ticket": {
+                "recipient": "registration@example.com",
+                "requester": {"name": "Test User", "email": "test@edx.org"},
+                "subject": "a subject",
+                "comment": {"body": "some details"},
+                "tags": expected_zendesk_tags
+            }
+        }
+
+        expected_update_ticket_request = {
+            "ticket": {
+                "comment": {
+                    "public": False,
+                    "body":
+                    "Additional information:\n\n"
+                    "Client IP: 1.2.3.4\n"
+                    "Host: test_server\n"
+                    "Page: test_referer\n"
+                    "Browser: test_user_agent"
+                }
+            }
+        }
+
+        if fields.get("course_id"):
+            expected_custom_fields = [{"id": 1234, "value": fields["course_id"]}]
+            expected_create_ticket_request["ticket"]["custom_fields"] = expected_custom_fields
+
+        self._test_success(self._anon_user, fields)
+        expected_zendesk_calls = [
+            mock.call.create_ticket(expected_create_ticket_request),
+            mock.call.update_ticket(42, expected_update_ticket_request)
+        ]
+        self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
+        self._assert_datadog_called(datadog_mock, expected_datadog_tags)
 
     def test_bad_request_auth_user_no_subject(self, zendesk_mock_class, datadog_mock):
         """Test a request from an authenticated user not specifying `subject`."""
@@ -303,7 +362,85 @@ class SubmitFeedbackTest(TestCase):
             )
         ]
         self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
-        self._assert_datadog_called(datadog_mock, with_tags=False)
+        self._assert_datadog_called(datadog_mock, [])
+
+    @data(
+        ("course-v1:testOrg+testCourseNumber+testCourseRun", True),
+        ("course-v1:testOrg+testCourseNumber+testCourseRun", False),
+        ("", None),
+        (None, None)
+    )
+    @unpack
+    @override_settings(ZENDESK_CUSTOM_FIELDS={"course_id": 1234, "enrollment_mode": 5678})
+    def test_valid_request_auth_user_with_custom_fields(self, course_id, enrollment_state, zendesk_mock, datadog_mock):
+        """
+        Test a valid request from an authenticated user when configured to use Zendesk Custom Fields.
+
+        The response should have a 200 (success) status code, and a ticket with
+        the given information should have been submitted via the Zendesk API. When course_id is
+        present, it should be sent to Zendesk via a custom field, along with the enrollment mode
+        if the user has an active enrollment for that course. When course_id is blank or missing,
+        the request should still be processed successfully.
+        """
+        zendesk_mock_instance = zendesk_mock.return_value
+        zendesk_mock_instance.create_ticket.return_value = 42
+
+        fields = self._auth_fields.copy()
+
+        expected_zendesk_tags = None
+        expected_datadog_tags = None
+        if course_id is not None:
+            fields["course_id"] = course_id
+            expected_zendesk_tags = [course_id, "LMS"]
+            expected_datadog_tags = ["course_id:{}".format(course_id)]
+        else:
+            expected_zendesk_tags = ["LMS"]
+            expected_datadog_tags = []
+
+        expected_create_ticket_request = {
+            "ticket": {
+                "recipient": "registration@example.com",
+                "requester": {"name": "Test User", "email": "test@edx.org"},
+                "subject": "a subject",
+                "comment": {"body": "some details"},
+                "tags": expected_zendesk_tags
+            }
+        }
+
+        expected_update_ticket_request = {
+            "ticket": {
+                "comment": {
+                    "public": False,
+                    "body":
+                    "Additional information:\n\n"
+                    "username: test\n"
+                    "Client IP: 1.2.3.4\n"
+                    "Host: test_server\n"
+                    "Page: test_referer\n"
+                    "Browser: test_user_agent",
+                }
+            }
+        }
+
+        if fields.get("course_id"):
+            expected_custom_fields = [{"id": 1234, "value": fields["course_id"]}]
+            if enrollment_state is not None:
+                enrollment = CourseEnrollmentFactory.create(
+                    user=self._auth_user,
+                    course_id=course_id,
+                    is_active=enrollment_state
+                )
+                if enrollment.is_active:
+                    expected_custom_fields.append({"id": 5678, "value": enrollment.mode})
+            expected_create_ticket_request["ticket"]["custom_fields"] = expected_custom_fields
+
+        self._test_success(self._auth_user, fields)
+        expected_zendesk_calls = [
+            mock.call.create_ticket(expected_create_ticket_request),
+            mock.call.update_ticket(42, expected_update_ticket_request)
+        ]
+        self.assertEqual(zendesk_mock_instance.mock_calls, expected_zendesk_calls)
+        self._assert_datadog_called(datadog_mock, expected_datadog_tags)
 
     def test_get_request(self, zendesk_mock_class, datadog_mock):
         """Test that a GET results in a 405 even with all required fields"""
@@ -329,7 +466,7 @@ class SubmitFeedbackTest(TestCase):
         resp = self._build_and_run_request(self._anon_user, self._anon_fields)
         self.assertEqual(resp.status_code, 500)
         self.assertFalse(resp.content)
-        self._assert_datadog_called(datadog_mock, with_tags=True)
+        self._assert_datadog_called(datadog_mock, ["issue_type:test_issue"])
 
     def test_zendesk_error_on_update(self, zendesk_mock_class, datadog_mock):
         """
@@ -344,7 +481,7 @@ class SubmitFeedbackTest(TestCase):
         zendesk_mock_instance.update_ticket.side_effect = err
         resp = self._build_and_run_request(self._anon_user, self._anon_fields)
         self.assertEqual(resp.status_code, 200)
-        self._assert_datadog_called(datadog_mock, with_tags=True)
+        self._assert_datadog_called(datadog_mock, ["issue_type:test_issue"])
 
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": False})
     def test_not_enabled(self, zendesk_mock_class, datadog_mock):
