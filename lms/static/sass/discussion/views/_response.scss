@@ -182,13 +182,14 @@
 
 .response-count {
   @include float(right);
+  @include margin-right($baseline / 2);
   color: $forum-color-response-count;
   font-size: $forum-base-font-size;
 }
 
 .response-pagination {
   visibility: visible;
-  padding: 0 ($baseline/2);
+  margin: ($baseline / 2) 0;
 
   &:empty {
     visibility: hidden;

@@ -1,7 +1,7 @@
 <div class="discussion-post">
     <header class="post-header">
         <% if (!readOnly) { %>
-            <div class="post-header-actions post-extended-content">
+            <div class="post-header-actions">
                 <%=
                 _.template(
                     $('#forum-actions').html())(
