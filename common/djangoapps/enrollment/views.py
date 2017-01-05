@@ -99,6 +99,7 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
                 * course_end: The date and time when the course closes. If
                   null, the course never ends.
                 * course_id: The unique identifier for the course.
+                * course_name: The name of the course.
                 * course_modes: An array of data about the enrollment modes
                   supported for the course. If the request uses the parameter
                   include_expired=1, the array also includes expired
@@ -216,6 +217,7 @@ class EnrollmentCourseDetailView(APIView):
                 * course_end: The date and time when the course closes. If
                   null, the course never ends.
                 * course_id: The unique identifier for the course.
+                * course_name: The name of the course.
                 * course_modes: An array of data about the enrollment modes
                   supported for the course. If the request uses the parameter
                   include_expired=1, the array also includes expired
@@ -399,6 +401,8 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
                   null, the course never ends.
 
                 * course_id: The unique identifier for the course.
+
+                * course_name: The name of the course.
 
                 * course_modes: An array of data about the enrollment modes
                   supported for the course. If the request uses the parameter

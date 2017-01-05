@@ -1003,6 +1003,7 @@ FEEDBACK_SUBMISSION_EMAIL = None
 ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
+ZENDESK_CUSTOM_FIELDS = {}  # Maps custom field name to Zendesk ID. For example, { 'a_custom_field': 123456 }
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None

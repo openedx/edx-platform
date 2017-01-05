@@ -25,6 +25,7 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import track.views
 from student.roles import GlobalStaff
+from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
@@ -222,6 +223,26 @@ class _ZendeskApi(object):
         return None
 
 
+def _format_zendesk_additional_info(additional_info):
+    """
+    Format the data in the additional_info dictionary for use in the Zendesk API by first extracting any
+    information that can be stored in Zendesk custom fields and then by constructing a string with the remaining
+    info. The custom field information will be sent to Zendesk with the initial request to create the ticket. The
+    string of remaining info will be sent as a private ticket update after the ticket is created.
+    """
+    custom_fields = []
+    other_info = []
+    for key, value in sorted(additional_info.items()):
+        if value is None:
+            continue
+        elif key in settings.ZENDESK_CUSTOM_FIELDS:
+            custom_fields.append({"id": settings.ZENDESK_CUSTOM_FIELDS[key], "value": value})
+        else:
+            other_info.append("{}: {}".format(key, value))
+    other_info = u"Additional information:\n\n" + u"\n".join(other_info)
+    return (custom_fields, other_info)
+
+
 def _record_feedback_in_zendesk(
         realname,
         email,
@@ -248,11 +269,7 @@ def _record_feedback_in_zendesk(
     which the user will not see in followup emails from support.
     """
     zendesk_api = _ZendeskApi()
-
-    additional_info_string = (
-        u"Additional information:\n\n" +
-        u"\n".join(u"%s: %s" % (key, value) for (key, value) in additional_info.items() if value is not None)
-    )
+    zendesk_custom_fields, zendesk_additional_info = _format_zendesk_additional_info(additional_info)
 
     # Tag all issues with LMS to distinguish channel in Zendesk; requested by student support team
     zendesk_tags = list(tags.values()) + ["LMS"]
@@ -271,6 +288,10 @@ def _record_feedback_in_zendesk(
             "tags": zendesk_tags
         }
     }
+
+    if zendesk_custom_fields:
+        new_ticket["ticket"]["custom_fields"] = zendesk_custom_fields
+
     group = None
     if group_name is not None:
         group = zendesk_api.get_group(group_name)
@@ -294,7 +315,7 @@ def _record_feedback_in_zendesk(
 
     # Additional information is provided as a private update so the information
     # is not visible to the user.
-    ticket_update = {"ticket": {"comment": {"public": False, "body": additional_info_string}}}
+    ticket_update = {"ticket": {"comment": {"public": False, "body": zendesk_additional_info}}}
     try:
         zendesk_api.update_ticket(ticket_id, ticket_update)
     except zendesk.ZendeskError:
@@ -307,9 +328,19 @@ def _record_feedback_in_zendesk(
     return True
 
 
+def _format_datadog_tags(tags, course_id=None):
+    """
+    Format a list of tags for use with the Datadog API.
+    """
+    # Avoid modifying the original tags dictionary
+    tags = dict(tags)
+    if course_id is not None:
+        tags["course_id"] = course_id
+    return [u"{k}:{v}".format(k=k, v=v) for k, v in sorted(tags.items())]
+
+
 def _record_feedback_in_datadog(tags):
-    datadog_tags = [u"{k}:{v}".format(k=k, v=v) for k, v in tags.items()]
-    dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=datadog_tags)
+    dog_stats_api.increment(DATADOG_FEEDBACK_METRIC, tags=tags)
 
 
 def get_feedback_form_context(request):
@@ -321,9 +352,10 @@ def get_feedback_form_context(request):
 
     context["subject"] = request.POST["subject"]
     context["details"] = request.POST["details"]
-    context["tags"] = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
-    )
+
+    context["tags"] = {}
+    if "issue_type" in request.POST:
+        context["tags"]["issue_type"] = request.POST["issue_type"]
 
     context["additional_info"] = {}
 
@@ -331,6 +363,14 @@ def get_feedback_form_context(request):
         context["realname"] = request.user.profile.name
         context["email"] = request.user.email
         context["additional_info"]["username"] = request.user.username
+
+        course_id = request.POST.get("course_id")
+        if course_id:
+            context["additional_info"]["course_id"] = course_id
+            enrollment = CourseEnrollment.get_enrollment(request.user, CourseKey.from_string(course_id))
+            # TODO: Determine what to do if enrollment is missing or inactive.
+            if enrollment:
+                context["additional_info"]["enrollment_mode"] = enrollment.mode
     else:
         context["realname"] = request.POST["name"]
         context["email"] = request.POST["email"]
@@ -422,7 +462,8 @@ def submit_feedback(request):
             support_email=context["support_email"]
         )
 
-    _record_feedback_in_datadog(context["tags"])
+    datadog_tags = _format_datadog_tags(context["tags"], context["additional_info"].get("course_id"))
+    _record_feedback_in_datadog(datadog_tags)
 
     return HttpResponse(status=(200 if success else 500))
 

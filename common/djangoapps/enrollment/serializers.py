@@ -36,6 +36,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     """
 
     course_id = serializers.CharField(source="id")
+    course_name = serializers.CharField(source="display_name")
     enrollment_start = serializers.DateTimeField(format=None)
     enrollment_end = serializers.DateTimeField(format=None)
     course_start = serializers.DateTimeField(source="start", format=None)
