@@ -215,42 +215,6 @@ function($, _, Utils, _str) {
                     });
                 });
             });
-
-            describe('Too long arguments ', function() {
-                var longFileName = (function() {
-                        var text = '';
-                        var possibleChars = 'abcdefghijklmnopqrstuvwxyz';
-                        /* eslint vars-on-top: 0 */
-                        for (var i = 0; i < 255; i++) {
-                            text += possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
-                        }
-                        return text;
-                    }()),
-                    html5LongUrls = (function(videoName) {
-                        var links = [
-                            'http://somelink.com/%s?param=1&param=2#hash',
-                            'http://somelink.com/%s#hash',
-                            'http://somelink.com/%s?param=1&param=2',
-                            'http://somelink.com/%s',
-                            'ftp://somelink.com/%s',
-                            'https://somelink.com/%s',
-                            'https://somelink.com/sub/sub/%s',
-                            'http://cdn.somecdn.net/v/%s',
-                            'somelink.com/%s',
-                            '%s'
-                        ];
-                        return $.map(links, function(link) {
-                            return _str.sprintf(link, videoName);
-                        });
-                    }(longFileName));
-
-                $.each(html5LongUrls, function(index, link) {
-                    it(link, function() {
-                        var result = Utils.parseHTML5Link(link);
-                        expect(result.video.length).toBe(150);
-                    });
-                });
-            });
         });
 
         it('Method: getYoutubeLink', function() {
