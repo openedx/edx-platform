@@ -52,7 +52,6 @@ common/lib/xmodule/xmodule/js/src/html/edit.js
 common/lib/xmodule/xmodule/js/src/raw/edit/json.js
 common/lib/xmodule/xmodule/js/src/raw/edit/metadata-only.js
 common/lib/xmodule/xmodule/js/src/raw/edit/xml.js
-common/lib/xmodule/xmodule/js/src/sequence/display.js
 common/lib/xmodule/xmodule/js/src/sequence/edit.js
 common/lib/xmodule/xmodule/js/src/tabs/tabs-aggregator.js
 common/lib/xmodule/xmodule/js/src/vertical/edit.js

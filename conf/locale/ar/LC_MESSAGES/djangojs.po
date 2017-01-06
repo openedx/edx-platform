@@ -19,6 +19,8 @@
 # AR R1 <e2far1@hotmail.com>, 2016
 # ayshibly <ayshibly@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
+# e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # br1ng <ibnalawam@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
 # Khaled Jalajel <khaledjalajeldode@gmail.com>, 2015
@@ -32,7 +34,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Ned Batchelder <ned@edx.org>, 2015-2016
-# omarithawi <oithawi@qrf.org>, 2015-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # SiddigSami <siddigsami@live.com>, 2014-2015
@@ -54,6 +56,8 @@
 # Ahmed Jazzar <ajazzar@qrf.org>, 2016
 # AR C2 <e2f458fd4s512@outlook.com>, 2016
 # AR R1 <e2far1@hotmail.com>, 2016
+# e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2014-2015
@@ -80,13 +84,14 @@
 # Alhamzah Alnufaili <alhamzah.alnufaili@gmail.com>, 2016
 # AR C2 <e2f458fd4s512@outlook.com>, 2016
 # mohammad hamdi <babrica@hotmail.com>, 2014
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Emad Ahmad Alghamdi <eaalghamdi@kau.edu.sa>, 2015
 # Khaled Abdel wahab <engkhaledabdelwahab@gmail.com>, 2015
 # may <may@qordoba.com>, 2014-2015
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2016
-# omarithawi <oithawi@qrf.org>, 2015-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # سيف المنايا <m2fahad9@gmail.com>, 2015
@@ -102,12 +107,13 @@
 # Ahmed Jazzar <ajazzar@qrf.org>, 2016
 # Alhamzah Alnufaili <alhamzah.alnufaili@gmail.com>, 2016
 # AR C2 <e2f458fd4s512@outlook.com>, 2016
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # may <may@qordoba.com>, 2014-2015
 # Mohamed Ibrahim <root.php@hotmail.com>, 2015
 # wd3bbas <mohed.alabbas@gmail.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Ned Batchelder <ned@edx.org>, 2016
-# omarithawi <oithawi@qrf.org>, 2015-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
 # Saramami.mami <saramami.mami@yahoo.com>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
@@ -116,8 +122,8 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
 "POT-Creation-Date: 2016-12-08 18:45+0000\n"
-"PO-Revision-Date: 2016-11-22 16:42+0000\n"
-"Last-Translator: Ned Batchelder <ned@edx.org>\n"
+"PO-Revision-Date: 2016-12-29 20:30+0000\n"
+"Last-Translator: e2f_ar t3 <e2f_ar_t3@outlook.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4623,7 +4629,7 @@ msgid ""
 "address.{paragraphEnd}"
 msgstr ""
 "{paragraphStart}لقد أدخلت {boldStart}{email}{boldEnd}. إذا كان عنوان البريد "
-"الاكتروني هذا مرتبط مع حسابك في {platform_name}، سوف نرسل رسالة التي تحوي "
+"الإلكتروني هذا مرتبطًا مع حسابك في {platform_name}، سوف نرسل رسالة تحوي "
 "إرشادات إعادة تعيين كلمة المرور إلى عنوان البريد الإلكتروني "
 "هذا.{paragraphEnd}"
 

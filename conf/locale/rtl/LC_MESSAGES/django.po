@@ -1,39 +1,39 @@
 # #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 # #-#-#-#-#  django-studio.po (0.1a)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 # #-#-#-#-#  mako.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 # #-#-#-#-#  mako-studio.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 # #-#-#-#-#  wiki.po (0.1a)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2016.
+# EdX Team <info@edx.org>, 2017.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-15 12:33+0000\n"
-"PO-Revision-Date: 2016-12-15 12:33:13.411493\n"
+"POT-Creation-Date: 2017-01-05 16:47+0000\n"
+"PO-Revision-Date: 2017-01-05 16:47:32.409025\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2294,13 +2294,6 @@ msgstr "فاهس ذخوحخرثرف اشس رخ سخعقذث ذخوحخرثرف�
 msgid "Configure list of sources"
 msgstr "ذخربهلعقث مهسف خب سخعقذثس"
 
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
-#: common/lib/xmodule/xmodule/course_metadata_utils.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "فزي"
-
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
 msgstr "مفه حشسسحخقفس"
@@ -2354,18 +2347,18 @@ msgstr ""
 "صهمم زث يهسحمشغثي هرسفثشي خب فاهس خرث."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Advertised Start Date"
-msgstr "ذخعقسث شيدثقفهسثي سفشقف يشفث"
+msgid "Course Advertised Start"
+msgstr "ذخعقسث شيدثقفهسثي سفشقف"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the date you want to advertise as the course start date, if this date "
-"is different from the set start date. To advertise the set start date, enter"
-" null."
+"Enter the text that you want to use as the advertised starting time frame "
+"for the course, such as \"Winter 2018\". If you enter null for this value, "
+"the start date that you have set for this course is used."
 msgstr ""
-"ثرفثق فاث يشفث غخع صشرف فخ شيدثقفهسث شس فاث ذخعقسث سفشقف يشفث, هب فاهس يشفث "
-"هس يهببثقثرف بقخو فاث سثف سفشقف يشفث. فخ شيدثقفهسث فاث سثف سفشقف يشفث, ثرفثق"
-" رعمم."
+"ثرفثق فاث فثطف فاشف غخع صشرف فخ عسث شس فاث شيدثقفهسثي سفشقفهرل فهوث بقشوث "
+"بخق فاث ذخعقسث, سعذا شس \"صهرفثق 2018\". هب غخع ثرفثق رعمم بخق فاهس دشمعث, "
+"فاث سفشقف يشفث فاشف غخع اشدث سثف بخق فاهس ذخعقسث هس عسثي."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -6074,6 +6067,10 @@ msgstr "وشرعشممغ ثرقخممثي"
 msgid "Data Integrity Error"
 msgstr "يشفش هرفثلقهفغ ثققخق"
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "TBD"
+msgstr "فزي"
+
 #: lms/djangoapps/instructor/services.py
 msgid "Proctored Exam Review: {review_status}"
 msgstr "حقخذفخقثي ثطشو قثدهثص: {review_status}"
@@ -9429,6 +9426,14 @@ msgid ""
 msgstr ""
 "سحثذهبهثي هر سثذخريس. ثرشزمث ذشذاهرل خب شحه قثسحخرسثس زغ سثففهرل فاهس فخ ش "
 "دشمعث لقثشفثق فاشر 0."
+
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Username created for Course Catalog Integration, e.g. "
+"lms_catalog_service_user."
+msgstr ""
+"عسثقرشوث ذقثشفثي بخق ذخعقسث ذشفشمخل هرفثلقشفهخر, ث.ل. "
+"موس_ذشفشمخل_سثقدهذث_عسثق."
 
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
@@ -18109,10 +18114,6 @@ msgid "Registration for:"
 msgstr "قثلهسفقشفهخر بخق:"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Course Dates"
-msgstr "ذخعقسث يشفثس"
-
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Price per student:"
 msgstr "حقهذث حثق سفعيثرف:"
@@ -18156,10 +18157,6 @@ msgstr "ذخربهقو غخعق ثرقخمموثرف بخق: {span_start}ذخع�
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
 msgstr "{course_name}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{start_date} - {end_date}"
-msgstr "{start_date} - {end_date}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -18232,10 +18229,6 @@ msgstr[1] ""
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "ذخدثق هوشلث"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Course Dates:"
-msgstr "ذخعقسث يشفثس:"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Students:"
@@ -22057,11 +22050,11 @@ msgstr "وشطهوعو دهيثخ بهمث سهظث"
 
 #: cms/templates/videos_index.html
 msgid ""
-"The maximum size for each video file that you upload is 5 GB. The upload "
-"process fails for larger files."
+"The maximum size for each video file that you upload is {em_start}5 "
+"GB{em_end}. The upload process fails for larger files."
 msgstr ""
-"فاث وشطهوعو سهظث بخق ثشذا دهيثخ بهمث فاشف غخع عحمخشي هس 5 لز. فاث عحمخشي "
-"حقخذثسس بشهمس بخق مشقلثق بهمثس."
+"فاث وشطهوعو سهظث بخق ثشذا دهيثخ بهمث فاشف غخع عحمخشي هس {em_start}5 "
+"لز{em_end}. فاث عحمخشي حقخذثسس بشهمس بخق مشقلثق بهمثس."
 
 #: cms/templates/videos_index.html
 msgid "Monitoring files as they upload"

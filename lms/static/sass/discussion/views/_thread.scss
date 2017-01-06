@@ -45,7 +45,8 @@
     font-weight: 600;
 }
 
-.thread-responses-wrapper {
+.thread-responses-wrapper,
+.post-extended-content {
     padding: 0 ($baseline/2);
 }
 
@@ -96,8 +97,8 @@
 
 // +thread - wrapper styling
 .thread-wrapper {
-    .thread-main-wrapper {
-        padding-bottom: $baseline;
+    .response-btn-count-wrapper {
+        margin: $baseline 0;
     }
 }
 

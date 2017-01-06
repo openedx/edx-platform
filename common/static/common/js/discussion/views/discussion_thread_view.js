@@ -280,6 +280,9 @@
                     responseCountFormat = ngettext(
                         '{numResponses} other response', '{numResponses} other responses', responseTotal
                     );
+                    if (responseTotal === 0) {
+                        this.$el.find('.response-count').hide();
+                    }
                 } else {
                     responseCountFormat = ngettext(
                         '{numResponses} response', '{numResponses} responses', responseTotal
@@ -288,6 +291,7 @@
                 this.$el.find('.response-count').text(
                     edx.StringUtils.interpolate(responseCountFormat, {numResponses: responseTotal}, true)
                 );
+
                 responsePagination = this.$el.find('.response-pagination');
                 responsePagination.empty();
                 if (responseTotal > 0) {
@@ -327,6 +331,8 @@
                         });
                         return responsePagination.append($loadMoreButton);
                     }
+                } else {
+                    this.$el.find('.add-response').hide();
                 }
             };
 
@@ -345,9 +351,9 @@
 
             DiscussionThreadView.prototype.renderAddResponseButton = function() {
                 if (this.model.hasResponses() && this.model.can('can_reply') && !this.model.get('closed')) {
-                    return this.$el.find('div.add-response').show();
+                    return this.$el.find('.add-response').show();
                 } else {
-                    return this.$el.find('div.add-response').hide();
+                    return this.$el.find('.add-response').hide();
                 }
             };
 
