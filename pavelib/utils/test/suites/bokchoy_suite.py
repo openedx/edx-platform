@@ -71,7 +71,7 @@ def load_courses(options):
     `test_root/courses/test-example-course/`, options.imports_dir should be
     `test_root/courses/`.
     """
-    if 'imports_dir' in options or 'imports_dir' in options.get('load_courses', {}):
+    if 'imports_dir' in options:
         msg = colorize('green', "Importing courses from {}...".format(options.imports_dir))
         print msg
 
