@@ -13,7 +13,6 @@ import textwrap
 import unittest
 
 import ddt
-import flaky
 from lxml import etree
 from mock import Mock, patch, DEFAULT
 import webob
@@ -1412,7 +1411,6 @@ class CapaModuleTest(unittest.TestCase):
         RANDOMIZATION.ALWAYS,
         RANDOMIZATION.ONRESET
     )
-    @flaky.flaky  # TNL-6041
     def test_random_seed_with_reset(self, rerandomize):
         """
         Run the test for each possible rerandomize value
@@ -1470,13 +1468,13 @@ class CapaModuleTest(unittest.TestCase):
         # to another valid seed
         else:
 
-            # Since there's a small chance we might get the
-            # same seed again, give it 5 chances
+            # Since there's a small chance (expected) we might get the
+            # same seed again, give it 10 chances
             # to generate a different seed
-            success = _retry_and_check(5, lambda: _reset_and_get_seed(module) != seed)
+            success = _retry_and_check(10, lambda: _reset_and_get_seed(module) != seed)
 
             self.assertIsNotNone(module.seed)
-            msg = 'Could not get a new seed from reset after 5 tries'
+            msg = 'Could not get a new seed from reset after 10 tries'
             self.assertTrue(success, msg)
 
     @ddt.data(
