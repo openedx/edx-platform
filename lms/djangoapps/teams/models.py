@@ -263,5 +263,5 @@ class CourseTeamMembership(models.Model):
         membership.team.save()
         membership.save()
         emit_team_event('edx.team.activity_updated', membership.team.course_id, {
-            'team_id': membership.team_id,
+            'team_id': membership.team.team_id,
         })

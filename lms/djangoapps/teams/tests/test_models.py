@@ -172,7 +172,7 @@ class TeamSignalsTest(EventTestMixin, SharedModuleStoreTestCase):
             self.assertGreater(now, team_membership.last_activity_at)
             self.assert_event_emitted(
                 'edx.team.activity_updated',
-                team_id=team.id,
+                team_id=team.team_id,
             )
         else:
             self.assertEqual(team.last_activity_at, team_last_activity)
