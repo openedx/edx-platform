@@ -11,7 +11,7 @@ from nose.plugins.skip import SkipTest
 
 from capa.safe_exec import safe_exec, update_hash
 from codejail.safe_exec import SafeExecException
-from codejail.jail_code import is_configured
+from codejail import is_configured
 
 
 class TestSafeExec(unittest.TestCase):
