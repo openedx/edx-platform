@@ -245,7 +245,7 @@ class TestGetCourseRun(mixins.CatalogIntegrationMixin, CacheIsolationTestCase):
         self.user = UserFactory()
         self.catalog_integration = self.create_catalog_integration(
             internal_api_url="http://catalog.example.com:443/api/v1",
-            cache_ttl=1,
+            course_run_cache_ttl=60,
         )
         self.course_runs = [factories.CourseRun() for __ in range(4)]
         self.course_key_1 = CourseKey.from_string(self.course_runs[0]["key"])

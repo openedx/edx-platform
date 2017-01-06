@@ -16,6 +16,7 @@ class CatalogIntegrationMixin(object):
         'enabled': True,
         'internal_api_url': 'https://catalog-internal.example.com/api/v1/',
         'cache_ttl': 0,
+        'course_run_cache_ttl': 0,
     }
 
     def create_catalog_integration(self, **kwargs):

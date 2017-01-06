@@ -480,7 +480,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase, MilestonesTestCaseMixin,
         self.request.user = self.user
         self.catalog_integration = self.create_catalog_integration(
             internal_api_url="http://catalog.example.com:443/api/v1",
-            cache_ttl=1
+            course_run_cache_ttl=60
         )
         self.course_id_string = unicode(self.course.id)
         self.course_run = factories.CourseRun(key=self.course_id_string)

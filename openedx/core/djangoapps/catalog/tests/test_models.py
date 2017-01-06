@@ -19,5 +19,6 @@ class TestCatalogIntegration(mixins.CatalogIntegrationMixin, TestCase):
     @ddt.unpack
     def test_cache_control(self, cache_ttl, is_cache_enabled, _mock_cache):
         """Test the behavior of the property controlling whether API responses are cached."""
-        catalog_integration = self.create_catalog_integration(cache_ttl=cache_ttl)
+        catalog_integration = self.create_catalog_integration(cache_ttl=cache_ttl, course_run_cache_ttl=cache_ttl)
         self.assertEqual(catalog_integration.is_cache_enabled, is_cache_enabled)
+        self.assertEqual(catalog_integration.is_course_run_cache_enabled, is_cache_enabled)
