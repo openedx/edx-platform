@@ -267,6 +267,15 @@ class SplitModuleTest(unittest.TestCase):
                             },
                         },
                         {
+                            "id": "chap",
+                            "parent": "head12345",
+                            "parent_type": "course",
+                            "category": "chapter",
+                            "fields": {
+                                "display_name": "Buffalo buffalo Buffalo buffalo buffalo buffalo Buffalo buffalo"
+                            },
+                        },
+                        {
                             "id": "chapter2",
                             "parent": "head12345",
                             "parent_type": "course",
@@ -1189,13 +1198,14 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         # get all modules
         matches = modulestore().get_items(locator)
-        self.assertEqual(len(matches), 7)
+        self.assertEqual(len(matches), 8)
         matches = modulestore().get_items(locator)
-        self.assertEqual(len(matches), 7)
+        self.assertEqual(len(matches), 8)
         matches = modulestore().get_items(locator, qualifiers={'category': 'chapter'})
-        self.assertEqual(len(matches), 3)
+        self.assertEqual(len(matches), 4)
         matches = modulestore().get_items(locator, qualifiers={'category': 'garbage'})
         self.assertEqual(len(matches), 0)
+        # Test that we don't accidentally get an item with a similar name.
         matches = modulestore().get_items(locator, qualifiers={'name': 'chapter1'})
         self.assertEqual(len(matches), 1)
         matches = modulestore().get_items(locator, qualifiers={'name': ['chapter1', 'chapter2']})
@@ -1209,7 +1219,7 @@ class SplitModuleItemTests(SplitModuleTest):
         matches = modulestore().get_items(locator, settings={'group_access': {'$exists': True}})
         self.assertEqual(len(matches), 1)
         matches = modulestore().get_items(locator, settings={'group_access': {'$exists': False}})
-        self.assertEqual(len(matches), 6)
+        self.assertEqual(len(matches), 7)
 
     def test_get_parents(self):
         '''

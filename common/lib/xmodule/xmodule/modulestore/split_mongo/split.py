@@ -57,6 +57,7 @@ import copy
 import datetime
 import hashlib
 import logging
+import six
 from contracts import contract, new_contract
 from importlib import import_module
 from mongodb_proxy import autoretry_read
@@ -1202,9 +1203,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             block_name = qualifiers.pop('name')
             block_ids = []
             for block_id, block in course.structure['blocks'].iteritems():
-                # Do an in comparison on the name qualifier
-                # so that a list can be used to filter on block_id
-                if block_id.id in block_name and _block_matches_all(block):
+                # Don't do an in comparison blindly; first check to make sure
+                # that the name qualifier we're looking at isn't a plain string;
+                # if it is a string, then it should match exactly.
+                if isinstance(block_name, six.string_types):
+                    name_matches = block_id.id == block_name
+                else:
+                    name_matches = block_id.id in block_name
+                if name_matches and _block_matches_all(block):
                     block_ids.append(block_id)
 
             return self._load_items(course, block_ids, **kwargs)
