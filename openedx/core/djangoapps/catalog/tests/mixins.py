@@ -32,9 +32,9 @@ class CatalogIntegrationMixin(object):
         Register a mock response for GET on the catalog course run endpoint.
         """
         course_run_url = "http://catalog.example.com:443/api/v1/course_runs/?keys={}&exclude_utm=1&limit=20"
+        next_page_url = course_run_url + "&offset={}".format(offset + 1) if offset else ""
         if offset:
             course_run_url = course_run_url + "&offset={}".format(offset)
-        next_page_url = course_run_url + "&offset={}".format(offset + 1) if offset else ""
         httpretty.register_uri(
             httpretty.GET,
             course_run_url.format(
