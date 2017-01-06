@@ -7,3 +7,4 @@ clean:
 	tar cf /tmp/private.tar `git ls-files --exclude-from=/tmp/private-files --ignored --others`
 	git clean -fdX
 	tar xf /tmp/private.tar
+
