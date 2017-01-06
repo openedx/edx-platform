@@ -39,7 +39,10 @@
                         collection: this.discussion,
                         el: this.$('.inline-threads'),
                         courseSettings: this.courseSettings,
-                        hideRefineBar: true  // TODO: re-enable the search/filter bar when it works correctly
+                        hideRefineBar: true,  // TODO: re-enable the search/filter bar when it works correctly
+                        // TODO: remove. Used temporarily to disable read state on profile page. See comment in
+                        // discussion_thread_list_view.js / DiscussionThreadListView.prototype.renderThread
+                        profilePage: true
                     }).render();
 
                     this.discussionThreadListView.on('thread:selected', _.bind(this.navigateToThread, this));

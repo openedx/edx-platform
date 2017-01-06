@@ -169,6 +169,7 @@
             });
             return this.view.render();
         });
+
         setupAjax = function(callback) {
             return $.ajax.and.callFake(function(params) {
                 if (callback) {
@@ -185,19 +186,27 @@
                 };
             });
         };
+
         renderSingleThreadWithProps = function(props) {
             return makeView(new Discussion([new Thread(DiscussionViewSpecHelper.makeThreadWithProps(props))])).render();
         };
-        makeView = function(discussion) {
-            return new DiscussionThreadListView({
-                el: $('#fixture-element'),
-                collection: discussion,
-                showThreadPreview: true,
-                courseSettings: new DiscussionCourseSettings({
-                    is_cohorted: true
-                })
-            });
+
+        makeView = function(discussion, props) {
+            return new DiscussionThreadListView(
+                _.extend(
+                    {
+                        el: $('#fixture-element'),
+                        collection: discussion,
+                        showThreadPreview: true,
+                        courseSettings: new DiscussionCourseSettings({
+                            is_cohorted: true
+                        })
+                    },
+                    props
+                )
+            );
         };
+
         expectFilter = function(filterVal) {
             return $.ajax.and.callFake(function(params) {
                 _.each(['unread', 'unanswered', 'flagged'], function(paramName) {
@@ -679,6 +688,48 @@
                 view = makeView(discussion, showThreadPreview);
                 view.render();
                 expect(view.$el.find('.thread-preview-body').length).toEqual(0);
+            });
+        });
+
+        describe('read/unread state', function() {
+            it('adds never-read class to unread threads', function() {
+                var unreads = this.threads.filter(function(thread) {
+                    return !thread.read && thread.unread_comments_count === thread.comments_count;
+                }).length;
+
+                this.view = makeView(new Discussion(this.threads));
+                this.view.render();
+                expect(this.view.$('.never-read').length).toEqual(unreads);
+            });
+
+            it('shows a "x new" message for threads that are read, but have unread comments', function() {
+                var unreadThread = this.threads.filter(function(thread) {
+                        return thread.read && thread.unread_comments_count !== thread.comments_count;
+                    })[0],
+                    newCommentsOnUnreadThread = unreadThread.unread_comments_count;
+
+                this.view = makeView(new Discussion(this.threads));
+                this.view.render();
+                expect(
+                    this.view.$('.forum-nav-thread-unread-comments-count')
+                        .first()
+                        .text()
+                        .trim()
+                ).toEqual(newCommentsOnUnreadThread + ' new');
+            });
+
+            it('should display every thread as read if profilePage is passed to the constructor', function() {
+                // @TODO: This is temporary, see comment in DiscussionThreadListView.prototype.renderThread
+                this.view = makeView(new Discussion(this.threads), {profilePage: true});
+                this.view.render();
+                expect(this.view.$('.never-read').length).toEqual(0);
+            });
+
+            it('does not show the "x new" indicator for any thread if profilePage is passed', function() {
+                // @TODO: This is temporary, see comment in DiscussionThreadListView.prototype.renderThread
+                this.view = makeView(new Discussion(this.threads), {profilePage: true});
+                this.view.render();
+                expect(this.view.$('.forum-nav-thread-unread-comments-count').length).toEqual(0);
             });
         });
     });

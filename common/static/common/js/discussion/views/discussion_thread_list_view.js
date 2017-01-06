@@ -93,6 +93,7 @@
                 this.courseSettings = options.courseSettings;
                 this.hideRefineBar = options.hideRefineBar;
                 this.supportsActiveThread = options.supportsActiveThread;
+                this.profilePage = options.profilePage || false;
                 this.displayedCollection = new Discussion(this.collection.models, {
                     pages: this.collection.pages
                 });
@@ -335,7 +336,14 @@
             DiscussionThreadListView.prototype.renderThread = function(thread) {
                 var threadCommentCount = thread.get('comments_count'),
                     threadUnreadCommentCount = thread.get('unread_comments_count'),
-                    neverRead = !thread.get('read') && threadUnreadCommentCount === threadCommentCount,
+                    // @TODO: On the profile page, thread read state for the viewing user is not accessible via the API.
+                    // In this case, neverRead is set to false regardless of read state returned by the API.
+                    // Fix this when the Discussions API can support this query.
+                    neverRead = (
+                        !thread.get('read') &&
+                        threadUnreadCommentCount === threadCommentCount &&
+                        !this.profilePage
+                    ),
                     threadPreview = this.containsMarkup(thread.get('body')) ? '' : thread.get('body'),
                     context = _.extend(
                         {
@@ -344,7 +352,8 @@
                             threadPreview: threadPreview,
                             showThreadPreview: this.showThreadPreview
                         },
-                        thread.toJSON()
+                        thread.toJSON(),
+                        this.profilePage ? {unread_comments_count: 0} : {}  // See comment above about profile page
                     );
                 return $(this.threadListItemTemplate(context).toString());
             };
