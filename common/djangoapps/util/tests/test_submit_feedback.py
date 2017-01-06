@@ -264,13 +264,16 @@ class SubmitFeedbackTest(TestCase):
         zendesk_mock_instance.create_ticket.return_value = 42
 
         fields = self._anon_fields.copy()
+        if course_id is not None:
+            fields["course_id"] = course_id
 
         expected_zendesk_tags = None
         expected_datadog_tags = None
-        if course_id is not None:
-            fields["course_id"] = course_id
+        expected_custom_fields = None
+        if course_id:
             expected_zendesk_tags = [course_id, "test_issue", "LMS"]
             expected_datadog_tags = ["course_id:{}".format(course_id), "issue_type:test_issue"]
+            expected_custom_fields = [{"id": 1234, "value": fields["course_id"]}]
         else:
             expected_zendesk_tags = ["test_issue", "LMS"]
             expected_datadog_tags = ["issue_type:test_issue"]
@@ -285,6 +288,9 @@ class SubmitFeedbackTest(TestCase):
             }
         }
 
+        if expected_custom_fields:
+            expected_create_ticket_request["ticket"]["custom_fields"] = expected_custom_fields
+
         expected_update_ticket_request = {
             "ticket": {
                 "comment": {
@@ -298,10 +304,6 @@ class SubmitFeedbackTest(TestCase):
                 }
             }
         }
-
-        if fields.get("course_id"):
-            expected_custom_fields = [{"id": 1234, "value": fields["course_id"]}]
-            expected_create_ticket_request["ticket"]["custom_fields"] = expected_custom_fields
 
         self._test_success(self._anon_user, fields)
         expected_zendesk_calls = [
@@ -386,13 +388,24 @@ class SubmitFeedbackTest(TestCase):
         zendesk_mock_instance.create_ticket.return_value = 42
 
         fields = self._auth_fields.copy()
+        if course_id is not None:
+            fields["course_id"] = course_id
 
         expected_zendesk_tags = None
         expected_datadog_tags = None
-        if course_id is not None:
-            fields["course_id"] = course_id
+        expected_custom_fields = None
+        if course_id:
             expected_zendesk_tags = [course_id, "LMS"]
             expected_datadog_tags = ["course_id:{}".format(course_id)]
+            expected_custom_fields = [{"id": 1234, "value": course_id}]
+            if enrollment_state is not None:
+                enrollment = CourseEnrollmentFactory.create(
+                    user=self._auth_user,
+                    course_id=course_id,
+                    is_active=enrollment_state
+                )
+                if enrollment.is_active:
+                    expected_custom_fields.append({"id": 5678, "value": enrollment.mode})
         else:
             expected_zendesk_tags = ["LMS"]
             expected_datadog_tags = []
@@ -406,6 +419,9 @@ class SubmitFeedbackTest(TestCase):
                 "tags": expected_zendesk_tags
             }
         }
+
+        if expected_custom_fields:
+            expected_create_ticket_request["ticket"]["custom_fields"] = expected_custom_fields
 
         expected_update_ticket_request = {
             "ticket": {
@@ -421,18 +437,6 @@ class SubmitFeedbackTest(TestCase):
                 }
             }
         }
-
-        if fields.get("course_id"):
-            expected_custom_fields = [{"id": 1234, "value": fields["course_id"]}]
-            if enrollment_state is not None:
-                enrollment = CourseEnrollmentFactory.create(
-                    user=self._auth_user,
-                    course_id=course_id,
-                    is_active=enrollment_state
-                )
-                if enrollment.is_active:
-                    expected_custom_fields.append({"id": 5678, "value": enrollment.mode})
-            expected_create_ticket_request["ticket"]["custom_fields"] = expected_custom_fields
 
         self._test_success(self._auth_user, fields)
         expected_zendesk_calls = [

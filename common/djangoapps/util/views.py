@@ -364,7 +364,7 @@ def get_feedback_form_context(request):
     context["subject"] = request.POST["subject"]
     context["details"] = request.POST["details"]
     context["tags"] = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
+        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if request.POST.get(tag)]
     )
 
     context["additional_info"] = {}
