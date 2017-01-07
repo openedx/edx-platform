@@ -1,0 +1,20 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Dear {full_name}").format(full_name=full_name)}
+
+${_("You have been enrolled in {course_name} at {site_name} by a member "
+	"of the course staff. The course should now appear on your {site_name} "
+	"dashboard.").format(
+		course_name=display_name or course.display_name_with_default,
+		site_name=site_name
+	)}
+
+${_("To start accessing course materials, please visit {course_url} and login.").format(
+		course_url=course_url
+	)}
+
+----
+${_("This email was automatically sent from {site_name} to "
+	"{full_name}").format(
+		site_name=site_name, full_name=full_name
+	)}
