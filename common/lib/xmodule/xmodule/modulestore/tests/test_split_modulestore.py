@@ -629,7 +629,7 @@ class SplitModuleCourseTests(SplitModuleTest):
             course.advertised_start, "Fall 2013",
             "advertised_start"
         )
-        self.assertEqual(len(course.children), 3, "children")
+        self.assertEqual(len(course.children), 4, "children")
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
@@ -735,7 +735,7 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(course.tabs), 6)
         self.assertEqual(course.display_name, "The Ancient Greek Hero")
         self.assertEqual(course.advertised_start, "Fall 2013")
-        self.assertEqual(len(course.children), 3)
+        self.assertEqual(len(course.children), 4)
         # check dates and graders--forces loading of descriptor
         self.assertEqual(course.edited_by, "testassist@edx.org")
         self.assertDictEqual(course.grade_cutoffs, {"Pass": 0.45})
@@ -1103,7 +1103,7 @@ class SplitModuleItemTests(SplitModuleTest):
             self.assertEqual(len(block.tabs), 6, "wrong number of tabs")
             self.assertEqual(block.display_name, "The Ancient Greek Hero")
             self.assertEqual(block.advertised_start, "Fall 2013")
-            self.assertEqual(len(block.children), 3)
+            self.assertEqual(len(block.children), 4)
             # check dates and graders--forces loading of descriptor
             self.assertEqual(block.edited_by, "testassist@edx.org")
             self.assertDictEqual(
@@ -1253,7 +1253,7 @@ class SplitModuleItemTests(SplitModuleTest):
         block = modulestore().get_item(locator)
         children = block.get_children()
         expected_ids = [
-            "chapter1", "chapter2", "chapter3"
+            "chapter1", "chap", "chapter2", "chapter3"
         ]
         for child in children:
             self.assertEqual(child.category, "chapter")

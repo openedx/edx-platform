@@ -1205,7 +1205,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             for block_id, block in course.structure['blocks'].iteritems():
                 # Don't do an in comparison blindly; first check to make sure
                 # that the name qualifier we're looking at isn't a plain string;
-                # if it is a string, then it should match exactly.
+                # if it is a string, then it should match exactly. If it's other
+                # than a string, we check whether it contains the block ID; this
+                # is so a list or other iterable can be passed with multiple
+                # valid qualifiers.
                 if isinstance(block_name, six.string_types):
                     name_matches = block_id.id == block_name
                 else:
