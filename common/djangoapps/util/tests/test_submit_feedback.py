@@ -17,14 +17,13 @@ from student.tests.test_configuration_overrides import fake_get_value
 from student.tests.factories import CourseEnrollmentFactory
 
 TEST_SUPPORT_EMAIL = "support@example.com"
-TEST_ZENDESK_CUSTOM_FIELD_CONFIG = { "course_id": 1234, "enrollment_mode": 5678 }
+TEST_ZENDESK_CUSTOM_FIELD_CONFIG = {"course_id": 1234, "enrollment_mode": 5678}
 TEST_REQUEST_HEADERS = {
     "HTTP_REFERER": "test_referer",
     "HTTP_USER_AGENT": "test_user_agent",
     "REMOTE_ADDR": "1.2.3.4",
     "SERVER_NAME": "test_server",
 }
-
 
 def fake_support_backend_values(name, default=None):  # pylint: disable=unused-argument
     """
@@ -35,7 +34,6 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
         "email_from_address": TEST_SUPPORT_EMAIL,
     }
     return config_dict[name]
-
 
 @ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
@@ -71,7 +69,6 @@ class SubmitFeedbackTest(TestCase):
         # This does not contain issue_type nor course_id to ensure that they are optional
         self._auth_fields = {"subject": "a subject", "details": "some details"}
 
-
     def _build_and_run_request(self, user, fields):
         """
         Generate a request and invoke the view, returning the response.
@@ -90,7 +87,6 @@ class SubmitFeedbackTest(TestCase):
         req.user = user
         return views.submit_feedback(req)
 
-
     def _assert_bad_request(self, response, field, zendesk_mock_class, datadog_mock):
         """
         Assert that the given `response` contains correct failure data.
@@ -107,7 +103,6 @@ class SubmitFeedbackTest(TestCase):
         self.assertFalse(zendesk_mock_class.return_value.mock_calls)
         self.assertFalse(datadog_mock.mock_calls)
 
-
     def _test_bad_request_omit_field(self, user, fields, omit_field, zendesk_mock_class, datadog_mock):
         """
         Invoke the view with a request missing a field and assert correctness.
@@ -121,7 +116,6 @@ class SubmitFeedbackTest(TestCase):
         filtered_fields = {k: v for (k, v) in fields.items() if k != omit_field}
         resp = self._build_and_run_request(user, filtered_fields)
         self._assert_bad_request(resp, omit_field, zendesk_mock_class, datadog_mock)
-
 
     def _test_bad_request_empty_field(self, user, fields, empty_field, zendesk_mock_class, datadog_mock):
         """
@@ -138,7 +132,6 @@ class SubmitFeedbackTest(TestCase):
         resp = self._build_and_run_request(user, altered_fields)
         self._assert_bad_request(resp, empty_field, zendesk_mock_class, datadog_mock)
 
-
     def _test_success(self, user, fields):
         """
         Generate a request, invoke the view, and assert success.
@@ -149,7 +142,6 @@ class SubmitFeedbackTest(TestCase):
         """
         resp = self._build_and_run_request(user, fields)
         self.assertEqual(resp.status_code, 200)
-
 
     def _build_zendesk_ticket(self, recipient, name, email, subject, details, tags, custom_fields=None):
         """
@@ -170,7 +162,6 @@ class SubmitFeedbackTest(TestCase):
             ticket["ticket"]["custom_fields"] = custom_fields
 
         return ticket
-
 
     def _build_zendesk_ticket_update(self, request_headers, username=None):
         """
@@ -194,32 +185,27 @@ class SubmitFeedbackTest(TestCase):
             body.append("{}: {}".format(text, request_headers[header]))
 
         body = "Additional information:\n\n" + "\n".join(body)
-        return { "ticket": { "comment": { "public": False, "body": body } } }
-
+        return {"ticket": {"comment": {"public": False, "body": body}}}
 
     def _assert_zendesk_called(self, zendesk_mock, ticket_id, ticket, ticket_update):
         """Assert that Zendesk was called with the correct ticket and ticket_update."""
         expected_zendesk_calls = [mock.call.create_ticket(ticket), mock.call.update_ticket(ticket_id, ticket_update)]
         self.assertEqual(zendesk_mock.mock_calls, expected_zendesk_calls)
 
-
     def _assert_datadog_called(self, datadog_mock, tags):
         """Assert that datadog was called with the correct tags."""
         expected_datadog_calls = [mock.call.increment(views.DATADOG_FEEDBACK_METRIC, tags=tags)]
         self.assertEqual(datadog_mock.mock_calls, expected_datadog_calls)
-
 
     def test_bad_request_anon_user_no_name(self, zendesk_mock_class, datadog_mock):
         """Test a request from an anonymous user not specifying `name`."""
         self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "name", zendesk_mock_class, datadog_mock)
         self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "name", zendesk_mock_class, datadog_mock)
 
-
     def test_bad_request_anon_user_no_email(self, zendesk_mock_class, datadog_mock):
         """Test a request from an anonymous user not specifying `email`."""
         self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "email", zendesk_mock_class, datadog_mock)
         self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "email", zendesk_mock_class, datadog_mock)
-
 
     def test_bad_request_anon_user_invalid_email(self, zendesk_mock_class, datadog_mock):
         """Test a request from an anonymous user specifying an invalid `email`."""
@@ -228,18 +214,15 @@ class SubmitFeedbackTest(TestCase):
         resp = self._build_and_run_request(self._anon_user, fields)
         self._assert_bad_request(resp, "email", zendesk_mock_class, datadog_mock)
 
-
     def test_bad_request_anon_user_no_subject(self, zendesk_mock_class, datadog_mock):
         """Test a request from an anonymous user not specifying `subject`."""
         self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "subject", zendesk_mock_class, datadog_mock)
         self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "subject", zendesk_mock_class, datadog_mock)
 
-
     def test_bad_request_anon_user_no_details(self, zendesk_mock_class, datadog_mock):
         """Test a request from an anonymous user not specifying `details`."""
         self._test_bad_request_omit_field(self._anon_user, self._anon_fields, "details", zendesk_mock_class, datadog_mock)
         self._test_bad_request_empty_field(self._anon_user, self._anon_fields, "details", zendesk_mock_class, datadog_mock)
-
 
     def test_valid_request_anon_user(self, zendesk_mock_class, datadog_mock):
         """
@@ -269,7 +252,6 @@ class SubmitFeedbackTest(TestCase):
         self._test_success(user, fields)
         self._assert_zendesk_called(zendesk_mock_instance, ticket_id, ticket, ticket_update)
         self._assert_datadog_called(datadog_mock, ["issue_type:{}".format(fields["issue_type"])])
-
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_get_value)
     def test_valid_request_anon_user_configuration_override(self, zendesk_mock_class, datadog_mock):
@@ -301,7 +283,6 @@ class SubmitFeedbackTest(TestCase):
         self._test_success(user, fields)
         self._assert_zendesk_called(zendesk_mock_instance, ticket_id, ticket, ticket_update)
         self._assert_datadog_called(datadog_mock, ["issue_type:{}".format(fields["issue_type"])])
-
 
     @data("course-v1:testOrg+testCourseNumber+testCourseRun", "", None)
     @override_settings(ZENDESK_CUSTOM_FIELDS=TEST_ZENDESK_CUSTOM_FIELD_CONFIG)
@@ -348,22 +329,19 @@ class SubmitFeedbackTest(TestCase):
 
         ticket_update = self._build_zendesk_ticket_update(TEST_REQUEST_HEADERS)
 
-        self._test_success(self._anon_user, fields)
+        self._test_success(user, fields)
         self._assert_zendesk_called(zendesk_mock_instance, ticket_id, ticket, ticket_update)
         self._assert_datadog_called(datadog_mock, datadog_tags)
-
 
     def test_bad_request_auth_user_no_subject(self, zendesk_mock_class, datadog_mock):
         """Test a request from an authenticated user not specifying `subject`."""
         self._test_bad_request_omit_field(self._auth_user, self._auth_fields, "subject", zendesk_mock_class, datadog_mock)
         self._test_bad_request_empty_field(self._auth_user, self._auth_fields, "subject", zendesk_mock_class, datadog_mock)
 
-
     def test_bad_request_auth_user_no_details(self, zendesk_mock_class, datadog_mock):
         """Test a request from an authenticated user not specifying `details`."""
         self._test_bad_request_omit_field(self._auth_user, self._auth_fields, "details", zendesk_mock_class, datadog_mock)
         self._test_bad_request_empty_field(self._auth_user, self._auth_fields, "details", zendesk_mock_class, datadog_mock)
-
 
     def test_valid_request_auth_user(self, zendesk_mock_class, datadog_mock):
         """
@@ -393,7 +371,6 @@ class SubmitFeedbackTest(TestCase):
         self._test_success(user, fields)
         self._assert_zendesk_called(zendesk_mock_instance, ticket_id, ticket, ticket_update)
         self._assert_datadog_called(datadog_mock, [])
-
 
     @data(
         ("course-v1:testOrg+testCourseNumber+testCourseRun", True),
@@ -461,7 +438,6 @@ class SubmitFeedbackTest(TestCase):
         self._assert_zendesk_called(zendesk_mock_instance, ticket_id, ticket, ticket_update)
         self._assert_datadog_called(datadog_mock, datadog_tags)
 
-
     def test_get_request(self, zendesk_mock_class, datadog_mock):
         """Test that a GET results in a 405 even with all required fields"""
         req = self._request_factory.get("/submit_feedback", data=self._anon_fields)
@@ -473,7 +449,6 @@ class SubmitFeedbackTest(TestCase):
         # There should be absolutely no interaction with Zendesk
         self.assertFalse(zendesk_mock_class.mock_calls)
         self.assertFalse(datadog_mock.mock_calls)
-
 
     def test_zendesk_error_on_create(self, zendesk_mock_class, datadog_mock):
         """
@@ -488,7 +463,6 @@ class SubmitFeedbackTest(TestCase):
         self.assertEqual(resp.status_code, 500)
         self.assertFalse(resp.content)
         self._assert_datadog_called(datadog_mock, ["issue_type:{}".format(self._anon_fields["issue_type"])])
-
 
     def test_zendesk_error_on_update(self, zendesk_mock_class, datadog_mock):
         """
@@ -505,7 +479,6 @@ class SubmitFeedbackTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self._assert_datadog_called(datadog_mock, ["issue_type:{}".format(self._anon_fields["issue_type"])])
 
-
     @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": False})
     def test_not_enabled(self, zendesk_mock_class, datadog_mock):
         """
@@ -515,7 +488,6 @@ class SubmitFeedbackTest(TestCase):
         """
         with self.assertRaises(Http404):
             self._build_and_run_request(self._anon_user, self._anon_fields)
-
 
     def test_zendesk_not_configured(self, zendesk_mock_class, datadog_mock):
         """
@@ -533,7 +505,6 @@ class SubmitFeedbackTest(TestCase):
         test_case("django.conf.settings.ZENDESK_USER")
         test_case("django.conf.settings.ZENDESK_API_KEY")
 
-
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_support_backend_values)
     def test_valid_request_over_email(self, zendesk_mock_class, datadog_mock):  # pylint: disable=unused-argument
         with mock.patch("util.views.send_mail") as patched_send_email:
@@ -541,7 +512,6 @@ class SubmitFeedbackTest(TestCase):
             self.assertEqual(patched_send_email.call_count, 1)
             self.assertIn(self._anon_fields["email"], str(patched_send_email.call_args))
         self.assertEqual(resp.status_code, 200)
-
 
     @mock.patch("openedx.core.djangoapps.site_configuration.helpers.get_value", fake_support_backend_values)
     def test_exception_request_over_email(self, zendesk_mock_class, datadog_mock):  # pylint: disable=unused-argument
