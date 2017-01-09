@@ -41,7 +41,8 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
     DEFAULT_FROM_EMAIL=TEST_SUPPORT_EMAIL,
     ZENDESK_URL="dummy",
     ZENDESK_USER="dummy",
-    ZENDESK_API_KEY="dummy"
+    ZENDESK_API_KEY="dummy",
+    ZENDESK_CUSTOM_FIELDS={}
 )
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
