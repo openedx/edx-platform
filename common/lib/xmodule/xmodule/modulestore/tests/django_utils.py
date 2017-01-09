@@ -55,7 +55,7 @@ def mixed_store_config(data_dir, mappings, store_order=None):
             to use in creating courses.
     """
     if store_order is None:
-        store_order = [StoreConstructors.draft, StoreConstructors.split]
+        store_order = [StoreConstructors.split, StoreConstructors.draft]
 
     store_constructors = {
         StoreConstructors.split: split_mongo_store_config(data_dir)['default'],
