@@ -33,8 +33,12 @@ class TestLazyMod(unittest.TestCase):
         self.addCleanup(ModuleIsolation().clean_up)
 
     def test_simple(self):
-        # Import some stdlib module that has not been imported before
-        self.assertNotIn("colorsys", sys.modules)
+        # Import some stdlib module that has not been imported before.
+        self.assertNotIn(
+            "colorsys",
+            sys.modules,
+            "Found colorsys in sys.modules: {!r}".format(sys.modules.get("colorsys")),
+        )
         colorsys = LazyModule("colorsys")
         hsv = colorsys.rgb_to_hsv(.3, .4, .2)
         self.assertEqual(hsv[0], 0.25)
@@ -42,7 +46,11 @@ class TestLazyMod(unittest.TestCase):
     def test_dotted(self):
         # wsgiref is a module with submodules that is not already imported.
         # Any similar module would do. This test demonstrates that the module
-        # is not already im
-        self.assertNotIn("wsgiref.util", sys.modules)
+        # is not already imported.
+        self.assertNotIn(
+            "wsgiref.util",
+            sys.modules,
+            "Found wsgiref.util in sys.modules: {!r}".format(sys.modules.get("wsgiref.util")),
+        )
         wsgiref_util = LazyModule("wsgiref.util")
         self.assertEqual(wsgiref_util.guess_scheme({}), "http")
