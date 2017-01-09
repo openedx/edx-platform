@@ -146,7 +146,7 @@ def _has_database_updated_with_new_score(
         if api_score is None:
             # Same case as the initial 'if' above, for submissions-specific scores
             return score_deleted
-        reported_modified_time = api_score.created_at
+        reported_modified_time = api_score['created_at']
     else:
         reported_modified_time = score.modified
 

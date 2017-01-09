@@ -236,6 +236,18 @@ class RecalculateSubsectionGradeTest(ModuleStoreTestCase):
         self._assert_retry_called(mock_retry)
 
     @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
+    def test_retry_subsection_grade_on_update_not_complete_sub(self, mock_retry):
+        self.set_up_course()
+        with patch('lms.djangoapps.grades.tasks.sub_api.get_score') as mock_sub_score:
+            mock_sub_score.return_value = {
+                'created_at': datetime.utcnow().replace(tzinfo=pytz.UTC) - timedelta(days=1)
+            }
+            self._apply_recalculate_subsection_grade(
+                mock_score=MagicMock(module_type='openassessment')
+            )
+        self._assert_retry_called(mock_retry)
+
+    @patch('lms.djangoapps.grades.tasks.recalculate_subsection_grade_v2.retry')
     def test_retry_subsection_grade_on_no_score(self, mock_retry):
         self.set_up_course()
         self._apply_recalculate_subsection_grade(mock_score=None)
