@@ -25,6 +25,7 @@ TEST_REQUEST_HEADERS = {
     "SERVER_NAME": "test_server",
 }
 
+
 def fake_support_backend_values(name, default=None):  # pylint: disable=unused-argument
     """
     Method for getting configuration override values for support email.
@@ -34,6 +35,7 @@ def fake_support_backend_values(name, default=None):  # pylint: disable=unused-a
         "email_from_address": TEST_SUPPORT_EMAIL,
     }
     return config_dict[name]
+
 
 @ddt
 @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
