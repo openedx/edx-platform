@@ -76,6 +76,17 @@ PIPELINE_JS_COMPRESSOR = None
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
+BLOCK_STRUCTURES_SETTINGS = dict(
+    # We have CELERY_ALWAYS_EAGER set to True, so there's no asynchronous
+    # code running and the celery routing is unimportant.
+    # It does not make sense to retry.
+    BLOCK_STRUCTURES_TASK_MAX_RETRIES=0,
+    # course publish task delay is irrelevant is because the task is run synchronously
+    BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY=0,
+    # retry delay is irrelevent because we never retry
+    BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY=0,
+)
+
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
