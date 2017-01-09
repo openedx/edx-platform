@@ -718,16 +718,14 @@
                 ).toEqual(newCommentsOnUnreadThread + ' new');
             });
 
-            it('should display every thread as read if profilePage is passed to the constructor', function() {
-                // @TODO: This is temporary, see comment in DiscussionThreadListView.prototype.renderThread
-                this.view = makeView(new Discussion(this.threads), {profilePage: true});
+            it('should display every thread as read if hideReadState: true is passed to the constructor', function() {
+                this.view = makeView(new Discussion(this.threads), {hideReadState: true});
                 this.view.render();
                 expect(this.view.$('.never-read').length).toEqual(0);
             });
 
-            it('does not show the "x new" indicator for any thread if profilePage is passed', function() {
-                // @TODO: This is temporary, see comment in DiscussionThreadListView.prototype.renderThread
-                this.view = makeView(new Discussion(this.threads), {profilePage: true});
+            it('does not show the "x new" indicator for any thread if hideReadState: true is passed', function() {
+                this.view = makeView(new Discussion(this.threads), {hideReadState: true});
                 this.view.render();
                 expect(this.view.$('.forum-nav-thread-unread-comments-count').length).toEqual(0);
             });
