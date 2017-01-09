@@ -145,10 +145,7 @@ def attach_program_detail_url(programs):
         list, containing extended program dicts
     """
     for program in programs:
-        base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
-        slug = slugify(program['name'])
-
-        program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
+        program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
     return programs
 

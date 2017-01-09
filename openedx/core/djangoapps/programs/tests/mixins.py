@@ -10,7 +10,7 @@ from openedx.core.djangoapps.programs.tests import factories
 class ProgramsApiConfigMixin(object):
     """Utilities for working with Programs configuration during testing."""
 
-    DEFAULTS = {
+    PROGRAMS_API_CONFIG_DEFAULTS = {
         'enabled': True,
         'api_version_number': 1,
         'internal_service_url': 'http://internal.programs.org/',
@@ -25,7 +25,7 @@ class ProgramsApiConfigMixin(object):
 
     def create_programs_config(self, **kwargs):
         """Creates a new ProgramsApiConfig with DEFAULTS, updated with any provided overrides."""
-        fields = dict(self.DEFAULTS, **kwargs)
+        fields = dict(self.PROGRAMS_API_CONFIG_DEFAULTS, **kwargs)
         ProgramsApiConfig(**fields).save()
 
         return ProgramsApiConfig.current()

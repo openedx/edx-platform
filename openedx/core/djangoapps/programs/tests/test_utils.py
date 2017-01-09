@@ -344,10 +344,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
     def _attach_detail_url(self, programs):
         """Add expected detail URLs to a list of program dicts."""
         for program in programs:
-            base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
-            slug = slugify(program['name'])
-
-            program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
+            program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
     def test_no_enrollments(self):
         """Verify behavior when programs exist, but no relevant enrollments do."""

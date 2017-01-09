@@ -1,4 +1,6 @@
 """Factories for generating fake program-related data."""
+from uuid import uuid4
+
 import factory
 from factory.fuzzy import FuzzyText
 
@@ -7,6 +9,7 @@ class Program(factory.Factory):
     """
     Factory for stubbing program resources from the Programs API (v1).
     """
+
     class Meta(object):
         model = dict
 
@@ -20,11 +23,18 @@ class Program(factory.Factory):
     course_codes = []
     banner_image_urls = {}
 
+    @factory.lazy_attribute
+    def uuid(self):  # pylint: disable=missing-docstring
+        # NOTE (CCB): We return a string here since nearly all of our tests will be testing for that
+        # data type rather than UUID.
+        return uuid4().hex
+
 
 class Organization(factory.Factory):
     """
     Factory for stubbing nested organization resources from the Programs API (v1).
     """
+
     class Meta(object):
         model = dict
 
@@ -36,6 +46,7 @@ class CourseCode(factory.Factory):
     """
     Factory for stubbing nested course code resources from the Programs API (v1).
     """
+
     class Meta(object):
         model = dict
 
@@ -47,6 +58,7 @@ class RunMode(factory.Factory):
     """
     Factory for stubbing nested run mode resources from the Programs API (v1).
     """
+
     class Meta(object):
         model = dict
 
@@ -58,6 +70,7 @@ class Progress(factory.Factory):
     """
     Factory for stubbing program progress dicts.
     """
+
     class Meta(object):
         model = dict
 
