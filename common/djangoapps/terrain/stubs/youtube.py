@@ -101,7 +101,8 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 # We need to do this every time because Google sometimes sends different responses
                 # as part of their own experiments, which has caused our tests to become "flaky"
                 self.log_message("Getting iframe api from youtube.com")
-                iframe_api_response = requests.get('https://www.youtube.com/iframe_api').content.strip("\n").replace('vflGEorTa', 'vflcGItZc')
+                iframe_api_response = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
+                iframe_api_response = iframe_api_response.replace('vflcGItZc', 'vflGEorTa')
 
                 self.send_response(200, content=iframe_api_response, headers={'Content-type': 'text/html'})
 
