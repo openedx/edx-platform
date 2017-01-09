@@ -2,7 +2,8 @@
 
 from codejail.safe_exec import safe_exec as codejail_safe_exec
 from codejail.safe_exec import not_safe_exec as codejail_not_safe_exec
-from codejail.safe_exec import json_safe, SafeExecException
+from codejail.safe_exec import fake_safe_exec
+from codejail.safe_exec import configure_python, json_safe, JailError, SafeExecException
 from . import lazymod
 from dogapi import dog_stats_api
 
@@ -45,6 +46,14 @@ for name, modname in ASSUMED_IMPORTS:
     LAZY_IMPORTS.append("{} = LazyModule('{}')\n".format(name, modname))
 
 LAZY_IMPORTS = "".join(LAZY_IMPORTS)
+
+
+# Make sure CodeJail is ready for us. If we can't configure it, use an unsafe
+# executor that warns about being unsafe.
+try:
+    configure_python()
+except JailError:
+    codejail_safe_exec = fake_safe_exec         # pylint: disable=invalid-name
 
 
 def update_hash(hasher, obj):
