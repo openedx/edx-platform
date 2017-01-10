@@ -12,6 +12,7 @@ from lazy import lazy
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
 from lms.djangoapps.grades.config.models import PersistentGradesEnabledFlag
+from openedx.core.djangoapps.content.block_structure.api import get_block_structure_manager
 from openedx.core.djangoapps.signals.signals import COURSE_GRADE_CHANGED
 from xmodule import block_metadata_utils
 
@@ -323,17 +324,23 @@ class CourseGradeFactory(object):
     """
     Factory class to create Course Grade objects
     """
-    def create(self, student, course, read_only=True):
+    def create(self, student, course, collected_block_structure=None, read_only=True):
         """
         Returns the CourseGrade object for the given student and course.
 
         If read_only is True, doesn't save any updates to the grades.
         Raises a PermissionDenied if the user does not have course access.
         """
-        course_structure = get_course_blocks(student, course.location)
+        course_structure = get_course_blocks(
+            student,
+            course.location,
+            collected_block_structure=collected_block_structure,
+        )
+
         # if user does not have access to this course, throw an exception
         if not self._user_has_access_to_course(course_structure):
             raise PermissionDenied("User does not have access to this course")
+
         return (
             self._get_saved_grade(student, course, course_structure) or
             self._compute_and_update_grade(student, course, course_structure, read_only)
@@ -351,11 +358,17 @@ class CourseGradeFactory(object):
         If an error occurred, course_grade will be None and err_msg will be an
         exception message. If there was no error, err_msg is an empty string.
         """
+        # Pre-fetch the collected course_structure so:
+        # 1. Correctness: the same version of the course is used to
+        #    compute the grade for all students.
+        # 2. Optimization: the collected course_structure is not
+        #    retrieved from the data store multiple times.
+
+        collected_block_structure = get_block_structure_manager(course.id).get_collected()
         for student in students:
             with dog_stats_api.timer('lms.grades.CourseGradeFactory.iter', tags=[u'action:{}'.format(course.id)]):
-
                 try:
-                    course_grade = CourseGradeFactory().create(student, course)
+                    course_grade = CourseGradeFactory().create(student, course, collected_block_structure)
                     yield self.GradeResult(student, course_grade, "")
 
                 except Exception as exc:  # pylint: disable=broad-except
