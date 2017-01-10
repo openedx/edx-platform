@@ -16,6 +16,7 @@
 'video/01_initialize.js',
 ['video/03_video_player.js', 'video/00_i18n.js', 'moment', 'underscore'],
 function(VideoPlayer, i18n, moment, _) {
+    var moment = moment || window.moment;
     /**
      * @function
      *

@@ -33,6 +33,11 @@
     }
     requirejs.config({
         baseUrl: '/base/',
+        config: {
+            moment: {
+                wrapShim: true
+            }
+        },
         paths: {
             moment: 'xmodule_js/common_static/common/js/vendor/moment-with-locales',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
