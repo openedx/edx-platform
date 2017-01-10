@@ -105,6 +105,9 @@ class OLIAnalyticsBackend(BaseBackend):
             LOG.info('max_grade attribute missing from event for OLI service')
             return None
 
+        # This is supplied by the StatTutor Xblock.
+        problem_question_name = event_data.get('problem_question_name')
+
         timestamp = event.get('time')
         if not timestamp:
             LOG.info('time attribute missing from event for OLI service')
@@ -126,6 +129,7 @@ class OLIAnalyticsBackend(BaseBackend):
                 'max_grade': max_grade,
                 'timestamp': timestamp.isoformat(),
                 'problem_text': problem_text,
+                'problem_question_name': problem_question_name,
             },
         })
 
