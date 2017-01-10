@@ -1765,7 +1765,8 @@ def create_account_with_params(request, params):
         not (
             third_party_provider and third_party_provider.skip_email_verification and
             user.email == running_pipeline['kwargs'].get('details', {}).get('email')
-        )
+        ) and
+        "registered_from_amc" not in params  # don't need to activate email if the user already did that on AMC
     )
     if send_email:
         context = {
