@@ -295,11 +295,13 @@
                     // Set global variables that the util code is expecting to be defined
                     require([  // eslint-disable-line global-require
                         'edx-ui-toolkit/js/utils/html-utils',
-                        'edx-ui-toolkit/js/utils/string-utils'
-                    ], function(HtmlUtils, StringUtils) {
+                        'edx-ui-toolkit/js/utils/string-utils',
+                        'edx-ui-toolkit/js/utils/date-utils'
+                    ], function(HtmlUtils, StringUtils, DateUtils) {
                         window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
+                        window.edx.DateUtils = DateUtils;
                     });
                 }
             },
@@ -392,13 +394,15 @@
                         'underscore',
                         'underscore.string',
                         'edx-ui-toolkit/js/utils/html-utils',
-                        'edx-ui-toolkit/js/utils/string-utils'
-                    ], function(_, str, HtmlUtils, StringUtils) {
+                        'edx-ui-toolkit/js/utils/string-utils',
+                        'edx-ui-toolkit/js/utils/date-utils'
+                    ], function(_, str, HtmlUtils, StringUtils, DateUtils) {
                         window._ = _;
                         window._.str = str;
                         window.edx = window.edx || {};
                         window.edx.HtmlUtils = HtmlUtils;
                         window.edx.StringUtils = StringUtils;
+                        window.edx.DateUtils = DateUtils;
                     });
                 }
             },
@@ -537,14 +541,16 @@
                             'backbone',
                             'URI',
                             'edx-ui-toolkit/js/utils/html-utils',
-                            'edx-ui-toolkit/js/utils/string-utils'
+                            'edx-ui-toolkit/js/utils/string-utils',
+                            'edx-ui-toolkit/js/utils/date-utils'
                         ],
-                        function(Backbone, URI, HtmlUtils, StringUtils) {
+                        function(Backbone, URI, HtmlUtils, StringUtils, DateUtils) {
                             window.Backbone = Backbone;
                             window.URI = URI;
                             window.edx = window.edx || {};
                             window.edx.HtmlUtils = HtmlUtils;
                             window.edx.StringUtils = StringUtils;
+                            window.edx.DateUtils = DateUtils;
                         }
                     );
                 }

@@ -49,6 +49,7 @@
         // Add the UI Toolkit helper classes that have been installed in the 'edx' namespace
         defineDependency('edx.HtmlUtils', 'edx-ui-toolkit/js/utils/html-utils');
         defineDependency('edx.StringUtils', 'edx-ui-toolkit/js/utils/string-utils');
+        defineDependency('edx.DateUtils', 'edx-ui-toolkit/js/utils/date-utils');
 
         // utility.js adds two functions to the window object, but does not return anything
         defineDependency('isExternal', 'utility', true);
