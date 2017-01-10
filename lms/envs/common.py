@@ -1281,6 +1281,7 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/global-loader.js',
     'edx-ui-toolkit/js/utils/string-utils.js',
     'edx-ui-toolkit/js/utils/html-utils.js',
+    'edx-ui-toolkit/js/utils/date-utils.js',
 
     # Finally load RequireJS and dependent vendor libraries
     'common/js/vendor/require.js',
