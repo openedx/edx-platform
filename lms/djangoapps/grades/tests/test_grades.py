@@ -12,6 +12,7 @@ from courseware.model_data import set_score
 from courseware.tests.helpers import LoginEnrollmentTestCase
 
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from openedx.core.lib.block_structure.factory import BlockStructureFactory
 from openedx.core.djangolib.testing.utils import get_mock_request
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -68,7 +69,14 @@ class TestGradeIteration(SharedModuleStoreTestCase):
         """
         No students have grade entries.
         """
-        all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
+        with patch.object(
+            BlockStructureFactory,
+            'create_from_cache',
+            wraps=BlockStructureFactory.create_from_cache
+        ) as mock_create_from_cache:
+            all_course_grades, all_errors = self._course_grades_and_errors_for(self.course, self.students)
+            self.assertEquals(mock_create_from_cache.call_count, 1)
+
         self.assertEqual(len(all_errors), 0)
         for course_grade in all_course_grades.values():
             self.assertIsNone(course_grade.letter_grade)
