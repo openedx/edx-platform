@@ -47,7 +47,7 @@ from social.exceptions import AuthException, AuthAlreadyAssociated
 from edxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
-from organizations.models import Organization
+from organizations.models import Organization, UserOrganizationMapping
 from shoppingcart.api import order_history
 from student.models import (
     Registration, UserProfile,
@@ -1738,6 +1738,14 @@ def create_account_with_params(request, params):
 
     create_comments_service_user(user)
 
+    # APPSEMBLER SPECIFIC
+    organization = params.get('organization')
+    try:
+        organization = Organization.objects.get(name=organization)
+        UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_active=True)
+    except:
+        pass
+
     # Don't send email if we are:
     #
     # 1. Doing load testing.
@@ -1788,15 +1796,6 @@ def create_account_with_params(request, params):
     else:
         registration.activate()
         _enroll_user_in_pending_courses(user)  # Enroll student in any pending courses
-
-
-    # APPSEMBLER SPECIFIC
-    organization = params.get('organization')
-    try:
-        organization = Organization.objects.get(name=organization)
-        organization.users.add(user)
-    except:
-        pass
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
