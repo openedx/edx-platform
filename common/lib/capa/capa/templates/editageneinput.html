@@ -11,7 +11,7 @@
     <input type="hidden" name="genex_problem_number" id="genex_problem_number" value ="${genex_problem_number}"></input>
     <input type="hidden" name="input_${id}" aria-describedby="answer_${id}" id="input_${id}" value="${value|h}"/>
 
-    <p class="status" aria-describedby="input_${id}">
+    <p class="indicator-container" aria-describedby="input_${id}">
         <%include file="status_span.html" args="status=status, status_id=id"/>
     </p>
 

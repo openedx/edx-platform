@@ -43,9 +43,9 @@
   <br/>
     <p id="answer_${id}" class="answer"></p>
 
-    <p class="status">
-      <%include file="status_span.html" args="status=status, status_id=id"/>
-    </p>
+    <div class="indicator-container">
+        <%include file="status_span.html" args="status=status, status_id=id"/>
+    </div>
 
     <div class="error_message" style="padding: 5px 5px 5px 5px; background-color:#FA6666; height:60px;width:400px; display: none"></div>
 

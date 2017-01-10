@@ -5,6 +5,7 @@ This module contains tasks for asynchronous execution of grade updates.
 from celery import task
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db.utils import DatabaseError
 from logging import getLogger
 
@@ -29,6 +30,8 @@ from .signals.signals import SUBSECTION_SCORE_CHANGED
 from .transformer import GradesTransformer
 
 log = getLogger(__name__)
+
+KNOWN_RETRY_ERRORS = (DatabaseError, ValidationError)  # Errors we expect occasionally, should be resolved on retry
 
 
 @task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
@@ -72,41 +75,46 @@ def recalculate_subsection_grade_v2(**kwargs):
         event_transaction_type(string): human-readable type of the
             event at the root of the current event transaction.
     """
-    course_key = CourseLocator.from_string(kwargs['course_id'])
-    if not PersistentGradesEnabledFlag.feature_enabled(course_key):
-        return
+    try:
+        course_key = CourseLocator.from_string(kwargs['course_id'])
+        if not PersistentGradesEnabledFlag.feature_enabled(course_key):
+            return
 
-    score_deleted = kwargs['score_deleted']
-    scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
-    expected_modified_time = from_timestamp(kwargs['expected_modified_time'])
+        score_deleted = kwargs['score_deleted']
+        scored_block_usage_key = UsageKey.from_string(kwargs['usage_id']).replace(course_key=course_key)
+        expected_modified_time = from_timestamp(kwargs['expected_modified_time'])
 
-    # The request cache is not maintained on celery workers,
-    # where this code runs. So we take the values from the
-    # main request cache and store them in the local request
-    # cache. This correlates model-level grading events with
-    # higher-level ones.
-    set_event_transaction_id(kwargs.pop('event_transaction_id', None))
-    set_event_transaction_type(kwargs.pop('event_transaction_type', None))
+        # The request cache is not maintained on celery workers,
+        # where this code runs. So we take the values from the
+        # main request cache and store them in the local request
+        # cache. This correlates model-level grading events with
+        # higher-level ones.
+        set_event_transaction_id(kwargs.pop('event_transaction_id', None))
+        set_event_transaction_type(kwargs.pop('event_transaction_type', None))
 
-    # Verify the database has been updated with the scores when the task was
-    # created. This race condition occurs if the transaction in the task
-    # creator's process hasn't committed before the task initiates in the worker
-    # process.
-    if not _has_database_updated_with_new_score(
-            kwargs['user_id'], scored_block_usage_key, expected_modified_time, score_deleted,
-    ):
-        raise _retry_recalculate_subsection_grade(**kwargs)
+        # Verify the database has been updated with the scores when the task was
+        # created. This race condition occurs if the transaction in the task
+        # creator's process hasn't committed before the task initiates in the worker
+        # process.
+        if not _has_database_updated_with_new_score(
+                kwargs['user_id'], scored_block_usage_key, expected_modified_time, score_deleted,
+        ):
+            raise _retry_recalculate_subsection_grade(**kwargs)
 
-    _update_subsection_grades(
-        course_key,
-        scored_block_usage_key,
-        kwargs['only_if_higher'],
-        kwargs['course_id'],
-        kwargs['user_id'],
-        kwargs['usage_id'],
-        kwargs['expected_modified_time'],
-        score_deleted,
-    )
+        _update_subsection_grades(
+            course_key,
+            scored_block_usage_key,
+            kwargs['only_if_higher'],
+            kwargs['user_id'],
+        )
+
+    except Exception as exc:   # pylint: disable=broad-except
+        if not isinstance(exc, KNOWN_RETRY_ERRORS):
+            log.info("tnl-6244 grades unexpected failure: {}. kwargs={}".format(
+                repr(exc),
+                kwargs
+            ))
+        raise _retry_recalculate_subsection_grade(exc=exc, **kwargs)
 
 
 def _has_database_updated_with_new_score(
@@ -138,7 +146,7 @@ def _has_database_updated_with_new_score(
         if api_score is None:
             # Same case as the initial 'if' above, for submissions-specific scores
             return score_deleted
-        reported_modified_time = api_score.created_at
+        reported_modified_time = api_score['created_at']
     else:
         reported_modified_time = score.modified
 
@@ -149,11 +157,7 @@ def _update_subsection_grades(
         course_key,
         scored_block_usage_key,
         only_if_higher,
-        course_id,
         user_id,
-        usage_id,
-        expected_modified_time,
-        score_deleted,
 ):
     """
     A helper function to update subsection grades in the database
@@ -174,31 +178,19 @@ def _update_subsection_grades(
         course = store.get_course(course_key, depth=0)
         subsection_grade_factory = SubsectionGradeFactory(student, course, course_structure)
 
-        try:
-            for subsection_usage_key in subsections_to_update:
-                if subsection_usage_key in course_structure:
-                    subsection_grade = subsection_grade_factory.update(
-                        course_structure[subsection_usage_key],
-                        only_if_higher,
-                    )
-                    SUBSECTION_SCORE_CHANGED.send(
-                        sender=recalculate_subsection_grade,
-                        course=course,
-                        course_structure=course_structure,
-                        user=student,
-                        subsection_grade=subsection_grade,
-                    )
-
-        except DatabaseError as exc:
-            raise _retry_recalculate_subsection_grade(
-                user_id,
-                course_id,
-                usage_id,
-                only_if_higher,
-                expected_modified_time,
-                score_deleted,
-                exc,
-            )
+        for subsection_usage_key in subsections_to_update:
+            if subsection_usage_key in course_structure:
+                subsection_grade = subsection_grade_factory.update(
+                    course_structure[subsection_usage_key],
+                    only_if_higher,
+                )
+                SUBSECTION_SCORE_CHANGED.send(
+                    sender=recalculate_subsection_grade,
+                    course=course,
+                    course_structure=course_structure,
+                    user=student,
+                    subsection_grade=subsection_grade,
+                )
 
 
 def _retry_recalculate_subsection_grade(
