@@ -30,6 +30,7 @@ from courseware.access_response import (
 from courseware.tests.factories import UserFactory
 from student import auth
 from student.models import CourseEnrollment
+from mobile_api.models import IgnoreMobileAvailableFlagConfig
 from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 
 
@@ -46,6 +47,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
         self.user = UserFactory.create()
         self.password = 'test'
         self.username = self.user.username
+        IgnoreMobileAvailableFlagConfig(enabled=False).save()
 
     def tearDown(self):
         super(MobileAPITestCase, self).tearDown()
@@ -188,11 +190,20 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
     @ddt.unpack
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_SITE': True})
     def test_non_mobile_available(self, role, should_succeed):
+        """
+        Tests that the MobileAvailabilityError() is raised for certain user
+        roles when trying to access course content. Also verifies that if
+        the IgnoreMobileAvailableFlagConfig is enabled,
+        MobileAvailabilityError() will not be raised for all user roles.
+        """
         self.init_course_access()
         # set mobile_available to False for the test course
         self.course.mobile_available = False
         self.store.update_item(self.course, self.user.id)
         self._verify_response(should_succeed, MobileAvailabilityError(), role)
+
+        IgnoreMobileAvailableFlagConfig(enabled=True).save()
+        self._verify_response(True, MobileAvailabilityError(), role)
 
     def test_unenrolled_user(self):
         self.login()
