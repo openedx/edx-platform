@@ -1,3 +1,7 @@
+"""
+Celery tasks used by cms_user_tasks
+"""
+
 import logging
 
 from celery.task import task

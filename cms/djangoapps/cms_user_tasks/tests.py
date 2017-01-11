@@ -132,7 +132,9 @@ class TestUserTaskStopped(APITestCase):
         """
         Check the signal receiver and email sending.
         """
-        self.artifact = UserTaskArtifact.objects.create(status=self.status, name='BASE_URL', url='https://test.edx.org/')
+        UserTaskArtifact.objects.create(
+            status=self.status, name='BASE_URL', url='https://test.edx.org/'
+        )
         user_task_stopped.send(sender=UserTaskStatus, status=self.status)
 
         subject = "Your {studio_name} task status".format(studio_name=settings.STUDIO_NAME)
