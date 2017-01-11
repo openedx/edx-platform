@@ -24,4 +24,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 MICROSITE_BACKEND = 'microsite_configuration.backends.database.DatabaseMicrositeBackend'
 
-DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context_processors.intercom',)
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',)
+
+INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
+INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")

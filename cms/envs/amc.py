@@ -9,6 +9,8 @@ INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
 )
 
+DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djangoapps.appsembler.intercom_integration.context_processors.intercom',)
+
 MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
 
 if MANDRILL_API_KEY:
@@ -17,6 +19,9 @@ if MANDRILL_API_KEY:
         "MANDRILL_API_KEY": MANDRILL_API_KEY,
     }
     INSTALLED_APPS += ("anymail",)
+
+INTERCOM_APP_ID = AUTH_TOKENS.get("INTERCOM_APP_ID")
+INTERCOM_APP_SECRET = AUTH_TOKENS.get("INTERCOM_APP_SECRET")
 
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 FEATURES['ENABLE_LIBRARY_INDEX'] = True
@@ -27,3 +32,4 @@ ELASTIC_FIELD_MAPPINGS = {
         "type": "date"
     }
 }
+
