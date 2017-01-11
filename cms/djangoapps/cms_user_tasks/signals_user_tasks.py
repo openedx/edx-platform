@@ -24,10 +24,12 @@ def task_ended_handler(sender, **kwargs):  # pylint: disable=unused-argument
     handlers.
 
     Arguments:
-        sender (obj): The user_tasks.models.UserTaskStatus object of the
-            completed task.
-        status (obj): The instance of the class for which the signal was
-            sent. Ex: CourseImportTask
+        sender (obj): Currently the UserTaskStatus object class
+        **kwargs: See below
+
+    Keywork Arguments:
+        status (obj): UserTaskStatus of the completed task
+
     Returns:
         None
     """

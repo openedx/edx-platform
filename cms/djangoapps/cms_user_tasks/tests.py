@@ -3,17 +3,17 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
-
 from uuid import uuid4
+
+from rest_framework.test import APITestCase
+from user_tasks.models import UserTaskArtifact, UserTaskStatus
+from user_tasks.serializers import ArtifactSerializer, StatusSerializer
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import override_settings
-from rest_framework.test import APITestCase
-from user_tasks.models import UserTaskArtifact, UserTaskStatus
-from user_tasks.serializers import ArtifactSerializer, StatusSerializer
 
 from cms_user_tasks.signals_user_tasks import user_task_stopped
 
