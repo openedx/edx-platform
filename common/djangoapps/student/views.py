@@ -1739,12 +1739,19 @@ def create_account_with_params(request, params):
     create_comments_service_user(user)
 
     # APPSEMBLER SPECIFIC
-    organization = params.get('organization')
-    try:
-        organization = Organization.objects.get(name=organization)
+    organization_name = params.get('organization')
+    organization = None
+    # organization name is passed during AMC signup, otherwise it's a regular signup on a microsite
+    if organization_name:
+        try:
+            organization = Organization.objects.get(name=organization_name)
+        except:
+            pass
+    else:
+        organization = request.site.organizations.first()
+
+    if organization:
         UserOrganizationMapping.objects.get_or_create(user=user, organization=organization, is_active=True)
-    except:
-        pass
 
     # Don't send email if we are:
     #
