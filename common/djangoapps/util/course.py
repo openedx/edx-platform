@@ -30,8 +30,6 @@ def get_link_for_about_page_from_cache(course_key, catalog_course_run=None):
     Returns the url to the course about page from already cached dict if marketing
     site is enabled else returns lms course about url.
     """
-    assert isinstance(course_key, CourseKey)
-
     if settings.FEATURES.get('ENABLE_MKTG_SITE') and catalog_course_run:
         marketing_url = catalog_course_run.get('marketing_url')
         if marketing_url:
