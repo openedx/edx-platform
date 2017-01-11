@@ -9,7 +9,7 @@ import logging
 
 from contentstore.views.item import create_xblock_info
 from contentstore.utils import reverse_library_url, add_instructor
-from django.http import HttpResponseNotAllowed, Http404
+from django.http import HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.conf import settings
@@ -29,7 +29,7 @@ from .component import get_component_templates, CONTAINER_TEMPLATES
 from student.auth import (
     STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
 )
-from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole
+from student.roles import CourseInstructorRole, CourseStaffRole, LibraryUserRole, CourseCreatorRole
 from util.json_request import expect_json, JsonResponse, JsonResponseBadRequest
 
 __all__ = ['library_handler', 'manage_library_users']
@@ -38,6 +38,21 @@ log = logging.getLogger(__name__)
 
 LIBRARIES_ENABLED = settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES', False)
 
+def _get_library_creator_status(user):
+    """
+    Helper method for returning the library creation status for a particular user,
+    taking into account the value LIBRARIES_ENABLED.
+
+    """
+
+    if not LIBRARIES_ENABLED:
+        return False
+    elif user.is_staff:
+        return True
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return CourseCreatorRole().has_user(user)
+    else:
+        return True
 
 @login_required
 @ensure_csrf_cookie
@@ -49,6 +64,11 @@ def library_handler(request, library_key_string=None):
     if not LIBRARIES_ENABLED:
         log.exception("Attempted to use the content library API when the libraries feature is disabled.")
         raise Http404  # Should never happen because we test the feature in urls.py also
+
+    if not _get_library_creator_status(request.user):
+        if not request.user.is_staff:
+            return HttpResponseForbidden()
+
 
     if library_key_string is not None and request.method == 'POST':
         return HttpResponseNotAllowed(("POST",))
