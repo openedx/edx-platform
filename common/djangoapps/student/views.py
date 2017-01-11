@@ -44,7 +44,6 @@ from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
 from social.exceptions import AuthException, AuthAlreadyAssociated
 
-from cms.djangoapps.course_creators.models import CourseCreator
 from edxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
@@ -1756,6 +1755,7 @@ def create_account_with_params(request, params):
 
     # allow users registered from AMC to create courses
     if "registered_from_amc" in params:
+        from cms.djangoapps.course_creators.models import CourseCreator
         CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
 
     # APPSEMBLER SPECIFIC END
