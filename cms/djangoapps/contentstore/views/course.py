@@ -26,7 +26,7 @@ from .component import (
     ADVANCED_COMPONENT_TYPES,
 )
 from .item import create_xblock_info
-from .library import LIBRARIES_ENABLED, _get_library_creator_status
+from .library import LIBRARIES_ENABLED
 from ccx_keys.locator import CCXLocator
 from contentstore.course_group_config import (
     COHORT_SCHEME,
@@ -467,10 +467,7 @@ def course_listing(request):
     List all courses available to the logged in user
     """
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
-    user = request.user
-    user_can_see_libraries =\
-        user.is_active and (user.is_staff or CourseCreatorRole().has_user(user))
-    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED and user_can_see_libraries else []
+    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
 
     programs_config = ProgramsApiConfig.current()
     raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
@@ -521,14 +518,14 @@ def course_listing(request):
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
         'libraries': [format_library_for_view(lib) for lib in libraries],
-        'show_new_library_button': _get_library_creator_status(user),
-        'user': user,
+        'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
+        'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
-        'course_creator_status': _get_course_creator_status(user),
-        'rerun_creator_status': GlobalStaff().has_user(user),
+        'course_creator_status': _get_course_creator_status(request.user),
+        'rerun_creator_status': GlobalStaff().has_user(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
-        'is_programs_enabled': programs_config.is_studio_tab_enabled and user.is_staff,
+        'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
         'programs': programs,
         'program_authoring_url': reverse('programs'),
     })
@@ -1634,7 +1631,6 @@ def _get_course_creator_status(user):
     If the user passed in has not previously visited the index page, it will be
     added with status 'unrequested' if the course creator group is in use.
     """
-
     if user.is_staff:
         course_creator_status = 'granted'
     elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):

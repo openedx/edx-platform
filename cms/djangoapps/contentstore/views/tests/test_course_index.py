@@ -30,7 +30,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
-from student.roles import CourseCreatorRole
 
 
 class TestCourseIndex(CourseTestCase):
