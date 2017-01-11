@@ -1354,28 +1354,6 @@ def login_oauth_token(request, backend):
     raise Http404
 
 
-@ensure_csrf_cookie
-def logout_user(request):
-    """
-    HTTP request to log out the user. Redirects to marketing page.
-    Deletes both the CSRF and sessionid cookies so the marketing
-    site can determine the logged in state of the user
-    """
-    # We do not log here, because we have a handler registered
-    # to perform logging on successful logouts.
-    logout(request)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        target = reverse('cas-logout')
-    elif settings.APPSEMBLER_FEATURES.get('ENABLE_CUSTOM_REDIRECT_AFTER_LOGOUT', False) and hasattr(settings, 'CUSTOM_LOGOUT_REDIRECT_URL'):
-        target = settings.CUSTOM_LOGOUT_REDIRECT_URL
-    else:
-        target = '/'
-    response = redirect(target)
-
-    delete_logged_in_cookies(response)
-    return response
-
-
 @require_GET
 @login_required
 @ensure_csrf_cookie
