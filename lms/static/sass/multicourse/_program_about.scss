@@ -33,6 +33,10 @@
 #program-details-page {
     color: $gray;
 
+    .container {
+        border: none;
+    }
+
     > .grid-manual {
 
         > .row {
@@ -50,14 +54,19 @@
 
     .left-col,
     .right-col {
-        padding: 15px 0;
+        @media (min-width: $tablet) {
+            padding: 0 0 15px;
+        }
+        @media (min-width: $desktop) {
+            padding: 15px 0;
+        }
     }
 
     .left-col {
 
         @media (min-width: $tablet) {
             border-right: 1px solid #979797;
-            padding-right: 30px;
+            padding-right: 20px;
         }
         @media (min-width: $desktop) {
             padding-right: 50px;
@@ -66,10 +75,24 @@
 
     .right-col {
         @media (min-width: $tablet) {
-            padding-left: 20px;
+            padding-left: 0;
         }
         @media (min-width: $desktop) {
             padding-left: 30px;
+        }
+    }
+
+    .instructors-title {
+        color: #126f9a;
+        @media (min-width: $tablet) {
+            margin-top: 5px;
+            font-size: 18px;
+        }
+        @media (min-width: $desktop) {
+            font-size: 22px;
+        }
+        @media (min-width: $desktop-xl) {
+            font-size: 26px;
         }
     }
 
@@ -87,14 +110,21 @@
             }
 
             .avatar {
-                width: 60px;
+                width: 54px;
+                @media (min-width: $tablet) {
+                    width: 60px;
+                }
 
                 .img-holder {
-                    width: 60px;
-                    height: 60px;
+                    width: 54px;
+                    height: 54px;
                     border-radius: 50%;
                     border: 2px solid $blue;
                     overflow: hidden;
+                    @media (min-width: $tablet) {
+                        width: 60px;
+                        height: 60px;
+                    }
 
                     img {
                         max-width: 100%;
@@ -107,17 +137,91 @@
 
                 .name {
                     color: $blue;
+                    font-weight: 600;
                     font-size: .9em;
                     margin-bottom: 5px;
                 }
                 .dept {
                     font-size: .8em;
-                    line-height: 1.5em;
+                    line-height: 1.5;
                 }
             }
 
             &:last-child {
                 margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.vertical-icon-list {
+    background: white;
+    padding: 15px;
+    margin: 0 -15px -15px;
+    width: calc(100% + 30px);
+    @media (min-width: $tablet) {
+        display: table;
+        text-align: center;
+    }
+
+    .list-item {
+        display: table-cell;
+        vertical-align: top;
+        padding: 0 5px;
+        @media (max-width: $mobile) {
+            padding: 0;
+            display: table;
+            width: 100%;
+        }
+
+        .icon-container,
+        small {
+            display: block;
+            @media (max-width: $mobile) {
+                display: table-cell;
+                vertical-align: middle;
+            }
+        }
+
+        .icon-container {
+            margin: auto;
+            height: 40px;
+            position: relative;
+            @media (max-width: $mobile) {
+                width: 30px;
+            }
+            @media (min-width: $desktop) {
+                height: 60px;
+            }
+
+            img {
+                width: 100%;
+                max-width: 50px;
+                height: auto;
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                margin: auto;
+                @media (max-width: $mobile) {
+                    bottom: 0;
+                }
+                @media (min-width: $desktop) {
+                    max-width: 75px;
+                }
+            }
+        }
+
+        small {
+            margin-top: 10px;
+            padding-left: 10px;
+            font-size: .7em;
+            @media (min-width: $tablet) {
+                font-size: .6em;
+                padding-left: 0;
+            }
+            @media (min-width: $desktop) {
+                font-size: .75em;
             }
         }
     }
@@ -143,10 +247,10 @@
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 0;
-    line-height: 1.4em;
+    line-height: 1.4;
     font-size: .8em;
     @media (min-width: $tablet) {
-        line-height: 1.8em;
+        line-height: 1.8;
         font-size: 1em;
     }
 
@@ -158,7 +262,7 @@
         }
 
         &.writer {
-            font-weight: bold;
+            font-weight: 600;
             padding-left: 50px;
             @media (min-width: $tablet) {
                 padding-left: 0;
@@ -174,19 +278,33 @@
             }
         }
     }
+
+    &.visible-mobile {
+        font-size: 1em;
+        line-height: 1.5;
+    }
 }
 
 #accordion-group {
+    font-family: "Open Sans", Arial, Helvetica, sans-serif;
+    @media (max-width: $mobile) {
+        margin-left: -8px;
+        margin-right: -8px;
+    }
 
     .accordion-item {
 
         .accordion-head {
             background: #004165;
-            padding: 18px;
+            padding: 14px 14px 14px 50px;
             color: white;
             border-radius: 0;
-            border:none;
+            border: none;
             margin: 0;
+            position: relative;
+            @media (min-width: $tablet) {
+                padding: 18px 18px 18px 50px;
+            }
 
             &:hover,
             &.active {
@@ -196,10 +314,17 @@
             &:before {
                 content: "\f054";
                 font-family: FontAwesome;
-                margin-right: 25px;
+                position: absolute;
+                left: 20px;
+                top: 0;
+                bottom: 0;
+                width: 18px;
+                height: 22px;
+                margin: auto;
             }
 
-            &.active {
+            &.ui-state-active {
+
                 &:before {
                     content: "\f078";
                 }
@@ -211,6 +336,33 @@
             padding: 15px;
             background: #f6f6f6;
             border: none;
+
+            p,
+            ul {
+                color: #4a4a4a;
+                font-size: .85em;
+                line-height: 1.5;
+                margin-bottom: 15px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            p {
+
+                &:last-child {
+                    margin: 0;
+                }
+            }
+
+            ul {
+
+                li {
+                    padding-left: 0 !important;
+                    color: #4a4a4a;
+                }
+            }
         }
 
         &.show {
@@ -226,17 +378,55 @@
             background: #00527f;
         }
         &:nth-of-type(4) .accordion-head {
-            background: #015d91;
+            background: #005d91;
         }
         &:nth-of-type(5) .accordion-head {
             background: #016fad;
+        }
+        &:nth-of-type(6) .accordion-head {
+            background: #1878ad;
+        }
+
+        &.instructors-mobile-list {
+            @extend .visible-sm;
+
+            .accordion-content {
+                background: white;
+                padding: 0;
+                margin-left: -8px;
+                margin-right: -8px;
+
+                .instructor-profiles {
+                    margin: 0;
+
+                    .profile-item {
+                        padding: 15px 25px;
+                        margin: 0;
+
+                        .details {
+                            padding-left: 10px;
+
+                            .name {
+                                font-size: .8em;
+                            }
+                            .dept {
+                                font-size: .7em;
+                            }
+                        }
+
+                        &:nth-child(even) {
+                            background: #f0f0f0;
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 .course-card {
     background: white;
-    padding: 15px;
+    padding: 10px;
     margin-bottom: 30px;
     @include box-shadow(0, 1px, 5px, rgba(0, 0, 0, 0.4));
     border-radius: 4px;
@@ -248,11 +438,14 @@
     }
 
     .title {
-        color: #005686;
+        color: $blue-dark;
         margin-bottom: 20px;
-        font-size: 1.3em;
+        font-size: 1.1em;
         text-decoration: underline;
         @media (min-width: $tablet) {
+            font-size: 1.5em;
+        }
+        @media (min-width: $desktop) {
             font-size: 1.7em;
         }
 
@@ -265,15 +458,15 @@
             > span {
                 display: inline-block;
                 text-decoration: none;
-                font-size: 14px;
+                font-size: 12px;
                 @media (min-width: $tablet) {
                     font-size: 16px;
                 }
 
                 &:first-child {
                     border-right: 1px solid #4a4a4a;
-                    padding-right: 8px;
-                    margin-right: 8px;
+                    padding-right: 6px;
+                    margin-right: 6px;
                     @media (min-width: $tablet) {
                         padding-right: 10px;
                         margin-right: 10px;
@@ -297,7 +490,9 @@
     display: block;
     padding: 20px 0;
     background: #ececec;
+    margin-top: 15px;
     @media (min-width: $tablet) {
+        margin-top: 0;
         background: white;
         padding: 20px;
     }
@@ -307,9 +502,17 @@
     }
 
     > .hd {
+        color: $blue-dark;
         padding-left: 20px;
+        font-size: 20px;
+        margin-bottom: 15px;
         @media (min-width: $tablet) {
             padding: 0;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        @media (min-width: $desktop) {
+            font-size: 30px;
         }
     }
 
@@ -369,12 +572,31 @@
 /* Custom SCSS */
 .main-banner {
     height: 260px;
-    background: #005686;
+    background: $blue-dark;
     margin-bottom: 20px;
+    position: relative;
     @media (min-width: $tablet) {
         height: 333px;
-        background: $black;
+        background: #000 url('../images/banner-bg.jpg') no-repeat right center;
+        background-size: cover;
+        margin-bottom: 20px;
+    }
+    @media (min-width: $desktop) {
         margin-bottom: 50px;
+    }
+
+    .btn-play {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 15%;
+        margin: auto;
+        width: 100px;
+        height: 100px;
+        @media (min-width: $desktop-xl) {
+            width: 150px;
+            height: 150px;
+        }
     }
 
     .org-logo {
@@ -386,6 +608,12 @@
             margin-bottom: 12px;
             max-width: 120px;
             box-shadow: none;
+        }
+        @media (min-width: $tablet) {
+            max-width: 150px;
+        }
+        @media (min-width: $desktop) {
+            max-width: 200px;
         }
 
         img {
@@ -405,6 +633,12 @@
         letter-spacing: inherit;
         margin-bottom: 10px;
         @media (min-width: $tablet) {
+            font-size: 1.9em;
+        }
+        @media (min-width: $desktop) {
+            font-size: 2em;
+        }
+        @media (min-width: $desktop-xl) {
             font-size: 2.25em;
         }
     }
@@ -434,10 +668,11 @@
 }
 
 .program-desc-tbl {
+    margin-bottom: 20px;
 
     @extend .tbl-view;
     border: 1px solid #e3e3e3;
-    border-radius: 3px;
+    border-radius: 6px;
     @media (min-width: $tablet) {
         border: 2px solid #126f9a;
         border-radius: 0;
@@ -461,12 +696,17 @@
             padding: 15px !important;
         }
 
+        span,
+        span + a {
+            font-size: 1.1em;
+        }
+
         > span {
             @extend .tbl-col;
             display: block;
             width: 100%;
             color: #4a4a4a;
-            line-height: 1.2em;
+            line-height: 1.4;
 
             @media (min-width: $tablet) {
                 display: inline-block;
@@ -488,17 +728,44 @@
             }
 
             &:first-child {
-                color: #005686;
+                color: $blue-dark;
                 margin-bottom: 5px;
-
+                font-size: .85em;
+                @media (max-width: $mobile) {
+                    text-transform: uppercase;
+                }
                 @media (min-width: $tablet) {
                     width: 48%;
                     color: #4a4a4a;
                     margin-bottom: 0;
+                    font-size: 1em;
                 }
             }
         }
     }
+}
+
+.faq-links-list {
+
+    li {
+        margin-bottom: 15px;
+
+        a {
+            display: block;
+            position: relative;
+            color: $blue;
+            padding-left: 30px;
+
+            &:before {
+                font-family: FontAwesome;
+                content: "\f105";
+                position: absolute;
+                left: 5px;
+                top: 1px;
+            }
+        }
+    }
+
 }
 
 .ui-state-default .ui-icon {
