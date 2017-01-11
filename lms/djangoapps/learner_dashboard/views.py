@@ -57,8 +57,6 @@ def program_details(request, program_uuid):
     if not program_data:
         raise Http404
 
-    program_data = utils.ProgramDataExtender(program_data, request.user).extend()
-
     urls = {
         'program_listing_url': reverse('program_listing_view'),
         'track_selection_url': strip_course_id(
