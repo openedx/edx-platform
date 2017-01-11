@@ -944,6 +944,10 @@ INSTALLED_APPS = (
 
     # management of user-triggered async tasks (course import/export, etc.)
     'user_tasks',
+
+    # CMS specific user task handling
+    'cms_user_tasks',
+
 )
 
 

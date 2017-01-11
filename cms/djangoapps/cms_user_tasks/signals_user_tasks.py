@@ -1,15 +1,14 @@
 """
 Receivers of signals sent from django-user-tasks
 """
-from six.moves.urllib.parse import urljoin
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.dispatch import receiver
-from user_tasks.signals import user_task_stopped
+from six.moves.urllib.parse import urljoin
 from user_tasks.models import UserTaskArtifact
+from user_tasks.signals import user_task_stopped
 
-from cms.cms_user_tasks.tasks import send_task_complete_email
+from .tasks import send_task_complete_email
 from edxmako.shortcuts import render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 

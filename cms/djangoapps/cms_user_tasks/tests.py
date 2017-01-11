@@ -15,7 +15,7 @@ from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer
 
-from cms.cms_user_tasks.signals_user_tasks import user_task_stopped
+from cms_user_tasks.signals_user_tasks import user_task_stopped
 
 
 # Helper functions for stuff that pylint complains about without disable comments
