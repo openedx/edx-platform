@@ -2515,7 +2515,7 @@ class LogoutView(TemplateView):
     # Keep track of the page to which the user should ultimately be redirected.
     if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse_lazy('cas-logout')
-    elif settings.APPSEMBLER_FEATURES.get('ENABLE_CUSTOM_REDIRECT_AFTER_LOGOUT', False) and hasattr(settings, 'CUSTOM_LOGOUT_REDIRECT_URL'):
+    elif hasattr(settings, 'CUSTOM_LOGOUT_REDIRECT_URL'):
         target = settings.CUSTOM_LOGOUT_REDIRECT_URL
     else:
         target = '/'
