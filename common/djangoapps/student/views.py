@@ -92,6 +92,7 @@ import track.views
 
 import dogstats_wrapper as dog_stats_api
 
+from .roles import CourseCreatorRole
 from util.db import outer_atomic
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
@@ -1755,8 +1756,9 @@ def create_account_with_params(request, params):
 
     # allow users registered from AMC to create courses
     if "registered_from_amc" in params:
-        from cms.djangoapps.course_creators.models import CourseCreator
+        from cms.djangoapps.course_creators.views import CourseCreator
         CourseCreator.objects.update_or_create(user=user, defaults={'state': CourseCreator.GRANTED})
+        CourseCreatorRole().add_users(user)
 
     # APPSEMBLER SPECIFIC END
 
