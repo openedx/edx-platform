@@ -3,7 +3,7 @@
 ## Authentication
 The API requires OAuth authentication to grant access to the endpoints and actions.
 
-All endpoints can return the following response errors if there some problem with the authentication process:
+All endpoints can return the following response errors if there is a problem with the authentication process:
 
 ### Credentials not provided
 * Code: 401 UNAUTHORIZED
@@ -55,7 +55,7 @@ Content-Type: application/json
 Authorization: Bearer cbf6a5de322cf6a4323c957a882xy1s321c954b86
 Cache-Control: no-cache
 {
-	"username": "staff55",
+    "username": "staff55",
     "password": "edx",
     "email": "staff55@example.com",
     "name": "stafftest"
@@ -84,7 +84,7 @@ This endpoint is a tool to check if an user exists given the username.
 ## Enrollment Codes endpoints
 
 ### Generate Enrollment Codes
-This endpoint generates enrollment codes for a course. You can later enroll users in the course using the endpoint below and the  generated codes. This endpoint takes as parameters a course ID and the amount of desired codes to be generated.
+This endpoint generates enrollment codes for a course. You can later enroll users in the course using the endpoint below and the generated codes. This endpoint takes as parameters a course ID and the amount of desired codes to be generated.
 More info about Enrollment Codes [edX Docs](http://edx.readthedocs.io/projects/open-edx-building-and-running-a-course/en/latest/manage_live_course/manage_course_fees.html#create-and-manage-enrollment-codes)
 
 * URL: `/appsembler_api/v0/enrollment-codes/generate`
@@ -137,7 +137,7 @@ This endpoint allows you to enroll a user into a course using previously-generat
 	* Content:
 ```
 {
-  "success": "true",
+    "success": "true",
 }
 ```
 * Error Responses:
@@ -313,7 +313,7 @@ This endpoint provides information about user accounts. Can be called with filte
 	* Code: 200
 	* Content:
 	```
-	  {
+    {
     "username": "anewuser",
     "date_joined": "2016-12-17T23:45:47Z",
     "is_active": true,
