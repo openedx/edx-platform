@@ -26,8 +26,8 @@ class PhotoVerificationStatusViewTests(TestCase):
 
     def setUp(self):
         super(PhotoVerificationStatusViewTests, self).setUp()
-        self.user = UserFactory.create(password=self.PASSWORD)
-        self.staff = UserFactory.create(is_staff=True, password=self.PASSWORD)
+        self.user = UserFactory(password=self.PASSWORD)
+        self.staff = UserFactory(is_staff=True, password=self.PASSWORD)
         self.verification = SoftwareSecurePhotoVerification.objects.create(user=self.user, status='submitted')
         self.path = reverse('verification_status', kwargs={'username': self.user.username})
         self.client.login(username=self.staff.username, password=self.PASSWORD)
@@ -57,7 +57,7 @@ class PhotoVerificationStatusViewTests(TestCase):
 
     def test_no_verifications(self):
         """ The endpoint should return HTTP 404 if the user has no verifications. """
-        user = UserFactory.create()
+        user = UserFactory()
         path = reverse('verification_status', kwargs={'username': user.username})
         self.assert_path_not_found(path)
 
@@ -69,17 +69,19 @@ class PhotoVerificationStatusViewTests(TestCase):
 
     def test_staff_user(self):
         """ The endpoint should be accessible to staff users. """
+        self.client.logout()
         self.client.login(username=self.staff.username, password=self.PASSWORD)
         self.assert_verification_returned()
 
     def test_owner(self):
         """ The endpoint should be accessible to the user who submitted the verification request. """
-        self.client.login(username=self.user.username, password=self.user.password)
+        self.client.logout()
+        self.client.login(username=self.user.username, password=self.PASSWORD)
         self.assert_verification_returned()
 
     def test_non_owner_or_staff_user(self):
         """ The endpoint should NOT be accessible if the request is not made by the submitter or staff user. """
-        user = UserFactory.create()
+        user = UserFactory()
         self.client.login(username=user.username, password=self.PASSWORD)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 403)
@@ -88,5 +90,6 @@ class PhotoVerificationStatusViewTests(TestCase):
         """ The endpoint should return that the user is verified if the user's verification is accepted. """
         self.verification.status = 'approved'
         self.verification.save()
-        self.client.login(username=self.user.username, password=self.user.password)
+        self.client.logout()
+        self.client.login(username=self.user.username, password=self.PASSWORD)
         self.assert_verification_returned(verified=True)
