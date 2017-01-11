@@ -67,195 +67,221 @@ from openedx.core.djangolib.markup import HTML, Text
 
 <div id="program-details-page">
 
-    <div class="main-banner">
-        <div class="grid-manual">
-            <div class="row">
-                <div class="col col-12 md-col-9">
-                    <div class="org-logo">
-                        <img src="https://www.edx.org/sites/default/files/school/image/logo/iimb-200x101.png"
-                             alt="Indian Institute of Management, Bangalore Logo">
+        <div class="main-banner">
+            <div class="grid-manual">
+                <div class="row">
+                    <div class="col col-12 md-col-8 lg-col-9">
+                        <div class="org-logo">
+                            <img src="https://www.edx.org/sites/default/files/school/image/logo/iimb-200x101.png" alt="Indian Institute of Management, Bangalore Logo">
+                        </div>
+                        <h1 class="banner-title">Artificial Intelligence MicroMasters Program</h1>
+                        <p class="banner-description">Earn a MicroMasters Credential in Artificial Intelligence from Columbia University to launch your career in computer science and design the future.</p>
+                        <button type="button" class="btn-brand hidden-sm">Start the MicroMasters Program</button>
                     </div>
-                    <h1 class="banner-title">Artificial Intelligence MicroMasters Program</h1>
-                    <p class="banner-description">Earn a MicroMasters Credential in Artificial Intelligence from
-                        Columbia University to launch your career in computer science and design the future.</p>
-                    <button type="button" class="btn-brand hidden-sm">Start the MicroMasters Program</button>
-                </div>
-                <div class="col col-12 md-col-3" id="course-trailer">
-                    <a href="#!" class="trailer-link visible-sm">
-                        <i class="fa fa-play-circle-o" aria-hidden="true"></i>
-                        <span>View Course Trailer</span>
-                    </a>
-                    <div class="hidden-sm">
-                        video thumbnail
+                    <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
+                        <a href="#!" class="trailer-link visible-sm">
+                            <i class="fa fa-play-circle-o" aria-hidden="true"></i>
+                            <span>View Course Trailer</span>
+                        </a>
+                        <div class="hidden-sm">
+                            <a href="#!" class="btn-play">
+                                <img src="${static.url('images/programs/btn-play.png')}" alt="Play"/>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="grid-manual">
-        <div class="row">
-            <div class="col col-12 md-col-7 lg-col-8 left-col">
-                <ul class="list-divided program-desc-tbl">
-                    <li class="item">
+        <div class="grid-manual">
+            <div class="row">
+                <div class="col col-12 md-col-7 lg-col-8 left-col">
+                    <ul class="list-divided program-desc-tbl">
+                        <li class="item">
                             <span>
                                 <span class="fa fa-book fa-lg" aria-hidden="true"></span>
                                 Number of Courses
                             </span>
-                        <a href="#!">4 courses in program</a>
-                    </li>
-                    <li class="item">
+                            <a href="#!">4 courses in program</a>
+                        </li>
+                        <li class="item">
                             <span>
                                 <span class="fa fa-clock-o fa-lg" aria-hidden="true"></span>
                                 Average Length
                             </span>
-                        <span>12 weeks per course</span>
-                    </li>
-                    <li class="item">
+                            <span>12 weeks per course</span>
+                        </li>
+                        <li class="item">
                             <span>
                                 <span class="fa fa-tachometer fa-lg" aria-hidden="true"></span>
                                 Effort
                             </span>
-                        <span>8-12 hours per week, per course</span>
-                    </li>
-                    <li class="item">
+                            <span>8-12 hours per week, per course</span>
+                        </li>
+                        <li class="item">
                             <span>
                                 <span class="fa fa-tag fa-lg" aria-hidden="true"></span>
                                 Price (USD)
                             </span>
-                        <span>$300 per course, <br class="visible-sm"/> $1200 for entire program</span>
-                    </li>
-                </ul>
-                <div id="accordion-group">
-                    <div class="accordion-item">
-                        <div class="accordion-head">Section 1</div>
-                        <div class="accordion-content">
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea
-                                commodo consequat.
-                            </p>
+                            <span>$300 per course, <br class="visible-sm"/> $1200 for entire program</span>
+                        </li>
+                    </ul>
+                    <div id="accordion-group">
+                        <div class="accordion-item">
+                            <div class="accordion-head">Overview</div>
+                            <div class="accordion-content">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                    commodo consequat.
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="accordion-item">
-                        <div class="accordion-head">Section 1</div>
-                        <div class="accordion-content">
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea
-                                commodo consequat.
-                            </p>
+                        <div class="accordion-item">
+                            <div class="accordion-head">Job Outlook</div>
+                            <div class="accordion-content">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                    commodo consequat.
+                                </p>
+                                <ul class="list-bulleted list-disc no-indent">
+                                    <li>Machine Learning Software Engineering</li>
+                                    <li>Data Scientist</li>
+                                    <li>3D Artist</li>
+                                    <li>Computer Vision Engineer</li>
+                                </ul>
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                    commodo consequat.
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="accordion-item">
-                        <div class="accordion-head">Section 1</div>
-                        <div class="accordion-content">
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea
-                                commodo consequat.
-                            </p>
+                        <div class="accordion-item">
+                            <div class="accordion-head">What You'll Learn</div>
+                            <div class="accordion-content">
+                                <ul class="list-bulleted list-disc no-indent">
+                                    <li>Machine Learning Software Engineering</li>
+                                    <li>Data Scientist</li>
+                                    <li>3D Artist</li>
+                                    <li>Computer Vision Engineer</li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
-                    <div class="accordion-item">
-                        <div class="accordion-head">What is MicroMasters?</div>
-                        <div class="accordion-content">
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                incididunt ut labore.
-                            </p>
-                            <div class="tbl-view text-center">
-                                <div class="tbl-col">
-                                    <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
-                                    <small>Choose Your Program</small>
-                                </div>
-                                <div class="tbl-col">
-                                    <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
-                                    <small>Choose Your Program</small>
-                                </div>
-                                <div class="tbl-col">
-                                    <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
-                                    <small>Choose Your Program</small>
-                                </div>
-                                <div class="tbl-col">
-                                    <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
-                                    <small>Choose Your Program</small>
-                                </div>
-                                <div class="tbl-col">
-                                    <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
-                                    <small>Choose Your Program</small>
+                        <div class="accordion-item instructors-mobile-list">
+                            <div class="accordion-head">Instructors</div>
+                            <div class="accordion-content">
+                                <div class="instructor-profiles">
+                                    <div class="profile-item">
+                                        <div class="avatar">
+                                            <div class="img-holder">
+                                                <img src="${static.url('images/programs/avatar-male.png')}">
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="name">Ansaf Salleb-Aouissi</div>
+                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
+                                        </div>
+                                    </div>
+                                    <div class="profile-item">
+                                        <div class="avatar">
+                                            <div class="img-holder">
+                                                <img src="${static.url('images/programs/avatar-male.png')}">
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="name">Ansaf Salleb-Aouissi</div>
+                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
+                                        </div>
+                                    </div>
+                                    <div class="profile-item">
+                                        <div class="avatar">
+                                            <div class="img-holder">
+                                                <img src="${static.url('images/programs/avatar-male.png')}">
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="name">Ansaf Salleb-Aouissi</div>
+                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
+                                        </div>
+                                    </div>
+                                    <div class="profile-item">
+                                        <div class="avatar">
+                                            <div class="img-holder">
+                                                <img src="${static.url('images/programs/avatar-male.png')}">
+                                            </div>
+                                        </div>
+                                        <div class="details">
+                                            <div class="name">Ansaf Salleb-Aouissi</div>
+                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="accordion-item">
-                        <div class="accordion-head">FAQ</div>
-                        <div class="accordion-content">
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                                exercitation ullamco laboris nisi ut aliquip ex ea
-                                commodo consequat.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col col-12 md-col-5 lg-col-4 right-col hidden-sm">
-
-                <h2>Meet the Instructors <span>(8)</span></h2>
-                <div class="instructor-profiles">
-                    <div class="profile-item">
-                        <div class="avatar">
-                            <div class="img-holder">
-                                <img src="${static.url('images/programs/avatar-male.png')}" />
+                        <div class="accordion-item">
+                            <div class="accordion-head">What is MicroMasters?</div>
+                            <div class="accordion-content">
+                                <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.
+                                </p>
+                                <div class="vertical-icon-list">
+                                    <div class="list-item">
+                                        <div class="icon-container">
+                                            <img src="${static.url('images/programs/img-1.png')}"/>
+                                        </div>
+                                        <small>Choose Your Program</small>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="icon-container">
+                                            <img src="${static.url('images/programs/img-2.png')}"/>
+                                        </div>
+                                        <small>Learn Great Things at Your Own Place</small>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="icon-container">
+                                            <img src="${static.url('images/programs/img-3.png')}"/>
+                                        </div>
+                                        <small>Earn a valuable Credntial</small>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="icon-container">
+                                            <img src="${static.url('images/programs/img-4.png')}"/>
+                                        </div>
+                                        <small>Advance Your Career</small>
+                                    </div>
+                                    <div class="list-item">
+                                        <div class="icon-container">
+                                            <img src="${static.url('images/programs/img-5.png')}"/>
+                                        </div>
+                                        <small>Or Purchase a Full Master's Degree</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="details">
-                            <div class="name">Ansaf Salleb-Aouissi</div>
-                            <div class="dept">Department of Computer Science<br/>Columbia University</div>
-                        </div>
-                    </div>
-                    <div class="profile-item">
-                        <div class="avatar">
-                            <div class="img-holder">
-                                <img src="${static.url('images/programs/avatar-male.png')}" />
+                        <div class="accordion-item">
+                            <div class="accordion-head">FAQ</div>
+                            <div class="accordion-content">
+                                <ul class="list-unstyled faq-links-list">
+                                    <li class="item">
+                                        <a href="#!">Who is the MicroMasters Program intended for?</a>
+                                    </li>
+                                    <li class="item">
+                                        <a href="#!">What institute is offering credit?</a>
+                                    </li>
+                                    <li class="item">
+                                        <a href="#!">What subjects will be covered?</a>
+                                    </li>
+                                    <li class="item">
+                                        <a href="#!">What language is this program offered in?</a>
+                                    </li>
+                                    <li class="item">
+                                        <a href="#!">Is there a video transcript? What language?</a>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                        <div class="details">
-                            <div class="name">Ansaf Salleb-Aouissi</div>
-                            <div class="dept">Department of Computer Science<br/>Columbia University</div>
-                        </div>
                     </div>
-                    <div class="profile-item">
-                        <div class="avatar">
-                            <div class="img-holder">
-                                <img src="${static.url('images/programs/avatar-female.png')}" />
-                            </div>
-                        </div>
-                        <div class="details">
-                            <div class="name">Ansaf Salleb-Aouissi</div>
-                            <div class="dept">Department of Computer Science<br/>Columbia University</div>
-                        </div>
-                    </div>
-                    <div class="profile-item">
-                        <div class="avatar">
-                            <div class="img-holder">
-                                <img src="${static.url('images/programs/avatar-female.png')}" />
-                            </div>
-                        </div>
-                        <div class="details">
-                            <div class="name">Ansaf Salleb-Aouissi</div>
-                            <div class="dept">Department of Computer Science<br/>Columbia University</div>
-                        </div>
-                    </div>
-                </div>
-                <blockquote class="program-quote">
-                    <div class="quote">
+                    <blockquote class="program-quote visible-sm">
+                        <div class="quote">
                             <span class="pull-right hidden-sm">
                                 <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
                             </span>
@@ -263,124 +289,182 @@ from openedx.core.djangolib.markup import HTML, Text
                                 "Get highly values professionals with proficiency in artificial intelligence and machine learning. For me, a candidate credentialed through edX MicroMasters course in Artificial Intelligence would have a marked
                             advantage."
                             </span>
-                        <img class="visible-sm pull-left" src="${static.url('images/programs/quote-logo.png')}" width="40" height="40"/>
+                            <img class="visible-sm pull-left" src="${static.url('images/programs/quote-logo.png')}" width="40" height="40"/>
                             <span class="writer">
                                     Michael Idelchik, Vice President of Advanced Technology Programs, GE
                             </span>
-                    </div>
-                </blockquote>
-            </div>
-        </div>
-    </div>
+                        </div>
+                    </blockquote>
+                </div>
 
-    <div class="courses-in-program">
-        <h2 class="hd hd-3">Courses in the MicroMasters</h2>
-        <div class="course-slider-xs">
-            <div class="course-card">
-                <div class="tbl-view">
-                    <div class="tbl-col col-full-sm">
-                        <h4 class="hd title">
-                            Artificial Intelligence (A.I)
-                            <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                <span>Self - Paced</span>
-                            </small>
-                        </h4>
-                        <p class="copy-meta">
-                            Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson.
-                            This port wasn't built by a geyser field by accident, as it has rare resources, which is of
-                            great importance to the people of
-                            Darkwell and its success.
-                        </p>
+                <div class="col col-12 md-col-5 lg-col-4 right-col hidden-sm">
+
+                    <h2 class="instructors-title">Meet the Instructors <span>(8)</span></h2>
+                    <div class="instructor-profiles">
+                        <div class="profile-item">
+                            <div class="avatar">
+                                <div class="img-holder">
+                                    <img src="${static.url('images/programs/avatar-female.png')}"/>
+                                </div>
+                            </div>
+                            <div class="details">
+                                <div class="name">Ansaf Salleb-Aouissi</div>
+                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
+                            </div>
+                        </div>
+                        <div class="profile-item">
+                            <div class="avatar">
+                                <div class="img-holder">
+                                    <img src="${static.url('images/programs/avatar-male.png')}"/>
+                                </div>
+                            </div>
+                            <div class="details">
+                                <div class="name">Ansaf Salleb-Aouissi</div>
+                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
+                            </div>
+                        </div>
+                        <div class="profile-item">
+                            <div class="avatar">
+                                <div class="img-holder">
+                                    <img src="${static.url('images/programs/avatar-female.png')}"/>
+                                </div>
+                            </div>
+                            <div class="details">
+                                <div class="name">Ansaf Salleb-Aouissi</div>
+                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
+                            </div>
+                        </div>
+                        <div class="profile-item">
+                            <div class="avatar">
+                                <div class="img-holder">
+                                    <img src="${static.url('images/programs/avatar-male.png')}"/>
+                                </div>
+                            </div>
+                            <div class="details">
+                                <div class="name">Ansaf Salleb-Aouissi</div>
+                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="tbl-col col-full-sm">
-                        <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
-                    </div>
-                </div>
-            </div>
-            <div class="course-card">
-                <div class="tbl-view">
-                    <div class="tbl-col col-full-sm">
-                        <h4 class="hd title">
-                            Machine Learning
-                            <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                <span>Self - Paced</span>
-                            </small>
-                        </h4>
-                        <p class="copy-meta">
-                            Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson.
-                            This port wasn't built by a geyser field by accident, as it has rare resources, which is of
-                            great importance to the people of
-                            Darkwell and its success.
-                        </p>
-                    </div>
-                    <div class="tbl-col col-full-sm">
-                        <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
-                    </div>
-                </div>
-            </div>
-            <div class="course-card">
-                <div class="tbl-view">
-                    <div class="tbl-col col-full-sm">
-                        <h4 class="hd title">
-                            Animation and CGI Motion
-                            <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                <span>Self - Paced</span>
-                            </small>
-                        </h4>
-                        <p class="copy-meta">
-                            Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson.
-                            This port wasn't built by a geyser field by accident, as it has rare resources, which is of
-                            great importance to the people of
-                            Darkwell and its success.
-                        </p>
-                    </div>
-                    <div class="tbl-col col-full-sm">
-                        <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
-                    </div>
-                </div>
-            </div>
-            <div class="course-card">
-                <div class="tbl-view">
-                    <div class="tbl-col col-full-sm">
-                        <h4 class="hd title">
-                            Robotics
-                            <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                <span>Self - Paced</span>
-                            </small>
-                        </h4>
-                        <p class="copy-meta">
-                            Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson.
-                            This port wasn't built by a geyser field by accident, as it has rare resources, which is of
-                            great importance to the people of
-                            Darkwell and its success.
-                        </p>
-                    </div>
-                    <div class="tbl-col col-full-sm">
-                        <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
-                    </div>
+                    <blockquote class="program-quote">
+                        <div class="quote">
+                            <span class="pull-right hidden-sm">
+                                <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
+                            </span>
+                            <span>
+                                "Get highly values professionals with proficiency in artificial intelligence and machine learning. For me, a candidate credentialed through edX MicroMasters course in Artificial Intelligence would have a marked
+                            advantage."
+                            </span>
+                            <img class="visible-sm pull-left" src="${static.url('images/programs/quote-logo.png')}" width="40" height="40"/>
+                            <span class="writer">
+                                    Michael Idelchik, Vice President of Advanced Technology Programs, GE
+                            </span>
+                        </div>
+                    </blockquote>
                 </div>
             </div>
         </div>
-        <span class="pagingInfo"></span>
-    </div>
 
-</div> <!-- Program Details Page end -->
+        <div class="container courses-in-program">
+            <h3 class="hd">Courses in the MicroMasters</h3>
+            <div class="course-slider-xs">
+                <div class="course-card">
+                    <div class="tbl-view">
+                        <div class="tbl-col col-full-sm">
+                            <h4 class="hd title">
+                                Artificial Intelligence (A.I)
+                                <small>
+                                    <span>
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        Starts Janyuary 16, 2017
+                                    </span>
+                                    <span>Self - Paced</span>
+                                </small>
+                            </h4>
+                            <p class="copy-meta">
+                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
+                                Darkwell and its success.
+                            </p>
+                        </div>
+                        <div class="tbl-col col-full-sm">
+                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="tbl-view">
+                        <div class="tbl-col col-full-sm">
+                            <h4 class="hd title">
+                                Machine Learning
+                                <small>
+                                    <span>
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        Starts Janyuary 16, 2017
+                                    </span>
+                                    <span>Self - Paced</span>
+                                </small>
+                            </h4>
+                            <p class="copy-meta">
+                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
+                                Darkwell and its success.
+                            </p>
+                        </div>
+                        <div class="tbl-col col-full-sm">
+                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="tbl-view">
+                        <div class="tbl-col col-full-sm">
+                            <h4 class="hd title">
+                                Animation and CGI Motion
+                                <small>
+                                    <span>
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        Starts Janyuary 16, 2017
+                                    </span>
+                                    <span>Self - Paced</span>
+                                </small>
+                            </h4>
+                            <p class="copy-meta">
+                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
+                                Darkwell and its success.
+                            </p>
+                        </div>
+                        <div class="tbl-col col-full-sm">
+                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="tbl-view">
+                        <div class="tbl-col col-full-sm">
+                            <h4 class="hd title">
+                                Robotics
+                                <small>
+                                    <span>
+                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                        Starts Janyuary 16, 2017
+                                    </span>
+                                    <span>Self - Paced</span>
+                                </small>
+                            </h4>
+                            <p class="copy-meta">
+                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
+                                Darkwell and its success.
+                            </p>
+                        </div>
+                        <div class="tbl-col col-full-sm">
+                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span class="pagingInfo"></span>
+        </div>
+
+    </div> <!-- Program Details Page end -->
 
 
 
