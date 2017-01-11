@@ -98,7 +98,7 @@ def get_test_course(options):
         print colorize("green", "--imports-dir specified, skipping fetch of test course")
         return
 
-    if not options.get('should_fetch_course', False):
+    if options.get('skip-fetch'):
         print colorize("green", "--skip-fetch specified, skipping fetch of test course")
         return
 
@@ -398,7 +398,7 @@ class Pa11yCrawler(BokChoyTestSuite):
         url = "https://raw.githubusercontent.com/singingwolfboy/pa11ycrawler-ignore/master/ignore.yaml"
         return [
             "scrapy",
-            "crawl",
+            "test",
             "edx",
             "-a",
             "port=8003",
