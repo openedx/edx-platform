@@ -202,16 +202,16 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         raise NotFoundError('Unexpected dispatch type')
 
     @classmethod
-    def verify_current_content_visibility(cls, date, hide_after_date):
+    def verify_current_content_visibility(cls, due, hide_after_due):
         """
         Returns whether the content visibility policy passes
-        for the given date and hide_after_date values and
+        for the given due date and hide_after_due values and
         the current date-time.
         """
         return (
-            not date or
-            not hide_after_date or
-            datetime.now(UTC()) < date
+            not due or
+            not hide_after_due or
+            datetime.now(UTC()) < due
         )
 
     def student_view(self, context):
@@ -246,17 +246,20 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
         runtime user. If so, returns a banner_text or the fragment to
         display depending on whether staff is masquerading.
         """
-        course = self._get_course()
-        if not self._can_user_view_content(course):
-            if course.self_paced:
-                banner_text = _("Because the course has ended, this assignment is hidden from the learner.")
-            else:
-                banner_text = _("Because the due date has passed, this assignment is hidden from the learner.")
+        if not self._can_user_view_content():
+            subsection_format = (self.format or _("subsection")).lower()  # pylint: disable=no-member
+
+            # Translators: subsection_format refers to the assignment
+            # type of the subsection, such as Homework, Lab, Exam, etc.
+            banner_text = _(
+                "Because the due date has passed, "
+                "this {subsection_format} is hidden from the learner."
+            ).format(subsection_format=subsection_format)
 
             hidden_content_html = self.system.render_template(
                 'hidden_content.html',
                 {
-                    'self_paced': course.self_paced,
+                    'subsection_format': subsection_format,
                     'progress_url': context.get('progress_url'),
                 }
             )
@@ -277,15 +280,14 @@ class SequenceModule(SequenceFields, ProctoringFields, XModule):
             if content_milestones and self.runtime.user_is_staff:
                 return banner_text
 
-    def _can_user_view_content(self, course):
+    def _can_user_view_content(self):
         """
         Returns whether the runtime user can view the content
         of this sequential.
         """
-        hidden_date = course.end if course.self_paced else self.due
         return (
             self.runtime.user_is_staff or
-            self.verify_current_content_visibility(hidden_date, self.hide_after_due)
+            self.verify_current_content_visibility(self.due, self.hide_after_due)
         )
 
     def _student_view(self, context, banner_text=None):
