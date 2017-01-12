@@ -69,6 +69,9 @@ def is_youtube_available():
         bool:
 
     """
+    # TODO: Design and implement a better solution that is reliable and repeatable,
+    # reflects how the application works in production, and limits the third-party
+    # network traffic (e.g. repeatedly retrieving the js from youtube from the browser).
 
     youtube_api_urls = {
         'main': 'https://www.youtube.com/',
