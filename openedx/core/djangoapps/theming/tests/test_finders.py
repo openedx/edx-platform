@@ -1,15 +1,15 @@
 """
 Tests for comprehensive theme static files finders.
 """
-import unittest
 
 from django.conf import settings
 from django.test import TestCase
 
 from openedx.core.djangoapps.theming.finders import ThemeFilesFinder
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestThemeFinders(TestCase):
     """
     Test comprehensive theming static files finders.

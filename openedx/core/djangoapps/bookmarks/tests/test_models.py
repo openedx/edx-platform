@@ -8,9 +8,6 @@ from freezegun import freeze_time
 import mock
 from nose.plugins.attrib import attr
 import pytz
-from unittest import skipUnless
-
-from django.conf import settings
 
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator, BlockUsageLocator
@@ -19,6 +16,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import AdminFactory, UserFactory
 
 from .. import DEFAULT_FIELDS, OPTIONAL_FIELDS, PathItem
@@ -228,7 +226,7 @@ class BookmarksTestsBase(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class BookmarkModelTests(BookmarksTestsBase):
     """
     Test the Bookmark model.

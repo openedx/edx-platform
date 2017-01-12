@@ -3,10 +3,8 @@ Tests for the API functions in the credit app.
 """
 import datetime
 import json
-import unittest
 
 import ddt
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test.utils import override_settings
@@ -36,6 +34,7 @@ from openedx.core.djangoapps.credit.models import (
     CreditEligibility,
     CreditRequest
 )
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -203,7 +202,7 @@ class CreditApiTestBase(ModuleStoreTestCase):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+@skip_unless_lms
 @ddt.ddt
 class CreditRequirementApiTests(CreditApiTestBase):
     """
@@ -1165,7 +1164,7 @@ class CreditProviderIntegrationApiTests(CreditApiTestBase):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+@skip_unless_lms
 @override_settings(
     ECOMMERCE_API_URL=TEST_API_URL,
     ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY,

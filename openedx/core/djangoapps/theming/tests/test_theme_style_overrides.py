@@ -1,18 +1,17 @@
 """
-    Tests for comprehensive themes.
+Tests for comprehensive themes.
 """
-import unittest
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.contrib import staticfiles
 
 from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from student.tests.factories import UserFactory
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestComprehensiveThemeLMS(TestCase):
     """
     Test html, sass and static file overrides for comprehensive themes.
@@ -66,7 +65,7 @@ class TestComprehensiveThemeLMS(TestCase):
         self.assertEqual(result, settings.TEST_THEME / 'lms/static/images/logo.png')
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+@skip_unless_cms
 class TestComprehensiveThemeCMS(TestCase):
     """
     Test html, sass and static file overrides for comprehensive themes.
@@ -92,7 +91,7 @@ class TestComprehensiveThemeCMS(TestCase):
         self.assertContains(resp, "Login Page override for test-theme.")
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestComprehensiveThemeDisabledLMS(TestCase):
     """
         Test Sass compilation order and sass overrides for comprehensive themes.
@@ -115,7 +114,7 @@ class TestComprehensiveThemeDisabledLMS(TestCase):
         self.assertEqual(result, settings.REPO_ROOT / 'lms/static/images/logo.png')
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+@skip_unless_cms
 class TestComprehensiveThemeDisabledCMS(TestCase):
     """
     Test default html, sass and static file when no theme is applied.
@@ -139,7 +138,7 @@ class TestComprehensiveThemeDisabledCMS(TestCase):
         self.assertNotContains(resp, "Login Page override for test-theme.")
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestStanfordTheme(TestCase):
     """
     Test html, sass and static file overrides for stanford theme.

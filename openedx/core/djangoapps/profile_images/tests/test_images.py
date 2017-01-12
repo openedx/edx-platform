@@ -5,9 +5,7 @@ from contextlib import closing
 from itertools import product
 import os
 from tempfile import NamedTemporaryFile
-import unittest
 
-from django.conf import settings
 from django.core.files.uploadedfile import UploadedFile
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,6 +15,7 @@ from nose.plugins.attrib import attr
 import piexif
 from PIL import Image
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ..exceptions import ImageValidationError
 from ..images import (
     create_profile_images,
@@ -31,7 +30,7 @@ from .helpers import make_image_file, make_uploaded_file
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 class TestValidateUploadedImage(TestCase):
     """
     Test validate_uploaded_image
@@ -127,7 +126,7 @@ class TestValidateUploadedImage(TestCase):
 
 @attr(shard=2)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 class TestGenerateProfileImages(TestCase):
     """
     Test create_profile_images
@@ -224,7 +223,7 @@ class TestGenerateProfileImages(TestCase):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Profile Image API is only supported in LMS')
+@skip_unless_lms
 class TestRemoveProfileImages(TestCase):
     """
     Test remove_profile_images

@@ -12,7 +12,6 @@ import json
 from mock import patch
 from nose.plugins.attrib import attr
 from pytz import UTC
-import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -25,7 +24,7 @@ from student.tests.factories import UserFactory
 from student.models import UserProfile, LanguageProficiency, PendingEmailChange
 from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
 from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
 
 TEST_PROFILE_IMAGE_UPLOADED_AT = datetime.datetime(2002, 1, 9, 15, 43, 01, tzinfo=UTC)
@@ -140,7 +139,7 @@ class UserAPITestCase(APITestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 @attr(shard=2)
 class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
     """
@@ -193,7 +192,7 @@ class TestOwnUsernameAPI(CacheIsolationTestCase, UserAPITestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 @patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
     'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP',
@@ -783,7 +782,7 @@ class TestAccountsAPI(CacheIsolationTestCase, UserAPITestCase):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestAccountAPITransactions(TransactionTestCase):
     """
     Tests the transactional behavior of the account API

@@ -5,15 +5,15 @@ Testing persistent tasks
 from __future__ import print_function
 
 from celery import task
-from django.conf import settings
 from django.test import TestCase
-from unittest import skipUnless
 import six
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ..models import FailedTask
 from ..task import PersistOnFailureTask
 
 
+@skip_unless_lms
 class PersistOnFailureTaskTestCase(TestCase):
     """
     Test that persistent tasks save the appropriate values when needed.
@@ -32,15 +32,12 @@ class PersistOnFailureTaskTestCase(TestCase):
         cls.exampletask = exampletask
         super(PersistOnFailureTaskTestCase, cls).setUpClass()
 
-
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_exampletask_without_failure(self):
         result = self.exampletask.delay()
         result.wait()
         self.assertEqual(result.status, u'SUCCESS')
         self.assertFalse(FailedTask.objects.exists())
 
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_exampletask_with_failure(self):
         result = self.exampletask.delay(message=u'The example task failed')
         with self.assertRaises(ValueError):
@@ -57,7 +54,6 @@ class PersistOnFailureTaskTestCase(TestCase):
         self.assertEqual(failed_task_object.exc, u"ValueError(u'The example task failed',)")
         self.assertIsNone(failed_task_object.datetime_resolved)
 
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_persists_when_called_with_wrong_args(self):
         result = self.exampletask.delay(15, u'2001-03-04', err=True)
         with self.assertRaises(TypeError):
@@ -67,7 +63,6 @@ class PersistOnFailureTaskTestCase(TestCase):
         self.assertEqual(failed_task_object.args, [15, u'2001-03-04'])
         self.assertEqual(failed_task_object.kwargs, {u'err': True})
 
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_persists_with_overlength_field(self):
         overlong_message = u''.join(u'%03d' % x for x in six.moves.range(100))
         result = self.exampletask.delay(message=overlong_message)
