@@ -37,6 +37,8 @@ lookup_tag = inputtypes.registry.get_class_for_tag
 
 
 DESCRIBEDBY = HTML('aria-describedby="status_{status_id} desc-1 desc-2"')
+# Use TRAILING_TEXT_DESCRIBEDBY when trailing_text is not null
+TRAILING_TEXT_DESCRIBEDBY = HTML('aria-describedby="trailing_text_{trailing_text_id} status_{status_id} desc-1 desc-2"')
 DESCRIPTIONS = OrderedDict([('desc-1', 'description text 1'), ('desc-2', 'description text 2')])
 RESPONSE_DATA = {
     'label': 'question text 101',
@@ -361,7 +363,7 @@ class TextLineTest(unittest.TestCase):
                 'trailing_text': expected_text,
                 'preprocessor': None,
                 'response_data': RESPONSE_DATA,
-                'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
+                'describedby_html': TRAILING_TEXT_DESCRIBEDBY.format(trailing_text_id=prob_id, status_id=prob_id)
             }
             self.assertEqual(context, expected)
 
@@ -1295,7 +1297,7 @@ class FormulaEquationTest(unittest.TestCase):
                 'inline': False,
                 'trailing_text': expected_text,
                 'response_data': RESPONSE_DATA,
-                'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
+                'describedby_html': TRAILING_TEXT_DESCRIBEDBY.format(trailing_text_id=prob_id, status_id=prob_id)
             }
 
             self.assertEqual(context, expected)

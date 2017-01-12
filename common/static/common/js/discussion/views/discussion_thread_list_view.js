@@ -93,6 +93,7 @@
                 this.courseSettings = options.courseSettings;
                 this.hideRefineBar = options.hideRefineBar;
                 this.supportsActiveThread = options.supportsActiveThread;
+                this.hideReadState = options.hideReadState || false;
                 this.displayedCollection = new Discussion(this.collection.models, {
                     pages: this.collection.pages
                 });
@@ -342,7 +343,8 @@
                             neverRead: neverRead,
                             threadUrl: thread.urlFor('retrieve'),
                             threadPreview: threadPreview,
-                            showThreadPreview: this.showThreadPreview
+                            showThreadPreview: this.showThreadPreview,
+                            hideReadState: this.hideReadState
                         },
                         thread.toJSON()
                     );

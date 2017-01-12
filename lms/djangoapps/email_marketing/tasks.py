@@ -3,6 +3,7 @@ This file contains celery tasks for email marketing signal handler.
 """
 import logging
 import time
+from datetime import datetime, timedelta
 
 from celery import task
 from django.core.cache import cache
@@ -56,10 +57,16 @@ def update_user(self, sailthru_vars, email, site=None, new_user=False, activatio
 
     # if activating user, send welcome email
     if activation and email_config.sailthru_activation_template:
+        scheduled_datetime = datetime.utcnow() + timedelta(seconds=email_config.welcome_email_send_delay)
         try:
-            sailthru_response = sailthru_client.api_post("send",
-                                                         {"email": email,
-                                                          "template": email_config.sailthru_activation_template})
+            sailthru_response = sailthru_client.api_post(
+                "send",
+                {
+                    "email": email,
+                    "template": email_config.sailthru_activation_template,
+                    "schedule_time": scheduled_datetime.strftime('%Y-%m-%dT%H:%M:%SZ')
+                }
+            )
         except SailthruClientError as exc:
             log.error("Exception attempting to send welcome email to user %s in Sailthru - %s", email, unicode(exc))
             raise self.retry(exc=exc,

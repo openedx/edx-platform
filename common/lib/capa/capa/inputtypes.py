@@ -328,9 +328,16 @@ class InputTypeBase(object):
         }
 
         # Generate the list of ids to be used with the aria-describedby field.
+        descriptions = list()
+
+        # If there is trailing text, add the id as the first element to the list before adding the status id
+        if 'trailing_text' in self.loaded_attributes and self.loaded_attributes['trailing_text']:
+            trailing_text_id = 'trailing_text_' + self.input_id
+            descriptions.append(trailing_text_id)
+
         # Every list should contain the status id
         status_id = 'status_' + self.input_id
-        descriptions = list([status_id])
+        descriptions.append(status_id)
         descriptions.extend(self.response_data.get('descriptions', {}).keys())
         description_ids = ' '.join(descriptions)
         context.update(

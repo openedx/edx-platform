@@ -296,11 +296,9 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
 def get_html5_ids(html5_sources):
     """
     Helper method to parse out an HTML5 source into the ideas
-    NOTE: This assumes that '/' are not in the filename.
-    Slices each id by 150, restricting too long strings as video names.
+    NOTE: This assumes that '/' are not in the filename
     """
-    html5_ids = [x.split('/')[-1].rsplit('.', 1)[0][:150] for x in html5_sources]
-
+    html5_ids = [x.split('/')[-1].rsplit('.', 1)[0] for x in html5_sources]
     return html5_ids
 
 
