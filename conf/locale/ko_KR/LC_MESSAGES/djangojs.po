@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -15,7 +15,7 @@
 # kmooc <shevious@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -31,7 +31,7 @@
 # kmooc <shevious@gmail.com>, 2016
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -46,7 +46,7 @@
 # kmooc <shevious@gmail.com>, 2016
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -62,9 +62,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-08 18:45+0000\n"
-"PO-Revision-Date: 2016-11-29 12:51+0000\n"
-"Last-Translator: kmooc <shevious@gmail.com>\n"
+"POT-Creation-Date: 2017-01-05 17:02+0000\n"
+"PO-Revision-Date: 2017-01-05 17:07+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -141,6 +141,14 @@ msgstr "업로드 중"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#: cms/static/js/views/active_video_upload.js
+#: cms/static/js/views/modals/edit_xblock.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+msgid "Close"
+msgstr "닫기"
+
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Name"
@@ -209,13 +217,6 @@ msgstr "저장"
 msgid "Advanced"
 msgstr "고급"
 
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: cms/static/js/views/modals/edit_xblock.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-msgid "Close"
-msgstr "닫기"
-
 #: cms/static/js/views/previous_video_upload.js
 #: lms/static/js/views/image_field.js
 msgid "Removing"
@@ -232,6 +233,11 @@ msgstr "변경사항이 저장되었습니다."
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/utils.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/static/js/student_account/views/FinishAuthView.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
@@ -1885,40 +1891,12 @@ msgstr ""
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
 msgstr ""
 
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Hide Discussion"
-msgstr "게시판 감추기"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Show Discussion"
-msgstr "게시판  보기"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/response_comment_view.js
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "Sorry"
-msgstr "죄송합니다"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "We had some trouble loading the discussion. Please try again."
-msgstr "게시판을 로딩하는데 문제가 있습니다. 다시 시도하세요."
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid ""
-"We had some trouble loading the threads you requested. Please try again."
-msgstr "요청한 게시물을 로딩하는 중 오류가 발생했습니다. 다시 시도하세요."
-
 #: common/static/common/js/discussion/utils.js
 msgid "Loading content"
 msgstr "콘텐츠 로딩중"
 
 #: common/static/common/js/discussion/utils.js
-msgid ""
-"We had some trouble processing your request. Please ensure you have copied "
-"any "
+msgid "Your request could not be processed. Refresh the page and try again."
 msgstr ""
 
 #: common/static/common/js/discussion/utils.js
@@ -1944,101 +1922,120 @@ msgid_plural "{numVotes} Votes"
 msgstr[0] ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble subscribing you to this thread. Please try again."
-msgstr "이 게시물 구독에 오류가 발생했습니다. 다시 시도하세요."
+msgid ""
+"You could not be subscribed to this post. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble unsubscribing you from this thread. Please try again."
-msgstr "이 게시물 구독 취소에 오류가 발생했습니다. 다시 시도하세요."
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble marking this response as an answer.  Please try again."
-msgstr "채택하는 도중 오류가 발생했습니다. 다시 시도하세요."
+"This response could not be marked as an answer. Refresh the page and try "
+"again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing this response as an answer.  Please try again."
-msgstr "채택 취소 중 오류가 발생했습니다. 다시 시도하세요."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble marking this response endorsed.  Please try again."
-msgstr "이 답변을 지지하는데 오류가 발생했습니다. 다시 시도하세요."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble removing this endorsement.  Please try again."
-msgstr "이 답변 지지를 취소하는데 오류가 발생했습니다. 다시 시도하세요."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble saving your vote.  Please try again."
-msgstr "투표를 저장하는데 오류가 발생했습니다. 다시 시도하세요."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble pinning this thread. Please try again."
-msgstr "이 게시물을 고정하는데 오류가 발생했습니다. 다시 시도하세요."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble unpinning this thread. Please try again."
-msgstr "이 게시물 고정을 취소하는데 오류가 발생했습니다. 다시 시도하세요."
+"This response could not be unmarked as an answer. Refresh the page and try "
+"again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing your flag on this post.  Please try again."
-msgstr "이 게시글의 flag를 삭제하는데 문제가 발생했습니다. 다시 시도하세요."
+"This response could not be marked as endorsed. Refresh the page and try "
+"again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reporting this post.  Please try again."
-msgstr "게시물을 등록하는데 문제가 발생했습니다. 다시 시도하세요."
+msgid "This response could not be unendorsed. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble closing this thread.  Please try again."
-msgstr "이 게시물을 닫는데 오류가 발생했습니다. 다시 시도하세요."
+msgid "This vote could not be processed. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reopening this thread.  Please try again."
-msgstr "이 게시물을 다시 여는데 문제가 발생했습니다. 다시 시도하세요."
+msgid "This post could not be pinned. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be unpinned. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be flagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be unflagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be closed. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be reopened. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Hide Discussion"
+msgstr "게시판 감추기"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "This discussion could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "게시판  보기"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
 msgstr "다른 게시물 추가 로딩중"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "We had some trouble loading more threads. Please try again."
-msgstr "다른 게시물 추가 로딩중에 오류가 발생했습니다. 다시 시도하세요."
+msgid "Additional posts could not be loaded. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
 msgstr "현재 대화"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "Loading thread list"
-msgstr "게시물 목록 로딩중"
+msgid "Loading posts list"
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No threads matched your query."
-msgstr "귀하의 검색에 부합하는 게시물이 없습니다. "
+msgid "No posts matched your query."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
 msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "The post you selected has been deleted."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Responses could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
-"The thread you selected has been deleted. Please select another thread."
-msgstr "선택한 게시물은 삭제되었습니다. 다른 게시물을 선택하세요."
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading responses. Please reload the page."
-msgstr "오류가 발생했습니다. 다시 시도하세요."
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading more responses. Please try again."
-msgstr "더 많은 답변 로드중 문제가 생겼습니다. 다시 시도하세요. "
+"Additional responses could not be loaded. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
@@ -2084,8 +2081,8 @@ msgid "Are you sure you want to delete this comment?"
 msgstr "이 댓글을 삭제하시겠습니까?"
 
 #: common/static/common/js/discussion/views/response_comment_view.js
-msgid "We had some trouble deleting this comment. Please try again."
-msgstr "코멘트를 삭제하는데 오류가 발생했습니다. 다시 시도하세요."
+msgid "This comment could not be deleted. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
@@ -2322,10 +2319,6 @@ msgstr "부적절한 주석으로 신고합니다."
 msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
 msgstr[0] "이 주석은 %(count)s 플래그가 있습니다."
-
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "We had some trouble loading the page you requested. Please try again."
-msgstr "요청한 페이지를 로딩 중 오류가 발생했습니다. 잠시 후에 다시 시도하세요."
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -3383,7 +3376,7 @@ msgid "Insert Hyperlink"
 msgstr "하이퍼링크 삽입"
 
 #: lms/static/js/Markdown.Editor.js
-msgid "e.g. 'http://google.com/'"
+msgid "e.g. 'http://google.com'"
 msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
@@ -3782,6 +3775,10 @@ msgid "[no tags]"
 msgstr "[no tags]"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Unable to submit application"
+msgstr ""
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An error has occurred. Check your Internet connection and try again."
 msgstr ""
@@ -4148,6 +4145,25 @@ msgstr "장바구니에 선택된 강좌를 추가하고 있습니다."
 msgid "Loading your courses"
 msgstr "강좌를 불러오고 있습니다."
 
+#: lms/static/js/student_account/views/FormView.js
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "An error occurred."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "We couldn't sign you in."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+#, c-format
+msgid "An error occurred when signing you in to %s."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+#: lms/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr ""
+
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
@@ -4160,6 +4176,26 @@ msgstr ""
 msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"You have successfully signed into %(currentProvider)s, but your "
+"%(currentProvider)s"
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "We couldn't create your account."
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "You've successfully signed into %(currentProvider)s."
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4240,6 +4276,10 @@ msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
+msgstr ""
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Default (Local Time Zone)"
 msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
@@ -4656,7 +4696,7 @@ msgstr "학습자 수 "
 msgid "Overall Score"
 msgstr ""
 
-#: cms/static/cms/js/main.js
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -5147,8 +5187,28 @@ msgstr ""
 msgid "Marketing Slug is required."
 msgstr ""
 
+#: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
+msgid "Your file could not be uploaded"
+msgstr ""
+
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload completed for video {fileName}"
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload failed for video {fileName}"
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} is not in a supported file format. "
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} exceeds maximum size of {maxFileSizeInGB} GB."
 msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
@@ -5192,10 +5252,6 @@ msgstr ""
 msgid ""
 "Please follow the instructions here to upload a file elsewhere and link to "
 "it: {maxFileSizeRedirectUrl}"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid "Your file could not be uploaded"
 msgstr ""
 
 #: cms/static/js/views/assets.js
@@ -5841,7 +5897,6 @@ msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "상태"
 
@@ -5941,11 +5996,11 @@ msgid "Error posting your message."
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible To:"
+msgid "Add a Post"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
+msgid "Visible to"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
@@ -5955,8 +6010,7 @@ msgid ""
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Title:"
+msgid "All Groups"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
@@ -5965,7 +6019,7 @@ msgid "Add a clear and descriptive title to encourage participation."
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Enter your question or comment."
+msgid "Your question or idea"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
@@ -5981,7 +6035,10 @@ msgid "post anonymously to classmates"
 msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Add Post"
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
 msgstr ""
 
 #: common/static/common/templates/discussion/post-user-display.underscore
@@ -6104,12 +6161,6 @@ msgstr[0] ""
 msgid "Add a comment"
 msgstr ""
 
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr ""
-
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
@@ -6134,7 +6185,13 @@ msgid "This post is visible to everyone."
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type:"
+msgid "Post type"
+msgstr ""
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid ""
+"Questions raise issues that need answers. Discussions share ideas and start "
+"conversations."
 msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
@@ -6145,12 +6202,6 @@ msgstr ""
 msgid "Discussion"
 msgstr ""
 
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid ""
-"Questions raise issues that need answers. Discussions share ideas and start "
-"conversations."
-msgstr ""
-
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
 msgstr ""
@@ -6159,16 +6210,8 @@ msgstr ""
 msgid "Add a response:"
 msgstr ""
 
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Expand discussion"
-msgstr ""
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Collapse discussion"
-msgstr ""
-
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Topic Area:"
+msgid "Topic area"
 msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
@@ -6232,7 +6275,7 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "Active Threads"
+msgid "All Posts"
 msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
@@ -6704,10 +6747,6 @@ msgstr ""
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
-msgstr ""
-
-#: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Unable to submit application"
 msgstr ""
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
@@ -7263,28 +7302,6 @@ msgid "Register through edX"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
-#, python-format
-msgid ""
-"You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account."
-" To link your accounts, sign in now using your %(platformName)s password."
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid "We couldn't sign you in."
-msgstr "로그인 실패"
-
-#: lms/templates/student_account/login.underscore
-#, python-format
-msgid "An error occurred when signing you in to %(platformName)s."
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -7322,11 +7339,6 @@ msgid "Create an account"
 msgstr "가입하기"
 
 #: lms/templates/student_account/password_reset.underscore
-#: lms/templates/student_account/register.underscore
-msgid "An error occurred."
-msgstr ""
-
-#: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
 msgstr ""
 
@@ -7339,22 +7351,6 @@ msgstr ""
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset my password"
 msgstr "비밀번호 재설정"
-
-#: lms/templates/student_account/register.underscore
-msgid "We couldn't create your account."
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid "You've successfully signed into %(currentProvider)s."
-msgstr ""
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid ""
-"We just need a little more information before you start learning with "
-"%(platformName)s."
-msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -7465,11 +7461,6 @@ msgstr ""
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgstr "강좌"
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#, python-format
-msgid "Starts: %(start)s"
-msgstr ""
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
@@ -7989,6 +7980,14 @@ msgstr ""
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
+msgstr ""
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "Read More"
+msgstr ""
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "details about the failure"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-button.underscore

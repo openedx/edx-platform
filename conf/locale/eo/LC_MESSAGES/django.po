@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 16:47+0000\n"
-"PO-Revision-Date: 2017-01-05 16:47:32.409025\n"
+"POT-Creation-Date: 2017-01-12 17:52+0000\n"
+"PO-Revision-Date: 2017-01-12 17:52:25.477141\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -198,7 +198,7 @@ msgstr "Pröféssïönäl Éd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/courseware/courseware.html
+#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "Çöürsé Ⱡ'σяєм ιρѕυ#"
 
@@ -7050,6 +7050,14 @@ msgstr ""
 "Öptïönäl lms ürl sçhémé + höst üséd tö çönstrüçt ürls för çöntént lïßrärý, "
 "é.g. https://çöürsés.édx.örg. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Number of seconds to delay the sending of User Welcome email after user has "
+"been activated"
+msgstr ""
+"Nümßér öf séçönds tö déläý thé séndïng öf Ûsér Wélçömé émäïl äftér üsér häs "
+"ßéén äçtïvätéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
 msgstr "{platform_name} Stäff Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -7301,6 +7309,14 @@ msgstr "Mäïlïng Àddréss Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Goals"
 msgstr "Göäls Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Enrollment Mode"
+msgstr "Énröllmént Mödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Verification Status"
+msgstr "Vérïfïçätïön Stätüs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
@@ -12145,17 +12161,34 @@ msgstr "Ìn Prögréss Ⱡ'σяєм ιρѕυм ∂σłσя #"
 msgid "Ready"
 msgstr "Réädý Ⱡ'σяєм ιρѕ#"
 
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Uploaded"
+msgstr "Ûplöädéd Ⱡ'σяєм ιρѕυм ∂#"
+
 #. Translators: This is the status for a video that the servers have failed to
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
 msgstr "Fäïléd Ⱡ'σяєм ιρѕυ#"
 
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Cancelled"
+msgstr "Çänçélléd Ⱡ'σяєм ιρѕυм ∂σł#"
+
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed Duplicate"
 msgstr "Fäïléd Düplïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "YouTube Duplicate"
+msgstr "ÝöüTüßé Düplïçäté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
 
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
@@ -13051,6 +13084,10 @@ msgstr ""
 "α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ "
 "єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє"
 " νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυł#"
+
+#: lms/templates/help_modal.html
+msgid "- Select -"
+msgstr "- Séléçt - Ⱡ'σяєм ιρѕυм ∂σłσ#"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -21921,18 +21958,18 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid ""
-"To begin issuing certificates, a course team member with the Admin role "
-"selects {em_start}Activate{em_end}. Only course team members with the Admin "
-"role can edit or delete an activated certificate."
+"To begin issuing course certificates, a course team member with either the "
+"Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
+"members with these roles can edit or delete an activated certificate."
 msgstr ""
-"Tö ßégïn ïssüïng çértïfïçätés, ä çöürsé téäm mémßér wïth thé Àdmïn rölé "
-"séléçts {em_start}Àçtïväté{em_end}. Önlý çöürsé téäm mémßérs wïth thé Àdmïn "
-"rölé çän édït ör délété än äçtïvätéd çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
-"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ηση ρяσι∂єηт#"
+"Tö ßégïn ïssüïng çöürsé çértïfïçätés, ä çöürsé téäm mémßér wïth éïthér thé "
+"Stäff ör Àdmïn rölé séléçts {em_start}Àçtïväté{em_end}. Önlý çöürsé téäm "
+"mémßérs wïth thésé rölés çän édït ör délété än äçtïvätéd çértïfïçäté. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
+"ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ "
+"ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт #"
 
 #: cms/templates/certificates.html
 msgid ""
@@ -22089,11 +22126,11 @@ msgstr "Löçätïön ÌD Ⱡ'σяєм ιρѕυм ∂σłσя #"
 
 #: cms/templates/container.html
 msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
+"To create a link to this unit from an HTML component in this course, enter "
+"\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
-"Ûsé thïs ÌD whén ýöü çréäté lïnks tö thïs ünït fröm öthér çöürsé çöntént. "
-"Ýöü éntér thé ÌD ïn thé ÛRL fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+"Tö çréäté ä lïnk tö thïs ünït fröm än HTML çömpönént ïn thïs çöürsé, éntér "
+"\"/jümp_tö_ïd/<location ID>\" äs thé ÛRL välüé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"

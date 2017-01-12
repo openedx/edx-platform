@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -43,7 +43,7 @@
 # Zakaria <zakaria.braksa@gmail.com>, 2015
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -71,7 +71,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2014-2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -97,7 +97,7 @@
 # سيف المنايا <m2fahad9@gmail.com>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -121,9 +121,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-08 18:45+0000\n"
-"PO-Revision-Date: 2016-12-29 20:30+0000\n"
-"Last-Translator: e2f_ar t3 <e2f_ar_t3@outlook.com>\n"
+"POT-Creation-Date: 2017-01-05 17:02+0000\n"
+"PO-Revision-Date: 2017-01-05 17:07+0000\n"
+"Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -216,6 +216,20 @@ msgstr "جاري التحميل"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#: cms/static/js/views/active_video_upload.js
+#: cms/static/js/views/modals/edit_xblock.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/templates/image-modal.underscore
+#: common/static/common/templates/discussion/alert-popup.underscore
+#: common/static/common/templates/discussion/forum-action-close.underscore
+#: common/static/common/templates/discussion/search-alert.underscore
+#: lms/templates/student_profile/share_modal.underscore
+msgid "Close"
+msgstr "إغلاق"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
@@ -297,19 +311,6 @@ msgstr "حفظ"
 msgid "Advanced"
 msgstr "إعدادات متقدّمة"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: cms/static/js/views/modals/edit_xblock.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/common/templates/image-modal.underscore
-#: common/static/common/templates/discussion/alert-popup.underscore
-#: common/static/common/templates/discussion/forum-action-close.underscore
-#: common/static/common/templates/discussion/search-alert.underscore
-#: lms/templates/student_profile/share_modal.underscore
-msgid "Close"
-msgstr "إغلاق"
-
 #: cms/static/js/views/previous_video_upload.js
 #: lms/static/js/views/image_field.js
 msgid "Removing"
@@ -326,6 +327,11 @@ msgstr "جرى حفظ التغييرات التي أجريتها. "
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/utils.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/static/js/student_account/views/FinishAuthView.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
@@ -1612,12 +1618,9 @@ msgstr ""
 "يبدو أن الرابط الذي أدخلته عبارة عن رابط خارجي، هل تريد إضافة البادئة "
 "http:// اللازمة؟"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/signatory-details.underscore
 msgid "Title"
 msgstr "العنوان"
 
@@ -2073,43 +2076,13 @@ msgstr "يُعرض الآن {firstIndex} من أصل {numItems}."
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
 msgstr "يُعرض الآن {firstIndex}-{lastIndex} من أصل {numItems}."
 
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Hide Discussion"
-msgstr "إخفاء النقاش"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Show Discussion"
-msgstr "إظهار النقاش"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/response_comment_view.js
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "Sorry"
-msgstr "عذرًا"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "We had some trouble loading the discussion. Please try again."
-msgstr "نأسف لحدوث مشكلة في تحميل النقاش. يُرجى إعادة المحاولة. "
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid ""
-"We had some trouble loading the threads you requested. Please try again."
-msgstr ""
-"نأسف لحدوث مشكلة في تحميل المواضيع التي طلبتها. يُرجى إعادة المحاولة. "
-
 #: common/static/common/js/discussion/utils.js
 msgid "Loading content"
 msgstr "جاري تحميل المحتوى"
 
 #: common/static/common/js/discussion/utils.js
-msgid ""
-"We had some trouble processing your request. Please ensure you have copied "
-"any "
+msgid "Your request could not be processed. Refresh the page and try again."
 msgstr ""
-"كان لدينا بعض المشاكل في معالجة طلبك. الرجاء التأكد من الانتهاء من نسخ أي"
 
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/templates/discussion/pagination.underscore
@@ -2145,106 +2118,120 @@ msgstr[4] "{numVotes} صوتاً"
 msgstr[5] "{numVotes} صوت"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble subscribing you to this thread. Please try again."
+msgid ""
+"You could not be subscribed to this post. Refresh the page and try again."
 msgstr ""
-"نأسف لحدوث مشكلة في إتمام تسجيلك في هذا الموضوع. يُرجى إعادة المحاولة. "
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble unsubscribing you from this thread. Please try again."
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
 msgstr ""
-"نأسف لحدوث مشكلة في إلغاء تسجيلك في هذا الموضوع. يُرجى إعادة المحاولة."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble marking this response as an answer.  Please try again."
+"This response could not be marked as an answer. Refresh the page and try "
+"again."
 msgstr ""
-"نأسف لحدوث مشكلة في تحديد هذا الرد على أنّه إجابة. يُرجى إعادة المحاولة."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing this response as an answer.  Please try again."
-msgstr "نأسف لحدوث مشكلة في حذف هذا الرد كإجابة. يُرجى إعادة المحاولة."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble marking this response endorsed.  Please try again."
+"This response could not be unmarked as an answer. Refresh the page and try "
+"again."
 msgstr ""
-"نأسف لحدوث مشكلة في تحديد هذا الرد على أنّه مصدّق. يُرجى إعادة المحاولة. "
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble removing this endorsement.  Please try again."
-msgstr "نأسف لحدوث مشكلة في إلغاء هذه المصادقة. يُرجى إعادة المحاولة. "
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble saving your vote.  Please try again."
-msgstr "نأسف لحدوث مشكلة في حفظ تصويتك. يُرجى إعادة المحاولة. "
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble pinning this thread. Please try again."
-msgstr "نأسف لحدوث مشكلة في تثبيت هذا الموضوع. يُرجى إعادة المحاولة."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble unpinning this thread. Please try again."
-msgstr "نأسف لحدوث مشكلة في إلغاء تثبيت هذا الموضوع. يُرجى إعادة المحاولة."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing your flag on this post.  Please try again."
+"This response could not be marked as endorsed. Refresh the page and try "
+"again."
 msgstr ""
-"نأسف لحدوث مشكلة في إزالة إبلاغك حول هذا المنشور. يُرجى إعادة المحاولة."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reporting this post.  Please try again."
-msgstr "نأسف لحدوث مشكلة في الإبلاغ عن هذا المنشور. يُرجى إعادة المحاولة."
+msgid "This response could not be unendorsed. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble closing this thread.  Please try again."
-msgstr "نأسف لحدوث مشكلة في إغلاق هذا الموضوع. يُرجى إعادة المحاولة."
+msgid "This vote could not be processed. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reopening this thread.  Please try again."
-msgstr "نأسف لحدوث مشكلة في إعادة فتح هذا الموضوع. يُرجى إعادة المحاولة."
+msgid "This post could not be pinned. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be unpinned. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be flagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be unflagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be closed. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be reopened. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Hide Discussion"
+msgstr "إخفاء النقاش"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "This discussion could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "إظهار النقاش"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
 msgstr "تحميل المزيد من المواضيع"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "We had some trouble loading more threads. Please try again."
-msgstr "نأسف لحدوث مشكلة في تحميل المزيد من المواضيع. يُرجى إعادة المحاولة."
+msgid "Additional posts could not be loaded. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
 msgstr "المحادثة الحالية"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "Loading thread list"
-msgstr "تحميل قائمة المواضيع"
+msgid "Loading posts list"
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
 msgstr "لم نعثر على {original_query}. "
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No threads matched your query."
-msgstr "عذرًا، لا توجد مواضيع مطابقة لاستفسارك."
+msgid "No posts matched your query."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
 msgstr "عرض منشوراتِ حسب {username}."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "The post you selected has been deleted."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Responses could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
-"The thread you selected has been deleted. Please select another thread."
-msgstr "جرى حذف الموضوع الذي اخترته. يُرجى اختيار موضوع آخر."
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading responses. Please reload the page."
-msgstr "نأسف لحدوث مشكلة في تحميل الردود. يُرجى إعادة تحميل الصفحة."
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading more responses. Please try again."
-msgstr "نأسف لحدوث مشكلة في تحميل المزيد من الردود. يُرجى إعادة المحاولة."
+"Additional responses could not be loaded. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
@@ -2307,8 +2294,8 @@ msgid "Are you sure you want to delete this comment?"
 msgstr "هل أنت واثق من أنّك تودّ حذف هذا التعليق؟"
 
 #: common/static/common/js/discussion/views/response_comment_view.js
-msgid "We had some trouble deleting this comment. Please try again."
-msgstr "نأسف لحدوث مشكلة في حذف هذا التعليق. يُرجى إعادة المحاولة."
+msgid "This comment could not be deleted. Refresh the page and try again."
+msgstr ""
 
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
@@ -2599,10 +2586,6 @@ msgstr[2] "يوجد %(count)s إبلاغ على هذه الملاحظات الت
 msgstr[3] "توجد %(count)s إبلاغات على هذه الملاحظات التوضيحية"
 msgstr[4] "توجد %(count)s إبلاغات على هذه الملاحظات التوضيحية"
 msgstr[5] "تتضمّن هذه الملاحظة التوضيحية %(count)s إبلاغات. "
-
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "We had some trouble loading the page you requested. Please try again."
-msgstr "نأسف لحدوث مشكلة في تحميل الصفحة التي طلبتها. يُرجى إعادة المحاولة. "
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -3751,8 +3734,8 @@ msgid "Insert Hyperlink"
 msgstr "إدخال الرابط التشعّبي"
 
 #: lms/static/js/Markdown.Editor.js
-msgid "e.g. 'http://google.com/'"
-msgstr "مثال: 'http://google.com/'"
+msgid "e.g. 'http://google.com'"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Link Description"
@@ -4182,6 +4165,10 @@ msgstr "بحث في النتائج"
 #: lms/static/js/edxnotes/views/tabs/tags.js
 msgid "[no tags]"
 msgstr "[لا يوجد أي وسم]"
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Unable to submit application"
+msgstr ""
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
@@ -4621,6 +4608,24 @@ msgstr "جاري إضافة المساق المختار إلى عربة مشتر
 msgid "Loading your courses"
 msgstr "جاري تحميل مساقاتك"
 
+#: lms/static/js/student_account/views/FormView.js
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "An error occurred."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "We couldn't sign you in."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+#, c-format
+msgid "An error occurred when signing you in to %s."
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr "يُرجى تفقّد بريدك الإلكتروني"
+
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
@@ -4638,6 +4643,26 @@ msgid ""
 "An error has occurred. Try refreshing the page, or check your Internet "
 "connection."
 msgstr "نأسف لحدوث خطأ. يُرجى تحديث الصفحة أو تأكّد من اتصالك بالإنترنت."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"You have successfully signed into %(currentProvider)s, but your "
+"%(currentProvider)s"
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "We couldn't create your account."
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "You've successfully signed into %(currentProvider)s."
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -4735,6 +4760,10 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
 msgstr "جميع المناطق الزمنية"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Default (Local Time Zone)"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5196,7 +5225,7 @@ msgstr "عدد الطلّاب"
 msgid "Overall Score"
 msgstr ""
 
-#: cms/static/cms/js/main.js
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -5706,9 +5735,29 @@ msgstr "نشر"
 msgid "Marketing Slug is required."
 msgstr "الشارة التسويقية مطلوبة."
 
+#: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
+msgid "Your file could not be uploaded"
+msgstr "عذرًا، لم يمكن تحميل ملفّك. "
+
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
 msgstr "عمليات تحميل ملف الفيديو الخاص بك غير مكتملة."
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload completed for video {fileName}"
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload failed for video {fileName}"
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} is not in a supported file format. "
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} exceeds maximum size of {maxFileSizeInGB} GB."
+msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid ": video upload complete."
@@ -5759,10 +5808,6 @@ msgid ""
 msgstr ""
 "يُرجى اتّباع التعليمات الواردة هنا لتغيير مكان تحميل الملفّات التي يزيد "
 "حجمها عن الحد الأقصى المسموح به ولوضع رابط لها: {maxFileSizeRedirectUrl}"
-
-#: cms/static/js/views/assets.js
-msgid "Your file could not be uploaded"
-msgstr "عذرًا، لم يمكن تحميل ملفّك. "
 
 #: cms/static/js/views/assets.js
 msgid "Max file size exceeded"
@@ -6466,7 +6511,6 @@ msgstr "السابق"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "الحالة"
 
@@ -6566,12 +6610,12 @@ msgid "Error posting your message."
 msgstr "حدث خطأ في نشر رسالتك."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible To:"
-msgstr "مرئيٍّ لـ:"
+msgid "Add a Post"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
-msgstr "كافّة المجموعات "
+msgid "Visible to"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid ""
@@ -6582,9 +6626,8 @@ msgstr ""
 "مرئيّة لجميع الطلاب أو لشعب معيّنة يحدّدوها."
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Title:"
-msgstr "العنوان:"
+msgid "All Groups"
+msgstr "كافّة المجموعات "
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -6592,8 +6635,8 @@ msgid "Add a clear and descriptive title to encourage participation."
 msgstr "أضِف عنوانًا واضحًا ومعبّرًا لتشجيع المشاركة."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Enter your question or comment."
-msgstr "أَدخِل سؤالك أو تعليقك."
+msgid "Your question or idea"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6608,8 +6651,11 @@ msgid "post anonymously to classmates"
 msgstr "انشر أمام الزملاء من دون الكشف عن الهوية "
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Add Post"
-msgstr "أَضِف منشورًا"
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "تقديم"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
@@ -6738,12 +6784,6 @@ msgstr[5] "إظهار التعليقات (%(num_comments)s)"
 msgid "Add a comment"
 msgstr "إضافة تعليق "
 
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "تقديم"
-
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
@@ -6768,16 +6808,8 @@ msgid "This post is visible to everyone."
 msgstr "هذا المنشور مرئيٌّ للجميع."
 
 #: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type:"
-msgstr "نوع المنشور:"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Question"
-msgstr "سؤال"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Discussion"
-msgstr "المناقشة"
+msgid "Post type"
+msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
@@ -6787,6 +6819,14 @@ msgstr ""
 "تثير الأسئلة مواضيع تحتاج إلى إجابات، وتفتح النقاشات باب مشاركة الأفكار وبدء"
 " الحوارات."
 
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Question"
+msgstr "سؤال"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Discussion"
+msgstr "المناقشة"
+
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
 msgstr "إضافة رد:"
@@ -6795,17 +6835,9 @@ msgstr "إضافة رد:"
 msgid "Add a response:"
 msgstr "أضف رداً:"
 
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Expand discussion"
-msgstr "تكبير نافذة المناقشة"
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Collapse discussion"
-msgstr "تصغير نافذة المناقشة"
-
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Topic Area:"
-msgstr "مجال الموضوع:"
+msgid "Topic area"
+msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
@@ -6870,8 +6902,8 @@ msgstr ""
 "الأنشطة الجديدة وغير المقروءة في المنشورات التي تتابعها."
 
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "Active Threads"
-msgstr "المواضيع النشطة"
+msgid "All Posts"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7368,10 +7400,6 @@ msgstr "تفاصيل الطلبية"
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
 msgstr "طلب دعم مالي"
-
-#: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Unable to submit application"
-msgstr "نعتذّر لتعذّر تقديم الطلب"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
@@ -7967,32 +7995,6 @@ msgid "Register through edX"
 msgstr "التسجيل من خلال edX"
 
 #: lms/templates/student_account/login.underscore
-#, python-format
-msgid ""
-"You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account."
-" To link your accounts, sign in now using your %(platformName)s password."
-msgstr ""
-"تم الحصول على معلوماتك من %(currentProvider)s، لكنّ حسابك على "
-"%(currentProvider)s غير مرتبط بأي حساب على %(platformName)s. لربط حساباتك؛ "
-"يُرجى تعبئة البيانات المطلوبة والمتبقية في صفحة التسجيل على "
-"%(platformName)s."
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr "يُرجى تفقّد بريدك الإلكتروني"
-
-#: lms/templates/student_account/login.underscore
-msgid "We couldn't sign you in."
-msgstr "عذرًا، لم نتمكّن من تسجيل دخولك. "
-
-#: lms/templates/student_account/login.underscore
-#, python-format
-msgid "An error occurred when signing you in to %(platformName)s."
-msgstr "نأسف لحدوث خطأ أثناء تسجيل دخولك إلى %(platformName)s."
-
-#: lms/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -8032,11 +8034,6 @@ msgid "Create an account"
 msgstr " أنشئ حساباً جديداً اﻵن."
 
 #: lms/templates/student_account/password_reset.underscore
-#: lms/templates/student_account/register.underscore
-msgid "An error occurred."
-msgstr "نأسف لحدوث خطأ. "
-
-#: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
 msgstr "المساعدة بخصوص كلمة المرور"
 
@@ -8051,24 +8048,6 @@ msgstr ""
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset my password"
 msgstr "تغيير كلمة المرور"
-
-#: lms/templates/student_account/register.underscore
-msgid "We couldn't create your account."
-msgstr "عذرًا، لم نتمكّن من إنشاء حسابك. "
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid "You've successfully signed into %(currentProvider)s."
-msgstr "تم الحصول على معلوماتك من %(currentProvider)s. "
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid ""
-"We just need a little more information before you start learning with "
-"%(platformName)s."
-msgstr ""
-"نحتاج فقط إلى قليل من المعلومات الإضافية قبل أن تبدأ التعلّم مع "
-"%(platformName)s. "
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -8185,11 +8164,6 @@ msgstr "قائمة المساقات التي سجّلت فيها لتوّك كط
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgstr "المساق "
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#, python-format
-msgid "Starts: %(start)s"
-msgstr "يبدأ: %(start)s"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
@@ -8769,6 +8743,14 @@ msgstr "استخدم خاصية السحب والإفلات أو اضغط هنا
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
 msgstr "التحميلات النشطة"
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "Read More"
+msgstr ""
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "details about the failure"
+msgstr ""
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"

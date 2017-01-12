@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -17,7 +17,7 @@
 # yuval zana, 2015
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -30,7 +30,7 @@
 # Yoav Caspin <yoavc@pmo.gov.il>, 2016
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -44,12 +44,12 @@
 # qualityalltext <quality@alltext.co.il>, 2016
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # Shay Nativ <shay@yeda.org.il>, 2015
-# Yoav Caspin <yoavc@pmo.gov.il>, 2016
+# Yoav Caspin <yoavc@pmo.gov.il>, 2016-2017
 # yuval zana, 2015
 # yuval zana, 2015
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -62,7 +62,7 @@
 # Ron Rozen <Ronrozen@gmail.com>, 2016
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -76,7 +76,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-08 18:46+0000\n"
+"POT-Creation-Date: 2017-01-05 17:03+0000\n"
 "PO-Revision-Date: 2016-10-30 14:15+0000\n"
 "Last-Translator: qualityalltext <quality@alltext.co.il>\n"
 "Language-Team: Hebrew (http://www.transifex.com/open-edx/edx-platform/language/he/)\n"
@@ -429,6 +429,10 @@ msgstr "מדינה הוא שדה חובה"
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
 msgstr "על מנת להירשם, עליך לפעול בהתאם לקוד האתי."
+
+#: common/djangoapps/student/forms.py
+msgid "You must consent to data sharing to register."
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
@@ -1288,6 +1292,19 @@ msgstr "נובמבר"
 msgctxt "month name"
 msgid "December"
 msgstr "דצמבר"
+
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"I agree to allow {platform_name} to share data about my enrollment, "
+"completion and performance in all {platform_name} courses and programs where"
+" my enrollment is sponsored by {ec_name}."
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"To link your account with {ec_name}, you are required to consent to data "
+"sharing."
+msgstr ""
 
 #: common/djangoapps/util/file.py
 msgid "The file must end with the extension '{file_types}'."
@@ -2274,13 +2291,6 @@ msgstr "לרכיב זה אין עדיין רכיבי מקור מוגדרים."
 msgid "Configure list of sources"
 msgstr "הגדר רשימת מקורות"
 
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
-#: common/lib/xmodule/xmodule/course_metadata_utils.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "יקבע בהמשך"
-
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
 msgstr "סיסמאות LTI"
@@ -2333,18 +2343,15 @@ msgstr ""
 "מנהל במאגר הנתונים, המחיר ההוא יוצג במקום זה. "
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Advertised Start Date"
-msgstr "התאריך המפורסם לתחילת הקורס."
+msgid "Course Advertised Start"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the date you want to advertise as the course start date, if this date "
-"is different from the set start date. To advertise the set start date, enter"
-" null."
+"Enter the text that you want to use as the advertised starting time frame "
+"for the course, such as \"Winter 2018\". If you enter null for this value, "
+"the start date that you have set for this course is used."
 msgstr ""
-"הזן את התאריך לפרסום כתאריך ההתחלה של הקורס אם תאריך זה שונה מתאריך התחלת "
-"הקורס שנקבע. אם התאריך לפרסום התחלת הקורס זהה לתאריך שנקבע להתחלת הקורס, הזן"
-" אפס. "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -4601,6 +4608,10 @@ msgstr ""
 msgid "Powered by Open edX"
 msgstr "מופעל על ידי Open edX"
 
+#: lms/djangoapps/branding/api.py
+msgid "{platform_name} for Business"
+msgstr ""
+
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
 msgid "Blog"
 msgstr "בלוג"
@@ -4630,10 +4641,6 @@ msgstr "קריירות"
 msgid "Donate"
 msgstr "תרום"
 
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "ערכת מדיה"
-
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
 msgstr "תנאי השירות וקוד אתי"
@@ -4657,6 +4664,10 @@ msgstr "מדיניות נגישות"
 #: lms/djangoapps/branding/api.py
 msgid "Sitemap"
 msgstr "מפת אתר"
+
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "ערכת מדיה"
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
@@ -5926,6 +5937,10 @@ msgstr "נרשם באופן ידני"
 msgid "Data Integrity Error"
 msgstr "שגיאה בתקינות תאריך"
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "TBD"
+msgstr "יקבע בהמשך"
+
 #: lms/djangoapps/instructor/services.py
 msgid "Proctored Exam Review: {review_status}"
 msgstr "סקירת מבחן תחת פיקוח:  {review_status}"
@@ -6110,6 +6125,14 @@ msgstr "כתובת למשלוח דואר"
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Goals"
 msgstr "יעדים"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Enrollment Mode"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Verification Status"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
@@ -9175,6 +9198,12 @@ msgid ""
 msgstr ""
 "מצוין בשניות. אפשר אחסון במטמון של תגובות API על ידי הגדרתו לערך גדול מ-0."
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Username created for Course Catalog Integration, e.g. "
+"lms_catalog_service_user."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -10136,12 +10165,12 @@ msgid "Could not find user by email address '{email}'."
 msgstr "לא ניתן לאתר משתמש לפי כתובת דואר אלקטרוני '{email}'."
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "User {email} has registered but has not yet activated his/her account."
-msgstr "משתמש {email} נרשם אך טרם הפעיל את החשבון."
-
-#: cms/djangoapps/contentstore/views/user.py
 msgid "No `role` specified."
 msgstr "לא צויין 'תפקיד'."
+
+#: cms/djangoapps/contentstore/views/user.py
+msgid "User {email} has registered but has not yet activated his/her account."
+msgstr "משתמש {email} נרשם אך טרם הפעיל את החשבון."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -10169,17 +10198,34 @@ msgstr "בביצוע"
 msgid "Ready"
 msgstr "מוכן"
 
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Uploaded"
+msgstr ""
+
 #. Translators: This is the status for a video that the servers have failed to
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
 msgstr "נכשל"
 
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Cancelled"
+msgstr ""
+
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed Duplicate"
 msgstr "ההעתקה נכשלה"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "YouTube Duplicate"
+msgstr ""
 
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
@@ -10653,7 +10699,6 @@ msgid "Add a Post"
 msgstr "הוסף פוסט"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion thread list"
 msgstr "רשימת שרשור דיונים"
 
@@ -10662,8 +10707,20 @@ msgid "New topic form"
 msgstr "פורום בנושא חדש"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "User Profile"
-msgstr "פרופיל משתמש"
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s discussion started"
+msgid_plural "%s discussions started"
+msgstr[0] "דיון %s החל"
+msgstr[1] "%s דיונים שהחלו"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s comment"
+msgid_plural "%s comments"
+msgstr[0] "תגובה %s"
+msgstr[1] "%s תגובות"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance.html
 msgid "Discussion unavailable"
@@ -12024,10 +12081,6 @@ msgstr "לוח בקרה של:"
 #: lms/templates/user_dropdown.html
 msgid "Profile"
 msgstr "פרופיל"
-
-#: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
-msgstr "תמונת פרופיל עבור {username} "
 
 #: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
 msgid "More options dropdown"
@@ -14549,20 +14602,6 @@ msgstr "לפי פעילות מרובה"
 msgid "by most votes"
 msgstr "לפי הצבעות מרובות"
 
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s discussion started"
-msgid_plural "%s discussions started"
-msgstr[0] "דיון %s החל"
-msgstr[1] "%s דיונים שהחלו"
-
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s comment"
-msgid_plural "%s comments"
-msgstr[0] "תגובה %s"
-msgstr[1] "%s תגובות"
-
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
 msgstr "סיכומי הסטודנט"
@@ -14693,7 +14732,7 @@ msgstr ""
 #: lms/templates/emails/add_beta_tester_email_message.txt
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 msgid "To start accessing course materials, please visit {course_url}"
-msgstr "כדי להתחיל לגשת לחומרי הקורס, נא בקר ב-{course_url}"
+msgstr "כדי לצפות בחומרי הקורס יש להיכנס ל: {course_url}"
 
 #: lms/templates/emails/add_beta_tester_email_message.txt
 msgid "Visit {course_about_url} to join the course and begin the beta test."
@@ -17606,10 +17645,6 @@ msgid "Registration for:"
 msgstr "רישום עבור:"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Course Dates"
-msgstr "תאריכי הקורס"
-
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Price per student:"
 msgstr "מחיר לסטודנט"
@@ -17652,10 +17687,6 @@ msgstr "אשר את הרשמתך עבור {span_start}course dates{span_end}"
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
 msgstr "{course_name}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{start_date} - {end_date}"
-msgstr "{start_date} - {end_date}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -17723,10 +17754,6 @@ msgstr[1] "{course_names} הוסרו היות ופרק הזמן להרשמה נ�
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "תמונת נושא"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Course Dates:"
-msgstr "תאריכי הקורס:"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Students:"
@@ -18534,15 +18561,10 @@ msgstr "הנפקת תעודות ללומדים"
 
 #: cms/templates/certificates.html
 msgid ""
-"After you have configured and previewed your certificate, ask your edX "
-"partner manager to activate your certificate. When your certificate has been"
-" activated, you can begin issuing certificates to learners. Course team "
-"members without the Admin role cannot edit or delete an activated "
-"certificate."
+"To begin issuing course certificates, a course team member with either the "
+"Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
+"members with these roles can edit or delete an activated certificate."
 msgstr ""
-"לאחר שהגדרת את תעודתך וצפית בתצוגה המקדימה שלה, בקש מהמנהל שותף ב-edX להפעיל"
-" אותה. לאחר שהופעלה התעודה, יש באפשרותך להתחיל לשלוח תעודות ללומדים. חברי "
-"צוות בקורס שאינם בעלי תפקיד מינהלי  אינם יכולים למחוק תעודה מופעלת."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -21419,13 +21441,10 @@ msgstr "מדוע להעלות קבצי וידאו?"
 #: cms/templates/videos_index.html
 msgid ""
 "For a video to play on different devices, it needs to be available in "
-"multiple formats. After you upload an original video file in .mp4 or .mov "
+"multiple formats. After you upload an original video file in {file_formats} "
 "format on this page, an automated process creates those additional formats "
 "and stores them for you."
 msgstr ""
-"על מנת שסרטון וידאו יופעל בהתקנים שונים, עליו להיות זמין בפורמטים מרובים. "
-"לאחר שתעלה קובץ וידאו מקורי בפורמט ‎mp4 או ‎mov בעמוד זה, תהליך אוטומטי "
-"מייצר את אותם פורמטים נוספים ומאחסן אותם עבורך."
 
 #: cms/templates/videos_index.html
 msgid "Maximum Video File Size"
@@ -21433,11 +21452,9 @@ msgstr "גודל סרטון הווידאו המרבי שניתן להעלות"
 
 #: cms/templates/videos_index.html
 msgid ""
-"The maximum size for each video file that you upload is 5 GB. The upload "
-"process fails for larger files."
+"The maximum size for each video file that you upload is {em_start}5 "
+"GB{em_end}. The upload process fails for larger files."
 msgstr ""
-"הגודל המרבי של כל קובץ וידאו שתוכל להעלות הוא 5‎ GB. תהליך ההעלאה אינו פועל "
-"בקבצים גדולים יותר."
 
 #: cms/templates/videos_index.html
 msgid "Monitoring files as they upload"
@@ -21484,21 +21501,14 @@ msgstr "כיצד אני מציב את הסרטונים בקורס שלי? "
 
 #: cms/templates/videos_index.html
 msgid ""
-"When status for a file is {em_start}Ready{em_end}, you can add that video to"
-" a component in your course. Copy the unique video ID. In another browser "
-"window, on the Course Outline page, create or locate a video component to "
-"play this video. Edit the video component to paste the ID into the Advanced "
-"{em_start}Video ID{em_end} field. The video can play in the LMS as soon as "
-"its status is {em_start}Ready{em_end}, although processing may not be "
-"complete for all encodings and all video hosting sites."
+"When the status for a file is {em_start}Ready{em_end}, you can add that "
+"video to a component in your course. Copy the unique video ID. In another "
+"browser window, on the Course Outline page, create or locate a video "
+"component to play this video. Edit the video component to paste the ID into "
+"the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS"
+" as soon as its status is {em_start}Ready{em_end}, although processing may "
+"not be complete for all encodings and all video hosting sites."
 msgstr ""
-"כאשר סטטוס הקובץ {em_start}מוכן{em_end}, תוכל להוסיף את קובץ הווידאו לרכיב "
-"שבקורס שלך. העתק מזהה סרטון וידאו ייחודי. בחלון דפדפן אחר, בעמוד 'תרשים "
-"הקורס', צור או אתר רכיב וידאו על מנת להפעיל את סרטון הווידאו הזה. ערוך את "
-"רכיב הווידאו על מנת להדביק את המזהה בשדה ההגדרה המתקדמת {em_start}מזהה סרטון"
-" וידאו{em_end}. סרטון הווידאו יכול להיות מופעל ב-LMS ברגע שהסטטוס שלו "
-"{em_start}מוכן{em_end}, אף על פי שהעיבוד לא הושלם עבור כל הקידודים וכל אתרי "
-"האירוח של הווידאו."
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
