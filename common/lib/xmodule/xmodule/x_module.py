@@ -66,6 +66,11 @@ STUDIO_VIEW = 'studio_view'
 PREVIEW_VIEWS = [STUDENT_VIEW, AUTHOR_VIEW]
 
 
+# Make '_' a no-op so we can scrape strings. Using lambda instead of
+#  `django.utils.translation.ugettext_noop` because Django cannot be imported in this file
+_ = lambda text: text
+
+
 class OpaqueKeyReader(IdReader):
     """
     IdReader for :class:`DefinitionKey` and :class:`UsageKey`s.
@@ -256,8 +261,8 @@ class XModuleFields(object):
     Common fields for XModules.
     """
     display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
+        display_name=_("Display Name"),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those

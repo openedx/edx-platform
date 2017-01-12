@@ -23,20 +23,43 @@ from xmodule.xml_module import XmlDescriptor
 from xblock.fields import Scope, String, Dict, Boolean, List
 
 log = logging.getLogger(__name__)
+_ = lambda text: text
 
 
 class PollFields(object):
     # Name of poll to use in links to this poll
-    display_name = String(help="Display name for this module", scope=Scope.settings)
+    display_name = String(
+        help=_("The display name for this component."),
+        scope=Scope.settings
+    )
 
-    voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.user_state, default=False)
-    poll_answer = String(help="Student answer", scope=Scope.user_state, default='')
-    poll_answers = Dict(help="Poll answers from all students", scope=Scope.user_state_summary)
+    voted = Boolean(
+        help=_("Whether this student has voted on the poll"),
+        scope=Scope.user_state,
+        default=False
+    )
+    poll_answer = String(
+        help=_("Student answer"),
+        scope=Scope.user_state,
+        default=''
+    )
+    poll_answers = Dict(
+        help=_("Poll answers from all students"),
+        scope=Scope.user_state_summary
+    )
 
     # List of answers, in the form {'id': 'some id', 'text': 'the answer text'}
-    answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
+    answers = List(
+        help=_("Poll answers from xml"),
+        scope=Scope.content,
+        default=[]
+    )
 
-    question = String(help="Poll question", scope=Scope.content, default='')
+    question = String(
+        help=_("Poll question"),
+        scope=Scope.content,
+        default=''
+    )
 
 
 class PollModule(PollFields, XModule):

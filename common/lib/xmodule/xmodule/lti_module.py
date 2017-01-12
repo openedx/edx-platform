@@ -109,7 +109,7 @@ class LTIFields(object):
     display_name = String(
         display_name=_("Display Name"),
         help=_(
-            "Enter the name that students see for this component.  "
+            "The display name for this component. "
             "Analytics reports may also use the display name to identify this component."
         ),
         scope=Scope.settings,
