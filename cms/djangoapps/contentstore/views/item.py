@@ -98,6 +98,7 @@ def xblock_handler(request, usage_key_string):
     GET
         json: returns representation of the xblock (locator id, data, and metadata).
               if ?fields=graderType, it returns the graderType for the unit instead of the above.
+              if ?fields=ancestorInfo, it returns ancestor info of the xblock.
         html: returns HTML for rendering the xblock (which includes both the "preview" view and the "editor" view)
     PUT or POST or PATCH
         json: if xblock locator is specified, update the xblock instance. The json payload can contain
@@ -149,6 +150,10 @@ def xblock_handler(request, usage_key_string):
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
                     return JsonResponse(CourseGradingModel.get_section_grader_type(usage_key))
+                elif 'ancestorInfo' in fields:
+                    xblock = _get_xblock(usage_key, request.user)
+                    ancestor_info = _create_xblock_ancestor_info(xblock, is_concise=True)
+                    return JsonResponse(ancestor_info)
                 # TODO: pass fields to _get_module_info and only return those
                 with modulestore().bulk_operations(usage_key.course_key):
                     response = _get_module_info(_get_xblock(usage_key, request.user))
@@ -887,7 +892,7 @@ def _get_gating_info(course, xblock):
 
 def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=False, include_child_info=False,
                        course_outline=False, include_children_predicate=NEVER, parent_xblock=None, graders=None,
-                       user=None, course=None):
+                       user=None, course=None, is_concise=False):
     """
     Creates the information needed for client-side XBlockInfo.
 
@@ -897,6 +902,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     There are three optional boolean parameters:
       include_ancestor_info - if true, ancestor info is added to the response
       include_child_info - if true, direct child info is included in the response
+      is_concise - if true, returns the concise version of xblock info, default is false.
       course_outline - if true, the xblock is being rendered on behalf of the course outline.
         There are certain expensive computations that do not need to be included in this case.
 
@@ -933,20 +939,22 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             graders,
             include_children_predicate=include_children_predicate,
             user=user,
-            course=course
+            course=course,
+            is_concise=is_concise
         )
     else:
         child_info = None
 
     release_date = _get_release_date(xblock, user)
 
-    if xblock.category != 'course':
+    if xblock.category != 'course' and not is_concise:
         visibility_state = _compute_visibility_state(
             xblock, child_info, is_xblock_unit and has_changes, is_self_paced(course)
         )
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
+    published_on = get_default_time_display(xblock.published_on) if published and xblock.published_on else None
 
     # defining the default value 'True' for delete, duplicate, drag and add new child actions
     # in xblock_actions for each xblock.
@@ -970,82 +978,89 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
             pct_sign=_('%'))
 
     xblock_info = {
-        "id": unicode(xblock.location),
-        "display_name": xblock.display_name_with_default,
-        "category": xblock.category,
-        "edited_on": get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
-        "published": published,
-        "published_on": get_default_time_display(xblock.published_on) if published and xblock.published_on else None,
-        "studio_url": xblock_studio_url(xblock, parent_xblock),
-        "released_to_students": datetime.now(UTC) > xblock.start,
-        "release_date": release_date,
-        "visibility_state": visibility_state,
-        "has_explicit_staff_lock": xblock.fields['visible_to_staff_only'].is_set_on(xblock),
-        "start": xblock.fields['start'].to_json(xblock.start),
-        "graded": xblock.graded,
-        "due_date": get_default_time_display(xblock.due),
-        "due": xblock.fields['due'].to_json(xblock.due),
-        "format": xblock.format,
-        "course_graders": [grader.get('type') for grader in graders],
-        "has_changes": has_changes,
-        "actions": xblock_actions,
-        "explanatory_message": explanatory_message,
-        "group_access": xblock.group_access,
-        "user_partitions": get_user_partition_info(xblock, course=course),
+        'id': unicode(xblock.location),
+        'display_name': xblock.display_name_with_default,
+        'category': xblock.category
     }
-
-    if xblock.category == 'sequential':
+    if is_concise:
+        if child_info and len(child_info.get('children', [])) > 0:
+            xblock_info['child_info'] = child_info
+    else:
         xblock_info.update({
-            "hide_after_due": xblock.hide_after_due,
+            'edited_on': get_default_time_display(xblock.subtree_edited_on) if xblock.subtree_edited_on else None,
+            'published': published,
+            'published_on': published_on,
+            'studio_url': xblock_studio_url(xblock, parent_xblock),
+            'released_to_students': datetime.now(UTC) > xblock.start,
+            'release_date': release_date,
+            'visibility_state': visibility_state,
+            'has_explicit_staff_lock': xblock.fields['visible_to_staff_only'].is_set_on(xblock),
+            'start': xblock.fields['start'].to_json(xblock.start),
+            'graded': xblock.graded,
+            'due_date': get_default_time_display(xblock.due),
+            'due': xblock.fields['due'].to_json(xblock.due),
+            'format': xblock.format,
+            'course_graders': [grader.get('type') for grader in graders],
+            'has_changes': has_changes,
+            'actions': xblock_actions,
+            'explanatory_message': explanatory_message,
+            'group_access': xblock.group_access,
+            'user_partitions': get_user_partition_info(xblock, course=course),
         })
 
-    # update xblock_info with special exam information if the feature flag is enabled
-    if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
-        if xblock.category == 'course':
+        if xblock.category == 'sequential':
             xblock_info.update({
-                "enable_proctored_exams": xblock.enable_proctored_exams,
-                "create_zendesk_tickets": xblock.create_zendesk_tickets,
-                "enable_timed_exams": xblock.enable_timed_exams
-            })
-        elif xblock.category == 'sequential':
-            xblock_info.update({
-                "is_proctored_exam": xblock.is_proctored_exam,
-                "is_practice_exam": xblock.is_practice_exam,
-                "is_time_limited": xblock.is_time_limited,
-                "exam_review_rules": xblock.exam_review_rules,
-                "default_time_limit_minutes": xblock.default_time_limit_minutes,
+                'hide_after_due': xblock.hide_after_due,
             })
 
-    # Update with gating info
-    xblock_info.update(_get_gating_info(course, xblock))
+        # update xblock_info with special exam information if the feature flag is enabled
+        if settings.FEATURES.get('ENABLE_SPECIAL_EXAMS'):
+            if xblock.category == 'course':
+                xblock_info.update({
+                    'enable_proctored_exams': xblock.enable_proctored_exams,
+                    'create_zendesk_tickets': xblock.create_zendesk_tickets,
+                    'enable_timed_exams': xblock.enable_timed_exams
+                })
+            elif xblock.category == 'sequential':
+                xblock_info.update({
+                    'is_proctored_exam': xblock.is_proctored_exam,
+                    'is_practice_exam': xblock.is_practice_exam,
+                    'is_time_limited': xblock.is_time_limited,
+                    'exam_review_rules': xblock.exam_review_rules,
+                    'default_time_limit_minutes': xblock.default_time_limit_minutes,
+                })
 
-    if xblock.category == 'sequential':
-        # Entrance exam subsection should be hidden. in_entrance_exam is
-        # inherited metadata, all children will have it.
-        if getattr(xblock, "in_entrance_exam", False):
-            xblock_info["is_header_visible"] = False
+        # Update with gating info
+        xblock_info.update(_get_gating_info(course, xblock))
 
-    if data is not None:
-        xblock_info["data"] = data
-    if metadata is not None:
-        xblock_info["metadata"] = metadata
-    if include_ancestor_info:
-        xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline)
-    if child_info:
-        xblock_info['child_info'] = child_info
-    if visibility_state == VisibilityState.staff_only:
-        xblock_info["ancestor_has_staff_lock"] = ancestor_has_staff_lock(xblock, parent_xblock)
-    else:
-        xblock_info["ancestor_has_staff_lock"] = False
+        if xblock.category == 'sequential':
+            # Entrance exam subsection should be hidden. in_entrance_exam is
+            # inherited metadata, all children will have it.
+            if getattr(xblock, 'in_entrance_exam', False):
+                xblock_info['is_header_visible'] = False
 
-    if course_outline:
-        if xblock_info["has_explicit_staff_lock"]:
-            xblock_info["staff_only_message"] = True
-        elif child_info and child_info["children"]:
-            xblock_info["staff_only_message"] = all([child["staff_only_message"] for child in child_info["children"]])
+        if data is not None:
+            xblock_info['data'] = data
+        if metadata is not None:
+            xblock_info['metadata'] = metadata
+        if include_ancestor_info:
+            xblock_info['ancestor_info'] = _create_xblock_ancestor_info(xblock, course_outline, include_child_info=True)
+        if child_info:
+            xblock_info['child_info'] = child_info
+        if visibility_state == VisibilityState.staff_only:
+            xblock_info['ancestor_has_staff_lock'] = ancestor_has_staff_lock(xblock, parent_xblock)
         else:
-            xblock_info["staff_only_message"] = False
+            xblock_info['ancestor_has_staff_lock'] = False
 
+        if course_outline:
+            if xblock_info['has_explicit_staff_lock']:
+                xblock_info['staff_only_message'] = True
+            elif child_info and child_info['children']:
+                xblock_info['staff_only_message'] = all(
+                    [child['staff_only_message'] for child in child_info['children']]
+                )
+            else:
+                xblock_info['staff_only_message'] = False
     return xblock_info
 
 
@@ -1155,14 +1170,14 @@ def _compute_visibility_state(xblock, child_info, is_unit_with_changes, is_cours
         return VisibilityState.ready
 
 
-def _create_xblock_ancestor_info(xblock, course_outline):
+def _create_xblock_ancestor_info(xblock, course_outline=False, include_child_info=False, is_concise=False):
     """
     Returns information about the ancestors of an xblock. Note that the direct parent will also return
     information about all of its children.
     """
     ancestors = []
 
-    def collect_ancestor_info(ancestor, include_child_info=False):
+    def collect_ancestor_info(ancestor, include_child_info=False, is_concise=False):
         """
         Collect xblock info regarding the specified xblock and its ancestors.
         """
@@ -1172,16 +1187,18 @@ def _create_xblock_ancestor_info(xblock, course_outline):
                 ancestor,
                 include_child_info=include_child_info,
                 course_outline=course_outline,
-                include_children_predicate=direct_children_only
+                include_children_predicate=direct_children_only,
+                is_concise=is_concise
             ))
-            collect_ancestor_info(get_parent_xblock(ancestor))
-    collect_ancestor_info(get_parent_xblock(xblock), include_child_info=True)
+            collect_ancestor_info(get_parent_xblock(ancestor), is_concise=is_concise)
+    collect_ancestor_info(get_parent_xblock(xblock), include_child_info=include_child_info, is_concise=is_concise)
     return {
         'ancestors': ancestors
     }
 
 
-def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None, course=None):  # pylint: disable=line-too-long
+def _create_xblock_child_info(xblock, course_outline, graders, include_children_predicate=NEVER, user=None,
+                              course=None, is_concise=False):  # pylint: disable=line-too-long
     """
     Returns information about the children of an xblock, as well as about the primary category
     of xblock expected as children.
@@ -1202,6 +1219,7 @@ def _create_xblock_child_info(xblock, course_outline, graders, include_children_
                 graders=graders,
                 user=user,
                 course=course,
+                is_concise=is_concise
             ) for child in xblock.get_children()
         ]
     return child_info
