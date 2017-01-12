@@ -315,11 +315,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'end': self.end_time.total_seconds(),
             'transcriptLanguage': transcript_language,
             'transcriptLanguages': sorted_languages,
-
-            # TODO: Later on the value 1500 should be taken from some global
-            # configuration setting field.
-            'ytTestTimeout': 1500,
-
+            'ytTestTimeout': settings.YOUTUBE['TEST_TIMEOUT'],
             'ytApiUrl': settings.YOUTUBE['API'],
             'ytMetadataUrl': settings.YOUTUBE['METADATA_URL'],
             'ytKey': yt_api_key,
