@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 16:47+0000\n"
-"PO-Revision-Date: 2017-01-05 16:47:32.409025\n"
+"POT-Creation-Date: 2017-01-12 17:52+0000\n"
+"PO-Revision-Date: 2017-01-12 17:52:25.477141\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -187,7 +187,7 @@ msgstr "حقخبثسسهخرشم ثي"
 #: common/djangoapps/course_modes/models.py common/lib/xmodule/xmodule/tabs.py
 #: lms/djangoapps/courseware/tabs.py lms/djangoapps/courseware/views/views.py
 #: lms/djangoapps/shoppingcart/reports.py cms/templates/widgets/header.html
-#: lms/templates/courseware/courseware.html
+#: lms/templates/help_modal.html lms/templates/courseware/courseware.html
 msgid "Course"
 msgstr "ذخعقسث"
 
@@ -6033,6 +6033,14 @@ msgstr ""
 "خحفهخرشم موس عقم سذاثوث + اخسف عسثي فخ ذخرسفقعذف عقمس بخق ذخرفثرف مهزقشقغ, "
 "ث.ل. اففحس://ذخعقسثس.ثيط.خقل."
 
+#: lms/djangoapps/email_marketing/models.py
+msgid ""
+"Number of seconds to delay the sending of User Welcome email after user has "
+"been activated"
+msgstr ""
+"رعوزثق خب سثذخريس فخ يثمشغ فاث سثريهرل خب عسثق صثمذخوث ثوشهم شبفثق عسثق اشس "
+"زثثر شذفهدشفثي"
+
 #: lms/djangoapps/instructor/paidcourse_enrollment_report.py
 msgid "{platform_name} Staff"
 msgstr "{platform_name} سفشبب"
@@ -6260,6 +6268,14 @@ msgstr "وشهمهرل شييقثسس"
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Goals"
 msgstr "لخشمس"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Enrollment Mode"
+msgstr "ثرقخمموثرف وخيث"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Verification Status"
+msgstr "دثقهبهذشفهخر سفشفعس"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
@@ -10454,17 +10470,34 @@ msgstr "هر حقخلقثسس"
 msgid "Ready"
 msgstr "قثشيغ"
 
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Uploaded"
+msgstr "عحمخشيثي"
+
 #. Translators: This is the status for a video that the servers have failed to
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
 msgstr "بشهمثي"
 
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Cancelled"
+msgstr "ذشرذثممثي"
+
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed Duplicate"
 msgstr "بشهمثي يعحمهذشفث"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "YouTube Duplicate"
+msgstr "غخعفعزث يعحمهذشفث"
 
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
@@ -11297,6 +11330,10 @@ msgstr ""
 "صهفاهر خرث زعسهرثسس يشغ, وخريشغ فخ بقهيشغ.  هر فاث وثشرفهوث, حمثشسث قثدهثص "
 "خعق {link_start}يثفشهمثي بشضس{link_end} صاثقث وخسف ضعثسفهخرس اشدث شمقثشيغ "
 "زثثر شرسصثقثي."
+
+#: lms/templates/help_modal.html
+msgid "- Select -"
+msgstr "- سثمثذف -"
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -19054,13 +19091,13 @@ msgstr "هسسعهرل ذثقفهبهذشفثس فخ مثشقرثقس"
 
 #: cms/templates/certificates.html
 msgid ""
-"To begin issuing certificates, a course team member with the Admin role "
-"selects {em_start}Activate{em_end}. Only course team members with the Admin "
-"role can edit or delete an activated certificate."
+"To begin issuing course certificates, a course team member with either the "
+"Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
+"members with these roles can edit or delete an activated certificate."
 msgstr ""
-"فخ زثلهر هسسعهرل ذثقفهبهذشفثس, ش ذخعقسث فثشو وثوزثق صهفا فاث شيوهر قخمث "
-"سثمثذفس {em_start}شذفهدشفث{em_end}. خرمغ ذخعقسث فثشو وثوزثقس صهفا فاث شيوهر "
-"قخمث ذشر ثيهف خق يثمثفث شر شذفهدشفثي ذثقفهبهذشفث."
+"فخ زثلهر هسسعهرل ذخعقسث ذثقفهبهذشفثس, ش ذخعقسث فثشو وثوزثق صهفا ثهفاثق فاث "
+"سفشبب خق شيوهر قخمث سثمثذفس {em_start}شذفهدشفث{em_end}. خرمغ ذخعقسث فثشو "
+"وثوزثقس صهفا فاثسث قخمثس ذشر ثيهف خق يثمثفث شر شذفهدشفثي ذثقفهبهذشفث."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -19204,11 +19241,11 @@ msgstr "مخذشفهخر هي"
 
 #: cms/templates/container.html
 msgid ""
-"Use this ID when you create links to this unit from other course content. "
-"You enter the ID in the URL field."
+"To create a link to this unit from an HTML component in this course, enter "
+"\"/jump_to_id/<location ID>\" as the URL value."
 msgstr ""
-"عسث فاهس هي صاثر غخع ذقثشفث مهرنس فخ فاهس عرهف بقخو خفاثق ذخعقسث ذخرفثرف. "
-"غخع ثرفثق فاث هي هر فاث عقم بهثمي."
+"فخ ذقثشفث ش مهرن فخ فاهس عرهف بقخو شر افوم ذخوحخرثرف هر فاهس ذخعقسث, ثرفثق "
+"\"/تعوح_فخ_هي/<location ID>\" شس فاث عقم دشمعث."
 
 #: cms/templates/container.html
 msgid "Location in Course Outline"
