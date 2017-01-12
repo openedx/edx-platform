@@ -19,6 +19,8 @@ from django.views.decorators.http import require_http_methods
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locator import LibraryUsageLocator
 from pytz import UTC
+
+from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.fragment import Fragment
 from xblock_django.user_service import DjangoXBlockUserService
@@ -127,8 +129,11 @@ def xblock_handler(request, usage_key_string):
               if usage_key_string is not specified, create a new xblock instance, either by duplicating
               an existing xblock, or creating an entirely new one. The json playload can contain
               these fields:
-                :parent_locator: parent for new xblock, required for both duplicate and create new instance
+                :parent_locator: parent for new xblock, required for duplicate, move and create new instance
                 :duplicate_source_locator: if present, use this as the source for creating a duplicate copy
+                :move_source_locator: if present, use this as the source item for moving
+                :target_index: if present, use this as the target index for moving an item to a particular index
+                    otherwise target_index is calculated. It is sent back in the response.
                 :category: type of xblock, required if duplicate_source_locator is not present.
                 :display_name: name for new xblock, optional
                 :boilerplate: template name for populating fields, optional and only used
@@ -198,14 +203,26 @@ def xblock_handler(request, usage_key_string):
                 request.user,
                 request.json.get('display_name'),
             )
-
-            return JsonResponse({"locator": unicode(dest_usage_key), "courseKey": unicode(dest_usage_key.course_key)})
+            return JsonResponse({'locator': unicode(dest_usage_key), 'courseKey': unicode(dest_usage_key.course_key)})
         else:
             return _create_item(request)
+    elif request.method == 'PATCH':
+        if 'move_source_locator' in request.json:
+            move_source_usage_key = usage_key_with_run(request.json.get('move_source_locator'))
+            target_parent_usage_key = usage_key_with_run(request.json.get('parent_locator'))
+            target_index = request.json.get('target_index')
+            if (
+                    not has_studio_write_access(request.user, target_parent_usage_key.course_key) or
+                    not has_studio_read_access(request.user, target_parent_usage_key.course_key)
+            ):
+                raise PermissionDenied()
+            return _move_item(move_source_usage_key, target_parent_usage_key, request.user, target_index)
+
+        return JsonResponse({'error': 'Patch request did not recognise any parameters to handle.'}, status=400)
     else:
         return HttpResponseBadRequest(
-            "Only instance creation is supported without a usage key.",
-            content_type="text/plain"
+            'Only instance creation is supported without a usage key.',
+            content_type='text/plain'
         )
 
 
@@ -636,8 +653,107 @@ def _create_item(request):
     )
 
     return JsonResponse(
-        {"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)}
+        {'locator': unicode(created_block.location), 'courseKey': unicode(created_block.location.course_key)}
     )
+
+
+def _get_source_index(source_usage_key, source_parent):
+    """
+    Get source index position of the XBlock.
+
+    Arguments:
+        source_usage_key (BlockUsageLocator): Locator of source item.
+        source_parent (XBlock): A parent of the source XBlock.
+
+    Returns:
+        source_index (int): Index position of the xblock in a parent.
+    """
+    try:
+        source_index = source_parent.children.index(source_usage_key)
+        return source_index
+    except ValueError:
+        return None
+
+
+def _move_item(source_usage_key, target_parent_usage_key, user, target_index=None):
+    """
+    Move an existing xblock as a child of the supplied target_parent_usage_key.
+
+    Arguments:
+        source_usage_key (BlockUsageLocator): Locator of source item.
+        target_parent_usage_key (BlockUsageLocator): Locator of target parent.
+        target_index (int): If provided, insert source item at provided index location in target_parent_usage_key item.
+
+    Returns:
+        JsonResponse: Information regarding move operation. It may contains error info if an invalid move operation
+            is performed.
+    """
+    # Get the list of all component type XBlocks
+    component_types = sorted(set(name for name, class_ in XBlock.load_classes()) - set(DIRECT_ONLY_CATEGORIES))
+
+    store = modulestore()
+    with store.bulk_operations(source_usage_key.course_key):
+        source_item = store.get_item(source_usage_key)
+        source_parent = source_item.get_parent()
+        target_parent = store.get_item(target_parent_usage_key)
+        source_type = source_item.category
+        target_parent_type = target_parent.category
+        error = None
+
+        # Store actual/initial index of the source item. This would be sent back with response,
+        # so that with Undo operation, it would easier to move back item to it's original/old index.
+        source_index = _get_source_index(source_usage_key, source_parent)
+
+        valid_move_type = {
+            'vertical': source_type if source_type in component_types else 'component',
+            'sequential': 'vertical',
+            'chapter': 'sequential',
+        }
+
+        if valid_move_type.get(target_parent_type, '') != source_type:
+            error = 'You can not move {source_type} into {target_parent_type}.'.format(
+                source_type=source_type,
+                target_parent_type=target_parent_type,
+            )
+        elif source_parent.location == target_parent.location:
+            error = 'You can not move an item into the same parent.'
+        elif source_index is None:
+            error = '{source_usage_key} not found in {parent_usage_key}.'.format(
+                source_usage_key=unicode(source_usage_key),
+                parent_usage_key=unicode(source_parent.location)
+            )
+        else:
+            try:
+                target_index = int(target_index) if target_index is not None else None
+                if len(target_parent.children) < target_index:
+                    error = 'You can not move {source_usage_key} at an invalid index ({target_index}).'.format(
+                        source_usage_key=unicode(source_usage_key),
+                        target_index=target_index
+                    )
+            except ValueError:
+                error = 'You must provide target_index ({target_index}) as an integer.'.format(
+                    target_index=target_index
+                )
+        if error:
+            return JsonResponse({'error': error}, status=400)
+
+        # Remove reference from old parent.
+        source_parent.children.remove(source_item.location)
+        store.update_item(source_parent, user.id)
+
+        # When target_index is provided, insert xblock at target_index position, otherwise insert at the end.
+        insert_at = target_index if target_index is not None else len(target_parent.children)
+
+        # Add to new parent at particular location.
+        target_parent.children.insert(insert_at, source_item.location)
+        store.update_item(target_parent, user.id)
+
+        context = {
+            'move_source_locator': unicode(source_usage_key),
+            'parent_locator': unicode(target_parent_usage_key),
+            'source_index': target_index if target_index is not None else source_index
+        }
+        return JsonResponse(context)
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
