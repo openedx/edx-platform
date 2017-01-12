@@ -199,7 +199,7 @@ class IndexQueryTestCase(ModuleStoreTestCase):
     NUM_PROBLEMS = 20
 
     @ddt.data(
-        (ModuleStoreEnum.Type.mongo, 9),
+        (ModuleStoreEnum.Type.mongo, 8),
         (ModuleStoreEnum.Type.split, 4),
     )
     @ddt.unpack

@@ -25,7 +25,7 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
 
     Staff users are exempted from hidden content rules.
     """
-    VERSION = 2
+    VERSION = 1
     MERGED_DUE_DATE = 'merged_due_date'
     MERGED_HIDE_AFTER_DUE = 'merged_hide_after_due'
 
@@ -41,7 +41,7 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
     def _get_merged_hide_after_due(cls, block_structure, block_key):
         """
         Returns whether the block with the given block_key in the
-        given block_structure should be hidden after due date per
+        given block_structure should be visible to staff only per
         computed value from ancestry chain.
         """
         return block_structure.get_transformer_block_field(
@@ -81,8 +81,6 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
             func_merge_ancestors=min,
         )
 
-        block_structure.request_xblock_fields(u'self_paced', u'end')
-
     def transform_block_filters(self, usage_info, block_structure):
         # Users with staff access bypass the Visibility check.
         if usage_info.has_staff_access:
@@ -99,10 +97,6 @@ class HiddenContentTransformer(FilteringTransformerMixin, BlockStructureTransfor
         Returns whether the block with the given block_key should
         be hidden, given the current time.
         """
+        due = self._get_merged_due_date(block_structure, block_key)
         hide_after_due = self._get_merged_hide_after_due(block_structure, block_key)
-        self_paced = block_structure[block_structure.root_block_usage_key].self_paced
-        if self_paced:
-            hidden_date = block_structure[block_structure.root_block_usage_key].end
-        else:
-            hidden_date = self._get_merged_due_date(block_structure, block_key)
-        return not SequenceModule.verify_current_content_visibility(hidden_date, hide_after_due)
+        return not SequenceModule.verify_current_content_visibility(due, hide_after_due)

@@ -712,10 +712,7 @@ define(['jquery', 'backbone', 'underscore', 'gettext', 'js/views/baseview',
             return $.extend(
                 {},
                 AbstractVisibilityEditor.prototype.getContext.call(this),
-                {
-                    hide_after_due: this.modelVisibility() === 'hide_after_due',
-                    self_paced: this.model.get('self_paced') === true
-                }
+                {hide_after_due: this.modelVisibility() === 'hide_after_due'}
             );
         }
     });
