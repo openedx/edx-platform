@@ -5,6 +5,8 @@ Unit tests for integration of the django-user-tasks app and its REST API.
 from __future__ import absolute_import, print_function, unicode_literals
 from uuid import uuid4
 
+import mock
+from boto.exception import NoAuthHandlerFound
 from rest_framework.test import APITestCase
 from user_tasks.models import UserTaskArtifact, UserTaskStatus
 from user_tasks.serializers import ArtifactSerializer, StatusSerializer
@@ -15,7 +17,8 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import override_settings
 
-from cms_user_tasks.signals_user_tasks import user_task_stopped
+import cms_user_tasks.tasks
+from cms_user_tasks.signals import user_task_stopped
 
 
 # Helper functions for stuff that pylint complains about without disable comments
@@ -180,3 +183,14 @@ class TestUserTaskStopped(APITestCase):
 
         for fragment in fragments:
             self.assertIn(fragment, msg.body)
+
+    def test_email_retries(self):
+        """
+        Make sure we can succeed on retries
+        """
+        with mock.patch('django.core.mail.send_mail') as mock_exception:
+            mock_exception.side_effect = NoAuthHandlerFound()
+
+            with mock.patch('cms_user_tasks.tasks.send_task_complete_email.retry') as mock_retry:
+                user_task_stopped.send(sender=UserTaskStatus, status=self.status)
+                self.assertTrue(mock_retry.called)

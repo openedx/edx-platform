@@ -946,7 +946,7 @@ INSTALLED_APPS = (
     'user_tasks',
 
     # CMS specific user task handling
-    'cms_user_tasks',
+    'cms_user_tasks.apps.CmsUserTasksConfig',
 
 )
 

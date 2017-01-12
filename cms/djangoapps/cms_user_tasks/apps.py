@@ -1,5 +1,5 @@
 """
-CMS user tasks application aonfiguration
+CMS user tasks application configuration
 
 Signal handlers are connected here.
 """
@@ -17,4 +17,4 @@ class CmsUserTasksConfig(AppConfig):
         """
         Connect signal handlers.
         """
-        from . import signals_user_tasks  # pylint: disable=unused-variable
+        from . import signals  # pylint: disable=unused-variable
