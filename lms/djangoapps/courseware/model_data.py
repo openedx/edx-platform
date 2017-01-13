@@ -687,7 +687,7 @@ class FieldDataCache(object):
     A cache of django model objects needed to supply the data
     for a module and its descendants
     """
-    def __init__(self, descriptors, course_id, user, select_for_update=False, asides=None):
+    def __init__(self, descriptors, course_id, user, select_for_update=False, asides=None, read_only=False):
         """
         Find any courseware.models objects that are needed by any descriptor
         in descriptors. Attempts to minimize the number of queries to the database.
@@ -700,6 +700,7 @@ class FieldDataCache(object):
         user: The user for which to cache data
         select_for_update: Ignored
         asides: The list of aside types to load, or None to prefetch no asides.
+        read_only: We should not perform writes (they become a no-op).
         """
         if asides is None:
             self.asides = []
@@ -709,6 +710,7 @@ class FieldDataCache(object):
         assert isinstance(course_id, CourseKey)
         self.course_id = course_id
         self.user = user
+        self.read_only = read_only
 
         self.cache = {
             Scope.user_state: UserStateCache(
@@ -783,7 +785,7 @@ class FieldDataCache(object):
     @classmethod
     def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
                                          descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False, asides=None):
+                                         select_for_update=False, asides=None, read_only=False):
         """
         course_id: the course in the context of which we want StudentModules.
         user: the django user for whom to load modules.
@@ -794,7 +796,7 @@ class FieldDataCache(object):
             should be cached
         select_for_update: Ignored
         """
-        cache = FieldDataCache([], course_id, user, select_for_update, asides=asides)
+        cache = FieldDataCache([], course_id, user, select_for_update, asides=asides, read_only=read_only)
         cache.add_descriptor_descendents(descriptor, depth, descriptor_filter)
         return cache
 
@@ -840,6 +842,8 @@ class FieldDataCache(object):
             kv_dict (dict): dict mapping from `DjangoKeyValueStore.Key`s to field values
         Raises: DatabaseError if any fields fail to save
         """
+        if self.read_only:
+            return
 
         saved_fields = []
         by_scope = defaultdict(dict)
@@ -875,6 +879,8 @@ class FieldDataCache(object):
 
         Raises: KeyError if key isn't found in the cache
         """
+        if self.read_only:
+            return
 
         if key.scope.user == UserScope.ONE and not self.user.is_anonymous():
             # If we're getting user data, we expect that the key matches the
