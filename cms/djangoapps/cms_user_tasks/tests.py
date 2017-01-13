@@ -17,7 +17,6 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.test import override_settings
 
-import cms_user_tasks.tasks
 from cms_user_tasks.signals import user_task_stopped
 
 
