@@ -1,9 +1,10 @@
 """
 Receivers of signals sent from django-user-tasks
 """
+from urlparse import urljoin
+
 from django.core.urlresolvers import reverse
 from django.dispatch import receiver
-from six.moves.urllib.parse import urljoin
 from user_tasks.models import UserTaskArtifact
 from user_tasks.signals import user_task_stopped
 

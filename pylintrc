@@ -124,7 +124,7 @@ ignore-imports = no
 
 [TYPECHECK]
 ignore-mixin-members = yes
-ignored-classes = SQLObject,six,six.moves,
+ignored-classes = SQLObject
 unsafe-load-any-extension = yes
 generated-members = 
 	REQUEST,
@@ -148,7 +148,6 @@ generated-members =
 	name,
 	revision,
 	_meta,
-ignored-modules = six,six.moves,
 
 [VARIABLES]
 init-import = no
@@ -181,4 +180,4 @@ int-import-graph =
 [EXCEPTIONS]
 overgeneral-exceptions = Exception
 
-# 770104f46bd304c4904bd0ae2c2ba573139166d1
+# 054a2d9bad1e3621a8b1e448740dfd03399d2524
