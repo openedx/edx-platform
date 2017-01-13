@@ -50,10 +50,14 @@ define(['js/views/baseview', 'codemirror', 'common/js/components/views/feedback_
             },
 
             onSave: function(event) {
+                var handoutsContent = this.$codeMirror.getValue();
                 $('#handout_error').removeClass('is-shown');
                 $('.save-button').removeClass('is-disabled').attr('aria-disabled', false);
                 if ($('.CodeMirror-lines').find('.cm-error').length == 0) {
-                    this.model.set('data', this.$codeMirror.getValue());
+                    if (handoutsContent === '') {
+                        handoutsContent = '<ol></ol>';
+                    }
+                    this.model.set('data', handoutsContent);
                     var saving = new NotificationView.Mini({
                         title: gettext('Saving')
                     });
