@@ -205,7 +205,7 @@
     text-shadow: 0 1px 0 $btn-lms-shadow;
     background-clip: padding-box;
     font-size: 0.8125em;
-    
+
     &:focus,
     &:hover {
         box-shadow: inset 0 1px 0 0 $btn-lms-shadow-hover;
@@ -214,7 +214,7 @@
         background-image: -webkit-linear-gradient($btn-lms-background-hover,$btn-lms-gradient-hover);
         background-image: linear-gradient($btn-lms-background-hover,$btn-lms-gradient-hover);
     }
-    
+
     &:active {
         border: 1px solid $btn-lms-border;
         box-shadow: inset 0 0 8px 4px $btn-lms-shadow-active,inset 0 0 8px 4px $btn-lms-shadow-active;
@@ -335,6 +335,14 @@
 
     &.toggle-action {
       // TODO: generalize and move checkbox styling in from static-pages and assets sass
+    }
+
+    .btn-default.delete-button {
+      border: none;
+    }
+
+    .btn-default.edit-button {
+      font-weight: 300;
     }
   }
 }

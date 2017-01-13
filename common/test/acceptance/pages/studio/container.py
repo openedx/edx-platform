@@ -243,7 +243,7 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Duplicate the item with index source_index (based on vertical placement in page).
         """
-        click_css(self, 'a.duplicate-button', source_index)
+        click_css(self, '.duplicate-button', source_index)
 
     def delete(self, source_index):
         """
@@ -252,7 +252,7 @@ class ContainerPage(PageObject, HelpMixin):
         The index of the first item is 0.
         """
         # Click the delete button
-        click_css(self, 'a.delete-button', source_index, require_notification=False)
+        click_css(self, '.delete-button', source_index, require_notification=False)
         # Click the confirmation dialog button
         confirm_prompt(self)
 
@@ -451,14 +451,14 @@ class XBlockWrapper(PageObject):
         """
         Returns true if this xblock has a 'duplicate' button
         """
-        return self.q(css=self._bounded_selector('a.duplicate-button'))
+        return self.q(css=self._bounded_selector('.duplicate-button'))
 
     @property
     def has_delete_button(self):
         """
         Returns true if this xblock has a 'delete' button
         """
-        return self.q(css=self._bounded_selector('a.delete-button'))
+        return self.q(css=self._bounded_selector('.delete-button'))
 
     @property
     def has_edit_visibility_button(self):

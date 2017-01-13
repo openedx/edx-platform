@@ -4,11 +4,11 @@
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/js/components/utils/view_utils',
         'js/views/container', 'js/views/xblock', 'js/views/components/add_xblock', 'js/views/modals/edit_xblock',
-        'js/models/xblock_info', 'js/views/xblock_string_field_editor', 'js/views/pages/container_subviews',
-        'js/views/unit_outline', 'js/views/utils/xblock_utils'],
+        'js/views/modals/move_xblock_modal', 'js/models/xblock_info', 'js/views/xblock_string_field_editor',
+        'js/views/pages/container_subviews', 'js/views/unit_outline', 'js/views/utils/xblock_utils'],
     function($, _, gettext, BasePage, ViewUtils, ContainerView, XBlockView, AddXBlockComponent,
-              EditXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews, UnitOutlineView,
-              XBlockUtils) {
+              EditXBlockModal, MoveXBlockModal, XBlockInfo, XBlockStringFieldEditor, ContainerSubviews,
+              UnitOutlineView, XBlockUtils) {
         'use strict';
         var XBlockContainerPage = BasePage.extend({
             // takes XBlockInfo as a model
@@ -17,6 +17,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                 'click .edit-button': 'editXBlock',
                 'click .visibility-button': 'editVisibilitySettings',
                 'click .duplicate-button': 'duplicateXBlock',
+                'click .move-button': 'showMoveXBlockModal',
                 'click .delete-button': 'deleteXBlock',
                 'click .new-component-button': 'scrollToNewComponentButtons'
             },
@@ -189,6 +190,17 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
             duplicateXBlock: function(event) {
                 event.preventDefault();
                 this.duplicateComponent(this.findXBlockElement(event.target));
+            },
+
+            showMoveXBlockModal: function(event) {
+                var xblockElement = this.findXBlockElement(event.target),
+                    modal = new MoveXBlockModal({
+                        sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
+                        XBlockUrlRoot: this.getURLRoot()
+                    });
+
+                event.preventDefault();
+                modal.show();
             },
 
             deleteXBlock: function(event) {

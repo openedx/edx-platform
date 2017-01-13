@@ -129,8 +129,8 @@ def edit_component(index=0):
     # Verify that the "loading" indication has been hidden.
     world.wait_for_loading()
     # Verify that the "edit" button is present.
-    world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
-    world.css_click('a.edit-button', index)
+    world.wait_for(lambda _driver: world.css_visible('.edit-button'))
+    world.css_click('.edit-button', index)
     world.wait_for_ajax_complete()
 
 

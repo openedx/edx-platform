@@ -38,7 +38,7 @@ def not_see_any_static_pages(step):
 
 @step(u'I "(edit|delete)" the static page$')
 def click_edit_or_delete(step, edit_or_delete):
-    button_css = 'ul.component-actions a.%s-button' % edit_or_delete
+    button_css = 'ul.component-actions .%s-button' % edit_or_delete
     world.css_click(button_css)
 
 
