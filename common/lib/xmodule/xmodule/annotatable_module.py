@@ -39,7 +39,7 @@ class AnnotatableFields(object):
     )
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this module"),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default=_('Annotation'),
     )

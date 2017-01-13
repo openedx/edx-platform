@@ -25,7 +25,7 @@ class LibraryRoot(XBlock):
     resources_dir = None
 
     display_name = String(
-        help=_("Enter the name of the library as it should appear in Studio."),
+        help=_("The display name for this component."),
         default="Library",
         display_name=_("Library Display Name"),
         scope=Scope.settings

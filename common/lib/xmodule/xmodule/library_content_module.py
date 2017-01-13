@@ -60,7 +60,7 @@ class LibraryContentFields(object):
     # to locate input elements - keep synchronized
     display_name = String(
         display_name=_("Display Name"),
-        help=_("Display name for this module"),
+        help=_("The display name for this component."),
         default="Randomized Content Block",
         scope=Scope.settings,
     )
