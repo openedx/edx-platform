@@ -64,6 +64,7 @@
             'xblock/lms.runtime.v1': 'lms/js/xblock/lms.runtime.v1',
             'xblock': 'common/js/xblock',
             'capa/display': 'xmodule_js/src/capa/display',
+            'sequence/display': 'xmodule_js/src/sequence/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
             'logger': 'xmodule_js/common_static/js/src/logger',
             'Markdown.Converter': 'js/Markdown.Converter',

@@ -17,16 +17,22 @@
       <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
       <span>${_('Previous')}</span>
     </button>
-    <nav class="sequence-list-wrapper" aria-label="${_('Unit')}">
-      <ol id="sequence-list">
+    <nav class="sequence-list-wrapper" aria-label="${_('Sequence')}">
+      <ol id="sequence-list" role="tablist">
         % for idx, item in enumerate(items):
         <li>
-        <button class="seq_${item['type']} inactive nav-item"
-           data-id="${item['id']}"
-           data-element="${idx+1}"
-           data-page-title="${item['page_title']}"
-           data-path="${item['path']}"
-           id="tab_${idx}">
+        <button class="seq_${item['type']} inactive nav-item tab"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-expanded="false"
+            aria-controls="seq_content"
+            data-index="${idx}"
+            data-id="${item['id']}"
+            data-element="${idx+1}"
+            data-page-title="${item['page_title']}"
+            data-path="${item['path']}"
+            id="tab_${idx}">
             <span class="icon fa seq_${item['type']}" aria-hidden="true"></span>
             <span class="fa fa-fw fa-bookmark bookmark-icon ${"is-hidden" if not item['bookmarked'] else "bookmarked"}" aria-hidden="true"></span>
             <div class="sequence-tooltip sr"><span class="sr">${item['type']}&nbsp;</span>${item['page_title']}<span class="sr bookmark-icon-sr">&nbsp;${_("Bookmarked") if item['bookmarked'] else ""}</span></div>
@@ -51,7 +57,7 @@
     ${item['content']}
   </div>
   % endfor
-  <div id="seq_content"></div>
+  <div id="seq_content" role="tabpanel"></div>
 
   <nav class="sequence-bottom" aria-label="${_('Section')}">
     <button class="sequence-nav-button button-previous">

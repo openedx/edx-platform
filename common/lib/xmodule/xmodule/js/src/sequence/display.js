@@ -38,6 +38,12 @@
             this.displayTabTooltip = function(event) {
                 return Sequence.prototype.displayTabTooltip.apply(self, [event]);
             };
+            this.arrowKeys = {
+                LEFT: 37,
+                UP: 38,
+                RIGHT: 39,
+                DOWN: 40
+            };
 
             this.updatedProblems = {};
             this.requestToken = $(element).data('request-token');
@@ -52,6 +58,7 @@
             this.nextUrl = this.el.data('next-url');
             this.prevUrl = this.el.data('prev-url');
             this.base_page_title = ' | ' + document.title;
+            this.keydownHandler($(element).find('#sequence-list .tab'));
             this.bind();
             this.render(parseInt(this.el.data('position'), 10));
         }
@@ -62,10 +69,61 @@
 
         Sequence.prototype.bind = function() {
             this.$('#sequence-list .nav-item').click(this.goto);
+            this.$('#sequence-list .nav-item').keypress(this.keyDownHandler);
             this.el.on('bookmark:add', this.addBookmarkIconToActiveNavItem);
             this.el.on('bookmark:remove', this.removeBookmarkIconFromActiveNavItem);
             this.$('#sequence-list .nav-item').on('focus mouseenter', this.displayTabTooltip);
             this.$('#sequence-list .nav-item').on('blur mouseleave', this.hideTabTooltip);
+        };
+
+        Sequence.prototype.previousNav = function(focused, index) {
+            var $navItemList,
+                $sequenceList = $(focused).parent().parent();
+            if (index === 0) {
+                $navItemList = $sequenceList.find('li').last();
+            } else {
+                $navItemList = $sequenceList.find('li:eq(' + index + ')').prev();
+            }
+            $sequenceList.find('.tab').removeClass('visited').removeClass('focused');
+            $navItemList.find('.tab').addClass('focused').focus();
+        };
+
+        Sequence.prototype.nextNav = function(focused, index, total) {
+            var $navItemList,
+                $sequenceList = $(focused).parent().parent();
+            if (index === total) {
+                $navItemList = $sequenceList.find('li').first();
+            } else {
+                $navItemList = $sequenceList.find('li:eq(' + index + ')').next();
+            }
+            $sequenceList.find('.tab').removeClass('visited').removeClass('focused');
+            $navItemList.find('.tab').addClass('focused').focus();
+        };
+
+        Sequence.prototype.keydownHandler = function(element) {
+            var self = this;
+            element.keydown(function(event) {
+                var key = event.keyCode,
+                    $focused = $(event.currentTarget),
+                    $sequenceList = $focused.parent().parent(),
+                    index = $sequenceList.find('li')
+                        .index($focused.parent()),
+                    total = $sequenceList.find('li')
+                        .size() - 1;
+                switch (key) {
+                case self.arrowKeys.LEFT:
+                    event.preventDefault();
+                    self.previousNav($focused, index);
+                    break;
+
+                case self.arrowKeys.RIGHT:
+                    event.preventDefault();
+                    self.nextNav($focused, index, total);
+                    break;
+
+                // no default
+                }
+            });
         };
 
         Sequence.prototype.displayTabTooltip = function(event) {
@@ -317,13 +375,22 @@
         Sequence.prototype.mark_visited = function(position) {
             // Don't overwrite class attribute to avoid changing Progress class
             var element = this.link_for(position);
-            element.removeClass('inactive').removeClass('active').addClass('visited');
+            element.attr({tabindex: '-1', 'aria-selected': 'false', 'aria-expanded': 'false'})
+                .removeClass('inactive')
+                .removeClass('active')
+                .removeClass('focused')
+                .addClass('visited');
         };
 
         Sequence.prototype.mark_active = function(position) {
             // Don't overwrite class attribute to avoid changing Progress class
             var element = this.link_for(position);
-            element.removeClass('inactive').removeClass('visited').addClass('active');
+            element.attr({tabindex: '0', 'aria-selected': 'true', 'aria-expanded': 'true'})
+                .removeClass('inactive')
+                .removeClass('visited')
+                .removeClass('focused')
+                .addClass('active');
+            this.$('.sequence-list-wrapper').focus();
         };
 
         Sequence.prototype.addBookmarkIconToActiveNavItem = function(event) {
