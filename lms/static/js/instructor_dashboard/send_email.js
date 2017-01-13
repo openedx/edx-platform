@@ -197,7 +197,7 @@
                     sendemail.$course_mode_targets.each(inputDisable);
                 } else {
                     sendemail.$cohort_targets.each(inputEnable);
-                    sendemail.$cohort_targets.each(inputEnable);
+                    sendemail.$course_mode_targets.each(inputEnable);
                 }
                 targets = [];
                 $('input[name="send_to"]:checked+label').each(function() {
