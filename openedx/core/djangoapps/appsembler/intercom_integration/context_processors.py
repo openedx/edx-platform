@@ -24,6 +24,6 @@ def intercom(request):
             digestmod=hashlib.sha256).hexdigest()
         data['intercom_user_hash'] = user_hash
         data['intercom_app_id'] = intercom_app_id
-        data['dinamo'] = 'zagreb'
+        data['intercom_lms_url'] = request.site.domain
 
     return data
