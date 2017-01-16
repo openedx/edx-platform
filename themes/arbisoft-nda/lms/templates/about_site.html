@@ -1,0 +1,51 @@
+## mako
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+
+<script type="text/template" id="about-content">
+  <div class="grid-manual">
+    <div class="row">
+      <div class="col col-12 text-center">
+        <h2>Lorem ipsum dolor sit amet, ad mea dictas audiam</h2>
+      </div>
+    </div>
+
+    <div class="row about-list text-center">
+      <div class="col col-4 about-list-item">
+        <div class="about-icon">
+          <img src="${static.url('images/about-img.png')}" alt="Students" />
+          <p>
+            <span>Participants</span>
+            Lorem ipsum dolor sit amet, ad mea dictas audiam, nec id graecis explicari.
+          </p>
+        </div>
+      </div>
+      <div class="col col-4 about-list-item">
+        <div class="about-icon">
+          <img src="${static.url('images/about-img.png')}" alt="Faculty" />
+          <p>
+            <span>Faculty</span>
+            Lorem ipsum dolor sit amet, ad mea dictas audiam, nec id graecis explicari.
+          </p>
+        </div>
+      </div>
+      <div class="col col-4 about-list-item">
+        <div class="about-icon">
+          <img src="${static.url('images/about-img.png')}" alt="Courses" />
+          <p>
+            <span>Courses</span>
+            Lorem ipsum dolor sit amet, ad mea dictas audiam, nec id graecis explicari.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row hidden more-about-btn">
+      <div class="col col-12 text-center">
+        <a href="/about" class="btn-neutral">More about this site</a>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script src="${static.url('js/about-site.js')}"></script>

@@ -15,16 +15,16 @@ from openedx.core.djangolib.markup import HTML
             <legend class="sr">${_("Send to:")}</legend>
             <ul role="group" class="email-targets-primary">
                 <li>
-                    <input type="checkbox" name="send_to" value="myself" id="target_myself">
-                    <label for="target_myself">${_("Myself")}</label>
-                </li>
-                <li>
                     <input type="checkbox" name="send_to" value="staff" id="target_staff">
                     <label for="target_staff">${_("Staff and Administrators")}</label>
                 </li>
                 <li>
                     <input type="checkbox" name="send_to" value="learners" id="target_learners">
                     <label for="target_learners">${_("All Learners")}</label>
+                </li>
+                <li>
+                    <input type="checkbox" name="send_to" value="myself" id="target_myself">
+                    <label for="target_myself">${_("Fail or not attempted training")}</label>
                 </li>
             </ul>
             %if len(section_data['cohorts']) > 0:

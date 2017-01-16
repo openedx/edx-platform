@@ -4,6 +4,7 @@ Models for bulk email
 import logging
 import markupsafe
 
+from courseware import grades, courses
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -46,9 +47,11 @@ SEND_TO_MYSELF = 'myself'
 SEND_TO_STAFF = 'staff'
 SEND_TO_LEARNERS = 'learners'
 SEND_TO_COHORT = 'cohort'
+SEND_TO_FAILURE = 'failure'
+
 EMAIL_TARGET_CHOICES = zip(
-    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT],
-    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort']
+    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_FAILURE],
+    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', "All fail students"]
 )
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 
@@ -106,14 +109,18 @@ class Target(models.Model):
             courseenrollment__is_active=True
         )
         if self.target_type == SEND_TO_MYSELF:
-            if user_id is None:
-                raise ValueError("Must define self user to send email to self.")
-            user = User.objects.filter(id=user_id)
-            return use_read_replica_if_available(user)
+            course = courses.get_course_by_id(course_key)
+            ids = []
+            for __, student in enumerate(enrollment_qset):
+                request.user = student
+                grade = grades.grade(student, request, course)
+                if grade['percent'] and grade['percent'] > 70:
+                    ids.append(student.id)
+            return use_read_replica_if_available(enrollment_qset.exclude(id__in=ids))
         elif self.target_type == SEND_TO_STAFF:
             return use_read_replica_if_available(staff_instructor_qset)
         elif self.target_type == SEND_TO_LEARNERS:
-            return use_read_replica_if_available(enrollment_qset.exclude(id__in=staff_instructor_qset))
+            return use_read_replica_if_available(enrollment_qset)
         elif self.target_type == SEND_TO_COHORT:
             return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)  # pylint: disable=no-member
         else:

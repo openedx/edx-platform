@@ -1,0 +1,19 @@
+## mako
+<%page expression_filter="h"/>
+<%namespace name='static' file='static_content.html'/>
+
+<link rel="stylesheet" type="text/css" href="${static.url('css/lms-main-v2.css')}"/>
+
+
+<!-- Hack to prevent font awesome icons from being overridden -->
+<script>
+  var observer = new MutationObserver(function(mutations, obv){
+    mutations.forEach(function(mutation) {
+      if (mutation.target.classList.contains('edx-icons')) {
+        mutation.target.classList.remove('edx-icons');
+        observer.disconnect();
+      }
+    });
+  });
+  observer.observe(document.querySelector('html'), {attributes: true});
+</script>

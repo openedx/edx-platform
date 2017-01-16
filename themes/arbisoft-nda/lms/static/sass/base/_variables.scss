@@ -1,0 +1,25 @@
+@import 'lms/static/sass/partials/base/variables';
+
+$white: #ffffff;
+$body-background-color: $white;
+$x-dark: #34383a;
+$light: #d2d0d0;
+$x-light: #e4e4e4;
+$dark: #6b6969;
+$brand-blue: #5d98d0;
+$course-section-background-color: #f7f7f7;
+$brand-color: $brand-blue;;
+$base: #9b9b9b;
+$success-base: #25b85a;
+$error-base: #b20610;
+$brand-font: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+$action-primary-fg: $brand-color;
+$action-primary-bg: lighten($brand-color, 10%);
+$action-primary-shadow: $brand-color !default;
+$link-color: $brand-color !default;
+
+$blue: #1485d1;
+$black: #000000;
+$teal: #567283;
+$light-gray: #95979a;
+

@@ -316,17 +316,14 @@ class CourseTabList(List):
         # If the course has a discussion link specified, use that even if we feature
         # flag discussions off. Disabling that is mostly a server safety feature
         # at this point, and we don't need to worry about external sites.
-        if course.discussion_link:
-            discussion_tab = CourseTab.load(
-                'external_discussion', name=_('External Discussion'), link=course.discussion_link
-            )
-        else:
-            discussion_tab = CourseTab.load('discussion')
+        # if course.discussion_link:
+        #     discussion_tab = CourseTab.load(
+        #         'external_discussion', name=_('External Discussion'), link=course.discussion_link
+        #     )
+        # else:
+        #     discussion_tab = CourseTab.load('discussion')
 
         course.tabs.extend([
-            CourseTab.load('textbooks'),
-            discussion_tab,
-            CourseTab.load('wiki'),
             CourseTab.load('progress'),
         ])
 
