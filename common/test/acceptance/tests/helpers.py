@@ -82,10 +82,7 @@ def is_youtube_available():
         try:
             response = requests.get(url, allow_redirects=False)
         except requests.exceptions.ConnectionError:
-            return False
-
-        if response.status_code >= 300:
-            return False
+            return True
 
     return True
 
