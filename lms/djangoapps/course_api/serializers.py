@@ -7,6 +7,8 @@ import urllib
 from django.core.urlresolvers import reverse
 from rest_framework import serializers
 
+from course_modes.models import CourseMode
+from lms.djangoapps.commerce.api.v1.serializers import CourseModeSerializer
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from openedx.core.lib.api.fields import AbsoluteURLField
 
@@ -50,6 +52,12 @@ class _CourseApiMediaCollectionSerializer(serializers.Serializer):  # pylint: di
     image = ImageSerializer(source='image_urls')
 
 
+class _CourseModeSerializer(serializers.Serializer):
+    """ CourseMode serializer. """
+    name = serializers.CharField(source='mode_slug')
+    price = serializers.IntegerField(source='min_price')
+    currency = serializers.CharField()
+
 class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-method
     """
     Serializer for Course objects providing minimal data about the course.
@@ -73,6 +81,7 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
     pacing = serializers.CharField()
     mobile_available = serializers.BooleanField()
     hidden = serializers.SerializerMethodField()
+    course_modes = serializers.SerializerMethodField()
     instructor_info = serializers.SerializerMethodField()
 
     # 'course_id' is a deprecated field, please use 'id' instead.
@@ -83,6 +92,12 @@ class CourseSerializer(serializers.Serializer):  # pylint: disable=abstract-meth
         Get the instructor_info dict and returns the list of instructors
         """
         return course_overview.instructor_info.get('instructors', [])
+
+    def get_course_modes(self, course_overview):
+        """
+        Get the course_modes
+        """
+        return CourseModeSerializer(CourseMode.objects.filter(course_id=course_overview.id), many=True).data
 
     def get_hidden(self, course_overview):
         """

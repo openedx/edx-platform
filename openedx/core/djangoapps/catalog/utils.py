@@ -76,7 +76,7 @@ def get_programs(user=None, uuid=None, type=None):  # pylint: disable=redefined-
         return []
 
 
-def get_program_types(user=None):  # pylint: disable=redefined-builtin
+def get_program_types(user=None, program_type_name=None):  # pylint: disable=redefined-builtin
     """Retrieve all program types from the catalog service.
 
     Returns:
@@ -91,29 +91,49 @@ def get_program_types(user=None):  # pylint: disable=redefined-builtin
         api = create_catalog_api_client(user, catalog_integration)
         cache_key = '{base}.program_types'.format(base=catalog_integration.CACHE_KEY)
 
-        return get_edx_api_data(
+        response = get_edx_api_data(
             catalog_integration,
             user,
             'program_types',
             cache_key=cache_key if catalog_integration.is_cache_enabled else None,
             api=api
         )
+        # Because program type name is not url friendly, we don't have a program_types endpoint
+        # to retrieve a single program_type based on program_type_name.
+        if program_type_name:
+            response = [program_type for program_type in response if program_type.name==program_type_name]
+
+        return response
     else:
         return []
 
 
-def get_programs_data(user=None):
-    """Return the list of Programs after adding the ProgramType Logo Image"""
+def get_programs_data(user=None, program_id=None):
+    """Return the list of Programs after adding the ProgramType Logo Image
+       This is of programs is to be displayed on the courseware and home page
+       Filter out all programs with status not in the allowed_statuses list.
+    """
 
-    programs_list = get_programs(user)
-    program_types = get_program_types(user)
+    allowed_statuses = ['active']
+    filtered_programs_list = []
 
-    program_types_lookup_dict = {program_type["name"]: program_type for program_type in program_types}
+    programs_list = get_programs(user, program_id)
 
-    for program in programs_list:
-        program["logo_image"] = program_types_lookup_dict[program["type"]]["logo_image"]
+    if programs_list:
+        program_types = get_program_types(user)
+        program_types_lookup_dict = {program_type["name"]: program_type for program_type in program_types}
 
-    return programs_list
+        # The get_programs returns a dict in case of a single program lookup.
+        if isinstance(programs_list, dict):
+            programs_list = [programs_list]
+
+
+        for program in programs_list:
+            if program["status"] in allowed_statuses:
+                program["logo_image"] = program_types_lookup_dict[program["type"]]["logo_image"]
+                filtered_programs_list.append(program)
+
+    return filtered_programs_list
 
 
 def munge_catalog_program(catalog_program):
