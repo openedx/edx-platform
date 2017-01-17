@@ -30,7 +30,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
     """
 
     # Default number of seconds to delay the response to simulate network latency.
-    DEFAULT_DELAY_SEC = 0.5
+    DEFAULT_DELAY_SEC = 1.0
 
     def do_DELETE(self):  # pylint: disable=invalid-name
         """
@@ -101,7 +101,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 # We need to do this every time because Google sometimes sends different responses
                 # as part of their own experiments, which has caused our tests to become "flaky"
                 self.log_message("Getting iframe api from youtube.com")
-                iframe_api_response = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
+                iframe_api_response = requests.get('https://www.youtube.com/iframe_api')
                 self.send_response(200, content=iframe_api_response, headers={'Content-type': 'text/html'})
 
         else:
