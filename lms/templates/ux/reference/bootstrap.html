@@ -1,0 +1,16 @@
+## Override the default styles_version to the Pattern Library version (version 2)
+<%! main_css = "style-main-v2" %>
+
+<%page expression_filter="h"/>
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="/main.html" />
+
+<%block name="pagetitle">Bootstrap POC</%block>
+
+<%block name="bodyclass">pattern-library</%block>
+
+<%block name="content">
+  <%static:require_module module_name="common/js/vendor/bootstrap-poc" class_name="">
+    new BootstrapPoc.default(document.querySelector('#content'));
+  </%static:require_module>
+</%block>

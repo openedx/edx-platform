@@ -60,6 +60,7 @@ NPM_INSTALLED_LIBRARIES = [
     'underscore.string/dist/underscore.string.js',
     'underscore/underscore.js',
     'hls.js/dist/hls.js',
+    'bootstrap-poc/dist/bootstrap-poc.js'
 ]
 
 # A list of NPM installed developer libraries that should be copied into the common
