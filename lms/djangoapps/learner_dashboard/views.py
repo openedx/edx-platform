@@ -8,6 +8,7 @@ from django.views.decorators.http import require_GET
 
 from edxmako.shortcuts import render_to_response
 from lms.djangoapps.learner_dashboard.utils import strip_course_id, FAKE_COURSE_KEY
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.utils import get_programs as get_catalog_programs, munge_catalog_program
 from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -41,26 +42,20 @@ def program_listing(request):
 
 @login_required
 @require_GET
-def program_details(request, program_id):
+def program_details(request, program_uuid):
     """View details about a specific program."""
+
     programs_config = ProgramsApiConfig.current()
-    if not programs_config.show_program_details:
+    if not programs_config.show_program_details or not CatalogIntegration.is_enabled():
         raise Http404
 
-    try:
-        # If the ID is a UUID, the requested program resides in the catalog.
-        uuid.UUID(program_id)
-
-        program_data = get_catalog_programs(request.user, uuid=program_id)
-        if program_data:
-            program_data = munge_catalog_program(program_data)
-    except ValueError:
-        program_data = utils.get_programs(request.user, program_id=program_id)
+    program_data = get_catalog_programs(request.user, uuid=program_uuid)
+    if program_data:
+        # TODO Get rid of this. Always use the Catalog API's format.
+        program_data = munge_catalog_program(program_data)
 
     if not program_data:
         raise Http404
-
-    program_data = utils.ProgramDataExtender(program_data, request.user).extend()
 
     urls = {
         'program_listing_url': reverse('program_listing_view'),
@@ -73,6 +68,7 @@ def program_details(request, program_id):
     context = {
         'program_data': program_data,
         'urls': urls,
+        # TODO Can we get rid of these?
         'show_program_listing': programs_config.show_program_listing,
         'nav_hidden': True,
         'disable_courseware_js': True,

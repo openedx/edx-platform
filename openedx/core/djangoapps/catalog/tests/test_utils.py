@@ -1,15 +1,16 @@
 """Tests covering utilities for integrating with the catalog service."""
-import uuid
 import copy
+import uuid
 
-from django.test import TestCase
 import mock
+from django.test import TestCase
 from opaque_keys.edx.keys import CourseKey
 
 from openedx.core.djangoapps.catalog import utils
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests import factories, mixins
 from student.tests.factories import UserFactory, AnonymousUserFactory
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 
@@ -19,6 +20,7 @@ UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 @mock.patch('config_models.models.cache.get', return_value=None)
 class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of programs from the catalog service."""
+
     def setUp(self):
         super(TestGetPrograms, self).setUp()
 
@@ -106,7 +108,7 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
         # This should not return programs.
         self.assertEqual(data, [])
 
-    def test_get_programs_data(self, _mock_cache, mock_get_catalog_data):   # pylint: disable=unused-argument
+    def test_get_programs_data(self, _mock_cache, mock_get_catalog_data):  # pylint: disable=unused-argument
         programs = []
         program_types = []
         programs_data = []
@@ -173,9 +175,12 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
         self.assertEqual(data, [])
 
 
-class TestMungeCatalogProgram(TestCase):
+class TestMungeCatalogProgram(SharedModuleStoreTestCase):
     """Tests covering querystring stripping."""
-    catalog_program = factories.Program()
+
+    def setUp(self):
+        super(TestMungeCatalogProgram, self).setUp()
+        self.catalog_program = factories.Program()
 
     def test_munge_catalog_program(self):
         munged = utils.munge_catalog_program(self.catalog_program)
@@ -223,6 +228,7 @@ class TestMungeCatalogProgram(TestCase):
 @mock.patch('config_models.models.cache.get', return_value=None)
 class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
     """Tests covering retrieval of course runs from the catalog service."""
+
     def setUp(self):
         super(TestGetCourseRun, self).setUp()
 
@@ -286,6 +292,7 @@ class TestGetCourseRun(mixins.CatalogIntegrationMixin, TestCase):
 @mock.patch(UTILS_MODULE + '.get_course_run')
 class TestGetRunMarketingUrl(TestCase):
     """Tests covering retrieval of course run marketing URLs."""
+
     def setUp(self):
         super(TestGetRunMarketingUrl, self).setUp()
 

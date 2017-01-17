@@ -12,24 +12,24 @@
                 initialize: function(data) {
                     if (data) {
                         this.context = data;
-                        this.setActiveRunMode(this.getRunMode(data.run_modes), data.user_preferences);
+                        this.setActiveRunMode(this.getCourseRun(data.course_runs), data.user_preferences);
                     }
                 },
 
-                getUnselectedRunMode: function(runModes) {
-                    if (runModes && runModes.length > 0) {
+                getUnselectedRunMode: function(course_runs) {
+                    if (course_runs && course_runs.length > 0) {
                         return {
-                            course_image_url: runModes[0].course_image_url,
-                            marketing_url: runModes[0].marketing_url,
-                            is_enrollment_open: runModes[0].is_enrollment_open
+                            course_image_url: course_runs[0].course_image_url,
+                            marketing_url: course_runs[0].marketing_url,
+                            is_enrollment_open: course_runs[0].is_enrollment_open
                         };
                     }
 
                     return {};
                 },
 
-                getRunMode: function(runModes) {
-                    var enrolled_mode = _.findWhere(runModes, {is_enrolled: true}),
+                getCourseRun: function(courseRuns) {
+                    var enrolled_mode = _.findWhere(courseRuns, {is_enrolled: true}),
                         openEnrollmentRunModes = this.getEnrollableRunModes(),
                         desiredRunMode;
                     // We populate our model by looking at the run modes.
@@ -43,14 +43,14 @@
                             desiredRunMode = this.getUnselectedRunMode(openEnrollmentRunModes);
                         }
                     } else {
-                        desiredRunMode = this.getUnselectedRunMode(runModes);
+                        desiredRunMode = this.getUnselectedRunMode(courseRuns);
                     }
 
                     return desiredRunMode;
                 },
 
                 getEnrollableRunModes: function() {
-                    return _.where(this.context.run_modes, {
+                    return _.where(this.context.course_runs, {
                         is_enrollment_open: true,
                         is_enrolled: false,
                         is_course_ended: false
@@ -58,7 +58,7 @@
                 },
 
                 getUpcomingRunModes: function() {
-                    return _.where(this.context.run_modes, {
+                    return _.where(this.context.course_runs, {
                         is_enrollment_open: false,
                         is_enrolled: false,
                         is_course_ended: false
@@ -82,38 +82,38 @@
                     return DateUtils.localize(context);
                 },
 
-                setActiveRunMode: function(runMode, userPreferences) {
+                setActiveRunMode: function(courseRun, userPreferences) {
                     var startDateString;
-                    if (runMode) {
-                        if (runMode.advertised_start !== undefined && runMode.advertised_start !== 'None') {
-                            startDateString = runMode.advertised_start;
+                    if (courseRun) {
+                        if (courseRun.advertised_start !== undefined && courseRun.advertised_start !== 'None') {
+                            startDateString = courseRun.advertised_start;
                         } else {
                             startDateString = this.formatDate(
-                                runMode.start_date,
+                                courseRun.start_date,
                                 userPreferences
                             );
                         }
                         this.set({
-                            certificate_url: runMode.certificate_url,
-                            course_image_url: runMode.course_image_url || '',
-                            course_key: runMode.course_key,
-                            course_url: runMode.course_url || '',
+                            certificate_url: courseRun.certificate_url,
+                            course_image_url: courseRun.course_image_url || '',
+                            course_key: courseRun.course_key,
+                            course_url: courseRun.course_url || '',
                             display_name: this.context.display_name,
                             end_date: this.formatDate(
-                                runMode.end_date,
+                                courseRun.end_date,
                                 userPreferences
                             ),
                             enrollable_run_modes: this.getEnrollableRunModes(),
-                            is_course_ended: runMode.is_course_ended,
-                            is_enrolled: runMode.is_enrolled,
-                            is_enrollment_open: runMode.is_enrollment_open,
+                            is_course_ended: courseRun.is_course_ended,
+                            is_enrolled: courseRun.is_enrolled,
+                            is_enrollment_open: courseRun.is_enrollment_open,
                             key: this.context.key,
-                            marketing_url: runMode.marketing_url,
-                            mode_slug: runMode.mode_slug,
-                            run_key: runMode.run_key,
+                            marketing_url: courseRun.marketing_url,
+                            mode_slug: courseRun.mode_slug,
+                            run_key: courseRun.run_key,
                             start_date: startDateString,
                             upcoming_run_modes: this.getUpcomingRunModes(),
-                            upgrade_url: runMode.upgrade_url
+                            upgrade_url: courseRun.upgrade_url
                         });
                     }
                 },
@@ -124,7 +124,7 @@
                 },
 
                 updateRun: function(runKey) {
-                    var selectedRun = _.findWhere(this.get('run_modes'), {run_key: runKey});
+                    var selectedRun = _.findWhere(this.get('course_runs'), {run_key: runKey});
                     if (selectedRun) {
                         this.setActiveRunMode(selectedRun);
                     }

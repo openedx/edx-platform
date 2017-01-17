@@ -1,28 +1,20 @@
 """Tests covering Programs utilities."""
-import copy
-import datetime
 import json
 from unittest import skipUnless
-import uuid
 
 import ddt
+import httpretty
+import mock
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.test.utils import override_settings
-from django.utils.text import slugify
-import httpretty
-import mock
+from edx_oauth2_provider.tests.factories import ClientFactory
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
-from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
-from pytz import utc
 
 from lms.djangoapps.certificates.api import MODES
-from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
-from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.tests import factories as credentials_factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
 from openedx.core.djangoapps.programs import utils
@@ -31,10 +23,6 @@ from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from util.date_utils import strftime_localized
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
@@ -344,10 +332,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
     def _attach_detail_url(self, programs):
         """Add expected detail URLs to a list of program dicts."""
         for program in programs:
-            base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
-            slug = slugify(program['name'])
-
-            program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
+            program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
     def test_no_enrollments(self):
         """Verify behavior when programs exist, but no relevant enrollments do."""
@@ -696,220 +681,3 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
         # Verify that all programs are complete.
         meter = utils.ProgramProgressMeter(self.user)
         self.assertEqual(meter.completed_programs, program_ids)
-
-
-@ddt.ddt
-@override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
-class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
-    """Tests of the program data extender utility class."""
-    maxDiff = None
-    sku = 'abc123'
-    password = 'test'
-    checkout_path = '/basket'
-
-    def setUp(self):
-        super(TestProgramDataExtender, self).setUp()
-
-        self.user = UserFactory()
-        self.client.login(username=self.user.username, password=self.password)
-
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-        self.course = CourseFactory()
-        self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
-        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
-
-        self.organization = factories.Organization()
-        self.run_mode = factories.RunMode(course_key=unicode(self.course.id))  # pylint: disable=no-member
-        self.course_code = factories.CourseCode(run_modes=[self.run_mode])
-        self.program = factories.Program(
-            organizations=[self.organization],
-            course_codes=[self.course_code]
-        )
-
-    def _assert_supplemented(self, actual, **kwargs):
-        """DRY helper used to verify that program data is extended correctly."""
-        course_overview = CourseOverview.get_from_id(self.course.id)  # pylint: disable=no-member
-        run_mode = dict(
-            factories.RunMode(
-                certificate_url=None,
-                course_image_url=course_overview.course_image_url,
-                course_key=unicode(self.course.id),  # pylint: disable=no-member
-                course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
-                end_date=self.course.end.replace(tzinfo=utc),
-                enrollment_open_date=strftime_localized(utils.DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
-                is_course_ended=self.course.end < datetime.datetime.now(utc),
-                is_enrolled=False,
-                is_enrollment_open=True,
-                marketing_url=MARKETING_URL,
-                start_date=self.course.start.replace(tzinfo=utc),
-                upgrade_url=None,
-                advertised_start=None
-            ),
-            **kwargs
-        )
-        course_code = factories.CourseCode(display_name=self.course_code['display_name'], run_modes=[run_mode])
-        expected = copy.deepcopy(self.program)
-        expected['course_codes'] = [course_code]
-
-        self.assertEqual(actual, expected)
-
-    @ddt.data(
-        (False, None, False),
-        (True, MODES.audit, True),
-        (True, MODES.verified, False),
-    )
-    @ddt.unpack
-    @mock.patch(UTILS_MODULE + '.CourseMode.mode_for_course')
-    def test_student_enrollment_status(self, is_enrolled, enrolled_mode, is_upgrade_required, mock_get_mode):
-        """Verify that program data is supplemented with the student's enrollment status."""
-        expected_upgrade_url = '{root}/{path}?sku={sku}'.format(
-            root=ECOMMERCE_URL_ROOT,
-            path=self.checkout_path.strip('/'),
-            sku=self.sku,
-        )
-
-        update_commerce_config(enabled=True, checkout_page=self.checkout_path)
-
-        mock_mode = mock.Mock()
-        mock_mode.sku = self.sku
-        mock_get_mode.return_value = mock_mode
-
-        if is_enrolled:
-            CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=enrolled_mode)  # pylint: disable=no-member
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-
-        self._assert_supplemented(
-            data,
-            is_enrolled=is_enrolled,
-            upgrade_url=expected_upgrade_url if is_upgrade_required else None
-        )
-
-    @ddt.data(MODES.audit, MODES.verified)
-    def test_inactive_enrollment_no_upgrade(self, enrolled_mode):
-        """Verify that a student with an inactive enrollment isn't encouraged to upgrade."""
-        update_commerce_config(enabled=True, checkout_page=self.checkout_path)
-
-        CourseEnrollmentFactory(
-            user=self.user,
-            course_id=self.course.id,  # pylint: disable=no-member
-            mode=enrolled_mode,
-            is_active=False,
-        )
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-
-        self._assert_supplemented(data)
-
-    @mock.patch(UTILS_MODULE + '.CourseMode.mode_for_course')
-    def test_ecommerce_disabled(self, mock_get_mode):
-        """Verify that the utility can operate when the ecommerce service is disabled."""
-        update_commerce_config(enabled=False, checkout_page=self.checkout_path)
-
-        mock_mode = mock.Mock()
-        mock_mode.sku = self.sku
-        mock_get_mode.return_value = mock_mode
-
-        CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=MODES.audit)  # pylint: disable=no-member
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-
-        self._assert_supplemented(data, is_enrolled=True, upgrade_url=None)
-
-    @ddt.data(
-        (1, 1, False),
-        (1, -1, True),
-    )
-    @ddt.unpack
-    def test_course_enrollment_status(self, start_offset, end_offset, is_enrollment_open):
-        """
-        Verify that course enrollment status is reflected correctly.
-        """
-        self.course.enrollment_start = datetime.datetime.now(utc) - datetime.timedelta(days=start_offset)
-        self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=end_offset)
-
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-
-        self._assert_supplemented(
-            data,
-            is_enrollment_open=is_enrollment_open,
-            enrollment_open_date=strftime_localized(self.course.enrollment_start, 'SHORT_DATE'),
-        )
-
-    def test_no_enrollment_start_date(self):
-        """Verify that a closed course with no explicit enrollment start date doesn't cause an error.
-
-        Regression test for ECOM-4973.
-        """
-        self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=1)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-
-        self._assert_supplemented(
-            data,
-            is_enrollment_open=False,
-        )
-
-    @ddt.data(True, False)
-    @mock.patch(UTILS_MODULE + '.certificate_api.certificate_downloadable_status')
-    @mock.patch(CERTIFICATES_API_MODULE + '.has_html_certificates_enabled')
-    def test_certificate_url_retrieval(self, is_uuid_available, mock_html_certs_enabled, mock_get_cert_data):
-        """Verify that the student's run mode certificate is included, when available."""
-        test_uuid = uuid.uuid4().hex
-        mock_get_cert_data.return_value = {'uuid': test_uuid} if is_uuid_available else {}
-        mock_html_certs_enabled.return_value = True
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-
-        expected_url = reverse(
-            'certificates:render_cert_by_uuid',
-            kwargs={'certificate_uuid': test_uuid}
-        ) if is_uuid_available else None
-
-        self._assert_supplemented(data, certificate_url=expected_url)
-
-    @ddt.data(-1, 0, 1)
-    def test_course_course_ended(self, days_offset):
-        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=days_offset)
-        self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-
-        self._assert_supplemented(data)
-
-    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
-    def test_organization_logo_exists(self, mock_get_organization_by_short_name):
-        """ Verify the logo image is set from the organizations api """
-        mock_logo_url = 'edx/logo.png'
-        mock_image = mock.Mock()
-        mock_image.url = mock_logo_url
-        mock_get_organization_by_short_name.return_value = {
-            'logo': mock_image
-        }
-
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-        self.assertEqual(data['organizations'][0].get('img'), mock_logo_url)
-
-    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
-    def test_organization_missing(self, mock_get_organization_by_short_name):
-        """ Verify the logo image is not set if the organizations api returns None """
-        mock_get_organization_by_short_name.return_value = None
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-        self.assertEqual(data['organizations'][0].get('img'), None)
-
-    @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
-    def test_organization_logo_missing(self, mock_get_organization_by_short_name):
-        """
-        Verify the logo image is not set if the organizations api returns organization,
-        but the logo is not available
-        """
-        mock_get_organization_by_short_name.return_value = {'logo': None}
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
-        self.assertEqual(data['organizations'][0].get('img'), None)

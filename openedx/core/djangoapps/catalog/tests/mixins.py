@@ -5,7 +5,7 @@ from openedx.core.djangoapps.catalog.models import CatalogIntegration
 class CatalogIntegrationMixin(object):
     """Utility for working with the catalog service during testing."""
 
-    DEFAULTS = {
+    CATALOG_INTEGRATION_DEFAULTS = {
         'enabled': True,
         'internal_api_url': 'https://catalog-internal.example.com/api/v1/',
         'cache_ttl': 0,
@@ -13,7 +13,7 @@ class CatalogIntegrationMixin(object):
 
     def create_catalog_integration(self, **kwargs):
         """Creates a new CatalogIntegration with DEFAULTS, updated with any provided overrides."""
-        fields = dict(self.DEFAULTS, **kwargs)
+        fields = dict(self.CATALOG_INTEGRATION_DEFAULTS, **kwargs)
         CatalogIntegration(**fields).save()
 
         return CatalogIntegration.current()

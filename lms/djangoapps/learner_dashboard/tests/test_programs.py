@@ -3,6 +3,8 @@
 Unit tests covering the program listing and detail pages.
 """
 import json
+from uuid import uuid4
+
 import re
 import unittest
 from urlparse import urljoin
@@ -11,12 +13,14 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import override_settings
-from django.utils.text import slugify
 from edx_oauth2_provider.tests.factories import ClientFactory
 import httpretty
 import mock
 from provider.constants import CONFIDENTIAL
 
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
+from openedx.core.djangoapps.catalog.tests import factories as catalog_factories
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.credentials.models import CredentialsApiConfig
 from openedx.core.djangoapps.credentials.tests import factories as credentials_factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin
@@ -214,11 +218,9 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         for index, actual_program in enumerate(actual):
             expected_program = self.data[index]
 
-            base = reverse('program_details_view', args=[expected_program['id']]).rstrip('/')
-            slug = slugify(expected_program['name'])
             self.assertEqual(
                 actual_program['detail_url'],
-                '{}/{}'.format(base, slug)
+                reverse('program_details_view', args=[expected_program['uuid']])
             )
 
     def test_certificates_listed(self):
@@ -266,41 +268,28 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
-class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
+class TestProgramDetails(ProgramsApiConfigMixin, CatalogIntegrationMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
-    program_id = 123
     password = 'test'
-    url = reverse('program_details_view', args=[program_id])
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestProgramDetails, cls).setUpClass()
-
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-        course = CourseFactory()
-        organization = programs_factories.Organization()
-        run_mode = programs_factories.RunMode(course_key=unicode(course.id))  # pylint: disable=no-member
-        course_code = programs_factories.CourseCode(run_modes=[run_mode])
-
-        cls.data = programs_factories.Program(
-            organizations=[organization],
-            course_codes=[course_code]
-        )
 
     def setUp(self):
         super(TestProgramDetails, self).setUp()
+        self.create_programs_config()
+        self.create_catalog_integration()
 
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
 
-    def mock_programs_api(self, data, status=200):
+        self.program = catalog_factories.Program()
+        self.url = reverse('program_details_view', args=[self.program['uuid']])
+
+    def mock_programs_api(self, data, status=200, uuid=None):
         """Helper for mocking out Programs API URLs."""
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
-        url = '{api_root}/programs/{id}/'.format(
-            api_root=ProgramsApiConfig.current().internal_api_url.strip('/'),
-            id=self.program_id
+        url = '{api_root}/programs/{uuid}/'.format(
+            api_root=CatalogIntegration.current().internal_api_url.strip('/'),
+            uuid=uuid or data['uuid']
         )
 
         body = json.dumps(data)
@@ -318,7 +307,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.assertContains(response, 'programData')
         self.assertContains(response, 'urls')
         self.assertContains(response, 'program_listing_url')
-        self.assertContains(response, self.data['name'])
+        self.assertContains(response, self.program['title'])
         self.assert_programs_tab_present(response)
 
     def assert_programs_tab_present(self, response):
@@ -332,8 +321,7 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         """
         Verify that login is required to access the page.
         """
-        self.create_programs_config()
-        self.mock_programs_api(self.data)
+        self.mock_programs_api(self.program)
 
         self.client.logout()
 
@@ -346,41 +334,29 @@ class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
         self.client.login(username=self.user.username, password=self.password)
 
         response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
         self.assert_program_data_present(response)
 
-    def test_404_if_disabled(self):
-        """
-        Verify that the page 404s if disabled.
-        """
-        self.create_programs_config(program_details_enabled=False)
+    def test_404_if_catalog_integration_disabled(self):
+        """ Verify the page 404s if integration with the Catalog Service is disabled. """
+        self.catalog_integration = self.create_catalog_integration(enabled=False)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 404)
 
+    def test_404_if_page_disabled(self):
+        """ Verify that the page 404s if the functionality is disabled. """
+        self.create_programs_config(program_details_enabled=False)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
     def test_404_if_no_data(self):
         """Verify that the page 404s if no program data is found."""
-        self.create_programs_config()
-
-        self.mock_programs_api(self.data, status=404)
+        self.mock_programs_api(self.program, status=404)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
         httpretty.reset()
 
-        self.mock_programs_api({})
+        self.mock_programs_api({}, uuid=uuid4().hex)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 404)
-
-    def test_page_routing(self):
-        """Verify that the page can be hit with or without a program name in the URL."""
-        self.create_programs_config()
-        self.mock_programs_api(self.data)
-
-        response = self.client.get(self.url)
-        self.assert_program_data_present(response)
-
-        response = self.client.get(self.url + 'program_name/')
-        self.assert_program_data_present(response)
-
-        response = self.client.get(self.url + 'program_name/invalid/')
         self.assertEqual(response.status_code, 404)
