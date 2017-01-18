@@ -89,7 +89,7 @@ class TestXFrameWhitelistDecoratorForSAML(TestCase):
     @ddt.unpack
     @ddt.data(
         (
-            'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO',
+            'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO?param1=1&param2=',
             {
                 'X-Frame-Options': 'ALLOW-FROM %s' % SCORM_CLOUD_URL,
                 'Content-Security-Policy': "frame-ancestors %s" % SCORM_CLOUD_URL,
