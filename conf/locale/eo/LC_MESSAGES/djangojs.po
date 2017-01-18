@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-05 16:46+0000\n"
-"PO-Revision-Date: 2017-01-05 16:47:32.840143\n"
+"POT-Creation-Date: 2017-01-12 17:49+0000\n"
+"PO-Revision-Date: 2017-01-12 17:52:25.911208\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -121,6 +121,20 @@ msgstr "Ûplöädïng Ⱡ'σяєм ιρѕυм ∂σł#"
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#: cms/static/js/views/active_video_upload.js
+#: cms/static/js/views/modals/edit_xblock.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/templates/image-modal.underscore
+#: common/static/common/templates/discussion/alert-popup.underscore
+#: common/static/common/templates/discussion/forum-action-close.underscore
+#: common/static/common/templates/discussion/search-alert.underscore
+#: lms/templates/student_profile/share_modal.underscore
+msgid "Close"
+msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
+
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
@@ -201,19 +215,6 @@ msgstr "Sävé Ⱡ'σяєм ι#"
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
 msgid "Advanced"
 msgstr "Àdvänçéd Ⱡ'σяєм ιρѕυм ∂#"
-
-#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: cms/static/js/views/modals/edit_xblock.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/common/templates/image-modal.underscore
-#: common/static/common/templates/discussion/alert-popup.underscore
-#: common/static/common/templates/discussion/forum-action-close.underscore
-#: common/static/common/templates/discussion/search-alert.underscore
-#: lms/templates/student_profile/share_modal.underscore
-msgid "Close"
-msgstr "Çlösé Ⱡ'σяєм ιρѕ#"
 
 #: cms/static/js/views/previous_video_upload.js
 #: lms/static/js/views/image_field.js
@@ -6216,6 +6217,10 @@ msgstr "Püßlïsh Ⱡ'σяєм ιρѕυм #"
 msgid "Marketing Slug is required."
 msgstr "Märkétïng Slüg ïs réqüïréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
+#: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
+msgid "Your file could not be uploaded"
+msgstr "Ýöür fïlé çöüld nöt ßé üplöädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
 msgstr ""
@@ -6223,9 +6228,14 @@ msgstr ""
 "¢σηѕє¢тєтυ#"
 
 #: cms/static/js/views/active_video_upload_list.js
-#: cms/static/js/views/assets.js
-msgid "Your file could not be uploaded"
-msgstr "Ýöür fïlé çöüld nöt ßé üplöädéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+msgid "Upload completed for video {fileName}"
+msgstr ""
+"Ûplöäd çömplétéd för vïdéö {fileName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload failed for video {fileName}"
+msgstr ""
+"Ûplöäd fäïléd för vïdéö {fileName} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid "{filename} is not in a supported file format. "
@@ -9544,6 +9554,14 @@ msgstr ""
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
 msgstr "Àçtïvé Ûplöäds Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "Read More"
+msgstr "Réäd Möré Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "details about the failure"
+msgstr "détäïls äßöüt thé fäïlüré Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"

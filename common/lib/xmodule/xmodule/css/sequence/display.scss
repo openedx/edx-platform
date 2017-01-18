@@ -272,6 +272,7 @@ nav.sequence-bottom {
 // hover and active states
 .sequence-nav-button,
 .sequence-nav button {
+  &.focused,
   &:hover,
   &:active,
   &.active {

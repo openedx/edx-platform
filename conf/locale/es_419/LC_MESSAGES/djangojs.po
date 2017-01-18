@@ -1,6 +1,6 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -40,7 +40,7 @@
 # Yusuf (Josè) Luis <alagunajs@gmail.com>, 2016
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -69,7 +69,7 @@
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -96,7 +96,7 @@
 # Valeria Freire <valtodopds@hotmail.com>, 2014-2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -119,8 +119,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-08 18:45+0000\n"
-"PO-Revision-Date: 2016-11-22 16:42+0000\n"
+"POT-Creation-Date: 2017-01-05 17:02+0000\n"
+"PO-Revision-Date: 2017-01-12 16:45+0000\n"
 "Last-Translator: Ned Batchelder <ned@edx.org>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -214,6 +214,20 @@ msgstr "Subiendo"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
+#: cms/static/js/views/active_video_upload.js
+#: cms/static/js/views/modals/edit_xblock.js
+#: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/static/common/templates/image-modal.underscore
+#: common/static/common/templates/discussion/alert-popup.underscore
+#: common/static/common/templates/discussion/forum-action-close.underscore
+#: common/static/common/templates/discussion/search-alert.underscore
+#: lms/templates/student_profile/share_modal.underscore
+msgid "Close"
+msgstr "Cerrar"
+
+#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+#. Translators: this is a message from the raw HTML editor displayed in the
+#. browser when a user needs to edit HTML
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
@@ -295,19 +309,6 @@ msgstr "Guardar"
 msgid "Advanced"
 msgstr "Avanzado"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
-#. Translators: this is a message from the raw HTML editor displayed in the
-#. browser when a user needs to edit HTML
-#: cms/static/js/views/modals/edit_xblock.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/static/common/templates/image-modal.underscore
-#: common/static/common/templates/discussion/alert-popup.underscore
-#: common/static/common/templates/discussion/forum-action-close.underscore
-#: common/static/common/templates/discussion/search-alert.underscore
-#: lms/templates/student_profile/share_modal.underscore
-msgid "Close"
-msgstr "Cerrar"
-
 #: cms/static/js/views/previous_video_upload.js
 #: lms/static/js/views/image_field.js
 msgid "Removing"
@@ -324,6 +325,11 @@ msgstr "Sus cambios han sido guardados."
 #. error,
 #. e.g. "Error: required field is missing".
 #: cms/static/js/views/xblock_validation.js
+#: common/static/common/js/discussion/utils.js
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+#: common/static/common/js/discussion/views/discussion_thread_list_view.js
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+#: common/static/common/js/discussion/views/response_comment_view.js
 #: lms/static/js/student_account/views/FinishAuthView.js
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
@@ -1592,12 +1598,9 @@ msgstr ""
 "La URL que introdujo parece ser un vínculo externo. ¿Desea agregarle el "
 "prefijo requerido http://?"
 
-#. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: cms/templates/js/course-instructor-details.underscore
-#: cms/templates/js/signatory-details.underscore
 msgid "Title"
 msgstr "Título"
 
@@ -2042,46 +2045,13 @@ msgstr "Mostrando {firstIndex} de {numItems}"
 msgid "Showing {firstIndex}-{lastIndex} out of {numItems} total"
 msgstr "Mostrando {firstIndex}-{lastIndex} de un total de {numItems}"
 
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Hide Discussion"
-msgstr "Ocultar Discusión"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "Show Discussion"
-msgstr "Mostrar Discusión"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-#: common/static/common/js/discussion/utils.js
-#: common/static/common/js/discussion/views/discussion_thread_list_view.js
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-#: common/static/common/js/discussion/views/response_comment_view.js
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "Sorry"
-msgstr "Lo sentimos"
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid "We had some trouble loading the discussion. Please try again."
-msgstr ""
-"Ocurrió un problema al cargar la discusión. Por favor intente nuevamente."
-
-#: common/static/common/js/discussion/discussion_module_view.js
-msgid ""
-"We had some trouble loading the threads you requested. Please try again."
-msgstr ""
-"Ocurrió un problema al cargar la discusión solicitada. Por favor intente "
-"nuevamente."
-
 #: common/static/common/js/discussion/utils.js
 msgid "Loading content"
 msgstr "Cargando contenido"
 
 #: common/static/common/js/discussion/utils.js
-msgid ""
-"We had some trouble processing your request. Please ensure you have copied "
-"any "
+msgid "Your request could not be processed. Refresh the page and try again."
 msgstr ""
-"Ocurrió un problema al procesar su solicitud. Asegurese de haber copiado "
-"cualquier"
 
 #: common/static/common/js/discussion/utils.js
 #: common/static/common/templates/discussion/pagination.underscore
@@ -2109,124 +2079,120 @@ msgstr[0] "{numVotes} Voto"
 msgstr[1] "{numVotes} Votos"
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble subscribing you to this thread. Please try again."
+msgid ""
+"You could not be subscribed to this post. Refresh the page and try again."
 msgstr ""
-"Tenemos problemas suscribiéndote a esta conversación. Por favor intenta de "
-"nuevo."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble unsubscribing you from this thread. Please try again."
+"You could not be unsubscribed from this post. Refresh the page and try "
+"again."
 msgstr ""
-"Tenemos problemas desuscribiendote de este hilo. Por favor intenta de nuevo."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble marking this response as an answer.  Please try again."
+"This response could not be marked as an answer. Refresh the page and try "
+"again."
 msgstr ""
-"Tenemos algunos problemas marcando tu mensaje como respuesta. Por favor "
-"inténtalo de nuevo."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing this response as an answer.  Please try again."
+"This response could not be unmarked as an answer. Refresh the page and try "
+"again."
 msgstr ""
-"Tenemos algunos problemas borrando tu mensaje como respuesta. Por favor "
-"inténtalo de nuevo."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble marking this response endorsed.  Please try again."
-msgstr ""
-"Tenemos problemas para marcar tu respuesta como aprobada. Por favor intenta "
-"de nuevo."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble removing this endorsement.  Please try again."
-msgstr "Tenemos problemas borrando tu respuesta. Por favor intenta de nuevo."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble saving your vote.  Please try again."
-msgstr ""
-"Tenemos algunos problemas guardando tu voto. Por favor inténtalo nuevamente."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble pinning this thread. Please try again."
-msgstr "Tenemos problemas fijando este hilo. Por favor intenta de nuevo."
-
-#: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble unpinning this thread. Please try again."
-msgstr "Tenemos problemas desmarcando este hilo. Por favor intenta de nuevo."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
 msgid ""
-"We had some trouble removing your flag on this post.  Please try again."
+"This response could not be marked as endorsed. Refresh the page and try "
+"again."
 msgstr ""
-"Tenemos problemas borrando tu marca para esta publicación. Por favor intenta"
-" de nuevo."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reporting this post.  Please try again."
+msgid "This response could not be unendorsed. Refresh the page and try again."
 msgstr ""
-"Tenemos problemas en el reporte sobre esta publicación. Por favor intenta de"
-" nuevo."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble closing this thread.  Please try again."
+msgid "This vote could not be processed. Refresh the page and try again."
 msgstr ""
-"Tenemos problemas cerrando esta discusión. Por favor intenta de nuevo."
 
 #: common/static/common/js/discussion/views/discussion_content_view.js
-msgid "We had some trouble reopening this thread.  Please try again."
+msgid "This post could not be pinned. Refresh the page and try again."
 msgstr ""
-"Tenemos problemas reabriendo esta discusión. Por favor intenta de nuevo."
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be unpinned. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be flagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid ""
+"This post could not be unflagged for abuse. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be closed. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_content_view.js
+msgid "This post could not be reopened. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Hide Discussion"
+msgstr "Ocultar Discusión"
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "This discussion could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_inline_view.js
+msgid "Show Discussion"
+msgstr "Mostrar Discusión"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Loading more threads"
 msgstr "Cargando más discusiones"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "We had some trouble loading more threads. Please try again."
+msgid "Additional posts could not be loaded. Refresh the page and try again."
 msgstr ""
-"Tuvimos un problema al cargar más discusiones. Por favor intente nuevamente."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Current conversation"
 msgstr "conversación actual"
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "Loading thread list"
-msgstr "Cargando la lista de discusiones"
+msgid "Loading posts list"
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "No results found for {original_query}. "
 msgstr "No se encontraron resultados para {original_query}."
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
-msgid "No threads matched your query."
-msgstr "Ninguna discusión coincide con los criterios dados."
+msgid "No posts matched your query."
+msgstr ""
 
 #: common/static/common/js/discussion/views/discussion_thread_list_view.js
 msgid "Show posts by {username}."
 msgstr "Mostrar las publicaciones por {username}."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "The post you selected has been deleted."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
+msgid "Responses could not be loaded. Refresh the page and try again."
+msgstr ""
+
+#: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid ""
-"The thread you selected has been deleted. Please select another thread."
+"Additional responses could not be loaded. Refresh the page and try again."
 msgstr ""
-"La discusión que seleccionó ha sido borrada. Por favor seleccione otra "
-"discusión."
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading responses. Please reload the page."
-msgstr ""
-"Ocurrió un problema al cargar las respuestas de la discusión. Por favor "
-"intente recargar la página."
-
-#: common/static/common/js/discussion/views/discussion_thread_view.js
-msgid "We had some trouble loading more responses. Please try again."
-msgstr ""
-"Ocurrió un problema al cargar más respuestas para la discusión. Por favor "
-"intente recargar la página."
 
 #: common/static/common/js/discussion/views/discussion_thread_view.js
 msgid "{numResponses} other response"
@@ -2277,9 +2243,8 @@ msgid "Are you sure you want to delete this comment?"
 msgstr "¿Está seguro de que desea borrar este comentario?"
 
 #: common/static/common/js/discussion/views/response_comment_view.js
-msgid "We had some trouble deleting this comment. Please try again."
+msgid "This comment could not be deleted. Refresh the page and try again."
 msgstr ""
-"Ocurrió un problema al borrar el comentario. Por favor intente nuevamente."
 
 #: common/static/common/js/discussion/views/thread_response_view.js
 msgid "Are you sure you want to delete this response?"
@@ -2538,12 +2503,6 @@ msgid "This annotation has %(count)s flag."
 msgid_plural "This annotation has %(count)s flags."
 msgstr[0] "Esta publicación tiene %(count)s marca."
 msgstr[1] "Esta publicación tiene %(count)s marcas."
-
-#: lms/djangoapps/discussion/static/discussion/js/views/discussion_user_profile_view.js
-msgid "We had some trouble loading the page you requested. Please try again."
-msgstr ""
-"Ocurrió un problema al cargar la página solicitada. Por favor intente "
-"nuevamente."
 
 #: lms/djangoapps/support/static/support/js/views/certificates.js
 msgid "An unexpected error occurred.  Please try again."
@@ -3719,8 +3678,8 @@ msgid "Insert Hyperlink"
 msgstr "Insertar hipervínculo"
 
 #: lms/static/js/Markdown.Editor.js
-msgid "e.g. 'http://google.com/'"
-msgstr "p. ej. 'http://google.com/'"
+msgid "e.g. 'http://google.com'"
+msgstr ""
 
 #: lms/static/js/Markdown.Editor.js
 msgid "Link Description"
@@ -4149,6 +4108,10 @@ msgid "[no tags]"
 msgstr "[sin etiquetas]"
 
 #: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
+msgid "Unable to submit application"
+msgstr ""
+
+#: lms/static/js/financial-assistance/views/financial_assistance_form_view.js
 #: lms/static/js/student_account/views/LoginView.js
 msgid "An error has occurred. Check your Internet connection and try again."
 msgstr ""
@@ -4546,6 +4509,24 @@ msgstr "Añadiendo el curso seleccionado a su carrito de compras"
 msgid "Loading your courses"
 msgstr "Cargando sus cursos"
 
+#: lms/static/js/student_account/views/FormView.js
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "An error occurred."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid "We couldn't sign you in."
+msgstr ""
+
+#: lms/static/js/student_account/views/LoginView.js
+#, c-format
+msgid "An error occurred when signing you in to %s."
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+msgid "Check Your Email"
+msgstr "Revise su correo electrónico"
+
 #: lms/static/js/student_account/views/LoginView.js
 msgid ""
 "{paragraphStart}You entered {boldStart}{email}{boldEnd}. If this email "
@@ -4561,6 +4542,26 @@ msgid ""
 msgstr ""
 "Ha ocurrido un error. Intente recargar la página o revise su conexión a "
 "Internet."
+
+#: lms/static/js/student_account/views/LoginView.js
+msgid ""
+"You have successfully signed into %(currentProvider)s, but your "
+"%(currentProvider)s"
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "We couldn't create your account."
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid "You've successfully signed into %(currentProvider)s."
+msgstr ""
+
+#: lms/static/js/student_account/views/RegisterView.js
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Basic Account Information"
@@ -4659,6 +4660,10 @@ msgstr ""
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "All Time Zones"
 msgstr "Todas las zonas horarias"
+
+#: lms/static/js/student_account/views/account_settings_factory.js
+msgid "Default (Local Time Zone)"
+msgstr ""
 
 #: lms/static/js/student_account/views/account_settings_factory.js
 msgid "Additional Information"
@@ -5108,7 +5113,7 @@ msgstr "Número de estudiantes"
 msgid "Overall Score"
 msgstr ""
 
-#: cms/static/cms/js/main.js
+#: cms/static/cms/js/main.js cms/static/js/views/active_video_upload_list.js
 msgid ""
 "This may be happening because of an error with our server or your internet "
 "connection. Try refreshing the page or making sure you are online."
@@ -5637,9 +5642,29 @@ msgstr "Publicar"
 msgid "Marketing Slug is required."
 msgstr "Se requiere slug de marketing."
 
+#: cms/static/js/views/active_video_upload.js cms/static/js/views/assets.js
+msgid "Your file could not be uploaded"
+msgstr "Su archivo no pudo ser cargado"
+
 #: cms/static/js/views/active_video_upload_list.js
 msgid "Your video uploads are not complete."
 msgstr "Los archivos de vídeo no han terminado de cargar."
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload completed for video {fileName}"
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "Upload failed for video {fileName}"
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} is not in a supported file format. "
+msgstr ""
+
+#: cms/static/js/views/active_video_upload_list.js
+msgid "{filename} exceeds maximum size of {maxFileSizeInGB} GB."
+msgstr ""
 
 #: cms/static/js/views/active_video_upload_list.js
 msgid ": video upload complete."
@@ -5689,10 +5714,6 @@ msgid ""
 msgstr ""
 "Por favor siga las instrucciones aqui para cargar un archivo en otro parte y"
 " enlazelo: {maxFileSizeRedirectUrl}"
-
-#: cms/static/js/views/assets.js
-msgid "Your file could not be uploaded"
-msgstr "Su archivo no pudo ser cargado"
 
 #: cms/static/js/views/assets.js
 msgid "Max file size exceeded"
@@ -6397,7 +6418,6 @@ msgstr "Anterior"
 
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/djangoapps/support/static/support/templates/certificates_results.underscore
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
 msgstr "Estado"
 
@@ -6497,12 +6517,12 @@ msgid "Error posting your message."
 msgstr "Error al publicar su mensaje."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Visible To:"
-msgstr "Visible para:"
+msgid "Add a Post"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "All Groups"
-msgstr "Todos los Grupos"
+msgid "Visible to"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid ""
@@ -6513,9 +6533,8 @@ msgstr ""
 "visibles a todos los estudiantes o para un grupo común específico."
 
 #: common/static/common/templates/discussion/new-post.underscore
-#: common/static/common/templates/discussion/thread-edit.underscore
-msgid "Title:"
-msgstr "Título:"
+msgid "All Groups"
+msgstr "Todos los Grupos"
 
 #: common/static/common/templates/discussion/new-post.underscore
 #: common/static/common/templates/discussion/thread-edit.underscore
@@ -6523,8 +6542,8 @@ msgid "Add a clear and descriptive title to encourage participation."
 msgstr "Añade un título claro y descriptivo para fomentar la participación."
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Enter your question or comment."
-msgstr "Ingrese su pregunta o comentario."
+msgid "Your question or idea"
+msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "follow this post"
@@ -6539,8 +6558,11 @@ msgid "post anonymously to classmates"
 msgstr "publicar anónimamente a mis compañeros de curso"
 
 #: common/static/common/templates/discussion/new-post.underscore
-msgid "Add Post"
-msgstr "Añadir entrada"
+#: common/static/common/templates/discussion/thread-response.underscore
+#: common/static/common/templates/discussion/thread.underscore
+#: lms/templates/verify_student/incourse_reverify.underscore
+msgid "Submit"
+msgstr "Enviar"
 
 #: common/static/common/templates/discussion/post-user-display.underscore
 #: common/static/common/templates/discussion/thread-list-item.underscore
@@ -6665,12 +6687,6 @@ msgstr[1] "Mostrar comentarios (%(num_comments)s)"
 msgid "Add a comment"
 msgstr "Añadir un comentario"
 
-#: common/static/common/templates/discussion/thread-response.underscore
-#: common/static/common/templates/discussion/thread.underscore
-#: lms/templates/verify_student/incourse_reverify.underscore
-msgid "Submit"
-msgstr "Enviar"
-
 #: common/static/common/templates/discussion/thread-show.underscore
 #, python-format
 msgid "%(post_type)s posted %(time_ago)s by %(author)s"
@@ -6695,16 +6711,8 @@ msgid "This post is visible to everyone."
 msgstr "Esta publicación es visible para todos."
 
 #: common/static/common/templates/discussion/thread-type.underscore
-msgid "Post type:"
-msgstr "Tipo de entrada:"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Question"
-msgstr "Pregunta"
-
-#: common/static/common/templates/discussion/thread-type.underscore
-msgid "Discussion"
-msgstr "Discusión"
+msgid "Post type"
+msgstr ""
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
@@ -6714,6 +6722,14 @@ msgstr ""
 "Las preguntas plantean tópicos que necesitan respuestas. En sección "
 "\"Discusiones\" comparte ideas y comienza conversaciones."
 
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Question"
+msgstr "Pregunta"
+
+#: common/static/common/templates/discussion/thread-type.underscore
+msgid "Discussion"
+msgstr "Discusión"
+
 #: common/static/common/templates/discussion/thread.underscore
 msgid "Add a Response"
 msgstr "Añadir una respuesta"
@@ -6722,17 +6738,9 @@ msgstr "Añadir una respuesta"
 msgid "Add a response:"
 msgstr "Añada su respuesta:"
 
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Expand discussion"
-msgstr "Expandir discusión"
-
-#: common/static/common/templates/discussion/thread.underscore
-msgid "Collapse discussion"
-msgstr "Contraer discusión"
-
 #: common/static/common/templates/discussion/topic.underscore
-msgid "Topic Area:"
-msgstr "Área Temática"
+msgid "Topic area"
+msgstr ""
 
 #: common/static/common/templates/discussion/topic.underscore
 msgid "Add your post to a relevant topic to help others find it."
@@ -6799,8 +6807,8 @@ msgstr ""
 "está siguiendo."
 
 #: lms/djangoapps/discussion/static/discussion/templates/user-profile.underscore
-msgid "Active Threads"
-msgstr "Hilos Activos"
+msgid "All Posts"
+msgstr ""
 
 #: lms/djangoapps/support/static/support/templates/certificates.underscore
 msgid "username or email"
@@ -7292,10 +7300,6 @@ msgstr "Detalles de la orden"
 #: lms/templates/financial-assistance/financial_assessment_submitted.underscore
 msgid "Financial Assistance Application"
 msgstr "Solicitud de asistencia financiera"
-
-#: lms/templates/financial-assistance/financial_assessment_form.underscore
-msgid "Unable to submit application"
-msgstr "No se pudo enviar la solicitud"
 
 #: lms/templates/financial-assistance/financial_assessment_form.underscore
 msgid "About You"
@@ -7900,32 +7904,6 @@ msgid "Register through edX"
 msgstr "Registrarse a través de edX"
 
 #: lms/templates/student_account/login.underscore
-#, python-format
-msgid ""
-"You have successfully signed into %(currentProvider)s, but your "
-"%(currentProvider)s account does not have a linked %(platformName)s account."
-" To link your accounts, sign in now using your %(platformName)s password."
-msgstr ""
-"Ha iniciado sesión exitosamente en %(currentProvider)s, pero su cuenta de "
-"%(currentProvider)s no está vinculada con una cuenta en %(platformName)s. "
-"Para vincular sus cuentas, ingrese con su usuario y contraseña de "
-"%(platformName)s."
-
-#: lms/templates/student_account/login.underscore
-#: lms/templates/verify_student/intro_step.underscore
-msgid "Check Your Email"
-msgstr "Revise su correo electrónico"
-
-#: lms/templates/student_account/login.underscore
-msgid "We couldn't sign you in."
-msgstr "No se ha podido iniciar su sesión."
-
-#: lms/templates/student_account/login.underscore
-#, python-format
-msgid "An error occurred when signing you in to %(platformName)s."
-msgstr "Ocurrió un error al iniciar su sesión en %(platformName)s."
-
-#: lms/templates/student_account/login.underscore
 msgid ""
 "Sign in here using your email address and password, or use one of the "
 "providers listed below."
@@ -7968,11 +7946,6 @@ msgid "Create an account"
 msgstr "Crear una cuenta"
 
 #: lms/templates/student_account/password_reset.underscore
-#: lms/templates/student_account/register.underscore
-msgid "An error occurred."
-msgstr "Ha ocurrido un error."
-
-#: lms/templates/student_account/password_reset.underscore
 msgid "Password assistance"
 msgstr "Ayuda con la contraseña"
 
@@ -7987,24 +7960,6 @@ msgstr ""
 #: lms/templates/student_account/password_reset.underscore
 msgid "Reset my password"
 msgstr "Restablecer mi contraseña"
-
-#: lms/templates/student_account/register.underscore
-msgid "We couldn't create your account."
-msgstr "No pudimos crear su cuenta."
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid "You've successfully signed into %(currentProvider)s."
-msgstr "Ha iniciado sesión exitosamente en %(currentProvider)s."
-
-#: lms/templates/student_account/register.underscore
-#, python-format
-msgid ""
-"We just need a little more information before you start learning with "
-"%(platformName)s."
-msgstr ""
-"Necesitamos un poco mas de información antes de comiences a aprender con "
-"%(platformName)s."
 
 #: lms/templates/student_account/register.underscore
 msgid "Create an account using"
@@ -8123,11 +8078,6 @@ msgstr "Lista de cursos que te has inscrito como estudiante verificado"
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Course"
 msgstr "Curso"
-
-#: lms/templates/verify_student/enrollment_confirmation_step.underscore
-#, python-format
-msgid "Starts: %(start)s"
-msgstr "Empieza: %(start)s"
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Explore your course!"
@@ -8730,6 +8680,14 @@ msgstr "Arrastre y suelte o pulse aquí para subir archivos de video."
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Active Uploads"
 msgstr "Cargas activas"
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "Read More"
+msgstr ""
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "details about the failure"
+msgstr ""
 
 #: cms/templates/js/add-xblock-component-button.underscore
 msgid "Add Component:"

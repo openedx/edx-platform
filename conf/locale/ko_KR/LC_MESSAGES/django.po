@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -17,7 +17,7 @@
 # Sujin Lee <sujinlee.me@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -33,7 +33,7 @@
 # Young C. Kim, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -53,7 +53,7 @@
 # Sunah Lim <whitetree70@snu.ac.kr>, 2013
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -71,7 +71,7 @@
 # Sunah Lim <whitetree70@snu.ac.kr>, 2013
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -89,7 +89,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-12-08 18:46+0000\n"
+"POT-Creation-Date: 2017-01-05 17:03+0000\n"
 "PO-Revision-Date: 2016-11-25 05:04+0000\n"
 "Last-Translator: kmooc <shevious@gmail.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/open-edx/edx-platform/language/ko_KR/)\n"
@@ -400,6 +400,10 @@ msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
+msgstr ""
+
+#: common/djangoapps/student/forms.py
+msgid "You must consent to data sharing to register."
 msgstr ""
 
 #: common/djangoapps/student/forms.py
@@ -1213,6 +1217,19 @@ msgstr ""
 #: common/djangoapps/util/date_utils.py
 msgctxt "month name"
 msgid "December"
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"I agree to allow {platform_name} to share data about my enrollment, "
+"completion and performance in all {platform_name} courses and programs where"
+" my enrollment is sponsored by {ec_name}."
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"To link your account with {ec_name}, you are required to consent to data "
+"sharing."
 msgstr ""
 
 #: common/djangoapps/util/file.py
@@ -2135,13 +2152,6 @@ msgstr ""
 msgid "Configure list of sources"
 msgstr ""
 
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
-#: common/lib/xmodule/xmodule/course_metadata_utils.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr ""
-
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
 msgstr ""
@@ -2189,14 +2199,14 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Advertised Start Date"
+msgid "Course Advertised Start"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the date you want to advertise as the course start date, if this date "
-"is different from the set start date. To advertise the set start date, enter"
-" null."
+"Enter the text that you want to use as the advertised starting time frame "
+"for the course, such as \"Winter 2018\". If you enter null for this value, "
+"the start date that you have set for this course is used."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -4179,6 +4189,10 @@ msgstr ""
 msgid "Powered by Open edX"
 msgstr ""
 
+#: lms/djangoapps/branding/api.py
+msgid "{platform_name} for Business"
+msgstr ""
+
 #: lms/templates/static_templates/blog.html
 msgid "Blog"
 msgstr "블로그"
@@ -4208,10 +4222,6 @@ msgstr ""
 msgid "Donate"
 msgstr "기부하기"
 
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "미디어 키트"
-
 #: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
 msgstr ""
@@ -4231,6 +4241,10 @@ msgstr ""
 #: lms/djangoapps/branding/api.py
 msgid "Sitemap"
 msgstr ""
+
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "미디어 키트"
 
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
@@ -5414,6 +5428,10 @@ msgstr ""
 msgid "Data Integrity Error"
 msgstr ""
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "TBD"
+msgstr ""
+
 #: lms/djangoapps/instructor/services.py
 msgid "Proctored Exam Review: {review_status}"
 msgstr ""
@@ -5567,6 +5585,14 @@ msgstr "주소"
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Goals"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Enrollment Mode"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Verification Status"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
@@ -8333,6 +8359,12 @@ msgid ""
 "value greater than 0."
 msgstr ""
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Username created for Course Catalog Integration, e.g. "
+"lms_catalog_service_user."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -9214,11 +9246,11 @@ msgid "Could not find user by email address '{email}'."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "User {email} has registered but has not yet activated his/her account."
+msgid "No `role` specified."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "No `role` specified."
+msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
@@ -9245,16 +9277,33 @@ msgstr ""
 msgid "Ready"
 msgstr ""
 
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Uploaded"
+msgstr ""
+
 #. Translators: This is the status for a video that the servers have failed to
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
 msgstr ""
 
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Cancelled"
+msgstr ""
+
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed Duplicate"
+msgstr ""
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "YouTube Duplicate"
 msgstr ""
 
 #. Translators: This is the status for a video for which an invalid
@@ -9725,7 +9774,6 @@ msgid "Add a Post"
 msgstr ""
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion thread list"
 msgstr "게시물 목록"
 
@@ -9734,8 +9782,18 @@ msgid "New topic form"
 msgstr "신규 주제 형식"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "User Profile"
-msgstr "사용자 정보"
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s discussion started"
+msgid_plural "%s discussions started"
+msgstr[0] "%s 토의 시작됨"
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s comment"
+msgid_plural "%s comments"
+msgstr[0] "%s 코멘트"
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance.html
 msgid "Discussion unavailable"
@@ -11052,10 +11110,6 @@ msgstr "대시보드:"
 
 #: lms/templates/user_dropdown.html
 msgid "Profile"
-msgstr ""
-
-#: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
 msgstr ""
 
 #: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
@@ -13292,18 +13346,6 @@ msgstr "댓글 순"
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
 msgstr "추천 순"
-
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s discussion started"
-msgid_plural "%s discussions started"
-msgstr[0] "%s 토의 시작됨"
-
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s comment"
-msgid_plural "%s comments"
-msgstr[0] "%s 코멘트"
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -16192,10 +16234,6 @@ msgid "Registration for:"
 msgstr "등록: "
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Course Dates"
-msgstr "강좌 날짜"
-
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Price per student:"
 msgstr "학습자별 비용:"
@@ -16238,10 +16276,6 @@ msgstr "수강신청 확인: {span_start}강좌 날짜{span_end}"
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
 msgstr "{course_name}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{start_date} - {end_date}"
-msgstr "{start_date} - {end_date}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -16305,10 +16339,6 @@ msgstr[0] "수강신청 기간이 지났기 때문에 {course_names}가 나타�
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "강좌 첫 화면 이미지"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Course Dates:"
-msgstr "강좌 날짜:"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Students:"
@@ -17060,11 +17090,9 @@ msgstr ""
 
 #: cms/templates/certificates.html
 msgid ""
-"After you have configured and previewed your certificate, ask your edX "
-"partner manager to activate your certificate. When your certificate has been"
-" activated, you can begin issuing certificates to learners. Course team "
-"members without the Admin role cannot edit or delete an activated "
-"certificate."
+"To begin issuing course certificates, a course team member with either the "
+"Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
+"members with these roles can edit or delete an activated certificate."
 msgstr ""
 
 #: cms/templates/certificates.html
@@ -19741,12 +19769,10 @@ msgstr "왜 동영상 파일을 업로드 하는가?"
 #: cms/templates/videos_index.html
 msgid ""
 "For a video to play on different devices, it needs to be available in "
-"multiple formats. After you upload an original video file in .mp4 or .mov "
+"multiple formats. After you upload an original video file in {file_formats} "
 "format on this page, an automated process creates those additional formats "
 "and stores them for you."
 msgstr ""
-"동영상을 다른 장치에서 재생하려면, 파일이 다양한 파일 형식으로 재생될 수 있어야 합니다. 이 페이지에 원래의 동영상 파일을 .mp4 "
-"또는 .mov로 업로드하시면 됩니다. 그후 다른 형식의 파일들이 생성된 후 저장까지 자동으로 진행됩니다."
 
 #: cms/templates/videos_index.html
 msgid "Maximum Video File Size"
@@ -19754,8 +19780,8 @@ msgstr ""
 
 #: cms/templates/videos_index.html
 msgid ""
-"The maximum size for each video file that you upload is 5 GB. The upload "
-"process fails for larger files."
+"The maximum size for each video file that you upload is {em_start}5 "
+"GB{em_end}. The upload process fails for larger files."
 msgstr ""
 
 #: cms/templates/videos_index.html
@@ -19798,13 +19824,13 @@ msgstr "내 강좌에서 동영상을 얻으려면 어떻게 해야하나요?"
 
 #: cms/templates/videos_index.html
 msgid ""
-"When status for a file is {em_start}Ready{em_end}, you can add that video to"
-" a component in your course. Copy the unique video ID. In another browser "
-"window, on the Course Outline page, create or locate a video component to "
-"play this video. Edit the video component to paste the ID into the Advanced "
-"{em_start}Video ID{em_end} field. The video can play in the LMS as soon as "
-"its status is {em_start}Ready{em_end}, although processing may not be "
-"complete for all encodings and all video hosting sites."
+"When the status for a file is {em_start}Ready{em_end}, you can add that "
+"video to a component in your course. Copy the unique video ID. In another "
+"browser window, on the Course Outline page, create or locate a video "
+"component to play this video. Edit the video component to paste the ID into "
+"the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS"
+" as soon as its status is {em_start}Ready{em_end}, although processing may "
+"not be complete for all encodings and all video hosting sites."
 msgstr ""
 
 #: cms/templates/visibility_editor.html
