@@ -2,6 +2,7 @@
 Decorators that can be used to interact with third_party_auth.
 """
 from functools import wraps
+from urlparse import urlparse, urlunparse
 
 from django.conf import settings
 from django.utils.decorators import available_attrs
@@ -24,8 +25,14 @@ def allow_frame_from_whitelisted_url(view_func):  # pylint: disable=invalid-name
         if settings.FEATURES['ENABLE_THIRD_PARTY_AUTH']:
             referer = request.META.get('HTTP_REFERER')
             if referer is not None:
+                parsed_url = urlparse(referer)
+                # reconstruct a referer url without querystring and trailing slash
+                referer_url = urlunparse(
+                    (parsed_url.scheme, parsed_url.netloc, parsed_url.path.rstrip('/'), '', '', '')
+                )
                 sso_urls = SAMLProviderData.objects.values_list('sso_url', flat=True)
-                if referer in sso_urls:
+                sso_urls = [url.rstrip('/') for url in sso_urls]
+                if referer_url in sso_urls:
                     allowed_urls = ' '.join(settings.THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL)
                     x_frame_option = 'ALLOW-FROM {}'.format(allowed_urls)
                     content_security_policy = "frame-ancestors {}".format(allowed_urls)
