@@ -36,6 +36,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
     OUTPUT_FILE_NAME = "test_org_email_opt_in.csv"
     OUTPUT_FIELD_NAMES = [
+        "user_id",
+        "username",
         "email",
         "full_name",
         "course_id",
@@ -400,6 +402,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
 
         # Check the header row
         self.assertEqual({
+            "user_id": "user_id",
+            "username": "username",
             "email": "email",
             "full_name": "full_name",
             "course_id": "course_id",
@@ -410,6 +414,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
         # Check data rows
         for user, course_id, opt_in_pref in args:
             self.assertIn({
+                "user_id": str(user.id),
+                "username": user.username.encode('utf-8'),
                 "email": user.email.encode('utf-8'),
                 "full_name": (
                     user.profile.name.encode('utf-8')
