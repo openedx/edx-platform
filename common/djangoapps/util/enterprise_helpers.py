@@ -7,7 +7,7 @@ import logging
 
 try:
     from enterprise.models import EnterpriseCustomer
-    from enterprise import api as enterprise_api
+    from enterprise import utils as enterprise_utils
     from enterprise.tpa_pipeline import (
         active_provider_requests_data_sharing,
         active_provider_enforces_data_sharing,
@@ -142,9 +142,9 @@ def get_enterprise_customer_logo_url(request):
     ec_uuid = parameter.get('ec_uuid', None)
 
     if provider_id:
-        branding_info = enterprise_api.get_enterprise_branding_info_by_provider_id(provider_id=provider_id)
+        branding_info = enterprise_utils.get_enterprise_branding_info_by_provider_id(identity_provider_id=provider_id)
     elif ec_uuid:
-        branding_info = enterprise_api.get_enterprise_branding_info_by_ec_uuid(ec_uuid=ec_uuid)
+        branding_info = enterprise_utils.get_enterprise_branding_info_by_ec_uuid(ec_uuid=ec_uuid)
 
     logo_url = None
     if branding_info and branding_info.logo:

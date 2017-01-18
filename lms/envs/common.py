@@ -2187,6 +2187,10 @@ REST_FRAMEWORK = {
     ),
     'PAGE_SIZE': 10,
     'URL_FORMAT_OVERRIDE': None,
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '60/minute',
+        'service_user': '120/minute',
+    },
 }
 
 
@@ -2830,6 +2834,7 @@ ECOMMERCE_API_URL = None
 ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
 ECOMMERCE_SERVICE_WORKER_USERNAME = 'ecommerce_worker'
+ENTERPRISE_SERVICE_WORKER_USERNAME = 'enterprise_worker'
 
 COURSE_CATALOG_API_URL = None
 
