@@ -64,3 +64,16 @@ SEARCH_SKIP_ENROLLMENT_START_DATE_FILTERING = True
 
 # disable for now
 #AUTHENTICATION_BACKENDS = ('organizations.backends.OrganizationMemberBackend',) + AUTHENTICATION_BACKENDS
+
+# SENTRY
+SENTRY_DSN = AUTH_TOKENS.get('SENTRY_DSN', False)
+
+if SENTRY_DSN:
+
+    # Set your DSN value
+    RAVEN_CONFIG = {
+        'dsn': SENTRY_DSN,
+    }
+
+    INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
+
