@@ -311,7 +311,7 @@ class GetBatchUserDataView(APIView):
 
     def get(self, request):
         """
-            /api/jitterbit/v1/accounts/batch[?time-parameter]
+            /appsembler_api/v0/analytics/accounts/batch[?time-parameter]
 
             time-parameter is an optional query parameter of:
                 ?updated_min=yyyy-mm-ddThh:mm:ss
@@ -351,7 +351,7 @@ class GetBatchEnrollmentDataView(APIView):
 
     def get(self, request):
         """
-        /api/jitterbit/v1/enrollment/batch[?course_id=course_slug&time-parameter]
+        /appsembler_api/v0/analytics/accounts/batch[?course_id=course_slug&time-parameter]
 
         course_slug an optional query parameter; if specified will only show enrollments
             for that particular course. The course_id need to be URL encoded, so:
