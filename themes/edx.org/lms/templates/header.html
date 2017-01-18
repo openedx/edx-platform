@@ -147,14 +147,13 @@ site_status_msg = get_site_status_msg(course_id)
   </div>
 </header>
 % if course:
-<!--[if lte IE 9]>
-<div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
-    begin_strong=HTML('<strong>'),
-    end_strong=HTML('</strong>'),
-    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
-    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
-)}</div>
-<![endif]-->
+## <div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+##     begin_strong=HTML('<strong>'),
+##     end_strong=HTML('</strong>'),
+##     chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
+##     ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+## )}</div>
+<div class="ie-banner" aria-hidden="true">${Text(_('Your browser is not fully supported. We strongly recommend using.'))}</div>
 % endif
 
 <%include file="help_modal.html"/>
