@@ -164,5 +164,5 @@ jsonfield==1.0.3
 pynliner==0.5.2
 
 # Labster requirements
--e git+https://github.com/Livit/Livit.Learn.OverviewXBlock.git@49e6ba5fdfb3ad0c320843d1a5b302de6f342a28#egg=XBlockOverview
+-e git+git@github.com:Livit/Livit.Learn.OverviewXBlock.git@49e6ba5fdfb3ad0c320843d1a5b302de6f342a28#egg=XBlockOverview
 raven==5.19.0
