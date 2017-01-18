@@ -11,7 +11,7 @@ from logging import getLogger
 
 from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
-from openedx.core.djangoapps.celery_utils.task import PersistOnFailureTask
+from openedx.core.djangoapps.celery_utils.persist_on_failure import PersistOnFailureTask
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
@@ -19,8 +19,6 @@ from student.models import anonymous_id_for_user
 from track.event_transaction_utils import (
     set_event_transaction_type,
     set_event_transaction_id,
-    get_event_transaction_type,
-    get_event_transaction_id
 )
 from util.date_utils import from_timestamp
 from xmodule.modulestore.django import modulestore
