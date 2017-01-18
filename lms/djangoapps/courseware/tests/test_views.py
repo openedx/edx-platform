@@ -191,6 +191,48 @@ class TestJumpTo(ModuleStoreTestCase):
 
 @attr(shard=2)
 @ddt.ddt
+class IndexQueryTestCase(ModuleStoreTestCase):
+    """
+    Tests for query count.
+    """
+    CREATE_USER = False
+    NUM_PROBLEMS = 20
+
+    @ddt.data(
+        (ModuleStoreEnum.Type.mongo, 8),
+        (ModuleStoreEnum.Type.split, 4),
+    )
+    @ddt.unpack
+    def test_index_query_counts(self, store_type, expected_query_count):
+        with self.store.default_store(store_type):
+            course = CourseFactory.create()
+            with self.store.bulk_operations(course.id):
+                chapter = ItemFactory.create(category='chapter', parent_location=course.location)
+                section = ItemFactory.create(category='sequential', parent_location=chapter.location)
+                vertical = ItemFactory.create(category='vertical', parent_location=section.location)
+                for _ in range(self.NUM_PROBLEMS):
+                    ItemFactory.create(category='problem', parent_location=vertical.location)
+
+        password = 'test'
+        self.user = UserFactory(password=password)
+        self.client.login(username=self.user.username, password=password)
+        CourseEnrollment.enroll(self.user, course.id)
+
+        with check_mongo_calls(expected_query_count):
+            url = reverse(
+                'courseware_section',
+                kwargs={
+                    'course_id': unicode(course.id),
+                    'chapter': unicode(chapter.location.name),
+                    'section': unicode(section.location.name),
+                }
+            )
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+
+@attr(shard=2)
+@ddt.ddt
 class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
@@ -1235,7 +1277,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []}),
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}}),
     )
     def test_view_certificate_link(self):
         """
@@ -1294,7 +1336,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': False})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_view_certificate_link_hidden(self):
         """
@@ -1341,7 +1383,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     @ddt.data(
         *itertools.product(
@@ -1381,7 +1423,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     @patch.dict('django.conf.settings.FEATURES', {'CERTIFICATES_HTML_VIEW': True})
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_page_with_invalidated_certificate_with_html_view(self):
         """
@@ -1415,7 +1457,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_page_with_invalidated_certificate_with_pdf(self):
         """
@@ -1432,7 +1474,7 @@ class ProgressPageTests(ModuleStoreTestCase):
 
     @patch(
         'lms.djangoapps.grades.new.course_grade.CourseGrade.summary',
-        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': []})
+        PropertyMock(return_value={'grade': 'Pass', 'percent': 0.75, 'section_breakdown': [], 'grade_breakdown': {}})
     )
     def test_message_for_audit_mode(self):
         """ Verify that message appears on progress page, if learner is enrolled
@@ -1782,6 +1824,7 @@ class ViewCheckerBlock(XBlock):
     """
     has_children = True
     state = String(scope=Scope.user_state)
+    position = 0
 
     def student_view(self, context):  # pylint: disable=unused-argument
         """
@@ -1992,11 +2035,19 @@ class TestRenderXBlock(RenderXBlockTestMixin, ModuleStoreTestCase):
         reload_django_url_config()
         super(TestRenderXBlock, self).setUp()
 
-    def get_response(self, url_encoded_params=None):
+    def test_render_xblock_with_invalid_usage_key(self):
+        """
+        Test XBlockRendering with invalid usage key
+        """
+        response = self.get_response(usage_key='some_invalid_usage_key')
+        self.assertEqual(response.status_code, 404)
+        self.assertIn('Page not found', response.content)
+
+    def get_response(self, usage_key, url_encoded_params=None):
         """
         Overridable method to get the response from the endpoint that is being tested.
         """
-        url = reverse('render_xblock', kwargs={"usage_key_string": unicode(self.html_block.location)})
+        url = reverse('render_xblock', kwargs={'usage_key_string': unicode(usage_key)})
         if url_encoded_params:
             url += '?' + url_encoded_params
         return self.client.get(url)

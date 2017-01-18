@@ -374,7 +374,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
         reset_student_attempts(self.course_key, self.user, msk, requesting_user=self.user)
         self.assertEqual(json.loads(module().state)['attempts'], 0)
 
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_SCORE_CHANGED.send')
+    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
     def test_delete_student_attempts(self, _mock_signal):
         msk = self.course_key.make_usage_key('dummy', 'module')
         original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
@@ -400,7 +400,7 @@ class TestInstructorEnrollmentStudentModule(SharedModuleStoreTestCase):
 
     # Disable the score change signal to prevent other components from being
     # pulled into tests.
-    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_SCORE_CHANGED.send')
+    @mock.patch('lms.djangoapps.grades.signals.handlers.PROBLEM_WEIGHTED_SCORE_CHANGED.send')
     def test_delete_submission_scores(self, _mock_signal):
         user = UserFactory()
         problem_location = self.course_key.make_usage_key('dummy', 'module')
@@ -534,6 +534,7 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         )
         cls.request = get_mock_request(UserFactory())
         cls.user = cls.request.user
+        cls.instructor = UserFactory(username='staff', is_staff=True)
 
     def _get_subsection_grade_and_verify(self, all_earned, all_possible, graded_earned, graded_possible):
         """
@@ -557,13 +558,12 @@ class TestStudentModuleGrading(SharedModuleStoreTestCase):
         self._get_subsection_grade_and_verify(0, 1, 0, 1)
         answer_problem(course=self.course, request=self.request, problem=self.problem, score=1, max_value=1)
         self._get_subsection_grade_and_verify(1, 1, 1, 1)
-
         # Delete student state using the instructor dash
         reset_student_attempts(
             self.course.id,
             self.user,
             problem_location,
-            requesting_user=self.user,
+            requesting_user=self.instructor,
             delete_module=True,
         )
         # Verify that the student's grades are reset

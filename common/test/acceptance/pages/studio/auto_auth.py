@@ -12,19 +12,24 @@ class AutoAuthPage(PageObject):
     """
     The automatic authorization page.
     When allowed via the django settings file, visiting
-    this url will create a user and log them in.
+    this url will create/update a user and log them in.
     """
 
     def __init__(self, browser, username=None, email=None, password=None,
-                 staff=None, course_id=None, roles=None, no_login=None):
+                 staff=None, course_id=None, roles=None, no_login=None, is_active=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,
         but you can also specify credentials using querystring parameters.
 
+        Can be used to update an account, call to this end-point with already
+        made account's credentials along with values to update will result into
+        an account update.
+
         `username`, `email`, and `password` are the user's credentials (strings)
         `staff` is a boolean indicating whether the user is global staff.
         `course_id` is the ID of the course to enroll the student in.
+        `is_active` activation status of user
         Currently, this has the form "org/number/run"
 
         Note that "global staff" is NOT the same as course staff.
@@ -54,6 +59,9 @@ class AutoAuthPage(PageObject):
 
         if no_login:
             self._params['no_login'] = True
+
+        if is_active is not None:
+            self._params['is_active'] = 'true' if is_active else 'false'
 
     @property
     def url(self):

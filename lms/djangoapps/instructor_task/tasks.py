@@ -193,7 +193,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def calculate_students_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -252,7 +252,7 @@ def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     """
     Compute information about invited students who have not enrolled
@@ -293,7 +293,7 @@ def cohort_students(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def export_ora2_data(entry_id, xmodule_instance_args):
     """
     Generate a CSV of ora2 responses and push it to S3.

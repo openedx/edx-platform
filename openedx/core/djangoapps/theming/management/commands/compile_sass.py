@@ -135,5 +135,5 @@ class Command(BaseCommand):
 
         call_task(
             'pavelib.assets.compile_sass',
-            options={'system': system, 'theme-dirs': theme_dirs, 'themes': themes, 'force': force, 'debug': debug},
+            options={'system': system, 'theme_dirs': theme_dirs, 'themes': themes, 'force': force, 'debug': debug},
         )

@@ -69,25 +69,12 @@ def is_youtube_available():
         bool:
 
     """
-
-    youtube_api_urls = {
-        'main': 'https://www.youtube.com/',
-        'player': 'https://www.youtube.com/iframe_api',
-        # For transcripts, you need to check an actual video, so we will
-        # just specify our default video and see if that one is available.
-        'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
-    }
-
-    for url in youtube_api_urls.itervalues():
-        try:
-            response = requests.get(url, allow_redirects=False)
-        except requests.exceptions.ConnectionError:
-            return False
-
-        if response.status_code >= 300:
-            return False
-
-    return True
+    # Skip all the youtube tests for now because they are failing intermittently
+    # due to changes on their side. See: TE-1927
+    # TODO: Design and implement a better solution that is reliable and repeatable,
+    # reflects how the application works in production, and limits the third-party
+    # network traffic (e.g. repeatedly retrieving the js from youtube from the browser).
+    return False
 
 
 def is_focused_on_element(browser, selector):

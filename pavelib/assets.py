@@ -8,6 +8,7 @@ from functools import wraps
 from threading import Timer
 import argparse
 import glob
+import os
 import traceback
 
 from paver import tasks
@@ -46,17 +47,25 @@ COMMON_LOOKUP_PATHS = [
 # A list of NPM installed libraries that should be copied into the common
 # static directory.
 NPM_INSTALLED_LIBRARIES = [
-    'jquery/dist/jquery.js',
+    'backbone-validation/dist/backbone-validation-min.js',
+    'backbone/backbone.js',
+    'backbone.paginator/lib/backbone.paginator.js',
+    'moment-timezone/builds/moment-timezone-with-data.js',
+    'moment/min/moment-with-locales.js',
     'jquery-migrate/dist/jquery-migrate.js',
     'jquery.scrollto/jquery.scrollTo.js',
-    'underscore/underscore.js',
-    'underscore.string/dist/underscore.string.js',
+    'jquery/dist/jquery.js',
     'picturefill/dist/picturefill.js',
-    'backbone/backbone.js',
-    'edx-ui-toolkit/node_modules/backbone.paginator/lib/backbone.paginator.js',
-    'backbone-validation/dist/backbone-validation-min.js',
-    'edx-ui-toolkit/node_modules/moment-timezone/builds/moment-timezone-with-data.js',
-    'edx-ui-toolkit/node_modules/moment/min/moment-with-locales.js',
+    'requirejs/require.js',
+    'underscore.string/dist/underscore.string.js',
+    'underscore/underscore.js',
+]
+
+# A list of NPM installed developer libraries that should be copied into the common
+# static directory only in development mode.
+NPM_INSTALLED_DEVELOPER_LIBRARIES = [
+    'sinon/pkg/sinon.js',
+    'squirejs/src/Squire.js',
 ]
 
 # Directory to install static vendor files
@@ -450,28 +459,13 @@ def compile_sass(options):
     """
     debug = options.get('debug')
     force = options.get('force')
-    systems = getattr(options, 'system', ALL_SYSTEMS)
-    themes = getattr(options, 'themes', [])
-    theme_dirs = getattr(options, 'theme-dirs', [])
+    systems = get_parsed_option(options, 'system', ALL_SYSTEMS)
+    themes = get_parsed_option(options, 'themes', [])
+    theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
     if not theme_dirs and themes:
         # We can not compile a theme sass without knowing the directory that contains the theme.
         raise ValueError('theme-dirs must be provided for compiling theme sass.')
-
-    if isinstance(systems, basestring):
-        systems = systems.split(',')
-    else:
-        systems = systems if isinstance(systems, list) else [systems]
-
-    if isinstance(themes, basestring):
-        themes = themes.split(',')
-    else:
-        themes = themes if isinstance(themes, list) else [themes]
-
-    if isinstance(theme_dirs, basestring):
-        theme_dirs = theme_dirs.split(',')
-    else:
-        theme_dirs = theme_dirs if isinstance(theme_dirs, list) else [theme_dirs]
 
     if themes and theme_dirs:
         themes = get_theme_paths(themes=themes, theme_dirs=theme_dirs)
@@ -597,6 +591,19 @@ def process_npm_assets():
     """
     Process vendor libraries installed via NPM.
     """
+    def copy_vendor_library(library, skip_if_missing=False):
+        """
+        Copies a vendor library to the shared vendor directory.
+        """
+        library_path = 'node_modules/{library}'.format(library=library)
+        if os.path.exists(library_path):
+            sh('/bin/cp -rf {library_path} {vendor_dir}'.format(
+                library_path=library_path,
+                vendor_dir=NPM_VENDOR_DIRECTORY,
+            ))
+        elif not skip_if_missing:
+            raise Exception('Missing vendor file {library_path}'.format(library_path=library_path))
+
     # Skip processing of the libraries if this is just a dry run
     if tasks.environment.dry_run:
         tasks.environment.info("install npm_assets")
@@ -606,11 +613,14 @@ def process_npm_assets():
     NPM_VENDOR_DIRECTORY.mkdir_p()
 
     # Copy each file to the vendor directory, overwriting any existing file.
+    print("Copying vendor files into static directory")
     for library in NPM_INSTALLED_LIBRARIES:
-        sh('/bin/cp -rf node_modules/{library} {vendor_dir}'.format(
-            library=library,
-            vendor_dir=NPM_VENDOR_DIRECTORY,
-        ))
+        copy_vendor_library(library)
+
+    # Copy over each developer library too if they have been installed
+    print("Copying developer vendor files into static directory")
+    for library in NPM_INSTALLED_DEVELOPER_LIBRARIES:
+        copy_vendor_library(library, skip_if_missing=True)
 
 
 def process_xmodule_assets():
@@ -693,6 +703,38 @@ def execute_compile_sass(args):
         )
 
 
+def get_parsed_option(command_opts, opt_key, default=None):
+    """
+    Extract user command option and parse it.
+    Arguments:
+        command_opts: Command line arguments passed via paver command.
+        opt_key: name of option to get and parse
+        default: if `command_opt_value` not in `command_opts`, `command_opt_value` will be set to default.
+    Returns:
+         list or None
+    """
+    command_opt_value = getattr(command_opts, opt_key, default)
+    if command_opt_value:
+        command_opt_value = listfy(command_opt_value)
+
+    return command_opt_value
+
+
+def listfy(data):
+    """
+    Check and convert data to list.
+    Arguments:
+        data: data structure to be converted.
+    """
+
+    if isinstance(data, basestring):
+        data = data.split(',')
+    elif not isinstance(data, list):
+        data = [data]
+
+    return data
+
+
 @task
 @cmdopts([
     ('background', 'b', 'Background mode'),
@@ -708,19 +750,14 @@ def watch_assets(options):
     if tasks.environment.dry_run:
         return
 
-    themes = getattr(options, 'themes', None)
-    theme_dirs = getattr(options, 'theme-dirs', [])
+    themes = get_parsed_option(options, 'themes')
+    theme_dirs = get_parsed_option(options, 'theme_dirs', [])
 
     if not theme_dirs and themes:
         # We can not add theme sass watchers without knowing the directory that contains the themes.
         raise ValueError('theme-dirs must be provided for watching theme sass.')
     else:
         theme_dirs = [path(_dir) for _dir in theme_dirs]
-
-    if isinstance(themes, basestring):
-        themes = themes.split(',')
-    else:
-        themes = themes if isinstance(themes, list) else [themes]
 
     sass_directories = get_watcher_dirs(theme_dirs, themes)
     observer = PollingObserver()
@@ -808,5 +845,5 @@ def update_assets(args):
     if args.watch:
         call_task(
             'pavelib.assets.watch_assets',
-            options={'background': not args.debug, 'theme-dirs': args.theme_dirs, 'themes': args.themes},
+            options={'background': not args.debug, 'theme_dirs': args.theme_dirs, 'themes': args.themes},
         )

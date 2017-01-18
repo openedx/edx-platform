@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from requests.auth import HTTPBasicAuth
 
-from lms.djangoapps.grades import course_grades
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from xmodule.modulestore.django import modulestore
 from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey
@@ -271,7 +271,7 @@ class XQueueCertInterface(object):
         self.request.session = {}
 
         is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
-        grade = course_grades.summary(student, course)
+        grade = CourseGradeFactory().create(student, course).summary
         enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
         mode_is_verified = enrollment_mode in GeneratedCertificate.VERIFIED_CERTS_MODES
         user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)

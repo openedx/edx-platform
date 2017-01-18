@@ -91,6 +91,9 @@
             DiscussionThreadListView.prototype.initialize = function(options) {
                 var self = this;
                 this.courseSettings = options.courseSettings;
+                this.hideRefineBar = options.hideRefineBar;
+                this.supportsActiveThread = options.supportsActiveThread;
+                this.hideReadState = options.hideReadState || false;
                 this.displayedCollection = new Discussion(this.collection.models, {
                     pages: this.collection.pages
                 });
@@ -107,7 +110,7 @@
                 this.boardName = null;
                 this.current_search = '';
                 this.mode = 'all';
-                this.showThreadPreview = options.showThreadPreview;
+                this.showThreadPreview = true;
                 this.searchAlertCollection = new Backbone.Collection([], {
                     model: Backbone.Model
                 });
@@ -164,7 +167,7 @@
                 active = $currentElement.has('.forum-nav-thread-link.is-active').length !== 0;
                 $currentElement.replaceWith($content);
                 this.showMetadataAccordingToSort();
-                if (active) {
+                if (this.supportsActiveThread && active) {
                     this.setActiveThread(threadId);
                 }
             };
@@ -220,6 +223,9 @@
                 }
                 this.showMetadataAccordingToSort();
                 this.renderMorePages();
+                if (this.hideRefineBar) {
+                    this.$('.forum-nav-refine-bar').addClass('is-hidden');
+                }
                 this.trigger('threads:rendered');
             };
 
@@ -309,7 +315,8 @@
                 error = function() {
                     self.renderThreads();
                     DiscussionUtil.discussionAlert(
-                        gettext('Sorry'), gettext('We had some trouble loading more threads. Please try again.')
+                        gettext('Error'),
+                        gettext('Additional posts could not be loaded. Refresh the page and try again.')
                     );
                 };
                 return this.collection.retrieveAnotherPage(this.mode, options, {
@@ -336,7 +343,8 @@
                             neverRead: neverRead,
                             threadUrl: thread.urlFor('retrieve'),
                             threadPreview: threadPreview,
-                            showThreadPreview: this.showThreadPreview
+                            showThreadPreview: this.showThreadPreview,
+                            hideReadState: this.hideReadState
                         },
                         thread.toJSON()
                     );
@@ -346,7 +354,9 @@
             DiscussionThreadListView.prototype.threadSelected = function(e) {
                 var threadId;
                 threadId = $(e.target).closest('.forum-nav-thread').attr('data-id');
-                this.setActiveThread(threadId);
+                if (this.supportsActiveThread) {
+                    this.setActiveThread(threadId);
+                }
                 this.trigger('thread:selected', threadId);
                 return false;
             };
@@ -478,7 +488,7 @@
                             element,
                             edx.HtmlUtils.joinHtml(
                                 edx.HtmlUtils.HTML("<li class='forum-nav-load-more'>"),
-                                    self.getLoadingContent(gettext('Loading thread list')),
+                                    self.getLoadingContent(gettext('Loading posts list')),
                                 edx.HtmlUtils.HTML('</li>')
                             )
                         );
@@ -515,7 +525,7 @@
                                 );
                                 self.addSearchAlert(message);
                             } else if (response.discussion_data.length === 0) {
-                                self.addSearchAlert(gettext('No threads matched your query.'));
+                                self.addSearchAlert(gettext('No posts matched your query.'));
                             }
                             self.displayedCollection.reset(self.collection.models);
                             if (text) {

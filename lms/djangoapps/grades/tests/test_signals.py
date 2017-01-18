@@ -4,49 +4,76 @@ Tests for the score change signals defined in the courseware models module.
 
 import re
 
+from datetime import datetime
 import ddt
 from django.test import TestCase
 from mock import patch, MagicMock
+import pytz
+from util.date_utils import to_timestamp
 
 from ..signals.handlers import (
     enqueue_subsection_update,
     submissions_score_set_handler,
     submissions_score_reset_handler,
+    problem_raw_score_changed_handler,
 )
 
 UUID_REGEX = re.compile(ur'%(hex)s{8}-%(hex)s{4}-%(hex)s{4}-%(hex)s{4}-%(hex)s{12}' % {'hex': u'[0-9a-f]'})
+
+FROZEN_NOW_DATETIME = datetime.now().replace(tzinfo=pytz.UTC)
+FROZEN_NOW_TIMESTAMP = to_timestamp(FROZEN_NOW_DATETIME)
 
 SUBMISSION_SET_KWARGS = {
     'points_possible': 10,
     'points_earned': 5,
     'anonymous_user_id': 'anonymous_id',
     'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456'
+    'item_id': 'i4x://org/course/usage/123456',
+    'created_at': FROZEN_NOW_TIMESTAMP,
 }
 
 
 SUBMISSION_RESET_KWARGS = {
     'anonymous_user_id': 'anonymous_id',
     'course_id': 'CourseID',
-    'item_id': 'i4x://org/course/usage/123456'
+    'item_id': 'i4x://org/course/usage/123456',
+    'created_at': FROZEN_NOW_TIMESTAMP,
+}
+
+PROBLEM_RAW_SCORE_CHANGED_KWARGS = {
+    'raw_earned': 1.0,
+    'raw_possible': 2.0,
+    'weight': 4,
+    'user_id': 'UserID',
+    'course_id': 'CourseID',
+    'usage_id': 'i4x://org/course/usage/123456',
+    'only_if_higher': False,
+    'score_deleted': True,
+    'modified': FROZEN_NOW_TIMESTAMP,
 }
 
 
 @ddt.ddt
-class SubmissionSignalRelayTest(TestCase):
+class ScoreChangedSignalRelayTest(TestCase):
     """
-    Tests to ensure that the courseware module correctly catches score_set and
-    score_reset signals from the Submissions API and recasts them as LMS
-    signals. This ensures that listeners in the LMS only have to handle one type
-    of signal for all scoring events.
+    Tests to ensure that the courseware module correctly catches
+    (a) score_set and score_reset signals from the Submissions API
+    (b) LMS PROBLEM_RAW_SCORE_CHANGED signals
+    and recasts them as LMS PROBLEM_WEIGHTED_SCORE_CHANGED signals.
+
+    This ensures that listeners in the LMS only have to handle one type
+    of signal for all scoring events regardless of their origin.
     """
 
     def setUp(self):
         """
         Configure mocks for all the dependencies of the render method
         """
-        super(SubmissionSignalRelayTest, self).setUp()
-        self.signal_mock = self.setup_patch('lms.djangoapps.grades.signals.signals.PROBLEM_SCORE_CHANGED.send', None)
+        super(ScoreChangedSignalRelayTest, self).setUp()
+        self.signal_mock = self.setup_patch(
+            'lms.djangoapps.grades.signals.signals.PROBLEM_WEIGHTED_SCORE_CHANGED.send',
+            None,
+        )
         self.user_mock = MagicMock()
         self.user_mock.id = 42
         self.get_user_mock = self.setup_patch(
@@ -72,18 +99,20 @@ class SubmissionSignalRelayTest(TestCase):
     def test_score_set_signal_handler(self, handler, kwargs, earned, possible):
         """
         Ensure that on receipt of a score_(re)set signal from the Submissions API,
-        the signal handler correctly converts it to a PROBLEM_SCORE_CHANGED signal.
+        the signal handler correctly converts it to a PROBLEM_WEIGHTED_SCORE_CHANGED
+        signal.
 
         Also ensures that the handler calls user_by_anonymous_id correctly.
         """
         handler(None, **kwargs)
         expected_set_kwargs = {
             'sender': None,
-            'points_possible': possible,
-            'points_earned': earned,
+            'weighted_possible': possible,
+            'weighted_earned': earned,
             'user_id': self.user_mock.id,
             'course_id': 'CourseID',
-            'usage_id': 'i4x://org/course/usage/123456'
+            'usage_id': 'i4x://org/course/usage/123456',
+            'modified': FROZEN_NOW_TIMESTAMP,
         }
         self.signal_mock.assert_called_once_with(**expected_set_kwargs)
         self.get_user_mock.assert_called_once_with(kwargs['anonymous_user_id'])
@@ -122,6 +151,38 @@ class SubmissionSignalRelayTest(TestCase):
         handler(None, **kwargs)
         self.signal_mock.assert_not_called()
 
+    def test_raw_score_changed_signal_handler(self):
+        problem_raw_score_changed_handler(None, **PROBLEM_RAW_SCORE_CHANGED_KWARGS)
+        expected_set_kwargs = {
+            'sender': None,
+            'weighted_earned': 2.0,
+            'weighted_possible': 4.0,
+            'user_id': 'UserID',
+            'course_id': 'CourseID',
+            'usage_id': 'i4x://org/course/usage/123456',
+            'only_if_higher': False,
+            'score_deleted': True,
+            'modified': FROZEN_NOW_TIMESTAMP
+        }
+        self.signal_mock.assert_called_with(**expected_set_kwargs)
+
+    def test_raw_score_changed_score_deleted_optional(self):
+        local_kwargs = PROBLEM_RAW_SCORE_CHANGED_KWARGS.copy()
+        del local_kwargs['score_deleted']
+        problem_raw_score_changed_handler(None, **local_kwargs)
+        expected_set_kwargs = {
+            'sender': None,
+            'weighted_earned': 2.0,
+            'weighted_possible': 4.0,
+            'user_id': 'UserID',
+            'course_id': 'CourseID',
+            'usage_id': 'i4x://org/course/usage/123456',
+            'only_if_higher': False,
+            'score_deleted': False,
+            'modified': FROZEN_NOW_TIMESTAMP
+        }
+        self.signal_mock.assert_called_with(**expected_set_kwargs)
+
     @patch('lms.djangoapps.grades.signals.handlers.log.info')
     def test_problem_score_changed_logging(self, mocklog):
         enqueue_subsection_update(
@@ -129,6 +190,7 @@ class SubmissionSignalRelayTest(TestCase):
             user_id=1,
             course_id=u'course-v1:edX+Demo_Course+DemoX',
             usage_id=u'block-v1:block-key',
+            modified=FROZEN_NOW_DATETIME,
         )
         log_statement = mocklog.call_args[0][0]
         log_statement = UUID_REGEX.sub(u'*UUID*', log_statement)
@@ -136,7 +198,7 @@ class SubmissionSignalRelayTest(TestCase):
             log_statement,
             (
                 u'Grades: Request async calculation of subsection grades with args: '
-                u'course_id:course-v1:edX+Demo_Course+DemoX, usage_id:block-v1:block-key, '
-                u'user_id:1. Task [*UUID*]'
-            )
+                u'course_id:course-v1:edX+Demo_Course+DemoX, modified:{time}, '
+                u'usage_id:block-v1:block-key, user_id:1. Task [*UUID*]'
+            ).format(time=FROZEN_NOW_DATETIME)
         )

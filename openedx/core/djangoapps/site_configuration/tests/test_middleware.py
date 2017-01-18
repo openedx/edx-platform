@@ -7,6 +7,7 @@ import unittest
 from mock import patch
 
 from django.conf import settings
+from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
 
@@ -29,13 +30,13 @@ from openedx.core.djangoapps.site_configuration.tests.factories import SiteConfi
 @ddt.ddt
 @override_settings(SESSION_SAVE_EVERY_REQUEST=True)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class SessionCookieDomainOverrideTests(DatabaseMicrositeTestCase):
+class SessionCookieDomainMicrositeOverrideTests(DatabaseMicrositeTestCase):
     """
     Tests regarding the session cookie management in the middlware for Microsites
     """
 
     def setUp(self):
-        super(SessionCookieDomainOverrideTests, self).setUp()
+        super(SessionCookieDomainMicrositeOverrideTests, self).setUp()
         # Create a test client, and log it in so that it will save some session
         # data.
         self.user = UserFactory.create()
@@ -90,6 +91,35 @@ class SessionCookieDomainOverrideTests(DatabaseMicrositeTestCase):
                 response = self.client.get('/', HTTP_HOST=settings.MICROSITE_TEST_HOSTNAME)
                 self.assertNotIn('test_site.localhost', str(response.cookies['sessionid']))
                 self.assertNotIn('Domain', str(response.cookies['sessionid']))
+
+
+# NOTE: We set SESSION_SAVE_EVERY_REQUEST to True in order to make sure
+# Sessions are always started on every request
+# pylint: disable=no-member, protected-access
+@override_settings(SESSION_SAVE_EVERY_REQUEST=True)
+class SessionCookieDomainSiteConfigurationOverrideTests(TestCase):
+    """
+    Tests regarding the session cookie management in the middlware for Microsites
+    """
+
+    def setUp(self):
+        super(SessionCookieDomainSiteConfigurationOverrideTests, self).setUp()
+        # Create a test client, and log it in so that it will save some session data.
+        self.user = UserFactory.create()
+        self.user.set_password('password')
+        self.user.save()
+        self.site = SiteFactory.create(
+            domain='testserver.fake',
+            name='testserver.fake'
+        )
+        self.site_configuration = SiteConfigurationFactory.create(
+            site=self.site,
+            values={
+                "SESSION_COOKIE_DOMAIN": self.site.domain,
+            }
+        )
+        self.client = Client()
+        self.client.login(username=self.user.username, password="password")
 
     def test_session_cookie_domain_with_site_configuration_override(self):
         """

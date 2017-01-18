@@ -6,28 +6,27 @@ import hashlib
 import json
 import logging
 import os
-import traceback
+import re
 import struct
 import sys
-import re
+import traceback
 
+from django.conf import settings
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
     import dogstats_wrapper as dog_stats_api
 except ImportError:
     dog_stats_api = None
+from pytz import utc
 
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
-from capa.responsetypes import StudentInputError, \
-    ResponseError, LoncapaProblemError
+from capa.responsetypes import StudentInputError, ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames, get_inner_html_from_xpath
-from .progress import Progress
-from xmodule.exceptions import NotFoundError
-from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
-from .fields import Timedelta, Date
-from django.utils.timezone import UTC
+from xblock.fields import Boolean, Dict, Float, Integer, Scope, String, XMLString
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
-from django.conf import settings
+from xmodule.exceptions import NotFoundError
+from .fields import Date, Timedelta
+from .progress import Progress
 
 from openedx.core.djangolib.markup import HTML, Text
 
@@ -41,6 +40,8 @@ _ = lambda text: text
 NUM_RANDOMIZATION_BINS = 20
 # Never produce more than this many different seeds, no matter what.
 MAX_RANDOMIZATION_BINS = 1000
+
+FEATURES = getattr(settings, 'FEATURES', {})
 
 
 def randomization_bin(seed, problem_id):
@@ -76,7 +77,7 @@ class ComplexEncoder(json.JSONEncoder):
     """
     Extend the JSON encoder to correctly handle complex numbers
     """
-    def default(self, obj):
+    def default(self, obj):  # pylint: disable=method-hidden
         """
         Print a nicely formatted complex number, or default to the JSON encoder
         """
@@ -91,7 +92,7 @@ class CapaFields(object):
     """
     display_name = String(
         display_name=_("Display Name"),
-        help=_("This name appears in the horizontal navigation at the top of the page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         # it'd be nice to have a useful default but it screws up other things; so,
         # use display_name_with_default for those
@@ -157,7 +158,12 @@ class CapaFields(object):
             {"display_name": _("Per Student"), "value": RANDOMIZATION.PER_STUDENT}
         ]
     )
-    data = String(help=_("XML data for the problem"), scope=Scope.content, default="<problem></problem>")
+    data = XMLString(
+        help=_("XML data for the problem"),
+        scope=Scope.content,
+        enforce_type=FEATURES.get('ENABLE_XBLOCK_XML_VALIDATION', True),
+        default="<problem></problem>"
+    )
     correct_map = Dict(help=_("Dictionary with the correctness of current student answers"),
                        scope=Scope.user_state, default={})
     input_state = Dict(help=_("Dictionary for maintaining the state of inputtypes"), scope=Scope.user_state)
@@ -257,11 +263,13 @@ class CapaMixin(CapaFields):
                     )
                 )
                 # create a dummy problem with error message instead of failing
-                problem_text = (u'<problem><text><span class="inline-error">'
-                                u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
-                                    url=self.location.to_deprecated_string(),
-                                    msg=msg)
-                                )
+                problem_text = (
+                    u'<problem><text><span class="inline-error">'
+                    u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
+                        url=self.location.to_deprecated_string(),
+                        msg=msg,
+                    )
+                )
                 self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise
@@ -349,7 +357,7 @@ class CapaMixin(CapaFields):
         """
         Set the module's last submission time (when the problem was submitted)
         """
-        self.last_submission_time = datetime.datetime.now(UTC())
+        self.last_submission_time = datetime.datetime.now(utc)
 
     def get_score(self):
         """
@@ -803,7 +811,7 @@ class CapaMixin(CapaFields):
         Is it now past this problem's due date, including grace period?
         """
         return (self.close_date is not None and
-                datetime.datetime.now(UTC()) > self.close_date)
+                datetime.datetime.now(utc) > self.close_date)
 
     def closed(self):
         """
@@ -1093,7 +1101,7 @@ class CapaMixin(CapaFields):
 
         metric_name = u'capa.check_problem.{}'.format
         # Can override current time
-        current_time = datetime.datetime.now(UTC())
+        current_time = datetime.datetime.now(utc)
         if override_time is not False:
             current_time = override_time
 
@@ -1128,8 +1136,9 @@ class CapaMixin(CapaFields):
 
         # Wait time between resets: check if is too soon for submission.
         if self.last_submission_time is not None and self.submission_wait_seconds != 0:
-            if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
-                remaining_secs = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds())
+            seconds_since_submission = (current_time - self.last_submission_time).total_seconds()
+            if seconds_since_submission < self.submission_wait_seconds:
+                remaining_secs = int(self.submission_wait_seconds - seconds_since_submission)
                 msg = _(u'You must wait at least {wait_secs} between submissions. {remaining_secs} remaining.').format(
                     wait_secs=self.pretty_print_seconds(self.submission_wait_seconds),
                     remaining_secs=self.pretty_print_seconds(remaining_secs))
@@ -1343,7 +1352,7 @@ class CapaMixin(CapaFields):
                 log.warning('Input id %s is not mapped to an input type.', input_id)
 
             answer_response = None
-            for response, responder in self.lcp.responders.iteritems():
+            for responder in self.lcp.responders.itervalues():
                 if input_id in responder.answer_ids:
                     answer_response = responder
 
@@ -1406,8 +1415,10 @@ class CapaMixin(CapaFields):
         if not self.lcp.supports_rescoring():
             event_info['failure'] = 'unsupported'
             self.track_function_unmask('problem_rescore_fail', event_info)
+            # pylint: disable=line-too-long
             # Translators: 'rescoring' refers to the act of re-submitting a student's solution so it can get a new score.
             raise NotImplementedError(_("Problem's definition does not support rescoring."))
+            # pylint: enable=line-too-long
 
         if not self.done:
             event_info['failure'] = 'unanswered'
@@ -1440,7 +1451,6 @@ class CapaMixin(CapaFields):
         # rescoring should have no effect on attempts, so don't
         # need to increment here, or mark done.  Just save.
         self.set_state_from_lcp()
-
         self.publish_grade(only_if_higher)
 
         new_score = self.lcp.get_score()
@@ -1460,7 +1470,11 @@ class CapaMixin(CapaFields):
         event_info['attempts'] = self.attempts
         self.track_function_unmask('problem_rescore', event_info)
 
-        return {'success': success}
+        return {
+            'success': success,
+            'new_raw_earned': new_score['score'],
+            'new_raw_possible': new_score['total'],
+        }
 
     def save_problem(self, data):
         """
@@ -1482,8 +1496,10 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('save_problem_fail', event_info)
             return {
                 'success': False,
+                # pylint: disable=line-too-long
                 # Translators: 'closed' means the problem's due date has passed. You may no longer attempt to solve the problem.
-                'msg': _("Problem is closed.")
+                'msg': _("Problem is closed."),
+                # pylint: enable=line-too-long
             }
 
         # Problem submitted. Student should reset before saving
@@ -1535,8 +1551,10 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('reset_problem_fail', event_info)
             return {
                 'success': False,
+                # pylint: disable=line-too-long
                 # Translators: 'closed' means the problem's due date has passed. You may no longer attempt to solve the problem.
                 'msg': _("You cannot select Reset for a problem that is closed."),
+                # pylint: enable=line-too-long
             }
 
         if not self.is_submitted():

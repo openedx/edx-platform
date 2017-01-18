@@ -76,17 +76,33 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 module = self._get_student_module(usage_info.user, usage_info.course_key, block_key)
                 if module:
                     state_dict = json.loads(module.state)
+                else:
+                    state_dict = {}
+
+                for selected_block in state_dict.get('selected', []):
                     # Add all selected entries for this user for this
                     # library module to the selected list.
-                    for state in state_dict['selected']:
-                        usage_key = usage_info.course_key.make_usage_key(state[0], state[1])
-                        if usage_key in library_children:
-                            selected.append((state[0], state[1]))
+                    block_type, block_id = selected_block
+                    usage_key = usage_info.course_key.make_usage_key(block_type, block_id)
+                    if usage_key in library_children:
+                        selected.append(selected_block)
 
-                # update selected
+                # Update selected
                 previous_count = len(selected)
                 block_keys = LibraryContentModule.make_selection(selected, library_children, max_count, mode)
                 selected = block_keys['selected']
+
+                # Save back any changes
+                if any(block_keys[changed] for changed in ('invalid', 'overlimit', 'added')):
+                    state_dict['selected'] = list(selected)
+                    StudentModule.objects.update_or_create(  # pylint: disable=no-member
+                        student=usage_info.user,
+                        course_id=usage_info.course_key,
+                        module_state_key=block_key,
+                        defaults={
+                            'state': json.dumps(state_dict),
+                        },
+                    )
 
                 # publish events for analytics
                 self._publish_events(block_structure, block_key, previous_count, max_count, block_keys)
@@ -125,7 +141,6 @@ class ContentLibraryTransformer(FilteringTransformerMixin, BlockStructureTransfo
                 student=user,
                 course_id=course_key,
                 module_state_key=block_key,
-                state__contains='"selected": [['
             )
         except StudentModule.DoesNotExist:
             return None

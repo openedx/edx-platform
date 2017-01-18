@@ -51,6 +51,11 @@ class SubsectionGrade(object):
         Returns whether any problem in this subsection
         was attempted by the student.
         """
+
+        assert self.all_total is not None, (
+            "SubsectionGrade not fully populated yet.  Call init_from_structure or init_from_model "
+            "before use."
+        )
         return self.all_total.attempted
 
     def init_from_structure(self, student, course_structure, submissions_scores, csm_scores):
@@ -63,7 +68,7 @@ class SubsectionGrade(object):
         ):
             self._compute_block_score(descendant_key, course_structure, submissions_scores, csm_scores)
 
-        self.all_total, self.graded_total = graders.aggregate_scores(self.scores, self.display_name, self.location)
+        self.all_total, self.graded_total = graders.aggregate_scores(self.scores)
         self._log_event(log.debug, u"init_from_structure", student)
         return self
 
@@ -78,17 +83,13 @@ class SubsectionGrade(object):
             tw_earned=model.earned_graded,
             tw_possible=model.possible_graded,
             graded=True,
-            display_name=self.display_name,
-            module_id=self.location,
-            attempted=True,  # TODO TNL-5930
+            attempted=model.first_attempted is not None,
         )
         self.all_total = AggregatedScore(
             tw_earned=model.earned_all,
             tw_possible=model.possible_all,
             graded=False,
-            display_name=self.display_name,
-            module_id=self.location,
-            attempted=True,  # TODO TNL-5930
+            attempted=model.first_attempted is not None,
         )
         self._log_event(log.debug, u"init_from_model", student)
         return self
@@ -129,17 +130,23 @@ class SubsectionGrade(object):
         Compute score for the given block. If persisted_values
         is provided, it is used for possible and weight.
         """
-        block = course_structure[block_key]
-
-        if getattr(block, 'has_score', False):
-            problem_score = get_score(
-                submissions_scores,
-                csm_scores,
-                persisted_block,
-                block,
-            )
-            if problem_score:
-                self.locations_to_scores[block_key] = problem_score
+        try:
+            block = course_structure[block_key]
+        except KeyError:
+            # It's possible that the user's access to that
+            # block has changed since the subsection grade
+            # was last persisted.
+            pass
+        else:
+            if getattr(block, 'has_score', False):
+                problem_score = get_score(
+                    submissions_scores,
+                    csm_scores,
+                    persisted_block,
+                    block,
+                )
+                if problem_score:
+                    self.locations_to_scores[block_key] = problem_score
 
     def _persisted_model_params(self, student):
         """
@@ -156,6 +163,7 @@ class SubsectionGrade(object):
             earned_graded=self.graded_total.earned,
             possible_graded=self.graded_total.possible,
             visible_blocks=self._get_visible_blocks,
+            attempted=self.attempted
         )
 
     @property

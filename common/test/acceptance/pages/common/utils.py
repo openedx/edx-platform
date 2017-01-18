@@ -3,6 +3,7 @@ Utility methods common to Studio and the LMS.
 """
 from bok_choy.promise import EmptyPromise
 from common.test.acceptance.tests.helpers import disable_animations
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 def wait_for_notification(page):
@@ -70,3 +71,10 @@ def confirm_prompt(page, cancel=False, require_notification=None):
     page.wait_for_element_visibility(confirmation_button_css, 'Confirmation button is visible')
     require_notification = (not cancel) if require_notification is None else require_notification
     click_css(page, confirmation_button_css, require_notification=require_notification)
+
+
+def hover(browser, element):
+    """
+    Hover over an element.
+    """
+    ActionChains(browser).move_to_element(element).perform()

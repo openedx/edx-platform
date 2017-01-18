@@ -15,6 +15,7 @@ from xmodule.editing_module import MetadataOnlyEditingDescriptor
 from xmodule.x_module import XModule
 
 from xblock.fields import Scope, Dict, Boolean, List, Integer, String
+from xblock.fragment import Fragment
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ class WordCloudFields(object):
     """XFields for word cloud."""
     display_name = String(
         display_name=_("Display Name"),
-        help=_("The label for this word cloud on the course page."),
+        help=_("The display name for this component."),
         scope=Scope.settings,
         default="Word cloud"
     )
@@ -93,10 +94,6 @@ class WordCloudModule(WordCloudFields, XModule):
     js = {
         'js': [
             resource_string(__name__, 'js/src/javascript_loader.js'),
-            resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
-            resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
-            resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
-            resource_string(__name__, 'js/src/word_cloud/word_cloud_main.js'),
         ],
     }
     css = {'scss': [resource_string(__name__, 'css/word_cloud/display.scss')]}
@@ -237,9 +234,13 @@ class WordCloudModule(WordCloudFields, XModule):
                 'error': 'Unknown Command!'
             })
 
-    def get_html(self):
-        """Template rendering."""
-        context = {
+    def student_view(self, context):
+        """
+        Renders the output that a student will see.
+        """
+        fragment = Fragment()
+
+        fragment.add_content(self.system.render_template('word_cloud.html', {
             'ajax_url': self.system.ajax_url,
             'display_name': self.display_name,
             'instructions': self.instructions,
@@ -247,13 +248,24 @@ class WordCloudModule(WordCloudFields, XModule):
             'element_id': self.location.html_id(),
             'num_inputs': self.num_inputs,
             'submitted': self.submitted,
-        }
-        self.content = self.system.render_template('word_cloud.html', context)
-        return self.content
+        }))
+
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.min.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/d3.layout.cloud.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud.js'))
+        fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/word_cloud_main.js'))
+
+        return fragment
+
+    def author_view(self, context):
+        """
+        Renders the output that an author will see.
+        """
+        return self.student_view(context)
 
 
 class WordCloudDescriptor(WordCloudFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for WordCloud Xmodule."""
     module_class = WordCloudModule
-    resources_dir = None
+    resources_dir = 'assets/word_cloud'
     template_dir_name = 'word_cloud'

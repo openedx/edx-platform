@@ -2,6 +2,7 @@
 Acceptance tests for adding components in Studio.
 """
 import ddt
+from nose.plugins.attrib import attr
 
 from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.fixtures.course import XBlockFixtureDesc
@@ -10,6 +11,7 @@ from common.test.acceptance.pages.studio.utils import add_component, add_compone
 from common.test.acceptance.pages.studio.settings_advanced import AdvancedSettingsPage
 
 
+@attr(shard=9)
 @ddt.ddt
 class AdvancedProblemComponentTest(ContainerBase):
     """
@@ -68,6 +70,7 @@ class AdvancedProblemComponentTest(ContainerBase):
         self.assertEqual(problem.name, component)
 
 
+@attr(shard=9)
 class ComponentTest(ContainerBase):
     """
     Test class to add different components.

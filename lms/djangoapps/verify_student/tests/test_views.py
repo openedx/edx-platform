@@ -533,7 +533,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             response,
             unicode(course.id),
             course.display_name,
-            course.start_datetime_text(),
             courseware_url
         )
 
@@ -744,7 +743,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # Expect that the expiration date is set
         response = self._get_page(payment_flow, course.id)
         data = self._get_page_data(response)
-        self.assertEqual(data['verification_deadline'], deadline.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertEqual(data['verification_deadline'], unicode(deadline))
 
     def test_course_mode_expired(self):
         deadline = datetime.now(tz=pytz.UTC) + timedelta(days=-360)
@@ -762,7 +761,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # to the student that the deadline has passed
         response = self._get_page("verify_student_verify_now", course.id)
         self.assertContains(response, "verification deadline")
-        self.assertContains(response, deadline.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertContains(response, deadline)
 
     @ddt.data(datetime.now(tz=pytz.UTC) + timedelta(days=360), None)
     def test_course_mode_expired_verification_deadline_in_future(self, verification_deadline):
@@ -811,7 +810,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
 
         # Check that the verification deadline (rather than the upgrade deadline) is displayed
         if verification_deadline is not None:
-            self.assertEqual(data["verification_deadline"], verification_deadline.strftime("%b %d, %Y at %H:%M UTC"))
+            self.assertEqual(data["verification_deadline"], unicode(verification_deadline))
         else:
             self.assertEqual(data["verification_deadline"], "")
 
@@ -840,7 +839,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
         # message when we go to verify.
         response = self._get_page("verify_student_verify_now", course.id)
         self.assertContains(response, "verification deadline")
-        self.assertContains(response, verification_deadline_in_past.strftime("%b %d, %Y at %H:%M UTC"))
+        self.assertContains(response, verification_deadline_in_past)
 
     @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     @ddt.data("verify_student_start_flow", "verify_student_begin_flow")
@@ -986,12 +985,11 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             else:
                 self.assertFalse(displayed, msg="Expected '{req}' requirement to be hidden".format(req=req))
 
-    def _assert_course_details(self, response, course_key, display_name, start_text, url):
+    def _assert_course_details(self, response, course_key, display_name, url):
         """Check the course information on the page. """
         response_dict = self._get_page_data(response)
         self.assertEqual(response_dict['course_key'], course_key)
         self.assertEqual(response_dict['course_name'], display_name)
-        self.assertEqual(response_dict['course_start_date'], start_text)
         self.assertEqual(response_dict['courseware_url'], url)
 
     def _assert_user_details(self, response, full_name):
@@ -1021,7 +1019,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase, XssTestMixin):
             'full_name': pay_and_verify_div['data-full-name'],
             'course_key': pay_and_verify_div['data-course-key'],
             'course_name': pay_and_verify_div['data-course-name'],
-            'course_start_date': pay_and_verify_div['data-course-start-date'],
             'courseware_url': pay_and_verify_div['data-courseware-url'],
             'course_mode_name': pay_and_verify_div['data-course-mode-name'],
             'course_mode_slug': pay_and_verify_div['data-course-mode-slug'],

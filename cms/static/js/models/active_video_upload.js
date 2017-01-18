@@ -21,7 +21,13 @@ define(
                 defaults: {
                     videoId: null,
                     status: statusStrings.STATUS_QUEUED,
-                    progress: 0
+                    progress: 0,
+                    failureMessage: null
+                },
+
+                uploading: function() {
+                    var status = this.get('status');
+                    return (this.get('progress') < 1) && ((status === statusStrings.STATUS_UPLOADING));
                 }
             },
             statusStrings

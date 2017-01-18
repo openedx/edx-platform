@@ -3,7 +3,6 @@ Problem Page.
 """
 from bok_choy.page_object import PageObject
 from common.test.acceptance.pages.common.utils import click_css
-from common.test.acceptance.tests.helpers import is_focused_on_element
 from selenium.webdriver.common.keys import Keys
 
 
@@ -46,6 +45,13 @@ class ProblemPage(PageObject):
         Return the content of the problem
         """
         return self.q(css="div.problems-wrapper").text[0]
+
+    @property
+    def problem_meta(self):
+        """
+        Return the problem meta text
+        """
+        return self.q(css=".problems-wrapper .problem-progress").text[0]
 
     @property
     def message_text(self):
@@ -212,7 +218,16 @@ class ProblemPage(PageObject):
         """
         Check for focus problem meta.
         """
-        return is_focused_on_element(self.browser, '.problem-header')
+        return self.q(css='.problem-header').focused
+
+    def wait_for_focus_on_problem_meta(self):
+        """
+        Waits for focus on Problem Meta section
+        """
+        self.wait_for(
+            promise_check_func=self.is_focus_on_problem_meta,
+            description='Waiting for focus on Problem Meta section'
+        )
 
     def is_submit_disabled(self):
         """
@@ -309,20 +324,32 @@ class ProblemPage(PageObject):
             'Waiting for the focus to be on the hint notification'
         )
 
-    def click_review_in_notification(self):
+    def click_review_in_notification(self, notification_type):
         """
         Click on the "Review" button within the visible notification.
         """
+        css_string = '.notification.notification-{notification_type} .review-btn'.format(
+            notification_type=notification_type
+        )
+
         # The review button cannot be clicked on until it is tabbed to, so first tab to it.
         # Multiple tabs may be required depending on the content (for instance, hints with links).
         def tab_until_review_focused():
             """ Tab until the review button is focused """
             self.browser.switch_to_active_element().send_keys(Keys.TAB)
-            return self.q(css='.notification .review-btn').focused
+            if self.q(css=css_string).focused:
+                self.scroll_to_element(css_string)
+            return self.q(css=css_string).focused
 
-        self.wait_for(tab_until_review_focused, 'Waiting for the Review button to become focused')
-
-        click_css(self, '.notification .review-btn', require_notification=False)
+        self.wait_for(
+            tab_until_review_focused,
+            'Waiting for the Review button to become focused'
+        )
+        self.wait_for_element_visibility(
+            css_string,
+            'Waiting for the button to be visible'
+        )
+        click_css(self, css_string, require_notification=False)
 
     def get_hint_button_disabled_attr(self):
         """ Return the disabled attribute of all hint buttons (once hints are visible, there will be two). """

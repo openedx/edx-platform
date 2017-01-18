@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -22,12 +22,14 @@
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
 # AzizAhmed <dr.zezo@gmail.com>, 2014
+# e2f_ar r3 <e2f_ar_r3@outlook.com>, 2016
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # HasnaG <hasnaa.elghandor@yahoo.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Karim Mohamed <karim.mohamed.eg@gmail.com>, 2016
 # Khaled Jalajel <khaledjalajeldode@gmail.com>, 2015
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# Lekaa Ahmed <leka2ahmed@yahoo.com>, 2016
+# Lekaa Ahmed <inactive+lekaaahmed_gtc_YmU0Yz@transifex.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2013
 # may <may@qordoba.com>, 2013-2015
@@ -37,7 +39,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Natalia Berdnikov <nberdnikov@edx.org>, 2016
 # Ned Batchelder <ned@edx.org>, 2015-2016
-# omarithawi <oithawi@qrf.org>, 2014-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2014-2016
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # RaghadG <raghad_g@yahoo.com>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
@@ -46,7 +48,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2016 EdX
+# Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -71,7 +73,7 @@
 # soliman osman <solimanosman@windowslive.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -90,13 +92,15 @@
 # baraahadri <baraahadri@gmail.com>, 2014
 # Belal A. Nwiran <bnwiran@gmail.com>, 2015
 # طاهر <charaf.le.prince@gmail.com>, 2014
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Hani <hani0a@hotmail.com>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Karim Mohamed <karim.mohamed.eg@gmail.com>, 2016
+# keltouma <said.benkrim@gmail.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
-# Lekaa Ahmed <leka2ahmed@yahoo.com>, 2016
+# Lekaa Ahmed <inactive+lekaaahmed_gtc_YmU0Yz@transifex.com>, 2016
 # Mahmoud Elkhateeb <eng.elkhteeb@gmail.com>, 2013
 # may <may@qordoba.com>, 2014-2015
 # mustafasadiq <mustafasadiq0@gmail.com>, 2014
@@ -104,7 +108,7 @@
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013-2014
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Ned Batchelder <ned@edx.org>, 2016
-# omarithawi <oithawi@qrf.org>, 2014-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2014-2017
 # Osama M. Mneina <o.mneina@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
@@ -112,7 +116,7 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -125,6 +129,7 @@
 # AR C2 <e2f458fd4s512@outlook.com>, 2016
 # A <smart.9922@hotmail.com>, 2014
 # طاهر <charaf.le.prince@gmail.com>, 2014
+# e2f_ar t3 <e2f_ar_t3@outlook.com>, 2016
 # Safaa_fadl <fadlaoui_safaa@yahoo.fr>, 2014
 # Hassan05 <hassan.upb@gmail.com>, 2014
 # Jad Freij <jkfreij@gmail.com>, 2014
@@ -134,14 +139,14 @@
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
 # Najwan Al Rousan <najwanrousan@gmail.com>, 2013
 # Ned Batchelder <ned@edx.org>, 2016
-# omarithawi <oithawi@qrf.org>, 2015-2016
+# Omar Al-Ithawi <oithawi@qrf.org>, 2015-2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # shefaa abu jabel <shefaa.aj@gmail.com>, 2016
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2015
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2016 edX
+# Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -156,7 +161,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2016-11-03 15:59+0000\n"
+"POT-Creation-Date: 2017-01-05 17:03+0000\n"
 "PO-Revision-Date: 2016-11-08 08:16+0000\n"
 "Last-Translator: Soha Assali <soha+transifex@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)\n"
@@ -294,7 +299,6 @@ msgstr "إنّك مسجَّل كطالب يحمل شهادة ميثاق الشر
 #: common/djangoapps/course_modes/helpers.py lms/djangoapps/branding/api.py
 #: openedx/core/djangoapps/user_api/views.py
 #: lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/honor.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
 msgid "Honor Code"
@@ -430,65 +434,6 @@ msgstr "مساعد أستاذ لشؤون المتعلّمين"
 msgid "Student"
 msgstr "الطالب"
 
-#: common/djangoapps/embargo/forms.py
-#: lms/djangoapps/verified_track_content/forms.py
-msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
-msgstr ""
-"عذرًا، لم نتمكّن من إيجاد المساق. يُرجى التأكّد من صحّة الرقم التعريفي "
-"للمساق."
-
-#: common/djangoapps/embargo/models.py
-msgid "The course key for the restricted course."
-msgstr "رقم المساق للمساق المحجوز"
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from enrollment."
-msgstr "الرسالة الواجب عرضها عندما يُمنَع المستخدم من التسجيل."
-
-#: common/djangoapps/embargo/models.py
-msgid "The message to show when a user is blocked from accessing a course."
-msgstr "الرسالة الواجب عرضها عندما يُمنَع المستخدم من الوصول إلى المساق."
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Allow users who enrolled in an allowed country to access restricted courses "
-"from excluded countries."
-msgstr ""
-"السماح للمستخدمين المسجّلين والمقيمين في بلد مسموح بالوصول إلى المساقات "
-"المقيَّدة من البلدان المحظورة."
-
-#: common/djangoapps/embargo/models.py
-msgid "Two character ISO country code."
-msgstr "رمز ’أيزو‘ للبلد مؤلّف من حرفين"
-
-#: common/djangoapps/embargo/models.py
-msgid ""
-"Whether to include or exclude the given course. If whitelist countries are "
-"specified, then ONLY users from whitelisted countries will be able to access"
-" the course.  If blacklist countries are specified, then users from "
-"blacklisted countries will NOT be able to access the course."
-msgstr ""
-"سواء سيُدرج أو يٌستثنى مساق معيَّن. إذا جرى تحديد بلدان اللائحة البيضاء، "
-"ستقتصر سماحية الوصول إلى المساق على طلاب هذه البلدان فقط. ومن جهة أخرى، إذا "
-"جرى تحديد بلدان اللائحة السوداء، فلن يٌسمح للطلاب من هذه البلدان بالوصول إلى"
-" المساق. "
-
-#: common/djangoapps/embargo/models.py
-msgid "The course to which this rule applies."
-msgstr "المساق الذي تنطبق عليه هذه القاعدة"
-
-#: common/djangoapps/embargo/models.py
-msgid "The country to which this rule applies."
-msgstr "البلد الذي تنطبق عليه هذه القاعدة"
-
-#: common/djangoapps/embargo/models.py
-msgid "Whitelist {country} for {course}"
-msgstr "أدرج {country} على اللائحة البيضاء للمساق {course}"
-
-#: common/djangoapps/embargo/models.py
-msgid "Blacklist {country} for {course}"
-msgstr "أردج {country} على اللائحة السوداء للمساق {course}"
-
 #: common/djangoapps/student/admin.py
 msgid "User profile"
 msgstr "الملف التعريفي للمستخدم"
@@ -578,6 +523,10 @@ msgstr "يجب إدخال الدولة"
 #: common/djangoapps/student/forms.py
 msgid "To enroll, you must follow the honor code."
 msgstr "للتسجيل، يجب عليك اتّباع ميثاق الشرف الأكاديمي."
+
+#: common/djangoapps/student/forms.py
+msgid "You must consent to data sharing to register."
+msgstr ""
 
 #: common/djangoapps/student/forms.py
 msgid "You are missing one or more required fields"
@@ -750,13 +699,13 @@ msgstr "المدرسة الابتدائية"
 
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "No Formal Education"
-msgstr "لا تعليم رسمي"
+msgid "No formal education"
+msgstr ""
 
 #. Translators: 'Other' refers to the student's level of education
 #: common/djangoapps/student/models.py
-msgid "Other Education"
-msgstr "تعليم آخر"
+msgid "Other education"
+msgstr ""
 
 #: common/djangoapps/student/models.py
 msgid "{platform_name} Honor Code Certificate for {course_name}"
@@ -1475,6 +1424,19 @@ msgctxt "month name"
 msgid "December"
 msgstr "ديسمبر"
 
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"I agree to allow {platform_name} to share data about my enrollment, "
+"completion and performance in all {platform_name} courses and programs where"
+" my enrollment is sponsored by {ec_name}."
+msgstr ""
+
+#: common/djangoapps/util/enterprise_helpers.py
+msgid ""
+"To link your account with {ec_name}, you are required to consent to data "
+"sharing."
+msgstr ""
+
 #: common/djangoapps/util/file.py
 msgid "The file must end with the extension '{file_types}'."
 msgid_plural ""
@@ -1781,14 +1743,6 @@ msgstr "(سطر الكود المصدري غير متوفّر) "
 #: common/lib/capa/capa/responsetypes.py
 msgid "See XML source line {sourcenum}."
 msgstr "يُرجى الاطّلاع على السطر الأصلي بلغة XML {sourcenum}. "
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "JavaScript Input"
-msgstr "مُدخل بلغة جافاسكريبت"
-
-#: common/lib/capa/capa/responsetypes.py
-msgid "Execution of unsafe Javascript code is not allowed."
-msgstr "لا يُسمح بتنفيذ كود غير آمن مكتوب بلغة جافاسكريبت."
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
@@ -2177,6 +2131,10 @@ msgid "Dictionary with the current student responses"
 msgstr "قاموس بردود الطالب الحالية"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+msgid "Whether or not the answers have been saved since last submit"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/capa_base.py
 msgid "Whether the student has answered the problem"
 msgstr "فيما إذا أجاب الطالب عن المسألة"
 
@@ -2294,6 +2252,11 @@ msgstr ""
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Hint ({hint_num} of {hints_count}): "
 msgstr "التلميح ({hint_num} من أصل {hints_count}):"
+
+#: common/lib/xmodule/xmodule/capa_base.py
+msgid ""
+"Your answers were previously saved. Click '{button_name}' to grade them."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Incorrect ({progress} point)"
@@ -2512,13 +2475,6 @@ msgstr "لا يتضمّن هذا العنصر أي عناصر مصدر التي 
 msgid "Configure list of sources"
 msgstr "ضبط قائمة المصادر"
 
-#. Translators: TBD stands for 'To Be Determined' and is used when a course
-#. does not yet have an announced start date.
-#: common/lib/xmodule/xmodule/course_metadata_utils.py
-#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
-msgid "TBD"
-msgstr "سيُحدَّد لاحقًا "
-
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "LTI Passports"
 msgstr "تصاريح قابلية التشغيل البيني لأدوات التعلّم ’LTI‘"
@@ -2571,18 +2527,15 @@ msgstr ""
 "هذا."
 
 #: common/lib/xmodule/xmodule/course_module.py
-msgid "Course Advertised Start Date"
-msgstr "التاريخ المعلَن لبدء المساق"
+msgid "Course Advertised Start"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the date you want to advertise as the course start date, if this date "
-"is different from the set start date. To advertise the set start date, enter"
-" null."
+"Enter the text that you want to use as the advertised starting time frame "
+"for the course, such as \"Winter 2018\". If you enter null for this value, "
+"the start date that you have set for this course is used."
 msgstr ""
-"يُرجى إدخال التاريخ الذي تودّ الإعلان عنه كتاريخ بدء المساق أمّا إذا كان هذا"
-" التاريخ مختلفًا عن تاريخ البدء المحدَّد فيمكنك الإعلان عن تاريخ البدء "
-"بإدخال القيمة ,null‘. "
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
@@ -4947,6 +4900,10 @@ msgstr ""
 msgid "Powered by Open edX"
 msgstr "تُديره Open edX"
 
+#: lms/djangoapps/branding/api.py
+msgid "{platform_name} for Business"
+msgstr ""
+
 #: lms/djangoapps/branding/api.py lms/templates/static_templates/blog.html
 msgid "Blog"
 msgstr "المدوّنة"
@@ -4977,10 +4934,6 @@ msgid "Donate"
 msgstr "تبرَّع"
 
 #: lms/djangoapps/branding/api.py
-msgid "Sitemap"
-msgstr "خريطة الموقع"
-
-#: lms/djangoapps/branding/api.py
 msgid "Terms of Service & Honor Code"
 msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 
@@ -4990,7 +4943,6 @@ msgstr "شروط الخدمة وميثاق الشرف الأكاديمي"
 #: lms/djangoapps/branding/api.py lms/djangoapps/certificates/views/webview.py
 #: cms/templates/widgets/footer.html
 #: lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/privacy.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5001,12 +4953,19 @@ msgstr "سياسة الخصوصية"
 msgid "Accessibility Policy"
 msgstr "سياسة إمكانية الوصول "
 
+#: lms/djangoapps/branding/api.py
+msgid "Sitemap"
+msgstr "خريطة الموقع"
+
+#: lms/templates/static_templates/media-kit.html
+msgid "Media Kit"
+msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
+
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: This is a legal document users must agree to
 #. in order to register a new account.
 #: lms/djangoapps/branding/api.py openedx/core/djangoapps/user_api/views.py
 #: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
-#: themes/example/lms/templates/static_templates/tos.html
 #: themes/red-theme/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/footer.html
 #: themes/stanford-style/lms/templates/static_templates/tos.html
@@ -5639,10 +5598,6 @@ msgstr "{relative} مضى - {absolute}"
 #: lms/djangoapps/courseware/date_summary.py
 msgid "in {relative} - {absolute}"
 msgstr "في {relative} - {absolute}"
-
-#: lms/djangoapps/courseware/date_summary.py
-msgid "Today is {date}"
-msgstr "تاريخ اليوم {date}"
 
 #: lms/djangoapps/courseware/date_summary.py
 msgid "Course Starts"
@@ -6305,6 +6260,10 @@ msgstr "مسجَّل يدويًّا"
 msgid "Data Integrity Error"
 msgstr "خطأ في سلامة البيانات"
 
+#: lms/djangoapps/instructor/paidcourse_enrollment_report.py
+msgid "TBD"
+msgstr "سيُحدَّد لاحقًا "
+
 #: lms/djangoapps/instructor/services.py
 msgid "Proctored Exam Review: {review_status}"
 msgstr "معاينة الامتحان المراقب: {review_status} "
@@ -6489,6 +6448,14 @@ msgstr "العنوان البريدي"
 #: lms/djangoapps/instructor_task/tasks_helper.py
 msgid "Goals"
 msgstr "الأهداف"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Enrollment Mode"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Verification Status"
+msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Cohort"
@@ -7019,10 +6986,6 @@ msgstr "حُدِّث سعر CourseMode بنجاح"
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Course Info"
 msgstr "معلومات المساق "
-
-#: lms/djangoapps/instructor/views/instructor_dashboard.py
-msgid "No end date set"
-msgstr "لم يُحدّد تاريخ الانتهاء"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
 msgid "Enrollment data is now available in {dashboard_link}."
@@ -8767,6 +8730,13 @@ msgid ""
 "The user {username} is not enrolled in the course associated with this team."
 msgstr "إنّ المستخدم {username} غير مسجَّل في المساق المرتبط بهذا الفريق."
 
+#: lms/djangoapps/verified_track_content/forms.py
+#: openedx/core/djangoapps/embargo/forms.py
+msgid "COURSE NOT FOUND.  Please check that the course ID is valid."
+msgstr ""
+"عذرًا، لم نتمكّن من إيجاد المساق. يُرجى التأكّد من صحّة الرقم التعريفي "
+"للمساق."
+
 #: lms/djangoapps/verified_track_content/models.py
 msgid "The course key for the course we would like to be auto-cohorted."
 msgstr "مفتاح الدورة للدورة التدريبية التي تود جعلها تشعبية بشكل تلقائي. "
@@ -9635,6 +9605,12 @@ msgstr ""
 "حدد مدة الذاكرة المؤقتة بالثواني لتفعل تخزين النتائج مؤقتاً عند إدخالك قيمةً"
 " أكبر من 0."
 
+#: openedx/core/djangoapps/catalog/models.py
+msgid ""
+"Username created for Course Catalog Integration, e.g. "
+"lms_catalog_service_user."
+msgstr ""
+
 #: openedx/core/djangoapps/cors_csrf/models.py
 msgid ""
 "List of domains that are allowed to make cross-domain requests to this site."
@@ -9836,6 +9812,58 @@ msgstr "إعادة تعيين اللغة على رمز اللغة الافترا
 #: openedx/core/djangoapps/dark_lang/views.py
 msgid "Language reset to user's preference: {preview_language_code}"
 msgstr "إعادة تعيين اللغة على تفضيل المستخدم: {preview_language_code}"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course key for the restricted course."
+msgstr "رقم المساق للمساق المحجوز"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from enrollment."
+msgstr "الرسالة الواجب عرضها عندما يُمنَع المستخدم من التسجيل."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The message to show when a user is blocked from accessing a course."
+msgstr "الرسالة الواجب عرضها عندما يُمنَع المستخدم من الوصول إلى المساق."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Allow users who enrolled in an allowed country to access restricted courses "
+"from excluded countries."
+msgstr ""
+"السماح للمستخدمين المسجّلين والمقيمين في بلد مسموح بالوصول إلى المساقات "
+"المقيَّدة من البلدان المحظورة."
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Two character ISO country code."
+msgstr "رمز ’أيزو‘ للبلد مؤلّف من حرفين"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid ""
+"Whether to include or exclude the given course. If whitelist countries are "
+"specified, then ONLY users from whitelisted countries will be able to access"
+" the course.  If blacklist countries are specified, then users from "
+"blacklisted countries will NOT be able to access the course."
+msgstr ""
+"سواء سيُدرج أو يٌستثنى مساق معيَّن. إذا جرى تحديد بلدان اللائحة البيضاء، "
+"ستقتصر سماحية الوصول إلى المساق على طلاب هذه البلدان فقط. ومن جهة أخرى، إذا "
+"جرى تحديد بلدان اللائحة السوداء، فلن يٌسمح للطلاب من هذه البلدان بالوصول إلى"
+" المساق. "
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The course to which this rule applies."
+msgstr "المساق الذي تنطبق عليه هذه القاعدة"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "The country to which this rule applies."
+msgstr "البلد الذي تنطبق عليه هذه القاعدة"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Whitelist {country} for {course}"
+msgstr "أدرج {country} على اللائحة البيضاء للمساق {course}"
+
+#: openedx/core/djangoapps/embargo/models.py
+msgid "Blacklist {country} for {course}"
+msgstr "أردج {country} على اللائحة السوداء للمساق {course}"
 
 #: openedx/core/djangoapps/external_auth/views.py
 msgid ""
@@ -10560,12 +10588,12 @@ msgid "Could not find user by email address '{email}'."
 msgstr "تعذّر إيجاد المستخدم من خلال عنوان البريد الإلكتروني ’{email}‘."
 
 #: cms/djangoapps/contentstore/views/user.py
-msgid "User {email} has registered but has not yet activated his/her account."
-msgstr "قام المستخدم {email} بالتسجيل ولكنّه لم يفعّل حسابه بعد."
-
-#: cms/djangoapps/contentstore/views/user.py
 msgid "No `role` specified."
 msgstr "ليس هناك من ’دور‘ محدَّد "
+
+#: cms/djangoapps/contentstore/views/user.py
+msgid "User {email} has registered but has not yet activated his/her account."
+msgstr "قام المستخدم {email} بالتسجيل ولكنّه لم يفعّل حسابه بعد."
 
 #: cms/djangoapps/contentstore/views/user.py
 msgid "Invalid `role` specified."
@@ -10593,17 +10621,34 @@ msgstr "قيد المعالجة"
 msgid "Ready"
 msgstr "مستعدّ"
 
+#. Translators: This is the status for a video that is uploaded completely
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Uploaded"
+msgstr ""
+
 #. Translators: This is the status for a video that the servers have failed to
 #. process
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed"
 msgstr "خلل أثناء المعالجة"
 
+#. Translators: This is the status for a video that is cancelled during upload
+#. by user
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Cancelled"
+msgstr ""
+
 #. Translators: This is the status for a video which has failed
 #. due to being flagged as a duplicate by an external or internal CMS
 #: cms/djangoapps/contentstore/views/videos.py
 msgid "Failed Duplicate"
 msgstr "فشل التكرار"
+
+#. Translators: This is the status for a video which has duplicate token for
+#. youtube
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "YouTube Duplicate"
+msgstr ""
 
 #. Translators: This is the status for a video for which an invalid
 #. processing token was provided in the course settings
@@ -10788,7 +10833,6 @@ msgstr "رقم المساق: "
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/courseware/courses.html
 #: themes/edx.org/lms/templates/header.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Courses"
 msgstr "المساقات"
@@ -10925,7 +10969,6 @@ msgid "Choose Language"
 msgstr "اختر لغة"
 
 #: cms/templates/widgets/header.html lms/templates/user_dropdown.html
-#: themes/example/lms/templates/header.html
 msgid "Account"
 msgstr "الحساب"
 
@@ -10987,7 +11030,6 @@ msgstr "أرسل رسالةً إلكترونية إلى {email}"
 
 #: cms/templates/widgets/sock.html
 #: themes/edx.org/cms/templates/widgets/sock.html
-#: themes/example/lms/templates/static_templates/contact.html
 #: themes/stanford-style/lms/templates/static_templates/about.html
 msgid "Contact Us"
 msgstr "اتصل بنا"
@@ -11001,10 +11043,13 @@ msgid "Usermenu dropdown"
 msgstr "قائمة المستخدم"
 
 #: cms/templates/widgets/user_dropdown.html lms/templates/user_dropdown.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign Out"
 msgstr "تسجيل الخروج"
+
+#: common/lib/capa/capa/templates/codeinput.html
+msgid "Code Editor"
+msgstr ""
 
 #: common/templates/license.html
 msgid "All Rights Reserved"
@@ -11034,6 +11079,38 @@ msgstr "محتوى مُجاز مشترك ومبتكر، شروطه كالتال�
 msgid "Some Rights Reserved"
 msgstr "بعض الحقوق محفوظة"
 
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Feedback Form"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Email: {email}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Full Name: {realname}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Inquiry Type: {inquiry_type}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Message: {message}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Tags: {tags}"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_body.txt
+msgid "Additional Info:"
+msgstr ""
+
+#: common/templates/emails/contact_us_feedback_email_subject.txt
+msgid "Feedback from user"
+msgstr ""
+
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion - {course_number}"
@@ -11048,7 +11125,6 @@ msgid "Add a Post"
 msgstr "أضف منشوراً"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_board.html
-#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
 msgid "Discussion thread list"
 msgstr "قائمة مواضيع المناقشة "
 
@@ -11057,8 +11133,28 @@ msgid "New topic form"
 msgstr "استمارة موضوع جديد"
 
 #: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
-msgid "User Profile"
-msgstr "الملف الشخصي للمستخدم "
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s discussion started"
+msgid_plural "%s discussions started"
+msgstr[0] "بدأ %s نقاش"
+msgstr[1] "بدأ %s نقاش"
+msgstr[2] "بدأ %s نقاش"
+msgstr[3] "بدأ %s نقاش"
+msgstr[4] "بدأ %s نقاش"
+msgstr[5] "%s نقاشات بدأت "
+
+#: lms/djangoapps/discussion/templates/discussion/discussion_profile_page.html
+#: lms/templates/discussion/_user_profile.html
+#, python-format
+msgid "%s comment"
+msgid_plural "%s comments"
+msgstr[0] "%s تعليق"
+msgstr[1] "%s تعليق"
+msgstr[2] "%s تعليق"
+msgstr[3] "%s تعليقات"
+msgstr[4] "%s تعليقات"
+msgstr[5] "%s تعليقات "
 
 #: lms/djangoapps/discussion/templates/discussion/maintenance.html
 msgid "Discussion unavailable"
@@ -11099,13 +11195,21 @@ msgstr "جرى وضع علامة"
 msgid "Bookmark this page"
 msgstr "إضافة الصفحة للمفضلة"
 
-#: lms/templates/course.html themes/example/lms/templates/course.html
+#: lms/templates/conditional_module.html
+msgid "You do not have access to this dependency module."
+msgstr ""
+
+#: lms/templates/course.html
 msgid "LEARN MORE"
 msgstr "اعرف المزيد"
 
-#: lms/templates/course.html themes/example/lms/templates/course.html
+#: lms/templates/course.html
 msgid "Starts"
 msgstr "البداية"
+
+#: lms/templates/course.html
+msgid "Starts: {date}"
+msgstr ""
 
 #: lms/templates/courses_list.html
 msgid "View all Courses"
@@ -11113,7 +11217,6 @@ msgstr "عرض جميع المساقات"
 
 #: lms/templates/dashboard.html lms/templates/user_dropdown.html
 #: themes/edx.org/lms/templates/dashboard.html
-#: themes/example/lms/templates/header.html
 msgid "Dashboard"
 msgstr "لوحة المعلومات"
 
@@ -11210,7 +11313,6 @@ msgstr "عليك التسجيل في المنصة قبل أن تستطيع مش�
 #: lms/templates/enroll_staff.html lms/templates/ccx/enrollment.html
 #: lms/templates/courseware/course_about.html
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "Enroll"
 msgstr "تسجيل"
 
@@ -11378,15 +11480,10 @@ msgstr "شكرًا لك!"
 #: lms/templates/help_modal.html
 msgid ""
 "Thank you for your inquiry or feedback.  We typically respond to a request "
-"within one business day (Monday to Friday, {open_time} UTC to {close_time} "
-"UTC.) In the meantime, please review our {link_start}detailed FAQs{link_end}"
-" where most questions have already been answered."
+"within one business day, Monday to Friday.  In the meantime, please review "
+"our {link_start}detailed FAQs{link_end} where most questions have already "
+"been answered."
 msgstr ""
-"نشكرك على تقديم تساؤلك أو آرائك وملاحظاتك. نردّ عادةً على أي طلب في غضون يوم"
-" عمل واحد (الاثنين إلى الجمعة، {open_time} بحسب التوقيت العالمي UTC حتى "
-"{close_time} بحسب التوقيت العالمي UTC). وفي هذه الأثناء، يُرجى مراجعة قسمنا "
-"بشأن {link_start}الأسئلة الشائعة المفصّلة{link_end} حيث ستجد إجابات لغالبية "
-"الأسئلة المطروحة."
 
 #: lms/templates/help_modal.html
 msgid "problem"
@@ -11736,8 +11833,7 @@ msgstr ""
 msgid "Raw data:"
 msgstr "البيانات الأوّلية:"
 
-#: lms/templates/navigation.html themes/example/lms/templates/header.html
-#: themes/red-theme/lms/templates/header.html
+#: lms/templates/navigation.html themes/red-theme/lms/templates/header.html
 msgid "Global"
 msgstr "عالمي"
 
@@ -11777,7 +11873,6 @@ msgid "Register"
 msgstr "تسجيل"
 
 #: lms/templates/navigation.html themes/edx.org/lms/templates/header.html
-#: themes/example/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html
 msgid "Sign in"
 msgstr "تسجيل الدخول"
@@ -12449,13 +12544,9 @@ msgstr ""
 msgid "Dashboard for:"
 msgstr "لوحة المعلومات لـ:"
 
-#: lms/templates/user_dropdown.html themes/example/lms/templates/header.html
+#: lms/templates/user_dropdown.html
 msgid "Profile"
 msgstr "الملف الشخصي"
-
-#: lms/templates/user_dropdown.html
-msgid "Profile image for {username}"
-msgstr "صورة الملف الشخصي للمستخدم {username}"
 
 #: lms/templates/user_dropdown.html themes/red-theme/lms/templates/header.html
 msgid "More options dropdown"
@@ -14019,16 +14110,18 @@ msgid "due {date}"
 msgstr "تاريخ الاستحقاق {date}"
 
 #: lms/templates/courseware/accordion.html
+msgid "{section_format} due {{date}}"
+msgstr ""
+
+#: lms/templates/courseware/accordion.html
 msgid "This content is graded"
 msgstr "جرى تقييم هذا المحتوى"
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة لاحقًا. "
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid ""
 "The currently logged-in user account does not have permission to enroll in "
 "this course. You may need to {start_logout_tag}log out{end_tag} then try the"
@@ -14108,7 +14201,6 @@ msgid "Additional Resources"
 msgstr "مصادر إضافية"
 
 #: lms/templates/courseware/course_about.html
-#: themes/example/lms/templates/courseware/course_about.html
 msgid "enroll"
 msgstr "تسجيل"
 
@@ -14176,10 +14268,6 @@ msgstr "أنت الآن تستعرض المساق بصفتك {i_start}{user_name
 #: lms/templates/courseware/course_navigation.html
 msgid "Course Material"
 msgstr "مواد المساق"
-
-#: lms/templates/courseware/course_updates.html
-msgid "All course updates"
-msgstr "جميع تحديثات الدورة التدريبية"
 
 #: lms/templates/courseware/course_updates.html
 msgid "Hide"
@@ -14300,6 +14388,10 @@ msgstr "تصفّح النشرات "
 msgid "Important Course Dates"
 msgstr "تواريخ مهمّة بالنسبة للمساق"
 
+#: lms/templates/courseware/info.html
+msgid "Today is {date}"
+msgstr ""
+
 #: lms/templates/courseware/news.html
 msgid "News - MITx 6.002x"
 msgstr "أخبار- MITx 6.002x "
@@ -14346,12 +14438,9 @@ msgstr "{student_name}، لم تعد مؤهلاً للحصول على مواد �
 
 #: lms/templates/courseware/progress.html
 msgid ""
-"{student_name}, you have met the requirements for credit in this course."
-msgstr "{student_name}، لقد حققت متطلبات النجاح هذا المساق"
-
-#: lms/templates/courseware/progress.html
-msgid "{a_start}Go to your dashboard{a_end} to purchase course credit."
-msgstr "{a_start} قم بزيارة لوحة معلوماتك {a_end} لشراء مواد المساق."
+"{student_name}, you have met the requirements for credit in this course. "
+"{a_start}Go to your dashboard{a_end} to purchase course credit."
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "{student_name}, you have not yet met the requirements for credit."
@@ -14378,8 +14467,8 @@ msgid "Verification Declined"
 msgstr "عذرًا، لقد جرى رفض عملية التحقّق"
 
 #: lms/templates/courseware/progress.html
-msgid "Completed by"
-msgstr "أكمله"
+msgid "Completed by {date}"
+msgstr ""
 
 #: lms/templates/courseware/progress.html
 msgid "Upcoming"
@@ -14631,20 +14720,20 @@ msgid "Enrolled as: "
 msgstr "مسجَّل كـ: "
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Ended - {end_date}"
-msgstr "انتهى - {end_date}"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Started - {start_date}"
-msgstr "بدأ - {start_date}"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Coming Soon"
 msgstr "قريبًا"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Starts - {start_date}"
-msgstr "يبدأ - {start_date}"
+msgid "Ended - {date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Started - {date}"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Starts - {date}"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "View Archived Course"
@@ -15059,28 +15148,6 @@ msgstr "حسب أكبر عدد من الأنشطة"
 #: lms/templates/discussion/_thread_list_template.html
 msgid "by most votes"
 msgstr "حسب أكبر عدد من الأصوات"
-
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s discussion started"
-msgid_plural "%s discussions started"
-msgstr[0] "بدأ %s نقاش"
-msgstr[1] "بدأ %s نقاش"
-msgstr[2] "بدأ %s نقاش"
-msgstr[3] "بدأ %s نقاش"
-msgstr[4] "بدأ %s نقاش"
-msgstr[5] "%s نقاشات بدأت "
-
-#: lms/templates/discussion/_user_profile.html
-#, python-format
-msgid "%s comment"
-msgid_plural "%s comments"
-msgstr[0] "%s تعليق"
-msgstr[1] "%s تعليق"
-msgstr[2] "%s تعليق"
-msgstr[3] "%s تعليقات"
-msgstr[4] "%s تعليقات"
-msgstr[5] "%s تعليقات "
 
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Student Notes"
@@ -16140,6 +16207,10 @@ msgstr "الاسم الظاهر للمساق:"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Course End Date:"
 msgstr "تاريخ انتهاء المساق:"
+
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid "No end date set"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Has the course started?"
@@ -18213,10 +18284,6 @@ msgid "Registration for:"
 msgstr "التسجيل في:"
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Course Dates"
-msgstr "تواريخ المساق"
-
-#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Price per student:"
 msgstr "السعر لكل طالب:"
@@ -18259,10 +18326,6 @@ msgstr "يرجى تأكيد تسجيلك في: {span_start}تواريخ المس
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid "{course_name}"
 msgstr "{course_name}"
-
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{start_date} - {end_date}"
-msgstr "{start_date} - {end_date}"
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -18337,10 +18400,6 @@ msgstr[5] "{course_names} قد حُذفت لأن فترة التسجيل قد أ
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Cover Image"
 msgstr "صورة الغلاف"
-
-#: lms/templates/shoppingcart/shopping_cart.html
-msgid "Course Dates:"
-msgstr "تواريخ المساق:"
 
 #: lms/templates/shoppingcart/shopping_cart.html
 msgid "Students:"
@@ -18468,10 +18527,6 @@ msgstr "الأسئلة الشائعة"
 #: themes/red-theme/lms/templates/footer.html
 msgid "Jobs"
 msgstr "الوظائف"
-
-#: lms/templates/static_templates/media-kit.html
-msgid "Media Kit"
-msgstr "الأدوات الخاصة بالوسائط المتعدّدة"
 
 #: lms/templates/static_templates/news.html
 #: lms/templates/static_templates/press.html
@@ -18660,6 +18715,18 @@ msgstr ""
 "إذا كان لديك أي أسئلة حول هذه الدورة أو الاستمارة، يمكنك الاتصال على "
 "{link_start}{mail_to_link}{link_end}."
 
+#: lms/templates/verify_student/_verification_help.html
+msgid "Have questions?"
+msgstr "هل لديك أسئلة؟ "
+
+#: lms/templates/verify_student/_verification_help.html
+msgid ""
+"Please read {a_start}our FAQs to view common questions about our "
+"certificates{a_end}."
+msgstr ""
+"الرجاء قراءة {a_start}الأسئلة الأكثر تكراراً الخاصة بموقعنا للاطلاع على "
+"الأسئلة الشائعة لما يتعلق بشهاداتنا{a_end}."
+
 #: lms/templates/verify_student/incourse_reverify.html
 msgid "Re-Verify for {course_name}"
 msgstr "يرجى إعادة التحقق للمساق {course_name}"
@@ -18674,10 +18741,9 @@ msgstr "لقد انقضى الموعد النهائي للتحديث"
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
-"The verification deadline for {course_name} was {date}. Verification is no "
-"longer available."
+"The verification deadline for {course_name} was {{date}}. Verification is no"
+" longer available."
 msgstr ""
-"الموعد النهائي للتحقق للمساق {course_name} كان {date}. لم يعد التحقق متاحًا."
 
 #: lms/templates/verify_student/missed_deadline.html
 msgid ""
@@ -18700,18 +18766,6 @@ msgstr "إجراء عملية التحقّق الخاصة بالمساق {course
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Enroll In {course_name}"
 msgstr "التسجيل في {course_name}"
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid "Have questions?"
-msgstr "هل لديك أسئلة؟ "
-
-#: lms/templates/verify_student/pay_and_verify.html
-msgid ""
-"Please read {a_start}our FAQs to view common questions about our "
-"certificates{a_end}."
-msgstr ""
-"الرجاء قراءة {a_start}الأسئلة الأكثر تكراراً الخاصة بموقعنا للاطلاع على "
-"الأسئلة الشائعة لما يتعلق بشهاداتنا{a_end}."
 
 #: lms/templates/verify_student/pay_and_verify.html
 msgid "Technical Requirements"
@@ -18826,85 +18880,6 @@ msgid ""
 msgstr ""
 "{b_start} ادعم مهمتنا: {b_end} EdX مشروع غير ربحي، يعتمد على مجموعة من "
 "الشهادات الموثّقة بهدف دعم تمويل التعليم المجاني للجميع، حول العالم."
-
-#: themes/example/lms/templates/header.html
-msgid "Create Account"
-msgstr "إنشاء حساب "
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Want to purchase this course for a group?"
-msgstr "هل ترغب في شراء هذه الدورة التعليمية لمجموعة أفراد؟"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid ""
-"You can purchase enrollment codes for this course to distribute to your team"
-msgstr "يمكنك شراء رموز التسجيل لهذه الدورة وتوزيعها على فريقك"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Purchase for a Group"
-msgstr "الشراء لمجموعة أفراد"
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid ""
-"Bulk discounts may apply for groups larger than 10. Contact "
-"{link_start}harvardxplus@harvard.edu{link_end} for more information."
-msgstr ""
-"قد يتم منح خصومات كبيرة على المجموعات التي تحوي أكثر من 10 أفراد. اتصل بـ  "
-"{link_start}harvardxplus@harvard.edu{link_end} للمزيد من المعلومات."
-
-#: themes/example/lms/templates/courseware/course_about.html
-msgid "Email Us"
-msgstr "راسلنا عبر البريد الإلكتروني"
-
-#: themes/example/lms/templates/courseware/courses.html
-msgid "Lorem ipsum dolor sit amet."
-msgstr "Lorem ipsum dolor sit amet."
-
-#: themes/example/lms/templates/static_templates/about.html
-msgid "About Us"
-msgstr "عن الموقع"
-
-#: themes/example/lms/templates/static_templates/contact.html
-msgid "Thank you for your inquiry"
-msgstr "شكراً على استفسارك"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "FAQ's"
-msgstr "الأسئلة الشائعة"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "General FAQs"
-msgstr "الأسئلة الشائعة العامة"
-
-#: themes/example/lms/templates/static_templates/faq.html
-#: themes/example/lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/tos.html
-msgid "Lorem ipsum dolor sit amet"
-msgstr "Lorem ipsum dolor sit amet"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Academic Planning"
-msgstr "التخطيط الدراسي"
-
-#: themes/example/lms/templates/static_templates/faq.html
-#: themes/example/lms/templates/static_templates/honor.html
-#: themes/example/lms/templates/static_templates/privacy.html
-#: themes/example/lms/templates/static_templates/tos.html
-msgid "Back to top"
-msgstr "عودة إلى الأعلى"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Registration"
-msgstr "تسجيل"
-
-#: themes/example/lms/templates/static_templates/faq.html
-msgid "Finances"
-msgstr "الموارد المالية"
-
-#: themes/example/lms/templates/student_account/login_and_register.html
-msgid "Sign in or Create Account"
-msgstr "تسجيل الدخول أو إنشاء حساب"
 
 #. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
 #. Please do not translate any of these trademarks and company names.
@@ -19243,15 +19218,10 @@ msgstr "إصدار شهادات للمتعلمين  "
 
 #: cms/templates/certificates.html
 msgid ""
-"After you have configured and previewed your certificate, ask your edX "
-"partner manager to activate your certificate. When your certificate has been"
-" activated, you can begin issuing certificates to learners. Course team "
-"members without the Admin role cannot edit or delete an activated "
-"certificate."
+"To begin issuing course certificates, a course team member with either the "
+"Staff or Admin role selects {em_start}Activate{em_end}. Only course team "
+"members with these roles can edit or delete an activated certificate."
 msgstr ""
-"بعد أن كونت وعاينت شهادتك، اطلب من مدير edX الشريك أن يفعل شهادتك. عندما يتم"
-" تفعيل الشهادة يمكنك أن تبدأ بإصدار شهادات للطلاب. لا يمكن لأعضاء الفريق "
-"الذين ليس لديهم دور مشرف تحرير أو حذف شهادة التي تفعيلها."
 
 #: cms/templates/certificates.html
 msgid ""
@@ -21723,6 +21693,10 @@ msgid "Course Overview"
 msgstr "نظرة عامة عن المساق"
 
 #: cms/templates/settings.html
+msgid "HTML Code Editor"
+msgstr ""
+
+#: cms/templates/settings.html
 msgid ""
 "Introductions, prerequisites, FAQs that are used on {a_link_start}your "
 "course summary page{a_link_end} (formatted in HTML)"
@@ -22196,13 +22170,10 @@ msgstr "ما الهدف من تحميل الفيديو هنا؟"
 #: cms/templates/videos_index.html
 msgid ""
 "For a video to play on different devices, it needs to be available in "
-"multiple formats. After you upload an original video file in .mp4 or .mov "
+"multiple formats. After you upload an original video file in {file_formats} "
 "format on this page, an automated process creates those additional formats "
 "and stores them for you."
 msgstr ""
-"لإتاحة تشغيل الفيديو على أجهزة مختلفة، يجب أن يكون متوفّرًا بصيغ متعدّدة. "
-"وبعد أن تحمّل ملفًّا أصليًّا للفيديو بصيغة .mp4 أو .mov على هذه الصفحة، تبدأ"
-" عملية أوتوماتيكية بإنشاء هذه الصيغ الإضافية وتخزّنها لك. "
 
 #: cms/templates/videos_index.html
 msgid "Maximum Video File Size"
@@ -22210,11 +22181,9 @@ msgstr "الحجم الأقصى لملف الفيديو"
 
 #: cms/templates/videos_index.html
 msgid ""
-"The maximum size for each video file that you upload is 5 GB. The upload "
-"process fails for larger files."
+"The maximum size for each video file that you upload is {em_start}5 "
+"GB{em_end}. The upload process fails for larger files."
 msgstr ""
-"إن الحجم الأقصى المسموح به لكل ملف فيديو ترغب بتحميله هو 5 غيغا بايت حيث "
-"ستفشل عملية التحميل للملفات الأكبر حجمًا. "
 
 #: cms/templates/videos_index.html
 msgid "Monitoring files as they upload"
@@ -22262,22 +22231,14 @@ msgstr "كيف أجلب الفيديوهات إلى مساقي؟"
 
 #: cms/templates/videos_index.html
 msgid ""
-"When status for a file is {em_start}Ready{em_end}, you can add that video to"
-" a component in your course. Copy the unique video ID. In another browser "
-"window, on the Course Outline page, create or locate a video component to "
-"play this video. Edit the video component to paste the ID into the Advanced "
-"{em_start}Video ID{em_end} field. The video can play in the LMS as soon as "
-"its status is {em_start}Ready{em_end}, although processing may not be "
-"complete for all encodings and all video hosting sites."
+"When the status for a file is {em_start}Ready{em_end}, you can add that "
+"video to a component in your course. Copy the unique video ID. In another "
+"browser window, on the Course Outline page, create or locate a video "
+"component to play this video. Edit the video component to paste the ID into "
+"the Advanced {em_start}Video ID{em_end} field. The video can play in the LMS"
+" as soon as its status is {em_start}Ready{em_end}, although processing may "
+"not be complete for all encodings and all video hosting sites."
 msgstr ""
-"يمكنك، وبمجرّد أن تصبح حالة الملفّ {em_start}جاهز{em_end}، إضافة مقطع "
-"الفيديو إلى أحد المكوِّنات في مساقك. كما يُرجى نسخ الرقم التعريفي الفريد "
-"للفيديو. وفي نافذة متصفِّح أخرى، في صفحة مخطَّط المساق، إنشاء أو تحديد "
-"مكوِّن الفيديو لتشغيل هذا الفيديو. عدّل هذا المكوِّن للصق الرقم التعريفي في "
-"حقل {em_start}الرقم التعريفي للفيديو{em_end} المتقدِّم. وقد يجري تشغيل "
-"الفيديو في نظام إدارة التعلّم LMS حالما تصبح حالته {em_start}جاهز{em_end}، "
-"وذلك بالرغم من أنّ المعالجة قد لا تُستَكمَل لجميع عمليات الترميز ولجميع "
-"مواقع استضافة الفيديو."
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"

@@ -37,6 +37,8 @@ lookup_tag = inputtypes.registry.get_class_for_tag
 
 
 DESCRIBEDBY = HTML('aria-describedby="status_{status_id} desc-1 desc-2"')
+# Use TRAILING_TEXT_DESCRIBEDBY when trailing_text is not null
+TRAILING_TEXT_DESCRIBEDBY = HTML('aria-describedby="trailing_text_{trailing_text_id} status_{status_id} desc-1 desc-2"')
 DESCRIPTIONS = OrderedDict([('desc-1', 'description text 1'), ('desc-2', 'description text 2')])
 RESPONSE_DATA = {
     'label': 'question text 101',
@@ -162,49 +164,87 @@ class ChoiceGroupTest(unittest.TestCase):
         self.check_group('checkboxgroup', 'checkbox', '[]')
 
 
-class JavascriptInputTest(unittest.TestCase):
-    '''
-    The javascript input is a pretty straightforward pass-thru, but test it anyway
-    '''
+class JSInputTest(unittest.TestCase):
+    """
+    Test context variables passed into the jsinput template.
+    """
 
-    def test_rendering(self):
-        params = "(1,2,3)"
+    def test_rendering_default_values(self):
+        """
+        Tests the default values passed through to render.
+        """
+        xml_str = '<jsinput id="prob_1_2"/>'
+        expected = {
+            'html_file': None,
+            'gradefn': "gradefn",
+            'get_statefn': None,
+            'set_statefn': None,
+            'initial_state': None,
+            'width': "400",
+            'height': "300",
+            'title': "Problem Remote Content",
+            'sop': None
+        }
 
-        problem_state = "abc12',12&hi<there>"
-        display_class = "a_class"
-        display_file = "my_files/hi.js"
+        self._render_context_test(xml_str, expected)
 
-        xml_str = """<javascriptinput id="prob_1_2" params="{params}" problem_state="{ps}"
-                                    display_class="{dc}" display_file="{df}"/>""".format(
-            params=params,
-            ps=quote_attr(problem_state),
-            dc=display_class, df=display_file)
+    def test_rendering_provided_values(self):
+        """
+        Tests that values provided by course authors are passed through to render.
+        """
+        xml_str = """
+        <jsinput id="prob_1_2"
+            gradefn="WebGLDemo.getGrade" get_statefn="WebGLDemo.getState" set_statefn="WebGLDemo.setState"
+            initial_state='{"selectedObjects":{"cube":true,"cylinder":false}}'
+            width="1000" height="1200"
+            html_file="https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html"
+            sop="false" title="Awesome and fun!"
+        />
+        """
 
+        expected = {
+            'html_file': "https://studio.edx.org/c4x/edX/DemoX/asset/webGLDemo.html",
+            'gradefn': "WebGLDemo.getGrade",
+            'get_statefn': "WebGLDemo.getState",
+            'set_statefn': "WebGLDemo.setState",
+            'initial_state': '{"selectedObjects":{"cube":true,"cylinder":false}}',
+            'width': "1000",
+            'height': "1200",
+            'title': "Awesome and fun!",
+            'sop': 'false'
+        }
+
+        self._render_context_test(xml_str, expected)
+
+    def _render_context_test(self, xml_str, expected_context):
+        """
+        Helper method for testing context based on the provided XML string.
+        """
         element = etree.fromstring(xml_str)
-
         state = {
-            'value': '3',
+            'value': 103,
             'response_data': RESPONSE_DATA
         }
-        the_input = lookup_tag('javascriptinput')(test_capa_system(), element, state)
+        the_input = lookup_tag('jsinput')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=protected-access
-        prob_id = 'prob_1_2'
-        expected = {
-            'STATIC_URL': '/dummy-static/',
-            'id': prob_id,
-            'status': inputtypes.Status('unanswered'),
-            'msg': '',
-            'value': '3',
-            'params': params,
-            'display_file': display_file,
-            'display_class': display_class,
-            'problem_state': problem_state,
-            'response_data': RESPONSE_DATA,
-            'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
-        }
 
-        self.assertEqual(context, expected)
+        full_expected_context = {
+            'STATIC_URL': '/dummy-static/',
+            'id': 'prob_1_2',
+            'status': inputtypes.Status('unanswered'),
+            'describedby_html': DESCRIBEDBY.format(status_id='prob_1_2'),
+            'msg': "",
+            'params': None,
+            'jschannel_loader': '/dummy-static/js/capa/src/jschannel.js',
+            'jsinput_loader': '/dummy-static/js/capa/src/jsinput.js',
+            'saved_state': 103,
+            'response_data': RESPONSE_DATA,
+            'value': 103
+        }
+        full_expected_context.update(expected_context)
+
+        self.assertEqual(full_expected_context, context)
 
 
 class TextLineTest(unittest.TestCase):
@@ -323,7 +363,7 @@ class TextLineTest(unittest.TestCase):
                 'trailing_text': expected_text,
                 'preprocessor': None,
                 'response_data': RESPONSE_DATA,
-                'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
+                'describedby_html': TRAILING_TEXT_DESCRIBEDBY.format(trailing_text_id=prob_id, status_id=prob_id)
             }
             self.assertEqual(context, expected)
 
@@ -1257,7 +1297,7 @@ class FormulaEquationTest(unittest.TestCase):
                 'inline': False,
                 'trailing_text': expected_text,
                 'response_data': RESPONSE_DATA,
-                'describedby_html': DESCRIBEDBY.format(status_id=prob_id)
+                'describedby_html': TRAILING_TEXT_DESCRIBEDBY.format(trailing_text_id=prob_id, status_id=prob_id)
             }
 
             self.assertEqual(context, expected)

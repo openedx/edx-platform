@@ -32,6 +32,8 @@ var edx = edx || {};
                 currencySymbol: '$',
                 upgrade: false,
                 verificationDeadline: '',
+                userTimezone: 'UTC',
+                userLanguage: 'en-US',
                 courseName: '',
                 requirements: {},
                 hasVisibleReqs: false,

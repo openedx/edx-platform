@@ -5,6 +5,7 @@ Tests for minimum grade requirement status
 import ddt
 import pytz
 from datetime import timedelta, datetime
+from mock import MagicMock
 from unittest import skipUnless
 
 from django.conf import settings
@@ -73,7 +74,9 @@ class TestMinGradedRequirementStatus(ModuleStoreTestCase):
 
     def assert_requirement_status(self, grade, due_date, expected_status):
         """ Verify the user's credit requirement status is as expected after simulating a grading calculation. """
-        listen_for_grade_calculation(None, self.user, {'percent': grade}, self.course.id, due_date)
+        course_grade = MagicMock()
+        course_grade.percent = grade
+        listen_for_grade_calculation(None, self.user, course_grade, self.course.id, due_date)
         req_status = get_credit_requirement_status(self.course.id, self.request.user.username, 'grade', 'grade')
 
         self.assertEqual(req_status[0]['status'], expected_status)

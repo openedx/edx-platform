@@ -7,7 +7,6 @@
 <a href=<%= certificate_web_view_url %> class="button preview-certificate-link" target="_blank">
     <%= gettext("Preview Certificate") %>
 </a>
-<% if (CMS.User.isGlobalStaff) { %>
 <button class="button activate-cert">
     <span>
     <% if(!is_active) { %>
@@ -16,4 +15,3 @@
         <%= gettext("Deactivate") %></span>
     <% } %>
 </button>
-<% } %>

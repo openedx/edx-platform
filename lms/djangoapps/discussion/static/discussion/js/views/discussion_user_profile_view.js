@@ -1,3 +1,4 @@
+/* globals DiscussionThreadView */
 (function(define) {
     'use strict';
 
@@ -13,77 +14,70 @@
         'common/js/discussion/utils',
         'common/js/discussion/views/discussion_thread_profile_view',
         'text!discussion/templates/user-profile.underscore',
-        'text!common/templates/discussion/pagination.underscore'
+        'common/js/discussion/views/discussion_thread_list_view'
     ],
         function(_, $, Backbone, gettext, URI, HtmlUtils, ViewUtils, Discussion, DiscussionUtil,
-                 DiscussionThreadProfileView, userProfileTemplate, paginationTemplate) {
+                 DiscussionThreadProfileView, userProfileTemplate, DiscussionThreadListView) {
             var DiscussionUserProfileView = Backbone.View.extend({
                 events: {
-                    'click .discussion-paginator a': 'changePage'
+                    'click .all-posts-btn': 'navigateToAllThreads'
                 },
 
                 initialize: function(options) {
-                    Backbone.View.prototype.initialize.call(this);
-                    this.page = options.page;
-                    this.numPages = options.numPages;
-                    this.discussion = new Discussion();
-                    this.discussion.on('reset', _.bind(this.render, this));
-                    this.discussion.reset(this.collection, {silent: false});
+                    this.courseSettings = options.courseSettings;
+                    this.discussion = options.discussion;
+                    this.mode = 'all';
+                    this.listenTo(this.model, 'change', this.render);
                 },
 
                 render: function() {
-                    var self = this,
-                        baseUri = URI(window.location).removeSearch('page'),
-                        pageUrlFunc,
-                        paginationParams;
-                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(userProfileTemplate)({
-                        threads: self.discussion.models
-                    }));
-                    this.discussion.map(function(thread) {
-                        var view = new DiscussionThreadProfileView({
-                            el: self.$('article#thread_' + thread.id),
-                            model: thread
-                        });
-                        view.render();
-                        return view;
-                    });
-                    pageUrlFunc = function(page) {
-                        return baseUri.clone().addSearch('page', page).toString();
-                    };
-                    paginationParams = DiscussionUtil.getPaginationParams(this.page, this.numPages, pageUrlFunc);
-                    HtmlUtils.setHtml(
-                        this.$el.find('.discussion-pagination'),
-                        HtmlUtils.template(paginationTemplate)(paginationParams)
+                    HtmlUtils.setHtml(this.$el,
+                        HtmlUtils.template(userProfileTemplate)({})
                     );
+
+                    this.discussionThreadListView = new DiscussionThreadListView({
+                        collection: this.discussion,
+                        el: this.$('.inline-threads'),
+                        courseSettings: this.courseSettings,
+                        hideRefineBar: true,  // TODO: re-enable the search/filter bar when it works correctly
+                        // @TODO: On the profile page, thread read state for the viewing user is not accessible via API.
+                        // Fix this when the Discussions API can support this query. Until then, hide read state.
+                        hideReadState: true
+                    }).render();
+
+                    this.discussionThreadListView.on('thread:selected', _.bind(this.navigateToThread, this));
+
                     return this;
                 },
 
-                changePage: function(event) {
-                    var self = this,
-                        url;
-                    event.preventDefault();
-                    url = $(event.target).attr('href');
-                    DiscussionUtil.safeAjax({
-                        $elem: this.$el,
-                        $loading: $(event.target),
-                        takeFocus: true,
-                        url: url,
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function(response) {
-                            self.page = response.page;
-                            self.numPages = response.num_pages;
-                            self.discussion.reset(response.discussion_data, {silent: false});
-                            history.pushState({}, '', url);
-                            ViewUtils.setScrollTop(0);
-                        },
-                        error: function() {
-                            DiscussionUtil.discussionAlert(
-                                gettext('Sorry'),
-                                gettext('We had some trouble loading the page you requested. Please try again.')
-                            );
-                        }
+                navigateToThread: function(threadId) {
+                    var thread = this.discussion.get(threadId);
+                    this.threadView = new DiscussionThreadView({
+                        el: this.$('.forum-content'),
+                        model: thread,
+                        mode: 'inline',
+                        course_settings: this.courseSettings
                     });
+                    this.threadView.render();
+                    this.listenTo(this.threadView.showView, 'thread:_delete', this.navigateToAllThreads);
+                    this.discussionThreadListView.$el.addClass('is-hidden');
+                    this.$('.inline-thread').removeClass('is-hidden');
+                },
+
+                navigateToAllThreads: function() {
+                    // Hide the inline thread section
+                    this.$('.inline-thread').addClass('is-hidden');
+
+                    // Delete the thread view
+                    this.threadView.$el.empty().off();
+                    this.threadView.stopListening();
+                    this.threadView = null;
+
+                    // Show the thread list view
+                    this.discussionThreadListView.$el.removeClass('is-hidden');
+
+                    // Set focus to thread list item that was saved as active
+                    this.discussionThreadListView.$('.is-active').focus();
                 }
             });
 

@@ -10,168 +10,177 @@
 // CASE: new post
 .forum-new-post-form {
   .wmd-input {
-    @include discussion-wmd-input;
     box-sizing: border-box;
     position: relative;
     z-index: 1;
-    width: 100%;
-    height: 150px;
-    background: $forum-color-background;
-  }
-
-  .wmd-preview-container {
-    @include discussion-new-post-wmd-preview-container;
-  }
-
-  .wmd-preview-label {
-    @include discussion-wmd-preview-label;
-  }
-
-  .wmd-preview {
-    @include discussion-wmd-preview;
-  }
-
-  .wmd-button {
-    background: none;
   }
 }
 
 // =========================
 
-// CASE: inline styling
-// TO-DO: additional styling cleanup here necessary, for now this case was ported over from _discussion.scss
-.discussion-module {
+// WMD styling
 
-  .wmd-panel {
-    width: 100%;
-    min-width: 500px;
-  }
+.wmd-preview-container {
+  @include discussion-new-post-wmd-preview-container;
+}
 
-  .wmd-button-bar  {
-    width: 100%;
-  }
+.wmd-preview-label {
+  @include discussion-wmd-preview-label;
+}
 
-  .wmd-input {
-    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
-    width: 100%;
-    height: 150px;
-    font-style: normal;
+.wmd-preview {
+  @include discussion-wmd-preview;
+}
+
+.wmd-button {
+  background: none;
+}
+
+.wmd-button-bar  {
+  width: 100%;
+}
+
+.wmd-button-row {
+  @include transition(all .2s ease-out 0s);
+  position: relative;
+  overflow: hidden;
+  margin: ($baseline/2) ($baseline/4) ($baseline/4) ($baseline/4);
+  padding: 0;
+  height: 30px;
+}
+
+.wmd-spacer {
+  @include margin-left(14px);
+  position: absolute;
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  background-color: Silver;
+  list-style: none;
+}
+
+.wmd-button {
+  position: absolute;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  list-style: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.wmd-button:hover {
+  background: none;
+  box-shadow: none;
+}
+
+.wmd-button > span {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-image: url('#{$static-path}/images/wmd-buttons-transparent.png');
+  background-position: 0 0;
+  background-repeat: no-repeat;
+}
+
+.wmd-spacer1 {
+  // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+  left: 50px;
+}
+
+.wmd-spacer2 {
+  // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+  left: 175px;
+}
+
+.wmd-spacer3 {
+  // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
+  left: 300px;
+}
+
+.wmd-input {
+  @include discussion-wmd-input;
+  box-sizing: border-box;
+  width: 100%;
+  background: $forum-color-background;
+}
+
+.wmd-prompt-background {
+  background-color: $black;
+}
+
+.wmd-prompt-dialog {
+  @extend .modal;
+  background: $forum-color-background;
+  padding: $baseline;
+
+  > div {
     font-size: $forum-base-font-size;
-    font-family: Monaco, 'Lucida Console', monospace;
-    line-height: 1.6em;
+    font-family: arial, helvetica, sans-serif;
+  }
 
-    &::-webkit-input-placeholder {
-      color: #888;
+  b {
+    font-size: $forum-large-font-size;
+  }
+
+  > form > input[type="text"] {
+    border-radius: $forum-border-radius;
+    color: #333;
+  }
+
+  > form > input[type="button"] {
+    border: 1px solid #888;
+    font-family: $sans-serif;
+    font-size: $forum-x-large-font-size;
+  }
+
+  > form > input[type="file"] {
+    margin-bottom: 18px;
+  }
+
+  .field-group .field .field-hint {
+    @include margin-left(0);
+    width: 100%;
+  }
+
+  .field-input-label {
+    font-size: $forum-base-font-size;
+  }
+
+  .input-text {
+    width: calc(100% - 175px); // minus choose file button width
+    height: 40px; // align with choose file button
+
+    &.has-error {
+      border-color: $forum-color-error;
     }
   }
 
-  .wmd-button-row {
-    @include transition(all .2s ease-out 0s);
-    position: relative;
-    overflow: hidden;
-    margin: ($baseline/2) ($baseline/4) ($baseline/4) ($baseline/4);
-    padding: 0;
-    height: 30px;
+  .field-message.has-error {
+    width: calc(100% - 175px); // align with input-text
+    background-color: $forum-color-error;
+    color: $white;
+    padding: $baseline / 2;
+    box-sizing: border-box;
   }
 
-  .wmd-spacer {
-    @include margin-left(14px);
-    position: absolute;
-    display: inline-block;
-    width: 1px;
-    height: 20px;
-    background-color: Silver;
-    list-style: none;
-  }
-
-  .wmd-button {
-    position: absolute;
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: none;
-    background: none;
-    list-style: none;
+  .field-label {
     cursor: pointer;
-    padding: 0;
   }
 
-  .wmd-button:hover {
-    background: none;
-    box-shadow: none;
+  .input-checkbox {
+    @include margin-right($baseline / 5);
   }
 
-  .wmd-button > span {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    background-image: url('#{$static-path}/images/wmd-buttons-transparent.png');
-    background-position: 0 0;
-    background-repeat: no-repeat;
+  #new-url-input {
+    direction: ltr; // http url is always English
   }
+}
 
-  .wmd-spacer1 {
-    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
-    left: 50px;
-  }
-
-  .wmd-spacer2 {
-    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
-    left: 175px;
-  }
-
-  .wmd-spacer3 {
-    // Note: the WMD toolbar does not support RTL so this is hard-coded to the left
-    left: 300px;
-  }
-
-  .wmd-prompt-background {
-    background-color: Black;
-  }
-
-  .wmd-prompt-dialog {
-    @extend .modal;
-    background: $forum-color-background;
-  }
-
-  .wmd-prompt-dialog {
-    padding: $baseline;
-
-    > div {
-      font-size: $forum-base-font-size;
-      font-family: arial, helvetica, sans-serif;
-    }
-
-    b {
-      font-size: $forum-large-font-size;
-    }
-
-    > form > input[type="text"] {
-      border-radius: $forum-border-radius;
-      color: #333;
-    }
-
-    > form > input[type="button"] {
-      border: 1px solid #888;
-      font-family: $sans-serif;
-      font-size: $forum-x-large-font-size;
-    }
-
-    > form > input[type="file"] {
-      margin-bottom: 18px;
-    }
-  }
-
-  .wmd-button-row {
-    // this is being hidden now because the inline styles to position the icons are not being written
-    position: relative;
-    height: 25px;
-  }
-
-  .wmd-button {
-    span {
-      background-image: url("#{$static-path}/images/wmd-buttons.png");
-      display: inline-block;
-    }
-  }
+.wmd-button-row {
+  // this is being hidden now because the inline styles to position the icons are not being written
+  position: relative;
+  height: 25px;
 }

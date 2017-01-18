@@ -33,7 +33,8 @@ class LoginEnrollmentTestCase(TestCase):
             self.email,
             self.password,
         )
-        self.activate_user(self.email)
+        # activate_user re-fetches and returns the activated user record
+        self.user = self.activate_user(self.email)
         self.login(self.email, self.password)
 
     def assert_request_status_code(self, status_code, url, method="GET", **kwargs):
@@ -100,7 +101,10 @@ class LoginEnrollmentTestCase(TestCase):
         url = reverse('activate', kwargs={'key': activation_key})
         self.assert_request_status_code(200, url)
         # Now make sure that the user is now actually activated
-        self.assertTrue(User.objects.get(email=email).is_active)
+        user = User.objects.get(email=email)
+        self.assertTrue(user.is_active)
+        # And return the user we fetched.
+        return user
 
     def enroll(self, course, verify=False):
         """

@@ -76,6 +76,17 @@ PIPELINE_JS_COMPRESSOR = None
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
 
+BLOCK_STRUCTURES_SETTINGS = dict(
+    # We have CELERY_ALWAYS_EAGER set to True, so there's no asynchronous
+    # code running and the celery routing is unimportant.
+    # It does not make sense to retry.
+    BLOCK_STRUCTURES_TASK_MAX_RETRIES=0,
+    # course publish task delay is irrelevant is because the task is run synchronously
+    BLOCK_STRUCTURES_COURSE_PUBLISH_TASK_DELAY=0,
+    # retry delay is irrelevent because we never retry
+    BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY=0,
+)
+
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
@@ -168,6 +179,9 @@ FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Enable dashboard search for tests
 FEATURES['ENABLE_DASHBOARD_SEARCH'] = True
 
+# discussion home panel, which includes a subscription on/off setting for discussion digest emails.
+FEATURES['ENABLE_DISCUSSION_HOME_PANEL'] = True
+
 # Enable support for OpenBadges accomplishments
 FEATURES['ENABLE_OPENBADGES'] = True
 
@@ -207,6 +221,7 @@ ECOMMERCE_API_URL = 'http://localhost:8043/api/v2/'
 ECOMMERCE_API_SIGNING_KEY = 'ecommerce-key'
 
 LMS_ROOT_URL = "http://localhost:8000"
+DOC_LINK_BASE_URL = 'http://edx.readthedocs.io/projects/edx-guide-for-students'
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

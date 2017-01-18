@@ -1,5 +1,7 @@
 ## mako
 <%!
+  import datetime
+
   from django.utils.translation import ugettext as _
   from branding.api import get_footer
 %>
@@ -35,10 +37,10 @@
               % endfor
           </nav>
           <p class="copyright">${_(
-          u"\u00A9 2016 edX Inc.  All rights reserved except where noted.  "
+          u"\u00A9 2012-{year} edX Inc.  All rights reserved except where noted.  "
           u"EdX, Open edX and the edX and Open EdX logos are registered trademarks "
           u"or trademarks of edX Inc."
-          )}
+          ).format(year=datetime.datetime.now().year)}
           </p>
 
           ## The OpenEdX link may be hidden when this view is served

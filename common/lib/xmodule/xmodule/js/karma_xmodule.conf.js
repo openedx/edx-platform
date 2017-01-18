@@ -31,7 +31,7 @@ var options = {
         {pattern: 'common_static/js/vendor/jquery-ui.min.js', included: true},
         {pattern: 'common_static/js/vendor/jquery.ui.draggable.js', included: true},
         {pattern: 'common_static/js/vendor/json2.js', included: true},
-        {pattern: 'common_static/js/vendor/moment-with-locales.js', included: true},
+        {pattern: 'common_static/common/js/vendor/moment-with-locales.js', included: true},
         {pattern: 'common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js', included: true},
         {pattern: 'common_static/js/vendor/tinymce/js/tinymce/tinymce.full.min.js', included: true},
         {pattern: 'common_static/js/src/accessibility_tools.js', included: true},
@@ -46,7 +46,7 @@ var options = {
         {pattern: 'common_static/js/vendor/jasmine-imagediff.js', included: true},
         {pattern: 'common_static/common/js/spec_helpers/jasmine-waituntil.js', included: true},
         {pattern: 'common_static/common/js/spec_helpers/jasmine-extensions.js', included: true},
-        {pattern: 'common_static/js/vendor/sinon-1.17.0.js', included: true},
+        {pattern: 'common_static/common/js/vendor/sinon.js', included: true},
 
         // Load the edX global namespace before RequireJS is installed
         {pattern: 'common_static/edx-ui-toolkit/js/utils/global-loader.js', included: true},
@@ -54,7 +54,7 @@ var options = {
         {pattern: 'common_static/edx-ui-toolkit/js/utils/html-utils.js', included: true},
 
         // Load RequireJS and move it into the RequireJS namespace
-        {pattern: 'common_static/js/vendor/requirejs/require.js', included: true},
+        {pattern: 'common_static/common/js/vendor/require.js', included: true},
         {pattern: 'RequireJS-namespace-undefine.js', included: true},
         {pattern: 'spec/main_requirejs.js', included: true}
     ],

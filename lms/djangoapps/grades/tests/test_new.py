@@ -111,7 +111,7 @@ class TestCourseGradeFactory(GradeTestBase):
     def test_course_grade_feature_gating(self, feature_flag, course_setting):
         # Grades are only saved if the feature flag and the advanced setting are
         # both set to True.
-        grade_factory = CourseGradeFactory(self.request.user)
+        grade_factory = CourseGradeFactory()
         with persistent_grades_feature_flags(
             global_flag=feature_flag,
             enabled_for_all_courses=False,
@@ -119,32 +119,32 @@ class TestCourseGradeFactory(GradeTestBase):
             enabled_for_course=course_setting
         ):
             with patch('lms.djangoapps.grades.new.course_grade.CourseGrade.load_persisted_grade') as mock_save_grades:
-                grade_factory.create(self.course)
+                grade_factory.create(self.request.user, self.course)
         self.assertEqual(mock_save_grades.called, feature_flag and course_setting)
 
     def test_course_grade_creation(self):
-        grade_factory = CourseGradeFactory(self.request.user)
+        grade_factory = CourseGradeFactory()
         with mock_get_score(1, 2):
-            course_grade = grade_factory.create(self.course)
+            course_grade = grade_factory.create(self.request.user, self.course)
         self.assertEqual(course_grade.letter_grade, u'Pass')
         self.assertEqual(course_grade.percent, 0.5)
 
     def test_zero_course_grade(self):
-        grade_factory = CourseGradeFactory(self.request.user)
+        grade_factory = CourseGradeFactory()
         with mock_get_score(0, 2):
-            course_grade = grade_factory.create(self.course)
+            course_grade = grade_factory.create(self.request.user, self.course)
         self.assertIsNone(course_grade.letter_grade)
         self.assertEqual(course_grade.percent, 0.0)
 
     def test_get_persisted(self):
-        grade_factory = CourseGradeFactory(self.request.user)
+        grade_factory = CourseGradeFactory()
         # first, create a grade in the database
         with mock_get_score(1, 2):
-            grade_factory.create(self.course, read_only=False)
+            grade_factory.create(self.request.user, self.course, read_only=False)
 
         # retrieve the grade, ensuring it is as expected and take just one query
         with self.assertNumQueries(1):
-            course_grade = grade_factory.get_persisted(self.course)
+            course_grade = grade_factory.get_persisted(self.request.user, self.course)
         self.assertEqual(course_grade.letter_grade, u'Pass')
         self.assertEqual(course_grade.percent, 0.5)
 
@@ -168,7 +168,7 @@ class TestCourseGradeFactory(GradeTestBase):
         # ensure the grade can still be retrieved via get_persisted
         # despite its outdated grading policy
         with self.assertNumQueries(1):
-            course_grade = grade_factory.get_persisted(self.course)
+            course_grade = grade_factory.get_persisted(self.request.user, self.course)
         self.assertEqual(course_grade.letter_grade, u'Pass')
         self.assertEqual(course_grade.percent, 0.5)
 
@@ -214,7 +214,7 @@ class TestSubsectionGradeFactory(ProblemSubmissionTestMixin, GradeTestBase):
                 'lms.djangoapps.grades.new.subsection_grade.SubsectionGradeFactory._get_bulk_cached_grade',
                 wraps=self.subsection_grade_factory._get_bulk_cached_grade
             ) as mock_get_bulk_cached_grade:
-                with self.assertNumQueries(12):
+                with self.assertNumQueries(14):
                     grade_a = self.subsection_grade_factory.create(self.sequence)
                 self.assertTrue(mock_get_bulk_cached_grade.called)
                 self.assertTrue(mock_create_grade.called)
@@ -587,7 +587,7 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
         Creates a course grade and asserts that the associated logging
         matches the expected totals passed in to the function.
         """
-        factory.create(self.course, read_only=False)
+        factory.create(self.request.user, self.course, read_only=False)
         log_mock.assert_called_with(
             u"Persistent Grades: CourseGrade.{0}, course: {1}, user: {2}".format(
                 log_statement,
@@ -597,7 +597,7 @@ class TestCourseGradeLogging(ProblemSubmissionTestMixin, SharedModuleStoreTestCa
         )
 
     def test_course_grade_logging(self):
-        grade_factory = CourseGradeFactory(self.request.user)
+        grade_factory = CourseGradeFactory()
         with persistent_grades_feature_flags(
             global_flag=True,
             enabled_for_all_courses=False,

@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 
 from courseware.tabs import get_course_tab_list
-from courseware.tests.factories import UserFactory, StudentModuleFactory
+from courseware.tests.factories import UserFactory, StudentModuleFactory, StaffFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from lms.djangoapps.instructor.views.gradebook_api import calculate_page_info
 
@@ -100,8 +100,29 @@ class TestInstructorDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase, XssT
             return len([tab for tab in tabs if tab.name == 'Instructor']) == 1
 
         self.assertTrue(has_instructor_tab(self.instructor, self.course))
+
+        staff = StaffFactory(course_key=self.course.id)
+        self.assertTrue(has_instructor_tab(staff, self.course))
+
         student = UserFactory.create()
         self.assertFalse(has_instructor_tab(student, self.course))
+
+    def test_student_admin_staff_instructor(self):
+        """
+        Verify that staff users are not able to see course-wide options, while still
+        seeing individual learner options.
+        """
+        # Original (instructor) user can see both specific grades, and course-wide grade adjustment tools
+        response = self.client.get(self.url)
+        self.assertIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
+        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
+
+        # But staff user can only see specific grades
+        staff = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff.username, password="test")
+        response = self.client.get(self.url)
+        self.assertNotIn('<h4 class="hd hd-4">Adjust all enrolled learners', response.content)
+        self.assertIn('<h4 class="hd hd-4">View a specific learner&#39;s grades and progress', response.content)
 
     def test_default_currency_in_the_html_response(self):
         """

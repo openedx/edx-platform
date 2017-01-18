@@ -130,11 +130,19 @@ class RoleBase(AccessRole):
         self.course_key = course_key
         self._role_name = role_name
 
-    def has_user(self, user):
+    # pylint: disable=arguments-differ
+    def has_user(self, user, check_user_activation=True):
         """
-        Return whether the supplied django user has access to this role.
+        Check if the supplied django user has access to this role.
+
+        Arguments:
+            user: user to check against access to role
+            check_user_activation: Indicating whether or not we need to check
+                user activation while checking user roles
+        Return:
+            bool identifying if user has that particular role or not
         """
-        if not (user.is_authenticated() and user.is_active):
+        if check_user_activation and not (user.is_authenticated() and user.is_active):
             return False
 
         # pylint: disable=protected-access

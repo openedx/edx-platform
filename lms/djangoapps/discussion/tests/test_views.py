@@ -1081,9 +1081,7 @@ class InlineDiscussionTestCase(ForumsEnableMixin, ModuleStoreTestCase):
         """Verifies that the response contains the appropriate courseware_url and courseware_title"""
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
-        expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
         expected_courseware_title = 'Chapter / Discussion1'
-        self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
         self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
 
     def test_courseware_data(self, mock_request):
@@ -1155,8 +1153,8 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
         html = response.content
         self.assertRegexpMatches(html, r'data-page="1"')
         self.assertRegexpMatches(html, r'data-num-pages="1"')
-        self.assertRegexpMatches(html, r'<span>1</span> discussion started')
-        self.assertRegexpMatches(html, r'<span>2</span> comments')
+        self.assertRegexpMatches(html, r'<span class="discussion-count">1</span> discussion started')
+        self.assertRegexpMatches(html, r'<span class="discussion-count">2</span> comments')
         self.assertRegexpMatches(html, r'&#39;id&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_ID))
         self.assertRegexpMatches(html, r'&#39;title&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
         self.assertRegexpMatches(html, r'&#39;body&#39;: &#39;{}&#39;'.format(self.TEST_THREAD_TEXT))
@@ -1181,14 +1179,8 @@ class UserProfileTestCase(ForumsEnableMixin, UrlResetMixin, ModuleStoreTestCase)
     def test_html(self, mock_request):
         self.check_html(mock_request)
 
-    def test_html_p2(self, mock_request):
-        self.check_html(mock_request, page="2")
-
     def test_ajax(self, mock_request):
         self.check_ajax(mock_request)
-
-    def test_ajax_p2(self, mock_request):
-        self.check_ajax(mock_request, page="2")
 
     def test_404_non_enrolled_user(self, __):
         """

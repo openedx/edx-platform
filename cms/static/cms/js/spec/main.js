@@ -1,7 +1,24 @@
 /* globals requirejs, requireSerial */
+/* eslint-disable quote-props */
 
 (function(requirejs, requireSerial) {
     'use strict';
+
+    if (window) {
+        define('add-a11y-deps',
+            [
+                'underscore',
+                'underscore.string',
+                'edx-ui-toolkit/js/utils/html-utils',
+                'edx-ui-toolkit/js/utils/string-utils'
+            ], function(_, str, HtmlUtils, StringUtils) {
+                window._ = _;
+                window._.str = str;
+                window.edx = window.edx || {};
+                window.edx.HtmlUtils = HtmlUtils;
+                window.edx.StringUtils = StringUtils;
+            });
+    }
 
     var i, specHelpers, testFiles;
 
@@ -48,8 +65,8 @@
             'xblock': 'common/js/xblock',
             'utility': 'xmodule_js/common_static/js/src/utility',
             'accessibility': 'xmodule_js/common_static/js/src/accessibility_tools',
-            'sinon': 'xmodule_js/common_static/js/vendor/sinon-1.17.0',
-            'squire': 'xmodule_js/common_static/js/vendor/Squire',
+            'sinon': 'common/js/vendor/sinon',
+            'squire': 'common/js/vendor/Squire',
             'jasmine-imagediff': 'xmodule_js/common_static/js/vendor/jasmine-imagediff',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
@@ -167,6 +184,10 @@
                     });
                     return window.MathJax.Hub.Configured();
                 }
+            },
+            'accessibility': {
+                exports: 'accessibility',
+                deps: ['add-a11y-deps']
             },
             'URI': {
                 exports: 'URI'
@@ -289,6 +310,6 @@
     ];
 
     requireSerial(specHelpers.concat(testFiles), function() {
-        return window.__karma__.start();
+        return window.__karma__.start();  // eslint-disable-line no-underscore-dangle
     });
 }).call(this, requirejs, requireSerial);

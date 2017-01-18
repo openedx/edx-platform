@@ -32,7 +32,6 @@
 
             initialize: function(options) {
                 this.courseSettings = options.courseSettings;
-                this.showThreadPreview = true;
                 this.sidebar_padding = 10;
                 this.current_search = '';
                 this.mode = 'all';
@@ -47,7 +46,7 @@
                     collection: this.discussion,
                     el: this.$('.discussion-thread-list-container'),
                     courseSettings: this.courseSettings,
-                    showThreadPreview: this.showThreadPreview
+                    supportsActiveThread: true
                 }).render();
                 this.searchView = new DiscussionSearchView({
                     el: this.$('.forum-search')
@@ -171,7 +170,7 @@
                 HtmlUtils.append(this.$('.forum-content').empty(), HtmlUtils.template(discussionHomeTemplate)({}));
                 this.$('.forum-nav-thread-list a').removeClass('is-active').find('.sr')
                     .remove();
-                this.$('input.email-setting').bind('click', this.updateEmailNotifications);
+                this.$('input.email-setting').bind('click', this.discussionThreadListView.updateEmailNotifications);
                 DiscussionUtil.safeAjax({
                     url: url,
                     type: 'GET',

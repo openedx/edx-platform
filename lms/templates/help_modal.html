@@ -99,15 +99,21 @@ from xmodule.tabs import CourseTabList
           <label data-field="email" for="feedback_form_email">${_('E-mail')}*</label>
           <input name="email" type="text" id="feedback_form_email" required>
     % endif
+
+          <div class="js-course-id-anchor">
+              % if course:
+                  <input name="course_id" type="hidden" value="${unicode(course.id)}">
+              % endif
+          </div>
+
           <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue')}*</label>
           <input name="subject" type="text" id="feedback_form_subject" required>
+
           <label data-field="details" for="feedback_form_details">${_('Tell us the details')}*</label>
           <span class="tip" id="feedback_form_details_tip">${_('Describe what you were doing when you encountered the issue. Include any details that will help us to troubleshoot, including error messages that you saw.')}</span>
           <textarea name="details" id="feedback_form_details" required aria-describedby="feedback_form_details_tip"></textarea>
+
           <input name="issue_type" type="hidden">
-    % if course:
-          <input name="course_id" type="hidden" value="${unicode(course.id)}">
-    % endif
           <div class="submit">
             <input name="submit" type="submit" value="${_('Submit')}" id="feedback_submit">
           </div>
@@ -138,7 +144,12 @@ from xmodule.tabs import CourseTabList
 
 <script type="text/javascript">
 $(document).ready(function() {
-    var $helpModal = $("#help-modal"),
+    var currentCourseId,
+        courseOptions = [],
+        userAuthenticated = false,
+        courseOptionsLoadInProgress = false,
+        finishedLoadingCourseOptions = false,
+        $helpModal = $("#help-modal"),
         $closeButton = $("#help-modal .close-modal"),
         $leanOverlay = $("#lean_overlay"),
         $feedbackForm = $("#feedback_form"),
@@ -149,11 +160,101 @@ $(document).ready(function() {
             $('area,input,select,textarea,button').removeAttr('tabindex');
             $(".help-tab a").focus();
             $leanOverlay.removeAttr('tabindex');
+        },
+        showFeedback = function(event, issue_type, title, subject_label, details_label) {
+            event.preventDefault();
+            DialogTabControls.initializeTabKeyValues("#feedback_form_wrapper", $closeButton);
+            $("#feedback_form input[name='issue_type']").val(issue_type);
+            $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
+            $("#feedback_form_wrapper label[data-field='subject']").html(subject_label);
+            $("#feedback_form_wrapper label[data-field='details']").html(details_label);
+            if (userAuthenticated && finishedLoadingCourseOptions && courseOptions.length > 1) {
+                $('.js-course-id-anchor').html([
+                    '<label for="feedback_form_course">' + '${_("Course") | n, js_escaped_string}' + '</label>',
+                    '<select name="course_id" id="feedback_form_course" class="feedback-form-select">',
+                    courseOptions.join(''),
+                    '</select>'
+                ].join(''));
+            }
+            $("#help_wrapper").css("display", "none");
+            $("#feedback_form_wrapper").css("display", "block");
+            $closeButton.focus();
+        },
+        loadCourseOptions = function() {
+            courseOptionsLoadInProgress = true;
+            $.ajax({
+                url: '/api/enrollment/v1/enrollment',
+                success: function(data) {
+                    var i,
+                        courseDetails,
+                        courseName,
+                        courseId,
+                        option,
+                        defaultOptionText = '${_("- Select -") | n, js_escaped_string}',
+                        markedSelectedOption = false;
+
+                    // Make sure courseOptions is empty before we begin pushing options into it.
+                    courseOptions = [];
+
+                    for (i = 0; i < data.length; i++) {
+                        courseDetails = data[i].course_details;
+                        if (!courseDetails) {
+                            continue;
+                        }
+
+                        courseName = courseDetails.course_name;
+                        courseId = courseDetails.course_id;
+                        if (!(courseName && courseId)) {
+                            continue;
+                        }
+
+                        // Build an option for this course and select it if it's the course we're currently viewing.
+                        if (!markedSelectedOption && courseId === currentCourseId) {
+                            option = buildCourseOption(courseName, courseId, true);
+                            markedSelectedOption = true;
+                        } else {
+                            option = buildCourseOption(courseName, courseId, false);
+                        }
+
+                        courseOptions.push(option);
+                    }
+
+                    // Build the default option and select it if we haven't already selected another option.
+                    option = buildCourseOption(defaultOptionText, '', !markedSelectedOption);
+
+                    // Add the default option to the head of the courseOptions Array.
+                    courseOptions.unshift(option);
+
+                    finishedLoadingCourseOptions = true;
+                },
+                complete: function() {
+                    courseOptionsLoadInProgress = false;
+                }
+            });
+        },
+        buildCourseOption = function(courseName, courseId, selected) {
+            var option = '<option value="' + _.escape(courseId) + '"';
+            if (selected) {
+                option += ' selected';
+            }
+            option += '>' + _.escape(courseName) + '</option>';
+            return option;
         };
+
+    % if user.is_authenticated():
+        userAuthenticated = true;
+    % endif
+
+    % if course:
+        currentCourseId = "${unicode(course.id) | n, js_escaped_string}";
+    % endif
 
     DialogTabControls.setKeydownListener($helpModal, $closeButton);
 
     $(".help-tab").click(function() {
+        if (userAuthenticated && !finishedLoadingCourseOptions && !courseOptionsLoadInProgress) {
+            loadCourseOptions();
+        }
         $helpModal.css("position", "absolute");
         DialogTabControls.initializeTabKeyValues("#help_wrapper", $closeButton);
         $(".field-error").removeClass("field-error");
@@ -170,18 +271,6 @@ $(document).ready(function() {
         $("button.close-modal").attr('tabindex', 0);
         $closeButton.focus();
     });
-
-    showFeedback = function(event, issue_type, title, subject_label, details_label) {
-        $("#help_wrapper").css("display", "none");
-        DialogTabControls.initializeTabKeyValues("#feedback_form_wrapper", $closeButton);
-        $("#feedback_form input[name='issue_type']").val(issue_type);
-        $("#feedback_form_wrapper").css("display", "block");
-        $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
-        $("#feedback_form_wrapper label[data-field='subject']").html(subject_label);
-        $("#feedback_form_wrapper label[data-field='details']").html(details_label);
-        $closeButton.focus();
-        event.preventDefault();
-    };
 
     $("#feedback_link_problem").click(function(event) {
         $("#feedback_form_details_tip").css({"display": "block", "padding-bottom": "5px"});

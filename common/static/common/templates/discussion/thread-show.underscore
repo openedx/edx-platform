@@ -1,7 +1,23 @@
 <div class="discussion-post">
-    <header class="wrapper-post-header">
+    <header class="post-header">
+        <% if (!readOnly) { %>
+            <div class="post-header-actions">
+                <%=
+                _.template(
+                    $('#forum-actions').html())(
+                    {
+                        contentId: cid,
+                        contentType: 'post',
+                        primaryActions: ['vote', 'follow'],
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close'],
+                        readOnly: readOnly
+                    }
+                )
+                %>
+            </div>
+        <% } %>
         <div class="post-header-content">
-            <h1 class="post-title"><%- title %></h1>
+            <h4 class="post-title"><%- title %></h4>
             <p class="posted-details">
             <%
             var timeAgoHtml = interpolate(
@@ -32,27 +48,11 @@
                 </span>
             </div>
         </div>
-        <% if (!readOnly) { %>
-            <div class="post-header-actions post-extended-content">
-                <%=
-                _.template(
-                    $('#forum-actions').html())(
-                    {
-                        contentId: cid,
-                        contentType: 'post',
-                        primaryActions: ['vote', 'follow'],
-                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close'],
-                        readOnly: readOnly
-                    }
-                )
-                %>
-            </div>
-        <% } %>
     </header>
 
     <div class="post-body"><%- body %></div>
     <div class="post-context">
-        <% if (mode == "tab" && obj.courseware_url) { %>
+        <% if (mode === "tab" && obj.courseware_url) { %>
             <%
             var courseware_title_linked = interpolate(
                 '<a href="%(courseware_url)s">%(courseware_title)s</a>',

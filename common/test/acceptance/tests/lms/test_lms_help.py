@@ -3,11 +3,12 @@ Test Help links in LMS
 """
 import json
 
-from flaky import flaky
 
-from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
+from common.test.acceptance.tests.lms.test_lms_instructor_dashboard import BaseInstructorDashboardTest
 from common.test.acceptance.pages.lms.instructor_dashboard import InstructorDashboardPage
+from common.test.acceptance.tests.studio.base_studio_test import ContainerBase
 from common.test.acceptance.fixtures import LMS_BASE_URL
+from common.test.acceptance.fixtures.course import CourseFixture
 
 from common.test.acceptance.tests.helpers import (
     assert_link,
@@ -98,3 +99,26 @@ class TestCohortHelp(ContainerBase):
         data = json.dumps({'is_cohorted': True})
         response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to enable cohorts")
+
+
+class InstructorDashboardHelp(BaseInstructorDashboardTest):
+    """
+    Tests opening help from the general Help button in the instructor dashboard.
+    """
+
+    def setUp(self):
+        super(InstructorDashboardHelp, self).setUp()
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.log_in_as_instructor()
+        self.instructor_dashboard_page = self.visit_instructor_dashboard()
+
+    def test_instructor_dashboard_help(self):
+        """
+        Scenario: Help button opens staff help
+        Given that I am viewing the Instructor Dashboard
+        When I click "Help"
+        Then I see help about the instructor dashboard in a new tab
+        """
+        href = 'http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/SFD_instructor_dash_help.html'
+        self.instructor_dashboard_page.click_help()
+        assert_opened_help_link_is_correct(self, href)

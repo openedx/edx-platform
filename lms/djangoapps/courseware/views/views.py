@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 from django.core.context_processors import csrf
 from django.db import transaction
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, QueryDict
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
@@ -34,18 +34,22 @@ from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from rest_framework import status
 from lms.djangoapps.instructor.views.api import require_global_staff
+from lms.djangoapps.ccx.utils import prep_course_for_grading
+from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
+from lms.djangoapps.instructor.enrollment import uses_shib
+from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
+from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 
+from openedx.core.djangoapps.catalog.utils import get_programs_data
 import shoppingcart
 import survey.utils
 import survey.views
-from lms.djangoapps.ccx.utils import prep_course_for_grading
 from certificates import api as certs_api
 from certificates.models import CertificateStatuses
 from openedx.core.djangoapps.models.course_details import CourseDetails
 from commerce.utils import EcommerceService
 from enrollment.api import add_enrollment
 from course_modes.models import CourseMode
-from lms.djangoapps.grades.new.course_grade import CourseGradeFactory
 from courseware.access import has_access, has_ccx_coach_role, _adjust_start_date_for_beta_testers
 from courseware.access_response import StartDateError
 from courseware.access_utils import in_preview_mode
@@ -67,8 +71,6 @@ from courseware.models import StudentModule, BaseStudentModuleHistory
 from courseware.url_helpers import get_redirect_url, get_redirect_url_for_global_staff
 from courseware.user_state_client import DjangoXBlockUserStateClient
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
-from lms.djangoapps.instructor.enrollment import uses_shib
-from lms.djangoapps.verify_student.models import SoftwareSecurePhotoVerification
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.coursetalk.helpers import inject_coursetalk_keys_into_context
 from openedx.core.djangoapps.credit.api import (
@@ -86,15 +88,13 @@ from util.date_utils import strftime_localized
 from util.db import outer_atomic
 from util.milestones_helpers import get_prerequisite_courses_display
 from util.views import _record_feedback_in_zendesk
-from util.views import ensure_valid_course_key
+from util.views import ensure_valid_course_key, ensure_valid_usage_key
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.tabs import CourseTabList
 from xmodule.x_module import STUDENT_VIEW
-from lms.djangoapps.ccx.custom_exception import CCXLocatorValidationException
 from ..entrance_exams import user_must_complete_entrance_exam
 from ..module_render import get_module_for_descriptor, get_module, get_module_by_usage_id
-
 
 log = logging.getLogger("edx.courseware")
 
@@ -136,21 +136,32 @@ def courses(request):
     Render "find courses" page.  The course selection work is done in courseware.courses.
     """
     courses_list = []
+    programs_list = []
     course_discovery_meanings = getattr(settings, 'COURSE_DISCOVERY_MEANINGS', {})
     if not settings.FEATURES.get('ENABLE_COURSE_DISCOVERY'):
         courses_list = get_courses(request.user)
 
-        if configuration_helpers.get_value(
-                "ENABLE_COURSE_SORTING_BY_START_DATE",
-                settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]
-        ):
+        if configuration_helpers.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
+                                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
             courses_list = sort_by_start_date(courses_list)
         else:
             courses_list = sort_by_announcement(courses_list)
 
+    # Getting all the programs from course-catalog service. The programs_list is being added to the context but it's
+    # not being used currently in courseware/courses.html. To use this list, you need to create a custom theme that
+    # overrides courses.html. The modifications to courses.html to display the programs will be done after the support
+    # for edx-pattern-library is added.
+    if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
+                                       settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
+        programs_list = get_programs_data(request.user)
+
     return render_to_response(
         "courseware/courses.html",
-        {'courses': courses_list, 'course_discovery_meanings': course_discovery_meanings}
+        {
+            'courses': courses_list,
+            'course_discovery_meanings': course_discovery_meanings,
+            'programs_list': programs_list
+        }
     )
 
 
@@ -271,7 +282,7 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     with modulestore().bulk_operations(course_key):
         course = get_course_by_id(course_key, depth=2)
         access_response = has_access(request.user, 'load', course, course_key)
@@ -283,8 +294,12 @@ def course_info(request, course_id):
             # redirect to the dashboard page.
             if isinstance(access_response, StartDateError):
                 start_date = strftime_localized(course.start, 'SHORT_DATE')
-                params = urllib.urlencode({'notlive': start_date})
-                return redirect('{0}?{1}'.format(reverse('dashboard'), params))
+                params = QueryDict(mutable=True)
+                params['notlive'] = start_date
+                return redirect('{dashboard_url}?{params}'.format(
+                    dashboard_url=reverse('dashboard'),
+                    params=params.urlencode()
+                ))
             # Otherwise, give a 404 to avoid leaking info about access
             # control.
             raise Http404("Course not found.")
@@ -719,7 +734,7 @@ def _progress(request, course_key, student_id):
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
 
-    course_grade = CourseGradeFactory(student).create(course)
+    course_grade = CourseGradeFactory().create(student, course)
     courseware_summary = course_grade.chapter_grades
     grade_summary = course_grade.summary
 
@@ -1123,7 +1138,7 @@ def is_course_passed(course, grade_summary=None, student=None, request=None):
     success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
 
     if grade_summary is None:
-        grade_summary = CourseGradeFactory(student).create(course).summary
+        grade_summary = CourseGradeFactory().create(student, course).summary
 
     return success_cutoff and grade_summary['percent'] >= success_cutoff
 
@@ -1221,12 +1236,14 @@ def _track_successful_certificate_generation(user_id, course_id):  # pylint: dis
 
 
 @require_http_methods(["GET", "POST"])
+@ensure_valid_usage_key
 def render_xblock(request, usage_key_string, check_if_enrolled=True):
     """
     Returns an HttpResponse with HTML content for the xBlock with the given usage_key.
     The returned HTML is a chromeless rendering of the xBlock (excluding content of the containing courseware).
     """
     usage_key = UsageKey.from_string(usage_key_string)
+
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     course_key = usage_key.course_key
 
@@ -1246,8 +1263,11 @@ def render_xblock(request, usage_key_string, check_if_enrolled=True):
             request, unicode(course_key), unicode(usage_key), disable_staff_debug_info=True, course=course
         )
 
+        student_view_context = request.GET.dict()
+        student_view_context['show_bookmark_button'] = False
+
         context = {
-            'fragment': block.render('student_view', context=request.GET),
+            'fragment': block.render('student_view', context=student_view_context),
             'course': course,
             'disable_accordion': True,
             'allow_iframing': True,

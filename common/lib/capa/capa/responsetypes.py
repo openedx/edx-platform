@@ -154,7 +154,7 @@ class LoncapaResponse(object):
     # By default, we set this to False, allowing subclasses to override as appropriate.
     multi_device_support = False
 
-    def __init__(self, xml, inputfields, context, system, capa_module):
+    def __init__(self, xml, inputfields, context, system, capa_module, minimal_init):
         """
         Init is passed the following arguments:
 
@@ -190,10 +190,7 @@ class LoncapaResponse(object):
             raise LoncapaProblemError(msg)
 
         for prop in self.required_attributes:
-            prop_value = xml.get(prop)
-            if prop_value:  # Stripping off the empty strings
-                prop_value = prop_value.strip()
-            if not prop_value:
+            if not xml.get(prop):
                 msg = "Error in problem specification: %s missing required attribute %s" % (
                     unicode(self), prop)
                 msg += "\nSee XML source line %s" % getattr(
@@ -213,28 +210,29 @@ class LoncapaResponse(object):
             maxpoints = inputfield.get('points', '1')
             self.maxpoints.update({inputfield.get('id'): int(maxpoints)})
 
-        # dict for default answer map (provided in input elements)
-        self.default_answer_map = {}
-        for entry in self.inputfields:
-            answer = entry.get('correct_answer')
-            if answer:
-                self.default_answer_map[entry.get(
-                    'id')] = contextualize_text(answer, self.context)
+        if not minimal_init:
+            # dict for default answer map (provided in input elements)
+            self.default_answer_map = {}
+            for entry in self.inputfields:
+                answer = entry.get('correct_answer')
+                if answer:
+                    self.default_answer_map[entry.get(
+                        'id')] = contextualize_text(answer, self.context)
 
-        # Does this problem have partial credit?
-        # If so, what kind? Get it as a list of strings.
-        partial_credit = xml.xpath('.')[0].get('partial_credit', default=False)
+            # Does this problem have partial credit?
+            # If so, what kind? Get it as a list of strings.
+            partial_credit = xml.xpath('.')[0].get('partial_credit', default=False)
 
-        if str(partial_credit).lower().strip() == 'false':
-            self.has_partial_credit = False
-            self.credit_type = []
-        else:
-            self.has_partial_credit = True
-            self.credit_type = partial_credit.split(',')
-            self.credit_type = [word.strip().lower() for word in self.credit_type]
+            if str(partial_credit).lower().strip() == 'false':
+                self.has_partial_credit = False
+                self.credit_type = []
+            else:
+                self.has_partial_credit = True
+                self.credit_type = partial_credit.split(',')
+                self.credit_type = [word.strip().lower() for word in self.credit_type]
 
-        if hasattr(self, 'setup_response'):
-            self.setup_response()
+            if hasattr(self, 'setup_response'):
+                self.setup_response()
 
     def get_max_score(self):
         """
@@ -608,210 +606,6 @@ class LoncapaResponse(object):
     def has_answerpool(self):
         """True if the response has an answer-pool transformation."""
         return hasattr(self, '_has_answerpool')
-
-#-----------------------------------------------------------------------------
-
-
-@registry.register
-class JavascriptResponse(LoncapaResponse):
-    """
-    This response type is used when the student's answer is graded via
-    Javascript using Node.js.
-    """
-
-    human_name = _('JavaScript Input')
-    tags = ['javascriptresponse']
-    max_inputfields = 1
-    allowed_inputfields = ['javascriptinput']
-
-    def setup_response(self):
-        # Sets up generator, grader, display, and their dependencies.
-        self.parse_xml()
-
-        self.compile_display_javascript()
-
-        self.params = self.extract_params()
-
-        if self.generator:
-            self.problem_state = self.generate_problem_state()
-        else:
-            self.problem_state = None
-
-        self.solution = None
-
-        self.prepare_inputfield()
-
-    def compile_display_javascript(self):
-
-        # TODO FIXME
-        # arjun: removing this behavior for now (and likely forever). Keeping
-        # until we decide on exactly how to solve this issue. For now, files are
-        # manually being compiled to DATA_DIR/js/compiled.
-
-        # latestTimestamp = 0
-        # basepath = self.capa_system.filestore.root_path + '/js/'
-        # for filename in (self.display_dependencies + [self.display]):
-        #    filepath = basepath + filename
-        #    timestamp = os.stat(filepath).st_mtime
-        #    if timestamp > latestTimestamp:
-        #        latestTimestamp = timestamp
-        #
-        # h = hashlib.md5()
-        # h.update(self.answer_id + str(self.display_dependencies))
-        # compiled_filename = 'compiled/' + h.hexdigest() + '.js'
-        # compiled_filepath = basepath + compiled_filename
-
-        # if not os.path.exists(compiled_filepath) or os.stat(compiled_filepath).st_mtime < latestTimestamp:
-        #    outfile = open(compiled_filepath, 'w')
-        #    for filename in (self.display_dependencies + [self.display]):
-        #        filepath = basepath + filename
-        #        infile = open(filepath, 'r')
-        #        outfile.write(infile.read())
-        #        outfile.write(';\n')
-        #        infile.close()
-        #    outfile.close()
-
-        # TODO this should also be fixed when the above is fixed.
-        filename = self.capa_system.ajax_url.split('/')[-1] + '.js'
-        self.display_filename = 'compiled/' + filename
-
-    def parse_xml(self):
-        self.generator_xml = self.xml.xpath('//*[@id=$id]//generator',
-                                            id=self.xml.get('id'))[0]
-
-        self.grader_xml = self.xml.xpath('//*[@id=$id]//grader',
-                                         id=self.xml.get('id'))[0]
-
-        self.display_xml = self.xml.xpath('//*[@id=$id]//display',
-                                          id=self.xml.get('id'))[0]
-
-        self.xml.remove(self.generator_xml)
-        self.xml.remove(self.grader_xml)
-        self.xml.remove(self.display_xml)
-
-        self.generator = self.generator_xml.get("src")
-        self.grader = self.grader_xml.get("src")
-        self.display = self.display_xml.get("src")
-
-        if self.generator_xml.get("dependencies"):
-            self.generator_dependencies = self.generator_xml.get(
-                "dependencies").split()
-        else:
-            self.generator_dependencies = []
-
-        if self.grader_xml.get("dependencies"):
-            self.grader_dependencies = self.grader_xml.get(
-                "dependencies").split()
-        else:
-            self.grader_dependencies = []
-
-        if self.display_xml.get("dependencies"):
-            self.display_dependencies = self.display_xml.get(
-                "dependencies").split()
-        else:
-            self.display_dependencies = []
-
-        self.display_class = self.display_xml.get("class")
-
-    def get_node_env(self):
-
-        js_dir = os.path.join(self.capa_system.filestore.root_path, 'js')
-        tmp_env = os.environ.copy()
-        node_path = self.capa_system.node_path + ":" + os.path.normpath(js_dir)
-        tmp_env["NODE_PATH"] = node_path
-        return tmp_env
-
-    def call_node(self, args):
-        # Node.js code is un-sandboxed. If the LoncapaSystem says we aren't
-        # allowed to run unsafe code, then stop now.
-        if not self.capa_system.can_execute_unsafe_code():
-            _ = self.capa_system.i18n.ugettext
-            msg = _("Execution of unsafe Javascript code is not allowed.")
-            raise LoncapaProblemError(msg)
-
-        subprocess_args = ["node"]
-        subprocess_args.extend(args)
-
-        return subprocess.check_output(subprocess_args, env=self.get_node_env())
-
-    def generate_problem_state(self):
-
-        generator_file = os.path.dirname(os.path.normpath(
-            __file__)) + '/javascript_problem_generator.js'
-        output = self.call_node([generator_file,
-                                 self.generator,
-                                 json.dumps(self.generator_dependencies),
-                                 json.dumps(str(self.context['seed'])),
-                                 json.dumps(self.params)]).strip()
-
-        return json.loads(output)
-
-    def extract_params(self):
-
-        params = {}
-
-        for param in self.xml.xpath('//*[@id=$id]//responseparam',
-                                    id=self.xml.get('id')):
-
-            raw_param = param.get("value")
-            params[param.get("name")] = json.loads(
-                contextualize_text(raw_param, self.context))
-
-        return params
-
-    def prepare_inputfield(self):
-
-        for inputfield in self.xml.xpath('//*[@id=$id]//javascriptinput',
-                                         id=self.xml.get('id')):
-
-            escapedict = {'"': '&quot;'}
-
-            encoded_params = json.dumps(self.params)
-            encoded_params = saxutils.escape(encoded_params, escapedict)
-            inputfield.set("params", encoded_params)
-
-            encoded_problem_state = json.dumps(self.problem_state)
-            encoded_problem_state = saxutils.escape(encoded_problem_state,
-                                                    escapedict)
-            inputfield.set("problem_state", encoded_problem_state)
-
-            inputfield.set("display_file", self.display_filename)
-            inputfield.set("display_class", self.display_class)
-
-    def get_score(self, student_answers):
-        json_submission = student_answers[self.answer_id]
-        (all_correct, evaluation, solution) = self.run_grader(json_submission)
-        self.solution = solution
-        correctness = 'correct' if all_correct else 'incorrect'
-        if all_correct:
-            points = self.get_max_score()
-        else:
-            points = 0
-        return CorrectMap(self.answer_id, correctness, npoints=points, msg=evaluation)
-
-    def run_grader(self, submission):
-        if submission is None or submission == '':
-            submission = json.dumps(None)
-
-        grader_file = os.path.dirname(os.path.normpath(
-            __file__)) + '/javascript_problem_grader.js'
-        outputs = self.call_node([grader_file,
-                                  self.grader,
-                                  json.dumps(self.grader_dependencies),
-                                  submission,
-                                  json.dumps(self.problem_state),
-                                  json.dumps(self.params)]).split('\n')
-
-        all_correct = json.loads(outputs[0].strip())
-        evaluation = outputs[1].strip()
-        solution = outputs[2].strip()
-        return (all_correct, evaluation, solution)
-
-    def get_answers(self):
-        if self.solution is None:
-            (_, _, self.solution) = self.run_grader(None)
-
-        return {self.answer_id: self.solution}
 
 
 #-----------------------------------------------------------------------------
@@ -4118,7 +3912,6 @@ __all__ = [
     ChoiceResponse,
     MultipleChoiceResponse,
     TrueFalseResponse,
-    JavascriptResponse,
     AnnotationResponse,
     ChoiceTextResponse,
 ]

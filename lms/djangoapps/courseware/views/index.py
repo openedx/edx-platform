@@ -348,7 +348,7 @@ class CoursewareIndex(View):
         sets up the runtime, which binds the request user to the section.
         """
         # Pre-fetch all descendant data
-        self.section = modulestore().get_item(self.section.location, depth=None)
+        self.section = modulestore().get_item(self.section.location, depth=None, lazy=False)
         self.field_data_cache.add_descriptor_descendents(self.section, depth=None)
 
         # Bind section to user
@@ -388,6 +388,8 @@ class CoursewareIndex(View):
             'bookmarks_api_url': reverse('bookmarks'),
             'language_preference': self._get_language_preference(),
             'disable_optimizely': True,
+            'section_title': None,
+            'sequence_title': None
         }
         table_of_contents = toc_for_course(
             self.effective_user,
@@ -437,6 +439,11 @@ class CoursewareIndex(View):
                 table_of_contents['next_of_active_section'],
             )
             courseware_context['fragment'] = self.section.render(STUDENT_VIEW, section_context)
+            if self.section.position and self.section.has_children:
+                display_items = self.section.get_display_items()
+                if display_items:
+                    courseware_context['sequence_title'] = display_items[self.section.position - 1] \
+                        .display_name_with_default
 
         return courseware_context
 

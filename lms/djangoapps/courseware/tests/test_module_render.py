@@ -2,6 +2,7 @@
 """
 Test for lms courseware app, module render unit
 """
+from datetime import datetime
 import ddt
 import itertools
 import json
@@ -15,10 +16,12 @@ from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
+from freezegun import freeze_time
 from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from pyquery import PyQuery
+import pytz
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -1831,18 +1834,21 @@ class TestXmoduleRuntimeEvent(TestSubmittingProblems):
         self.assertIsNone(student_module.grade)
         self.assertIsNone(student_module.max_grade)
 
-    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_SCORE_CHANGED.send')
+    @freeze_time(datetime.now().replace(tzinfo=pytz.UTC))
+    @patch('lms.djangoapps.grades.signals.handlers.PROBLEM_RAW_SCORE_CHANGED.send')
     def test_score_change_signal(self, send_mock):
         """Test that a Django signal is generated when a score changes"""
         self.set_module_grade_using_publish(self.grade_dict)
         expected_signal_kwargs = {
             'sender': None,
-            'points_possible': self.grade_dict['max_value'],
-            'points_earned': self.grade_dict['value'],
+            'raw_possible': self.grade_dict['max_value'],
+            'raw_earned': self.grade_dict['value'],
+            'weight': None,
             'user_id': self.student_user.id,
             'course_id': unicode(self.course.id),
             'usage_id': unicode(self.problem.location),
             'only_if_higher': None,
+            'modified': datetime.now().replace(tzinfo=pytz.UTC)
         }
         send_mock.assert_called_with(**expected_signal_kwargs)
 

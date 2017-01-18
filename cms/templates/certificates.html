@@ -90,9 +90,9 @@ CMS.User.isGlobalStaff = '${is_global_staff}'=='True' ? true : false;
             <p>${_("For verified certificates, specify between one and four signatories and upload the associated images.")}</p>
             <p>${_("To edit or delete a certificate before it is activated, hover over the top right corner of the form and select {em_start}Edit{em_end} or the delete icon.").format(em_start="<strong>", em_end="</strong>")}</p>
             <p>${_("To view a sample certificate, choose a course mode and select {em_start}Preview Certificate{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
-            
+
             <h3 class="title-3">${_("Issuing Certificates to Learners")}</h3>
-            <p>${_("After you have configured and previewed your certificate, ask your edX partner manager to activate your certificate. When your certificate has been activated, you can begin issuing certificates to learners. Course team members without the Admin role cannot edit or delete an activated certificate.")}</p>
+            <p>${_("To begin issuing course certificates, a course team member with either the Staff or Admin role selects {em_start}Activate{em_end}. Only course team members with these roles can edit or delete an activated certificate.").format(em_start="<strong>", em_end="</strong>")}</p>
             <p>${_("{em_start}Do not{em_end} delete certificates after a course has started; learners who have already earned certificates will no longer be able to access them.").format(em_start="<strong>", em_end="</strong>")}</p>
             <p><a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about certificates")}</a></p>
           </div>

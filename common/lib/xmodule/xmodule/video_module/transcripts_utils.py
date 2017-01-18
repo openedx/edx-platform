@@ -673,7 +673,7 @@ class VideoTranscriptsMixin(object):
             transcripts = copy.deepcopy(get_bumper_settings(self).get('transcripts', {}))
             sub = transcripts.pop("en", "")
         else:
-            transcripts = self.transcripts
+            transcripts = self.transcripts if self.transcripts else {}
             sub = self.sub
 
         # Only attach transcripts that are not empty.

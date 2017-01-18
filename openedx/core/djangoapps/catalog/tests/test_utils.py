@@ -1,7 +1,7 @@
 """Tests covering utilities for integrating with the catalog service."""
 import uuid
+import copy
 
-import ddt
 from django.test import TestCase
 import mock
 from opaque_keys.edx.keys import CourseKey
@@ -9,8 +9,7 @@ from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.catalog import utils
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.catalog.tests import factories, mixins
-from student.tests.factories import UserFactory
-
+from student.tests.factories import UserFactory, AnonymousUserFactory
 
 UTILS_MODULE = 'openedx.core.djangoapps.catalog.utils'
 
@@ -51,6 +50,7 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
         querystring = {
             'marketable': 1,
             'exclude_utm': 1,
+            'published_course_runs_only': 1,
         }
         if type:
             querystring['type'] = type
@@ -66,6 +66,73 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
 
         self.assert_contract(mock_get_catalog_data.call_args)
         self.assertEqual(data, programs)
+
+    def test_get_programs_anonymous_user(self, _mock_cache, mock_get_catalog_data):
+        programs = [factories.Program() for __ in range(3)]
+        mock_get_catalog_data.return_value = programs
+
+        anonymous_user = AnonymousUserFactory()
+
+        # The user is an Anonymous user but the Catalog Service User has not been created yet.
+        data = utils.get_programs(anonymous_user)
+        # This should not return programs.
+        self.assertEqual(data, [])
+
+        UserFactory(username='lms_catalog_service_user')
+        # After creating the service user above,
+        data = utils.get_programs(anonymous_user)
+        # the programs should be returned successfully.
+        self.assertEqual(data, programs)
+
+    def test_get_program_types(self, _mock_cache, mock_get_catalog_data):
+        program_types = [factories.ProgramType() for __ in range(3)]
+        mock_get_catalog_data.return_value = program_types
+
+        # Creating Anonymous user but the Catalog Service User has not been created yet.
+        anonymous_user = AnonymousUserFactory()
+        data = utils.get_program_types(anonymous_user)
+        # This should not return programs.
+        self.assertEqual(data, [])
+
+        # Creating Catalog Service User user
+        UserFactory(username='lms_catalog_service_user')
+        data = utils.get_program_types(anonymous_user)
+        # the programs should be returned successfully.
+        self.assertEqual(data, program_types)
+
+        # Catalog integration is disabled now.
+        self.catalog_integration = self.create_catalog_integration(enabled=False)
+        data = utils.get_program_types(anonymous_user)
+        # This should not return programs.
+        self.assertEqual(data, [])
+
+    def test_get_programs_data(self, _mock_cache, mock_get_catalog_data):   # pylint: disable=unused-argument
+        programs = []
+        program_types = []
+        programs_data = []
+
+        for index in range(3):
+            # Creating the Programs and their corresponding program types.
+            type_name = "type_name_{postfix}".format(postfix=index)
+            program = factories.Program(type=type_name)
+            program_type = factories.ProgramType(name=type_name)
+
+            # Maintaining the programs, program types and program data(program+logo_image) lists.
+            programs.append(program)
+            program_types.append(program_type)
+            programs_data.append(copy.deepcopy(program))
+
+            # Adding the logo image in program data.
+            programs_data[-1]['logo_image'] = program_type["logo_image"]
+
+        with mock.patch("openedx.core.djangoapps.catalog.utils.get_programs") as patched_get_programs:
+            with mock.patch("openedx.core.djangoapps.catalog.utils.get_program_types") as patched_get_program_types:
+                # Mocked the "get_programs" and "get_program_types"
+                patched_get_programs.return_value = programs
+                patched_get_program_types.return_value = program_types
+
+                programs_data = utils.get_programs_data()
+                self.assertEqual(programs_data, programs)
 
     def test_get_one_program(self, _mock_cache, mock_get_catalog_data):
         program = factories.Program()

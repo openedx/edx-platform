@@ -41,22 +41,19 @@
     &:hover,
     &:active,
     &:focus {
-        border-color: $forum-color-hover;
-        background-color: $forum-color-hover;
-        background-image: none;
-        box-shadow: none;
-        color: $forum-color-active-text;
-        text-decoration: none;  // Don't show underlines on links that are styled as buttons
+        // Note:these rules all need !important in order to beat out
+        // the base button styling defined in the courseware.
+        border-color: $forum-color-hover !important;
+        background-color: $forum-color-hover !important;
+        background-image: none !important;
+        box-shadow: none !important;
+        color: $forum-color-active-text !important;
+        text-decoration: none !important;  // Don't show underlines on links that are styled as buttons
     }
 }
 
-// Layout control for discussion modules that does not apply to the discussion board
-.discussion-module {
-    .discussion {
-        clear: both;
-        padding-top: ($baseline/2);
-    }
-
+// Use pattern library buttons for discussion components
+.discussion-module, .wmd-prompt-dialog {
     .btn {
         @extend %pattern-library-btn;
         background-color: $forum-color-background;
@@ -67,5 +64,12 @@
         @extend %pattern-library-btn;
         background-color: $forum-color-active-thread;
         color: $forum-color-active-text;
+    }
+}
+
+// Layout control for discussion modules that does not apply to the discussion board
+.discussion-module {
+    .discussion {
+        clear: both;
     }
 }

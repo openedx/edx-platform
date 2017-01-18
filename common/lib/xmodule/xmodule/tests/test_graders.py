@@ -1,4 +1,5 @@
 """Grading tests"""
+import ddt
 import unittest
 
 from xmodule import graders
@@ -12,13 +13,11 @@ class GradesheetTest(unittest.TestCase):
 
     def test_weighted_grading(self):
         scores = []
-        agg_fields = dict(display_name="aggregated_score", module_id=None, attempted=False)
-        prob_fields = dict(
-            display_name="problem_score", module_id=None, raw_earned=0, raw_possible=0, weight=0, attempted=False,
-        )
+        agg_fields = dict(attempted=False)
+        prob_fields = dict(raw_earned=0, raw_possible=0, weight=0, attempted=False)
 
         # No scores
-        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
+        all_total, graded_total = aggregate_scores(scores)
         self.assertEqual(
             all_total,
             AggregatedScore(tw_earned=0, tw_possible=0, graded=False, **agg_fields),
@@ -30,7 +29,7 @@ class GradesheetTest(unittest.TestCase):
 
         # (0/5 non-graded)
         scores.append(ProblemScore(weighted_earned=0, weighted_possible=5, graded=False, **prob_fields))
-        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
+        all_total, graded_total = aggregate_scores(scores)
         self.assertEqual(
             all_total,
             AggregatedScore(tw_earned=0, tw_possible=5, graded=False, **agg_fields),
@@ -44,7 +43,7 @@ class GradesheetTest(unittest.TestCase):
         prob_fields['attempted'] = True
         agg_fields['attempted'] = True
         scores.append(ProblemScore(weighted_earned=3, weighted_possible=5, graded=True, **prob_fields))
-        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
+        all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(
             all_total,
             AggregatedScore(tw_earned=3, tw_possible=10, graded=False, **agg_fields),
@@ -56,7 +55,7 @@ class GradesheetTest(unittest.TestCase):
 
         # (0/5 non-graded) + (3/5 graded) + (2/5 graded) = 5/15 total, 5/10 graded
         scores.append(ProblemScore(weighted_earned=2, weighted_possible=5, graded=True, **prob_fields))
-        all_total, graded_total = aggregate_scores(scores, display_name=agg_fields['display_name'])
+        all_total, graded_total = aggregate_scores(scores)
         self.assertAlmostEqual(
             all_total,
             AggregatedScore(tw_earned=5, tw_possible=15, graded=False, **agg_fields),
@@ -67,6 +66,7 @@ class GradesheetTest(unittest.TestCase):
         )
 
 
+@ddt.ddt
 class GraderTest(unittest.TestCase):
     """
     Tests grader implementations
@@ -76,54 +76,47 @@ class GraderTest(unittest.TestCase):
     }
 
     incomplete_gradesheet = {
-        'Homework': [],
-        'Lab': [],
-        'Midterm': [],
+        'Homework': {},
+        'Lab': {},
+        'Midterm': {},
     }
 
-    common_fields = dict(graded=True, module_id=None, attempted=True)
+    class MockGrade(object):
+        """
+        Mock class for SubsectionGrade object.
+        """
+        def __init__(self, graded_total, display_name):
+            self.graded_total = graded_total
+            self.display_name = display_name
+
+    common_fields = dict(graded=True, attempted=True)
     test_gradesheet = {
-        'Homework': [
-            AggregatedScore(tw_earned=2, tw_possible=20.0, display_name='hw1', **common_fields),
-            AggregatedScore(tw_earned=16, tw_possible=16.0, display_name='hw2', **common_fields),
-        ],
+        'Homework': {
+            'hw1': MockGrade(AggregatedScore(tw_earned=2, tw_possible=20.0, **common_fields), display_name='hw1'),
+            'hw2': MockGrade(AggregatedScore(tw_earned=16, tw_possible=16.0, **common_fields), display_name='hw2'),
+        },
 
         # The dropped scores should be from the assignments that don't exist yet
-        'Lab': [
-            AggregatedScore(tw_earned=1, tw_possible=2.0, display_name='lab1', **common_fields),  # Dropped
-            AggregatedScore(tw_earned=1, tw_possible=1.0, display_name='lab2', **common_fields),
-            AggregatedScore(tw_earned=1, tw_possible=1.0, display_name='lab3', **common_fields),
-            AggregatedScore(tw_earned=5, tw_possible=25.0, display_name='lab4', **common_fields),  # Dropped
-            AggregatedScore(tw_earned=3, tw_possible=4.0, display_name='lab5', **common_fields),  # Dropped
-            AggregatedScore(tw_earned=6, tw_possible=7.0, display_name='lab6', **common_fields),
-            AggregatedScore(tw_earned=5, tw_possible=6.0, display_name='lab7', **common_fields),
-        ],
+        'Lab': {
+            # Dropped
+            'lab1': MockGrade(AggregatedScore(tw_earned=1, tw_possible=2.0, **common_fields), display_name='lab1'),
+            'lab2': MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab2'),
+            'lab3': MockGrade(AggregatedScore(tw_earned=1, tw_possible=1.0, **common_fields), display_name='lab3'),
+            # Dropped
+            'lab4': MockGrade(AggregatedScore(tw_earned=5, tw_possible=25.0, **common_fields), display_name='lab4'),
+            # Dropped
+            'lab5': MockGrade(AggregatedScore(tw_earned=3, tw_possible=4.0, **common_fields), display_name='lab5'),
+            'lab6': MockGrade(AggregatedScore(tw_earned=6, tw_possible=7.0, **common_fields), display_name='lab6'),
+            'lab7': MockGrade(AggregatedScore(tw_earned=5, tw_possible=6.0, **common_fields), display_name='lab7'),
+        },
 
-        'Midterm': [
-            AggregatedScore(tw_earned=50.5, tw_possible=100, display_name="Midterm Exam", **common_fields),
-        ],
+        'Midterm': {
+            'midterm': MockGrade(
+                AggregatedScore(tw_earned=50.5, tw_possible=100, **common_fields),
+                display_name="Midterm Exam",
+            ),
+        },
     }
-
-    def test_single_section_grader(self):
-        midterm_grader = graders.SingleSectionGrader("Midterm", "Midterm Exam")
-        lab4_grader = graders.SingleSectionGrader("Lab", "lab4")
-        bad_lab_grader = graders.SingleSectionGrader("Lab", "lab42")
-
-        for graded in [
-                midterm_grader.grade(self.empty_gradesheet),
-                midterm_grader.grade(self.incomplete_gradesheet),
-                bad_lab_grader.grade(self.test_gradesheet),
-        ]:
-            self.assertEqual(len(graded['section_breakdown']), 1)
-            self.assertEqual(graded['percent'], 0.0)
-
-        graded = midterm_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.505)
-        self.assertEqual(len(graded['section_breakdown']), 1)
-
-        graded = lab4_grader.grade(self.test_gradesheet)
-        self.assertAlmostEqual(graded['percent'], 0.2)
-        self.assertEqual(len(graded['section_breakdown']), 1)
 
     def test_assignment_format_grader(self):
         homework_grader = graders.AssignmentFormatGrader("Homework", 12, 2)
@@ -179,8 +172,6 @@ class GraderTest(unittest.TestCase):
         # First, a few sub graders
         homework_grader = graders.AssignmentFormatGrader("Homework", 12, 2)
         lab_grader = graders.AssignmentFormatGrader("Lab", 7, 3)
-        # phasing out the use of SingleSectionGraders, and instead using AssignmentFormatGraders that
-        # will act like SingleSectionGraders on single sections.
         midterm_grader = graders.AssignmentFormatGrader("Midterm", 1, 0)
 
         weighted_grader = graders.WeightedSubsectionsGrader([
@@ -268,6 +259,8 @@ class GraderTest(unittest.TestCase):
             },
             {
                 'type': "Midterm",
+                'min_count': 0,
+                'drop_count': 0,
                 'name': "Midterm Exam",
                 'short_label': "Midterm",
                 'weight': 0.5,
@@ -294,5 +287,25 @@ class GraderTest(unittest.TestCase):
         self.assertAlmostEqual(graded['percent'], 0.11)
         self.assertEqual(len(graded['section_breakdown']), 12 + 1)
 
-        # TODO: How do we test failure cases? The parser only logs an error when
-        # it can't parse something. Maybe it should throw exceptions?
+    @ddt.data(
+        (
+            # empty
+            {},
+            u"Configuration has no appropriate grader class."
+        ),
+        (
+            # no min_count
+            {'type': "Homework", 'drop_count': 0},
+            u"Configuration has no appropriate grader class."
+        ),
+        (
+            # no drop_count
+            {'type': "Homework", 'min_count': 0},
+            u"__init__() takes at least 4 arguments (3 given)"
+        ),
+    )
+    @ddt.unpack
+    def test_grader_with_invalid_conf(self, invalid_conf, expected_error_message):
+        with self.assertRaises(ValueError) as error:
+            graders.grader_from_conf([invalid_conf])
+        self.assertIn(expected_error_message, error.exception.message)

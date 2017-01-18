@@ -7,7 +7,6 @@ import random
 import textwrap
 
 from abc import ABCMeta, abstractmethod
-from flaky import flaky
 from nose import SkipTest
 from nose.plugins.attrib import attr
 from selenium.webdriver import ActionChains
@@ -20,6 +19,7 @@ from capa.tests.response_xml_factory import (
     CustomResponseXMLFactory,
     FormulaResponseXMLFactory,
     ImageResponseXMLFactory,
+    JSInputXMLFactory,
     MultipleChoiceResponseXMLFactory,
     NumericalResponseXMLFactory,
     OptionResponseXMLFactory,
@@ -133,7 +133,29 @@ class ProblemTypeTestBase(ProblemsTest, EventsTestMixin):
         raise NotImplementedError()
 
 
-class ProblemTypeTestMixin(object):
+class ProblemTypeA11yTestMixin(object):
+    """
+    Shared a11y tests for all problem types.
+    """
+    @attr('a11y')
+    def test_problem_type_a11y(self):
+        """
+        Run accessibility audit for the problem type.
+        """
+        self.problem_page.wait_for(
+            lambda: self.problem_page.problem_name == self.problem_name,
+            "Make sure the correct problem is on the page"
+        )
+
+        # Set the scope to the problem container
+        self.problem_page.a11y_audit.config.set_scope(
+            include=['div#seq_content'])
+
+        # Run the accessibility audit.
+        self.problem_page.a11y_audit.check_for_accessibility_errors()
+
+
+class ProblemTypeTestMixin(ProblemTypeA11yTestMixin):
     """
     Test cases shared amongst problem types.
     """
@@ -166,9 +188,8 @@ class ProblemTypeTestMixin(object):
         self.wait_for_status('correct')
         self.problem_page.wait_success_notification()
         # Check that clicking on "Review" goes to the problem meta location
-        self.problem_page.click_review_in_notification()
-        # TODO: determine why the focus is not being set
-        # self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.click_review_in_notification(notification_type='submit')
+        self.problem_page.wait_for_focus_on_problem_meta()
 
         # Check for corresponding tracking event
         expected_events = [
@@ -257,7 +278,7 @@ class ProblemTypeTestMixin(object):
         And I should see the problem title is focused
         """
         self.problem_page.click_show()
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.wait_for_focus_on_problem_meta()
 
     @attr(shard=7)
     def test_save_reaction(self):
@@ -285,16 +306,14 @@ class ProblemTypeTestMixin(object):
         self.assertTrue(self.problem_page.is_save_button_enabled())
         self.problem_page.wait_for_save_notification()
         # Check that clicking on "Review" goes to the problem meta location
-        self.problem_page.click_review_in_notification()
-        # TODO: determine why the focus is not being set
-        # self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.click_review_in_notification(notification_type='save')
+        self.problem_page.wait_for_focus_on_problem_meta()
 
         # Not all problems will detect the change and remove the save notification
         if self.can_update_save_notification:
             self.answer_problem(correctness='incorrect')
             self.assertFalse(self.problem_page.is_save_notification_visible())
 
-    @flaky  # TNL-5774
     @attr(shard=7)
     def test_reset_clears_answer_and_focus(self):
         """
@@ -316,7 +335,7 @@ class ProblemTypeTestMixin(object):
         # clear the answers
         self.problem_page.click_reset()
         # Focus should change to meta
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.wait_for_focus_on_problem_meta()
         # Answer should be reset
         self.wait_for_status('unanswered')
 
@@ -360,23 +379,6 @@ class ProblemTypeTestMixin(object):
         self.answer_problem(correctness='partially-correct')
         self.problem_page.click_submit()
         self.problem_page.wait_partial_notification()
-
-    @attr('a11y')
-    def test_problem_type_a11y(self):
-        """
-        Run accessibility audit for the problem type.
-        """
-        self.problem_page.wait_for(
-            lambda: self.problem_page.problem_name == self.problem_name,
-            "Make sure the correct problem is on the page"
-        )
-
-        # Set the scope to the problem container
-        self.problem_page.a11y_audit.config.set_scope(
-            include=['div#seq_content'])
-
-        # Run the accessibility audit.
-        self.problem_page.a11y_audit.check_for_accessibility_errors()
 
 
 class AnnotationProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -493,7 +495,7 @@ class CheckboxProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.click_show()
         self.assertTrue(self.problem_page.is_solution_tag_present())
         self.assertTrue(self.problem_page.is_correct_choice_highlighted(correct_choices=[1, 3]))
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.wait_for_focus_on_problem_meta()
 
 
 class MultipleChoiceProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -706,8 +708,8 @@ class NumericalProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
         self.problem_page.click_submit()
         self.problem_page.wait_for_gentle_alert_notification()
         # Check that clicking on "Review" goes to the problem meta location
-        self.problem_page.click_review_in_notification()
-        self.assertTrue(self.problem_page.is_focus_on_problem_meta())
+        self.problem_page.click_review_in_notification(notification_type='gentle-alert')
+        self.problem_page.wait_for_focus_on_problem_meta()
 
 
 class FormulaProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
@@ -803,6 +805,29 @@ class ScriptProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):
 
         self.problem_page.fill_answer(first_addend, input_num=0)
         self.problem_page.fill_answer(second_addend, input_num=1)
+
+
+class JSInputTypeTest(ProblemTypeTestBase, ProblemTypeA11yTestMixin):
+    """
+    TestCase Class for jsinput (custom JavaScript) problem type.
+    Right now the only test point that is executed is the a11y test.
+    This is because the factory simply creates an empty iframe.
+    """
+    problem_name = 'JSINPUT PROBLEM'
+    problem_type = 'customresponse'
+
+    factory = JSInputXMLFactory()
+
+    factory_kwargs = {
+        'question_text': 'IFrame shows below (but has no content)'
+    }
+
+    def answer_problem(self, correctness):
+        """
+        Problem is not set up to work (displays an empty iframe), but this method must
+        be extended because the parent class has marked it as abstract.
+        """
+        raise NotImplementedError()
 
 
 class CodeProblemTypeTest(ProblemTypeTestBase, ProblemTypeTestMixin):

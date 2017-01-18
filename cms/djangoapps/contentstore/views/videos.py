@@ -1,6 +1,9 @@
 """
 Views related to the video upload feature
 """
+from datetime import datetime, timedelta
+import logging
+
 from boto import s3
 import csv
 from uuid import uuid4
@@ -12,7 +15,14 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods
 import rfc6266
 
-from edxval.api import create_video, get_videos_for_course, SortDirection, VideoSortField
+from edxval.api import (
+    create_video,
+    get_videos_for_course,
+    SortDirection,
+    VideoSortField,
+    remove_video_for_course,
+    update_video_status
+)
 from opaque_keys.edx.keys import CourseKey
 
 from contentstore.models import VideoUploadConfig
@@ -25,9 +35,21 @@ from .course import get_course_and_check_access
 
 __all__ = ["videos_handler", "video_encodings_download"]
 
+LOGGER = logging.getLogger(__name__)
+
 
 # Default expiration, in seconds, of one-time URLs used for uploading videos.
 KEY_EXPIRATION_IN_SECONDS = 86400
+
+VIDEO_SUPPORTED_FILE_FORMATS = {
+    '.mp4': 'video/mp4',
+    '.mov': 'video/quicktime',
+}
+
+VIDEO_UPLOAD_MAX_FILE_SIZE_GB = 5
+
+# maximum time for video to remain in upload state
+MAX_UPLOAD_HOURS = 24
 
 
 class StatusDisplayStrings(object):
@@ -42,11 +64,17 @@ class StatusDisplayStrings(object):
     _IN_PROGRESS = ugettext_noop("In Progress")
     # Translators: This is the status for a video that the servers have successfully processed
     _COMPLETE = ugettext_noop("Ready")
+    # Translators: This is the status for a video that is uploaded completely
+    _UPLOAD_COMPLETED = ugettext_noop("Uploaded")
     # Translators: This is the status for a video that the servers have failed to process
     _FAILED = ugettext_noop("Failed")
+    # Translators: This is the status for a video that is cancelled during upload by user
+    _CANCELLED = ugettext_noop("Cancelled")
     # Translators: This is the status for a video which has failed
     # due to being flagged as a duplicate by an external or internal CMS
     _DUPLICATE = ugettext_noop("Failed Duplicate")
+    # Translators: This is the status for a video which has duplicate token for youtube
+    _YOUTUBE_DUPLICATE = ugettext_noop("YouTube Duplicate")
     # Translators: This is the status for a video for which an invalid
     # processing token was provided in the course settings
     _INVALID_TOKEN = ugettext_noop("Invalid Token")
@@ -62,9 +90,14 @@ class StatusDisplayStrings(object):
         "transcode_active": _IN_PROGRESS,
         "file_delivered": _COMPLETE,
         "file_complete": _COMPLETE,
+        "upload_completed": _UPLOAD_COMPLETED,
         "file_corrupt": _FAILED,
         "pipeline_error": _FAILED,
+        "upload_failed": _FAILED,
+        "s3_upload_failed": _FAILED,
+        "upload_cancelled": _CANCELLED,
         "duplicate": _DUPLICATE,
+        "youtube_duplicate": _YOUTUBE_DUPLICATE,
         "invalid_token": _INVALID_TOKEN,
         "imported": _IMPORTED,
     }
@@ -77,8 +110,8 @@ class StatusDisplayStrings(object):
 
 @expect_json
 @login_required
-@require_http_methods(("GET", "POST"))
-def videos_handler(request, course_key_string):
+@require_http_methods(("GET", "POST", "DELETE"))
+def videos_handler(request, course_key_string, edx_video_id=None):
     """
     The restful handler for video uploads.
 
@@ -91,6 +124,8 @@ def videos_handler(request, course_key_string):
         json: create a new video upload; the actual files should not be provided
             to this endpoint but rather PUT to the respective upload_url values
             contained in the response
+    DELETE
+        soft deletes a video for particular course
     """
     course = _get_and_validate_course(course_key_string, request.user)
 
@@ -102,7 +137,13 @@ def videos_handler(request, course_key_string):
             return videos_index_json(course)
         else:
             return videos_index_html(course)
+    elif request.method == "DELETE":
+        remove_video_for_course(course_key_string, edx_video_id)
+        return JsonResponse()
     else:
+        if is_status_update_request(request.json):
+            return send_video_status_update(request.json)
+
         return videos_post(course, request)
 
 
@@ -214,6 +255,36 @@ def _get_and_validate_course(course_key_string, user):
         return None
 
 
+def convert_video_status(video):
+    """
+    Convert status of a video. Status can be converted to one of the following:
+
+        *   FAILED if video is in `upload` state for more than 24 hours
+        *   `YouTube Duplicate` if status is `invalid_token`
+        *   user-friendly video status
+    """
+    now = datetime.now(video['created'].tzinfo)
+    if video['status'] == 'upload' and (now - video['created']) > timedelta(hours=MAX_UPLOAD_HOURS):
+        new_status = 'upload_failed'
+        status = StatusDisplayStrings.get(new_status)
+        message = 'Video with id [%s] is still in upload after [%s] hours, setting status to [%s]' % (
+            video['edx_video_id'], MAX_UPLOAD_HOURS, new_status
+        )
+        send_video_status_update([
+            {
+                'edxVideoId': video['edx_video_id'],
+                'status': new_status,
+                'message': message
+            }
+        ])
+    elif video['status'] == 'invalid_token':
+        status = StatusDisplayStrings.get('youtube_duplicate')
+    else:
+        status = StatusDisplayStrings.get(video['status'])
+
+    return status
+
+
 def _get_videos(course):
     """
     Retrieves the list of videos from VAL corresponding to this course.
@@ -222,7 +293,7 @@ def _get_videos(course):
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:
-        video["status"] = StatusDisplayStrings.get(video["status"])
+        video["status"] = convert_video_status(video)
 
     return videos
 
@@ -248,10 +319,12 @@ def videos_index_html(course):
         "videos_index.html",
         {
             "context_course": course,
-            "post_url": reverse_course_url("videos_handler", unicode(course.id)),
+            "video_handler_url": reverse_course_url("videos_handler", unicode(course.id)),
             "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
             "previous_uploads": _get_index_videos(course),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
+            "video_supported_file_formats": VIDEO_SUPPORTED_FILE_FORMATS.keys(),
+            "video_upload_max_file_size": VIDEO_UPLOAD_MAX_FILE_SIZE_GB
         }
     )
 
@@ -300,6 +373,11 @@ def videos_post(course, request):
             for file in request.json["files"]
     ):
         error = "Request 'files' entry does not contain 'file_name' and 'content_type'"
+    elif any(
+            file['content_type'] not in VIDEO_SUPPORTED_FILE_FORMATS.values()
+            for file in request.json["files"]
+    ):
+        error = "Request 'files' entry contain unsupported content_type"
 
     if error:
         return JsonResponse({"error": error}, status=400)
@@ -311,6 +389,12 @@ def videos_post(course, request):
 
     for req_file in req_files:
         file_name = req_file["file_name"]
+
+        try:
+            file_name.encode('ascii')
+        except UnicodeEncodeError:
+            error_msg = 'The file name for %s must contain only ASCII characters.' % file_name
+            return JsonResponse({'error': error_msg}, status=400)
 
         edx_video_id = unicode(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
@@ -361,3 +445,26 @@ def storage_service_key(bucket, file_name):
         file_name
     )
     return s3.key.Key(bucket, key_name)
+
+
+def send_video_status_update(updates):
+    """
+    Update video status in edx-val.
+    """
+    for update in updates:
+        update_video_status(update.get('edxVideoId'), update.get('status'))
+        LOGGER.info(
+            'VIDEOS: Video status update with id [%s], status [%s] and message [%s]',
+            update.get('edxVideoId'),
+            update.get('status'),
+            update.get('message')
+        )
+
+    return JsonResponse()
+
+
+def is_status_update_request(request_data):
+    """
+    Returns True if `request_data` contains status update else False.
+    """
+    return any('status' in update for update in request_data)

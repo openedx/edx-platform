@@ -11,7 +11,6 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils import timezone
 from django.utils.text import slugify
 import httpretty
 import mock
@@ -19,6 +18,7 @@ from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
 from edx_oauth2_provider.tests.factories import ClientFactory
 from provider.constants import CONFIDENTIAL
+from pytz import utc
 
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
@@ -718,8 +718,8 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
 
         self.course = CourseFactory()
-        self.course.start = timezone.now() - datetime.timedelta(days=1)
-        self.course.end = timezone.now() + datetime.timedelta(days=1)
+        self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
+        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
         self.organization = factories.Organization()
@@ -739,14 +739,15 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
                 course_image_url=course_overview.course_image_url,
                 course_key=unicode(self.course.id),  # pylint: disable=no-member
                 course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
-                end_date=strftime_localized(self.course.end, 'SHORT_DATE'),
+                end_date=self.course.end.replace(tzinfo=utc),
                 enrollment_open_date=strftime_localized(utils.DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
-                is_course_ended=self.course.end < timezone.now(),
+                is_course_ended=self.course.end < datetime.datetime.now(utc),
                 is_enrolled=False,
                 is_enrollment_open=True,
                 marketing_url=MARKETING_URL,
-                start_date=strftime_localized(self.course.start, 'SHORT_DATE'),
+                start_date=self.course.start.replace(tzinfo=utc),
                 upgrade_url=None,
+                advertised_start=None
             ),
             **kwargs
         )
@@ -825,9 +826,12 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_course_enrollment_status(self, start_offset, end_offset, is_enrollment_open):
-        """Verify that course enrollment status is reflected correctly."""
-        self.course.enrollment_start = timezone.now() - datetime.timedelta(days=start_offset)
-        self.course.enrollment_end = timezone.now() - datetime.timedelta(days=end_offset)
+        """
+        Verify that course enrollment status is reflected correctly.
+        """
+        self.course.enrollment_start = datetime.datetime.now(utc) - datetime.timedelta(days=start_offset)
+        self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=end_offset)
+
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
         data = utils.ProgramDataExtender(self.program, self.user).extend()
@@ -843,7 +847,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
         Regression test for ECOM-4973.
         """
-        self.course.enrollment_end = timezone.now() - datetime.timedelta(days=1)
+        self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
         data = utils.ProgramDataExtender(self.program, self.user).extend()
@@ -873,7 +877,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
     @ddt.data(-1, 0, 1)
     def test_course_course_ended(self, days_offset):
-        self.course.end = timezone.now() + datetime.timedelta(days=days_offset)
+        self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=days_offset)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
         data = utils.ProgramDataExtender(self.program, self.user).extend()

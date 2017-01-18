@@ -3,9 +3,11 @@
 End-to-end tests for the LMS that utilize the
 progress page.
 """
-from contextlib import contextmanager
-
 import ddt
+
+from bok_choy.javascript import js_defined
+from contextlib import contextmanager
+from nose.plugins.attrib import attr
 
 from ..helpers import (
     UniqueCourseTest, auto_auth, create_multiple_choice_problem, create_multiple_choice_xml, get_modal_alert
@@ -64,6 +66,13 @@ class ProgressPageBaseTest(UniqueCourseTest):
                 XBlockFixtureDesc('sequential', self.SUBSECTION_NAME).add_children(
                     XBlockFixtureDesc('vertical', self.UNIT_NAME).add_children(self.problem1, self.problem2)
                 )
+            ),
+            XBlockFixtureDesc('chapter', "Lab Section").add_children(
+                XBlockFixtureDesc('sequential', "Lab Subsection").add_children(
+                    XBlockFixtureDesc('vertical', "Lab Unit").add_children(
+                        create_multiple_choice_problem("Lab Exercise")
+                    )
+                )
             )
         ).install()
 
@@ -115,7 +124,9 @@ class ProgressPageBaseTest(UniqueCourseTest):
             self.logout_page.visit()
 
 
+@attr(shard=9)
 @ddt.ddt
+@js_defined('window.jQuery')
 class PersistentGradesTest(ProgressPageBaseTest):
     """
     Test that grades for completed assessments are persisted
@@ -261,6 +272,7 @@ class PersistentGradesTest(ProgressPageBaseTest):
             self.assertEqual(self._get_section_score(), (0, 2))
 
 
+@attr(shard=9)
 class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     Tests changing a subsection's 'graded' field
@@ -268,16 +280,17 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
     """
     def setUp(self):
         super(SubsectionGradingPolicyTest, self).setUp()
-        self._set_policy_for_subsection("Homework")
+        self._set_policy_for_subsection("Homework", 0)
+        self._set_policy_for_subsection("Lab", 1)
 
-    def _set_policy_for_subsection(self, policy):
+    def _set_policy_for_subsection(self, policy, section=0):
         """
-        Set the grading policy for the
-        subsection in the test.
+        Set the grading policy for the first subsection in the specified section.
+        If a section index is not provided, 0 is assumed.
         """
         with self._logged_in_session(staff=True):
             self.course_outline.visit()
-            modal = self.course_outline.section_at(0).subsection_at(0).edit()
+            modal = self.course_outline.section_at(section).subsection_at(0).edit()
             modal.policy = policy
             modal.save()
 
@@ -289,6 +302,93 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
         self.assertEqual(self._get_problem_scores(), problem_scores)
         self.assertEqual(self._get_section_score(), section_score)
         self.assertTrue(self.progress_page.text_on_page(text))
+
+    def _check_tick_text(self, index, sr_text, label, label_hidden=True):
+        """
+        Check the label and sr text for a horizontal (X-axis) tick.
+        """
+        self.assertEqual(sr_text, self.progress_page.x_tick_sr_text(index))
+        self.assertEqual([label, 'true' if label_hidden else None], self.progress_page.x_tick_label(index))
+
+    def test_axis_a11y(self):
+        """
+        Tests that the progress chart axes have appropriate a11y (screenreader) markup.
+        """
+        with self._logged_in_session():
+            self.courseware_page.visit()
+            # Answer the first HW problem (the unit contains 2 problems, only one will be answered correctly)
+            self._answer_problem_correctly()
+            self.courseware_page.click_next_button_on_top()
+            # Answer the first Lab problem (unit only contains a single problem)
+            self._answer_problem_correctly()
+            self.progress_page.visit()
+
+            # Verify that y-Axis labels are aria-hidden
+            self.assertEqual(['100%', 'true'], self.progress_page.y_tick_label(0))
+            self.assertEqual(['0%', 'true'], self.progress_page.y_tick_label(1))
+            self.assertEqual(['Pass 50%', 'true'], self.progress_page.y_tick_label(2))
+
+            # Verify x-Axis labels and sr-text
+            self._check_tick_text(0, [u'Homework 1 - Test Subsection 1 - 50% (1/2)'], u'HW 01')
+
+            # Homeworks 2-10 are checked in the for loop below.
+
+            self._check_tick_text(
+                10,
+                [u'Homework 11 Unreleased - 0% (?/?)', u'The lowest 2 Homework scores are dropped.'],
+                u'HW 11'
+            )
+
+            self._check_tick_text(
+                11,
+                [u'Homework 12 Unreleased - 0% (?/?)', u'The lowest 2 Homework scores are dropped.'],
+                u'HW 12'
+            )
+
+            self._check_tick_text(12, [u'Homework Average = 5%'], u'HW Avg')
+            self._check_tick_text(13, [u'Lab 1 - Lab Subsection - 100% (1/1)'], u'Lab 01')
+
+            # Labs 2-10 are checked in the for loop below.
+
+            self._check_tick_text(
+                23,
+                [u'Lab 11 Unreleased - 0% (?/?)', u'The lowest 2 Lab scores are dropped.'],
+                u'Lab 11'
+            )
+            self._check_tick_text(
+                24,
+                [u'Lab 12 Unreleased - 0% (?/?)', u'The lowest 2 Lab scores are dropped.'],
+                u'Lab 12'
+            )
+
+            self._check_tick_text(25, [u'Lab Average = 10%'], u'Lab Avg')
+            self._check_tick_text(26, [u'Midterm Exam = 0%'], u'Midterm')
+            self._check_tick_text(27, [u'Final Exam = 0%'], u'Final')
+
+            self._check_tick_text(
+                28,
+                [u'Homework = 0.75% of a possible 15.00%', u'Lab = 1.50% of a possible 15.00%'],
+                u'Total',
+                False  # The label "Total" should NOT be aria-hidden
+            )
+
+            # The grading policy has 12 Homeworks and 12 Labs. Most of them are unpublished,
+            # with no additional information.
+            for i in range(1, 10):
+                self._check_tick_text(
+                    i,
+                    [u'Homework {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
+                    u'HW 0{index}'.format(index=i + 1) if i < 9 else u'HW {index}'.format(index=i + 1)
+                )
+                self._check_tick_text(
+                    i + 13,
+                    [u'Lab {index} Unreleased - 0% (?/?)'.format(index=i + 1)],
+                    u'Lab 0{index}'.format(index=i + 1) if i < 9 else u'Lab {index}'.format(index=i + 1)
+                )
+
+            # Verify the overall score. The first element in the array is the sr-only text, and the
+            # second is the total text (including the sr-only text).
+            self.assertEqual(['Overall Score', 'Overall Score\n2%'], self.progress_page.graph_overall_score())
 
     def test_subsection_grading_policy_on_progress_page(self):
         with self._logged_in_session():
@@ -306,5 +406,20 @@ class SubsectionGradingPolicyTest(ProgressPageBaseTest):
             self.assertFalse(self.progress_page.text_on_page("Homework 1 - Test Subsection 1"))
 
         self._set_policy_for_subsection("Homework")
+
         with self._logged_in_session():
             self._check_scores_and_page_text([(1, 1), (0, 1)], (1, 2), "Homework 1 - Test Subsection 1 - 50% (1/2)")
+
+
+@attr('a11y')
+class ProgressPageA11yTest(ProgressPageBaseTest):
+    """
+    Class to test the accessibility of the progress page.
+    """
+
+    def test_progress_page_a11y(self):
+        """
+        Test the accessibility of the progress page.
+        """
+        self.progress_page.visit()
+        self.progress_page.a11y_audit.check_for_accessibility_errors()

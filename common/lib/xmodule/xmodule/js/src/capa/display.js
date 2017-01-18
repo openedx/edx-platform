@@ -997,24 +997,6 @@
                     return preprocessor.fn;
                 }
             },
-            javascriptinput: function(element) {
-                var container, data, display, displayClass, evaluation, params, problemState, submission,
-                    submissionField;
-                data = $(element).find('.javascriptinput_data');
-                params = data.data('params');
-                submission = data.data('submission');
-                evaluation = data.data('evaluation');
-                problemState = data.data('problem_state');
-                displayClass = window[data.data('display_class')];
-                if (evaluation === '') {
-                    evaluation = null;
-                }
-                container = $(element).find('.javascriptinput_container');
-                submissionField = $(element).find('.javascriptinput_input');
-                display = new displayClass(problemState, submission, evaluation, container, submissionField, params);
-                display.render();
-                return display;
-            },
             cminput: function(container) {
                 var CodeMirrorEditor, CodeMirrorTextArea, element, id, linenumbers, mode, spaces, tabsize;
                 element = $(container).find('textarea');
@@ -1063,14 +1045,6 @@
                         addClass('choicegroup_correct'));
                 }
                 return results;
-            },
-            javascriptinput: function(element, display, answers) {
-                var answer, answerId;
-                answerId = $(element).attr('id').split('_')
-                    .slice(1)
-                    .join('_');
-                answer = JSON.parse(answers[answerId]);
-                return display.showAnswer(answer);
             },
             choicetextgroup: function(element, display, answers) {
                 var answer, choice, inputId, i, len, results, $element;
@@ -1169,20 +1143,6 @@
                 } else {
                     console.log('Answer is absent for image input with id=' + id); // eslint-disable-line no-console
                 }
-            }
-        };
-
-        Problem.prototype.inputtypeHideAnswerMethods = {
-            choicegroup: function(element) {
-                var $element = $(element);
-                return $element.find('label').removeClass('choicegroup_correct');
-            },
-            javascriptinput: function(element, display) {
-                return display.hideAnswer();
-            },
-            choicetextgroup: function(element) {
-                var $element = $(element);
-                return $element.find('section[id^="forinput"]').removeClass('choicetextgroup_show_correct');
             }
         };
 

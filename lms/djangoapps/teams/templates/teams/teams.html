@@ -1,4 +1,7 @@
 ## mako
+
+<%page expression_filter="h"/>
+
 <%! import json %>
 <%!
 from django.utils.translation import ugettext as _
@@ -55,3 +58,4 @@ from openedx.core.djangolib.js_utils import (
 </%block>
 
 <%include file="../discussion/_underscore_templates.html" />
+<%include file="../discussion/_thread_list_template.html" />

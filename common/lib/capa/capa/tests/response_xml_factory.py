@@ -608,58 +608,16 @@ class ImageResponseXMLFactory(ResponseXMLFactory):
         return input_element
 
 
-class JavascriptResponseXMLFactory(ResponseXMLFactory):
-    """ Factory for producing <javascriptresponse> XML """
-
-    def create_response_element(self, **kwargs):
-        """ Create the <javascriptresponse> element.
-
-        Uses **kwargs:
-
-        *generator_src*: Name of the JS file to generate the problem.
-        *grader_src*: Name of the JS file to grade the problem.
-        *display_class*: Name of the class used to display the problem
-        *display_src*: Name of the JS file used to display the problem
-        *param_dict*: Dictionary of parameters to pass to the JS
-        """
-        # Get **kwargs
-        generator_src = kwargs.get("generator_src", None)
-        grader_src = kwargs.get("grader_src", None)
-        display_class = kwargs.get("display_class", None)
-        display_src = kwargs.get("display_src", None)
-        param_dict = kwargs.get("param_dict", {})
-
-        # Both display_src and display_class given,
-        # or neither given
-        assert((display_src and display_class) or
-               (not display_src and not display_class))
-
-        # Create the <javascriptresponse> element
-        response_element = etree.Element("javascriptresponse")
-
-        if generator_src:
-            generator_element = etree.SubElement(response_element, "generator")
-            generator_element.set("src", str(generator_src))
-
-        if grader_src:
-            grader_element = etree.SubElement(response_element, "grader")
-            grader_element.set("src", str(grader_src))
-
-        if display_class and display_src:
-            display_element = etree.SubElement(response_element, "display")
-            display_element.set("class", str(display_class))
-            display_element.set("src", str(display_src))
-
-        for (param_name, param_val) in param_dict.items():
-            responseparam_element = etree.SubElement(response_element, "responseparam")
-            responseparam_element.set("name", str(param_name))
-            responseparam_element.set("value", str(param_val))
-
-        return response_element
+class JSInputXMLFactory(CustomResponseXMLFactory):
+    """
+    Factory for producing <jsinput> XML.
+    Note that this factory currently does not create a functioning problem.
+    It will only create an empty iframe.
+    """
 
     def create_input_element(self, **kwargs):
-        """ Create the <javascriptinput> element """
-        return etree.Element("javascriptinput")
+        """ Create the <jsinput> element """
+        return etree.Element("jsinput")
 
 
 class MultipleChoiceResponseXMLFactory(ResponseXMLFactory):

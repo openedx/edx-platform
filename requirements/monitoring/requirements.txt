@@ -2,7 +2,8 @@
 # dependency monitoring tools like gemnasium.com can easily process them.
 
 # It can not be used to do the full installation because it is not in the correct
-# order.
+# order, and because we pin setuptools which needs to be installed in a different
+# process than the rest of the requirements.
 
 -r ../edx/development.txt
 

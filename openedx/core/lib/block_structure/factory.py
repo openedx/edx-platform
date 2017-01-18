@@ -53,7 +53,7 @@ class BlockStructureFactory(object):
                 block_structure._add_relation(xblock.location, child.location)  # pylint: disable=protected-access
                 build_block_structure(child)
 
-        root_xblock = modulestore.get_item(root_block_usage_key, depth=None)
+        root_xblock = modulestore.get_item(root_block_usage_key, depth=None, lazy=False)
         build_block_structure(root_xblock)
         return block_structure
 

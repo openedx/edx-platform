@@ -19,12 +19,13 @@ import calc
 
 from opaque_keys import InvalidKeyError
 
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 
 from edxmako.shortcuts import render_to_response, render_to_string
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 import track.views
 from student.roles import GlobalStaff
+from student.models import CourseEnrollment
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +45,26 @@ def ensure_valid_course_key(view_func):
         if course_key is not None:
             try:
                 CourseKey.from_string(course_key)
+            except InvalidKeyError:
+                raise Http404
+
+        response = view_func(request, *args, **kwargs)
+        return response
+
+    return inner
+
+
+def ensure_valid_usage_key(view_func):
+    """
+    This decorator should only be used with views which have argument usage_key_string.
+    If usage_key_string is not valid raise 404.
+    """
+    @wraps(view_func)
+    def inner(request, *args, **kwargs):  # pylint: disable=missing-docstring
+        usage_key = kwargs.get('usage_key_string')
+        if usage_key is not None:
+            try:
+                UsageKey.from_string(usage_key)
             except InvalidKeyError:
                 raise Http404
 
@@ -202,6 +223,40 @@ class _ZendeskApi(object):
         return None
 
 
+def _get_zendesk_custom_field_context(request):
+    """
+    Construct a dictionary of data that can be stored in Zendesk custom fields.
+    """
+    context = {}
+
+    course_id = request.POST.get("course_id")
+    if not course_id:
+        return context
+
+    context["course_id"] = course_id
+    if not request.user.is_authenticated():
+        return context
+
+    enrollment = CourseEnrollment.get_enrollment(request.user, CourseKey.from_string(course_id))
+    if enrollment and enrollment.is_active:
+        context["enrollment_mode"] = enrollment.mode
+
+    return context
+
+
+def _format_zendesk_custom_fields(context):
+    """
+    Format the data in `context` for compatibility with the Zendesk API.
+    Ignore any keys that have not been configured in `ZENDESK_CUSTOM_FIELDS`.
+    """
+    custom_fields = []
+    for key, val, in settings.ZENDESK_CUSTOM_FIELDS.items():
+        if key in context:
+            custom_fields.append({"id": val, "value": context[key]})
+
+    return custom_fields
+
+
 def _record_feedback_in_zendesk(
         realname,
         email,
@@ -211,7 +266,8 @@ def _record_feedback_in_zendesk(
         additional_info,
         group_name=None,
         require_update=False,
-        support_email=None
+        support_email=None,
+        custom_fields=None
 ):
     """
     Create a new user-requested Zendesk ticket.
@@ -226,6 +282,8 @@ def _record_feedback_in_zendesk(
     If `require_update` is provided, returns False when the update does not
     succeed. This allows using the private comment to add necessary information
     which the user will not see in followup emails from support.
+
+    If `custom_fields` is provided, submits data to those fields in Zendesk.
     """
     zendesk_api = _ZendeskApi()
 
@@ -251,6 +309,10 @@ def _record_feedback_in_zendesk(
             "tags": zendesk_tags
         }
     }
+
+    if custom_fields:
+        new_ticket["ticket"]["custom_fields"] = custom_fields
+
     group = None
     if group_name is not None:
         group = zendesk_api.get_group(group_name)
@@ -302,7 +364,7 @@ def get_feedback_form_context(request):
     context["subject"] = request.POST["subject"]
     context["details"] = request.POST["details"]
     context["tags"] = dict(
-        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
+        [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if request.POST.get(tag)]
     )
 
     context["additional_info"] = {}
@@ -392,6 +454,11 @@ def submit_feedback(request):
         if not settings.ZENDESK_URL or not settings.ZENDESK_USER or not settings.ZENDESK_API_KEY:
             raise Exception("Zendesk enabled but not configured")
 
+        custom_fields = None
+        if settings.ZENDESK_CUSTOM_FIELDS:
+            custom_field_context = _get_zendesk_custom_field_context(request)
+            custom_fields = _format_zendesk_custom_fields(custom_field_context)
+
         success = _record_feedback_in_zendesk(
             context["realname"],
             context["email"],
@@ -399,7 +466,8 @@ def submit_feedback(request):
             context["details"],
             context["tags"],
             context["additional_info"],
-            support_email=context["support_email"]
+            support_email=context["support_email"],
+            custom_fields=custom_fields
         )
 
     _record_feedback_in_datadog(context["tags"])

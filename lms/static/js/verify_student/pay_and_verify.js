@@ -50,6 +50,8 @@ var edx = edx || {};
                 courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
                 userEmail: el.data('user-email'),
+                userLanguage: el.data('user-language'),
+                userTimezone: el.data('user-timezone'),
                 hasVisibleReqs: _.some(
                     el.data('requirements'),
                     function(isVisible) { return isVisible; }
@@ -75,7 +77,6 @@ var edx = edx || {};
             'payment-confirmation-step': {
                 courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
-                courseStartDate: el.data('course-start-date'),
                 coursewareUrl: el.data('courseware-url'),
                 platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
@@ -94,7 +95,6 @@ var edx = edx || {};
             },
             'enrollment-confirmation-step': {
                 courseName: el.data('course-name'),
-                courseStartDate: el.data('course-start-date'),
                 coursewareUrl: el.data('courseware-url'),
                 platformName: el.data('platform-name')
             }

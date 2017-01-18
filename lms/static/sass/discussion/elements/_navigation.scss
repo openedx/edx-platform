@@ -1,6 +1,8 @@
 // discussion - elements - navigation
 // ====================
 
+@import '../../edx-pattern-library-shims/base/variables';
+
 .forum-nav {
     border: 1px solid #aaa;
     border-radius: $forum-border-radius;
@@ -120,10 +122,10 @@
 // -------------------
 // Sort and filter bar
 // -------------------
+
 .forum-nav-refine-bar {
     @include clearfix();
     @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
-    @include text-align(right);
     font-size: $forum-small-font-size;
     border-bottom: 1px solid $forum-color-border;
     background-color: $gray-l5;
@@ -132,17 +134,22 @@
 }
 
 .forum-nav-filter-main {
+    @include text-align(left);
+    @include float(left);
     box-sizing: border-box;
     display: inline-block;
     width: 50%;
-    @include text-align(left);
 }
 
 .forum-nav-filter-cohort, .forum-nav-sort {
+    @include text-align(right);
+    @include float(right);
     box-sizing: border-box;
     display: inline-block;
-    width: 50%;
-    @include text-align(right);
+
+    @media (min-width: $bp-screen-md) {
+        width: 50%;
+    }
 }
 
 %forum-nav-select {
@@ -157,6 +164,7 @@
 
 .forum-nav-filter-cohort-control {
     @extend %forum-nav-select;
+    max-width: 60%;
 }
 
 .forum-nav-sort-control {
@@ -167,14 +175,19 @@
 // Thread list
 // -----------
 .forum-nav-thread-list {
-    @include padding-left(0);
+    padding-left: 0 !important; // should *not* be RTLed, see below for explanation
+    min-height: 60px;  // @TODO: Remove this when we have a real empty state for the discussion thread list
     margin: 0;
-    overflow-y: scroll;
+    overflow-y: auto;
     list-style: none;
     border-radius: 0 0 3px 3px;
 
     .forum-nav-thread-labels {
         margin: 5px 0 0;
+        // Overrides overspecific courseware CSS from:
+        // https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L470
+        // note this should *not* be RTLed, as the rule it overrides is not RTLed
+        padding-left: 0 !important;
     }
 
     .thread-preview-body {
@@ -184,6 +197,22 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+
+        @include rtl {
+            // This is counterintuitive, but when showing a preview of the first part of RTL text, using direction: rtl
+            // will actually show the _last_ part of that text.
+            direction: ltr;
+        }
+    }
+}
+
+// Overrides underspecific styles from courseware css
+.course-wrapper .course-content .forum-nav-thread-list-wrapper .forum-nav-thread-list {
+    @include padding-left(0);
+    list-style: none;
+
+    .forum-nav-thread {
+        margin: 0;
     }
 }
 
@@ -217,33 +246,7 @@
         }
 
         &.is-active {
-            color: $forum-color-background;
             background-color: $forum-color-reading-thread;
-
-            .forum-nav-thread-labels > li {
-                border-color: $forum-color-background;
-                color: $forum-color-background;
-            }
-
-            .forum-nav-thread-votes-count {
-                color: $forum-color-background;
-            }
-
-            .forum-nav-thread-comments-count {
-                color: $base-font-color;
-
-                &:after {
-                    @include border-right-color($forum-color-border);
-                }
-            }
-
-            span.icon {
-                color: $forum-color-background;
-            }
-
-            .thread-preview-body {
-                color: $forum-color-background;
-            }
         }
 
         .forum-nav-thread-unread-comments-count {
@@ -269,6 +272,7 @@
 .forum-nav-thread-wrapper-0 {
     @extend %forum-nav-thread-wrapper;
     @include margin-right($baseline/5);
+    align-self: flex-start;
 
     .icon {
         font-size: $forum-base-font-size;
@@ -287,13 +291,16 @@
 .forum-nav-thread-wrapper-1 {
     @extend %forum-nav-thread-wrapper;
     margin: 0 ($baseline / 4);
-    width: 80%;
+      // 125 is the width we need to save for the "X new" comments indicator - and we want to clip the preview
+      // at the same length whether there are unread comments for this story or not.
+    max-width: calc(100% - 125px);
     flex-grow: 1;  // This column should consume all the available space
 }
 
 .forum-nav-thread-wrapper-2 {
     @extend %forum-nav-thread-wrapper;
     @include text-align(right);
+    min-width: 90px;
     white-space: nowrap;
 }
 
@@ -364,7 +371,9 @@
     &:hover,
     &:focus {
         color: $forum-color-active-text;
-        background-color: $forum-color-active-thread;
+        // !important overrides the one set here:
+        // https://github.com/edx/edx-platform/blob/master/lms/static/sass/elements/_controls.scss#L472
+        background-color: $forum-color-active-thread !important;
     }
 }
 

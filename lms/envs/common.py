@@ -49,7 +49,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 PLATFORM_NAME = "Your Platform Name Here"
 CC_MERCHANT_NAME = PLATFORM_NAME
 # Shows up in the platform footer, eg "(c) COPYRIGHT_YEAR"
-COPYRIGHT_YEAR = "2016"
+COPYRIGHT_YEAR = "2017"
 
 PLATFORM_FACEBOOK_ACCOUNT = "http://www.facebook.com/YourPlatformFacebookAccount"
 PLATFORM_TWITTER_ACCOUNT = "@YourPlatformTwitterAccount"
@@ -249,10 +249,14 @@ FEATURES = {
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
 
-    # When a user goes to the homepage ('/') the user see the
+    # When a user goes to the homepage ('/') the user sees the
     # courses listed in the announcement dates order - this is default Open edX behavior.
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': True,
+
+    # When set to True, a list of programs is displayed along with the list of courses
+    # when the user visits the homepage or the find courses page.
+    'DISPLAY_PROGRAMS_ON_MARKETING_PAGES': False,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
@@ -361,6 +365,9 @@ FEATURES = {
     # Note: This has no effect unless ANALYTICS_DASHBOARD_URL is already set,
     #       because without that setting, the tab does not show up for any courses.
     'ENABLE_CCX_ANALYTICS_DASHBOARD_URL': False,
+
+    # Set this to False to facilitate cleaning up invalid xml from your modulestore.
+    'ENABLE_XBLOCK_XML_VALIDATION': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -996,6 +1003,7 @@ FEEDBACK_SUBMISSION_EMAIL = None
 ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
+ZENDESK_CUSTOM_FIELDS = {}
 
 ##### EMBARGO #####
 EMBARGO_SITE_REDIRECT_URL = None
@@ -1275,7 +1283,7 @@ base_vendor_js = [
     'edx-ui-toolkit/js/utils/html-utils.js',
 
     # Finally load RequireJS and dependent vendor libraries
-    'js/vendor/requirejs/require.js',
+    'common/js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
     'js/vendor/URI.min.js',
     'common/js/vendor/backbone.js'
@@ -1690,7 +1698,7 @@ REQUIRE_BASE_URL = "./"
 REQUIRE_BUILD_PROFILE = "lms/js/build.js"
 
 # The name of the require.js script used by your project, relative to REQUIRE_BASE_URL.
-REQUIRE_JS = "js/vendor/requirejs/require.js"
+REQUIRE_JS = "common/js/vendor/require.js"
 
 # A dictionary of standalone modules to build with almond.js.
 REQUIRE_STANDALONE_MODULES = {}
@@ -2662,6 +2670,8 @@ OPTIONAL_APPS = (
 
     # Enterprise App (http://github.com/edx/edx-enterprise)
     'enterprise',
+    # Required by the Enterprise App
+    'django_object_actions',  # https://github.com/crccheck/django-object-actions
 )
 
 for app_name in OPTIONAL_APPS:
@@ -3024,3 +3034,7 @@ REDIRECT_CACHE_KEY_PREFIX = 'redirects'
 ############## Settings for LMS Context Sensitive Help ##############
 
 DOC_LINK_BASE_URL = None
+
+############## Settings for the Enterprise App ######################
+
+ENTERPRISE_ENROLLMENT_API_URL = LMS_ROOT_URL + "/api/enrollment/v1/"

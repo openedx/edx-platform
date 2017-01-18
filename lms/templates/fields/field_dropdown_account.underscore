@@ -20,16 +20,20 @@
         <span class="u-field-value-readonly"></span>
     <% } else { %>
         <select name="select" id="u-field-select-<%- id %>" aria-describedby="u-field-help-message-<%- id %>">
-            <% if (showBlankOption) { %>
-                <option value=""></option>
-            <% } %>
             <% _.each(groupOptions, function(groupOption) { %>
-                <% if (groupOption.groupTitle != null) { %>
-                    <optgroup label="<%- groupOption.groupTitle %>">
+                <% if (showBlankOption) { %>
+                    <% if (groupOption.nullValueOptionLabel) { %>
+                        <option value=""><%- groupOption.nullValueOptionLabel %></option>
+                    <% } else { %>
+                        <option value=""></option>
+                    <% } %>
                 <% } %>
-                <% _.each(groupOption.selectOptions, function(selectOption) { %>
-                    <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
-                <% }); %>
+                    <% if (groupOption.groupTitle != null) { %>
+                        <optgroup label="<%- groupOption.groupTitle %>">
+                    <% } %>
+                    <% _.each(groupOption.selectOptions, function(selectOption) { %>
+                        <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
+                    <% }); %>
             <% }); %>
         </select>
         <span class="icon-caret-down" aria-hidden="true"></span>

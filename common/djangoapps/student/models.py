@@ -29,7 +29,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.db import models, IntegrityError, transaction
+from django.db import models, IntegrityError
 from django.db.models import Count
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver, Signal
@@ -121,7 +121,6 @@ class AnonymousUserId(models.Model):
     user = models.ForeignKey(User, db_index=True)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
     course_id = CourseKeyField(db_index=True, max_length=255, blank=True)
-    unique_together = (user, course_id)
 
 
 def anonymous_id_for_user(user, course_id, save=True):
@@ -159,22 +158,11 @@ def anonymous_id_for_user(user, course_id, save=True):
         return digest
 
     try:
-        anonymous_user_id, __ = AnonymousUserId.objects.get_or_create(
-            defaults={'anonymous_user_id': digest},
+        AnonymousUserId.objects.get_or_create(
             user=user,
-            course_id=course_id
+            course_id=course_id,
+            anonymous_user_id=digest,
         )
-        if anonymous_user_id.anonymous_user_id != digest:
-            log.error(
-                u"Stored anonymous user id %(anonymous_user_id)r for "
-                u"user %(user)r in course %(course_id)r doesn't match "
-                u"computed id %(digest)r", {
-                    "anonymous_user_id": anonymous_user_id.anonymous_user_id,
-                    "user": user,
-                    "course_id": course_id,
-                    "digest": digest,
-                }
-            )
     except IntegrityError:
         # Another thread has already created this entry, so
         # continue
@@ -1036,7 +1024,6 @@ class CourseEnrollment(models.Model):
         cache.delete(self.enrollment_status_hash_cache_key(self.user))
 
     @classmethod
-    @transaction.atomic
     def get_or_create_enrollment(cls, user, course_key):
         """
         Create an enrollment for a user in a class. By default *this enrollment
@@ -2065,11 +2052,25 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         )
 
     def _cert_name(self, course_name, cert_mode):
-        """Name of the certification, for display on LinkedIn. """
-        return self.MODE_TO_CERT_NAME.get(
+        """
+        Name of the certification, for display on LinkedIn.
+
+        Arguments:
+            course_name (unicode): The display name of the course.
+            cert_mode (str): The course mode of the user's certificate (e.g. "verified", "honor", "professional")
+
+        Returns:
+            str: The formatted string to display for the name field on the LinkedIn Add to Profile dialog.
+        """
+        default_cert_name = self.MODE_TO_CERT_NAME.get(
             cert_mode,
             _(u"{platform_name} Certificate for {course_name}")
-        ).format(
+        )
+        # Look for an override of the certificate name in the SOCIAL_SHARING_SETTINGS setting
+        share_settings = configuration_helpers.get_value('SOCIAL_SHARING_SETTINGS', settings.SOCIAL_SHARING_SETTINGS)
+        cert_name = share_settings.get('CERTIFICATE_LINKEDIN_MODE_TO_CERT_NAME', {}).get(cert_mode, default_cert_name)
+
+        return cert_name.format(
             platform_name=configuration_helpers.get_value('platform_name', settings.PLATFORM_NAME),
             course_name=course_name
         )

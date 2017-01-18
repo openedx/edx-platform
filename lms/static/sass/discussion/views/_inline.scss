@@ -1,0 +1,54 @@
+// forums - inline discussion styling
+// ====================
+
+.discussion.inline-discussion {
+    .inline-threads {
+        border: 1px solid $forum-color-border;
+        border-radius: $forum-border-radius;
+    }
+
+    .inline-thread {
+        border: 1px solid $forum-color-border;
+        border-radius: $forum-border-radius;
+
+        .forum-nav-bar {
+            padding: ($baseline / 2) ($baseline / 4);
+            color: $forum-color-navigation-bar;
+            position: relative;
+
+            .all-posts-btn {
+                color: $forum-color-primary;
+
+                .icon {
+                    @include margin-left($baseline / 2);
+                }
+            }
+        }
+
+        .forum-content {
+            padding: $baseline / 2;
+            overflow-y: auto;
+        }
+    }
+
+   .new-post-article {
+        position: relative;
+        border: 1px solid $forum-color-border;
+
+        .add-post-cancel {
+          @include right($baseline / 2);
+          top: $baseline / 2;
+          position: absolute;
+          color: $uxpl-primary-blue;
+
+            &:hover,
+            &:focus {
+                border-color: transparent;
+                box-shadow: none;
+                background-color: transparent;
+                background-image: none;
+            }
+        }
+    }
+
+}

@@ -13,6 +13,9 @@ from openedx.core.lib.html_to_text import html_to_text
 from openedx.core.lib.mail_utils import wrap_message
 
 from config_models.models import ConfigurationModel
+from course_modes.models import CourseMode
+from enrollment.api import validate_course_mode
+from enrollment.errors import CourseModeNotFoundError
 from student.roles import CourseStaffRole, CourseInstructorRole
 
 from openedx.core.djangoapps.xmodule_django.models import CourseKeyField
@@ -45,9 +48,10 @@ SEND_TO_MYSELF = 'myself'
 SEND_TO_STAFF = 'staff'
 SEND_TO_LEARNERS = 'learners'
 SEND_TO_COHORT = 'cohort'
+SEND_TO_TRACK = 'track'
 EMAIL_TARGET_CHOICES = zip(
-    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT],
-    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort']
+    [SEND_TO_MYSELF, SEND_TO_STAFF, SEND_TO_LEARNERS, SEND_TO_COHORT, SEND_TO_TRACK],
+    ['Myself', 'Staff and instructors', 'All students', 'Specific cohort', 'Specific course mode']
 )
 EMAIL_TARGETS = {target[0] for target in EMAIL_TARGET_CHOICES}
 
@@ -78,6 +82,8 @@ class Target(models.Model):
         """
         if self.target_type == SEND_TO_COHORT:
             return self.cohorttarget.short_display()  # pylint: disable=no-member
+        elif self.target_type == SEND_TO_TRACK:
+            return self.coursemodetarget.short_display()  # pylint: disable=no-member
         else:
             return self.target_type
 
@@ -87,6 +93,8 @@ class Target(models.Model):
         """
         if self.target_type == SEND_TO_COHORT:
             return self.cohorttarget.long_display()  # pylint: disable=no-member
+        elif self.target_type == SEND_TO_TRACK:
+            return self.coursemodetarget.long_display()  # pylint: disable=no-member
         else:
             return self.get_target_type_display()
 
@@ -115,6 +123,12 @@ class Target(models.Model):
             return use_read_replica_if_available(enrollment_qset.exclude(id__in=staff_instructor_qset))
         elif self.target_type == SEND_TO_COHORT:
             return self.cohorttarget.cohort.users.filter(id__in=enrollment_qset)  # pylint: disable=no-member
+        elif self.target_type == SEND_TO_TRACK:
+            return use_read_replica_if_available(
+                enrollment_qset.filter(
+                    courseenrollment__mode=self.coursemodetarget.track.mode_slug
+                )
+            )
         else:
             raise ValueError("Unrecognized target type {}".format(self.target_type))
 
@@ -131,6 +145,9 @@ class CohortTarget(Target):
     def __init__(self, *args, **kwargs):
         kwargs['target_type'] = SEND_TO_COHORT
         super(CohortTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.short_display()
 
     def short_display(self):
         return "{}-{}".format(self.target_type, self.cohort.name)
@@ -159,6 +176,53 @@ class CohortTarget(Target):
         return cohort
 
 
+class CourseModeTarget(Target):
+    """
+    Subclass of Target, specifically for course modes.
+    """
+    track = models.ForeignKey('course_modes.CourseMode')
+
+    class Meta:
+        app_label = "bulk_email"
+
+    def __init__(self, *args, **kwargs):
+        kwargs['target_type'] = SEND_TO_TRACK
+        super(CourseModeTarget, self).__init__(*args, **kwargs)
+
+    def __unicode__(self):
+        return self.short_display()
+
+    def short_display(self):
+        return "{}-{}".format(self.target_type, self.track.mode_slug)  # pylint: disable=no-member
+
+    def long_display(self):
+        all_modes = CourseMode.objects.filter(
+            course_id=self.track.course_id,
+            mode_slug=self.track.mode_slug,  # pylint: disable=no-member
+        )
+        return "Course mode: {}, Currencies: {}".format(
+            self.track.mode_display_name,  # pylint: disable=no-member
+            ", ".join([mode.currency for mode in all_modes])
+        )
+
+    @classmethod
+    def ensure_valid_mode(cls, mode_slug, course_id):
+        """
+        Ensures mode_slug is a valid mode for course_id. Will raise an error if invalid.
+        """
+        if mode_slug is None:
+            raise ValueError("Cannot create a CourseModeTarget without specifying a mode_slug.")
+        try:
+            validate_course_mode(unicode(course_id), mode_slug)
+        except CourseModeNotFoundError:
+            raise ValueError(
+                "Track {track} does not exist in course {course_id}".format(
+                    track=mode_slug,
+                    course_id=course_id
+                )
+            )
+
+
 class CourseEmail(Email):
     """
     Stores information for an email to a course.
@@ -179,7 +243,7 @@ class CourseEmail(Email):
     @classmethod
     def create(
             cls, course_id, sender, targets, subject, html_message,
-            text_message=None, template_name=None, from_addr=None, cohort_name=None):
+            text_message=None, template_name=None, from_addr=None):
         """
         Create an instance of CourseEmail.
         """
@@ -189,7 +253,7 @@ class CourseEmail(Email):
 
         new_targets = []
         for target in targets:
-            # split target, to handle cohort:cohort_name
+            # split target, to handle cohort:cohort_name and track:mode_slug
             target_split = target.split(':', 1)
             # Ensure our desired target exists
             if target_split[0] not in EMAIL_TARGETS:
@@ -200,6 +264,14 @@ class CourseEmail(Email):
                 # target_split[1] will contain the cohort name
                 cohort = CohortTarget.ensure_valid_cohort(target_split[1], course_id)
                 new_target, _ = CohortTarget.objects.get_or_create(target_type=target_split[0], cohort=cohort)
+            elif target_split[0] == SEND_TO_TRACK:
+                # target_split[1] contains the desired mode slug
+                CourseModeTarget.ensure_valid_mode(target_split[1], course_id)
+
+                # There could exist multiple CourseModes that match this query, due to differing currency types.
+                # The currencies do not affect user lookup though, so we can just use the first result.
+                mode = CourseMode.objects.filter(course_id=course_id, mode_slug=target_split[1])[0]
+                new_target, _ = CourseModeTarget.objects.get_or_create(target_type=target_split[0], track=mode)
             else:
                 new_target, _ = Target.objects.get_or_create(target_type=target_split[0])
             new_targets.append(new_target)

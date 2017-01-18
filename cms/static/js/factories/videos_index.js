@@ -5,19 +5,23 @@ define([
     'use strict';
     var VideosIndexFactory = function(
         $contentWrapper,
-        postUrl,
+        videoHandlerUrl,
         encodingsDownloadUrl,
         concurrentUploadLimit,
         uploadButton,
-        previousUploads
+        previousUploads,
+        videoSupportedFileFormats,
+        videoUploadMaxFileSizeInGB
     ) {
         var activeView = new ActiveVideoUploadListView({
-                postUrl: postUrl,
+                postUrl: videoHandlerUrl,
                 concurrentUploadLimit: concurrentUploadLimit,
                 uploadButton: uploadButton,
+                videoSupportedFileFormats: videoSupportedFileFormats,
+                videoUploadMaxFileSizeInGB: videoUploadMaxFileSizeInGB,
                 onFileUploadDone: function(activeVideos) {
                     $.ajax({
-                        url: postUrl,
+                        url: videoHandlerUrl,
                         contentType: 'application/json',
                         dataType: 'json',
                         type: 'GET'
@@ -30,6 +34,7 @@ define([
                                        isActive[0].get('status') === ActiveVideoUpload.STATUS_COMPLETE;
                             }),
                             updatedView = new PreviousVideoUploadListView({
+                                videoHandlerUrl: videoHandlerUrl,
                                 collection: updatedCollection,
                                 encodingsDownloadUrl: encodingsDownloadUrl
                             });
@@ -38,6 +43,7 @@ define([
                 }
             }),
             previousView = new PreviousVideoUploadListView({
+                videoHandlerUrl: videoHandlerUrl,
                 collection: new Backbone.Collection(previousUploads),
                 encodingsDownloadUrl: encodingsDownloadUrl
             });

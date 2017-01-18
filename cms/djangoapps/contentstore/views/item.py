@@ -635,7 +635,7 @@ def _create_item(request):
     )
 
 
-def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
+def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None, is_child=False):
     """
     Duplicate an existing xblock as a child of the supplied parent_usage_key.
     """
@@ -653,6 +653,10 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         for field in source_item.fields.values():
             if field.scope == Scope.settings and field.is_set_on(source_item):
                 duplicate_metadata[field.name] = field.read_from(source_item)
+
+        if is_child:
+            display_name = display_name or source_item.display_name or source_item.category
+
         if display_name is not None:
             duplicate_metadata['display_name'] = display_name
         else:
@@ -698,7 +702,7 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         if source_item.has_children and not children_handled:
             dest_module.children = dest_module.children or []
             for child in source_item.children:
-                dupe = _duplicate_item(dest_module.location, child, user=user)
+                dupe = _duplicate_item(dest_module.location, child, user=user, is_child=True)
                 if dupe not in dest_module.children:  # _duplicate_item may add the child for us.
                     dest_module.children.append(dupe)
             store.update_item(dest_module, user.id)
@@ -944,8 +948,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
 
-    # defining the default value 'True' for delete, drag and add new child actions in xblock_actions for each xblock.
-    xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True}
+    # defining the default value 'True' for delete, duplicate, drag and add new child actions
+    # in xblock_actions for each xblock.
+    xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True, 'duplicable': True}
     explanatory_message = None
 
     # is_entrance_exam is inherited metadata.
