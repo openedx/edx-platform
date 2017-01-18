@@ -176,7 +176,7 @@ Via this endpoint the status of the Enrollment Codes can be changed. The endpoin
 
 **cancel** When you can cancel an enrollment code, the code becomes unavailable. If a user was enrolled using this code, the user will be unenrolled from the related course.
 
-**restore** If the code was previously "canceled", it will become available again. If the code was active and a user was enrolled in a course using it, the user will be unenrolled from the course, and the code will be available again for enrolling another user.
+**restore** If the code was previously "cancelled", it will become available again. If the code was active and a user was enrolled in a course using it, the user will be unenrolled from the course, and the code will be available again for enrolling another user.
 
 * URL: `/appsembler_api/v0/enrollment-codes/status`
 * Method: `POST`
