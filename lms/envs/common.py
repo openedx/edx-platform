@@ -2153,6 +2153,12 @@ INSTALLED_APPS = (
 
     # additional release utilities to ease automation
     'release_util',
+
+    # entitlements
+    "entitlements",
+
+    # enterprise features
+    "enterprise"
 )
 
 # Migrations which are not in the standard module "migrations"
