@@ -4,7 +4,7 @@ xblock-image-modal==0.3.1
 -e git+https://github.com/Stanford-Online/xblock-free-text-response@5f27268cac7c89e51ba14e2c0165a38d991fce14#egg=xblock-free-text-response
 -e git+https://github.com/Stanford-Online/xblock-grademe.git@v0.1.0#egg=grademebutton
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
--e git+https://github.com/Stanford-Online/xblock-submit-and-compare.git@ce5777a66164f40b0d97a7842916ed142abfd7cc#egg=xblock-submit-and-compare
+-e git+https://github.com/Stanford-Online/xblock-submit-and-compare.git@d8f50217eee464a7b5c0fc6fe19f286a103875e6#egg=xblock-submit-and-compare
 -e git+https://github.com/Stanford-Online/xblock-mufi.git@ee853b8a7668a87c27d13d55c0d149a04b8657b8#egg=xblock_mufi-master
 -e git+https://github.com/Stanford-Online/edx-analytics-data-api-client.git@1b8260ce8dd6edb999fffc46b09f77c83f87e1f9#egg=edx-analytics-data-api-client
 -e git+https://github.com/openlearninginitiative/xblock-inline-dropdown.git@d4b3630838f8df0f2d3706128366650d3b0f158b#egg=inline_dropdown
