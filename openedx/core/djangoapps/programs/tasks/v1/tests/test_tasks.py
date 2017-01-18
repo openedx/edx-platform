@@ -2,7 +2,6 @@
 Tests for programs celery tasks.
 """
 import json
-import unittest
 
 from celery.exceptions import MaxRetriesExceededError
 import ddt
@@ -20,7 +19,7 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
 from openedx.core.djangoapps.programs.tasks.v1 import tasks
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 
 
@@ -28,7 +27,7 @@ TASKS_MODULE = 'openedx.core.djangoapps.programs.tasks.v1.tasks'
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
     """
     Test the get_api_client function
@@ -53,7 +52,7 @@ class GetApiClientTestCase(TestCase, ProgramsApiConfigMixin):
 
 
 @httpretty.activate
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class GetCompletedProgramsTestCase(ProgramsApiConfigMixin, CacheIsolationTestCase):
     """
     Test the get_completed_programs function
@@ -113,7 +112,7 @@ class GetCompletedProgramsTestCase(ProgramsApiConfigMixin, CacheIsolationTestCas
         self._assert_num_requests(1)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class GetAwardedCertificateProgramsTestCase(TestCase):
     """
     Test the get_awarded_certificate_programs function
@@ -154,7 +153,7 @@ class GetAwardedCertificateProgramsTestCase(TestCase):
         self.assertEqual(result, [1])
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class AwardProgramCertificateTestCase(TestCase):
     """
     Test the award_program_certificate function
@@ -183,7 +182,7 @@ class AwardProgramCertificateTestCase(TestCase):
         self.assertEqual(json.loads(httpretty.last_request().body), expected_body)
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @ddt.ddt
 @mock.patch(TASKS_MODULE + '.award_program_certificate')
 @mock.patch(TASKS_MODULE + '.get_awarded_certificate_programs')

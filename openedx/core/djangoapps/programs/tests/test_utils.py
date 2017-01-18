@@ -2,11 +2,9 @@
 import copy
 import datetime
 import json
-from unittest import skipUnless
 import uuid
 
 import ddt
-from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -29,7 +27,7 @@ from openedx.core.djangoapps.programs import utils
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -45,7 +43,7 @@ MARKETING_URL = 'https://www.example.com/marketing/path'
 @ddt.ddt
 @attr(shard=2)
 @httpretty.activate
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, CredentialsDataMixin,
                            CredentialsApiConfigMixin, CacheIsolationTestCase):
     """Tests covering the retrieval of programs from the Programs service."""
@@ -190,7 +188,7 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         self.assertEqual(actual, [])
 
 
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class GetProgramsByRunTests(TestCase):
     """Tests verifying that programs are inverted correctly."""
     maxDiff = None
@@ -262,7 +260,7 @@ class GetProgramsByRunTests(TestCase):
         self.assertEqual(course_ids, [])
 
 
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class GetCompletedCoursesTestCase(TestCase):
     """
     Test the get_completed_courses function
@@ -308,7 +306,7 @@ class GetCompletedCoursesTestCase(TestCase):
 
 @attr(shard=2)
 @httpretty.activate
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
     """Tests of the program progress utility class."""
     def setUp(self):
@@ -700,7 +698,7 @@ class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
 
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
 class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
     """Tests of the program data extender utility class."""

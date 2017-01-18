@@ -1,9 +1,7 @@
 """Tests for the backpopulate_program_credentials management command."""
 import json
-from unittest import skipUnless
 
 import ddt
-from django.conf import settings
 from django.core.management import call_command, CommandError
 from django.test import TestCase
 from edx_oauth2_provider.tests.factories import ClientFactory
@@ -17,6 +15,7 @@ from lms.djangoapps.certificates.tests.factories import GeneratedCertificateFact
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
 
@@ -26,7 +25,7 @@ COMMAND_MODULE = 'openedx.core.djangoapps.programs.management.commands.backpopul
 @ddt.ddt
 @httpretty.activate
 @mock.patch(COMMAND_MODULE + '.award_program_certificates.delay')
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class BackpopulateProgramCredentialsTests(ProgramsApiConfigMixin, TestCase):
     """Tests for the backpopulate_program_credentials management command."""
     course_id, alternate_course_id = 'org/course/run', 'org/alternate/run'

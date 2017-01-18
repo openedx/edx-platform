@@ -4,15 +4,14 @@ Grades related signals.
 
 from logging import getLogger
 
-from courseware.model_data import get_score, set_score
 from django.dispatch import receiver
-from openedx.core.lib.grade_utils import is_score_higher
 from submissions.models import score_set, score_reset
-from util.date_utils import to_timestamp
 
 from courseware.model_data import get_score, set_score
 from eventtracking import tracker
+from openedx.core.lib.grade_utils import is_score_higher
 from student.models import user_by_anonymous_id
+from util.date_utils import to_timestamp
 from track.event_transaction_utils import (
     get_event_transaction_type,
     get_event_transaction_id,

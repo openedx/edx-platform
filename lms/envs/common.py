@@ -2153,6 +2153,10 @@ INSTALLED_APPS = (
 
     # additional release utilities to ease automation
     'release_util',
+
+    # Customized celery tasks, including persisting failed tasks so they can
+    # be retried
+    'openedx.core.djangoapps.celery_utils',
 )
 
 # Migrations which are not in the standard module "migrations"

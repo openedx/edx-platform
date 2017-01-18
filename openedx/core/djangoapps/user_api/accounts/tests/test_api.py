@@ -17,6 +17,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import mail
 from django.test.client import RequestFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.models import PendingEmailChange
 from student.tests.tests import UserSettingsEventTestMixin
 from ...errors import (
@@ -35,7 +36,7 @@ def mock_render_to_string(template_name, context):
 
 
 @attr(shard=2)
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     """
     These tests specifically cover the parts of the API methods that are not covered by test_views.py.
@@ -239,7 +240,7 @@ class TestAccountApi(UserSettingsEventTestMixin, TestCase):
     {'full': 50, 'small': 10},
     clear=True
 )
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@skip_unless_lms
 class AccountSettingsOnCreationTest(TestCase):
     # pylint: disable=missing-docstring
 
@@ -333,7 +334,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         u'a' * (PASSWORD_MAX_LENGTH + 1)
     ]
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_activate_account(self):
         # Create the account, which is initially inactive
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -393,7 +394,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
     def test_activate_account_invalid_key(self):
         activate_account(u'invalid')
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     def test_request_password_change(self):
         # Create and activate an account
         activation_key = create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
@@ -411,7 +412,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         result = re.search(r'(?P<url>https?://[^\s]+)', email_body)
         self.assertIsNot(result, None)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     def test_request_password_change_invalid_user(self):
         with self.assertRaises(UserNotFound):
             request_password_change(self.EMAIL, self.ORIG_HOST, self.IS_SECURE)
@@ -419,7 +420,7 @@ class AccountCreationActivationAndPasswordChangeTest(TestCase):
         # Verify that no email messages have been sent
         self.assertEqual(len(mail.outbox), 0)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     def test_request_password_change_inactive_user(self):
         # Create an account, but do not activate it
         create_account(self.USERNAME, self.PASSWORD, self.EMAIL)

@@ -1,16 +1,15 @@
 """
     Tests for microsites and comprehensive themes.
 """
-import unittest
-
 from django.conf import settings
 from django.test import TestCase
 from django.contrib.sites.models import Site
 
 from openedx.core.djangoapps.theming.models import SiteTheme
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestComprehensiveThemeLMS(TestCase):
     """
     Test html, sass and static file overrides for comprehensive themes.

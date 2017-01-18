@@ -9,6 +9,7 @@ Utility classes for testing django applications.
 """
 
 import copy
+from unittest import skipUnless
 
 import crum
 from django import db
@@ -175,3 +176,17 @@ def get_mock_request(user=None):
     request.get_host = lambda: "edx.org"
     crum.set_current_request(request)
     return request
+
+
+def skip_unless_cms(func):
+    """
+    Only run the decorated test in the CMS test suite
+    """
+    return skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in CMS')(func)
+
+
+def skip_unless_lms(func):
+    """
+    Only run the decorated test in the LMS test suite
+    """
+    return skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')(func)

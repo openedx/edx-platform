@@ -21,7 +21,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 from django_comment_common import models
 from openedx.core.lib.api.test_utils import ApiTestCase, TEST_API_KEY
 from openedx.core.lib.time_zone_utils import get_display_time_zone
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 from third_party_auth.tests.testutil import simulate_running_pipeline, ThirdPartyAuthTestMixin
 from third_party_auth.tests.utils import (
@@ -541,7 +541,7 @@ class PreferenceUsersListViewTest(UserApiTestCase):
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class LoginSessionViewTest(UserAPITestCase):
     """Tests for the login end-points of the user API. """
 
@@ -713,7 +713,7 @@ class LoginSessionViewTest(UserAPITestCase):
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class PasswordResetViewTest(UserAPITestCase):
     """Tests of the user API's password reset endpoint. """
 
@@ -771,7 +771,7 @@ class PasswordResetViewTest(UserAPITestCase):
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class RegistrationViewTest(ThirdPartyAuthTestMixin, UserAPITestCase):
     """Tests for the registration end-points of the User API. """
 
@@ -1925,7 +1925,7 @@ class TestGoogleRegistrationView(
 
 
 @ddt.ddt
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class UpdateEmailOptInTestCase(UserAPITestCase, SharedModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 

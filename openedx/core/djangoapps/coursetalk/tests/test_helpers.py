@@ -1,17 +1,15 @@
 """ CourseTalk widget helpers tests """
 from __future__ import unicode_literals
 
-from unittest import skipUnless
-
 from django import test
-from django.conf import settings
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.coursetalk import helpers
 from openedx.core.djangoapps.coursetalk import models
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 
 
-@skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Tests only valid in LMS')
+@skip_unless_lms
 class CourseTalkKeyTests(test.TestCase):
     """
     CourseTalkKeyTests:
