@@ -14,18 +14,10 @@
 -e git+https://github.com/open-craft/xblock-group-project-v2.git@39771899e30700d3083daedc6464611c1ce9427a#egg=xblock-group-project-v2
 -e git+https://github.com/OfficeDev/xblock-officemix.git@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock-officemix
 git+https://github.com/mckinseyacademy/xblock-diagnosticfeedback.git@v0.2.1#egg=xblock-diagnostic-feedback==0.2.1
-# git+https://github.com/edx-solutions/api-integration.git@v1.0.6#egg=api-integration==1.0.6
-# git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.2#egg=organizations-edx-platform-extensions==1.1.2
-# git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.2#egg=gradebook-edx-platform-extensions==1.0.2
-# git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.6#egg=projects-edx-platform-extensions==1.0.6
-# git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.0.0#egg=discussion-edx-platform-extensions==1.0.0
-# git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.1#egg=course-edx-platform-extensions==1.0.1
-# git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.1#egg=progress-edx-platform-extensions==1.0.1
-
-git+https://github.com/edx-solutions/api-integration.git@e99b42b27c28486e9521bf8f001b35049a2f8462#egg=api-integration
-git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@d5c232d85ff36aef6cbe24f096ce2a21dd4e6193#egg=organizations-edx-platform-extensions
-git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@ziafazal/eucalyptus-modification#egg=gradebook-edx-platform-extensions
-git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@8dc04ed6fcb5f1b95ce8ab03b060acf2c9b1f0c1#egg=projects-edx-platform-extensions
-git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@e8bcf9a79e42e44bee3770ba873a5638b7c9d287#egg=discussion-edx-platform-extensions
-git+https://github.com/edx-solutions/course-edx-platform-extensions.git@f82270471c84f3981797419e9a2f7c2200d4c0bc#egg=course-edx-platform-extensions
-git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@26c4b913d776f1e084ad688bf4247ff5071a6f85#egg=progress-edx-platform-extensions
+git+https://github.com/edx-solutions/api-integration.git@v1.0.9#egg=api-integration==1.0.9
+git+https://github.com/edx-solutions/organizations-edx-platform-extensions.git@v1.1.4#egg=organizations-edx-platform-extensions==1.1.4
+git+https://github.com/edx-solutions/gradebook-edx-platform-extensions.git@1.0.5#egg=gradebook-edx-platform-extensions==1.0.5
+git+https://github.com/edx-solutions/projects-edx-platform-extensions.git@v1.0.8#egg=projects-edx-platform-extensions==1.0.8
+git+https://github.com/edx-solutions/discussion-edx-platform-extensions.git@v1.0.1#egg=discussion-edx-platform-extensions==1.0.1
+git+https://github.com/edx-solutions/course-edx-platform-extensions.git@v1.0.2#egg=course-edx-platform-extensions==1.0.2
+git+https://github.com/edx-solutions/progress-edx-platform-extensions.git@1.0.2#egg=progress-edx-platform-extensions==1.0.2
