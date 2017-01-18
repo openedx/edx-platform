@@ -32,7 +32,7 @@ def allow_frame_from_whitelisted_url(view_func):  # pylint: disable=invalid-name
                     (parsed_url.scheme, parsed_url.netloc, parsed_url.path.rstrip('/'), '', '', '')
                 )
                 sso_urls = SAMLProviderData.objects.values_list('sso_url', flat=True)
-                sso_urls = map(lambda u: u.rstrip('/'), sso_urls)
+                sso_urls = [url.rstrip('/') for url in sso_urls]
                 if referer_url in sso_urls:
                     allowed_urls = ' '.join(settings.THIRD_PARTY_AUTH_FRAME_ALLOWED_FROM_URL)
                     x_frame_option = 'ALLOW-FROM {}'.format(allowed_urls)
