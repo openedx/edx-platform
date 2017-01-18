@@ -31,7 +31,7 @@ site_status_msg = get_site_status_msg(course_id)
 <div class="site-status">
   <div class="inner-wrapper">
     <span class="white-error-icon"></span>
-    <p>${site_status_msg}</p>
+    <p>${site_status_msg | n, decode.utf8}</p>
   </div>
 </div>
 % endif
@@ -164,8 +164,13 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
-<!--[if lte IE 8]>
-<div class="ie-banner" aria-hidden="true">$(Text(_('{strong_open_tag}Warning:{strong_close_tag} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(chrome_link=HTML('<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>'), ff_link=HTML('<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>'), strong_open_tag=HTML('<strong>'), strong_close_tag=HTML('</strong>'),)}</div>
+<!--[if lte IE 9]>
+<div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+    begin_strong=HTML('<strong>'),
+    end_strong=HTML('</strong>'),
+    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+)}</div>
 <![endif]-->
 % endif
 
