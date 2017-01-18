@@ -74,7 +74,7 @@ class TestXFrameWhitelistDecoratorForSAML(TestCase):
         super(TestXFrameWhitelistDecoratorForSAML, self).setUp()
         self.configure_saml_provider_data(
             entity_id='https://idp.testshib.org/idp/shibboleth',
-            sso_url='https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO',
+            sso_url='https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO/',
             public_key='testkey',
             fetched_at=datetime.datetime.now()
         )
@@ -88,6 +88,14 @@ class TestXFrameWhitelistDecoratorForSAML(TestCase):
 
     @ddt.unpack
     @ddt.data(
+        (
+            'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO/?param1=1&param2=',
+            {
+                'X-Frame-Options': 'ALLOW-FROM %s' % SCORM_CLOUD_URL,
+                'Content-Security-Policy': "frame-ancestors %s" % SCORM_CLOUD_URL,
+
+            }
+        ),
         (
             'https://idp.testshib.org/idp/profile/SAML2/Redirect/SSO?param1=1&param2=',
             {
