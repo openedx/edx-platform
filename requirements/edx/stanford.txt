@@ -11,3 +11,4 @@ xblock-image-modal==0.3.1
 -e git+https://github.com/Stanford-Online/xblock-in-video-quiz.git@release/v0.1.2#egg=invideoquiz_xblock
 ubcpi-xblock==0.5.0
 -e git+https://github.com/Stanford-Online/XBlockStattutor.git@bbe80daabaaa73af72e0180609d903d9ea71cb37#egg=stattutor_xblock
+-e git+https://github.com/Stanford-Online/EdxAdaptXBlock.git@0dab829b2c9061e296be56d3ca7c8e027adcf362#egg=edxadapt-xblock
