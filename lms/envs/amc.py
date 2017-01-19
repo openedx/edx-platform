@@ -72,6 +72,11 @@ if SENTRY_DSN:
 
     # Set your DSN value
     RAVEN_CONFIG = {
+        'environment': FEATURES['ENVIRONMENT'],  # This should be moved somewhere more sensible
+        'tags': {
+            'app': 'edxapp',
+            'service': 'lms'
+        },
         'dsn': SENTRY_DSN,
     }
 
