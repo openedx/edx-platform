@@ -9,5 +9,11 @@ for cache_key in CACHES.keys():
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-INSTALLED_APPS += ('appsembler',)
+INSTALLED_APPS += (
+    'appsembler',
+    'appsembler_api',
+)
+
 DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('appsembler.context_processors.intercom',)
+
+CUSTOM_LOGOUT_REDIRECT_URL = ENV_TOKENS.get('CUSTOM_LOGOUT_REDIRECT_URL', '/')

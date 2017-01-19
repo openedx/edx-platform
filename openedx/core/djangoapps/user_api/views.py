@@ -41,6 +41,7 @@ from .accounts import (
 from .accounts.api import check_account_exists
 from .serializers import UserSerializer, UserPreferenceSerializer
 
+from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -50,6 +51,7 @@ class LoginSessionView(APIView):
     authentication_classes = []
 
     @method_decorator(ensure_csrf_cookie)
+    @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
         """Return a description of the login form.
 
