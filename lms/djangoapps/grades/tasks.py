@@ -11,6 +11,7 @@ from logging import getLogger
 
 from courseware.model_data import get_score
 from lms.djangoapps.course_blocks.api import get_course_blocks
+from openedx.core.djangoapps.celery_utils.task import PersistOnFailureTask
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locator import CourseLocator
 from submissions import api as sub_api
@@ -54,7 +55,7 @@ def recalculate_subsection_grade(
     )
 
 
-@task(default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
+@task(base=PersistOnFailureTask, default_retry_delay=30, routing_key=settings.RECALCULATE_GRADES_ROUTING_KEY)
 def recalculate_subsection_grade_v2(**kwargs):
     """
     Updates a saved subsection grade.

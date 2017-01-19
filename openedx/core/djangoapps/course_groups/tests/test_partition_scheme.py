@@ -2,13 +2,9 @@
 Test the partitions and partitions service
 
 """
-
-import json
-from django.conf import settings
 import django.test
 from mock import patch
 from nose.plugins.attrib import attr
-from unittest import skipUnless
 
 from courseware.masquerade import handle_ajax, setup_masquerade
 from courseware.tests.test_masquerade import StaffMasqueradeTestCase
@@ -19,6 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DAT
 from xmodule.modulestore.tests.factories import ToyCourseFactory
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
 from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
@@ -383,7 +380,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         self._verify_masquerade_for_group(self.user_partition.groups[1])
         self._verify_masquerade_for_group(None)
 
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_group_masquerade(self):
         """
@@ -391,7 +388,7 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         """
         self._verify_masquerade_for_all_groups()
 
-    @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
+    @skip_unless_lms
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_group_masquerade_with_cohort(self):
         """

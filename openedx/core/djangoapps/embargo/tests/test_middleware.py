@@ -2,7 +2,6 @@
 Tests for EmbargoMiddleware with CountryAccessRules
 """
 
-import unittest
 from mock import patch
 from nose.plugins.attrib import attr
 import ddt
@@ -11,11 +10,12 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.core.cache import cache as django_cache
 
+from config_models.models import cache as config_cache
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from util.testing import UrlResetMixin
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from config_models.models import cache as config_cache
 
 from ..models import RestrictedCourse, IPFilter
 from ..test_utils import restrict_course
@@ -23,7 +23,7 @@ from ..test_utils import restrict_course
 
 @attr(shard=3)
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class EmbargoMiddlewareAccessTests(UrlResetMixin, ModuleStoreTestCase):
     """Tests of embargo middleware country access rules.
 

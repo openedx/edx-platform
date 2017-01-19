@@ -1,7 +1,4 @@
 """Tests covering Credentials utilities."""
-import unittest
-
-from django.conf import settings
 from django.core.cache import cache
 from nose.plugins.attrib import attr
 import httpretty
@@ -18,11 +15,11 @@ from openedx.core.djangoapps.credentials.utils import (
 from openedx.core.djangoapps.credentials.tests import factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangolib.testing.utils import CacheIsolationTestCase
+from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 @attr(shard=2)
 class TestCredentialsRetrieval(ProgramsApiConfigMixin, CredentialsApiConfigMixin, CredentialsDataMixin,
                                ProgramsDataMixin, CacheIsolationTestCase):

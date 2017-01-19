@@ -2,21 +2,20 @@
 from smtplib import SMTPException
 
 import ddt
-from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
 import mock
-import unittest
 
 from microsite_configuration.tests.factories import SiteFactory
 from openedx.core.djangoapps.api_admin.models import ApiAccessRequest, ApiAccessConfig
 from openedx.core.djangoapps.api_admin.models import log as model_log
 from openedx.core.djangoapps.api_admin.tests.factories import ApiAccessRequestFactory
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from student.tests.factories import UserFactory
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ApiAccessRequestTests(TestCase):
 
     def setUp(self):
@@ -79,7 +78,7 @@ class ApiAccessConfigTests(TestCase):
         )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class ApiAccessRequestSignalTests(TestCase):
     def setUp(self):
         super(ApiAccessRequestSignalTests, self).setUp()

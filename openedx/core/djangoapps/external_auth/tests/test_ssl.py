@@ -3,10 +3,10 @@ Provides unit tests for SSL based authentication portions
 of the external_auth app.
 """
 # pylint: disable=no-member
-import copy
-import unittest
-
 from contextlib import contextmanager
+import copy
+from mock import Mock, patch
+
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User
@@ -15,10 +15,10 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from mock import Mock, patch
 
 from openedx.core.djangoapps.external_auth.models import ExternalAuthMap
 import openedx.core.djangoapps.external_auth.views as external_auth_views
+from openedx.core.djangolib.testing.utils import skip_unless_cms, skip_unless_lms
 from student.models import CourseEnrollment
 from student.roles import CourseStaffRole
 from student.tests.factories import UserFactory
@@ -81,7 +81,7 @@ class SSLClientTest(ModuleStoreTestCase):
         self.factory = RequestFactory()
         self.mock = Mock()
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_ssl_login_with_signup_lms(self):
         """
         Validate that an SSL login creates an eamap user and
@@ -101,7 +101,7 @@ class SSLClientTest(ModuleStoreTestCase):
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.USER_EMAIL)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @skip_unless_cms
     def test_ssl_login_with_signup_cms(self):
         """
         Validate that an SSL login creates an eamap user and
@@ -120,7 +120,7 @@ class SSLClientTest(ModuleStoreTestCase):
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(email=self.USER_EMAIL)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_ssl_login_without_signup_lms(self):
         """
@@ -140,7 +140,7 @@ class SSLClientTest(ModuleStoreTestCase):
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @skip_unless_cms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_ssl_login_without_signup_cms(self):
         """
@@ -166,7 +166,7 @@ class SSLClientTest(ModuleStoreTestCase):
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_default_login_decorator_ssl(self):
         """
@@ -184,7 +184,7 @@ class SSLClientTest(ModuleStoreTestCase):
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_registration_page_bypass(self):
         """
@@ -198,7 +198,7 @@ class SSLClientTest(ModuleStoreTestCase):
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @skip_unless_cms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_cms_registration_page_bypass(self):
         """
@@ -217,7 +217,7 @@ class SSLClientTest(ModuleStoreTestCase):
         response = self.client.get(reverse('signup'), follow=True)
         self.assertEqual(response.status_code, 404)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_signin_page_bypass(self):
         """
@@ -238,7 +238,7 @@ class SSLClientTest(ModuleStoreTestCase):
                           response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_ssl_bad_eamap(self):
         """
@@ -263,7 +263,7 @@ class SSLClientTest(ModuleStoreTestCase):
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         self.assertIn(SESSION_KEY, self.client.session)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITHOUT_SSL_AUTH)
     def test_ssl_decorator_no_certs(self):
         """Make sure no external auth happens without SSL enabled"""
@@ -279,7 +279,7 @@ class SSLClientTest(ModuleStoreTestCase):
         self.assertTrue(self.mock.called)
         self.assertEqual(0, len(ExternalAuthMap.objects.all()))
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     def test_ssl_login_decorator(self):
         """Create mock function to test ssl login decorator"""
 
@@ -305,7 +305,7 @@ class SSLClientTest(ModuleStoreTestCase):
             dec_mock(request)
         self.assertTrue(self.mock.called)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_ssl_decorator_auto_signup(self):
         """
@@ -330,7 +330,7 @@ class SSLClientTest(ModuleStoreTestCase):
 
         self.assertTrue(self.mock.called)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE)
     def test_ssl_lms_redirection(self):
         """
@@ -361,7 +361,7 @@ class SSLClientTest(ModuleStoreTestCase):
                          response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @skip_unless_cms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE)
     def test_ssl_cms_redirection(self):
         """
@@ -393,7 +393,7 @@ class SSLClientTest(ModuleStoreTestCase):
                          response.redirect_chain[-1])
         self.assertIn(SESSION_KEY, self.client.session)
 
-    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @skip_unless_lms
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_AUTO_ACTIVATE)
     def test_ssl_logout(self):
         """

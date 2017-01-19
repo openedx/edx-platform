@@ -3,17 +3,16 @@
 Unit tests for preference APIs.
 """
 
-import unittest
 import ddt
 import json
 from mock import patch
 
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.test.testcases import TransactionTestCase
 from rest_framework.test import APIClient
 from student.tests.factories import UserFactory
 
+from openedx.core.djangolib.testing.utils import skip_unless_lms
 from ...accounts.tests.test_views import UserAPITestCase
 from ..api import set_user_preference
 from .test_api import get_expected_validation_developer_message, get_expected_key_error_user_message
@@ -22,7 +21,7 @@ TOO_LONG_PREFERENCE_KEY = u"x" * 256
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestPreferencesAPI(UserAPITestCase):
     """
     Unit tests /api/user/v1/accounts/{username}/
@@ -316,7 +315,7 @@ class TestPreferencesAPI(UserAPITestCase):
         )
 
 
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestPreferencesAPITransactions(TransactionTestCase):
     """
     Tests the transactional behavior of the preferences API
@@ -363,7 +362,7 @@ class TestPreferencesAPITransactions(TransactionTestCase):
 
 
 @ddt.ddt
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@skip_unless_lms
 class TestPreferencesDetailAPI(UserAPITestCase):
     """
     Unit tests /api/user/v1/accounts/{username}/{preference_key}
