@@ -137,19 +137,24 @@
     @include text-align(left);
     @include float(left);
     box-sizing: border-box;
-    display: inline-block;
     width: 50%;
 }
 
 .forum-nav-filter-cohort, .forum-nav-sort {
     @include text-align(right);
-    @include float(right);
     box-sizing: border-box;
-    display: inline-block;
+}
 
-    @media (min-width: $bp-screen-md) {
+.forum-nav-filter-cohort {
+    .discussion-board & {
+        @include float(right);
+        @include text-align(right);
         width: 50%;
     }
+}
+
+.forum-nav-sort {
+    @include float(right);
 }
 
 %forum-nav-select {
