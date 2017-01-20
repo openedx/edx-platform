@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-12 17:52+0000\n"
-"PO-Revision-Date: 2017-01-12 17:52:25.477141\n"
+"POT-Creation-Date: 2017-01-20 19:58+0000\n"
+"PO-Revision-Date: 2017-01-20 19:58:35.691576\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -83,8 +83,7 @@ msgid "Subsection"
 msgstr "سعزسثذفهخر"
 
 #: cms/djangoapps/contentstore/views/helpers.py
-#: lms/djangoapps/instructor/views/tools.py lms/templates/seq_module.html
-#: lms/templates/ccx/schedule.html
+#: lms/djangoapps/instructor/views/tools.py lms/templates/ccx/schedule.html
 msgid "Unit"
 msgstr "عرهف"
 
@@ -203,6 +202,7 @@ msgstr "ذخعقسث"
 #: common/lib/xmodule/xmodule/textannotation_module.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 #: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 #: cms/templates/container.html cms/templates/library.html
 msgid "Display Name"
@@ -1822,24 +1822,25 @@ msgid "XML data for the annotation"
 msgstr "طوم يشفش بخق فاث شررخفشفهخر"
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
+#: common/lib/xmodule/xmodule/capa_base.py
+#: common/lib/xmodule/xmodule/conditional_module.py
 #: common/lib/xmodule/xmodule/html_module.py
 #: common/lib/xmodule/xmodule/imageannotation_module.py
 #: common/lib/xmodule/xmodule/library_content_module.py
+#: common/lib/xmodule/xmodule/library_root_xblock.py
+#: common/lib/xmodule/xmodule/poll_module.py
 #: common/lib/xmodule/xmodule/textannotation_module.py
+#: common/lib/xmodule/xmodule/video_module/video_xfields.py
 #: common/lib/xmodule/xmodule/videoannotation_module.py
-msgid "Display name for this module"
-msgstr "يهسحمشغ رشوث بخق فاهس وخيعمث"
+#: common/lib/xmodule/xmodule/word_cloud_module.py
+#: common/lib/xmodule/xmodule/x_module.py
+#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
+msgid "The display name for this component."
+msgstr "فاث يهسحمشغ رشوث بخق فاهس ذخوحخرثرف."
 
 #: common/lib/xmodule/xmodule/annotatable_module.py
 msgid "Annotation"
 msgstr "شررخفشفهخر"
-
-#: common/lib/xmodule/xmodule/capa_base.py
-#: common/lib/xmodule/xmodule/conditional_module.py
-#: common/lib/xmodule/xmodule/html_module.py
-msgid "This name appears in the horizontal navigation at the top of the page."
-msgstr ""
-"فاهس رشوث شححثشقس هر فاث اخقهظخرفشم رشدهلشفهخر شف فاث فخح خب فاث حشلث."
 
 #: common/lib/xmodule/xmodule/capa_base.py
 msgid "Blank Advanced Problem"
@@ -3493,10 +3494,6 @@ msgid "No Library Selected"
 msgstr "رخ مهزقشقغ سثمثذفثي"
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
-msgid "Enter the name of the library as it should appear in Studio."
-msgstr "ثرفثق فاث رشوث خب فاث مهزقشقغ شس هف ساخعمي شححثشق هر سفعيهخ."
-
-#: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Library Display Name"
 msgstr "مهزقشقغ يهسحمشغ رشوث"
 
@@ -3506,11 +3503,11 @@ msgstr "ثرفثق فاث رشوثس خب فاث شيدشرذثي ذخوحخرث
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
-"Enter the name that students see for this component.  Analytics reports may "
-"also use the display name to identify this component."
+"The display name for this component. Analytics reports may also use the "
+"display name to identify this component."
 msgstr ""
-"ثرفثق فاث رشوث فاشف سفعيثرفس سثث بخق فاهس ذخوحخرثرف.  شرشمغفهذس قثحخقفس وشغ "
-"شمسخ عسث فاث يهسحمشغ رشوث فخ هيثرفهبغ فاهس ذخوحخرثرف."
+"فاث يهسحمشغ رشوث بخق فاهس ذخوحخرثرف. شرشمغفهذس قثحخقفس وشغ شمسخ عسث فاث "
+"يهسحمشغ رشوث فخ هيثرفهبغ فاهس ذخوحخرثرف."
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid "LTI ID"
@@ -3941,6 +3938,26 @@ msgstr ""
 "ثرفثق فقعث خق بشمسث. هب فقعث, شرسصثق سعزوهسسهخرس بخق حقخزمثو وخيعمثس صهمم زث"
 " ذخرسهيثقثي هر فاث ثرفقشرذث ثطشو سذخقهرل/لشفهرل شملخقهفاو."
 
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Whether this student has voted on the poll"
+msgstr "صاثفاثق فاهس سفعيثرف اشس دخفثي خر فاث حخمم"
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Student answer"
+msgstr "سفعيثرف شرسصثق"
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from all students"
+msgstr "حخمم شرسصثقس بقخو شمم سفعيثرفس"
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll answers from xml"
+msgstr "حخمم شرسصثقس بقخو طوم"
+
+#: common/lib/xmodule/xmodule/poll_module.py
+msgid "Poll question"
+msgstr "حخمم ضعثسفهخر"
+
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Enter the date by which problems are due."
 msgstr "ثرفثق فاث يشفث زغ صاهذا حقخزمثوس شقث يعث."
@@ -4030,16 +4047,16 @@ msgid "This exam is hidden from the learner."
 msgstr "فاهس ثطشو هس اهييثر بقخو فاث مثشقرثق."
 
 #: common/lib/xmodule/xmodule/seq_module.py
-msgid "subsection"
-msgstr "سعزسثذفهخر"
+msgid ""
+"Because the course has ended, this assignment is hidden from the learner."
+msgstr ""
+"زثذشعسث فاث ذخعقسث اشس ثريثي, فاهس شسسهلروثرف هس اهييثر بقخو فاث مثشقرثق."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
-"Because the due date has passed, this {subsection_format} is hidden from the"
-" learner."
+"Because the due date has passed, this assignment is hidden from the learner."
 msgstr ""
-"زثذشعسث فاث يعث يشفث اشس حشسسثي, فاهس {subsection_format} هس اهييثر بقخو فاث"
-" مثشقرثق."
+"زثذشعسث فاث يعث يشفث اشس حشسسثي, فاهس شسسهلروثرف هس اهييثر بقخو فاث مثشقرثق."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid ""
@@ -4058,12 +4075,8 @@ msgid "Not Selected"
 msgstr "رخف سثمثذفثي"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
-msgid ""
-"This name is used for organizing your course content, but is not shown to "
-"students."
-msgstr ""
-"فاهس رشوث هس عسثي بخق خقلشرهظهرل غخعق ذخعقسث ذخرفثرف, زعف هس رخف ساخصر فخ "
-"سفعيثرفس."
+msgid "The display name for this component. (Not shown to learners)"
+msgstr "فاث يهسحمشغ رشوث بخق فاهس ذخوحخرثرف. (رخف ساخصر فخ مثشقرثقس)"
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Content Experiment"
@@ -4237,14 +4250,6 @@ msgstr ""
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Default Video URL"
 msgstr "يثبشعمف دهيثخ عقم"
-
-#: common/lib/xmodule/xmodule/video_module/video_xfields.py
-msgid ""
-"The name students see. This name appears in the course ribbon and as a "
-"header for the video."
-msgstr ""
-"فاث رشوث سفعيثرفس سثث. فاهس رشوث شححثشقس هر فاث ذخعقسث قهززخر شري شس ش "
-"اثشيثق بخق فاث دهيثخ."
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid "Component Display Name"
@@ -4533,10 +4538,6 @@ msgstr "حخسفثق هوشلث عقم"
 #: common/lib/xmodule/xmodule/videoannotation_module.py
 msgid "Poster URL"
 msgstr "حخسفثق عقم"
-
-#: common/lib/xmodule/xmodule/word_cloud_module.py
-msgid "The label for this word cloud on the course page."
-msgstr "فاث مشزثم بخق فاهس صخقي ذمخعي خر فاث ذخعقسث حشلث."
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 #: lms/templates/annotatable.html lms/templates/imageannotation.html
@@ -10072,10 +10073,6 @@ msgid "Gating milestone for {usage_key}"
 msgstr "لشفهرل وهمثسفخرث بخق {usage_key}"
 
 #: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
-msgid "Display name for this component"
-msgstr "يهسحمشغ رشوث بخق فاهس ذخوحخرثرف"
-
-#: openedx/core/lib/xblock_builtin/xblock_discussion/xblock_discussion.py
 msgid "Category"
 msgstr "ذشفثلخقغ"
 
@@ -11388,18 +11385,32 @@ msgid "Please try again later."
 msgstr "حمثشسث فقغ شلشهر مشفثق."
 
 #: lms/templates/hidden_content.html
-msgid "The due date for this {subsection_format} has passed."
-msgstr "فاث يعث يشفث بخق فاهس {subsection_format} اشس حشسسثي."
+msgid "The course has ended."
+msgstr "فاث ذخعقسث اشس ثريثي."
+
+#: lms/templates/hidden_content.html
+msgid "The due date for this assignment has passed."
+msgstr "فاث يعث يشفث بخق فاهس شسسهلروثرف اشس حشسسثي."
 
 #: lms/templates/hidden_content.html
 msgid ""
-"Because the due date has passed, this {subsection_format} is no longer "
-"available.{line_break}If you have completed this {subsection_format}, your "
-"grade is available on the {link_start}progress page{link_end}."
+"Because the course has ended, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
 msgstr ""
-"زثذشعسث فاث يعث يشفث اشس حشسسثي, فاهس {subsection_format} هس رخ مخرلثق "
-"شدشهمشزمث.{line_break}هب غخع اشدث ذخوحمثفثي فاهس {subsection_format}, غخعق "
-"لقشيث هس شدشهمشزمث خر فاث {link_start}حقخلقثسس حشلث{link_end}."
+"زثذشعسث فاث ذخعقسث اشس ثريثي, فاهس شسسهلروثرف هس رخ مخرلثق "
+"شدشهمشزمث.{line_break}هب غخع اشدث ذخوحمثفثي فاهس شسسهلروثرف, غخعق لقشيث هس "
+"شدشهمشزمث خر فاث {link_start}حقخلقثسس حشلث{link_end}."
+
+#: lms/templates/hidden_content.html
+msgid ""
+"Because the due date has passed, this assignment is no longer "
+"available.{line_break}If you have completed this assignment, your grade is "
+"available on the {link_start}progress page{link_end}."
+msgstr ""
+"زثذشعسث فاث يعث يشفث اشس حشسسثي, فاهس شسسهلروثرف هس رخ مخرلثق "
+"شدشهمشزمث.{line_break}هب غخع اشدث ذخوحمثفثي فاهس شسسهلروثرف, غخعق لقشيث هس "
+"شدشهمشزمث خر فاث {link_start}حقخلقثسس حشلث{link_end}."
 
 #: lms/templates/imageannotation.html
 msgid "Note: only instructors may annotate."
@@ -12031,6 +12042,10 @@ msgstr ""
 #: lms/templates/seq_module.html
 msgid "Previous"
 msgstr "حقثدهخعس"
+
+#: lms/templates/seq_module.html
+msgid "Sequence"
+msgstr "سثضعثرذث"
 
 #: lms/templates/seq_module.html
 msgid "Next"
@@ -17273,6 +17288,10 @@ msgid "(Learners not explicitly assigned to a cohort)"
 msgstr "(مثشقرثقس رخف ثطحمهذهفمغ شسسهلرثي فخ ش ذخاخقف)"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
+msgid "Learners in the {track_name} Track"
+msgstr "مثشقرثقس هر فاث {track_name} فقشذن"
+
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Subject: "
 msgstr "سعزتثذف: "
 
@@ -18731,13 +18750,13 @@ msgstr "شزخعف ثيط"
 
 #: themes/edx.org/lms/templates/footer.html
 msgid ""
-"© 2016 edX Inc.  All rights reserved except where noted.  EdX, Open edX and "
-"the edX and Open EdX logos are registered trademarks or trademarks of edX "
-"Inc."
+"© 2012-{year} edX Inc.  All rights reserved except where noted.  EdX, Open "
+"edX and the edX and Open EdX logos are registered trademarks or trademarks "
+"of edX Inc."
 msgstr ""
-"© 2016 ثيط هرذ.  شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي.  ثيط, خحثر ثيط شري "
-"فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس خب ثيط "
-"هرذ."
+"© 2012-{year} ثيط هرذ.  شمم قهلافس قثسثقدثي ثطذثحف صاثقث رخفثي.  ثيط, خحثر "
+"ثيط شري فاث ثيط شري خحثر ثيط مخلخس شقث قثلهسفثقثي فقشيثوشقنس خق فقشيثوشقنس "
+"خب ثيط هرذ."
 
 #: themes/edx.org/lms/templates/header.html
 #: themes/red-theme/lms/templates/header.html

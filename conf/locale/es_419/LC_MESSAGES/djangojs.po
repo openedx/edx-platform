@@ -30,6 +30,7 @@
 # Mecabotware <mecabotware.ideas@gmail.com>, 2015
 # Natalia, 2013
 # Natalia, 2013-2014,2016
+# Ned Weitzman <nweitzman@edx.org>, 2017
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
 # palichis <palichis@solid-ec.org>, 2015

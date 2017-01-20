@@ -33,6 +33,7 @@
 # Natalia, 2013
 # Natalia, 2013-2014
 # Ned Batchelder <ned@edx.org>, 2016
+# Ned Weitzman <nweitzman@edx.org>, 2017
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Patricia Colmenares <patrusca38@hotmail.com>, 2015
 # rcelaya <rcelaya@ula.ve>, 2014

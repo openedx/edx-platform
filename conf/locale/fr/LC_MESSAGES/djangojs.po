@@ -48,7 +48,7 @@
 # rafcha <raphael.chay@gmail.com>, 2014-2016
 # Régis Behmo <transifex.stuff@behmo.com>, 2016
 # Régis Millet <kulgar@ct2c.fr>, 2015
-# Richard Moch <richard.moch@gmail.com>, 2016
+# Richard Moch <richard.moch@gmail.com>, 2016-2017
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
 # samuel <samuelecin@gmail.com>, 2014
@@ -132,7 +132,7 @@
 # natg94 <bgenson@voo.be>, 2015
 # Olivier Lebon <oliv.lebon@wanadoo.fr>, 2015
 # rafcha <raphael.chay@gmail.com>, 2014-2016
-# Richard Moch <richard.moch@gmail.com>, 2016
+# Richard Moch <richard.moch@gmail.com>, 2016-2017
 # Sébastien Viallemonteil <sebastien.viallemonteil@educagri.fr>, 2015
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
@@ -3907,7 +3907,7 @@ msgstr "Cliquer pour ajouter"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Bookmark this page"
-msgstr ""
+msgstr "Ajouter cette page aux favoris"
 
 #: lms/static/js/bookmarks/views/bookmark_button.js
 msgid "Click to remove"
@@ -4587,6 +4587,7 @@ msgstr ""
 msgid "An error occurred when signing you in to %s."
 msgstr ""
 
+#: lms/static/js/student_account/views/LoginView.js
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Check Your Email"
 msgstr "Vérifiez votre email"
@@ -5413,6 +5414,8 @@ msgstr "Participe déjà au cours sélectionné"
 msgid ""
 "Are you sure you want to delete {email} from the library “{container}”?"
 msgstr ""
+"Êtes-vous sûr de vouloir supprimer {email} de la bibliothèque "
+"\"{container}\" ?"
 
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Library User"
@@ -6579,7 +6582,7 @@ msgstr ""
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Add a Post"
-msgstr ""
+msgstr "Ajouter un  message"
 
 #: common/static/common/templates/discussion/new-post.underscore
 msgid "Visible to"
@@ -6774,7 +6777,7 @@ msgstr "Ce message est visible par tous."
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid "Post type"
-msgstr ""
+msgstr "Type de message"
 
 #: common/static/common/templates/discussion/thread-type.underscore
 msgid ""
@@ -6951,7 +6954,7 @@ msgstr ""
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Username or email address"
-msgstr ""
+msgstr "Nom d'utilisateur ou adresse courriel"
 
 #: lms/djangoapps/support/static/support/templates/enrollment.underscore
 msgid "Course ID"
@@ -7102,15 +7105,15 @@ msgstr ""
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "My Bookmarks"
-msgstr ""
+msgstr "Mes favoris"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "Bookmarked on"
-msgstr ""
+msgstr "Signet ajouté"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid "You have not bookmarked any courseware pages yet."
-msgstr ""
+msgstr "Vous n'avez pas encore ajouté de signet dans les pages de cours"
 
 #: lms/templates/bookmarks/bookmarks-list.underscore
 msgid ""
@@ -7119,6 +7122,10 @@ msgid ""
 "of all your bookmarks, select Bookmarks in the upper left corner of any "
 "courseware page."
 msgstr ""
+"Utilisez les signets afin de vous aider à retourner facilement aux pages de "
+"cours. Pour ajouter un signet, sélectionnez Signets dans le coin supérieur "
+"droit de cette page. Afin de voir une liste de tous vos signets, "
+"sélectionnez Signets dans le coin supérieur gauche de toute page de cours."
 
 #: lms/templates/ccx/schedule.underscore
 msgid "Expand All"
@@ -7408,6 +7415,8 @@ msgid ""
 "To invalidate a certificate for a particular learner, add the username or "
 "email address below."
 msgstr ""
+"Pour invalider une attestation pour un apprenant, ajouter le nom d'usager ou"
+" l'adresse courriel ci-dessous."
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-invalidation.underscore
 msgid "Add notes about this learner"
@@ -7452,7 +7461,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Student email or username"
-msgstr ""
+msgstr "nom d'utilisateur ou adresse courriel"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list-editor.underscore
 msgid "Free text notes"
@@ -7472,7 +7481,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "User Email"
-msgstr ""
+msgstr "Email de l'utilisateur"
 
 #: lms/templates/instructor/instructor_dashboard_2/certificate-white-list.underscore
 msgid "Exception Granted"
