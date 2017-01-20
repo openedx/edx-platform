@@ -39,6 +39,7 @@ django-user-tasks==0.1.2
 #djangorestframework>=3.1,<3.2
 git+https://github.com/edx/django-rest-framework.git@3c72cb5ee5baebc4328947371195eae2077197b0#egg=djangorestframework==3.2.3
 django==1.8.17
+django-waffle==0.11.1
 djangorestframework-jwt==1.8.0
 djangorestframework-oauth==1.1.0
 edx-ccx-keys==0.2.1
