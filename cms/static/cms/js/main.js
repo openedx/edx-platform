@@ -45,14 +45,15 @@
                 });
                 return msg.show();
             });
-            $.postJSON = function(url, data, callback) {
+            $.postJSON = function(url, data, callback, type) {
                 if ($.isFunction(data)) {
                     callback = data;
                     data = undefined;
                 }
+                type = type || 'POST';
                 return $.ajax({
                     url: url,
-                    type: 'POST',
+                    type: type,
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     data: JSON.stringify(data),

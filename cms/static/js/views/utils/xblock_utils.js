@@ -6,7 +6,8 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
     function($, _, gettext, ViewUtils, ModuleUtils, XBlockInfo, StringUtils) {
         'use strict';
         var addXBlock, duplicateXBlock, deleteXBlock, createUpdateRequestData, updateXBlockField, VisibilityState,
-            getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType, findXBlockInfo;
+            getXBlockVisibilityClass, getXBlockListTypeClass, updateXBlockFields, getXBlockType, findXBlockInfo,
+            moveXBlock;
 
         /**
          * Represents the possible visibility states for an xblock:
@@ -88,6 +89,34 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                         duplicationOperation.reject();
                     });
                     return duplicationOperation.promise();
+                });
+        };
+
+        /**
+         * Moves the specified xblock in a new parent xblock.
+         * @param {jquery Element}  source_locator  The xblock element to be moved.
+         * @param {jquery Element}  parent_locator  New parent xblock locator of the xblockto be moved,
+         *      new moved xblock would be placed under this xblock.
+         * @returns {jQuery promise} A promise representing the duplication of the xblock.
+         */
+        moveXBlock = function(sourceLocator, parentLocator, targetIndex) {
+            var operationText = targetIndex !== undefined ? gettext('Undo moving') : gettext('Moving');
+            return ViewUtils.runOperationShowingMessage(operationText,
+                function() {
+                    var movingOperation = $.Deferred();
+                    $.postJSON(ModuleUtils.getUpdateUrl(), {
+                        move_source_locator: sourceLocator,
+                        parent_locator: parentLocator,
+                        target_index: targetIndex
+                    }, function(data) {
+                        movingOperation.resolve(data);
+                    },
+                    'PATCH'
+                    )
+                    .fail(function() {
+                        movingOperation.reject();
+                    });
+                    return movingOperation.promise();
                 });
         };
 
@@ -267,6 +296,7 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
         return {
             VisibilityState: VisibilityState,
             addXBlock: addXBlock,
+            moveXBlock: moveXBlock,
             duplicateXBlock: duplicateXBlock,
             deleteXBlock: deleteXBlock,
             updateXBlockField: updateXBlockField,

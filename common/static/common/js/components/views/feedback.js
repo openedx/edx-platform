@@ -21,6 +21,8 @@
                 options: {
                     title: '',
                     message: '',
+                    titleLink: '',
+                    messageLink: '',
                     intent: null,  // "warning", "confirmation", "error", "announcement", "step-required", etc
                     type: null, // "alert", "notification", or "prompt": set by subclass
                     shown: true,  // is this view currently being shown?
