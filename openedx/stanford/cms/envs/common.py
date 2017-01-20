@@ -1,6 +1,8 @@
 from cms.envs.common import *
 from openedx.stanford.lms.envs.common import (
+    COURSE_MODE_DEFAULTS,
     DEFAULT_COURSE_ABOUT_IMAGE_URL,
+    EXTRA_MIMETYPES,
     INSTRUCTOR_QUERY_PROBLEM_TYPES,
 )
 

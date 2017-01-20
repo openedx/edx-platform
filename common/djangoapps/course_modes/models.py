@@ -6,6 +6,7 @@ import pytz
 
 from collections import namedtuple, defaultdict
 from config_models.models import ConfigurationModel
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -100,8 +101,18 @@ class CourseMode(models.Model):
     NO_ID_PROFESSIONAL_MODE = "no-id-professional"
     CREDIT_MODE = "credit"
 
-    DEFAULT_MODE = Mode(HONOR, _('Honor'), 0, '', 'usd', None, None, None)
-    DEFAULT_MODE_SLUG = HONOR
+    # Stanford Fork: getting DEFAULT_MODE values from settings so we can generate certificates properly without breaking tests!
+    DEFAULT_MODE = Mode(
+        settings.COURSE_MODE_DEFAULTS['slug'],
+        settings.COURSE_MODE_DEFAULTS['name'],
+        settings.COURSE_MODE_DEFAULTS['min_price'],
+        settings.COURSE_MODE_DEFAULTS['suggested_prices'],
+        settings.COURSE_MODE_DEFAULTS['currency'],
+        settings.COURSE_MODE_DEFAULTS['expiration_datetime'],
+        settings.COURSE_MODE_DEFAULTS['description'],
+        settings.COURSE_MODE_DEFAULTS['sku'],
+    )
+    DEFAULT_MODE_SLUG = settings.COURSE_MODE_DEFAULTS["slug"]
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = [VERIFIED, PROFESSIONAL]
