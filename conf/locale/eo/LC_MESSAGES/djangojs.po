@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2017-01-12 17:49+0000\n"
-"PO-Revision-Date: 2017-01-12 17:52:25.911208\n"
+"POT-Creation-Date: 2017-01-20 19:56+0000\n"
+"PO-Revision-Date: 2017-01-20 19:58:36.141398\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -4650,6 +4650,11 @@ msgstr "Réstöré énröllmént çödé Ⱡ'σяєм ιρѕυм ∂σłσя ѕ�
 #: lms/static/js/instructor_dashboard/ecommerce.js
 msgid "Mark enrollment code as unused"
 msgstr "Märk énröllmént çödé äs ünüséd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+
+#: lms/static/js/instructor_dashboard/send_email.js
+msgid "All learners in the {track_name} track"
+msgstr ""
+"Àll léärnérs ïn thé {track_name} träçk Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
 
 #: lms/static/js/instructor_dashboard/student_admin.js
 msgid ""
@@ -9828,8 +9833,27 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/js/content-visibility-editor.underscore
+msgid "Hide content after course end date"
+msgstr ""
+"Hïdé çöntént äftér çöürsé énd däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєт#"
+
+#: cms/templates/js/content-visibility-editor.underscore
 msgid "Hide content after due date"
 msgstr "Hïdé çöntént äftér düé däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: cms/templates/js/content-visibility-editor.underscore
+msgid ""
+"After the course\\'s end date has passed, learners can no longer access "
+"subsection content. The subsection remains included in grade calculations."
+msgstr ""
+"Àftér thé çöürsé\\'s énd däté häs pässéd, léärnérs çän nö löngér äççéss "
+"süßséçtïön çöntént. Thé süßséçtïön rémäïns ïnçlüdéd ïn grädé çälçülätïöns. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм,"
+" qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ "
+"¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє "
+"¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт "
+"ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂#"
 
 #: cms/templates/js/content-visibility-editor.underscore
 msgid ""
@@ -9860,18 +9884,19 @@ msgstr ""
 #: cms/templates/js/content-visibility-editor.underscore
 #, python-format
 msgid ""
-"If you select an option other than \"%(hide_label)s\", after the subsection "
-"release date has passed, published units in this subsection will become "
-"available to learners unless units are explicitly hidden."
+"If you select an option other than \"%(hide_label)s\", published units in "
+"this subsection become available to learners unless they are explicitly "
+"hidden."
 msgstr ""
-"Ìf ýöü séléçt än öptïön öthér thän \"%(hide_label)s\", äftér thé süßséçtïön "
-"réléäsé däté häs pässéd, püßlïshéd ünïts ïn thïs süßséçtïön wïll ßéçömé "
-"äväïläßlé tö léärnérs ünléss ünïts äré éxplïçïtlý hïddén. Ⱡ'σяєм ιρѕυм ∂σłσя"
-" ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт"
-" łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
-"єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα ¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ "
-"αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ "
-"ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт ¢υρι∂αтαт ησ#"
+"Ìf ýöü séléçt än öptïön öthér thän \"%(hide_label)s\", püßlïshéd ünïts ïn "
+"thïs süßséçtïön ßéçömé äväïläßlé tö léärnérs ünléss théý äré éxplïçïtlý "
+"hïddén. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ "
+"єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм"
+" νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα "
+"¢σммσ∂σ ¢σηѕєqυαт. ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє νєłιт"
+" єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт "
+"¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂ "
+"єѕт ł#"
 
 #: cms/templates/js/course-instructor-details.underscore
 msgid "Instructor Name"
@@ -10032,6 +10057,12 @@ msgstr "Grädéd äs: Ⱡ'σяєм ιρѕυм ∂σłσ#"
 #: cms/templates/js/course-outline.underscore
 msgid "Due:"
 msgstr "Düé: Ⱡ'σяєм ι#"
+
+#: cms/templates/js/course-outline.underscore
+msgid "Subsection is hidden after course end date"
+msgstr ""
+"Süßséçtïön ïs hïddén äftér çöürsé énd däté Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя #"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Subsection is hidden after due date"

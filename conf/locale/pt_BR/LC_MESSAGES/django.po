@@ -16,6 +16,7 @@
 # Douglas Reginatto <dreginatto@yahoo.com.br>, 2016
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
+# Eduardo Barasal Morales <emorales@nic.br>, 2017
 # Erik Henrique <contato@erikhenrique.com.br>, 2015
 # Filipe Oliveira <contato@fmoliveira.com.br>, 2013
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014

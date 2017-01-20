@@ -25,7 +25,7 @@
 # shevious <shevious@yahoo.com>, 2015
 # Jong-Dae Park <jdpark7@gmail.com>, 2013
 # jeon <bluerespect@nate.com>, 2014-2015
-# Chanseok <kcsgoodboy@naver.com>, 2014
+# Chanseok Kang <kcsgoodboy@naver.com>, 2014
 # seungil <luck8778@gmail.com>, 2014
 # roidog <jimroid@gmail.com>, 2015
 # kmooc <shevious@gmail.com>, 2016

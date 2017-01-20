@@ -59,7 +59,7 @@
 # rafcha <raphael.chay@gmail.com>, 2014-2015
 # Régis Millet <kulgar@ct2c.fr>, 2015
 # Richard Moch <richard.moch@gmail.com>, 2014
-# Richard Moch <richard.moch@gmail.com>, 2014-2016
+# Richard Moch <richard.moch@gmail.com>, 2014-2017
 # romain couturat <romain.couturat@fun-mooc.fr>, 2016
 # Sarina Canelake <sarina@edx.org>, 2014
 # Sebastien Vigneau <sebastien.vigneau@gmail.com>, 2015
@@ -177,7 +177,7 @@
 # Ramarohetra Malalatiana <mtiana8@gmail.com>, 2014
 # rafcha <raphael.chay@gmail.com>, 2014-2016
 # Régis Millet <kulgar@ct2c.fr>, 2015
-# Richard Moch <richard.moch@gmail.com>, 2016
+# Richard Moch <richard.moch@gmail.com>, 2016-2017
 # romain couturat <romain.couturat@fun-mooc.fr>, 2016
 # SALHI Aissam <ais.salhy@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -5648,13 +5648,13 @@ msgstr "Gratuit"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your enrollment: Audit track"
-msgstr ""
+msgstr "Votre inscription: Auditeur"
 
 #: lms/djangoapps/courseware/views/views.py
 msgid ""
 "You are enrolled in the audit track for this course. The audit track does "
 "not include a certificate."
-msgstr ""
+msgstr "Vous êtes inscrit en auditeur pour ce cours."
 
 #: lms/djangoapps/courseware/views/views.py
 msgid "Your certificate has been invalidated"
@@ -6905,14 +6905,14 @@ msgstr "0 envoyé"
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "{num_emails} sent"
 msgid_plural "{num_emails} sent"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_emails} envoyé"
+msgstr[1] "{num_emails} envoyés"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "{num_emails} failed"
 msgid_plural "{num_emails} failed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{num_emails} échoué"
+msgstr[1] "{num_emails} échoués"
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Complete"
@@ -9261,10 +9261,12 @@ msgid ""
 "You can create up to {max_num_bookmarks_per_course} bookmarks. You must "
 "remove some bookmarks before you can add new ones."
 msgstr ""
+"Vous pouvez créer jusqu'à {max_num_bookmarks_per_course} signets. Vous devez"
+" effacer certains signets avant de pouvoir en ajouter des nouveaux."
 
 #: openedx/core/djangoapps/bookmarks/views.py
 msgid "Bookmark with usage_id: {usage_id} does not exist."
-msgstr ""
+msgstr "Il n'existe de pas signet avec l'usage_id: {usage_id}."
 
 #: openedx/core/djangoapps/catalog/models.py
 msgid "Internal API URL"
@@ -9842,7 +9844,7 @@ msgstr ""
 #. in order to register a new account.
 #: openedx/core/djangoapps/user_api/views.py
 msgid "I agree to the {platform_name} {terms_of_service}"
-msgstr ""
+msgstr "J'accepte les {terms_of_service} de  {platform_name}"
 
 #. Translators: "Terms of Service" is a legal document users must agree to
 #. in order to register a new account.
@@ -10741,7 +10743,7 @@ msgstr ""
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Email: {email}"
-msgstr ""
+msgstr "Adresse email: {email}"
 
 #: common/templates/emails/contact_us_feedback_email_body.txt
 msgid "Full Name: {realname}"
@@ -10841,7 +10843,7 @@ msgstr "Ajouté aux favoris"
 
 #: lms/templates/bookmark_button.html
 msgid "Bookmark this page"
-msgstr ""
+msgstr "Ajouter aux favoris"
 
 #: lms/templates/conditional_module.html
 msgid "You do not have access to this dependency module."
@@ -13092,7 +13094,7 @@ msgstr ""
 
 #: lms/templates/ccx/enrollment.html
 msgid "Enter username or email"
-msgstr ""
+msgstr "Veuillez saisir un nom d'utilisateur ou un email."
 
 #: lms/templates/ccx/enrollment.html
 msgid "Checking this box has no effect if 'Revoke' is clicked."
@@ -13571,6 +13573,7 @@ msgstr ""
 #: themes/stanford-style/lms/templates/courseware/course_about_sidebar_header.html
 msgid "Email someone to say you've enrolled in this course"
 msgstr ""
+"Envoyer un email à quelqu'un pour dire que vous êtes inscrit dans ce cours"
 
 #: lms/templates/courseware/course_navigation.html
 msgid "Course View"
@@ -14525,7 +14528,7 @@ msgstr "Cordialement, l'équipe de {course_name}"
 
 #: lms/templates/emails/activation_email.txt
 msgid "Thank you for creating an account with {platform_name}!"
-msgstr ""
+msgstr "Merci d'avoir créé un compre sur {platform_name}!"
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -14534,6 +14537,10 @@ msgid ""
 "following link. If that doesn't work, copy and paste the link into your "
 "browser's address bar."
 msgstr ""
+"Plus qu'une étape avant de vous inscrire à un cours : vous devez d'abord "
+"activer votre compte {platform_name}. Pour activer votre compte, cliquez sur"
+" le lien suivant. Si cela ne fonctionne pas, copiez et collez le lien dans "
+"la barre d'adresse de votre navigateur."
 
 #: lms/templates/emails/activation_email.txt
 msgid ""
@@ -14542,6 +14549,10 @@ msgid ""
 "to this email message. Check the help section of the {platform_name} "
 "website."
 msgstr ""
+"si vous n'avez pas créé un compte, vous n'avez rien à faire; vous ne "
+"recevrez plus de courriels de notre part. Si vous avez besoin d'aide, s'il "
+"vous plaît ne répondez pas à ce courriel. Consultez la section d'aide du "
+"site web de {platform_name}."
 
 #: lms/templates/emails/activation_email_subject.txt
 msgid "Activate Your {platform_name} Account"
@@ -16688,14 +16699,15 @@ msgstr "Historique des actions liées aux e-mails"
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "To see the content of previously sent emails, click this button:"
 msgstr ""
+"Pour voir le contenu des messages envoyés précédemment, cliquez ce bouton : "
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "Show Sent Email History"
-msgstr ""
+msgstr "Voir l'historique des e-mails envoyés"
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid "To read a sent email message, click its subject."
-msgstr ""
+msgstr "Pour lire un e-mail envoyé, cliquez sur son sujet."
 
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 msgid ""
@@ -16751,7 +16763,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Learner email address or username"
-msgstr ""
+msgstr "Adresse email ou nom d'utilisateur de l'apprenant"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "View Progress Page"
@@ -17130,7 +17142,7 @@ msgstr ""
 
 #: lms/templates/provider/authorize.html
 msgid "Read your email address"
-msgstr ""
+msgstr "Voir votre adresse de courriel"
 
 #: lms/templates/provider/authorize.html
 msgid "Read the list of courses in which you are a staff member."
@@ -17150,7 +17162,7 @@ msgstr ""
 
 #: lms/templates/registration/activate_account_notice.html
 msgid "You're almost there!"
-msgstr ""
+msgstr "Vous y êtes presque !"
 
 #: lms/templates/registration/activate_account_notice.html
 msgid ""
@@ -17159,10 +17171,14 @@ msgid ""
 "{email_start}{email}{email_end} with instructions for activating your "
 "account. If you don't receive this message, check your spam folder."
 msgstr ""
+"Plus qu'une étape : pour vous inscrire à un cours, vous devez d'abord ativer"
+" votre compte. Un email contenant les instructions pour activer votre compte"
+" vous a été envoyé à {email_start}{email}{email_end}. Si vous ne recevez pas"
+" ce message, vérifiez dans votre dossier de spam."
 
 #: lms/templates/registration/activation_complete.html
 msgid "Account Activated"
-msgstr ""
+msgstr "Compte activé"
 
 #: lms/templates/registration/activation_complete.html
 msgid "Account already active"
@@ -17382,7 +17398,7 @@ msgstr[1] ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "The following receipt has been emailed to {receipient_emails}"
-msgstr ""
+msgstr "Le reçu suivant a été envoyé par e-mail à {receipient_emails}"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid ""
@@ -17429,7 +17445,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Company Contact Email"
-msgstr ""
+msgstr "Adresse email de contact de l'entreprise"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Recipient Name"
