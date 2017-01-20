@@ -194,9 +194,11 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
 
             showMoveXBlockModal: function(event) {
                 var xblockElement = this.findXBlockElement(event.target),
+                    parentXBlockElement = xblockElement.parents('.studio-xblock-wrapper'),
                     modal = new MoveXBlockModal({
                         sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
-                        XBlockURLRoot: this.getURLRoot(),
+                        sourceParentXBlockInfo: XBlockUtils.findXBlockInfo(parentXBlockElement, this.model),
+                        XBlockUrlRoot: this.getURLRoot(),
                         outlineURL: this.options.outlineURL
                     });
 
