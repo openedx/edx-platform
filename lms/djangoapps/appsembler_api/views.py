@@ -42,6 +42,7 @@ from shoppingcart.models import (
 from shoppingcart.views import get_reg_code_validity
 
 from opaque_keys.edx.keys import CourseKey
+from certificates.models import GeneratedCertificate
 
 from .serializers import BulkEnrollmentSerializer
 
@@ -394,6 +395,13 @@ class GetBatchEnrollmentDataView(APIView):
                 'course_id': str(enrollment.course_id),
                 'date_enrolled': enrollment.created,
             }
+            cert = GeneratedCertificate.objects.filter(course_id=course_id).filter(user=enrollment.user)
+            if cert:
+                enrollment['certificate'] = {
+                    'completion_date': str(cert.created_date),
+                    'grade': cert.grade,
+                    'url': cert.download_url
+                }
 
             enrollment_list.append(enrollment_data)
 
