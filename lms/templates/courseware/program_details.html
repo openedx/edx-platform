@@ -2,6 +2,7 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
+from datetime import datetime
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
@@ -52,6 +53,15 @@ from openedx.core.djangolib.markup import HTML, Text
             $(".course-slider-xs").html();
         }
     }
+
+    $("ul.faq-links-list li.item").click(function(){
+        if ($(this).find(".answer").hasClass('hidden')) {
+            $(this).find(".answer").removeClass("hidden");
+        } else {
+            $(this).find(".answer").addClass("hidden");
+        }
+    });
+
 </script>
 
 <script type="text/javascript">
@@ -74,9 +84,9 @@ from openedx.core.djangolib.markup import HTML, Text
                         <div class="org-logo">
                             <img src="https://www.edx.org/sites/default/files/school/image/logo/iimb-200x101.png" alt="Indian Institute of Management, Bangalore Logo">
                         </div>
-                        <h1 class="banner-title">Artificial Intelligence MicroMasters Program</h1>
-                        <p class="banner-description">Earn a MicroMasters Credential in Artificial Intelligence from Columbia University to launch your career in computer science and design the future.</p>
-                        <button type="button" class="btn-brand hidden-sm">Start the MicroMasters Program</button>
+                        <h1 class="banner-title">${program['title']}</h1>
+                        <p class="banner-description">${program['subtitle']}</p>
+                        <button type="button" class="btn-brand hidden-sm">Start the ${program['type']['name']} Program</button>
                     </div>
                     <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
                         <a href="#!" class="trailer-link visible-sm">
@@ -93,7 +103,7 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
         </div>
 
-        <div class="grid-manual">
+        <div class="grid-manual data-table">
             <div class="row">
                 <div class="col col-12 md-col-7 lg-col-8 left-col">
                     <ul class="list-divided program-desc-tbl">
@@ -102,21 +112,21 @@ from openedx.core.djangolib.markup import HTML, Text
                                 <span class="fa fa-book fa-lg" aria-hidden="true"></span>
                                 Number of Courses
                             </span>
-                            <a href="#!">4 courses in program</a>
+                            <a href="#courses">${len(program['courses'])} courses in program</a>
                         </li>
                         <li class="item">
                             <span>
                                 <span class="fa fa-clock-o fa-lg" aria-hidden="true"></span>
                                 Average Length
                             </span>
-                            <span>12 weeks per course</span>
+                            <span>${program['weeks_to_complete']} weeks per course</span>
                         </li>
                         <li class="item">
                             <span>
                                 <span class="fa fa-tachometer fa-lg" aria-hidden="true"></span>
                                 Effort
                             </span>
-                            <span>8-12 hours per week, per course</span>
+                            <span>${program['min_hours_effort_per_week']}-${program['max_hours_effort_per_week']} hours per week, per course</span>
                         </li>
                         <li class="item">
                             <span>
@@ -131,38 +141,28 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-head">Overview</div>
                             <div class="accordion-content">
                                 <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                                    commodo consequat.
+                                    ${program['overview']}
                                 </p>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <div class="accordion-head">Job Outlook</div>
                             <div class="accordion-content">
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                                    commodo consequat.
-                                </p>
+
                                 <ul class="list-bulleted list-disc no-indent">
-                                    <li>Machine Learning Software Engineering</li>
-                                    <li>Data Scientist</li>
-                                    <li>3D Artist</li>
-                                    <li>Computer Vision Engineer</li>
+                                    % for item in program['job_outlook_items']:
+                                        <li>${item}</li>
+                                    % endfor
                                 </ul>
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                                    commodo consequat.
-                                </p>
                             </div>
                         </div>
                         <div class="accordion-item">
                             <div class="accordion-head">What You'll Learn</div>
                             <div class="accordion-content">
                                 <ul class="list-bulleted list-disc no-indent">
-                                    <li>Machine Learning Software Engineering</li>
-                                    <li>Data Scientist</li>
-                                    <li>3D Artist</li>
-                                    <li>Computer Vision Engineer</li>
+                                    % for item in program['expected_learning_items']:
+                                        <li>${item}</li>
+                                    % endfor
                                 </ul>
                             </div>
                         </div>
@@ -170,59 +170,26 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-head">Instructors</div>
                             <div class="accordion-content">
                                 <div class="instructor-profiles">
-                                    <div class="profile-item">
-                                        <div class="avatar">
-                                            <div class="img-holder">
-                                                <img src="${static.url('images/programs/avatar-male.png')}">
+                                    %for instructor in program['staff']:
+                                        <div class="profile-item">
+                                            <div class="avatar">
+                                                <div class="img-holder">
+                                                    <img src="${static.url(instructor['profile_image_url'])}" alt="${instructor['given_name']}"/>
+                                                </div>
+                                            </div>
+                                            <div class="details">
+                                                <div class="name">${instructor['given_name']}</div>
+                                                <div class="dept">${instructor['position']['organization_name']}</div>
                                             </div>
                                         </div>
-                                        <div class="details">
-                                            <div class="name">Ansaf Salleb-Aouissi</div>
-                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
-                                        </div>
-                                    </div>
-                                    <div class="profile-item">
-                                        <div class="avatar">
-                                            <div class="img-holder">
-                                                <img src="${static.url('images/programs/avatar-male.png')}">
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="name">Ansaf Salleb-Aouissi</div>
-                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
-                                        </div>
-                                    </div>
-                                    <div class="profile-item">
-                                        <div class="avatar">
-                                            <div class="img-holder">
-                                                <img src="${static.url('images/programs/avatar-male.png')}">
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="name">Ansaf Salleb-Aouissi</div>
-                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
-                                        </div>
-                                    </div>
-                                    <div class="profile-item">
-                                        <div class="avatar">
-                                            <div class="img-holder">
-                                                <img src="${static.url('images/programs/avatar-male.png')}">
-                                            </div>
-                                        </div>
-                                        <div class="details">
-                                            <div class="name">Ansaf Salleb-Aouissi</div>
-                                            <div class="dept">Department of Computer Science<br>Columbia University</div>
-                                        </div>
-                                    </div>
+                                    %endfor
                                 </div>
                             </div>
                         </div>
                         <div class="accordion-item">
-                            <div class="accordion-head">What is MicroMasters?</div>
+                            <div class="accordion-head">${program['type']['faq']['question']}</div>
                             <div class="accordion-content">
-                                <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore.
-                                </p>
+                                <p>${program['type']['faq']['answer']}</p>
                                 <div class="vertical-icon-list">
                                     <div class="list-item">
                                         <div class="icon-container">
@@ -261,21 +228,12 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-head">FAQ</div>
                             <div class="accordion-content">
                                 <ul class="list-unstyled faq-links-list">
-                                    <li class="item">
-                                        <a href="#!">Who is the MicroMasters Program intended for?</a>
-                                    </li>
-                                    <li class="item">
-                                        <a href="#!">What institute is offering credit?</a>
-                                    </li>
-                                    <li class="item">
-                                        <a href="#!">What subjects will be covered?</a>
-                                    </li>
-                                    <li class="item">
-                                        <a href="#!">What language is this program offered in?</a>
-                                    </li>
-                                    <li class="item">
-                                        <a href="#!">Is there a video transcript? What language?</a>
-                                    </li>
+                                    %for item in program['faq']:
+                                        <li class="item">
+                                            <a href="#!">${item['question']}</a>
+                                            <div class="answer hidden">${item['answer']}</div>
+                                        </li>
+                                    %endfor
                                 </ul>
                             </div>
                         </div>
@@ -286,12 +244,12 @@ from openedx.core.djangolib.markup import HTML, Text
                                 <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
                             </span>
                             <span>
-                                "Get highly values professionals with proficiency in artificial intelligence and machine learning. For me, a candidate credentialed through edX MicroMasters course in Artificial Intelligence would have a marked
-                            advantage."
+                                ${program['individual_endorsements'][0]['quote']}
                             </span>
                             <img class="visible-sm pull-left" src="${static.url('images/programs/quote-logo.png')}" width="40" height="40"/>
                             <span class="writer">
-                                    Michael Idelchik, Vice President of Advanced Technology Programs, GE
+                                ${program['individual_endorsements'][0]['endorser']['given_name']},
+                                ${program['individual_endorsements'][0]['endorser']['position']['title']}
                             </span>
                         </div>
                     </blockquote>
@@ -299,50 +257,27 @@ from openedx.core.djangolib.markup import HTML, Text
 
                 <div class="col col-12 md-col-5 lg-col-4 right-col hidden-sm">
 
-                    <h2 class="instructors-title">Meet the Instructors <span>(8)</span></h2>
+                    <h2 class="instructors-title">Meet the Instructors <span>(${len(program['staff'])})</span></h2>
                     <div class="instructor-profiles">
-                        <div class="profile-item">
-                            <div class="avatar">
-                                <div class="img-holder">
-                                    <img src="${static.url('images/programs/avatar-female.png')}"/>
+                        %for instructor in program['staff']:
+                            <div class="profile-item">
+                                <div class="avatar">
+                                    <div class="img-holder">
+                                        <img src="${static.url(instructor['profile_image_url'])}" alt="${instructor['given_name']}"/>
+                                    </div>
+                                </div>
+                                <div class="details">
+                                    <div class="name">${instructor['given_name']}</div>
+                                    <div class="dept">${instructor['position']['organization_name']}</div>
                                 </div>
                             </div>
-                            <div class="details">
-                                <div class="name">Ansaf Salleb-Aouissi</div>
-                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
-                            </div>
-                        </div>
-                        <div class="profile-item">
-                            <div class="avatar">
-                                <div class="img-holder">
-                                    <img src="${static.url('images/programs/avatar-male.png')}"/>
-                                </div>
-                            </div>
-                            <div class="details">
-                                <div class="name">Ansaf Salleb-Aouissi</div>
-                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
-                            </div>
-                        </div>
-                        <div class="profile-item">
-                            <div class="avatar">
-                                <div class="img-holder">
-                                    <img src="${static.url('images/programs/avatar-female.png')}"/>
-                                </div>
-                            </div>
-                            <div class="details">
-                                <div class="name">Ansaf Salleb-Aouissi</div>
-                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
-                            </div>
-                        </div>
-                        <div class="profile-item">
-                            <div class="avatar">
-                                <div class="img-holder">
-                                    <img src="${static.url('images/programs/avatar-male.png')}"/>
-                                </div>
-                            </div>
-                            <div class="details">
-                                <div class="name">Ansaf Salleb-Aouissi</div>
-                                <div class="dept">Department of Computer Science<br/>Columbia University</div>
+                        %endfor
+
+                        <div class="pagination hidden-xs">
+                            <div class="pages">1-4 of 8</div>
+                            <div class="controls">
+                                <a href="#" class="active"><span class="fa fa-chevron-down active"></span></a>
+                                <a href="#"><span class="fa fa-chevron-up"></span></a>
                             </div>
                         </div>
                     </div>
@@ -352,12 +287,12 @@ from openedx.core.djangolib.markup import HTML, Text
                                 <img src="${static.url('images/programs/quote-logo.png')}" width="90" height="90"/>
                             </span>
                             <span>
-                                "Get highly values professionals with proficiency in artificial intelligence and machine learning. For me, a candidate credentialed through edX MicroMasters course in Artificial Intelligence would have a marked
-                            advantage."
+                               ${program['individual_endorsements'][0]['quote']}
                             </span>
                             <img class="visible-sm pull-left" src="${static.url('images/programs/quote-logo.png')}" width="40" height="40"/>
                             <span class="writer">
-                                    Michael Idelchik, Vice President of Advanced Technology Programs, GE
+                                ${program['individual_endorsements'][0]['endorser']['given_name']},
+                                ${program['individual_endorsements'][0]['endorser']['position']['title']}
                             </span>
                         </div>
                     </blockquote>
@@ -365,101 +300,40 @@ from openedx.core.djangolib.markup import HTML, Text
             </div>
         </div>
 
-        <div class="container courses-in-program">
-            <h3 class="hd">Courses in the MicroMasters</h3>
+        <div class="container courses-in-program" id="courses">
+            <h3 class="hd">Courses in the ${program['type']['name']}</h3>
             <div class="course-slider-xs">
-                <div class="course-card">
-                    <div class="tbl-view">
-                        <div class="tbl-col col-full-sm">
-                            <h4 class="hd title">
-                                Artificial Intelligence (A.I)
-                                <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                    <span>Self - Paced</span>
-                                </small>
-                            </h4>
-                            <p class="copy-meta">
-                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
-                                Darkwell and its success.
-                            </p>
-                        </div>
-                        <div class="tbl-col col-full-sm">
-                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="tbl-view">
-                        <div class="tbl-col col-full-sm">
-                            <h4 class="hd title">
-                                Machine Learning
-                                <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                    <span>Self - Paced</span>
-                                </small>
-                            </h4>
-                            <p class="copy-meta">
-                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
-                                Darkwell and its success.
-                            </p>
-                        </div>
-                        <div class="tbl-col col-full-sm">
-                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
+                %for course in program['courses']:
+                    <div class="course-card">
+                        <div class="tbl-view">
+                            <div class="tbl-col col-full-sm">
+                                <h4 class="hd title">
+                                    ${course['title']}
+                                    <small>
+                                        <span>
+                                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                            Starts ${datetime.strptime(course['course_runs'][0]['start'], '%Y-%m-%dT%H:%M:%SZ').strftime('%B %-d, %Y')}
+                                        </span>
+
+                                        %if course['course_runs'][0]['pacing_type'] == "instructor_paced":
+                                            <span>Instructor - Paced</span>
+                                        %else:
+                                            <span>Self - Paced</span>
+                                        %endif
+                                    </small>
+
+                                </h4>
+                                <p class="copy-meta">
+                                   ${course['course_runs'][0]['short_description']}
+                                </p>
+                            </div>
+                            <div class="tbl-col col-full-sm">
+                                <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="course-card">
-                    <div class="tbl-view">
-                        <div class="tbl-col col-full-sm">
-                            <h4 class="hd title">
-                                Animation and CGI Motion
-                                <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                    <span>Self - Paced</span>
-                                </small>
-                            </h4>
-                            <p class="copy-meta">
-                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
-                                Darkwell and its success.
-                            </p>
-                        </div>
-                        <div class="tbl-col col-full-sm">
-                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="tbl-view">
-                        <div class="tbl-col col-full-sm">
-                            <h4 class="hd title">
-                                Robotics
-                                <small>
-                                    <span>
-                                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                                        Starts Janyuary 16, 2017
-                                    </span>
-                                    <span>Self - Paced</span>
-                                </small>
-                            </h4>
-                            <p class="copy-meta">
-                                Raised inside a geyser field, the port of Darkwell is home to vikings lead by Mrs. Chilson. This port wasn't built by a geyser field by accident, as it has rare resources, which is of great importance to the people of
-                                Darkwell and its success.
-                            </p>
-                        </div>
-                        <div class="tbl-col col-full-sm">
-                            <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
-                        </div>
-                    </div>
-                </div>
+                %endfor
+
             </div>
             <span class="pagingInfo"></span>
         </div>

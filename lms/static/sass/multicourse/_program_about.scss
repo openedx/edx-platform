@@ -29,11 +29,15 @@
         display: none !important;
     }
 }
-
+.content-wrapper{
+    max-width: none !important;
+    padding-top: 0 !important;
+}
 #program-details-page {
     color: $gray;
 
     .container {
+        min-width: auto;
         border: none;
     }
 
@@ -84,6 +88,9 @@
 
     .instructors-title {
         color: #126f9a;
+        font-family: $sans-serif;
+        text-transform: none;
+        letter-spacing: 0px;
         @media (min-width: $tablet) {
             margin-top: 5px;
             font-size: 18px;
@@ -101,7 +108,7 @@
 
         .profile-item {
             @extend .tbl-view;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
 
             .avatar,
             .details {
@@ -226,6 +233,9 @@
         }
     }
 }
+.courses-in-program .course-card .tbl-view .tbl-col:first-child{
+    width: 70% !important;
+}
 
 #course-trailer {
 
@@ -287,46 +297,41 @@
 
 #accordion-group {
     font-family: "Open Sans", Arial, Helvetica, sans-serif;
-    @media (max-width: $mobile) {
-        margin-left: -8px;
-        margin-right: -8px;
-    }
 
     .accordion-item {
-
+        border-bottom: 1px solid $blue-dark;
         .accordion-head {
             background: #004165;
-            padding: 14px 14px 14px 50px;
+            padding: 18px 18px 18px 84px;
             color: white;
             border-radius: 0;
             border: none;
             margin: 0;
+            font-size: 1.13em;
             position: relative;
-            @media (min-width: $tablet) {
-                padding: 18px 18px 18px 50px;
-            }
 
             &:hover,
-            &.active {
+            &.active,
+            &:focus{
                 cursor: pointer;
+                outline:0;
             }
 
             &:before {
                 content: "\f054";
                 font-family: FontAwesome;
                 position: absolute;
-                left: 20px;
-                top: 0;
-                bottom: 0;
+                left: 44px;
+                top: 20px;
                 width: 18px;
                 height: 22px;
-                margin: auto;
             }
 
             &.ui-state-active {
 
                 &:before {
                     content: "\f078";
+                    left: 40px;
                 }
             }
         }
@@ -393,8 +398,6 @@
             .accordion-content {
                 background: white;
                 padding: 0;
-                margin-left: -8px;
-                margin-right: -8px;
 
                 .instructor-profiles {
                     margin: 0;
@@ -446,7 +449,7 @@
             font-size: 1.5em;
         }
         @media (min-width: $desktop) {
-            font-size: 1.7em;
+            font-size: 2.25rem;
         }
 
         small {
@@ -458,9 +461,9 @@
             > span {
                 display: inline-block;
                 text-decoration: none;
-                font-size: 12px;
+                font-size: 0.85rem;
                 @media (min-width: $tablet) {
-                    font-size: 16px;
+                    font-size: 1.15rem;
                 }
 
                 &:first-child {
@@ -479,6 +482,7 @@
     p {
         margin-bottom: 0;
         font-weight: normal;
+        font-size: 1rem;
     }
 
     &:last-child {
@@ -503,8 +507,8 @@
 
     > .hd {
         color: $blue-dark;
-        padding-left: 20px;
         font-size: 20px;
+        padding: 0 1.25rem !important;
         margin-bottom: 15px;
         @media (min-width: $tablet) {
             padding: 0;
@@ -561,6 +565,13 @@
                 }
             }
         }
+        .btn-enroll-now{
+            width: 100% !important;
+            max-width: 300px !important;
+            height: 50px;
+            font-size: 1.33rem;
+            font-weight: bold;
+        }
     }
 
     .pagingInfo {
@@ -570,27 +581,32 @@
 }
 
 /* Custom SCSS */
+h1, h2, h3, h4, h5, h6{
+    font-family: $sans-serif;
+}
 .main-banner {
     height: 260px;
     background: $blue-dark;
     margin-bottom: 20px;
     position: relative;
+    @media(max-width: $mobile){
+        padding: 0 12px 25px;
+        height: auto;
+    }
     @media (min-width: $tablet) {
         height: 333px;
-        background: #000 url('../../images/programs/banner-bg.jpg') no-repeat right center;
-        background-size: cover;
+        //background: #000 url('https://dphy0qlkz2ftb.cloudfront.net/media/programs/banner_images/9549586e-0993-4903-9139-173b012328ea.large.jpg') no-repeat center center;
+        background: #000 url('#{$static-path}/images/programs/banner-bg.jpg') no-repeat center center;
         margin-bottom: 20px;
     }
     @media (min-width: $desktop) {
-        margin-bottom: 50px;
+        margin-bottom: 50px
     }
 
     .btn-play {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        right: 15%;
+        line-height: 333px;
         margin: auto;
+        display: block;
         width: 100px;
         height: 100px;
         @media (min-width: $desktop-xl) {
@@ -601,6 +617,8 @@
 
     .org-logo {
         display: inline-block;
+        position: relative;
+        overflow: hidden;
         margin-bottom: 8px;
         background: rgba(255, 255, 255, .8);
         @include box-shadow(0, 3px, 4px, rgba(0, 0, 0, 0.5));
@@ -619,6 +637,17 @@
         img {
             max-width: 100%;
         }
+        &:after{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -2px;
+            right: -2px;
+            box-shadow: 0px 1px 3px #333;
+            height: 1px;
+            background: #a1a5a5;
+            z-index: 1;
+        }
     }
 
     .banner-title,
@@ -627,7 +656,7 @@
     }
 
     .banner-title {
-        font-size: 1.3em;
+        font-size: 1.5em;
         font-weight: 600;
         text-align: left;
         letter-spacing: inherit;
@@ -645,11 +674,12 @@
 
     .banner-description {
         min-height: 60px;
-        font-size: .8em;
+        font-size: 1.06em;
         font-weight: 600;
         line-height: 1.35;
         @media (max-width: $mobile) {
             margin-bottom: 14px;
+            font-weight: normal;
         }
         @media (min-width: $tablet) {
             font-size: 1.1em;
@@ -658,8 +688,43 @@
             font-size: 1.25em;
         }
     }
+    .grid-manual, .row{
+        @media(max-width: $mobile){
+            display: block;
+        }
+    }
 }
-
+.pagination {
+    margin: 10px 0 40px;
+    width: 100%;
+    display: block;
+    .pages{
+        width: calc(100% - 120px);
+        text-align: right;
+        display: inline-block;
+    }
+    .controls{
+        text-align: center;
+        display: inline-block;
+        width: 115px;
+        a{
+            display: inline-block;
+            width: 50px;
+            &:first-child{
+                border-right: 1px solid $light-gray2;
+            }
+            .fa{
+                font-size: 1.4rem;
+                color: $border-color;
+            }
+            &.active{
+                .fa{
+                    color: $gray-d2;
+                }
+            }
+        }
+    }
+}
 .grid-container,
 .grid-manual {
 
@@ -695,10 +760,9 @@
             font-size: 1.1em;
             padding: 15px !important;
         }
-
         span,
         span + a {
-            font-size: 1.1em;
+            font-size: 1.024em;
         }
 
         > span {
@@ -715,7 +779,8 @@
 
             .fa {
                 display: none;
-                margin-right: 15px;
+                margin-right: 25px;
+                font-size: 1.5em;
                 @media (min-width: $desktop) {
                     display: inline-block;
                 }
@@ -730,6 +795,9 @@
             &:first-child {
                 color: $blue-dark;
                 margin-bottom: 5px;
+                @media (max-width: $mobile) {
+                    margin-bottom: 0;
+                }
                 font-size: .85em;
                 @media (max-width: $mobile) {
                     text-transform: uppercase;
@@ -738,8 +806,34 @@
                     width: 48%;
                     color: #4a4a4a;
                     margin-bottom: 0;
-                    font-size: 1em;
+                    font-size: 1.024em;
                 }
+            }
+        }
+    }
+}
+.data-table{
+    @media(max-width: $mobile){
+        padding: 0 20px;
+    }
+    .list-divided{
+        @media(min-width: $mobile){
+            padding: 0 12px !important;
+        }
+
+        .item{
+            margin-top: 0.625rem;
+            line-height: 1.4em;
+            padding: 15px 15px 19px 25px !important;
+            border-bottom: 1px solid $m-gray-l3 !important;
+            @media (min-width: $tablet) {
+                padding: 15px 0px 19px 0 !important;
+            }
+            @media(max-width: $mobile){
+                margin: 0 !important;
+            }
+            &:last-child{
+                border-bottom: 0 !important;
             }
         }
     }
@@ -762,6 +856,11 @@
                 position: absolute;
                 left: 5px;
                 top: 1px;
+            }
+            & + div {
+                padding: 10px 30px;
+                font-size: 1rem;
+                color: $black;
             }
         }
     }
