@@ -23,6 +23,7 @@ from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfi
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs.tests import factories as programs_factories
 from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin
+from openedx.core.djangolib.testing.utils import skip_unless_lms, toggle_switch
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -32,9 +33,9 @@ UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 MARKETING_URL = 'https://www.example.com/marketing/path'
 
 
+@skip_unless_lms
 @httpretty.activate
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program listing page."""
     maxDiff = None
@@ -99,7 +100,7 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
         """Helper for mocking out Credentials API URLs."""
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Credentials API calls.')
 
-        url = '{base}/user_credentials/?username={username}'.format(
+        url = '{base}/credentials/?username={username}'.format(
             base=CredentialsApiConfig.current().internal_api_url.strip('/'),
             username=self.user.username
         )
@@ -261,10 +262,29 @@ class TestProgramListing(ProgramsApiConfigMixin, CredentialsApiConfigMixin, Shar
                 expected_credential['certificate_url']
             )
 
+    def test_switch_to_catalog(self):
+        """
+        Verify that the 'get_programs_from_catalog' switch can be used to route
+        traffic between the programs and catalog services.
+        """
+        self.create_programs_config()
+        switch_name = 'get_programs_from_catalog'
 
+        with mock.patch('openedx.core.djangoapps.programs.utils.get_programs') as mock_get_programs:
+            mock_get_programs.return_value = self.data
+
+            toggle_switch(switch_name)
+            self.client.get(self.url)
+            mock_get_programs.assert_called_with(self.user, use_catalog=True)
+
+            toggle_switch(switch_name)
+            self.client.get(self.url)
+            mock_get_programs.assert_called_with(self.user, use_catalog=False)
+
+
+@skip_unless_lms
 @httpretty.activate
 @override_settings(MKTG_URLS={'ROOT': 'https://www.example.com'})
-@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
 class TestProgramDetails(ProgramsApiConfigMixin, SharedModuleStoreTestCase):
     """Unit tests for the program details page."""
