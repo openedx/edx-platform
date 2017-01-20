@@ -21,7 +21,6 @@ from pytz import utc
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
-from openedx.core.djangoapps.credentials.tests import factories as credentials_factories
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
 from openedx.core.djangoapps.programs import utils
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -57,27 +56,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         self.user = UserFactory()
 
         cache.clear()
-
-    def _expected_progam_credentials_data(self):
-        """
-        Dry method for getting expected program credentials response data.
-        """
-        return [
-            credentials_factories.UserCredential(
-                id=1,
-                username='test',
-                credential=credentials_factories.ProgramCredential(
-                    program_id=1
-                )
-            ),
-            credentials_factories.UserCredential(
-                id=2,
-                username='test',
-                credential=credentials_factories.ProgramCredential(
-                    program_id=2
-                )
-            )
-        ]
 
     def test_get_programs(self):
         """Verify programs data can be retrieved."""
@@ -139,52 +117,6 @@ class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, Credential
         self.mock_programs_api(status_code=500)
 
         actual = utils.get_programs(self.user)
-        self.assertEqual(actual, [])
-
-    def test_get_program_for_certificates(self):
-        """Verify programs data can be retrieved and parsed correctly for certificates."""
-        self.create_programs_config()
-        self.mock_programs_api()
-        program_credentials_data = self._expected_progam_credentials_data()
-
-        actual = utils.get_programs_for_credentials(self.user, program_credentials_data)
-        expected = self.PROGRAMS_API_RESPONSE['results'][:2]
-        expected[0]['credential_url'] = program_credentials_data[0]['certificate_url']
-        expected[1]['credential_url'] = program_credentials_data[1]['certificate_url']
-
-        self.assertEqual(len(actual), 2)
-        self.assertEqual(actual, expected)
-
-    def test_get_program_for_certificates_no_data(self):
-        """Verify behavior when no programs data is found for the user."""
-        self.create_programs_config()
-        self.create_credentials_config()
-        self.mock_programs_api(data={'results': []})
-        program_credentials_data = self._expected_progam_credentials_data()
-
-        actual = utils.get_programs_for_credentials(self.user, program_credentials_data)
-        self.assertEqual(actual, [])
-
-    def test_get_program_for_certificates_id_not_exist(self):
-        """Verify behavior when no program with the given program_id in
-        credentials exists.
-        """
-        self.create_programs_config()
-        self.create_credentials_config()
-        self.mock_programs_api()
-        credential_data = [
-            {
-                "id": 1,
-                "username": "test",
-                "credential": {
-                    "credential_id": 1,
-                    "program_id": 100
-                },
-                "status": "awarded",
-                "credential_url": "www.example.com"
-            }
-        ]
-        actual = utils.get_programs_for_credentials(self.user, credential_data)
         self.assertEqual(actual, [])
 
 

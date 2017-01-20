@@ -2,15 +2,16 @@
 from collections import namedtuple
 import logging
 
+from django.contrib.auth.models import User
 from django.core.management import BaseCommand, CommandError
 from django.db.models import Q
 from opaque_keys.edx.keys import CourseKey
 from provider.oauth2.models import Client
 
 from certificates.models import GeneratedCertificate, CertificateStatuses  # pylint: disable=import-error
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.catalog.models import CatalogIntegration
 from openedx.core.djangoapps.programs.tasks.v1.tasks import award_program_certificates
-from openedx.core.djangoapps.programs.utils import get_programs
+from openedx.core.djangoapps.catalog.utils import get_programs
 
 
 # TODO: Log to console, even with debug mode disabled?
@@ -39,20 +40,17 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        programs_config = ProgramsApiConfig.current()
-        self.client = Client.objects.get(name=programs_config.OAUTH2_CLIENT_NAME)
+        catalog_config = CatalogIntegration.current()
 
-        if self.client.user is None:
-            msg = (
-                'No user is associated with the {} OAuth2 client. '
-                'A service user is necessary to make requests to the Programs API. '
-                'No tasks have been enqueued. '
-                'Associate a user with the client and try again.'
-            ).format(programs_config.OAUTH2_CLIENT_NAME)
+        try:
+            user = User.objects.get(username=catalog_config.service_username)
+        except:
+            raise CommandError(
+                'User with username [{}] not found. '
+                'A service user is required to run this command.'.format(catalog_config.service_username)
+            )
 
-            raise CommandError(msg)
-
-        self._load_run_modes()
+        self._load_run_modes(user)
 
         logger.info('Looking for users who may be eligible for a program certificate.')
 
@@ -85,9 +83,9 @@ class Command(BaseCommand):
             failed
         )
 
-    def _load_run_modes(self):
+    def _load_run_modes(self, user):
         """Find all run modes which are part of a program."""
-        programs = get_programs(self.client.user)
+        programs = get_programs(user)
         self.run_modes = self._flatten(programs)
 
     def _flatten(self, programs):

@@ -1,4 +1,6 @@
 """Factories for generating fake credentials-related data."""
+import uuid
+
 import factory
 from factory.fuzzy import FuzzyText
 
@@ -26,7 +28,7 @@ class ProgramCredential(factory.Factory):
         model = dict
 
     credential_id = factory.Sequence(lambda n: n)
-    program_id = factory.Sequence(lambda n: n)
+    program_uuid = factory.LazyAttribute(lambda obj: str(uuid.uuid4()))
 
 
 class CourseCredential(factory.Factory):
