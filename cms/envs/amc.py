@@ -13,6 +13,8 @@ DEFAULT_TEMPLATE_ENGINE['OPTIONS']['context_processors'] += ('openedx.core.djang
 
 MANDRILL_API_KEY = AUTH_TOKENS.get("MANDRILL_API_KEY")
 
+AMC_APP_URL = FEATURES['AMC_APP_URL']
+
 if MANDRILL_API_KEY:
     EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', 'anymail.backends.mandrill.MandrillBackend')
     ANYMAIL = {

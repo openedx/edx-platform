@@ -10,6 +10,8 @@ APPSEMBLER_FIRST_LOGIN_API = '/logged_into_edx'
 FEATURES["ORGANIZATIONS_APP"] = True
 FEATURES["ENABLE_COMPREHENSIVE_THEMING"] = True
 
+AMC_APP_URL = FEATURES['AMC_APP_URL']
+
 INSTALLED_APPS += (
     'openedx.core.djangoapps.appsembler.sites',
 )
