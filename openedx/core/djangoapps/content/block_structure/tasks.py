@@ -29,17 +29,37 @@ def update_course_in_cache(course_id):
     """
     Updates the course blocks (in the database) for the specified course.
     """
+    _call_and_retry_if_needed(course_id, api.update_course_in_cache, update_course_in_cache)
+
+
+@task(
+    default_retry_delay=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY'],
+    max_retries=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_TASK_MAX_RETRIES'],
+)
+def get_course_in_cache(course_id):
+    """
+    Gets the course blocks for the specified course, updating the cache if needed.
+    """
+    _call_and_retry_if_needed(course_id, api.get_course_in_cache, get_course_in_cache)
+
+
+def _call_and_retry_if_needed(course_id, api_method, task_method):
+    """
+    Calls the given api_method with the given course_id, retrying task_method upon failure.
+    """
     try:
         course_key = CourseKey.from_string(course_id)
-        api.update_course_in_cache(course_key)
+        api_method(course_key)
     except NO_RETRY_TASKS as exc:
         # Known unrecoverable errors
         raise
     except RETRY_TASKS as exc:
-        log.exception("update_course_in_cache encounted expected error, retrying.")
-        raise update_course_in_cache.retry(args=[course_id], exc=exc)
+        log.exception("%s encountered expected error, retrying.", task_method.__name__)
+        raise task_method.retry(args=[course_id], exc=exc)
     except Exception as exc:   # pylint: disable=broad-except
-        log.exception("update_course_in_cache encounted unknown error. Retry #{}".format(
-            update_course_in_cache.request.retries,
-        ))
-        raise update_course_in_cache.retry(args=[course_id], exc=exc)
+        log.exception(
+            "%s encountered unknown error. Retry #%d",
+            task_method.__name__,
+            task_method.request.retries,
+        )
+        raise task_method.retry(args=[course_id], exc=exc)
