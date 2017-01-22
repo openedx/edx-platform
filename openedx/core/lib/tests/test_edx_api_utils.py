@@ -1,4 +1,6 @@
-"""Tests covering edX API utilities."""
+"""
+Tests covering edX API utilities.
+"""
 import json
 
 from django.core.cache import cache
@@ -7,7 +9,10 @@ import httpretty
 import mock
 from nose.plugins.attrib import attr
 from edx_oauth2_provider.tests.factories import ClientFactory
+from openedx.core.djangoapps.catalog.tests import factories
+from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from provider.constants import CONFIDENTIAL
+from openedx.core.djangoapps.catalog.utils import create_catalog_api_client
 
 from openedx.core.djangoapps.commerce.utils import ecommerce_api_client
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
@@ -24,13 +29,15 @@ TEST_API_SIGNING_KEY = 'edx'
 
 @attr(shard=2)
 @httpretty.activate
-class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
-    """Tests for edX API data retrieval utility."""
+class TestGetEdxApiDataForPrograms(ProgramsApiConfigMixin, CacheIsolationTestCase):
+    """
+    Tests for edX API data retrieval utility for Programs endpoints.
+    """
 
     ENABLED_CACHES = ['default']
 
     def setUp(self):
-        super(TestGetEdxApiData, self).setUp()
+        super(TestGetEdxApiDataForPrograms, self).setUp()
 
         self.user = UserFactory()
         ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
@@ -38,7 +45,9 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         cache.clear()
 
     def _mock_programs_api(self, responses, url=None):
-        """Helper for mocking out Programs API URLs."""
+        """
+        Helper for mocking out Programs API URLs.
+        """
         self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
 
         url = url if url else ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
@@ -46,11 +55,15 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         httpretty.register_uri(httpretty.GET, url, responses=responses)
 
     def _assert_num_requests(self, count):
-        """DRY helper for verifying request counts."""
+        """
+        DRY helper for verifying request counts.
+        """
         self.assertEqual(len(httpretty.httpretty.latest_requests), count)
 
     def test_get_unpaginated_data(self):
-        """Verify that unpaginated data can be retrieved."""
+        """
+        Verify that unpaginated data can be retrieved.
+        """
         program_config = self.create_programs_config()
 
         expected_collection = ['some', 'test', 'data']
@@ -96,7 +109,9 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         self._assert_num_requests(len(expected_collection))
 
     def test_get_specific_resource(self):
-        """Verify that a specific resource can be retrieved."""
+        """
+        Verify that a specific resource can be retrieved.
+        """
         program_config = self.create_programs_config()
 
         resource_id = 1
@@ -118,7 +133,9 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
         self._assert_num_requests(1)
 
     def test_cache_utilization(self):
-        """Verify that when enabled, the cache is used."""
+        """
+        Verify that when enabled, the cache is used.
+        """
         program_config = self.create_programs_config(cache_ttl=5)
 
         expected_collection = ['some', 'test', 'data']
@@ -164,7 +181,9 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
 
     @mock.patch(UTILITY_MODULE + '.log.warning')
     def test_api_config_disabled(self, mock_warning):
-        """Verify that no data is retrieved if the provided config model is disabled."""
+        """
+        Verify that no data is retrieved if the provided config model is disabled.
+        """
         program_config = self.create_programs_config(enabled=False)
 
         actual = get_edx_api_data(program_config, self.user, 'programs')
@@ -175,7 +194,9 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
     @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
     @mock.patch(UTILITY_MODULE + '.log.exception')
     def test_client_initialization_failure(self, mock_exception, mock_init):
-        """Verify that an exception is logged when the API client fails to initialize."""
+        """
+        Verify that an exception is logged when the API client fails to initialize.
+        """
         mock_init.side_effect = Exception
 
         program_config = self.create_programs_config()
@@ -187,7 +208,9 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
 
     @mock.patch(UTILITY_MODULE + '.log.exception')
     def test_data_retrieval_failure(self, mock_exception):
-        """Verify that an exception is logged when data can't be retrieved."""
+        """
+        Verify that an exception is logged when data can't be retrieved.
+        """
         program_config = self.create_programs_config()
 
         self._mock_programs_api(
@@ -202,11 +225,73 @@ class TestGetEdxApiData(ProgramsApiConfigMixin, CacheIsolationTestCase):
     @override_settings(JWT_AUTH={'JWT_ISSUER': 'http://example.com/oauth', 'JWT_EXPIRATION': 30},
                        ECOMMERCE_API_SIGNING_KEY=TEST_API_SIGNING_KEY, ECOMMERCE_API_URL=TEST_API_URL)
     def test_client_passed(self):
-        """ Verify that when API client is passed edx_rest_api_client is not
-        used.
+        """
+        Verify that when API client is passed edx_rest_api_client is not used.
         """
         program_config = self.create_programs_config()
         api = ecommerce_api_client(self.user)
         with mock.patch('openedx.core.lib.edx_api_utils.EdxRestApiClient.__init__') as mock_init:
             get_edx_api_data(program_config, self.user, 'orders', api=api)
             self.assertFalse(mock_init.called)
+
+
+@httpretty.activate
+class TestGetEdxApiDataForCatalog(CatalogIntegrationMixin, CacheIsolationTestCase):
+    """
+    Tests for edX API data retrieval utility for Catalog endpoints.
+    """
+
+    ENABLED_CACHES = ['default']
+
+    def setUp(self):
+        super(TestGetEdxApiDataForCatalog, self).setUp()
+        self.user = UserFactory()
+        self.catalog_integration = self.create_catalog_integration(
+            internal_api_url="http://catalog.example.com:443/api/v1",
+            cache_ttl=1,
+        )
+
+    def _create_course_run_data(self, count):
+        """
+        Create course run data.
+        """
+        course_runs = [factories.CourseRun() for __ in range(count)]
+        course_key_strings = [course_run["key"] for course_run in course_runs]
+        return course_runs, course_key_strings
+
+    def test_get_unpaginated_data(self):
+        """
+        Verify that unpaginated data can be retrieved.
+        """
+        course_runs, course_key_strings = self._create_course_run_data(5)
+        self.register_catalog_course_run_response(course_key_strings, course_runs)
+        api = create_catalog_api_client(self.user, self.catalog_integration)
+
+        actual_collection = get_edx_api_data(
+            self.catalog_integration,
+            self.user,
+            'course_runs',
+            api=api,
+            querystring={'keys': ",".join(course_key_strings), 'exclude_utm': 1},
+        )
+        self.assertEqual(len(actual_collection), 5)
+        self.assertEqual(actual_collection, course_runs)
+
+    def test_get_paginated_data(self):
+        """
+        Verify that limit-offset based DRF paginated data can be retrieved.
+        """
+        course_runs, course_key_strings = self._create_course_run_data(22)
+        self.register_catalog_course_run_response(course_key_strings[:20], course_runs[:20])
+        self.register_catalog_course_run_response(course_key_strings[20:], course_runs[20:], 2)
+        api = create_catalog_api_client(self.user, self.catalog_integration)
+
+        actual_collection = get_edx_api_data(
+            self.catalog_integration,
+            self.user,
+            'course_runs',
+            api=api,
+            querystring={'keys': ",".join(course_key_strings), 'exclude_utm': 1},
+        )
+        self.assertEqual(len(actual_collection), 22)
+        self.assertEqual(actual_collection, course_runs[20:] + course_runs[:20])
