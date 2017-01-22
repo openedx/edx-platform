@@ -3,10 +3,13 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.files.storage import DefaultStorage
 from rest_framework import generics, views, viewsets
+from rest_framework import status
 from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 
 from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+from rest_framework.views import APIView
+
 from .serializers import SiteConfigurationSerializer, SiteConfigurationListSerializer, SiteSerializer,\
     RegistrationSerializer
 from .utils import delete_site
@@ -63,3 +66,12 @@ class FileUploadView(views.APIView):
 
 class SiteCreateView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
+
+
+class UsernameAvailabilityView(APIView):
+    def get(self, request, username, format=None):
+        try:
+            User.objects.get(username=username)
+            return Response(None, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
