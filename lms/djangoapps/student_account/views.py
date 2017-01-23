@@ -15,7 +15,6 @@ from django.http import (
 )
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from django_countries import countries
 from edxmako.shortcuts import render_to_response
@@ -55,7 +54,6 @@ User = get_user_model()  # pylint:disable=invalid-name
 
 
 @require_http_methods(['GET'])
-@ensure_csrf_cookie
 @xframe_allow_whitelisted
 def login_and_registration_form(request, initial_mode="login"):
     """Render the combined login/registration form, defaulting to login

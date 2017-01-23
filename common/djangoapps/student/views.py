@@ -33,7 +33,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.translation import ungettext
 from django.utils.http import base36_to_int, urlsafe_base64_encode, urlencode
 from django.utils.translation import ugettext as _, get_language
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
@@ -432,7 +432,6 @@ def _cert_info(user, course_overview, cert_status, course_mode):  # pylint: disa
     return status_dict
 
 
-@ensure_csrf_cookie
 def signin_user(request):
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     external_auth_response = external_auth_login(request)
@@ -467,7 +466,6 @@ def signin_user(request):
     return render_to_response('login.html', context)
 
 
-@ensure_csrf_cookie
 def register_user(request, extra_context=None):
     """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     # Determine the URL to redirect to following login:
@@ -572,7 +570,6 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
 
 
 @login_required
-@ensure_csrf_cookie
 def dashboard(request):
     """
     Provides the LMS dashboard view
@@ -1162,7 +1159,6 @@ def change_enrollment(request, check_access=True):
 
 
 # Need different levels of logging
-@ensure_csrf_cookie
 def login_user(request, error=""):  # pylint: disable=too-many-statements,unused-argument
     """AJAX request to log in the user."""
 
@@ -1426,7 +1422,6 @@ def login_oauth_token(request, backend):
 
 @require_GET
 @login_required
-@ensure_csrf_cookie
 def manage_user_standing(request):
     """
     Renders the view used to manage user standing. Also displays a table
@@ -1453,7 +1448,6 @@ def manage_user_standing(request):
 
 @require_POST
 @login_required
-@ensure_csrf_cookie
 def disable_account_ajax(request):
     """
     Ajax call to change user standing. Endpoint of the form
@@ -1501,7 +1495,6 @@ def disable_account_ajax(request):
 
 
 @login_required
-@ensure_csrf_cookie
 def change_setting(request):
     """JSON call to change a profile setting: Right now, location"""
     # TODO (vshnayder): location is no longer used
@@ -2154,7 +2147,6 @@ def auto_auth(request):
     return response
 
 
-@ensure_csrf_cookie
 def activate_account(request, key):
     """When link in activation e-mail is clicked"""
     regs = Registration.objects.filter(activation_key=key)
@@ -2476,7 +2468,6 @@ def do_email_change_request(user, new_email, activation_key=None):
     )
 
 
-@ensure_csrf_cookie
 def confirm_email_change(request, key):  # pylint: disable=unused-argument
     """
     User requested a new e-mail. This is called when the activation
@@ -2546,7 +2537,6 @@ def confirm_email_change(request, key):  # pylint: disable=unused-argument
 
 @require_POST
 @login_required
-@ensure_csrf_cookie
 def change_email_settings(request):
     """Modify logged-in user's setting for receiving emails from a course."""
     user = request.user

@@ -12,7 +12,6 @@ import pytz
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _, ugettext_noop
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
@@ -91,7 +90,6 @@ def show_analytics_dashboard_message(course_key):
     return settings.ANALYTICS_DASHBOARD_URL
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
@@ -381,7 +379,6 @@ def _section_certificates(course):
     }
 
 
-@ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_POST
 @login_required

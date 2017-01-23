@@ -34,7 +34,7 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
 from edxmako.shortcuts import render_to_response, render_to_string
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt
 
 import django_openid_auth.views as openid_views
 from django_openid_auth import auth as openid_auth
@@ -263,7 +263,6 @@ def _flatten_to_ascii(txt):
         return unicode(unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore'))
 
 
-@ensure_csrf_cookie
 def _signup(request, eamap, retfun=None):
     """
     Present form to complete for signup via external authentication.

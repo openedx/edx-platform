@@ -26,7 +26,6 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
@@ -314,7 +313,6 @@ class Certificate(object):
 
 @login_required
 @require_http_methods(("POST",))
-@ensure_csrf_cookie
 def certificate_activation_handler(request, course_key_string):
     """
     A handler for Certificate Activation/Deactivation
@@ -349,7 +347,6 @@ def certificate_activation_handler(request, course_key_string):
 
 @login_required
 @require_http_methods(("GET", "POST"))
-@ensure_csrf_cookie
 def certificates_list_handler(request, course_key_string):
     """
     A RESTful handler for Course Certificates
@@ -446,7 +443,6 @@ def certificates_list_handler(request, course_key_string):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("POST", "PUT", "DELETE"))
 def certificates_detail_handler(request, course_key_string, certificate_id):
     """
@@ -522,7 +518,6 @@ def certificates_detail_handler(request, course_key_string, certificate_id):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("POST", "PUT", "DELETE"))
 def signatory_detail_handler(request, course_key_string, certificate_id, signatory_id):
     """

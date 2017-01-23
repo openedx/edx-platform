@@ -16,7 +16,6 @@ from django.shortcuts import redirect
 import django.utils
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods, require_GET
-from django.views.decorators.csrf import ensure_csrf_cookie
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
@@ -281,7 +280,6 @@ def course_handler(request, course_key_string=None):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(["GET"])
 def course_rerun_handler(request, course_key_string):
     """
@@ -306,7 +304,6 @@ def course_rerun_handler(request, course_key_string):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_GET
 def course_search_index_handler(request, course_key_string):
     """
@@ -461,7 +458,6 @@ def _accessible_libraries_list(user):
 
 
 @login_required
-@ensure_csrf_cookie
 def course_listing(request):
     """
     List all courses available to the logged in user
@@ -572,7 +568,6 @@ def _deprecated_blocks_info(course_module, deprecated_block_types):
 
 
 @login_required
-@ensure_csrf_cookie
 def course_index(request, course_key):
     """
     Display an editable course overview.
@@ -871,7 +866,6 @@ def _rerun_course(request, org, number, run, fields):
 
 # pylint: disable=unused-argument
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(["GET"])
 def course_info_handler(request, course_key_string):
     """
@@ -904,7 +898,6 @@ def course_info_handler(request, course_key_string):
 
 # pylint: disable=unused-argument
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
 def course_info_update_handler(request, course_key_string, provided_id=None):
@@ -956,7 +949,6 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
 @expect_json
 def settings_handler(request, course_key_string):
@@ -1107,7 +1099,6 @@ def settings_handler(request, course_key_string):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
 def grading_handler(request, course_key_string, grader_index=None):
@@ -1203,7 +1194,6 @@ def _refresh_course_tabs(request, course_module):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
 @expect_json
 def advanced_settings_handler(request, course_key_string):
@@ -1329,7 +1319,6 @@ def assign_textbook_id(textbook, used_ids=()):
 
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
-@ensure_csrf_cookie
 def textbooks_list_handler(request, course_key_string):
     """
     A RESTful handler for textbook collections.
@@ -1404,7 +1393,6 @@ def textbooks_list_handler(request, course_key_string):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 def textbooks_detail_handler(request, course_key_string, textbook_id):
     """
@@ -1505,7 +1493,6 @@ def remove_content_or_experiment_group(request, store, course, configuration, gr
 
 @require_http_methods(("GET", "POST"))
 @login_required
-@ensure_csrf_cookie
 def group_configurations_list_handler(request, course_key_string):
     """
     A RESTful handler for Group Configurations
@@ -1562,7 +1549,6 @@ def group_configurations_list_handler(request, course_key_string):
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("POST", "PUT", "DELETE"))
 def group_configurations_detail_handler(request, course_key_string, group_configuration_id, group_id=None):
     """

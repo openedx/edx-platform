@@ -6,7 +6,6 @@ from functools import wraps
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.http import HttpResponse, HttpResponseBadRequest
 
 from openedx.core.djangolib.js_utils import dump_js_escaped_json
@@ -55,7 +54,6 @@ def check_feature_enabled(feature_name):
 
 
 @login_required
-@ensure_csrf_cookie
 @check_feature_enabled(feature_name='ENTRANCE_EXAMS')
 def entrance_exam(request, course_key_string):
     """

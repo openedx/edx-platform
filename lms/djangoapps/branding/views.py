@@ -9,7 +9,6 @@ from django.views.decorators.cache import cache_control
 from django.http import HttpResponse, Http404
 from django.utils import translation
 from django.shortcuts import redirect
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.staticfiles.storage import staticfiles_storage
 
 from edxmako.shortcuts import render_to_response
@@ -43,7 +42,6 @@ def get_course_enrollments(user):
     return site_enrollments
 
 
-@ensure_csrf_cookie
 @cache_if_anonymous()
 def index(request):
     '''
@@ -94,7 +92,6 @@ def index(request):
     return student.views.index(request, user=request.user)
 
 
-@ensure_csrf_cookie
 @cache_if_anonymous()
 def courses(request):
     """

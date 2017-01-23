@@ -23,7 +23,6 @@ from django.utils.decorators import method_decorator
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.views.generic import View
 from eventtracking import tracker
@@ -129,7 +128,6 @@ def user_groups(user):
     return group_names
 
 
-@ensure_csrf_cookie
 @cache_if_anonymous()
 def courses(request):
     """
@@ -217,7 +215,6 @@ def get_current_child(xmodule, min_depth=None, requested_child=None):
     return child
 
 
-@ensure_csrf_cookie
 @ensure_valid_course_key
 def jump_to_id(request, course_id, module_id):
     """
@@ -244,7 +241,6 @@ def jump_to_id(request, course_id, module_id):
     return jump_to(request, course_id, items[0].location.to_deprecated_string())
 
 
-@ensure_csrf_cookie
 def jump_to(_request, course_id, location):
     """
     Show the page that contains a specific location.
@@ -274,7 +270,6 @@ def jump_to(_request, course_id, location):
     return redirect(redirect_url)
 
 
-@ensure_csrf_cookie
 @ensure_valid_course_key
 def course_info(request, course_id):
     """
@@ -392,7 +387,6 @@ def get_last_accessed_courseware(course, request, user):
     return None
 
 
-@ensure_csrf_cookie
 @ensure_valid_course_key
 def static_tab(request, course_id, tab_slug):
     """
@@ -424,7 +418,6 @@ def static_tab(request, course_id, tab_slug):
     })
 
 
-@ensure_csrf_cookie
 @ensure_valid_course_key
 def syllabus(request, course_id):
     """
@@ -532,7 +525,6 @@ class EnrollStaffView(View):
         return redirect(reverse('about_course', args=[unicode(course_key)]))
 
 
-@ensure_csrf_cookie
 @cache_if_anonymous()
 def course_about(request, course_id):
     """

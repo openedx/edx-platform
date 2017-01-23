@@ -18,7 +18,6 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.servers.basehttp import FileWrapper
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.utils.translation import ugettext as _
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods, require_GET
 
 import dogstats_wrapper as dog_stats_api
@@ -60,7 +59,6 @@ CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11
 
 
 @login_required
-@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
 @ensure_valid_course_key
 def import_handler(request, course_key_string):
@@ -359,7 +357,6 @@ def _save_request_status(request, key, status):
 
 
 @require_GET
-@ensure_csrf_cookie
 @login_required
 @ensure_valid_course_key
 def import_status_handler(request, course_key_string, filename=None):
@@ -456,7 +453,6 @@ def send_tarball(tarball):
     return response
 
 
-@ensure_csrf_cookie
 @login_required
 @require_http_methods(("GET",))
 @ensure_valid_course_key

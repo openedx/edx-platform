@@ -7,7 +7,6 @@ import logging
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
 
 from student.auth import has_course_author_access
@@ -19,7 +18,6 @@ from opaque_keys.edx.keys import CourseKey
 log = logging.getLogger(__name__)
 
 
-@ensure_csrf_cookie
 @login_required
 def export_git(request, course_key_string):
     """

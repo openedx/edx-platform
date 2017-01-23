@@ -2,7 +2,6 @@
 Views related to course groups functionality.
 """
 
-from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage
@@ -117,7 +116,6 @@ def get_cohorted_discussions(course, course_settings):
 
 
 @require_http_methods(("GET", "PATCH"))
-@ensure_csrf_cookie
 @expect_json
 @login_required
 def course_cohort_settings_handler(request, course_key_string):
@@ -172,7 +170,6 @@ def course_cohort_settings_handler(request, course_key_string):
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))
-@ensure_csrf_cookie
 @expect_json
 @login_required
 def cohort_handler(request, course_key_string, cohort_id=None):
@@ -252,7 +249,6 @@ def cohort_handler(request, course_key_string, cohort_id=None):
         return JsonResponse(_get_cohort_representation(cohort, course))
 
 
-@ensure_csrf_cookie
 def users_in_cohort(request, course_key_string, cohort_id):
     """
     Return users in the cohort.  Show up to 100 per page, and page
@@ -302,7 +298,6 @@ def users_in_cohort(request, course_key_string, cohort_id):
 
 
 @transaction.non_atomic_requests
-@ensure_csrf_cookie
 @require_POST
 def add_users_to_cohort(request, course_key_string, cohort_id):
     """
@@ -365,7 +360,6 @@ def add_users_to_cohort(request, course_key_string, cohort_id):
                                'unknown': unknown})
 
 
-@ensure_csrf_cookie
 @require_POST
 def remove_user_from_cohort(request, course_key_string, cohort_id):
     """

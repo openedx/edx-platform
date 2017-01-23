@@ -10,7 +10,6 @@ from mako.exceptions import TopLevelLookupException
 from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
-from django.views.decorators.csrf import ensure_csrf_cookie
 
 from util.cache import cache_if_anonymous
 
@@ -31,7 +30,6 @@ def index(request, template):
         return redirect('/')
 
 
-@ensure_csrf_cookie
 @cache_if_anonymous()
 def render(request, template):
     """
@@ -51,7 +49,6 @@ def render(request, template):
         raise Http404
 
 
-@ensure_csrf_cookie
 @cache_if_anonymous()
 def render_press_release(request, slug):
     """
