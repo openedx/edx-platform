@@ -8,6 +8,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
         var modal,
             showModal,
             verifyNotificationStatus,
+            selectTargetParent,
             getConfirmationFeedbackTitle,
             getUndoConfirmationFeedbackTitle,
             getConfirmationFeedbackTitleLink,
@@ -19,24 +20,6 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             sourceParentLocator = 'source-parent-xblock-locator';
 
         describe('MoveXBlockModal', function() {
-            var modal,
-                showModal,
-                DISPLAY_NAME = 'HTML 101',
-                OUTLINE_URL = '/course/cid?formats=concise';
-
-            showModal = function() {
-                modal = new MoveXBlockModal({
-                    sourceXBlockInfo: new XBlockInfo({
-                        id: 'testCourse/branch/draft/block/verticalFFF',
-                        display_name: DISPLAY_NAME,
-                        category: 'html'
-                    }),
-                    XBlockUrlRoot: '/xblock',
-                    outlineURL: OUTLINE_URL
-                });
-                modal.show();
-            };
-
             beforeEach(function() {
                 TemplateHelpers.installTemplates([
                     'basic-modal',
@@ -51,7 +34,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
             it('rendered as expected', function() {
                 showModal();
-                expect(modal.$el.find('.modal-header .title').text()).toEqual('Move: ' + DISPLAY_NAME);
+                expect(modal.$el.find('.modal-header .title').text()).toEqual('Move: ' + sourceDisplayName);
                 expect(modal.$el.find('.modal-actions .action-primary.action-move').text()).toEqual('Move');
             });
 
@@ -60,25 +43,9 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     renderViewsSpy;
                 showModal();
                 renderViewsSpy = spyOn(modal, 'renderViews');
-                AjaxHelpers.expectRequest(requests, 'GET', OUTLINE_URL);
+                AjaxHelpers.expectRequest(requests, 'GET', outlineUrl);
                 AjaxHelpers.respondWithJson(requests, {});
                 expect(renderViewsSpy).toHaveBeenCalled();
-            });
-        });
-
-        describe('MoveXBlockModal', function() {
-            beforeEach(function() {
-                TemplateHelpers.installTemplates([
-                    'basic-modal',
-                    'modal-button',
-                    'move-xblock-modal'
-                ]);
-                showModal();
-            });
-
-            it('rendered as expected', function() {
-                expect(modal.$el.find('.modal-header .title').text()).toEqual('Move: ' + sourceDisplayName);
-                expect(modal.$el.find('.modal-actions .action-primary.action-move').text()).toEqual('Move');
             });
         });
 
@@ -98,6 +65,17 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 outlineURL: outlineUrl
             });
             modal.show();
+        };
+
+        selectTargetParent = function(parentLocator) {
+            modal.moveXBlockListView = {
+                parent_info: {
+                    parent: {
+                        id: parentLocator
+                    }
+                },
+                remove: function() {}   // attach a fake remove method
+            };
         };
 
         getConfirmationFeedbackTitle = function(displayName) {
@@ -145,7 +123,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
         };
 
         verifyNotificationStatus = function(requests, notificationSpy, notificationText, sourceIndex) {
-            var sourceIndex = sourceIndex || 0;
+            var sourceIndex = sourceIndex || 0;  // eslint-disable-line no-redeclare
             ViewHelpers.verifyNotificationShowing(notificationSpy, notificationText);
             AjaxHelpers.respondWithJson(requests, {
                 move_source_locator: sourceLocator,
@@ -158,6 +136,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
         describe('Move an xblock', function() {
             var sendMoveXBlockRequest,
                 moveXBlockWithSuccess;
+
             beforeEach(function() {
                 TemplateHelpers.installTemplates([
                     'basic-modal',
@@ -167,6 +146,10 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 showModal();
             });
 
+            afterEach(function() {
+                modal.hide();
+            });
+
             sendMoveXBlockRequest = function(requests, xblockLocator, parentLocator, targetIndex, sourceIndex) {
                 var responseData,
                     expectData,
@@ -174,9 +157,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     moveButton = modal.$el.find('.modal-actions .action-move')[sourceIndex];
 
                 // select a target item and click
-                modal.targetParentXBlockInfo = {
-                    id: parentLocator
-                };
+                selectTargetParent(parentLocator);
                 moveButton.click();
 
                 responseData = expectData = {
@@ -242,9 +223,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
             it('does not move an xblock when cancel button is clicked', function() {
                 var sourceIndex = 0;
                 // select a target parent and click cancel button
-                modal.targetParentXBlockInfo = {
-                    id: sourceParentLocator
-                };
+                selectTargetParent(targetParentLocator);
                 modal.$el.find('.modal-actions .action-cancel')[sourceIndex].click();
                 expect(modal.movedAlertView).toBeNull();
             });
@@ -253,9 +232,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 var requests = AjaxHelpers.requests(this),
                     notificationSpy = ViewHelpers.createNotificationSpy();
                 // select a target item and click on move
-                modal.targetParentXBlockInfo = {
-                    id: targetParentLocator
-                };
+                selectTargetParent(targetParentLocator);
                 modal.$el.find('.modal-actions .action-move').click();
                 verifyNotificationStatus(requests, notificationSpy, 'Moving');
             });

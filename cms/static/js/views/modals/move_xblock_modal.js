@@ -33,12 +33,14 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
         initialize: function() {
             BaseModal.prototype.initialize.call(this);
             this.sourceXBlockInfo = this.options.sourceXBlockInfo;
+            this.sourceParentXBlockInfo = this.options.sourceParentXBlockInfo;
             this.XBlockUrlRoot = this.options.XBlockUrlRoot;
             this.outlineURL = this.options.outlineURL;
             this.options.title = this.getTitle();
-            this.fetchCourseOutline();
-            this.targetParentXBlockInfo = null;
             this.movedAlertView = null;
+            this.moveXBlockBreadcrumbView = null;
+            this.moveXBlockListView = null;
+            this.fetchCourseOutline();
         },
 
         getTitle: function() {
@@ -54,7 +56,7 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
 
         show: function() {
             BaseModal.prototype.show.apply(this, [false]);
-            Feedback.prototype.inFocus.apply(this, [this.options.modalWindowClass]);
+            MovedAlertView.prototype.inFocus.apply(this, [this.options.modalWindowClass]);
         },
 
         hide: function() {
@@ -65,7 +67,7 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
                 this.moveXBlockBreadcrumbView.remove();
             }
             BaseModal.prototype.hide.apply(this);
-            Feedback.prototype.outFocus.apply(this);
+            MovedAlertView.prototype.outFocus.apply(this);
         },
 
         fetchCourseOutline: function() {
@@ -79,7 +81,7 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
                 $('.ui-loading').addClass('is-hidden');
                 $('.breadcrumb-container').removeClass('is-hidden');
                 self.renderViews(outlineJson);
-            }).fail(function(jqXHR, textStatus, errorThrown) {
+            }).fail(function(jqXHR, textStatus, errorThrown) {  // eslint-disable-line no-unused-vars
                 // TODO! What to do here???
             });
         },
@@ -120,7 +122,7 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
 
         moveXBlock: function() {
             var self = this;
-            XBlockViewUtils.moveXBlock(self.sourceXBlockInfo.id, self.targetParentXBlockInfo.id)
+            XBlockViewUtils.moveXBlock(self.sourceXBlockInfo.id, self.moveXBlockListView.parent_info.parent.id)
                 .done(function(response) {
                     if (response.move_source_locator) {
                         // hide modal
