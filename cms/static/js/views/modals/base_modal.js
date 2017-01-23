@@ -20,6 +20,7 @@
  *     button on the modal.
  *   primaryActionButtonType: A string to be used as type for primary action button.
  *   primaryActionButtonTitle: A string to be used as title for primary action button.
+ *   showEditorModeButtons: Whether to show editor mode button in the modal header.
  */
 define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
     function($, _, gettext, BaseView) {
@@ -41,7 +42,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                 viewSpecificClasses: '',
                 addPrimaryActionButton: false,
                 primaryActionButtonType: 'save',
-                primaryActionButtonTitle: gettext('Save')
+                primaryActionButtonTitle: gettext('Save'),
+                showEditorModeButtons: true
             }),
 
             initialize: function() {
@@ -66,6 +68,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/baseview'],
                     type: this.options.modalType,
                     size: this.options.modalSize,
                     title: this.getTitle(),
+                    modalSRTitle: this.options.modalSRTitle,
+                    showEditorModeButtons: this.options.showEditorModeButtons,
                     viewSpecificClasses: this.options.viewSpecificClasses
                 }));
                 this.addActionButtons();
