@@ -78,6 +78,13 @@
                 new_time: 1,
                 type: 'any'
             });
+            expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
+        });
+
+        it('can emit "play_video" event after "seek_video" event ', function() {
+            state.videoEventsPlugin.emitPlayVideoEvent = false;
+            state.el.trigger('seek', [1, 0, 'any']);
+            expect(state.videoEventsPlugin.emitPlayVideoEvent).toBeTruthy();
         });
 
         it('can emit "stop_video" event', function() {

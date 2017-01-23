@@ -94,6 +94,7 @@
                     new_time: time,
                     type: type
                 });
+                this.emitPlayVideoEvent = true;
             },
 
             onSpeedChange: function(event, newSpeed, oldSpeed) {
