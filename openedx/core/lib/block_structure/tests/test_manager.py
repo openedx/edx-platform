@@ -169,8 +169,10 @@ class TestBlockStructureManager(TestCase, ChildrenMapTestMixin):
 
     def test_get_collected_outdated_data(self):
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
-        TestTransformer1.VERSION += 1
+        TestTransformer1.VERSION += 1  # transformer code requires new schema version
         self.collect_and_verify(expect_modulestore_called=True, expect_cache_updated=True)
+        TestTransformer1.VERSION -= 1  # old transformer code works with new schema version
+        self.collect_and_verify(expect_modulestore_called=False, expect_cache_updated=False)
         self.assertEquals(TestTransformer1.collect_call_count, 2)
 
     def test_get_collected_version_update(self):
