@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -51,6 +51,7 @@
 # Nikolaos Maris, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013-2015
+# Patrick Jermann <patrick.jermann@epfl.ch>, 2017
 # Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2014
 # PETIT Yannick <yannick.petit@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013-2014
@@ -117,7 +118,7 @@
 # ytabaa <ytabaa@uae.ac.ma>, 2014
 # yepelboin <yves.epelboin@impmc.upmc.fr>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from French (http://www.transifex.com/open-edx/edx-platform/language/fr/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 

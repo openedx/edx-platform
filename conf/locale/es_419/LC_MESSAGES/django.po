@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -76,7 +76,7 @@
 # Natalia, 2014
 # Valeria Freire <valtodopds@hotmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Spanish (Latin America) (http://www.transifex.com/open-edx/edx-platform/language/es_419/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 

@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -72,7 +72,7 @@
 # Soha Assali <soha+transifex@qordoba.com>, 2015-2016
 # soliman osman <solimanosman@windowslive.com>, 2015
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Arabic (http://www.transifex.com/open-edx/edx-platform/language/ar/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 

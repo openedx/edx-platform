@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/).
 # Copyright (C) 2017 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -27,7 +27,7 @@
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # CHANDRA SHEKHAR SHARMA <shekharsharma041@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Hindi (http://www.transifex.com/open-edx/edx-platform/language/hi/)
 # Copyright (C) 2017 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
