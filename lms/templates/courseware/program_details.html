@@ -54,12 +54,61 @@ from openedx.core.djangolib.markup import HTML, Text
         }
     }
 
+    //faq
     $("ul.faq-links-list li.item").click(function(){
         if ($(this).find(".answer").hasClass('hidden')) {
             $(this).find(".answer").removeClass("hidden");
         } else {
             $(this).find(".answer").addClass("hidden");
         }
+    });
+
+    //pagination
+    var page = 0,
+        size = 4,
+        total = parseInt($(".instructor-size").text()),
+        max_pages = Math.ceil(total / size) - 1;
+
+    var paginate = function(page, size){
+        var start = size * page,
+            end = (start + size - 1) > total ? total - 1 : (start + size - 1);
+        $(".profile-item-desktop").each(function(index, item){
+            if (index >= start && index <= end){
+                $(item).css('display', 'block');
+            } else {
+                $(item).css('display', 'none');
+            }
+        });
+        $(".pagination-start").text(start + 1);
+        $(".pagination-end").text(end + 1);
+    }
+
+    paginate(page, size);
+
+    $("#pagination-next").click(function(){
+        if (page == max_pages){
+            return false;
+        }
+        if (page + 1 == max_pages){
+             $(this).removeClass("active");
+        }
+        page = page + 1;
+        paginate(page, size);
+        $("#pagination-previous").addClass("active");
+        return false;
+    });
+
+     $("#pagination-previous").click(function(){
+        if (page == 0){
+            return false;
+        }
+        if (page - 1 == 0){
+            $(this).removeClass("active");
+        }
+        page = page - 1;
+        paginate(page, size);
+        $("#pagination-next").addClass("active");
+        return false;
     });
 
 </script>
@@ -260,7 +309,7 @@ from openedx.core.djangolib.markup import HTML, Text
                     <h2 class="instructors-title">Meet the Instructors <span>(${len(program['staff'])})</span></h2>
                     <div class="instructor-profiles">
                         %for instructor in program['staff']:
-                            <div class="profile-item">
+                            <div class="profile-item profile-item-desktop">
                                 <div class="avatar">
                                     <div class="img-holder">
                                         <img src="${static.url(instructor['profile_image_url'])}" alt="${instructor['given_name']}"/>
@@ -274,10 +323,10 @@ from openedx.core.djangolib.markup import HTML, Text
                         %endfor
 
                         <div class="pagination hidden-xs">
-                            <div class="pages">1-4 of 8</div>
+                            <div class="pages"><span class="pagination-start"></span>-<span class="pagination-end"></span> of <span class="instructor-size">${len(program['staff'])}</span></div>
                             <div class="controls">
-                                <a href="#" class="active"><span class="fa fa-chevron-down active"></span></a>
-                                <a href="#"><span class="fa fa-chevron-up"></span></a>
+                                <a href="#" id="pagination-next" class="active"><span class="fa fa-chevron-down active"></span></a>
+                                <a href="#" id="pagination-previous"><span class="fa fa-chevron-up"></span></a>
                             </div>
                         </div>
                     </div>
