@@ -1,0 +1,20 @@
+<button class="button-backward" <%= !backButtonEnabled ? disabled="disabled" : "" %> >
+    <span class="sr"><%- backButtonSRText %></span>
+    <i class="fa fa-arrow-left" aria-hidden="true"></i>
+</button>
+<div class="breadcrumbs">
+    <% _.each(breadcrumbs.slice(0, -1), function (breadcrumb, index, items) { %>
+        <div class="bc-container bc-<%= index %>">
+            <span class="fa fa-angle-right fa-icon <%= index===0 ? "is-hidden" : "" %>" aria-hidden="true"></span>
+            <button class="parent-nav-button" data-parent-index="<%= index %>">
+                <%- breadcrumb %>
+            </button>
+        </div>
+    <% }) %>
+    <div class="bc-container bc-<%= breadcrumbs.length - 1 %> last">
+        <% if (breadcrumbs.length > 1) {%>
+            <span class="fa fa-caret-down fa-icon" aria-hidden="true"></span>
+        <% } %>
+        <span class="parent-displayname "><%- breadcrumbs[breadcrumbs.length - 1] %></span>
+    </div>
+</div>

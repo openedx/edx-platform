@@ -43,7 +43,8 @@ from openedx.core.djangolib.markup import HTML, Text
             "${action | n, js_escaped_string}",
             {
                 isUnitPage: ${is_unit_page | n, dump_js_escaped_json},
-                canEdit: true
+                canEdit: true,
+                outlineURL: "${outline_url | n, js_escaped_string}"
             }
         );
     });

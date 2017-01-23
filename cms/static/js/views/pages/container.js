@@ -196,7 +196,8 @@ define(['jquery', 'underscore', 'gettext', 'js/views/pages/base_page', 'common/j
                 var xblockElement = this.findXBlockElement(event.target),
                     modal = new MoveXBlockModal({
                         sourceXBlockInfo: XBlockUtils.findXBlockInfo(xblockElement, this.model),
-                        XBlockUrlRoot: this.getURLRoot()
+                        XBlockUrlRoot: this.getURLRoot(),
+                        outlineURL: this.options.outlineURL
                     });
 
                 event.preventDefault();

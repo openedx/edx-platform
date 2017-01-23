@@ -331,3 +331,108 @@
     }
   }
 }
+
+
+.move-xblock-modal {
+
+  button {
+    background: transparent;
+    border-color: transparent;
+  }
+
+  .breadcrumb-container {
+    margin-bottom: ($baseline/4);
+    border: 1px solid #D9D9D9;
+    border-bottom: 1px solid #979797;
+    padding: ($baseline/2) 0 ($baseline/2) 0;
+    background: #F5F5F5;
+    overflow: hidden;
+
+    button:not(.button-backward) {
+      padding: ($baseline/5) 0 ($baseline/5);
+      border: none;
+    }
+
+    .button-backward {
+      @include float(left);
+      padding-top: 0;
+      border-top: none;
+    }
+
+    .breadcrumbs {
+      @include float(left);
+      @include margin-left($baseline/4);
+      @include padding-left($baseline/2);
+      border-left: 1px solid #D9D9D9;
+
+      .bc-container:not(.bc-0) {
+        .fa-icon {
+          width: ($baseline*1.5);
+        }
+        // setting parent font-size to 0 and then setting child font-size is needed to remove the
+        // visible space between inline elements(span.fa-angle-right and button.parent-nav-button)
+        // https://davidwalsh.name/remove-whitespace-inline-block
+        & > * {
+          @include font-size(14);
+        }
+        font-size: 0;
+      }
+
+      @for $i from 2 to 5 {
+        .bc-#{$i} {
+          padding-left: ($baseline*1.5) * ($i - 1);
+        }
+      }
+
+      .bc-container:not(.last) {
+        button, .parent-displayname {
+          text-decoration: underline;
+          color: $ui-link-color;
+        }
+      }
+    }
+  }
+
+  .category-text {
+    @include font-size(14);
+    color: #414141
+  }
+
+  .xblock-items-container {
+    max-height: ($baseline*15);
+    overflow-y: auto;
+
+    .xblock-item {
+      .button-forward {
+        width: 100%;
+        border: none;
+        padding: ($baseline/2);
+
+        .button-displayname {
+          @include float(left);
+        }
+
+        .forward-sr-icon {
+          @include float(right);
+        }
+
+        .truncate {
+          max-width: 90%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        &:hover {
+          background: rgb(242, 248, 251);
+        }
+      }
+    }
+
+    .xblock-no-child-message {
+      display: block;
+      @include text-align(center);
+      padding: ($baseline*2);
+    }
+  }
+}

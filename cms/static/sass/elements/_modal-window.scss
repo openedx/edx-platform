@@ -285,6 +285,11 @@
   // specific modal overrides
   // ------------------------
 
+  // Move XBlock Modal
+  .move-xblock-modal .ui-loading {
+    box-shadow: none;
+  }
+
   // upload modal
   .assetupload-modal {
 
