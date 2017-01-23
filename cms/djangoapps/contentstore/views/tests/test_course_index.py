@@ -351,9 +351,8 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(json_response['category'], 'course')
         self.assertEqual(json_response['id'], unicode(self.course.location))
         self.assertEqual(json_response['display_name'], self.course.display_name)
-        if not is_concise:
-            self.assertTrue(json_response['published'])
-            self.assertIsNone(json_response['visibility_state'])
+        self.assertNotEqual(json_response.get('published', False), is_concise)
+        self.assertIsNone(json_response.get('visibility_state'))
 
         # Now verify the first child
         children = json_response['child_info']['children']
@@ -362,8 +361,8 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(first_child_response['category'], 'chapter')
         self.assertEqual(first_child_response['id'], unicode(self.chapter.location))
         self.assertEqual(first_child_response['display_name'], 'Week 1')
+        self.assertNotEqual(json_response.get('published', False), is_concise)
         if not is_concise:
-            self.assertTrue(json_response['published'])
             self.assertEqual(first_child_response['visibility_state'], VisibilityState.unscheduled)
         self.assertGreater(len(first_child_response['child_info']['children']), 0)
 
@@ -377,8 +376,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertIsNotNone(json_response['display_name'])
         self.assertIsNotNone(json_response['id'])
         self.assertIsNotNone(json_response['category'])
-        if not is_concise:
-            self.assertTrue(json_response['published'])
+        self.assertNotEqual(json_response.get('published', False), is_concise)
         if json_response.get('child_info', None):
             for child_response in json_response['child_info']['children']:
                 self.assert_correct_json_response(child_response, is_concise)
