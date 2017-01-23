@@ -344,6 +344,20 @@
     .btn-default.edit-button {
       font-weight: 300;
     }
+
+    .stack-move-icon {
+      font-size: 0.52em;
+
+      @include rtl {
+        .fa-file-o {
+          @include transform(rotateY(180deg));
+        }
+
+        .fa-arrow-right {
+          @include transform(rotate(180deg));
+        }
+      }
+    }
   }
 }
 
