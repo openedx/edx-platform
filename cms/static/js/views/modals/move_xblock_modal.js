@@ -4,27 +4,44 @@
 define([
     'jquery', 'backbone', 'underscore', 'gettext',
     'js/views/baseview', 'js/views/modals/base_modal',
+    'js/models/xblock_info', 'js/views/move_xblock_list', 'js/views/move_xblock_breadcrumb',
     'common/js/components/views/feedback',
     'edx-ui-toolkit/js/utils/string-utils',
     'text!templates/move-xblock-modal.underscore'
 ],
-function($, Backbone, _, gettext, BaseView, BaseModal, Feedback, StringUtils, MoveXblockModalTemplate) {
+function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlockListView, MoveXBlockBreadcrumbView,
+         Feedback, StringUtils, MoveXblockModalTemplate) {
     'use strict';
 
     var MoveXblockModal = BaseModal.extend({
         options: $.extend({}, BaseModal.prototype.options, {
             modalName: 'move-xblock',
-            modalSize: 'med',
+            modalSize: 'lg',
+            showEditorModeButtons: false,
             addPrimaryActionButton: true,
             primaryActionButtonType: 'move',
-            primaryActionButtonTitle: gettext('Move')
+            viewSpecificClasses: 'move-modal',
+            primaryActionButtonTitle: gettext('Move'),
+            modalSRTitle: gettext('Choose a location to move your component to')
         }),
 
         initialize: function() {
+            var self = this;
             BaseModal.prototype.initialize.call(this);
+            this.listenTo(Backbone, 'move:breadcrumbRendered', this.focusModal);
             this.sourceXBlockInfo = this.options.sourceXBlockInfo;
-            this.XBlockUrlRoot = this.options.sourceXBlockInfo;
+            this.XBlockURLRoot = this.options.XBlockURLRoot;
+            this.XBlockAncestorInfoURL = StringUtils.interpolate(
+                '{urlRoot}/{usageId}?fields=ancestorInfo',
+                {urlRoot: this.XBlockURLRoot, usageId: this.sourceXBlockInfo.get('id')}
+            );
+            this.outlineURL = this.options.outlineURL;
             this.options.title = this.getTitle();
+            this.fetchCourseOutline().done(function(courseOutlineInfo, ancestorInfo) {
+                $('.ui-loading').addClass('is-hidden');
+                $('.breadcrumb-container').removeClass('is-hidden');
+                self.renderViews(courseOutlineInfo, ancestorInfo);
+            });
         },
 
         getTitle: function() {
@@ -40,12 +57,54 @@ function($, Backbone, _, gettext, BaseView, BaseModal, Feedback, StringUtils, Mo
 
         show: function() {
             BaseModal.prototype.show.apply(this, [false]);
-            Feedback.prototype.inFocus.apply(this, [this.options.modalWindowClass]);
         },
 
         hide: function() {
+            if (this.moveXBlockListView) {
+                this.moveXBlockListView.remove();
+            }
+            if (this.moveXBlockBreadcrumbView) {
+                this.moveXBlockBreadcrumbView.remove();
+            }
             BaseModal.prototype.hide.apply(this);
             Feedback.prototype.outFocus.apply(this);
+        },
+
+        focusModal: function() {
+            Feedback.prototype.inFocus.apply(this, [this.options.modalWindowClass]);
+            $(this.options.modalWindowClass).focus();
+        },
+
+        fetchCourseOutline: function() {
+            return $.when(
+                this.fetchData(this.outlineURL),
+                this.fetchData(this.XBlockAncestorInfoURL)
+            );
+        },
+
+        fetchData: function(url) {
+            var deferred = $.Deferred();
+            $.ajax({
+                url: url,
+                contentType: 'application/json',
+                dataType: 'json',
+                type: 'GET'
+            }).done(function(data) {
+                deferred.resolve(data);
+            }).fail(function() {
+                deferred.reject();
+            });
+            return deferred.promise();
+        },
+
+        renderViews: function(courseOutlineInfo, ancestorInfo) {
+            this.moveXBlockBreadcrumbView = new MoveXBlockBreadcrumbView({});
+            this.moveXBlockListView = new MoveXBlockListView(
+                {
+                    model: new XBlockInfoModel(courseOutlineInfo, {parse: true}),
+                    ancestorInfo: ancestorInfo
+                }
+            );
         }
     });
 

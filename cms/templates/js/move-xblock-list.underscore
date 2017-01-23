@@ -1,0 +1,46 @@
+<div class="xblock-items-category">
+    <span class="sr">
+        <%
+        // Translators: message will be like `Units in Homework - Question Styles`, `Subsections in Example 1 - Getting started` etc.
+        %>
+        <%- StringUtils.interpolate(
+                gettext("{categoryText} in {parentDisplayname}"),
+                {categoryText: categoryText, parentDisplayname: parentDisplayname}
+            )
+        %>
+    </span>
+    <span class="category-text" aria-hidden="true">
+        <%- categoryText %>:
+    </span>
+</div>
+<ul class="xblock-items-container">
+    <% for (var i = 0; i < xblocks.length; i++) {
+        var xblock = xblocks[i];
+    %>
+        <li class="xblock-item" data-item-index="<%- i %>">
+            <% if (XBlocksCategory === 'component') { %>
+                <span class="xblock-displayname component truncate">
+                    <%- xblock.get('display_name') %>
+                </span>
+            <% } else { %>
+                <button class="button-forward" >
+                    <span class="xblock-displayname truncate">
+                        <%- xblock.get('display_name') %>
+                    </span>
+                    <% if(currentLocationIndex === i) { %>
+                        <span class="current-location">
+                            (<%- gettext('Current location') %>)
+                        </span>
+                    <% } %>
+                    <span class="icon fa fa-arrow-right forward-sr-icon" aria-hidden="true"></span>
+                    <span class="sr forward-sr-text"><%- gettext("Click for children") %></span>
+                </button>
+            <% } %>
+        </li>
+    <% } %>
+    <% if(xblocks.length === 0) { %>
+        <span class="xblock-no-child-message">
+            <%- noChildText %>
+        </span>
+    <% } %>
+</ul>
