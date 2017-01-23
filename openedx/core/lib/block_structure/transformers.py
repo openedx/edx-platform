@@ -90,7 +90,7 @@ class BlockStructureTransformers(object):
         outdated_transformers = []
         for transformer in TransformerRegistry.get_registered_transformers():
             version_in_block_structure = block_structure._get_transformer_data_version(transformer)  # pylint: disable=protected-access
-            if transformer.VERSION != version_in_block_structure:
+            if transformer.VERSION > version_in_block_structure:
                 outdated_transformers.append(transformer)
 
         if outdated_transformers:
