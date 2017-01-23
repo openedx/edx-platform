@@ -469,6 +469,10 @@ def _has_group_access(descriptor, user, course_key):
         # via updating the children of the split_test module.
         return ACCESS_GRANTED
 
+    # Allow staff and instructors roles group access, as they are not masquerading as a student.
+    if get_user_role(user, course_key) in ['staff', 'instructor']:
+        return ACCESS_GRANTED
+
     # use merged_group_access which takes group access on the block's
     # parents / ancestors into account
     merged_access = descriptor.merged_group_access
@@ -550,14 +554,20 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
+        # If the user (or the role the user is currently masquerading as) does not have
+        # access to this content, then deny access. The problem with calling _has_staff_access_to_descriptor
+        # before this method is that _has_staff_access_to_descriptor short-circuits and returns True
+        # for staff users in preview mode.
+        if not _has_group_access(descriptor, user, course_key):
+            return ACCESS_DENIED
+
+        # If the user has staff access, they can load the module and checks below are not needed.
         if _has_staff_access_to_descriptor(user, descriptor, course_key):
             return ACCESS_GRANTED
 
-        # if the user has staff access, they can load the module so this code doesn't need to run
         return (
             _visible_to_nonstaff_users(descriptor) and
             _can_access_descriptor_with_milestones(user, descriptor, course_key) and
-            _has_group_access(descriptor, user, course_key) and
             (
                 _has_detached_class_tag(descriptor) or
                 _can_access_descriptor_with_start_date(user, descriptor, course_key)

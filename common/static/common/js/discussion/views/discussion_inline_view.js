@@ -39,6 +39,9 @@
                 this.page = 1;
             }
 
+            this.defaultSortKey = 'activity';
+            this.defaultSortOrder = 'desc';
+
             // By default the view is displayed in a hidden state. If you want it to be shown by default (e.g. in Teams)
             // pass showByDefault as an option. This code will open it on initialization.
             if (this.showByDefault) {
@@ -48,7 +51,8 @@
 
         loadDiscussions: function($elem, error) {
             var discussionId = this.$el.data('discussion-id'),
-                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page),
+                url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + ('?page=' + this.page)
+                    + ('&sort_key=' + this.defaultSortKey) + ('&sort_order=' + this.defaultSortOrder),
                 self = this;
 
             DiscussionUtil.safeAjax({
@@ -100,8 +104,7 @@
             this.threadListView = new DiscussionThreadListView({
                 el: this.$('.inline-threads'),
                 collection: self.discussion,
-                courseSettings: self.course_settings,
-                hideRefineBar: true  // TODO: re-enable the search/filter bar when it works correctly
+                courseSettings: self.course_settings
             });
 
             this.threadListView.render();

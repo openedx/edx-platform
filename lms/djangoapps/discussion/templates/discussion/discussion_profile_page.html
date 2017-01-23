@@ -76,6 +76,7 @@ from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_str
                 data-course-name="${course.display_name_with_default}"
                 data-threads="${threads}"
                 data-user-info="${user_info}"
+                data-user-id="${django_user.id}"
                 data-page="${page}"
                 data-num-pages="${num_pages}"
                 data-user-create-comment="${json.dumps(can_create_comment)}"
