@@ -5,8 +5,8 @@ define([
     'jquery', 'backbone', 'underscore', 'gettext',
     'js/views/baseview', 'js/views/modals/base_modal',
     'js/models/xblock_info', 'js/views/move_xblock_list', 'js/views/move_xblock_breadcrumb',
-    'js/views/utils/xblock_utils',
     'common/js/components/views/feedback_move',
+    'js/views/utils/xblock_utils',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
     'text!templates/move-xblock-modal.underscore'
@@ -98,7 +98,7 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
             );
         },
 
-        showMovedBar: function (title, titleLink, messageLink) {
+        showMovedBar: function(title, titleLink, messageLink) {
             var self = this;
             if (self.movedAlertView) {
                 self.movedAlertView.hide();
@@ -118,14 +118,14 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
             });
         },
 
-        moveXBlock: function () {
+        moveXBlock: function() {
             var self = this;
             XBlockViewUtils.moveXBlock(self.sourceXBlockInfo.id, self.targetParentXBlockInfo.id)
-                .done(function (response) {
+                .done(function(response) {
                     if (response.move_source_locator) {
                         // hide modal
                         self.hide();
-                        // hide xblock placeholder
+                        // hide xblock element
                         $("li.studio-xblock-wrapper[data-locator='" + self.sourceXBlockInfo.id + "']").hide();
                         self.showMovedBar(
                             StringUtils.interpolate(
@@ -142,7 +142,10 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
                                 }
                             ),
                             HtmlUtils.interpolateHtml(
-                                HtmlUtils.HTML('<a class="action-undo-move" href="#" data-source-display-name="{displayName}" data-source-locator="{sourceLocator}" data-parent-locator="{parentLocator}" data-target-index="{targetIndex}">{undoMove}</a>'),
+                                HtmlUtils.HTML(
+                                    '<a class="action-undo-move" href="#" data-source-display-name="{displayName}" ' +
+                                    'data-source-locator="{sourceLocator}" data-parent-locator="{parentLocator}" ' +
+                                    'data-target-index="{targetIndex}">{undoMove}</a>'),
                                 {
                                     displayName: self.sourceXBlockInfo.get('display_name'),
                                     sourceLocator: self.sourceXBlockInfo.id,

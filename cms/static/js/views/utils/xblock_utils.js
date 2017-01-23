@@ -94,10 +94,12 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
 
         /**
          * Moves the specified xblock in a new parent xblock.
-         * @param {jquery Element}  source_locator  The xblock element to be moved.
-         * @param {jquery Element}  parent_locator  New parent xblock locator of the xblockto be moved,
+         * @param {String}  source_locator  The xblock element to be moved.
+         * @param {String}  parent_locator  New parent xblock locator of the xblock to be moved,
          *      new moved xblock would be placed under this xblock.
-         * @returns {jQuery promise} A promise representing the duplication of the xblock.
+         * @param {String}  targetIndex  Intended index position of the xblock in parent xblock. If provided,
+         *      xblock would be placed at the particular index in the parent xblock.
+         * @returns {jQuery promise} A promise representing the moving of the xblock.
          */
         moveXBlock = function(sourceLocator, parentLocator, targetIndex) {
             var operationText = targetIndex !== undefined ? gettext('Undo moving') : gettext('Moving');

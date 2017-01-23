@@ -45,15 +45,14 @@
                 });
                 return msg.show();
             });
-            $.postJSON = function(url, data, callback, type) {
+            $.postJSON = function(url, data, callback, type) {  // eslint-disable-line no-param-reassign
                 if ($.isFunction(data)) {
                     callback = data;
                     data = undefined;
                 }
-                type = type || 'POST';
                 return $.ajax({
                     url: url,
-                    type: type,
+                    type: type || 'POST',
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     data: JSON.stringify(data),
