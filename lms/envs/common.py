@@ -368,6 +368,9 @@ FEATURES = {
 
     # Set this to False to facilitate cleaning up invalid xml from your modulestore.
     'ENABLE_XBLOCK_XML_VALIDATION': True,
+
+    # Disable bulk email send from random different addresses when 'False'
+    'BULK_EMAIL_FROM_DIFFERENT_ADDRESSES': False,
 }
 
 # Ignore static asset files on import which match this pattern
