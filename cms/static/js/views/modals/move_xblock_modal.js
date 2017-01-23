@@ -50,8 +50,12 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
         },
 
         hide: function() {
-            this.moveXBlockListView.remove();
-            this.moveXBlockBreadcrumbView.remove();
+            if (this.moveXBlockListView) {
+                this.moveXBlockListView.remove();
+            }
+            if (this.moveXBlockBreadcrumbView) {
+                this.moveXBlockBreadcrumbView.remove();
+            }
             BaseModal.prototype.hide.apply(this);
             Feedback.prototype.outFocus.apply(this);
         },
@@ -73,7 +77,6 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
         },
 
         renderViews: function(outlineJson) {
-            debugger;
             this.moveXBlockBreadcrumbView = new MoveXBlockBreadcrumbView(
                 {
                     el: '.breadcrumb-container'

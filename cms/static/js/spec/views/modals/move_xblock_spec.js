@@ -5,7 +5,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
         describe('MoveXBlockModal', function() {
             var modal,
                 showModal,
-                DISPLAY_NAME = 'HTML 101';
+                DISPLAY_NAME = 'HTML 101',
+                OUTLINE_URL = '/course/cid?formats=concise';
 
             showModal = function() {
                 modal = new MoveXBlockModal({
@@ -14,7 +15,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                         display_name: DISPLAY_NAME,
                         category: 'html'
                     }),
-                    XBlockUrlRoot: '/xblock'
+                    XBlockUrlRoot: '/xblock',
+                    outlineURL: OUTLINE_URL
                 });
                 modal.show();
             };
@@ -25,12 +27,26 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     'modal-button',
                     'move-xblock-modal'
                 ]);
-                showModal();
+            });
+
+            afterEach(function() {
+                modal.hide();
             });
 
             it('rendered as expected', function() {
+                showModal();
                 expect(modal.$el.find('.modal-header .title').text()).toEqual('Move: ' + DISPLAY_NAME);
                 expect(modal.$el.find('.modal-actions .action-primary.action-move').text()).toEqual('Move');
+            });
+
+            it('sends request to fetch course outline', function() {
+                var requests = AjaxHelpers.requests(this),
+                    renderViewsSpy;
+                showModal();
+                renderViewsSpy = spyOn(modal, 'renderViews');
+                AjaxHelpers.expectRequest(requests, 'GET', OUTLINE_URL);
+                AjaxHelpers.respondWithJson(requests, {});
+                expect(renderViewsSpy).toHaveBeenCalled();
             });
         });
     });
