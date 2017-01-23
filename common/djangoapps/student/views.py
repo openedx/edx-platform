@@ -13,6 +13,7 @@ from django.views.generic import TemplateView
 from pytz import UTC
 from requests import HTTPError
 from ipware.ip import get_ip
+import waffle
 
 import edx_oauth2_provider
 from django.conf import settings
@@ -660,7 +661,8 @@ def dashboard(request):
     # Find programs associated with courses being displayed. This information
     # is passed in the template context to allow rendering of program-related
     # information on the dashboard.
-    meter = programs_utils.ProgramProgressMeter(user, enrollments=course_enrollments)
+    use_catalog = waffle.switch_is_active('get_programs_from_catalog')
+    meter = programs_utils.ProgramProgressMeter(user, enrollments=course_enrollments, use_catalog=use_catalog)
     programs_by_run = meter.engaged_programs(by_run=True)
 
     # Construct a dictionary of course mode information
