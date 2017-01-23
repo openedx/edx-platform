@@ -92,8 +92,11 @@ messages = xblock.validate().to_json()
 
                                 <li class="action-item action-move">
                                     <button data-tooltip="${_("Move")}" class="btn-default move-button action-button">
-                                    <span class="icon fa fa-folder-o" aria-hidden="true"></span>
-                                    <span class="sr">${_("Move")}</span>
+                                        <span class="stack-move-icon fa-stack fa-lg ">
+                                            <span class="fa fa-file-o fa-stack-2x fa-fw" aria-hidden="true"></span>
+                                            <span class="fa fa-arrow-right fa-stack-1x fa-fw" aria-hidden="true"></span>
+                                        </span>
+                                        <span class="sr">${_("Move")}</span>
                                     </button>
                                 </li>
                             % endif
