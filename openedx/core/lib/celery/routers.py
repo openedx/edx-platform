@@ -33,13 +33,6 @@ class AlternateEnvironmentRouter(object):
         If None is returned from this method, default routing logic is used.
         """
         alternate_env = self.alternate_env_tasks.get(task, None)
-        if 'update_course_in_cache' in task:
-            log.info("TNL-5408: task={task}, args={args}, alternate_env={alt_env}, queues={queues}".format(
-                task=task,
-                args=args,
-                alt_env=alternate_env,
-                queues=getattr(settings, 'CELERY_QUEUES', []).keys()
-            ))
         if alternate_env:
             return self.ensure_queue_env(alternate_env)
         return None
