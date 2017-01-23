@@ -13,6 +13,7 @@ from openedx.core.djangoapps.credentials.utils import get_programs_credentials
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.programs import utils
 from openedx.core.djangoapps.user_api.preferences.api import get_user_preferences
+import waffle
 
 
 @login_required
@@ -23,7 +24,8 @@ def program_listing(request):
     if not programs_config.show_program_listing:
         raise Http404
 
-    meter = utils.ProgramProgressMeter(request.user)
+    use_catalog = waffle.switch_is_active('get_programs_from_catalog')
+    meter = utils.ProgramProgressMeter(request.user, use_catalog=use_catalog)
 
     context = {
         'credentials': get_programs_credentials(request.user),

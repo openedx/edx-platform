@@ -18,8 +18,8 @@ from django.core.cache import caches
 from django.test import RequestFactory, TestCase, override_settings
 from django.conf import settings
 from django.contrib import sites
-
 from nose.plugins import Plugin
+from waffle.models import Switch
 
 from request_cache.middleware import RequestCache
 
@@ -190,3 +190,25 @@ def skip_unless_lms(func):
     Only run the decorated test in the LMS test suite
     """
     return skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')(func)
+
+
+def toggle_switch(name, active=True):
+    """
+    Activate or deactivate a Waffle switch. The switch is created if it does not exist.
+
+    Arguments:
+        name (str): Name of the switch to be toggled.
+
+    Keyword Arguments:
+        active (bool): Whether a newly created switch should be on or off.
+
+    Returns:
+        Switch
+    """
+    switch, created = Switch.objects.get_or_create(name=name, defaults={'active': active})
+
+    if not created:
+        switch.active = not switch.active
+        switch.save()
+
+    return switch
