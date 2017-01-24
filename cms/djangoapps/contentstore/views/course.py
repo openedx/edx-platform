@@ -106,6 +106,7 @@ from xmodule.tabs import CourseTab, CourseTabList, InvalidTabsException
 log = logging.getLogger(__name__)
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
+           'library_listing',
            'course_info_update_handler', 'course_search_index_handler',
            'course_rerun_handler',
            'settings_handler',
@@ -459,7 +460,10 @@ def course_listing(request):
     List all courses available to the logged in user
     """
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
-    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
+    if not settings.SPLIT_STUDIO_HOME and LIBRARIES_ENABLED:
+        libraries = _accessible_libraries_list(request.user)
+    else:
+        libraries = []
 
     programs_config = ProgramsApiConfig.current()
     raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
@@ -507,6 +511,7 @@ def course_listing(request):
 
     return render_to_response('index.html', {
         'courses': courses,
+        'split_studio_home': settings.SPLIT_STUDIO_HOME,
         'in_process_course_actions': in_process_course_actions,
         'libraries_enabled': LIBRARIES_ENABLED,
         'libraries': [format_library_for_view(lib) for lib in libraries],
@@ -517,6 +522,48 @@ def course_listing(request):
         'rerun_creator_status': GlobalStaff().has_user(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True),
+        'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
+        'programs': programs,
+        'program_authoring_url': reverse('programs'),
+    })
+
+
+@login_required
+@ensure_csrf_cookie
+def library_listing(request):
+    """
+    List all Libraries available to the logged in user
+    """
+    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
+
+    programs_config = ProgramsApiConfig.current()
+    raw_programs = get_programs(request.user) if programs_config.is_studio_tab_enabled else []
+
+    # Sort programs alphabetically by name.
+    # TODO: Support ordering in the Programs API itself.
+    programs = sorted(raw_programs, key=lambda p: p['name'].lower())
+
+    def format_library_for_view(library):
+        """
+        Return a dict of the data which the view requires for each library
+        """
+        return {
+            'display_name': library.display_name,
+            'library_key': unicode(library.location.library_key),
+            'url': reverse_library_url('library_handler', unicode(library.location.library_key)),
+            'org': library.display_org_with_default,
+            'number': library.display_number_with_default,
+            'can_edit': has_studio_write_access(request.user, library.location.library_key),
+        }
+
+    return render_to_response('library_index.html', {
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries': [format_library_for_view(lib) for lib in libraries],
+        'show_new_library_button': LIBRARIES_ENABLED and request.user.is_active,
+        'user': request.user,
+        'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
+        'course_creator_status': _get_course_creator_status(request.user),
+        'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
         'is_programs_enabled': programs_config.is_studio_tab_enabled and request.user.is_staff,
         'programs': programs,
         'program_authoring_url': reverse('programs'),
