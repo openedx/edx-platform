@@ -1,0 +1,11 @@
+<h6 class="hd-6 breadcrumbs">
+    <span class="nav-item">
+        <button class="btn-link all-topics">
+            <span class="icon fa fa-bars" aria-hidden="true"></span><%- gettext('All Topics') %>
+        </button>
+    </span>
+    <% contents.forEach(function(content) { %>
+        <span class="fa fa-angle-right"></span>
+        <span class="nav-item"><%- content %></span>
+    <% }); %>
+</h6>

@@ -1,0 +1,124 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<div class="data-download-container action-type-container">
+  <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
+
+
+  <br>
+  <p>${_("Click to display the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
+  <p><input type="button" name="dump-gradeconf" value="${_("Grading Configuration")}" data-endpoint="${ section_data['get_grading_config_url'] }"></p>
+
+  <div class="data-display-text" id="data-grade-config-text"></div>
+  <br>
+
+  <p>${_("Click to download a CSV of anonymized student IDs:")}</p>
+  <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" ></p>
+</div>
+
+%if settings.FEATURES.get('ENABLE_GRADE_DOWNLOADS'):
+  <div class="reports-download-container action-type-container">
+    <hr>
+    <h3 class="hd hd-3">${_("Reports")}</h3>
+
+    <p>${_("For large courses, generating some reports can take several hours. When report generation is complete, a link that includes the date and time of generation appears in the table below. These reports are generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
+
+    <p>${_("Please be patient and do not click these buttons multiple times. Clicking these buttons multiple times will significantly slow the generation process.")}</p>
+
+    <p>${_("Click to generate a CSV file of all students enrolled in this course, along with profile information such as email address and username:")}</p>
+
+    <p><input type="button" name="list-profiles-csv" value="${_("Download profile information as a CSV")}" data-endpoint="${ section_data['get_students_features_url'] }" data-csv="true"></p>
+
+    <p>${_("Click to generate a CSV file that lists learners who can enroll in the course but have not yet done so.")}</p>
+
+    <p><input type="button" name="list-may-enroll-csv" value="${_("Download a CSV of learners who can enroll")}" data-endpoint="${ section_data['get_students_who_may_enroll_url'] }" data-csv="true"></p>
+
+    %if section_data['show_generate_proctored_exam_report_button']:
+      <p>${_("Click to generate a CSV file of all proctored exam results in this course.")}</p>
+      <p><input type="button" name="proctored-exam-results-report" value="${_("Generate Proctored Exam Results Report")}" data-endpoint="${ section_data['list_proctored_results_url'] }"/></p>
+    %endif
+
+    %if section_data['course_has_survey']:
+      <p>${_("Click to generate a CSV file of survey results for this course.")}</p>
+      <p><input type="button" name="survey-results-report" value="${_("Generate Survey Results Report")}" data-endpoint="${ section_data['course_survey_results_url'] }"/></p>
+    %endif
+
+    <p>${_("To generate a CSV file that lists all student answers to a given problem, enter the location of the problem (from its Staff Debug Info).")}</p>
+
+    <p>
+      <label>
+        <span>${_("Problem location: ")}</span>
+        <input type="text" name="problem-location" />
+      </label>
+    </p>
+    <p>
+      <input type="button" name="list-problem-responses-csv" value="${_("Download a CSV of problem responses")}" data-endpoint="${ section_data['get_problem_responses_url'] }" data-csv="true">
+    </p>
+
+    <div class="issued_certificates">
+      <p>${_("Click to list certificates that are issued for this course:")}</p>
+      <p>
+        <input type="button" name="issued-certificates-list" value="${_("View Certificates Issued")}" data-csv="false" data-endpoint="${ section_data['get_issued_certificates_url'] }">
+        <input type="button" name="issued-certificates-csv" value="${_("Download CSV of Certificates Issued")}" data-csv="true" data-endpoint="${ section_data['get_issued_certificates_url'] }">
+      </p>
+      <div class="data-display-table certificate-data-display-table" id="data-issued-certificates-table"></div>
+      <div class="issued-certificates-error request-response-error msg msg-error copy"></div>
+    </div>
+
+  % if not disable_buttons:
+    <p>${_("For smaller courses, click to list profile information for enrolled students directly on this page:")}</p>
+    <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }"></p>
+  %endif
+  <div class="data-display-table profile-data-display-table" id="data-student-profiles-table"></div>
+
+  %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
+    <p>${_("Click to generate a CSV grade report for all currently enrolled students.")}</p>
+    <p>
+      <input type="button" name="calculate-grades-csv" class="async-report-btn" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/>
+      <input type="button" name="problem-grade-report" class="async-report-btn" value="${_("Generate Problem Grade Report")}" data-endpoint="${ section_data['problem_grade_report_url'] }"/>
+      <input type="button" name="export-ora2-data" class="async-report-btn" value="${_("Generate ORA Data Report")}" data-endpoint="${ section_data['export_ora2_data_url'] }"/>
+    </p>
+  %endif
+
+    <div class="request-response msg msg-confirm copy" id="report-request-response"></div>
+    <div class="request-response-error msg msg-error copy" id="report-request-response-error"></div>
+    <br>
+
+    <h3 class="hd hd-3">${_("Reports Available for Download")}</h3>
+    <p>
+      ${_("The reports listed below are available for download. A link to every report remains available on this page, identified by the UTC date and time of generation. Reports are not deleted, so you will always be able to access previously generated reports from this page.")}
+    </p>
+
+  %if settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
+    <p>
+      ${_("The answer distribution report listed below is generated periodically by an automated background process. The report is cumulative, so answers submitted after the process starts are included in a subsequent report. The report is generated several times per day.")}
+    </p>
+  %endif
+
+    ## Translators: a table of URL links to report files appears after this sentence.
+    <p>
+        ${Text(_("{strong_start}Note{strong_end}: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")).format(
+            strong_start=HTML("<strong>"),
+            strong_end=HTML("</strong>"),
+        )}
+    </p><br>
+
+    <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['list_report_downloads_url'] }" ></div>
+  </div>
+%endif
+
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
+    <div class="running-tasks-section">
+      <p>${_("The status for any active tasks appears in a table below.")} </p>
+      <br />
+      <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
+  </div>
+%endif

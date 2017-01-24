@@ -1,0 +1,113 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import js_escaped_string
+%>
+% if display_name is not UNDEFINED and display_name is not None:
+    <h3 class="hd hd-2">${display_name}</h3>
+% endif
+
+<div
+    id="video_${id}"
+    class="video closed"
+    data-metadata='${metadata}'
+    data-bumper-metadata='${bumper_metadata}'
+    data-poster='${poster}'
+    tabindex="-1"
+>
+    <div class="focus_grabber first"></div>
+
+    <div class="tc-wrapper">
+      <div class="video-wrapper">
+          <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+          <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
+          <div class="video-player-pre"></div>
+          <div class="video-player">
+              <div id="${id}"></div>
+              <h4 class="hd hd-4 video-error is-hidden">${_('No playable video sources found.')}</h4>
+          </div>
+          <div class="video-player-post"></div>
+          <div class="closed-captions"></div>
+          <div class="video-controls is-hidden">
+              <div>
+                  <div class="vcr"><div class="vidtime">0:00 / 0:00</div></div>
+                  <div class="secondary-controls"></div>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="focus_grabber last"></div>
+    
+    % if download_video_link or track or handout or branding_info:
+    <h3 class="hd hd-4 downloads-heading sr" id="video-download-transcripts_${id}">${_('Downloads and transcripts')}</h3>
+    <div class="wrapper-downloads" role="region" aria-labelledby="video-download-transcripts_${id}">
+        % if download_video_link:
+        <div class="wrapper-download-video">
+            <h4 class="hd hd-5">${_('Video')}</h4>
+            <a class="btn-link video-sources video-download-button" href="${download_video_link}">
+                ${_('Download video file')}
+            </a>
+        </div>
+        % endif
+        % if track:
+        <div class="wrapper-download-transcripts">
+            <h4 class="hd hd-5">${_('Transcripts')}</h4>
+            % if transcript_download_format:
+            <ul class="list-download-transcripts">
+                % for item in transcript_download_formats_list:
+                    <li class="transcript-option">
+                        <% dname = _("Download {file}").format(file=item['display_name']) %>
+                        <a class="btn btn-link" href="${track}" data-value="${item['value']}">${dname}</a>
+                    </li>
+                % endfor
+            </ul>
+            % else:
+            <a class="btn-link external-track" href="${track}">${_('Download transcript')}</a>
+            % endif
+        </div>
+        % endif
+        % if handout:
+        <div class="wrapper-handouts">
+            <h4 class="hd hd-5">${_('Handouts')}</h4>
+            <a class="btn-link" href="${handout}">${_('Download Handout')}</a>
+        </div>
+        % endif
+        % if branding_info:
+        <div class="branding">
+            <span class="host-tag">${branding_info['logo_tag']}</span>
+            <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
+        </div>
+        % endif
+    </div>
+    % endif
+</div>
+% if cdn_eval:
+<script>
+  //TODO: refactor this js into a separate file.
+  function sendPerformanceBeacon(id, expgroup, value, event_name) {
+    var data = {event: event_name, id: id, expgroup: expgroup, value: value, page: "html5vid"};
+    $.ajax({method: "POST", url: "/performance", data: data});
+  }
+  var cdnStartTime;
+  var salt = Math.floor((1 + Math.random()) * 0x100000).toString(36);
+  var id = "${id | n, js_escaped_string}";
+  function initializeCDNExperiment() {
+    sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group}, "", "load");
+    cdnStartTime = Date.now();
+    $.each(['loadstart', 'abort', 'error', 'stalled', 'loadedmetadata',
+                    'loadeddata', 'canplay', 'canplaythrough', 'seeked'],
+                    function(index, eventName) {
+      $("#video_" + id).bind("html5:" + eventName, null, function() {
+        timeElapsed = Date.now() - cdnStartTime;
+        sendPerformanceBeacon(id + "_" + salt, ${cdn_exp_group}, timeElapsed, eventName);
+      });
+    });
+  }
+  $("#video_" + id).bind("initialize", null, initializeCDNExperiment);
+  if ($("#video_" + id).hasClass("is-initialized")) {
+    initializeCDNExperiment();
+  }
+</script>
+% endif;

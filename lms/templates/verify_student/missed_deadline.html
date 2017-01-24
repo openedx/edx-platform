@@ -1,0 +1,42 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from lms.djangoapps.verify_student.views import PayAndVerifyView
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+
+<%block name="pagetitle">
+    % if deadline_name == PayAndVerifyView.VERIFICATION_DEADLINE:
+    ${_("Verification Deadline Has Passed")}
+    % elif deadline_name == PayAndVerifyView.UPGRADE_DEADLINE:
+    ${_("Upgrade Deadline Has Passed")}
+    % endif
+</%block>
+
+<%block name="content">
+    <section class="outside-app">
+        <p
+            class="localized-datetime"
+            data-datetime="${deadline}"
+            data-timezone="${user_timezone}"
+            data-language="${user_language}"
+            % if deadline_name == PayAndVerifyView.VERIFICATION_DEADLINE:
+            data-string="${
+                _(
+                    u'The verification deadline for {course_name} was {{date}}. Verification is no longer available.'
+                ).format(
+                    course_name=course.display_name
+                )
+            }"
+            % elif deadline_name == PayAndVerifyView.UPGRADE_DEADLINE:
+            data-string="${_(u'The deadline to upgrade to a verified certificate for this course has passed.')}"
+            % endif
+        >
+        </p>
+    </section>
+</%block>
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

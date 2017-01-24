@@ -1,0 +1,41 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.conf import settings
+%>
+<%block name="bodyclass">error</%block>
+<%block name="title">
+  % if error == '404':
+    404 - ${_("Page Not Found")}
+  % elif error == '500':
+    500 - ${_("Internal Server Error")}
+  % endif
+</%block>
+
+<%!
+help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
+help_link_end = '</a>'
+%>
+
+<%block name="content">
+  <article class="error-prompt">
+    % if error == '404':
+      <h1>${_("The Page You Requested Page Cannot be Found")}</h1>
+      <p class="description">${Text(_("We're sorry. We couldn't find the {studio_name} page you're looking for. You may want to return to the {studio_name} Dashboard and try again. If you are still having problems accessing things, please feel free to {link_start}contact {studio_name} support{link_end} for further help.")).format(
+          studio_name=settings.STUDIO_SHORT_NAME,
+          link_start=HTML(help_link_start),
+          link_end=HTML(help_link_end),
+        )}</p>
+    % elif error == '500':
+      <h1>${_("The Server Encountered an Error")}</h1>
+      <p class="description">${Text(_("We're sorry. There was a problem with the server while trying to process your last request. You may want to return to the {studio_name} Dashboard or try this request again. If you are still having problems accessing things, please feel free to {link_start}contact {studio_name} support{link_end} for further help.")).format(
+          studio_name=settings.STUDIO_SHORT_NAME,
+          link_start=HTML(help_link_start),
+          link_end=HTML(help_link_end),
+        )}</p>
+    % endif
+    <a href="/" class="back-button">${_("Back to dashboard")}</a>
+  </article>
+</%block>

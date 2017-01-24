@@ -1,0 +1,149 @@
+.course-card {
+  @include span(10);
+  @include pre(1);
+  @include post(1);
+  margin: {
+    left: auto;
+    right: auto;
+    bottom: $baseline;
+  }
+  padding: $baseline/2 0;
+
+  .section {
+    @extend .grid-manual;
+    padding: $baseline/2 $baseline;
+  }
+
+  .course-image-container {
+    @include float(left);
+
+    .header-img {
+      max-width: 100%;
+      @media(min-width: $bp-screen-sm) {
+        max-width: 191px;
+      }
+    }
+  }
+
+  .course-details {
+    @include float(right);
+    width: 100%;
+    @media(min-width: $bp-screen-sm) { width: calc(100% - 191px); }
+    padding-left: $baseline*1.5;
+
+    .course-title {
+      font-size: font-size(x-large);
+      font-weight: font-weight(normal);
+      margin-bottom: $baseline/4;
+    }
+
+    .course-text {
+      color: palette(grayscale, dark);
+
+      .run-period {
+        color: palette(grayscale, black);
+      }
+    }
+  }
+
+  .course-actions {
+
+    .enrollment-info {
+      width: $baseline*10;
+      text-align: center;
+      margin-bottom: $baseline/2;
+      text-transform: uppercase;
+    }
+
+    .select-error {
+      color: palette(error, text);
+      margin-bottom: $baseline/4;
+      font-size: font-size(small);
+      visibility: hidden;
+    }
+
+    .no-action-message {
+      margin-top: $baseline*2;
+      margin-bottom: $baseline/2;
+      color: palette(grayscale, dark);
+      font-size: font-size(large);
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .enrollment-opens {
+      text-align: center;
+      margin-bottom: $baseline/2;
+      .enrollment-open-date {
+        white-space: nowrap;
+      }
+    }
+
+    .run-select-container {
+      margin-bottom: $baseline;
+
+      .run-select {
+        width: $baseline*10;
+      }
+    }
+
+    .enroll-button {
+      width: $baseline*10;
+      text-align: center;
+    }
+
+    .view-course-link {
+      min-width: $baseline*10;
+      text-align: center;
+    }
+  }
+
+  .cta-primary {
+    display: inline-block;
+    background-color: palette(success, text);
+    border-color: palette(success, text);
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: palette(success, accent);
+      border-color: palette(success, accent);
+    }
+  }
+
+  .cta-secondary {
+    display: inline-block;
+    background-color: palette(primary, dark);
+    border-color: palette(primary, dark);
+
+    &:active,
+    &:focus,
+    &:hover {
+      background-color: palette(primary, base);
+      border-color: palette(primary, base);
+    }
+  }
+
+  .action-msg-view {
+    clear: both;
+  }
+
+  .message {
+    margin-bottom: $baseline;
+
+    @media(min-width: $bp-screen-md) {
+      margin-bottom: 0;
+    }
+  }
+
+  .upgrade-message,
+  .certificate-status {
+    border-top: 1px solid palette(grayscale, back);
+    padding-top: $baseline;
+
+    @media(min-width: $bp-screen-md) {
+      display: flex;
+      align-items: center;
+    }
+  }
+}

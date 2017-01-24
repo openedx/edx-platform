@@ -1,0 +1,70 @@
+<%! from capa.util import remove_markup
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
+
+<% element_checked = False %>
+% for choice_id, _ in choices:
+    <% choice_id = choice_id %>
+    %if choice_id in value:
+        <% element_checked = True %>
+    %endif
+% endfor
+<section id="choicetextinput_${id}" class="choicetextinput">
+<div class="choicetextgroup capa_inputtype" id="inputtype_${id}">
+    <div class="script_placeholder" data-src="${STATIC_URL}js/capa/choicetextinput.js"/>
+
+    <fieldset aria-label="${remove_markup(response_data['label'])}">
+        % for choice_id, choice_description in choices:
+        <% choice_id = choice_id %>
+        <section id="forinput${choice_id}"
+            % if input_type == 'radio' and choice_id in value :
+                % if status.classname:
+                    class="choicetextgroup_${status.classname}"
+                % endif
+            % endif
+            >
+            <input class="ctinput" type="${input_type}" name="choiceinput_${id}" id="${choice_id}" value="${choice_id}"
+
+            % if choice_id in value:
+            checked="true"
+            % endif
+            />
+
+            % for content_node in choice_description:
+                % if content_node['type'] == 'text':
+                    <span class="mock_label">
+                         ${content_node['contents']}
+                     </span>
+                % else:
+                    <% my_id = content_node.get('contents','') %>
+                    <% my_val = value.get(my_id,'') %>
+                    <input class="ctinput" type="text" name="${content_node['contents']}" id="${content_node['contents']}" value="${my_val|h}"/>
+                %endif
+                <span class="mock_label">
+                    ${content_node['tail_text']}
+                </span>
+
+            % endfor
+            <p id="answer_${choice_id}" class="answer"></p>
+                </section>
+
+        % endfor
+        <span id="answer_${id}"></span>
+    </fieldset>
+        <input class= "choicetextvalue" type="hidden"  name="input_${id}{}" id="input_${id}" value="${value|h}" />
+
+    <div class="indicator-container">
+    % if input_type == 'checkbox' or not element_checked:
+        <%include file="status_span.html" args="status=status, status_id=id"/>
+    % endif
+    </div>
+
+    % if show_correctness == "never" and (value or status not in ['unsubmitted']):
+    <div class="capa_alert">${_(submitted_message)}</div>
+    %endif
+    % if msg:
+    <span class="message" tabindex="-1">${HTML(msg)}</span>
+    % endif
+</div>
+</section>

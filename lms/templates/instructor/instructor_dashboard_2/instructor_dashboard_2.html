@@ -1,0 +1,132 @@
+<%page expression_filter="h"/>
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%def name="online_help_token()"><% return "instructor" %></%def>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+<%block name="bodyclass">view-in-course view-instructordash</%block>
+
+## ----- Tips on adding something to the new instructor dashboard -----
+## 1. add your input element, e.g. in instructor_dashboard2/data_download.html
+##   the input includes a reference like data-endpoint="${ section_data['get_anon_ids_url'] }"
+## 2. Go to the old dashboard djangoapps/instructor/views/instructor_dashboard.py and
+##   add in a definition of 'xxx_url' in the right section_data for whatever page your
+##   feature is on.
+## 3. Add a url() entry in api_urls.py
+## 4. Over in lms/static/coffee/src/instructor_dashboard/ there there are .coffee files
+##   for each page which define the .js. Edit this to make your input do something
+##   when clicked. The .coffee files use the name=xx to pick out inputs, not id=
+## 5. Implement your standard django/python in lms/djangoapps/instructor/views/api.py
+## 6. And tests go in lms/djangoapps/instructor/tests/
+
+<%block name="pagetitle">${_("Instructor Dashboard")}</%block>
+
+<%block name="headextra">
+  <%static:css group='style-course-vendor'/>
+  <%static:css group='style-vendor-tinymce-content'/>
+  <%static:css group='style-vendor-tinymce-skin'/>
+  <%static:css group='style-course'/>
+  <script type="text/javascript">
+    // This is a hack to get tinymce to work correctly in Firefox until the annotator tool is refactored to not include
+    // tinymce globally.
+    if(typeof window.Range.prototype === "undefined") {
+        window.Range.prototype = { };
+    }
+  </script>
+  <script type="text/javascript" src="${static.url('js/instructor_dashboard/proctoring.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/date.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-1.1.1.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery-jvectormap-1.1.1/jquery-jvectormap-world-mill-en.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drag-2.2.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.event.drop-2.2.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.core.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/slick.grid.js')}"></script>
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/smoothness/jquery-ui-1.8.16.custom.css')}">
+  <link rel="stylesheet" href="${static.url('css/vendor/slickgrid/slick.grid.css')}">
+  <script type="text/javascript" src="${static.url('js/vendor/codemirror-compressed.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/tinymce.full.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/tinymce/js/tinymce/jquery.tinymce.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jQuery-File-Upload/js/jquery.fileupload.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/jquery.qubit.js')}"></script>
+
+  <%static:js group='module-descriptor-js'/>
+  <%static:js group='instructor_dash'/>
+  <%static:js group='application'/>
+
+  ## Backbone classes declared explicitly until RequireJS is supported
+  <script type="text/javascript" src="${static.url('js/models/notification.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/views/file_uploader.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/utils/animation.js')}"></script>
+</%block>
+
+## Include Underscore templates
+<%block name="header_extras">
+% for template_name in ["cohorts", "enrollment-code-lookup-links", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "cohort-discussions-inline", "cohort-discussions-course-wide", "cohort-discussions-category", "cohort-discussions-subcategory", "certificate-white-list", "certificate-white-list-editor", "certificate-bulk-white-list", "certificate-invalidation"]:
+<script type="text/template" id="${template_name}-tpl">
+  <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
+</script>
+% endfor
+
+<script type="text/template" id="file-upload-tpl">
+  <%static:include path="file-upload.underscore" />
+</script>
+</%block>
+
+## NOTE that instructor is set as the active page so that the instructor button lights up, even though this is the instructor_2 page.
+<%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
+
+<style type="text/css"></style>
+
+<script language="JavaScript" type="text/javascript"></script>
+
+<div class="container">
+  <div class="instructor-dashboard-wrapper-2">
+        <main id="main" aria-label="Content" tabindex="-1">
+        <section class="instructor-dashboard-content-2" id="instructor-dashboard-content">
+            <h1 class="hd hd-1">${_("Instructor Dashboard")}</h1>
+          <div class="wrap-instructor-info studio-view">
+            %if studio_url:
+            <a class="instructor-info-action" href="${studio_url}">${_("View Course in Studio")}</a>
+            %endif
+          </div>
+
+          %if analytics_dashboard_message:
+            <div class="wrapper-msg urgency-low is-shown">
+                <p>${analytics_dashboard_message}</p>
+            </div>
+          %endif
+
+        ## links which are tied to idash-sections below.
+        ## the links are activated and handled in instructor_dashboard.coffee
+        ## when the javascript loads, it clicks on the first section
+        <ul class="instructor-nav">
+          % for section_data in sections:
+            ## This is necessary so we don't scrape 'section_display_name' as a string.
+            <% dname = section_data['section_display_name'] %>
+            <li class="nav-item"><button type="button" class="btn-link" data-section="${ section_data['section_key'] }">${_(dname)}</button></li>
+          % endfor
+        </ul>
+
+        ## each section corresponds to a section_data sub-dictionary provided by the view
+        ## to keep this short, sections can be pulled out into their own files
+
+        % for section_data in sections:
+          <section id="${ section_data['section_key'] }" class="idash-section" aria-labelledby="header-${section_data['section_key']}">
+              <h2 class="hd hd-2" id="header-${ section_data['section_key'] }">${ section_data['section_display_name'] }</h2>
+              <%include file="${ section_data['section_key'] }.html" args="section_data=section_data" />
+          </section>
+          % endfor
+        </section>
+        </main>
+  </div>
+</div>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

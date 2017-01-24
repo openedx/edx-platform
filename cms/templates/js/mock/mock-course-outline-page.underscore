@@ -1,0 +1,67 @@
+<div id="content">
+
+    <div class="wrapper-mast wrapper">
+        <header class="mast has-actions has-subtitle">
+            <h1 class="page-header">
+                <small class="subtitle">Content</small>
+                <span class="sr">&gt; </span>Course Outline
+            </h1>
+
+            <nav class="nav-actions">
+                <h3 class="sr">Page Actions</h3>
+                <ul>
+                    <li class="nav-item">
+                        <a href="#" class="button button-toggle button-toggle-expand-collapse collapse-all is-hidden">
+                            <span class="collapse-all"><span class="icon fa fa-arrow-up" aria-hidden="true"></span> <span class="label">Collapse All Sections</span></span>
+                            <span class="expand-all"><span class="icon fa fa-arrow-down" aria-hidden="true"></span> <span class="label">Expand All Sections</span></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">
+                            <span class="icon fa fa-plus" aria-hidden="true"></span>New Section
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a title="Reindex current course" data-category="reindex" class="button button-reindex" href="#">
+                            <span class="icon-arrow-right" aria-hidden="true"></span>Reindex
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" rel="external" class="button view-button view-live-button" title="Click to open the courseware in the LMS in a new tab">View Live</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+    </div>
+
+    <div class="wrapper-content wrapper">
+        <section class="content">
+            <article class="content-primary" role="main">
+                <div class="wrapper-dnd">
+                    <article class="outline outline-course" data-locator="mock-course" data-course-key="slashes:MockCourse">
+                        <div class="no-content add-xblock-component">
+                            <p>You haven't added any content to this course yet.
+                                <a href="#" class="button button-new" data-category="chapter" data-parent="mock-course" data-default-name="Section" title="Click to add a new section">
+                                    <span class="icon fa fa-plus" aria-hidden="true"></span>Add Section
+                                </a>
+                            </p>
+                        </div>
+                    </article>
+                </div>
+                <div class="ui-loading">
+                    <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">Loading</span></p>
+                </div>
+            </article>
+            <aside class="content-supplementary" role="complementary">
+                <div class="bit">
+                    <h3 class="title-3">What can I do on this page?</h3>
+                    <p>You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.</p>
+
+                    <p>In addition, you can drag and drop sections, subsections, and units to reorganize your course.</p>
+                </div>
+            </aside>
+        </section>
+    </div>
+    <footer>
+    </footer>
+</div>

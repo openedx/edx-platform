@@ -1,0 +1,38 @@
+<hr class="divider divider-lv1" />
+
+<form action="" method="post" id="cohort-inline-discussions-form" class="cohort-inline-discussions-form">
+    <div class="wrapper cohort-management-supplemental">
+        <div class="form-fields">
+            <div class="form-field">
+                <div class="inline-discussion-topics">
+                    <h4 class="hd hd-4 subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h4>
+                    <p><%- gettext('Specify whether content-specific discussion topics are divided by cohort.') %></p>
+                    <div class="always_cohort_inline_discussions">
+                        <label>
+                            <input type="radio" name="inline" class="check-all-inline-discussions" <%- alwaysCohortInlineDiscussions ? 'checked="checked"' : '' %>/>
+                            <span class="all-inline-discussions"><%- gettext('Always cohort content-specific discussion topics') %></span>
+                        </label>
+                    </div>
+                    <div class="cohort_inline_discussions">
+                        <label>
+                            <input type="radio" name="inline" class="check-cohort-inline-discussions" <%- alwaysCohortInlineDiscussions ? '' : 'checked="checked"' %>/>
+                            <span class="all-inline-discussions"><%- gettext('Cohort selected content-specific discussion topics') %></span>
+                        </label>
+                    </div>
+                    <hr class="divider divider-lv1" />
+                    <div class="field">
+                        <% if ( inlineDiscussionTopicsHtml.valueOf() ) { %>
+                           <ul class="inline-topics discussions-wrapper"><%= HtmlUtils.ensureHtml(inlineDiscussionTopicsHtml) %></ul>
+                        <% } else {  %>
+                           <span class="no-topics"><%- gettext('No content-specific discussion topics exist.') %></span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="divider divider-lv1" />
+        <div class="form-actions">
+            <button class="form-submit button action-primary action-save"><%- gettext('Save') %></button>
+        </div>
+    </div>
+</form>

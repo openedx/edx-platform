@@ -1,0 +1,43 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<%inherit file="../main.html" />
+<%block name="bodyclass">register verification-process step-requirements</%block>
+
+<%block name="pagetitle">${_("Re-Verification")}</%block>
+
+<%block name="header_extras">
+    % for template_name in ["webcam_photo", "image_input", "error", "face_photo_step", "id_photo_step", "review_photos_step", "reverify_success_step"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="verify_student/${template_name}.underscore" />
+        </script>
+    % endfor
+</%block>
+<%block name="js_extra">
+  <script src="${static.url('js/src/tooltip_manager.js')}"></script>
+  <%static:js group='reverify'/>
+</%block>
+
+<%block name="content">
+## Top-level wrapper for errors
+## JavaScript views may append to this wrapper
+<div id="error-container" style="display: none;"></div>
+
+<div class="container">
+  <section class="wrapper carousel">
+  ## Container for the reverification view.
+  ## The Backbone view renders itself into this <div>.
+  ## The server can pass information to the Backbone view
+  ## by including the information as "data-*" attributes
+  ## of this </div>.
+  <div id="reverify-container" class="reverify"
+    data-full-name='${user_full_name}'
+    data-platform-name='${platform_name}'
+    data-capture-sound='${capture_sound}'
+  ></div>
+  </section>
+</div>
+</%block>

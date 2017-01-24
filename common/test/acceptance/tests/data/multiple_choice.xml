@@ -1,0 +1,28 @@
+<problem markdown="Many edX courses have homework or exercises you need to complete.  Notice the clock image to the left?  That means this homework or exercise needs to be completed for you to pass the course. (This can be a bit confusing; the exercise may or may not have a due date prior to the end of the course.)&#10;&#10;We’ve provided eight (8) examples of how a professor might ask you questions. While the multiple choice question types below are somewhat standard, explore the other question types in the sequence above, like the formula builder- try them all out. &#10;&#10;As you go through the question types, notice how edX gives you immediate feedback on your responses - it really helps in the learning process.&#10;&#10;What color is the open ocean on a sunny day?&#10;&#10;[[yellow, (blue), green]]&#10;&#10;&#10;Which piece of furniture is built for sitting?&#10;&#10;( ) a table&#10;( ) a desk&#10;(x) a chair&#10;( ) a bookshelf&#10;&#10;Which of the following are musical instruments?&#10;&#10;[x] a piano&#10;[ ] a tree&#10;[x] a guitar&#10;[ ] a window&#10;&#10;&#10; " max_attempts="" weight="">
+  <p>Many edX courses have homework or exercises you need to complete.  Notice the clock image to the left?  That means this homework or exercise needs to be completed for you to pass the course. (This can be a bit confusing; the exercise may or may not have a due date prior to the end of the course.)</p>
+  <p>We’ve provided eight (8) examples of how a professor might ask you questions. While the multiple choice question types below are somewhat standard, explore the other question types in the sequence above, like the formula builder- try them all out. </p>
+  <p>As you go through the question types, notice how edX gives you immediate feedback on your responses - it really helps in the learning process.</p>
+  <p>What color is the open ocean on a sunny day?</p>
+  <optionresponse>
+    <optioninput options="('yellow','blue','green')" correct="blue"/>
+  </optionresponse>
+  <multiplechoiceresponse>
+    <label>Which piece of furniture is built for sitting?</label>
+    <choicegroup type="MultipleChoice">
+      <choice correct="false">a table</choice>
+      <choice correct="false">a desk</choice>
+      <choice correct="true">a chair</choice>
+      <choice correct="false">a bookshelf</choice>
+    </choicegroup>
+  </multiplechoiceresponse>
+  <choiceresponse>
+    <label>Which of the following are musical instruments?</label>
+    <checkboxgroup>
+      <choice correct="true">a piano</choice>
+      <choice correct="false">a tree</choice>
+      <choice correct="true">a guitar</choice>
+      <choice correct="false">a window</choice>
+    </checkboxgroup>
+  </choiceresponse>
+  <p> </p>
+</problem>

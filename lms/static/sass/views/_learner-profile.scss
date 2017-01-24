@@ -1,0 +1,500 @@
+// lms - application - learner profile
+// ====================
+
+// Table of Contents
+// * +Container - Learner Profile
+// * +Main - Header
+// * +Settings Section
+
+.view-profile {
+    $profile-image-dimension: 120px;
+
+    .window-wrap,
+    .content-wrapper {
+        background-color: $white;
+    }
+
+    .ui-loading-indicator {
+        @extend .ui-loading-base;
+        padding-bottom: $baseline;
+
+        // center horizontally
+        @include margin-left(auto);
+        @include margin-right(auto);
+        width: ($baseline*5);
+    }
+
+    .profile-image-field {
+        @include float(left);
+
+        button {
+            background: transparent !important;
+            border: none !important;
+            padding: 0;
+        }
+
+        .u-field-image {
+            padding-top: 0;
+            padding-bottom: ($baseline/4);
+        }
+
+        .image-wrapper {
+            width: $profile-image-dimension;
+            position: relative;
+
+            .image-frame {
+                display: block;
+                position: relative;
+                width: $profile-image-dimension;
+                height: $profile-image-dimension;
+                border-radius: ($baseline/4);
+            }
+
+            .u-field-upload-button {
+                position: absolute;
+                top: 0;
+                width: $profile-image-dimension;
+                height: $profile-image-dimension;
+                border-radius: ($baseline/4);
+                border: 2px dashed transparent;
+                background: rgba(229,241,247, .8);
+                color: $link-color;
+                text-shadow: none;
+                @include transition(all $tmg-f1 ease-in-out 0s);
+                opacity: 0;
+                z-index: 6;
+
+                i {
+                    color: $link-color;
+                }
+
+                &:focus,
+                &:hover {
+                    @include show-hover-state();
+                    border-color: $link-color;
+                }
+            }
+
+            .button-visible {
+                @include show-hover-state();
+            }
+
+            .upload-button-icon,
+            .upload-button-title {
+                display: block;
+                margin-bottom: ($baseline/4);
+                @include transform(translateY(35px));
+                line-height: 1.3em;
+                text-align: center;
+                z-index: 7;
+            }
+
+            .upload-button-input {
+                position: absolute;
+                top: -($profile-image-dimension * 2);
+                @include left(0);
+                width: $profile-image-dimension;
+                height: 100%;
+                cursor: pointer;
+                z-index: 5;
+                outline: 0;
+            }
+
+            .u-field-remove-button {
+                position: relative;
+                display: block;
+                width: $profile-image-dimension;
+                margin-top: ($baseline / 4);
+                padding: ($baseline / 5);
+                text-align: center;
+            }
+        }
+    }
+
+    .wrapper-profile {
+        min-height: 200px;
+
+        .ui-loading-indicator {
+            margin-top: 100px;
+        }
+    }
+
+    .profile-self {
+        .wrapper-profile-field-account-privacy {
+            @include clearfix();
+            @include box-sizing(border-box);
+            width: 100%;
+            margin: 0 auto 0;
+            border: 1px solid $gray-l3;
+            background-color: $gray-l4;
+            padding: ($baseline*0.75) 0;
+
+            .u-field-account_privacy {
+                @extend .container;
+                border: none;
+                box-shadow: none;
+                padding: 0 ($baseline*1.5);
+            }
+
+            .u-field-title {
+                @extend %t-strong;
+                width: auto;
+                color: $base-font-color;
+                cursor: text;
+                text-shadow: none; // override bad lms styles on labels
+            }
+
+            .u-field-value {
+                width: auto;
+                @include margin-left($baseline/2);
+            }
+
+            .u-field-message {
+                @include float(left);
+                width: 100%;
+                padding: 0;
+                color: $base-font-color;
+
+                .u-field-message-notification {
+                    color: $gray-d2;
+                }
+            }
+        }
+    }
+
+    .wrapper-profile-sections {
+        @extend .container;
+        padding: 0 ($baseline*1.5);
+    }
+
+    .wrapper-profile-section-one {
+        width: 100%;
+        display: inline-block;
+        margin-top: ($baseline*1.5);
+        @include margin-left($baseline/2);
+    }
+
+    .profile-section-one-fields {
+        @include float(left);
+        width: flex-grid(4, 12);
+        @include margin-left($baseline);
+
+        .u-field {
+            margin-bottom: ($baseline/4);
+            padding-top: 3px;
+            padding-bottom: 3px;
+            @include padding-left(3px);
+        }
+
+        .u-field-username {
+
+            input[type="text"] {
+                font-weight: 600;
+            }
+
+            .u-field-value {
+                width: 350px;
+                @extend %t-title4;
+            }
+        }
+
+        .u-field-icon {
+            display: inline-block;
+            vertical-align: baseline;
+        }
+
+        .u-field-title {
+            width: 0;
+        }
+
+        .u-field-value {
+            width: 200px;
+            display: inline-block;
+            vertical-align: baseline;
+        }
+
+        select {
+            width: 85%
+        }
+
+        .u-field-message {
+            @include float(right);
+            width: 20px;
+            display: inline-block;
+            vertical-align: baseline;
+            margin-top: 0;
+
+            .icon {
+                vertical-align: baseline;
+            }
+        }
+    }
+
+    .wrapper-profile-section-two {
+        padding-top: 1em;
+        width: flex-grid(8, 12);
+    }
+
+    .profile-section-two-fields {
+
+        .u-field-textarea {
+            margin-bottom: ($baseline/2);
+            padding: ($baseline/2) ($baseline*.75) ($baseline*.75) ($baseline*.75);
+
+            &.editable-toggle {
+                cursor: pointer;
+            }
+        }
+
+        .u-field-title {
+            @extend %t-title5;
+            @extend %t-weight4;
+            display: inline-block;
+            margin-top: 0;
+            margin-bottom: ($baseline/4);
+            color: inherit;
+        }
+
+        .u-field-value {
+            @extend %t-copy-base;
+            width: 100%;
+
+            textarea {
+                width: 100%;
+                background-color: transparent;
+                white-space: pre-line;
+            }
+
+            a {
+                color: inherit;
+            }
+        }
+
+        .u-field-message {
+            @include float(right);
+            width: auto;
+        }
+
+        .u-field.mode-placeholder {
+            padding: $baseline;
+            border: 2px dashed $gray-l3;
+            i {
+                font-size: 12px;
+                @include padding-right(5px);
+                vertical-align: middle;
+                color: $gray;
+            }
+            .u-field-title {
+                width: 100%;
+                text-align: center;
+            }
+
+            .u-field-value {
+                text-align: center;
+                line-height: 1.5em;
+                @extend %t-copy-sub1;
+                color: $gray;
+            }
+        }
+
+        .u-field.mode-placeholder:hover {
+            border: 2px dashed $link-color;
+            .u-field-title,
+            i {
+                color: $link-color;
+            }
+        }
+    }
+
+    .badge-paging-header {
+        padding-top: $baseline;
+    }
+
+    .page-content-nav {
+        @extend %page-content-nav;
+    }
+
+    .badge-set-display {
+        @extend .container;
+        padding: 0 0;
+
+        .badge-list {
+            // We're using a div instead of ul for accessibility, so we have to match the style
+            // used by ul.
+            margin: 1em 0;
+            padding: 0 0 0 40px;
+        }
+
+        .badge-display {
+            width: 50%;
+            display: inline-block;
+            vertical-align: top;
+            padding: 2em 0;
+            .badge-image-container {
+                padding-right: $baseline;
+                margin-left: 1em;
+                width: 20%;
+                vertical-align: top;
+                display: inline-block;
+                img.badge {
+                    width: 100%;
+                }
+                .accomplishment-placeholder {
+                    border: 4px dotted $gray-l4;
+                    border-radius: 50%;
+                    display: block;
+                    width: 100%;
+                    padding-bottom: 100%;
+                }
+            }
+            .badge-details {
+                @extend %t-copy-sub1;
+                @extend %t-regular;
+                max-width: 70%;
+                display: inline-block;
+                color: $gray-d1;
+                .badge-name {
+                    @extend %t-strong;
+                    @extend %t-copy-base;
+                    color: $gray-d3;
+                }
+                .badge-description {
+                    padding-bottom: $baseline;
+                    line-height: 1.5em;
+                }
+                .badge-date-stamp{
+                    @extend %t-copy-sub1;
+                }
+                .find-button-container {
+                    border: 1px solid $blue-l1;
+                    padding: ($baseline / 2) $baseline ($baseline / 2) $baseline;
+                    display: inline-block;
+                    border-radius: 5px;
+                    font-weight: bold;
+                    color: $blue-s3;
+                }
+                .share-button {
+                    @extend %t-action3;
+                    @extend %button-reset;
+                    background: $gray-l6;
+                    color: $gray-d1;
+                    padding: ($baseline / 4) ($baseline / 2);
+                    margin-bottom: ($baseline / 2);
+                    display: inline-block;
+                    border-radius: 5px;
+                    border: 2px solid $gray-d1;
+                    cursor: pointer;
+                    transition: background .5s;
+                    .share-prefix {
+                        display: inline-block;
+                        vertical-align: middle;
+                    }
+                    .share-icon-container {
+                        display: inline-block;
+                        img.icon-mozillaopenbadges {
+                            max-width: 1.5em;
+                            margin-right: .25em;
+                        }
+                    }
+                    &:hover {
+                        background: $gray-l4;
+                    }
+                    &:active {
+                        box-shadow: inset 0 4px 15px 0 $black-t2;
+                        transition: none;
+                    }
+                }
+            }
+        }
+        .badge-placeholder {
+            background-color: $gray-l7;
+            box-shadow: inset 0 0 4px 0 $gray-l4;
+        }
+    }
+
+    // ------------------------------
+    // #BADGES MODAL
+    // ------------------------------
+    .badges-overlay {
+        @extend %ui-depth1;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: $dark-trans-bg; /* dim the background */
+        width: 100%;
+        height: 100%;
+        vertical-align: middle;
+
+        .badges-modal {
+            @extend %t-copy-lead1;
+            @extend %ui-depth2;
+            color: $lighter-base-font-color;
+            box-sizing: content-box;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 700px;
+            max-height: calc(100% - 100px);
+            margin-right: auto;
+            margin-left: auto;
+            border-top: rem(10) solid $blue-l2;
+            background: $light-gray3;
+            padding-right: ($baseline * 2);
+            padding-left: ($baseline * 2);
+            padding-bottom: ($baseline);
+            overflow-x: hidden;
+
+            .modal-header {
+                margin-top: ($baseline / 2);
+                margin-bottom: ($baseline / 2);
+            }
+
+            .close {
+                @extend %button-reset;
+                @extend %t-strong;
+                color: $lighter-base-font-color;
+                position: absolute;
+                right: ($baseline);
+                top: $baseline;
+                cursor: pointer;
+                padding: ($baseline / 4) ($baseline / 2);
+                @include transition(all $tmg-f2 ease-in-out 0s);
+                &:focus, &:hover {
+                    background-color: $blue-d2;
+                    border-radius: 3px;
+                    color: $white;
+                }
+            }
+
+            .badges-steps {
+                display: table;
+            }
+
+            .image-container{
+                // Lines the image up with the content of the above list.
+                @include ltr {
+                    @include padding-left(2em);
+                }
+                @include rtl {
+                    @include padding-right(1em);
+                    float: right;
+                }
+            }
+
+            .backpack-logo {
+                @include float(right);
+                @include margin-left($baseline);
+            }
+        }
+    }
+
+    .modal-hr {
+        display: block;
+        border: none;
+        background-color: $light-gray;
+        height: rem(2);
+        width: 100%;
+    }
+}

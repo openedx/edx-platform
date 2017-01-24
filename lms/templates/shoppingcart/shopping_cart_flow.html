@@ -1,0 +1,28 @@
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.conf import settings
+%>
+<%block name="pagetitle">${_("Shopping cart")}</%block>
+<%block name="headextra">
+    <script type="text/javascript" src="${static.url('js/shoppingcart/shoppingcart.js')}"></script>
+</%block>
+<%block name="bodyextra">
+
+<div class="container">
+  <header class="wrapper confirm-enrollment shopping-cart">
+  <h1> ${_("{platform_name} -  Shopping Cart").format(platform_name=static.get_platform_name())}</h1>
+      % if shoppingcart_items:
+      <ol class="steps">
+          <li <%block name="review_highlight"/>>${_('Review')}</li>
+          <%block name="billing_details_highlight"/>
+          <li <%block name="payment_highlight"/>>${_('Payment')}</li>
+          <li <%block name="confirmation_highlight"/>>${_('Confirmation')}</li>
+      </ol>
+      %endif
+  </header>
+</div>
+<%block name="custom_content"/>
+
+</%block>

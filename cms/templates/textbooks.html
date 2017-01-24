@@ -1,0 +1,75 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "textbooks" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+%>
+
+<%block name="title">${_("Textbooks")}</%block>
+<%block name="bodyclass">is-signedin course view-textbooks</%block>
+
+<%block name="header_extras">
+% for template_name in ["edit-textbook", "show-textbook", "no-textbooks", "basic-modal", "modal-button", "upload-dialog"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="jsextra">
+<script type="text/javascript">
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
+CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
+CMS.URL.TEXTBOOKS = "${textbook_url}"
+CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
+</script>
+</%block>
+<%block name="requirejs">
+    require(["js/factories/textbooks"], function(TextbooksFactory) {
+        TextbooksFactory(${textbooks | n, dump_js_escaped_json});
+    });
+</%block>
+
+<%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">${_("Content")}</small>
+        <span class="sr">&gt; </span>${_("Textbooks")}
+      </h1>
+
+      <nav class="nav-actions" aria-label="${_('Page Actions')}">
+        <h3 class="sr">${_("Page Actions")}</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("New Textbook")}</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <article class="content-primary" role="main">
+
+      </article>
+      <aside class="content-supplementary" role="complementary">
+        <div class="bit">
+          <h3 class="title-3">${_("Why should I break my textbook into chapters?")}</h3>
+          <p>${_("Breaking your textbook into multiple chapters reduces loading times for students, especially those with slow Internet connections. Breaking up textbooks into chapters can also help students more easily find topic-based information.")}</p>
+        </div>
+        <div class="bit">
+          <h3 class="title-3">${_("What if my book isn't divided into chapters?")}</h3>
+          <p>${_("If your textbook doesn't have individual chapters, you can upload the entire text as a single chapter and enter a name of your choice in the Chapter Name field.")}</p>
+        </div>
+
+        <div class="bit external-help">
+          <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about textbooks")}</a>
+        </div>
+      </aside>
+    </section>
+  </div>
+</%block>

@@ -1,0 +1,17 @@
+div.static_tab_wrapper {
+	@include box-sizing(border-box);
+  padding: 2em 2.5em;
+
+  h1 {
+    @extend .top-header
+  }
+
+  section {
+    margin: 0px 0px 20px;
+  }
+
+  @media print {
+    border: 0;
+    background: transparent !important;
+  }
+}

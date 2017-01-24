@@ -1,0 +1,107 @@
+<div class="wrapper-content-main payment-confirmation-step">
+  <article class="content-main">
+    <h3 class="title">
+      <%= interpolate(
+            gettext( "Thank you %(full_name)s! We have received your payment for %(course_name)s."),
+            { course_name: "<span class='course_name_placeholder'></span>",
+              full_name: "<span class='full_name_placeholder'></span>"}, true
+          ) %>
+    </h3>
+
+    <% if ( receipt ) { %>
+    <div class="list-info">
+      <div class="info-item payment-info">
+        <div class="copy">
+          <p><%- gettext( "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information." ) %></p>
+        </div>
+
+        <div class="wrapper-report">
+          <table class="report report-receipt">
+            <thead>
+              <tr>
+                <th scope="col" ><%- gettext( "Order No." ) %></th>
+                <th scope="col" ><%- gettext( "Description" ) %></th>
+                <th scope="col" ><%- gettext( "Date" ) %></th>
+                <th scope="col" ><%- gettext( "Amount" ) %></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% for ( var i = 0; i < receipt.items.length; i++ ) { %>
+                <% if ( receipt.isRefunded ) { %>
+                  <td><del><%- receipt.orderNum %></del></td>
+                  <td><del><%- receipt.items[i].lineDescription %></del></td>
+                  <td><del><%- receipt.purchasedDatetime %></del></td>
+                  <td><del><%- receipt.items[i].cost %> (<%- receipt.currency.toUpperCase() %>)</del></td>
+                <% } else { %>
+                  <tr>
+                    <td><%- receipt.orderNum %></td>
+                    <td><%- receipt.items[i].lineDescription %></td>
+                    <td><%- receipt.purchasedDatetime %></td>
+                    <td><%- receipt.items[i].cost %> (<%- receipt.currency.toUpperCase() %>)</td>
+                  </tr>
+                <% } %>
+              <% } %>
+            </tbody>
+
+            <tfoot>
+              <tr>
+                <th scope="row" class="total-label"><%- gettext( "Total" ) %></th>
+                <td colspan="2"></td>
+                <td class="total-value">
+                  <span class="value-amount"><%- receipt.totalCost %></span>
+                   <span class="value-currency">(<%- receipt.currency.toUpperCase() %>)</span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <% if ( receipt.isRefunded ) { %>
+          <div class="msg msg-refunds">
+            <h4 class="title sr"><%- gettext( "Please Note" ) %>: </h4>
+            <div class="copy">
+              <p><%- gettext( "Crossed out items have been refunded." ) %></p>
+            </div>
+          </div>
+          <% } %>
+        </div>
+
+        <% if ( receipt.billedTo ) { %>
+            <div class="copy">
+              <p><%- gettext( "Billed to" ) %>:
+                  <span class="name-first"><%- receipt.billedTo.firstName %></span>
+                  <span class="name-last"><%- receipt.billedTo.lastName %></span>
+                  (<span class="address-city"><%- receipt.billedTo.city %></span>,
+                  <span class="address-state"><%- receipt.billedTo.state %></span>
+                  <span class="address-postalcode"><%- receipt.billedTo.postalCode %></span>
+                  <span class="address-country"><%- receipt.billedTo.country.toUpperCase() %></span>)
+              </p>
+            </div>
+        <% } %>
+
+        <div class="report report-receipt report-receipt-provider hidden" id="receipt-provider"></div>
+
+      </div>
+    </div>
+    <% } else { %>
+        <p class="no-content"><%- gettext( "No receipt available" ) %></p>
+    <% } %>
+
+    <nav class="nav-wizard is-ready">
+        <% if ( !is_verification_required ||  verified || is_request_in_themed_site) { %>
+            <a class="next action-primary right" href="/dashboard"><%- gettext( "Go to Dashboard" ) %></a>
+        <% } else { %>
+          <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- edx.StringUtils.interpolate( gettext( "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from {platformName} to verify your identity." ), { platformName: platformName } ) %>">
+            <%- gettext( "Want to confirm your identity later?" ) %>
+          </a>
+
+          <a id="verify_now_button"
+             class="next action-primary right"
+             href="<%- edx.StringUtils.interpolate( '/verify_student/verify-now/{courseKey}/', { courseKey: courseKey } ) %>"
+          >
+            <%- gettext( "Verify Now" ) %>
+          </a>
+      <% } %>
+    </nav>
+  </article>
+</div>

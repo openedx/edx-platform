@@ -1,0 +1,207 @@
+// discussion - views - new post
+// ====================
+
+// UI: form structure
+.forum-new-post-form,
+.edit-post-form {
+  @include clearfix();
+  box-sizing: border-box;
+  margin: 0;
+  border-radius: $forum-border-radius;
+  max-width: 1180px;
+
+  label,
+  .field-label-text {
+    -webkit-font-smoothing: initial;
+  }
+
+  .post-type {
+    text-shadow: none;
+  }
+
+  .post-type {
+    margin-bottom: 0;
+  }
+
+  .post-errors {
+    margin: 0 0 $baseline;
+    padding: 0 !important;
+    list-style: none !important;
+  }
+
+  .post-field {
+    margin-bottom: $baseline * 1.5;
+
+    .field-label {
+      margin: 0;
+
+      .field-input {
+        display: inline-block;
+        width: 70%;
+        vertical-align: top;
+        &:not([type="text"]) {
+          border-width: 0;
+          padding: 0;
+        }
+      }
+
+      .field-label-text {
+        margin: $baseline 0 0 0;
+        display: block;
+      }
+
+      .field-label-text + .field-input {
+        width: 75%;
+      }
+
+      .js-post-title {
+        width: 85%;
+      }
+    }
+
+    // UI: support text for input fields
+    .field-help {
+      margin: ($baseline / 4) 0 ($baseline / 4) 0;
+      font-size: $forum-small-font-size;
+      line-height: 1.5;
+
+      &#field_help_post_type {
+        margin-top: ($baseline / 2) 0 ($baseline / 3) 0;
+      }
+
+      &#new-post-editor-description {
+          @include padding-left(0);
+      }
+    }
+
+    .field-input {
+      padding: 0;
+      border: none;
+    }
+  }
+
+  .post-options {
+    margin-bottom: ($baseline/2);
+  }
+}
+
+.edit-post-form {
+    @include clearfix();
+    box-sizing: border-box;
+    width: 100%;
+    padding-top: 0;
+
+    h1 {
+      font-size: $forum-large-font-size;
+    }
+
+    .form-row {
+      margin-top: $baseline;
+    }
+
+    .post-cancel {
+      @include float(left);
+      @include margin($baseline/2, 0, 0, $baseline*0.75);
+    }
+
+    .post-update {
+      @include float(left);
+      margin-top: ($baseline/2);
+
+      &:hover, &:focus {
+        border-color: #222;
+      }
+    }
+
+    .edit-post-title {
+      box-sizing: border-box;
+      border: 1px solid $forum-color-border;
+      border-radius: $forum-border-radius;
+      padding: 0 ($baseline/2);
+      width: 100%;
+      height: 40px;
+      box-shadow: 0 1px 3px $shadow-l1 inset;
+      color: $dark-gray;
+      font-size: $forum-large-font-size;
+      font-family: $sans-serif;
+    }
+}
+
+// CASE: inline styling
+.discussion-module .forum-new-post-form {
+  background: $forum-color-background;
+}
+
+// ====================
+
+// UI: inputs
+.forum-new-post-form,
+.edit-post-form {
+  .post-type-input {
+    @extend %text-sr;
+  }
+
+  .post-type-label {
+    @include margin(0, $baseline / 2, 0, 0);
+    @include white-button;
+    font-size: $forum-base-font-size;
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 0 $baseline;
+    height: 36px;
+    text-align: center;
+    color: $gray-d3;
+    border: 1px solid $forum-color-border;
+    font-weight: 600;
+    line-height: 36px;
+
+    .icon {
+      @include margin-right($baseline/4);
+    }
+  }
+
+  .post-type-input:checked + .post-type-label {
+    border: none;
+    background-color: $forum-color-active-thread;
+    color: $forum-color-active-text;
+    background-image: none;
+    box-shadow: none;
+  }
+
+  .post-type-input:focus + .post-type-label {
+    box-shadow: 0 1px 1px rgba(0, 0,  0, 0.4) inset, 0 0 2px 2px $blue;
+  }
+
+  input[type=text].field-input {
+    box-sizing: border-box;
+    border: 1px solid $forum-color-border;
+    border-radius: $forum-border-radius;
+    padding: 0 $baseline/2;
+    height: 40px;
+    color: #333;
+    font-size: $forum-large-font-size;
+    font-family: 'Open Sans', sans-serif;
+  }
+
+  select.field-input {
+    border: 1px solid $forum-color-border !important;  // !important required to override -webkit-appearance
+    height: 40px;
+  }
+
+  .post-option {
+    box-sizing: border-box;
+    display: inline-block;
+    @include margin-right($baseline);
+    border-radius: $forum-border-radius;
+    padding: ($baseline/2);
+    cursor: pointer;
+
+    &:hover {
+      border-color: $forum-color-border;
+    }
+
+    .icon {
+      @include margin-right($baseline / 4);
+    }
+  }
+}

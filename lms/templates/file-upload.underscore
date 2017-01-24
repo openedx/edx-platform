@@ -1,0 +1,24 @@
+<div class="wrapper-form">
+  <h3 class="hd hd-3 form-title subsection-title"><%- title %></h3>
+
+  <div class="file-upload-form-result result"></div>
+
+  <form class="file-upload-form" id="file-upload-form" method="post" action="<%- url %>" enctype="multipart/form-data">
+
+      <div class="form-fields">
+        <div class="field field-file is-required">
+          <label class="field-label sr" for="file-upload-form-file"><%- inputLabel %></label>
+          <input id="file-upload-form-file" class="input input-file" name="uploaded-file" type="file"
+              <% if (extensions) { %>
+                  accept="<%- extensions %>"
+              <% } %>
+            />
+          <span class="tip tip-stacked"><%- inputTip %></span>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-submit is-disabled" aria-disabled="true"><%- submitButtonText %></button>
+      </div>
+  </form>
+</div>

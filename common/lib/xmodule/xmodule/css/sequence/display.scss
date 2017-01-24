@@ -1,0 +1,287 @@
+$seq-nav-border-color: $border-color !default;
+$seq-nav-hover-color: rgb(245, 245, 245) !default;
+$seq-nav-link-color: $link-color !default;
+$seq-nav-icon-color: rgb(10, 10, 10) !default;
+$seq-nav-icon-color-muted: rgb(90, 90, 90) !default;
+$seq-nav-tooltip-color: rgb(51, 51, 51) !default;
+$seq-nav-height: 44px;
+
+// repeated extends - needed since LMS styling was referenced
+.block-link {
+  @include border-left(1px solid $seq-nav-border-color);
+  display: block;
+
+  &:hover, &:focus {
+    background: none;
+  }
+}
+
+.topbar {
+  @include clearfix();
+  border-bottom: 1px solid $seq-nav-border-color;
+
+  @media print {
+    display: none;
+  }
+
+  a {
+    &.block-link {
+      @include border-left(1px solid $seq-nav-border-color);
+      display: block;
+
+      &:hover, &:focus {
+        background: none;
+      }
+    }
+  }
+}
+
+%ui-clear-button  {
+  background-color: transparent;
+  background-image: none;
+  background-position: center 14px;
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: 0;
+
+  background-clip: border-box;
+  box-shadow: none;
+  box-sizing: content-box;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+
+// ====================
+
+.sequence-nav {
+  @extend .topbar;
+  margin: 0 0 $baseline 0;
+  position: relative;
+  border-bottom: none;
+  z-index: 0;
+  height: $seq-nav-height;
+  display: flex;
+
+  .sequence-nav-button {
+    max-width: 200px;
+  }
+
+  @media print {
+    display: none;
+  }
+
+  .sequence-list-wrapper {
+    @extend %ui-depth2;
+    position: relative;
+    height: 100%;
+    flex-grow: 1;
+  }
+
+  ol {
+    display: flex;
+
+    li {
+      box-sizing: border-box;
+      min-width: 20px;
+      flex-grow: 1;
+      border-color: $seq-nav-border-color;
+      border-width: 1px;
+      border-top-style: solid;
+
+      &:not(:last-child) {
+        @include border-right-style(solid);
+      }
+
+      button {
+        @extend %ui-fake-link;
+        @extend %ui-clear-button;
+
+        width: 100%;
+        height: ($seq-nav-height - 1);
+        position: relative;
+        margin: 0;
+        padding: 0;
+        display: block;
+        text-align: center;
+        border-color: $seq-nav-border-color;
+        border-width: 1px;
+        border-bottom-style: solid;
+        box-sizing: border-box;
+
+        .icon {
+          display: block;
+          line-height: 100%; // This matches the height of the <a> its within (the parent) to get vertical centering.
+          font-size: 110%;
+          color: $seq-nav-icon-color-muted;
+        }
+
+        .fa-bookmark {
+          color: $seq-nav-link-color;
+        }
+
+        //video
+        &.seq_video {
+          .icon:before {
+            content: "\f008"; // .fa-film
+          }
+        }
+
+        //other
+        &.seq_other {
+          .icon:before {
+            content: "\f02d"; // .fa-book
+          }
+        }
+
+        //vertical
+        &.seq_vertical {
+          .icon:before {
+            content: "\f00b";  // .fa-tasks
+          }
+        }
+
+        //problems
+        &.seq_problem {
+          .icon:before {
+            content: "\f044";  // .fa-pencil-square-o
+          }
+        }
+
+        .sequence-tooltip {
+          @include text-align(left);
+          @extend %ui-depth2;
+          margin-top: ($baseline/5);
+          background: $seq-nav-tooltip-color;
+          color: $white;
+          font-family: $sans-serif;
+          line-height: lh();
+          right: 0;  // Should not be RTLed, tooltips do not move in RTL
+          padding: 6px;
+          position: absolute;
+          top: 48px;
+          text-shadow: 0 -1px 0 $black;
+          white-space: pre;
+          pointer-events: none;
+
+          &:empty {
+            background: none;
+
+            &::after {
+              display: none;
+            }
+          }
+
+          &::after {
+            @include transform(rotate(45deg));
+            @include right(18px);
+            background: $seq-nav-tooltip-color;
+            content: " ";
+            display: block;
+            height: 10px;
+            right: 18px;  // Not RTLed, positions tooltips relative to seq nav item
+            position: absolute;
+            top: -5px;
+            width: 10px;
+          }
+        }
+      }
+    }
+  }
+
+  body.touch-based-device & ol li button:hover p {
+    display: none;
+  }
+}
+
+.sequence-nav-button {
+  @extend %ui-depth3;
+  display: block;
+  top: 0;
+  height: 100%;
+  text-shadow: none; // overrides default button text-shadow
+  background: none;  // overrides default button gradient
+  background-color: white;
+  border-color: $seq-nav-border-color;
+  box-shadow: none;
+  min-width: 120px;
+  font-size: inherit;
+  font-weight: normal;
+  padding: 0 $baseline;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+
+  span:not(:last-child) {
+    @include padding-right($baseline / 2);
+  }
+
+  &.button-previous {
+    @include left(0);
+    @include border-top-left-radius(3px);
+    @include border-top-right-radius(0);
+    @include border-bottom-right-radius(0);
+    @include border-bottom-left-radius(3px);
+  }
+
+  &.button-next {
+    @include right(0);
+    @include border-top-left-radius(0);
+    @include border-top-right-radius(3px);
+    @include border-bottom-right-radius(3px);
+    @include border-bottom-left-radius(0);
+  }
+
+  &.disabled {
+    cursor: normal;
+  }
+}
+
+.seq_contents {
+  display: none;
+}
+
+nav.sequence-bottom {
+  position: relative;
+  height: 45px;
+  margin: lh(2) auto;
+  display: flex;
+  justify-content: center;
+
+  .sequence-nav-button {
+    position: relative;
+
+    &:last-of-type {
+      @include border-left(none);
+    }
+  }
+
+  @media print {
+    display: none;
+  }
+}
+
+#seq_content {
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}
+
+// hover and active states
+.sequence-nav-button,
+.sequence-nav button {
+  &.focused,
+  &:hover,
+  &:active,
+  &.active {
+    border-bottom: 3px solid $seq-nav-link-color;
+    // keeps icon/text centered on hover, necessary due to border-box setting
+    padding-top: 2px;
+
+    .icon {
+      color: $seq-nav-icon-color;
+    }
+  }
+}

@@ -1,0 +1,75 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "updates" %></%def>
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+## TODO decode course # from context_course into title.
+<%block name="title">${_("Course Updates")}</%block>
+<%block name="bodyclass">is-signedin course course-info updates view-updates</%block>
+
+<%block name="header_extras">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+% for template_name in ["course_info_update", "course_info_handouts"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
+<%block name="requirejs">
+  require(["js/factories/course_info"], function(CourseInfoFactory) {
+      CourseInfoFactory(
+        "${updates_url | n, js_escaped_string}",
+        "${handouts_locator | n, js_escaped_string}",
+        "${base_asset_url | n, js_escaped_string}",
+        ${push_notification_enabled | n, dump_js_escaped_json}
+       );
+  });
+</%block>
+
+<%block name="content">
+  <div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+      <h1 class="page-header">
+        <small class="subtitle">${_("Content")}</small>
+        <span class="sr">&gt; </span>${_("Course Updates")}
+      </h1>
+
+      <nav class="nav-actions" aria-label="${_('Page Actions')}">
+        <h3 class="sr">${_('Page Actions')}</h3>
+        <ul>
+          <li class="nav-item">
+            <a href="#" class=" button new-button new-update-button" disabled><span class="icon fa fa-plus" aria-hidden="true"></span> ${_('New Update')}</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </div>
+
+  <div class="wrapper-content wrapper">
+    <section class="content">
+      <div class="introduction">
+        <p class="copy">${_('Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML.')}</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="main-wrapper">
+    <div class="inner-wrapper">
+      <div class="course-info-wrapper">
+        <div class="main-column window">
+          <article class="course-updates" id="course-update-view">
+            <ol class="update-list" id="course-update-list"></ol>
+          </article>
+        </div>
+        <div class="sidebar course-handouts" id="course-handouts-view"></div>
+      </div>
+    </div>
+  </div>
+</%block>

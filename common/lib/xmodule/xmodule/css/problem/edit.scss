@@ -1,0 +1,120 @@
+.editor-bar {
+
+  .editor-tabs {
+
+    .advanced-toggle {
+      height: auto;
+      margin-top: -4px;
+      padding: 3px 9px;
+      font-size: 12px;
+      color: $link-color;
+
+      &.current {
+        border: 1px solid $lightGrey !important;
+        border-radius: 3px !important;
+        background: $lightGrey !important;
+        color: $darkGrey !important;
+        pointer-events: none;
+        cursor: none;
+
+        &:hover,
+        &:focus {
+          box-shadow: 0 0 0 0 !important;
+          background-color: $white;
+        }
+      }
+    }
+
+    .cheatsheet-toggle {
+      width: 21px;
+      height: 21px;
+      padding: 0;
+      margin: -1px 5px 0 15px;
+      border-radius: 22px;
+      border: 1px solid #a5aaaf;
+      background: #e5ecf3;
+      font-size: 13px;
+      font-weight: 700;
+      color: #565d64;
+      text-align: center;
+    }
+  }
+}
+
+.simple-editor-cheatsheet {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  width: 0;
+  border-radius: 0 3px 3px 0;
+  @include linear-gradient(left, $shadow-l1, $transparent 4px);
+  background-color: $white;
+  overflow: hidden;
+  @include transition(width .3s linear 0s);
+
+  &.shown {
+    width: 20%;
+    height: 100%;
+    overflow-y: scroll;
+  }
+
+  .cheatsheet-wrapper {
+    padding: 10%;
+  }
+
+  h6 {
+    margin-bottom: 7px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .row {
+    @include clearfix();
+    padding-bottom: 5px !important;
+    margin-bottom: 10px !important;
+    border-bottom: 1px solid #ddd !important;
+
+    &:last-child {
+      border-bottom: none !important;
+      margin-bottom: 0 !important;
+    }
+  }
+
+  .col {
+    display: block;
+
+    &.sample {
+      width: 60px;
+      margin-right: 30px;
+
+      .icon {
+          height: ($baseline * 1.5);
+      }
+    }
+  }
+
+  pre {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  code {
+    padding: 0;
+    background: none;
+  }
+}
+
+.problem-editor {
+// adding padding to simple editor only - adjacent selector is needed since there are no toggles for CodeMirror
+ .markdown-box+.CodeMirror {
+    padding: 10px;
+  }
+}
+
+.problem-editor-icon {
+  display: inline-block;
+  width: 26px;
+  height: 21px;
+  vertical-align: middle;
+  color: $base-font-color;
+}

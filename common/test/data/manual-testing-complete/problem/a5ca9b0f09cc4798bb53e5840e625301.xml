@@ -1,0 +1,10 @@
+<problem display_name="Multiple Choice" markdown="&#10;&#10;&gt;&gt;Which of the following equations is the most complex&lt;&lt;&#10;     ( ) \(E = m c^2 \)&#10;     (x) \(A = \pi r^2\)&#10;     &#10;">
+  <p>Which of the following equations is the most complex</p>
+  <multiplechoiceresponse>
+    <choicegroup label="Which of the following equations is the most complex" type="MultipleChoice">
+      <choice correct="false">\(E = m c^2 \)</choice>
+      <choice correct="true">\(A = \pi r^2\)</choice>
+    </choicegroup>
+  </multiplechoiceresponse>
+  <p>     </p>
+</problem>

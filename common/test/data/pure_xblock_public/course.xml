@@ -1,0 +1,3 @@
+<course org="edX" course="pure_xblock_public" url_name="2012_Fall">
+    <stubxblock test_field="set by xml" url_name="xblock_test" />
+</course>

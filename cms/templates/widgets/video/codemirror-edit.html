@@ -1,0 +1,33 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="tabName"/>
+<div>
+  <textarea id="xml-${html_id}" class="edit-box">${data | h}</textarea>
+</div>
+
+<script type='text/javascript'>
+require(["domReady!", "jquery", "codemirror"], function(doc, $, CodeMirror) {
+  ## Init CodeMirror editor
+  var el = $("#xml-${html_id}"),
+        xml_editor = CodeMirror.fromTextArea(el.get(0), {
+          mode: "application/xml",
+          lineNumbers: true,
+          lineWrapping: true
+        });
+
+  TabsEditingDescriptor.Model.addModelUpdate(
+    '${html_id}',
+    '${tabName}',
+    function()  { return xml_editor.getValue(); })
+
+  TabsEditingDescriptor.Model.addOnSwitch(
+    '${html_id}',
+    '${tabName}',
+    function(){
+        ## CodeMirror should get focus when tab is active
+        xml_editor.refresh();
+        xml_editor.focus();
+    }
+  )
+});
+</script>
+

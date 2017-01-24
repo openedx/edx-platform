@@ -1,0 +1,100 @@
+<%! from django.utils.translation import ugettext as _ %>
+<section class="container peer-grading-container">
+    <div class="peer-grading" data-ajax-url="${ajax_url}" data-location="${problem_location | h}" data-use-single-location="${use_single_location}">
+        <div class="error-container"></div>
+
+        <section class="content-panel">
+            <div class="instructions-panel">
+                <div class="calibration-panel">
+                    <h3>${_("Learning to Grade")}</h3>
+                </div>
+                <div class="grading-panel">
+                    <h3>${_("Peer Grading")}</h3>
+                </div>
+            </div>
+
+            <div class="prompt-wrapper">
+                <div class="visibility-control visibility-control-prompt">
+                    <div class="inner">
+                    </div>
+                    <a href="" class="section-header section-header-prompt question-header">${_('Hide Question')}</a>
+                </div>
+                <div class="prompt-information-container">
+                    <section>
+                        <div class="prompt-container">
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <section class="grading-wrapper">
+                <div class="grading-message">
+                </div>
+                <h2>${_("Student Response")}</h2>
+                <div class="grading-container">
+                    <div class="submission-wrapper">
+                        <h3></h3>
+                        <div class="submission-container">
+                        </div>
+                        <input type="hidden" name="submission-key" value="" />
+                        <input type="hidden" name="essay-id" value="" />
+                    </div>
+                    <div class="evaluation">
+                        <p class="rubric-selection-container"></p>
+                        <p class="score-selection-container"></p>
+                        <hr />
+                        <br />
+                        <h3>${_("Written Feedback")}</h3>
+                        <p class="ora-instructions">${_("Please include some written feedback as well.")}</p>
+                        <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
+                        <div class="flag-student-container">
+                            <br />
+                            <input type="checkbox" class="flag-checkbox" value="student_is_flagged">
+                            ${_("This submission has explicit, offensive, or (I suspect) plagiarized content. ")}
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="submission">
+                        <input type="button" value="${_("Submit")}" class="submit-button" name="show"/>
+                    </div>
+                </div>
+            </section>
+        </section>
+        <!-- Calibration feedback: Shown after a calibration is sent -->
+        <section class="calibration-feedback">
+            <h2>${_("How did I do?")}</h2>
+            <div class="calibration-feedback-wrapper">
+            </div>
+            <input type="button" class="calibration-feedback-button" value="${_("Continue")}" name="calibration-feedback-button" />
+        </section>
+
+        <!-- Interstitial Page: Shown between calibration and grading steps -->
+        <section class="interstitial-page">
+            <h1>${_("Ready to grade!")}</h1>
+            <p>${_("You have finished learning to grade, which means that you are now ready to start grading.")}</p>
+            <input type="button" class="interstitial-page-button" value="${_("Start Grading!")}" name="interstitial-page-button" />
+        </section>
+
+        <!-- Calibration Interstitial Page: Shown before calibration -->
+        <section class="calibration-interstitial-page">
+            <h1>${_("Learning to grade")}</h1>
+            <p>${_("You have not yet finished learning to grade this problem.")}</p>
+            <p>${_("You will now be shown a series of instructor-scored essays, and will be asked to score them yourself.")}</p>
+            <p>${_("Once you can score the essays similarly to an instructor, you will be ready to grade your peers.")}</p>
+            <input type="button" class="calibration-interstitial-page-button" value="${_("Start learning to grade")}" name="calibration-interstitial-page-button" />
+        </section>
+
+        <!-- Flag submission confirmation dialog -->
+        <section class="flag-submission-confirmation">
+            <h4>${_("Are you sure that you want to flag this submission?")}</h4>
+            <p>
+            ${_("You are about to flag a submission. You should only flag a submission that contains explicit, offensive, or  (suspected) plagiarized content. If the submission is not addressed to the question or is incorrect, you should give it a score of zero and accompanying feedback instead of flagging it.")}
+            </p>
+            <div>
+                <input type="button" class="flag-submission-removal-button" value="${_("Remove Flag")}" name="calibration-interstitial-page-button" />
+                <input type="button" class="flag-submission-confirmation-button" value="${_("Keep Flag")}" name="calibration-interstitial-page-button" />
+            </div>
+        </section>
+
+        <input type="button" value="${_("Go Back")}" class="action-button" name="back" />
+    </div>
+</section>

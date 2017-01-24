@@ -1,0 +1,31 @@
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+<%namespace name='static' file='static_content.html'/>
+
+<div class="wrapper wrapper-component-action-header">
+    <div class="component-header">
+    ${label}
+    </div>
+    <ul class="component-actions">
+      <li class="action-item action-edit">
+        <a href="#" class="edit-button action-button">
+            <span class="icon fa fa-pencil" aria-hidden="true"></span>
+            <span class="action-button-text">${_("Edit")}</span>
+        </a>
+      </li>
+      <li class="action-item action-duplicate">
+        <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+            <span class="icon fa fa-copy" aria-hidden="true"></span>
+            <span class="sr">${_("Duplicate this component")}</span>
+        </a>
+      </li>
+      <li class="action-item action-delete">
+        <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+            <span class="icon fa fa-trash-o" aria-hidden="true"></span>
+            <span class="sr">${_("Delete this component")}</span>
+        </a>
+      </li>
+    </ul>
+</div>
+<span data-tooltip="${_("Drag to reorder")}" class="drag-handle action"></span>
+${preview | n}

@@ -1,0 +1,757 @@
+// studio - elements - modal-window
+// ========================
+
+// start with the view/body
+[class*="view-"] {
+
+  // basic modal content
+  // ------------------------
+  .modal-window  {
+    @extend %ui-depth3;
+    @include box-sizing(border-box);
+    position: absolute;
+    width: 50%;
+    box-shadow: 0 0 7px $shadow-d1;
+    border-radius: ($baseline/5);
+    background-color: $gray-l4;
+    padding: 7px;
+    @include text-align(left);
+    @include direction();
+
+    .modal-content {
+      position: relative;
+      background-color: $white;
+      padding: 5%;
+    }
+
+    .title {
+      @extend %t-title5;
+      @extend %t-demi-strong;
+      margin: ($baseline/4) ($baseline/2) ($baseline/2) ($baseline/2);
+      color: $black;
+    }
+
+    .message {
+      @extend %t-copy-sub1;
+      margin: 0 0 $baseline 0;
+      color: $gray;
+    }
+
+    .message-status {
+      padding: 0;
+
+      &.error {
+        border: 0;
+        background-color: $white;
+        color: $red;
+      }
+
+      &.success {
+        border: 0;
+        background-color: $white;
+        color: $green-d1;
+      }
+    }
+
+    // UI: summary messages
+    .summary-message {
+      margin-bottom: $baseline;
+      padding: ($baseline*0.75);
+      background: $gray-d3;
+
+      .icon, .copy {
+        display: inline-block;
+        vertical-align: top;
+      }
+
+      .icon {
+        @extend %t-icon4;
+        @include margin-right($baseline/2);
+        color: $white;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+        max-width: 85%;
+        color: $white;
+      }
+    }
+
+    // CASE: Warning summary message
+    .summary-message-warning {
+      border-top: ($baseline/5) solid $color-warning;
+
+      .icon {
+        color: $color-warning;
+      }
+    }
+
+    // visual dividers
+    .divider-visual {
+      margin: ($baseline*0.75) 0;
+      border: ($baseline/20) solid $gray-l4;
+    }
+
+    // sections within a modal
+    .modal-section {
+      margin-bottom: ($baseline*0.75);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+      .settings-tabs-header {
+        margin-bottom: $baseline;
+        border-bottom: 1px solid $gray-l3;
+
+        li.settings-tab-buttons {
+          display: inline-block;
+          margin-right: $baseline;
+
+          .settings-tab-button {
+            @extend %t-copy-sub1;
+            @extend %t-regular;
+            background-image: none;
+            background-color: $white;
+            color: $mediumGrey;
+            border-radius: 0;
+            box-shadow: none;
+            border: 0;
+            padding: ($baseline/4) ($baseline/2);
+            text-transform: uppercase;
+            &:hover {
+              background-color: $white;
+              color: $blue;
+            }
+            &.active {
+              border-bottom: 4px solid $blue-d2;
+              color: $offBlack;
+            }
+          }
+        }
+      }
+    }
+
+    .modal-section-title {
+      @extend %t-title6;
+      margin: 0 0 ($baseline/2) 0;
+      border-bottom: ($baseline/10) solid $gray-l4;
+      padding-bottom: ($baseline/4);
+      color: $gray-d2;
+    }
+
+    .modal-subsection-title {
+      @extend %t-title8;
+      @extend %t-strong;
+      margin-bottom: ($baseline/4);
+      text-transform: uppercase;
+      letter-spacing: 0.1;
+      color: $gray-l2;
+    }
+
+    .modal-section-content {
+
+      .list-fields, .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .list-actions {
+        @extend %actions-list;
+        margin-left: ($baseline/4);
+
+        .action-button {
+          @extend %t-icon4;
+        }
+      }
+    }
+
+    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
+    .modal-chin,
+    .xblock-actions,
+    .modal-actions {
+      padding: ($baseline*0.75) 2% ($baseline/2) 2%;
+
+      .action-item {
+        @extend %t-action3;
+        display: inline-block;
+        margin-right: ($baseline*0.75);
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      .action-primary {
+        @include blue-button();
+        @extend %t-action3;
+        border-color: $blue-d1;
+        color: $white;
+      }
+
+      a {
+        color: $blue;
+
+        &:hover {
+          color: $blue-s2;
+        }
+      }
+    }
+  }
+
+
+  // small modals - quick editors and dialogs
+  // ------------------------
+  .modal-sm {
+    width: 30%;
+    min-width: ($baseline*15);
+
+    .modal-content {
+      padding: 5% 4%;
+    }
+  }
+
+  // medium modals - forms and interactives
+  // ------------------------
+  .modal-med {
+    width: 40%;
+    min-width: ($baseline*18);
+
+    .modal-content {
+      padding: 4%;
+    }
+  }
+
+  // large modals - component editors and interactives
+  // ------------------------
+  .modal-lg {
+    width: 70%;
+    min-width: ($baseline*27.5);
+    height: auto;
+
+    .modal-content {
+      padding: $baseline;
+    }
+
+    &.modal-editor {
+
+      .modal-header {
+        margin: ($baseline/4) ($baseline/2);
+
+        .title {
+          width: 47%;
+          display: inline-block;
+        }
+
+        .editor-modes {
+          width: 48%;
+          display: inline-block;
+          @include text-align(right);
+
+          .action-item {
+            display: inline-block;
+            margin-left: ($baseline/2);
+
+            .editor-button,
+            .settings-button {
+              @extend %btn-secondary-gray;
+              @extend %t-copy-sub1;
+              border: 0;
+              padding: ($baseline/4) ($baseline/2);
+              text-transform: uppercase;
+
+              &:hover {
+              }
+
+              &.is-set {
+                background-color: $gray-d1;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+
+      .modal-content {
+        height: 435px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0;
+      }
+    }
+  }
+
+
+
+  // specific modal overrides
+  // ------------------------
+
+  // upload modal
+  .assetupload-modal {
+
+    .status-upload {
+      margin-top: $baseline;
+    }
+  }
+
+
+  // component editor
+  .modal-window {
+
+    .CodeMirror {
+      height: 365px;
+    }
+
+    .CodeMirror-advanced {
+      height: 435px;
+    }
+
+    .wrapper-comp-settings {
+
+      .list-input {
+
+        &.settings-list {
+          height: auto;
+          max-height: none;
+        }
+      }
+    }
+  }
+
+  // xblock custom actions
+  .modal-window .editor-with-buttons {
+    margin-bottom: ($baseline*3);
+
+    // temporary fix until xblock structure is set
+    &.wrapper-comp-settings .list-input.settings-list {
+      height: 375px;
+    }
+
+    // TODO: need to sync up (alongside general editing mode) with xblocks.scss UI
+    .xblock-actions {
+      background-color: $gray-l4;
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+    }
+  }
+
+
+  // MODAL TYPE: component - video modal (includes special overrides for xblock-related editing view)
+  .modal-lg.modal-type-video {
+
+    .modal-content {
+      box-shadow: none;
+      height: auto;
+      overflow-y: hidden;
+
+      // modal within a modal
+      .wrapper-modal-window-assetupload {
+
+        .modal-window {
+          top: 10% !important;
+          left: 10% !important;
+        }
+
+        .modal-header {
+          margin: ($baseline/2) 2%;
+
+          .title {
+            width: auto;
+            margin: 0 0 ($baseline/4) 0;
+          }
+
+          .editor-modes {
+            display: none;
+          }
+        }
+
+        .modal-content {
+          padding: 2%;
+
+          .message {
+            margin: 0 ($baseline/4) ($baseline/4) ($baseline/4);
+          }
+
+          input[type="file"] {
+            margin: 0;
+          }
+        }
+
+        .modal-actions {
+          padding: ($baseline/2) 0;
+        }
+      }
+    }
+
+    .xmodule_edit.xmodule_VideoDescriptor .editor-with-tabs {
+
+      .edit-header {
+        border: 0;
+        background-color: $gray-l4;
+        padding: ($baseline/2);
+
+        .component-name {
+          @extend %t-title5;
+          @extend %t-strong;
+          display: inline-block;
+          vertical-align: middle;
+          width: 48%;
+          margin-left: ($baseline/2);
+          color: $black;
+
+          em {
+            color: inherit;
+            display: inline;
+          }
+        }
+
+        .editor-tabs {
+          display: inline-block;
+          width: 48%;
+          position: relative;
+          top: auto;
+          right: auto;
+          padding: 0;
+          text-align: right;
+
+          .inner_tab_wrap {
+            padding: 0;
+
+            a.tab {
+              @extend %btn-secondary-gray;
+              @extend %t-copy-sub1;
+              @extend %t-regular;
+              background-image: none;
+              box-shadow: none;
+              border: 0;
+              padding: ($baseline/4) ($baseline/2);
+              text-transform: uppercase;
+
+              &.current {
+                background-color: $gray-d1;
+                color: $white;
+              }
+            }
+          }
+        }
+      }
+
+      .tabs-wrapper {
+        height: ($baseline*24);
+        overflow-y: scroll;
+        border: 1px solid $gray-l2;
+
+        .component-tab {
+          border-top: 0;
+        }
+      }
+    }
+  }
+
+  .modal-window-overlay {
+    @extend %ui-depth3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: $black;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+  }
+
+  // MODAL TYPE: component - visibility modal
+  .xblock-visibility_view {
+
+    .visibility-controls-secondary {
+      max-height: 100%;
+      overflow-y: auto;
+      @include margin(($baseline*0.75), 0, 0, $baseline);
+    }
+
+    .visibility-controls-group {
+      @extend %wipe-last-child;
+      margin-bottom: $baseline;
+    }
+
+    // UI: form fields
+    .list-fields {
+
+      .field {
+        @extend %wipe-last-child;
+        margin-bottom: ($baseline/4);
+
+        label {
+          @extend %t-copy-sub1;
+        }
+      }
+
+      // UI: radio and checkbox inputs
+      .field-radio, .field-checkbox {
+
+        label {
+          @include margin-left($baseline/4);
+        }
+      }
+    }
+
+    .field-visibility-verification {
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 24px;
+        display: block;
+      }
+    }
+
+    // CASE: content group has been removed
+    .field-visibility-content-group.was-removed {
+
+      .input-checkbox:checked ~ label {
+        color: $color-error;
+      }
+
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        display: block;
+        color: $color-error;
+      }
+    }
+
+    // CASE: no groups configured for visibility
+    .is-not-configured {
+      @extend %no-content;
+      padding: ($baseline);
+      @include text-align(left); // reset for %no-content's default styling
+
+      .title {
+        @extend %t-title6;
+        font-weight: 600;  // needed for poorly scoped .title rule in modals
+        margin: 0 0 ($baseline/2) 0; // needed for poorly scoped .title rule in modals
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+
+         p {
+          @extend %wipe-last-child;
+          margin-bottom: $baseline;
+        }
+      }
+
+      &.has-actions {
+
+        .actions {
+          margin-top: $baseline;
+        }
+
+        .action {
+          @include margin-left(0); // reset for %no-content's default styling
+        }
+      }
+    }
+  }
+
+  // MODAL TYPE: outline - edit item settings
+  .wrapper-modal-window-bulkpublish-section,
+  .wrapper-modal-window-bulkpublish-subsection,
+  .wrapper-modal-window-bulkpublish-unit,
+  .course-outline-modal {
+    .exam-time-list-fields,
+    .exam-review-rules-list-fields {
+      margin: 0 0 ($baseline/2) 0;
+    }
+    .list-fields {
+      .field-message {
+        color: $gray-d1;
+        font-size: ($baseline/2);
+      }
+      .field {
+        display: inline-block;
+        vertical-align: top;
+        @include margin-right($baseline/2);
+        margin-bottom: ($baseline/4);
+
+        label {
+          @extend %t-copy-sub1;
+          @extend %t-strong;
+          @include transition(color $tmg-f3 ease-in-out 0s);
+          margin: 0 0 ($baseline/4) 0;
+
+          &.is-focused {
+            color: $blue;
+          }
+        }
+
+
+        input, textarea {
+          @extend %t-copy-base;
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          height: 100%;
+          width: 100%;
+          padding: ($baseline/2);
+
+          // CASE: long length
+          &.long {
+            width: 100%;
+          }
+
+          // CASE: short length
+          &.short {
+            width: 25%;
+          }
+        }
+
+        // CASE: specific release + due times/dates
+        .start-date,
+        .start-time,
+        .due-date,
+        .due-time {
+          width: ($baseline*7);
+        }
+
+        .tip {
+          @extend %t-copy-sub1;
+          @include transition(color, 0.15s, ease-in-out);
+          display: block;
+          margin-top: ($baseline/4);
+          color: $gray-l2;
+        }
+
+        .tip-warning {
+          color: $gray-d2;
+        }
+      }
+
+      // CASE: type-based input
+      .field-text {
+
+        // TODO: refactor the _forms.scss partial to allow for this area to inherit from it
+        label, input, textarea {
+          display: block;
+        }
+      }
+
+      // CASE: select input
+      .field-select {
+
+        .label, .input {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .label {
+          @include margin-right($baseline/2);
+        }
+
+        .input {
+          width: 100%;
+        }
+
+        // CASE: checkbox input
+        .field-checkbox {
+
+          .label, label {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+
+
+
+    // UI: grading section
+    .edit-settings-grading {
+
+      .grading-type {
+        margin-bottom: $baseline;
+      }
+    }
+
+    .edit-staff-lock, .edit-content-visibility {
+      margin-bottom: $baseline;
+
+      .tip {
+        font-weight: bold;
+        font-size: 12px;
+      }
+    }
+
+    // UI: staff lock section
+    .edit-staff-lock, .edit-settings-timed-examination, .edit-verification-access {
+
+      .checkbox-cosmetic .input-checkbox {
+        @extend %cont-text-sr;
+
+        // CASE: unchecked
+        ~ .tip-warning {
+          display: block;
+        }
+
+        // CASE: checked
+        &:checked {
+
+          ~ .tip-warning {
+            display: none;
+          }
+        }
+      }
+
+      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
+      .checkbox-cosmetic .label {
+        margin-bottom: 0;
+      }
+
+      .note {
+        @extend %t-copy-sub2;
+        @extend %t-regular;
+        margin: 14px 0 0 21px;
+        display: block;
+      }
+    }
+
+    .verification-access {
+      .checkbox-cosmetic .label {
+        @include float(left);
+        margin: 2px 6px 0 0;
+      }
+    }
+
+    // UI: timed and proctored exam section
+    .edit-settings-timed-examination {
+
+      // give a little space between the sections
+      padding-bottom: 10px;
+
+      .checkbox-cosmetic .input-checkbox {
+        @extend %cont-text-sr;
+
+        // CASE: unchecked
+        ~ .tip-warning {
+          display: block;
+        }
+
+        // CASE: checked
+        &:checked {
+
+          ~ .tip-warning {
+            display: none;
+          }
+        }
+      }
+
+      // needed to override poorly scoped margin-bottom on any label element in a view (from _forms.scss)
+      .checkbox-cosmetic .label {
+        margin-bottom: 0;
+      }
+    }
+
+    // UI: Access settings section
+    .edit-settings-access {
+      .gating-prereq {
+        margin-bottom: 10px;
+      }
+    }
+  }
+}

@@ -1,0 +1,229 @@
+<form id="settings_details" class="settings-details" method="post" action="">
+<section class="group-settings schedule">
+  <header>
+    <h2 class="title-2">Course Schedule</h2>
+  </header>
+
+  <ol class="list-input">
+    <li class="field-group field-group-course-start" id="course-start">
+      <div class="field date" id="field-course-start-date">
+        <label for="course-start-date">Course Start Date</label>
+        <input type="text" class="start-date date start datepicker" id="course-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">First day the course begins</span>
+      </div>
+
+      <div class="field time" id="field-course-start-time">
+        <label for="course-start-time">Course Start Time</label>
+        <input type="text" class="time start timepicker" id="course-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+
+    <li class="field-group field-group-course-end" id="course-end">
+      <div class="field date" id="field-course-end-date">
+        <label for="course-end-date">Course End Date</label>
+        <input type="text" class="end-date date end" id="course-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">Last day your course is active</span>
+      </div>
+
+      <div class="field time" id="field-course-end-time">
+        <label for="course-end-time">Course End Time</label>
+        <input type="text" class="time end" id="course-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+  </ol>
+
+  <ol class="list-input">
+    <li class="field-group field-group-enrollment-start" id="enrollment-start">
+      <div class="field date" id="field-enrollment-start-date">
+        <label for="course-enrollment-start-date">Enrollment Start Date</label>
+        <input type="text" class="start-date date start" id="course-enrollment-start-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">First day students can enroll</span>
+      </div>
+
+      <div class="field time" id="field-enrollment-start-time">
+        <label for="course-enrollment-start-time">Enrollment Start Time</label>
+        <input type="text" class="time start" id="course-enrollment-start-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+
+    <li class="field-group field-group-enrollment-end" id="enrollment-end">
+      <div class="field date" id="field-enrollment-end-date">
+        <label for="course-enrollment-end-date">Enrollment End Date</label>
+        <input type="text" class="end-date date end" id="course-enrollment-end-date" placeholder="MM/DD/YYYY" autocomplete="off" />
+        <span class="tip tip-stacked">Last day students can enroll</span>
+      </div>
+
+      <div class="field time" id="field-enrollment-end-time">
+        <label for="course-enrollment-end-time">Enrollment End Time</label>
+        <input type="text" class="time end" id="course-enrollment-end-time" value="" placeholder="HH:MM" autocomplete="off" />
+        <span class="tip tip-stacked timezone">(UTC)</span>
+      </div>
+    </li>
+    <li>
+    <li class="field field-select" id="field-pre-requisite-course">
+                    <label for="pre-requisite-course" class="">Prerequisite Course</label>
+                    <select class="input" id="pre-requisite-course">
+                        <option value="">None</option>
+                        <option value="test/CSS101/2012_T1">[Test] Communicating for Impact</option>
+                        <option value="Test/3423/2014_T2">CohortAverageTesting</option>
+                        <option value="edX/Open_DemoX/edx_demo_course">edX Demonstration Course</option>
+                    </select>
+                    <span class="tip tip-inline">Course that students must complete before beginning this course</span>
+                    <button type="submit" class="sr" name="submit" value="submit">set pre-requisite course</button>
+    </li>
+        <h3 id="heading-entrance-exam">Entrance Exam</h3>
+            <div class="show-data">
+                <div class="heading">
+                    <input type="checkbox" id="entrance-exam-enabled" />
+                    <label for="entrance-exam-enabled">Require students to pass an exam before beginning the course.</label>
+                </div>
+                <div class="div-grade-requirements">
+                    <p><span class="tip tip-inline">To create your course entrance exam, go to the <a href='${course_handler_url}'>Course Outline</a>. An Entrance Exam section will be created automatically.</span></p>
+                    <p><label for="entrance-exam-minimum-score-pct">Minimum Passing Score</label></p>
+                    <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format min-score-tip"><span id="min-score-format" class="tip tip-inline"> %</span></div></p>
+                    <p><span class="tip tip-inline" id="min-score-tip">The minimum score a student must receive to pass the entrance exam.</span></p>
+                </div>
+            </div>
+    </li>
+  </ol>
+</section>
+
+<section class="group-settings course_details">
+  <header>
+    <h2 class="title-2">Course Details</h2>
+    <span class="tip">Provide useful information about your course</span>
+  </header>
+  <ol class="list-input">
+    <li class="field" id="field-course-language">
+      <label for="course-language">Course Language</label>
+      <select id="course-language">
+        <option value="" selected> - </option>
+        <option value="en">English</option>
+      </select>
+      <span class="tip tip-stacked">Identify the course language here. This is used to assist users find courses that are taught in a specific language.</span>
+    </li>
+
+  </ol>
+</section>
+
+<section class="group-settings marketing">
+  <header>
+    <h2 class="title-2">Introducing Your Course</h2>
+    <span class="tip">Information for prospective students</span>
+  </header>
+  <ol class="list-input">
+
+    <li class="field text" id="field-course-title">
+      <label for="course-title">Course Title</label>
+      <input type="text" id="course-title" data-display-name="${context_course.display_name}">
+      <span class="tip tip-stacked">Displayed as title on the course details page. Limit to 50 characters.</span>
+    </li>
+    <li class="field text" id="field-course-subtitle">
+      <label for="course-subtitle">Course Subtitle</label>
+      <input type="text" id="course-subtitle">
+      <span class="tip tip-stacked">Displayed as subtitle on the course details page. Limit to 150 characters.</span>
+    </li>
+    <li class="field text" id="field-course-duration">
+      <label for="course-duration">Course Duration</label>
+      <input type="text" id="course-duration">
+      <span class="tip tip-stacked">Displayed on the course details page. Limit to 50 characters.</span>
+    </li>
+    <li class="field text" id="field-course-description">
+      <label for="course-description">Course Description</label>
+      <textarea class="text" id="course-description"></textarea>
+      <span class="tip tip-stacked">Displayed on the course details page. Limit to 1000 characters.</span>
+    </li>
+
+    <li class="field image" id="field-course-image">
+      <label for="course-image-url">Course Card Image</label>
+      <div class="current current-course-image">
+        <span class="wrapper-course-image">
+          <img class="course-image placeholder" id="course-image" src="${course_image_url}" alt="Course Image"/>
+        </span>
+        <span class="msg msg-empty">Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)</span>
+      </div>
+
+      <div class="wrapper-input">
+        <div class="input">
+          ## Translators: This is the placeholder text for a field that requests the URL for a course image
+          <input type="text" dir="ltr" class="long new-course-image-url" id="course-image-url" value="" placeholder="Your course image URL" autocomplete="off" />
+          <span class="tip tip-stacked">Please provide a valid path and name to your course image (Note: only JPEG or PNG format supported)</span>
+        </div>
+        <button type="button" class="action action-upload-image" id="upload-course-image">Upload Course Card Image</button>
+      </div>
+    </li>
+
+    <li class="field image" id="field-banner-image">
+      <label for="banner-image-url">Course Banner Image</label>
+      <div class="current current-course-image">
+        <span class="wrapper-course-image">
+          <img class="course-image placeholder" id="banner-image" src="${banner_image_url}" alt="Course Banner Image"/>
+        </span>
+        <span class="msg msg-empty">Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 1440px wide by 400px tall)</span>
+      </div>
+
+      <div class="wrapper-input">
+        <div class="input">
+          ## Translators: This is the placeholder text for a field that requests the URL for a course banner image
+          <input type="text" dir="ltr" class="long new-course-image-url" id="banner-image-url" value="" placeholder="Your banner image URL" autocomplete="off" />
+          <span class="tip tip-stacked">Please provide a valid path and name to your banner image (Note: only JPEG or PNG format supported)</span>
+        </div>
+        <button type="button" class="action action-upload-image" id="upload-banner-image">Upload Course Banner Image</button>
+      </div>
+    </li>
+
+    <li class="field image" id="field-video-thumbnail-image">
+      <label for="video-thumbnail-image-url">Course Video Thumbnail Image</label>
+      <div class="current current-course-image">
+        <span class="wrapper-course-image">
+          <img class="course-image placeholder" id="video-thumbnail-image" src="${video_thumbnail_image_url}" alt="Video Thumbnail Image"/>
+        </span>
+        <span class="msg msg-empty">Your course currently does not have a video thumbnail image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)</span>
+      </div>
+
+      <div class="wrapper-input">
+        <div class="input">
+          ## Translators: This is the placeholder text for a field that requests the URL for a course video thumbnail image
+          <input type="text" dir="ltr" class="long new-course-image-url" id="video-thumbnail-image-url" value="" placeholder="Your video thumbnail image URL" autocomplete="off" />
+          <span class="tip tip-stacked">Please provide a valid path and name to your video thumbnail image (Note: only JPEG or PNG format supported)</span>
+        </div>
+        <button type="button" class="action action-upload-image" id="upload-video-thumbnail-image">Upload Video Thumbnail Image</button>
+      </div>
+    </li>
+
+  </ol>
+</section>
+
+<section class="group-settings course-learning-info">
+    <header>
+        <h2 class="title-2">Learning Outcomes</h2>
+        <span class="tip">Add the learning outcomes for this course</span>
+    </header>
+    <ol class="list-input enum">
+      <li class="course-settings-learning-fields"></li>
+    </ol>
+    <div class="actions">
+      <button type="button" class="action action-primary button new-button add-course-learning-info">
+        <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>Add Learning Outcome
+      </button>
+    </div>
+</section>
+
+<section class="group-settings instructor-types">
+  <header>
+    <h2 class="title-2">Instructors</h2>
+    <span class="tip">Add details about the instructors for this course</span>
+  </header>
+  <ol class="list-input enum">
+    <li class="course-instructor-details-fields"></li>
+  </ol>
+  <div class="actions">
+    <button type="button" class="action action-primary button new-button add-course-instructor-info">
+      <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>Add Instructor
+    </button>
+  </div>
+</section>
+</form>

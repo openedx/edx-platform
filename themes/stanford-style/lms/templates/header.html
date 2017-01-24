@@ -1,0 +1,8 @@
+## mako
+<%namespace name='static' file='/static_content.html'/>
+<%inherit file="/navigation.html"/>
+
+## TODO: this will eventually be moved to the Sass
+<%block name="navigation_logo">
+  <img src="${static.url('images/logo.png')}" height="50" alt="Home Page" />
+</%block>

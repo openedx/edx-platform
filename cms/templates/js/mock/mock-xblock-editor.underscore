@@ -1,0 +1,10 @@
+<div class="xblock xblock-studio_view" data-runtime-version="1" data-usage-id="i4x:;_;_edX;_mock"
+     data-init="MockXBlock" data-runtime-class="StudioRuntime" tabindex="0">
+
+    <div class="mock-xblock">
+        <h3>Mock XBlock Editor</h3>
+        <div class="metadata_edit"></div>
+        <textarea data-metadata-name="custom_field">Custom Value</textarea>
+    </div>
+
+</div>

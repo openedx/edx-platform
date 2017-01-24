@@ -1,0 +1,121 @@
+## coding=utf-8
+
+## Pages currently use v1 styling by default. Once the Pattern Library
+## rollout has been completed, this default can be switched to v2.
+<%! main_css = "style-main-v1" %>
+
+## Standard imports
+<%namespace name='static' file='static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+<%page expression_filter="h"/>
+<!doctype html>
+<!--[if lte IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if !IE]><<!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
+  <head dir="${static.dir_rtl()}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>
+        <%block name="title"></%block> |
+        % if context_course:
+        <% ctx_loc = context_course.location %>
+        ${context_course.display_name_with_default} |
+        % elif context_library:
+        ${context_library.display_name_with_default} |
+        % endif
+        ${settings.STUDIO_NAME}
+    </title>
+
+    <%
+      jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+    %>
+
+    <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="path_prefix" content="${EDX_ROOT_URL}">
+
+    <%static:css group='style-vendor'/>
+    <%static:css group='style-vendor-tinymce-content'/>
+    <%static:css group='style-vendor-tinymce-skin'/>
+
+    <%static:css group='${self.attr.main_css}'/>
+
+    <%include file="widgets/segment-io.html" />
+
+    <%block name="header_extras"></%block>
+  </head>
+
+  <body class="${static.dir_rtl()} <%block name='bodyclass'></%block> lang_${LANGUAGE_CODE}">
+    <%block name="view_notes"></%block>
+
+    <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
+
+    <script type="text/javascript">
+      window.baseUrl = "${settings.STATIC_URL | n, js_escaped_string}";
+      var require = {baseUrl: window.baseUrl};
+    </script>
+    <script type="text/javascript" src="${static.url("common/js/vendor/require.js")}"></script>
+    <script type="text/javascript" src="${static.url("cms/js/require-config.js")}"></script>
+
+    <!-- view -->
+    <div class="wrapper wrapper-view" dir="${static.dir_rtl()}">
+        <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
+        <%include file="widgets/header.html" args="online_help_token=online_help_token" />
+
+      <div id="page-alert">
+      <%block name="page_alert"></%block>
+      </div>
+
+      <main id="main" aria-label="Content" tabindex="-1">
+          <div id="content">
+          <%block name="content"></%block>
+          </div>
+      </main>
+
+      % if user.is_authenticated():
+        <%include file="widgets/sock.html" args="online_help_token=online_help_token" />
+      % endif
+      <%include file="widgets/footer.html" />
+
+      <div id="page-notification"></div>
+    </div>
+
+    <div id="page-prompt"></div>
+
+    <%block name="modal_placeholder"></%block>
+
+    <%block name="jsextra"></%block>
+    <script type="text/javascript">
+      require(['common/js/common_libraries'], function () {
+          require(['js/factories/base'], function () {
+              require(['js/models/course'], function(Course) {
+                  % if context_course:
+                      window.course = new Course({
+                          id: "${context_course.id | n, js_escaped_string}",
+                          name: "${context_course.display_name_with_default | n, js_escaped_string}",
+                          url_name: "${context_course.location.name | n, js_escaped_string}",
+                          org: "${context_course.location.org | n, js_escaped_string}",
+                          num: "${context_course.location.course | n, js_escaped_string}",
+                          display_course_number: "${context_course.display_coursenumber | n, js_escaped_string}",
+                          revision: "${context_course.location.revision | n, js_escaped_string}",
+                          self_paced: ${context_course.self_paced | n, dump_js_escaped_json}
+                      });
+                  % endif
+                  % if user.is_authenticated():
+                      require(['js/sock']);
+                  % endif
+                  <%block name='requirejs'></%block>
+              });
+          });
+      });
+    </script>
+    <%include file="widgets/segment-io-footer.html" />
+    <div class="modal-cover"></div>
+  </body>
+</html>

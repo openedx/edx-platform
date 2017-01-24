@@ -1,0 +1,11 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Hi {full_name},").format(full_name=full_name)}
+
+${_("Thanks for submitting your photos!")}
+
+${_("We've received your information and the verification process has begun. You can check the status of the verification process on your dashboard.")}
+
+${_("Thank you,")}
+
+${_("The {platform_name} team").format(platform_name=platform_name)}

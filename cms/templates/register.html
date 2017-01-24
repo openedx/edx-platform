@@ -1,0 +1,115 @@
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "register" %></%def>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="title">${_("Sign Up")}</%block>
+<%block name="bodyclass">not-signedin view-signup</%block>
+
+<%block name="content">
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <header>
+      <h1 class="title title-1">${_("Sign Up for {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
+      <a href="${reverse('login')}" class="action action-signin">${_("Already have a {studio_name} Account? Sign in").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
+    </header>
+
+    <p class="introduction">${_("Ready to start creating online courses? Sign up below and start creating your first {platform_name} course today.").format(platform_name=settings.PLATFORM_NAME)}</p>
+
+    <article class="content-primary" role="main">
+      <form id="register_form" method="post">
+        <div id="register_error" name="register_error" class="message message-status message-status error">
+        </div>
+
+        <fieldset>
+          <legend class="sr">${_("Required Information to Sign Up for {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
+
+          <ol class="list-input">
+            <li class="field text required" id="field-email">
+              <label for="email">${_("E-mail")}</label>
+              ## Translators: This is the placeholder text for a field that requests an email address.
+              <input id="email" type="email" name="email" placeholder="${_("example: username@domain.com")}" />
+            </li>
+
+            <li class="field text required" id="field-name">
+              <label for="name">${_("Full Name")}</label>
+              ## Translators: This is the placeholder text for a field that requests the user's full name.
+              <input id="name" type="text" name="name" placeholder="${_("example: Jane Doe")}" />
+            </li>
+
+            <li class="field text required" id="field-username">
+              <label for="username">${_("Public Username")}</label>
+              ## Translators: This is the placeholder text for a field that asks the user to pick a username
+              <input id="username" type="text" name="username" placeholder="${_("example: JaneDoe")}" />
+              <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
+            </li>
+
+            <li class="field text required" id="field-password">
+              <label for="password">${_("Password")}</label>
+              <input id="password" type="password" name="password" />
+            </li>
+
+            <li class="field-group">
+              <div class="field text" id="field-location">
+                <label for="location">${_("Your Location")}</label>
+                <input class="short" id="location" type="text" name="location" />
+              </div>
+
+              <div class="field text" id="field-language">
+                <label for="language">${_("Preferred Language")}</label>
+                <input class="short" id="language" type="text" name="language" />
+              </div>
+            </li>
+
+            <li class="field checkbox required" id="field-tos">
+              <input id="tos" name="terms_of_service" type="checkbox" value="true" />
+              <label for="tos">
+                ${_("I agree to the {a_start} Terms of Service {a_end}").format(a_start='<a data-rel="edx.org" href="{}">'.format(marketing_link('TOS')), a_end="</a>")}
+              </label>
+            </li>
+          </ol>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Create My Account &amp; Start Authoring Courses")}</button>
+        </div>
+
+        <!-- no honor code for CMS, but need it because we're using the lms student object -->
+        <input name="honor_code" type="checkbox" value="true" checked="true" hidden="true">
+      </form>
+    </article>
+
+    <aside class="content-supplementary" role="complementary">
+      <h2 class="sr">${_("Common {studio_name} Questions").format(studio_name=settings.STUDIO_SHORT_NAME)}</h2>
+
+      <div class="bit">
+        <h3 class="title-3">${_("Who is {studio_name} for?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
+        <p>${_("{studio_name} is for anyone that wants to create online courses that leverage the global {platform_name} platform. Our users are often faculty members, teaching assistants and course staff, and members of instructional technology groups.").format(
+          studio_name=settings.STUDIO_SHORT_NAME, platform_name=settings.PLATFORM_NAME,
+        )}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("How technically savvy do I need to be to create courses in {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
+        <p>${_("{studio_name} is designed to be easy to use by almost anyone familiar with common web-based authoring environments (Wordpress, Moodle, etc.). No programming knowledge is required, but for some of the more advanced features, a technical background would be helpful. As always, we are here to help, so don't hesitate to dive right in.").format(
+          studio_name=settings.STUDIO_SHORT_NAME,
+        )}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("I've never authored a course online before. Is there help?")}</h3>
+        <p>${_("Absolutely. We have created an online course, edX101, that describes some best practices: from filming video, creating exercises, to the basics of running an online course. Additionally, we're always here to help, just drop us a note.")}</p>
+      </div>
+    </aside>
+  </section>
+</div>
+</%block>
+
+<%block name="requirejs">
+    require(["js/factories/register"], function (RegisterFactory) {
+        RegisterFactory();
+    });
+</%block>

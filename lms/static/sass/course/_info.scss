@@ -1,0 +1,352 @@
+.home {
+  @include clearfix();
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: $baseline $baseline ($baseline/2) $baseline;
+
+  .page-header-main {
+    display: inline-block;
+    width: flex-grid(8, 12);
+    margin: 0;
+
+    .page-title {
+      margin-bottom: 5px;
+      color: $dark-gray1;
+      font-size: 24px;
+    }
+
+    .page-subtitle {
+      color: $dark-gray1;
+      font-size: 14px;
+      text-transform: none;
+    }
+  }
+
+  .page-header-secondary {
+    @include float(right);
+    display: inline-block;
+    margin: ($baseline/2);
+    padding: ($baseline/2) ($baseline*0.75);
+    background-color: $blue;
+    border-radius: 2px;
+
+    .last-accessed-link {
+      @extend %t-title6;
+      color: $very-light-text;
+    }
+  }
+}
+
+div.info-wrapper {
+
+  background-color: $homepage-background;
+
+  section.updates {
+    @extend .content;
+    @include padding-left($baseline);
+    line-height: lh();
+    width: 100%;
+    display: block;
+
+    h1,h3 {
+      @include text-align(left);
+      @extend %t-strong;
+      @extend %t-title6;
+      margin-bottom: $baseline;
+      font-style: normal;
+    }
+
+    > p {
+      margin-bottom: lh();
+    }
+
+    > ol,section,div {
+      list-style: none;
+      margin-bottom: lh();
+      padding-left: 0;
+
+      .updates-article {
+        border-radius:3px;
+        background-color: $white;
+        border:1px solid transparent;
+        &:hover {
+          border: 1px solid $gray-l3;
+        }
+      }
+
+      .show-older-updates {
+        @extend %btn-pl-white-base;
+        padding: ($baseline/2);
+        @include font-size(14);
+        width: 100%;
+        display: block;
+        text-align: center;
+        cursor: pointer;
+        background: none;
+
+        &:hover, &:focus {
+          background-color: unset;
+          color: $m-blue-d3;
+          border: 1px solid black;
+        }
+      }
+
+      > li,article {
+        @extend .clearfix;
+        padding: $baseline;
+        list-style-type: none;
+        margin-bottom: lh(1.5);
+        background-color: $white;
+
+        ol, ul {
+          ol,ul {
+            list-style-type: disc;
+          }
+        }
+
+        .date {
+          @extend %t-title9;
+          margin-bottom: ($baseline/4);
+          text-transform: none;
+          background: url('#{$static-path}/images/calendar-icon.png') 0 center no-repeat;
+          @include padding-left($baseline);
+          @include float(left);
+        }
+      
+
+        .toggle-visibility-button {
+          @extend %t-title9;
+          @include float(right);
+          padding: 0;
+          cursor: pointer;
+          background: none;
+          border: none;
+          color: $blue;
+          font-weight: normal;
+        }
+
+        .toggle-visibility-element {
+          content:'';
+          display:block;
+          clear: both;
+        }
+
+        section.update-description {
+          section {
+            &.primary {
+              border: 1px solid #DDD;
+              background: $gray-l6;
+              padding: 20px;
+
+              p {
+                font-weight: bold;
+              }
+              .author {
+                font-weight: normal;
+                font-style: italic;
+              }
+            }
+          }
+
+          h3 {
+            font-size: 1em;
+            font-weight: bold;
+            margin: lh(1.5) 0 lh(0.5);
+          }
+
+          > ul {
+            list-style-type: disc;
+          }
+
+          > ol {
+            list-style: decimal outside none;
+            padding: 0 0 0 1em;
+          }
+
+          li {
+            margin-bottom: lh(0.5);
+          }
+        }
+      }
+    }
+  }
+
+  section.handouts {
+    padding: 20px 30px;
+    margin: 0;
+    @extend .sidebar;
+    background: rgba(0, 0, 0, 0);
+    box-shadow: none;
+    font-size: 14px;
+
+    a {
+      color: $link-color;
+    }
+
+    &:after {
+      left: -1px;
+      right: auto;
+    }
+
+    .handouts-header {
+      @include text-align(left);
+      @extend %t-strong;
+      @extend %t-title6;
+      margin-bottom: 0;
+      padding: 12px 26px 20px 0;
+      font-style: normal;
+    }
+
+    ul {
+      margin-bottom: 14px;
+    }
+
+    ol {
+      margin-bottom: 14px;
+      li {
+        @include text-align(left);
+
+        a {
+          display: block;
+          padding: 0;
+          color: $link-color;
+
+          &:hover,
+          &:focus {
+            background: transparent;
+          }
+        }
+
+        &.expandable,
+        &.collapsable {
+          margin: 0 16px 14px 16px;
+          @include transition(all .2s linear 0s);
+
+          h4 {
+            color: $link-color;
+            font-size: 1em;
+            font-weight: normal;
+            padding-left: 30px;
+          }
+        }
+
+        &.collapsable {
+          background: $white;
+          border-radius: 3px;
+          padding: 14px 0;
+          box-shadow: 0 0 1px 1px $shadow-l1, 0 1px 3px rgba(0, 0, 0, .25);
+
+          h4 {
+            margin-bottom: 16px;
+          }
+        }
+
+        &.multiple {
+
+          a {
+            display: inline-block;
+            padding: 0;
+
+            &:hover,
+            &:focus {
+              background: transparent;
+            }
+          }
+        }
+
+        ul {
+          background: none;
+          margin: 0;
+
+          li {
+            border-bottom: 0;
+            border-top: 1px solid #e6e6e6;
+            font-size: 0.9em;
+            margin: 0;
+            padding: 15px 30px;
+
+            a {
+              display: inline-block;
+              padding: 0;
+
+              &:hover,
+              &:focus {
+                background: transparent;
+              }
+            }
+          }
+        }
+
+        div.hitarea {
+          background-image: url('#{$static-path}/images/treeview-default.gif') no-repeat;
+          display: block;
+          height: 100%;
+          margin-left: 0;
+          max-height: 20px;
+          position: absolute;
+          width: 100%;
+
+          &:hover,
+          &:focus {
+            opacity: 0.6;
+            filter: alpha(opacity=60);
+
+            + h4 {
+              @extend a:hover;
+              text-decoration: underline;
+            }
+          }
+
+          &.expandable-hitarea {
+            background-position: -72px 0px;
+          }
+
+          &.collapsable-hitarea {
+            background-position: -55px -23px;
+          }
+        }
+
+        h3 {
+          border-bottom: 0;
+          box-shadow: none;
+          color: #888;
+          font-size: 1em;
+          margin-bottom: 0;
+        }
+
+        p {
+          letter-spacing: 0;
+          margin: 0;
+          text-transform: none;
+
+          a {
+            padding-right: 8px;
+
+            &:before {
+              color: $gray-l3;
+              content: "•";
+              display: inline-block;
+              padding-right: 8px;
+            }
+
+            &:first-child {
+              &:before {
+                content: "";
+                padding-right: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    @media print {
+      background: transparent !important;
+    }
+  }
+
+  @media print {
+    background: transparent !important;
+    border: 0;
+  }
+}

@@ -1,0 +1,44 @@
+<form>
+  <div role="group" aria-labelledby="verification-checkpoint-title">
+    <h3 id="verification-checkpoint-title" class="modal-section-title"><%= gettext('Verification Checkpoint') %></h3>
+    <div class="modal-section-content verification-access">
+      <div class="list-fields list-input">
+        <div class="field field-checkbox checkbox-cosmetic">
+          <input
+            type="checkbox"
+            id="verification-access-checkbox"
+            class="input input-checkbox"
+            name="verification-access"
+            value=""
+            <% if (hasVerificationRestrictions) { %> checked="checked" <% } %>
+            aria-describedby="verification-help-text"
+          >
+          <label class="label" for="verification-access-checkbox">
+            <span class="icon fa fa-check-square-o input-checkbox-checked" aria-hidden="true"></span>
+            <span class="icon fa fa-square-o input-checkbox-unchecked" aria-hidden="true"></span>
+            <span class="sr"><%- gettext("Must complete verification checkpoint") %></span>
+          </label>
+
+          <label class="sr" for="verification-partition-select">
+            <%= gettext('Verification checkpoint to be completed') %>
+          </label>
+
+          <select id="verification-partition-select">
+            <% for (var i = 0; i < verificationPartitions.length; i++) {
+              partition=verificationPartitions[i];
+            %>
+              <option
+                value="<%- partition.id %>"
+                <% if (partition.selected) { %> selected <% } %>
+              ><%- partition.name %></option>
+            <% } %>
+          </select>
+
+          <div id="verification-help-text" class="note">
+            <%= gettext("Learners who require verification must pass the selected checkpoint to see the content in this unit. Learners who do not require verification see this content by default.") %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

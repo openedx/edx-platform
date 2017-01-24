@@ -1,0 +1,4 @@
+<div class="sr-is-focusable sr-topics-view" tabindex="-1" aria-label="Tab content"></div>
+<div class="topics-paging-header"></div>
+<div class="topics-list"></div>
+<div class="topics-paging-footer"></div>

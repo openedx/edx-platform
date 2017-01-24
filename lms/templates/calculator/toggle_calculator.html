@@ -1,0 +1,152 @@
+<%page expression_filter="h"/>
+
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<div class="calc-main">
+    <button title="${_('Open Calculator')}" aria-controls="calculator_wrapper" aria-expanded="false" class="calc utility-control-button">
+        <span class="icon fa fa-calculator" aria-hidden="true"></span>
+    </button>
+    
+    <div id="calculator_wrapper">
+        <form id="calculator">
+            <div class="input-wrapper">
+                <label for="calculator_input" class="label-calc-input sr">${_('Enter equation')}</label>
+                <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" />
+                
+                <div class="help-wrapper">
+                    <button type="button" title="${_('Hints')}" id="calculator_hint" aria-haspopup="true" aria-expanded="false" aria-controls="calculator_input_help"></button>
+                    <ul id="calculator_input_help" class="help" aria-hidden="true">
+                        <li class="hint-item" id="hint-moreinfo">
+                            <p class="sr">${_('Use the arrow keys to navigate the tips or use the tab key to return to the calculator')}</p>
+                            <p>
+                                <span class="bold">
+                                    ${Text(_("For detailed information, see {math_link_start}Entering Mathematical and Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for Students{guide_link_end}.")).format(
+                                        math_link_start=HTML('<a href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting">'),
+                                        math_link_end=HTML('</a>'),
+                                        guide_link_start=HTML('<a href="http://edx-guide-for-students.readthedocs.io/en/latest/index.html">'),
+                                        guide_link_end=HTML('</a>'),
+                                    )}
+                                </span>
+                            </p>
+                        </li>
+                        <li class="hint-item" id="hint-tips"><p><span class="bold">${_("Tips")}:</span> </p>
+                            <ul>
+                                <li class="hint-item" id="hint-paren"><p>${_("Use parentheses () to make expressions clear. You can use parentheses inside other parentheses.")}</p></li>
+                                <li class="hint-item" id="hint-spaces"><p>${_("Do not use spaces in expressions.")}</p></li>
+                                <li class="hint-item" id="hint-howto-constants"><p>${_("For constants, indicate multiplication explicitly (example: 5*c).")}</p></li>
+                                <li class="hint-item" id="hint-howto-maffixes"><p>${_("For affixes, type the number and affix without a space (example: 5c).")}</p></li>
+                                <li class="hint-item" id="hint-howto-functions"><p>${_("For functions, type the name of the function, then the expression in parentheses.")}</p></li>
+                            </ul>
+                        </li>
+                            <li class="hint-item" id="hint-list">
+                                <table class="calculator-input-help-table">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="col">${_("To Use")}</th>
+                                            <th scope="col">${_("Type")}</th>
+                                            <th scope="col">${_("Examples")}</th>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">${_("Numbers")}</th>
+                                            <td>
+                                                ${_("Integers")}<br />
+                                                ${_("Fractions")}<br />
+                                                ${_("Decimals")}
+                                            </td>
+                                            <td dir="auto">
+                                                2520<br />
+                                                2/3<br />
+                                                3.14, .98
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            ## Translators: This refers to mathematical operators such as `plus`, `minus`, `division` and others.
+                                            <th scope="row">${_("Operators")}</th>
+                                            ## Translators: Please do not translate mathematical symbols.
+                                            <td dir="auto">
+                                                ${_("+ - * / (add, subtract, multiply, divide)")}<br />
+                                                ## Translators: Please do not translate mathematical symbols.
+                                                ${_("^ (raise to a power)")}<br />
+                                                ## Translators: Please do not translate mathematical symbols.
+                                                ${_("|| (parallel resistors)")}
+                                            </td>
+                                            <td dir="auto">
+                                                x+(2*y)/x-1
+                                                x^(n+1)<br />
+                                                v_IN+v_OUT<br />
+                                                1||2
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            ## Translators: This refers to symbols that are mathematical constants, such as "i" (square root of -1)
+                                            <th scope="row">${_("Constants")}</th>
+                                            <td dir="auto">c, e, g, i, j, k, pi, q, T</td>
+                                            <td dir="auto">
+                                                20*c<br />
+                                                418*T
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            ## Translators: This refers to symbols that appear at the end of a number, such as the percent sign (%) and metric affixes
+                                            <th scope="row">${_("Affixes")}</th>
+                                            <td dir="auto">${_("Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)")}</td>
+                                            <td dir="auto">
+                                                20%<br />
+                                                20c<br />
+                                                418T
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            ## Translators: This refers to basic mathematical functions such as "square root"
+                                            <th scope="row">${_("Basic functions")}</th>
+                                            <td dir="auto">abs, exp, fact or factorial, ln, log2, log10, sqrt</td>
+                                            <td dir="auto">
+                                                abs(x+y)<br />
+                                                sqrt(x^2-y)
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            ## Translators: This refers to mathematical Sine, Cosine and Tan
+                                            <th scope="row">${_("Trigonometric functions")}</th>
+                                            <td dir="auto">
+                                                sin, cos, tan, sec, csc, cot<br />
+                                                arcsin, sinh, arcsinh, etc.<br />
+                                            </td>
+                                            <td dir="auto">
+                                                sin(4x+y)<br />
+                                                arccsch(4x+y)
+                                            </td>
+                                            <td dir="auto"></td>
+                                        </tr>
+                                        <tr>
+                                            ## Translators: Please see http://en.wikipedia.org/wiki/Scientific_notation
+                                            <th scope="row">${_("Scientific notation")}</th>
+                                            ## Translators: 10^ is a mathematical symbol. Please do not translate.
+                                            <td dir="auto">${_("10^ and the exponent")}</td>
+                                            <td dir="auto">10^-9</td>
+                                        </tr>
+                                        <tr>
+                                            ## Translators: this is part of scientific notation. Please see http://en.wikipedia.org/wiki/Scientific_notation#E_notation
+                                            <th scope="row">${_("e notation")}</th>
+                                            ## Translators: 1e is a mathematical symbol. Please do not translate.
+                                            <td dir="auto">${_("1e and the exponent")}</td>
+                                            <td dir="auto">1e-9</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <input type="submit" id="calculator_button" value="=" aria-label="${_('Calculate')}">
+                <label for="calculator_output" class="calc-output-label sr">${_('Result')}</label>
+                <input type="text" id="calculator_output" tabindex="-1" readonly />
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,122 @@
+// studio - views - course creation page
+// ====================
+
+.view-course-create {
+
+  // basic layout
+  // --------------------
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
+
+  //
+
+  // header/masthead
+  // --------------------
+  .mast .page-header-super {
+
+    .course-original-title-id, .course-original-title {
+      display: block;
+    }
+
+    .course-original-title-id {
+      @extend %t-title5;
+    }
+  }
+
+
+  // course re-run form
+  // --------------------
+  .rerun-course {
+
+    .row {
+      @include clearfix();
+      margin-bottom: ($baseline*0.75);
+    }
+
+    .column {
+      float: left;
+      width: 48%;
+    }
+
+    .column:first-child {
+      margin-right: 4%;
+    }
+
+    label {
+      @extend %t-title7;
+      display: block;
+      font-weight: 700;
+    }
+
+    .rerun-course-org,
+    .rerun-course-number,
+    .rerun-course-name,
+    .rerun-course-run {
+      width: 100%;
+    }
+
+    .rerun-course-name {
+      @extend %t-title5;
+      font-weight: 300;
+    }
+
+    .rerun-course-save {
+      @include blue-button;
+
+      .icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: ($baseline/4);
+      }
+    }
+
+    .rerun-course-cancel {
+      @include white-button;
+    }
+
+    .item-details {
+      padding-bottom: 0;
+    }
+
+    .wrap-error {
+      @include transition(opacity $tmg-f2 ease 0s);
+      opacity: 0;
+    }
+
+    .wrap-error.is-shown {
+      opacity: 1;
+    }
+
+    .message-status {
+      display: block;
+      margin-bottom: 0;
+      padding: ($baseline*.5) ($baseline*1.5) 8px ($baseline*1.5);
+      font-weight: bold;
+    }
+
+    // NOTE: override for modern button styling until all buttons (in _forms.scss) can be converted
+    .actions {
+
+      .action-primary {
+        @include blue-button;
+        @extend %t-action2;
+      }
+
+      .action-secondary {
+        @include grey-button;
+        @extend %t-action2;
+      }
+    }
+  }
+}

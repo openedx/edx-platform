@@ -1,0 +1,220 @@
+// LMS -- modules -- calculator
+// ====================
+
+.calc-main {
+  @extend %ui-print-excluded;
+
+  bottom: -126px;
+  left: 0;
+  position: fixed;
+  @include transition(bottom $tmg-avg linear 0s);
+  -webkit-appearance: none;
+  width: 100%;
+
+  &.open {
+    bottom: -36px;
+  }
+
+  .calc {
+    @include transition(background-color $tmg-f2 ease-in-out 0s);
+    @include float(right);
+    @include right($baseline*.75);
+    position: relative;
+    top: -42px;
+    border-bottom: 0;
+    padding: ($baseline/1.5);
+    background: $black-t1;
+    color: $white;
+
+    &:hover, &:focus {
+      background: $gray-d1;
+    }
+
+    &.closed {
+      background-color: $black;
+      top: -36px;
+    }
+
+    .utility-control-label {
+      background: $black;
+      color: $white;
+    }
+  }
+
+  #calculator_wrapper {
+    clear: both;
+    position: relative;
+    top: -36px;
+    max-height: 90px;
+    background: $black;
+    color: $white;
+
+    // UI: input help table
+    .calculator-input-help-table {
+      margin: ($baseline/2) 0;
+
+      tr th, tr td {
+        vertical-align: top;
+        border: 1px solid $gray-l4;
+        padding: ($baseline/2);
+      }
+    }
+
+    form {
+      @extend .clearfix;
+      @include box-sizing(border-box);
+      padding: lh();
+
+      .calc-output-label {
+        color: $white;
+      }
+
+      #calculator_button {
+        background: $white;
+        border: 1px solid $white;
+        border-radius: 0;
+        box-shadow: none;
+        @include box-sizing(border-box);
+        color: $black;
+        float: left;
+        font-size: 30px;
+        font-weight: bold;
+        height: 35px;
+        margin: 0 (flex-gutter() / 2);
+        padding: 0;
+        text-shadow: none;
+        -webkit-appearance: none;
+        width: flex-grid(.5) + flex-gutter();
+
+        &:hover, &:focus {
+          background: $blue-d2;
+          color: $white;
+        }
+
+        .calc-button-label {
+          background: $black;
+          color: $white;
+        }
+      }
+
+      #calculator_output {
+        direction: ltr;  // Almost all of the real-world calculators are LTR
+        background: $white;
+        border: 1px solid $white;
+        box-shadow: none;
+        @include box-sizing(border-box);
+        color: $black;
+        float: left;
+        font-size: 16px;
+        font-weight: bold;
+        margin: 1px 0 0;
+        padding: 10px;
+        -webkit-appearance: none;
+        width: flex-grid(4);
+        
+        &.has-result {
+            border: 1px solid $green-d1;
+            box-shadow: inset 0px 0px ($baseline/3) $green-d1;
+        }
+      }
+
+      .input-wrapper {
+        @extend .clearfix;
+        float: left;
+        margin: 0;
+        position: relative;
+        width: flex-grid(7.5);
+
+        .label-calc-input {
+          background: $black;
+          color: $white;
+        }
+
+        #calculator_input {
+          direction: ltr;  // Almost all of the real-world calculators are LTR
+          border: none;
+          box-shadow: none;
+          @include box-sizing(border-box);
+          font-size: 16px;
+          padding: 10px;
+          -webkit-appearance: none;
+          width: 100%;
+
+          &:focus {
+            border: none;
+          }
+        }
+
+        .help-wrapper {
+          position: absolute;
+          right: 0;
+          top: 0;
+
+          #hint-instructions {
+            color: $white;
+          }
+
+          #calculator_hint {
+            @include hide-text;
+            display: block;
+            height: 35px;
+            width: 35px;
+            border: none;
+            background: url("#{$static-path}/images/info-icon.png") center center no-repeat;
+            color: $white;
+
+            &:focus {
+              outline: 5px auto #5b9dd9;
+              box-shadow: none;
+              border: none;
+            }
+
+            .calc-hint {
+              background: $black;
+              color: $white;
+            }
+          }
+
+          .help {
+            @include transition(none);
+            background: $white;
+            border-radius: 3px;
+            box-shadow: 0 0 3px #999;
+            color: #333;
+            padding: 10px;
+            position: absolute;
+            right: -40px;
+            bottom: 57px;
+            width: 600px;
+            overflow: hidden;
+            pointer-events: none;
+            display: none;
+            margin: 0;
+            list-style: none;
+
+            &.shown {
+              display: block;
+              pointer-events: auto;
+            }
+
+            .bold {
+              font-weight: bold;
+            }
+
+            p, p+p {
+              margin: 0;
+            }
+
+            .calc-postfixes {
+              margin: 10px auto;
+
+              td, th {
+                padding: 2px 15px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

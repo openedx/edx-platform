@@ -1,0 +1,956 @@
+// This is for A Font Garde
+// It loads the icon font only when it's available.
+// ---
+// It is scoped to the video player for now, but we
+// will eventually want to move this to the main font
+// sheet, globally, so it applies to all use cases.
+
+// --------
+// Defaults: what displays if the icon font doesn't load.
+// --------
+
+// the html target is necessary for xblocks and xmodules, but works across the board
+
+$secondary-dark: rgb(142, 62, 99); // UXPL secondary dark
+$secondary-base: rgb(203, 89, 141); // UXPL secondary base
+$secondary-light: rgb(219, 139, 175); // UXPL secondary light
+$cool-dark: rgb(79, 89, 93); // UXPL cool dark
+
+& {
+    margin-bottom: ($baseline*1.5);
+}
+
+.is-hidden {
+  display: none;
+}
+
+.video {
+  @include clearfix();
+  background: rgb(245, 245, 245); // UXPL grayscale x-back
+  display: block;
+  margin: 0 -12px;
+  padding: 12px;
+  border-radius: 5px;
+  outline: none;
+
+  &:focus,
+  &:active,
+  &:hover {
+    border: 0;
+  }
+
+  &.is-initialized {
+
+    .video-wrapper {
+
+      .spinner {
+        display: none;
+      }
+    }
+  }
+
+  // CASE: video pre-roll state
+  &.is-pre-roll {
+
+    .slider {
+      visibility: hidden;
+    }
+
+    .video-player {
+      position: relative;
+
+      &:before {
+        display: block;
+        content: "";
+        width: 100%;
+        padding-top: 55%;
+      }
+    }
+  }
+
+  .tc-wrapper {
+    @include clearfix();
+    position: relative;
+  }
+
+  .focus_grabber {
+    position: relative;
+    display: inline;
+    width: 0px;
+    height: 0px;
+  }
+
+    .downloads-heading {
+        margin: 1em 0 0 0;
+    }
+
+    .wrapper-downloads {
+        display: flex;
+
+        .hd {
+            margin: 0;
+        }
+
+        .wrapper-download-video,
+        .wrapper-download-transcripts,
+        .wrapper-handouts,
+        .branding {
+            flex: 1;
+            margin-top: $baseline;
+            @include padding-right($baseline);
+            vertical-align: top;
+        }
+
+        .wrapper-download-video {
+
+            .video-sources {
+                margin: 0;
+            }
+        }
+
+        .wrapper-download-transcripts {
+
+            .list-download-transcripts {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+
+                .transcript-option {
+                    margin: 0;
+                }
+            }
+        }
+
+        .branding {
+            @include padding-right(0);
+
+            .host-tag {
+                position: absolute;
+                left: -9999em;
+                display: inline-block;
+                vertical-align: middle;
+                color: $base-font-color;
+            }
+
+            .brand-logo {
+                display: inline-block;
+                max-width: 100%;
+                max-height: ($baseline*2);
+                padding: ($baseline/4) 0;
+                vertical-align: middle;
+            }
+        }
+    }
+
+  .video-wrapper {
+    @include float(left);
+    @include margin-right(flex-gutter(9));
+    width: flex-grid(6, 9);
+    background-color: black;
+    position: relative;
+
+    .video-player-pre,
+    .video-player-post {
+       height: 50px;
+       background-color: rgb(17, 16, 16) // UXPL grayscale black;
+    }
+
+    .spinner {
+      @include transform(translate(-50%, -50%));
+      position: absolute;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.7);
+      top: 50%;
+      left: 50%;
+      padding: 30px;
+      border-radius: 25%;
+
+      &:after{
+        @include animation(rotateCW 3s infinite linear);
+        content: '';
+        display: block;
+        width: 30px;
+        height: 30px;
+        border: 7px solid white;
+        border-top-color: transparent;
+        border-radius: 100%;
+        position: relative;
+      }
+    }
+
+    .btn-play {
+      @include transform(translate(-50%, -50%));
+      position: absolute;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.7);
+      top: 50%;
+      left: 50%;
+      padding: 30px;
+      border-radius: 25%;
+
+      &:after{
+        content: '';
+        display: block;
+        width: 0px;
+        height: 0px;
+        border-style: solid;
+        border-width: 30px 0 30px 50px;
+        border-color: transparent transparent transparent $white;
+        position: relative;
+      }
+    }
+
+    .closed-captions {
+      position: absolute;
+      width: 85%;
+      left: 5%;
+      top: 70%;
+      text-align: center;
+    }
+
+    .closed-captions.is-visible {
+      max-height: ($baseline * 3);
+      border-radius: ($baseline / 5);
+      padding: 8px ($baseline / 2) 8px ($baseline * 1.5);
+      background: rgba(0, 0, 0, .75);
+      color: $yellow;
+
+        &:before {
+            position: absolute;
+            display: inline-block;
+            top: 50%;
+            @include left($baseline);
+            margin-top: -.6em;
+            font-family: 'FontAwesome';
+            content: "\f142";
+            color: $white;
+            opacity: 0.5;
+        }
+
+        &:hover,
+        &.is-dragging {
+            background: rgba(0, 0, 0, 1.0);
+            cursor: move;
+
+            &:before {
+                opacity: 1.0;
+            }
+        }
+    }
+
+    .video-player {
+      overflow: hidden;
+      min-height: 300px;
+
+      > div {
+        height: 100%;
+
+        &.hidden {
+          display: none;
+        }
+      }
+
+      .video-error {
+        padding: ($baseline / 5);
+        background: black;
+        color: white !important; // the pattern library headings shim is more scoped
+      }
+
+      object,
+      iframe,
+      video {
+        display: block;
+        border: none;
+        width: 100%;
+      }
+
+      h4 {
+        text-align: center;
+        color: white;
+
+        &.hidden {
+          display: none;
+        }
+      }
+    }
+
+    .video-controls {
+      @include clearfix();
+      position: relative;
+      border: 0;
+      background: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+      color: rgb(240, 243, 245); // UXPL grayscale-cool xx-light
+
+      &:hover,
+      &:focus {
+
+        ul,
+        div {
+          opacity: 1;
+        }
+      }
+
+      %video-control {
+        @extend %t-strong;
+        @extend %t-title7;
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        padding: ($baseline / 2) ($baseline / 1.5);
+        background: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+        box-shadow: none;
+        text-shadow: none;
+        color: rgb(207, 216, 220); // UXPL grayscale-cool light
+
+        &:hover,
+        &:focus {
+          background: darken(rgb(40, 44, 46), 7%); // UXPL secondary
+        }
+
+        &:active,
+        &.is-active,
+        &.active {
+          color: rgb(14, 166, 236); // UXPL primary accent
+        }
+      }
+
+      .control {
+        @extend %video-control;
+
+        .icon {
+          width: 1em;
+
+          &.icon-hd {
+            // except when it's text, like with HD
+            // otherwise it's shifted to the right because "HD" is wider than 1em
+            width: auto;
+          }
+        }
+      }
+
+      .slider {
+        @include clearfix();
+        @include transform-origin(bottom left);
+        @include transition(height .7s ease-in-out 0s);
+        box-sizing: border-box;
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1;
+        height: ($baseline / 4);
+        margin-left: 0;
+        border: 1px solid $cool-dark;
+        border-radius: 0;
+        background: $cool-dark;
+
+        .ui-widget-header {
+          background: $secondary-dark;
+          border: 1px solid $secondary-dark;
+          box-shadow: none;
+          top: -1px;
+          left: -1px;
+        }
+
+        .ui-corner-all.slider-range {
+          opacity: 0.3;
+          background-color: #1e91d3;
+        }
+
+        .ui-slider-handle {
+          @extend %ui-fake-link;
+          @include transform-origin(bottom left);
+          @include transition(all .7s ease-in-out 0s);
+          box-sizing: border-box;
+          top: -1px;
+          height: ($baseline / 4);
+          width: ($baseline / 4);
+          margin-left: -($baseline / 8); // center-center causes the control to be beyond the end of the sider
+          border: 1px solid $secondary-base;
+          border-radius: ($baseline / 5);
+          padding: 0;
+          background: $secondary-base;
+          box-shadow: none;
+
+          &:focus,
+          &:hover {
+            background-color: $secondary-light;
+            border-color: $secondary-light;
+          }
+        }
+      }
+
+      .vcr {
+        @include float(left);
+        list-style: none;
+        @include border-right(1px solid rgb(40, 44, 46)); // UXPL grayscale-cool x-dark
+        padding: 0;
+
+        @media (max-width: 1120px) {
+          @include margin-right(lh(0.5));
+          font-size: em(14);
+        }
+
+        .video_control {
+
+          &:focus {
+            position: relative;
+          }
+
+          &.skip {
+            white-space: nowrap;
+          }
+        }
+
+        .vidtime {
+          @extend %t-strong;
+          @extend %t-title7;
+          @include padding-left(lh(.75));
+          display: inline-block;
+          color: rgb(207, 216, 220); // UXPL grayscale-cool light
+          -webkit-font-smoothing: antialiased;;
+
+          @media (max-width: 1120px) {
+            @include padding-left(lh(0.5));
+          }
+        }
+      }
+
+      .secondary-controls {
+        @include float(right);
+        @include border-left(1px dotted rgb(79, 89, 93)); // UXPL grayscale-cool x-dark
+
+        .volume,
+        .add-fullscreen,
+        .grouped-controls,
+        .quality-control {
+          @include border-left(1px dotted rgb(79, 89, 93)); // UXPL grayscale-cool x-dark
+        }
+
+        .speed-button,
+        .volume > .control,
+        .add-fullscreen,
+        .quality-control,
+        .toggle-transcript {
+
+          &:focus {
+            position: relative;
+          }
+        }
+
+        .menu-container {
+          position: relative;
+
+          .menu {
+            @include transition(none);
+            @extend %ui-depth1;
+            position: absolute;
+            display: none;
+            bottom: ($baseline * 2);
+            @include right(0); // right-align menus since this whole collection is on the right
+            width: 120px;
+            margin: 0;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+            background-color: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+            list-style: none;
+
+            li {
+              @extend %ui-fake-link;
+              color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
+
+              .speed-option,
+              .control-lang {
+                @include text-align(left);
+                display: block;
+                width: 100%;
+                border: 0;
+                border-radius: 0;
+                padding: lh(0.5);
+                background: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+                box-shadow: none;
+                color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
+                overflow: hidden;
+                text-shadow: none;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                &:hover,
+                &:focus {
+                  background-color: rgb(79, 89, 93); // UXPL grayscale-cool dark
+                  color: rgb(252, 252, 252); // UXPL grayscale white
+                }
+              }
+
+              &.is-active {
+
+                .speed-option,
+                .control-lang {
+                  @include border-left($baseline/10 solid rgb(14, 166, 236));
+                  font-weight: $font-bold;
+                  color: rgb(14, 166, 236); // UXPL primary accent
+                }
+              }
+            }
+          }
+
+          &.is-opened {
+
+            .menu {
+              display: block;
+            }
+          }
+        }
+
+        .speeds,
+        .lang,
+        .grouped-controls {
+          display: inline-block;
+        }
+
+        .speeds {
+
+          &.is-opened {
+
+            .control {
+
+              .icon {
+
+                @include ltr {
+                  @include transform(rotate(-90deg));
+                }
+
+                @include rtl {
+                  @include transform(rotate(90deg));
+                }
+              }
+            }
+          }
+
+          .speed-button {
+
+            .label {
+              @include padding(0 ($baseline/3) 0 0);
+              font-family: $body-font-family;
+              color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
+
+              @media (max-width: 1120px) {
+                display: none;
+              }
+            }
+
+            .value {
+              @include padding(0, lh(0.5), 0, 0);
+              color: rgb(231, 236, 238); // UXPL grayscale-cool x-light
+              font-weight: bold;
+
+              @media (max-width: 1120px) {
+                padding: 0 lh(0.5);
+              }
+            }
+          }
+        }
+
+        .lang {
+
+          .language-menu {
+            width: $baseline;
+            padding: ($baseline / 2) 0;
+          }
+
+          .control {
+
+            .icon {
+
+              @include rtl {
+                @include transform(rotate(-180deg));
+              }
+            }
+          }
+
+          &.is-opened {
+
+            .control {
+
+              .icon {
+
+                @include ltr {
+                  @include transform(rotate(90deg));
+                }
+
+                @include rtl {
+                  @include transform(rotate(90deg));
+                }
+              }
+            }
+          }
+        }
+
+        .volume {
+          display: inline-block;
+          position: relative;
+
+          &.is-opened {
+
+            .volume-slider-container {
+              display: block;
+              opacity: 1;
+            }
+          }
+
+          &:not(:first-child) > a {
+            @include border-left(none);
+          }
+
+          .volume-slider-container {
+            @include transition(none);
+            @extend %ui-depth1;
+            display: none;
+            position: absolute;
+            bottom: ($baseline * 2);
+            @include right(0);
+            width: 41px;
+            height: 120px;
+            background-color: rgb(40, 44, 46); // UXPL grayscale-cool x-dark
+
+            .volume-slider {
+              height: 100px;
+              width: ($baseline / 4);
+              margin: 14px auto;
+              box-sizing: border-box;
+              border: 1px solid $cool-dark;
+              background: $cool-dark;
+
+              .ui-slider-handle {
+                @extend %ui-fake-link;
+                @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
+                @include left(-5px);
+                box-sizing: border-box;
+                height: 13px;
+                width: 13px;
+                border: 1px solid $secondary-base;
+                border-radius: ($baseline / 5);
+                padding: 0;
+                background: $secondary-base;
+                box-shadow: none;
+
+                &:hover,
+                &:focus {
+                  background: $secondary-light;
+                  border-color: $secondary-light;
+                }
+              }
+
+              .ui-slider-range {
+                background: $secondary-dark;
+                border: 1px solid $secondary-dark;
+                left: -1px;
+                bottom: -1px;
+              }
+            }
+          }
+        }
+
+        .quality-control {
+          font-weight: 700;
+          letter-spacing: -1px;
+
+          &.active {
+            color: rgb(14, 166, 236); // UXPL primary accent
+          }
+
+          &.is-hidden {
+            display: none !important;
+          }
+        }
+
+        .toggle-transcript {
+
+            &.is-active {
+              color: rgb(14, 166, 236); // UXPL primary accent
+            }
+        }
+
+        .lang {
+
+          & > .hide-subtitles {
+            @include transition(none);
+          }
+        }
+      }
+    }
+
+    &:hover {
+
+      .video-controls {
+
+        .slider {
+          height: ($baseline / 1.5);
+
+          .ui-slider-handle {
+            height: ($baseline / 1.5);
+            width: ($baseline / 1.5);
+          }
+        }
+      }
+    }
+  }
+
+  &.video-fullscreen {
+
+      .closed-captions {
+          width: 60%;
+      }
+  }
+
+  .subtitles {
+    @include float(left);
+    overflow: auto;
+    max-height: 460px;
+    width: flex-grid(3, 9);
+    padding: 0;
+    font-size: 14px;
+    visibility: visible;
+
+    a {
+        color: #0074b5;
+    }
+
+    .subtitles-menu {
+      height: 100%;
+      margin: 0;
+      padding: 0 3px;
+      list-style: none;
+
+      li {
+        @extend %ui-fake-link;
+        margin-bottom: 8px;
+        border: 0;
+        padding: 0;
+        color: #0074b5; // AA compliant
+        line-height: lh();
+
+        span {
+          display: block;
+        }
+
+        &.current {
+          color: #333;
+          font-weight: 700;
+        }
+
+        &.focused {
+          outline: #000 dotted thin;
+          outline-offset: -1px;
+        }
+
+        &:hover,
+        &:focus {
+          text-decoration: underline;
+        }
+
+        &:empty {
+          margin-bottom: 0;
+        }
+
+        &.spacing:last-of-type {
+            position: relative;
+
+            .transcript-end {
+                position: absolute;
+                bottom: 0;
+            }
+        }
+      }
+    }
+  }
+
+  &.closed {
+
+    .video-wrapper {
+      width: flex-grid(9,9);
+      background-color: inherit;
+    }
+
+    .video-wrapper .video-controls.html5 {
+      bottom: 0;
+      left: 0;
+      right: 0;
+      position: absolute;
+      z-index: 1;
+    }
+
+    .video-wrapper .video-player-pre,
+    .video-wrapper .video-player-post {
+        height: 0;
+    }
+
+    .video-wrapper .video-player {
+      h3 {
+        color: black;
+      }
+    }
+
+    .subtitles {
+        @extend .is-hidden;
+    }
+
+    .subtitles.html5 {
+        @extend %ui-depth0;
+        background-color: rgba(243, 243, 243, 0.8);
+        height: 100%;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        width: 275px;
+        padding: 0 $baseline;
+        display: none;
+    }
+  }
+
+  &.video-fullscreen {
+    @extend %ui-depth4;
+    background: rgba(#000, .95);
+    border: 0;
+    bottom: 0;
+    height: 100%;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    vertical-align: middle;
+    border-radius: 0;
+
+    &.closed {
+      .tc-wrapper {
+        .video-wrapper {
+          width: 100%;
+        }
+      }
+    }
+
+    .video-wrapper .video-player-pre,
+    .video-wrapper .video-player-post {
+        height: 0;
+    }
+
+    .video-wrapper {
+        position: static;
+    }
+
+    .video-wrapper .video-player {
+      h3 {
+        color: white;
+      }
+    }
+
+    .tc-wrapper {
+      @include clearfix();
+      width: 100%;
+      height: 100%;
+
+      position: static;
+
+      .video-wrapper {
+        height: 100%;
+        width: 75%;
+        @include margin-right(0);
+        vertical-align: middle;
+
+        object,
+        iframe,
+        video{
+          position: absolute;
+          width: auto;
+          height: auto;
+        }
+      }
+
+      .video-controls {
+        @extend %ui-depth4;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+      }
+    }
+
+    .subtitles {
+      height: 100%;
+      width: 25%;
+      padding: lh();
+      @include box-sizing(border-box);
+      @include transition(none);
+      background: $black;
+      visibility: visible;
+
+      li {
+        color: #aaa;
+
+        &.current {
+          color: $white;
+        }
+      }
+    }
+  }
+
+  &.is-touch {
+    .tc-wrapper {
+      .video-wrapper {
+        object,
+        iframe,
+        video {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
+
+  .video-pre-roll {
+    @extend %ui-depth3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-color: $black;
+
+    &.is-html5 {
+      background-size: 15%;
+    }
+
+    .btn-play.btn-pre-roll {
+      padding: $baseline;
+      border: none;
+      border-radius: $baseline;
+      background: $black-t2;
+      box-shadow: none;
+
+      &:after {
+        // the button class, ties to functionality, also uses an icon font
+        // we're overriding it here so we can use our image instead
+        display: none;
+      }
+
+      img {
+        height: ($baseline * 4);
+        width: ($baseline * 4);
+      }
+
+      &:hover,
+      &:focus {
+        background: $blue;
+      }
+    }
+  }
+}

@@ -1,0 +1,160 @@
+## mako
+<%page expression_filter="h" args="online_help_token"/>
+<%namespace name='static' file='static_content.html'/>
+<%namespace file='main.html' import="login_query"/>
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import HTML, Text
+# App that handles subdomain specific branding
+import branding
+# app that handles site status messages
+from status.status import get_site_status_msg
+%>
+
+## Provide a hook for themes to inject branding on top.
+<%block name="navigation_top" />
+
+## Add UI Toolkit components if using the Pattern Library
+% if uses_pattern_library:
+    <%block name="js_extra">
+    <%static:require_module module_name="js/header_factory" class_name="HeaderFactory">
+    HeaderFactory();
+    </%static:require_module>
+    </%block>
+% endif
+
+<%block>
+<%
+try:
+    course_id = course.id
+except:
+    # can't figure out a better way to get at a possibly-defined course var
+    course_id = None
+site_status_msg = get_site_status_msg(course_id)
+%>
+% if site_status_msg:
+<div class="site-status">
+  <div class="inner-wrapper">
+    <span class="white-error-icon"></span>
+    <p>${site_status_msg}</p>
+  </div>
+</div>
+% endif
+</%block>
+
+% if uses_pattern_library:
+<header class="header-global ${"slim" if course and not disable_courseware_header else ""}" aria-label="Main" role="banner">
+% else:
+<header class="${"header-global slim" if course and not disable_courseware_header else "header-global-new"}" aria-label="Main" role="banner">
+% endif
+  <div class="${"rwd" if responsive else ""} wrapper-header nav-container">
+    <h1 class="logo" itemscope="" itemtype="http://schema.org/Organization">
+      <a href="${marketing_link('ROOT')}" itemprop="url">
+        <%block name="navigation_logo">
+            <img src="${static.url("images/logo.png")}" alt="${_("{platform_name} Home Page").format(platform_name=static.get_platform_name())}" itemprop="logo" />
+        </%block>
+      </a>
+    </h1>
+
+    % if course and not disable_courseware_header:
+    <h2 class="course-header">
+      <span class="provider">${course.display_org_with_default}:</span>
+      <span class="course-number">${course.display_number_with_default}</span>
+      <span class="course-name">${course.display_name_with_default}</span>
+    </h2>
+    % endif
+
+
+    % if user.is_authenticated():
+      % if not course or disable_courseware_header:
+        % if not nav_hidden or show_program_listing:
+          <nav aria-label="Main" class="nav-main">
+            <ul class="left list-inline nav-global authenticated">
+              % if not nav_hidden:
+                <%block name="navigation_global_links_authenticated">
+                  <li class="item nav-global-01">
+                    <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
+                  </li>
+                  <li class="item nav-global-02">
+                    <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
+                  </li>
+                  <li class="item nav-global-03">
+                    <a href="${marketing_link('SCHOOLS')}">${_("Schools & Partners")}</a>
+                  </li>
+                </%block>
+              % endif
+              % if show_program_listing:
+                <li class="tab-nav-item">
+                  <a class="${'active ' if reverse('dashboard') == request.path else ''}tab-nav-link" href="${reverse('dashboard')}">
+                    ${_("Courses")}
+                  </a>
+                </li>
+                <li class="tab-nav-item">
+                  <a class="${'active ' if reverse('program_listing_view') in request.path else ''}tab-nav-link" href="${reverse('program_listing_view')}">
+                    ${_("Programs")}
+                  </a>
+                </li>
+              % endif
+            </ul>
+          </nav>
+        % endif
+      % endif
+
+      <%include file="user_dropdown.html"/>
+
+      <a href="${get_online_help_info(online_help_token)['doc_url']}"
+         target="_blank"
+         class="doc-link">${_("Help")}</a>
+
+      % if should_display_shopping_cart_func(): # see shoppingcart.context_processor.user_has_cart_context_processor
+        <ul class="user">
+          <li class="primary">
+            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+              <span class="icon fa fa-shopping-cart" aria-hidden="true"></span> ${_("Shopping Cart")}
+            </a>
+          </li>
+        </ul>
+      % endif
+
+    % else:
+      <nav aria-label="Account" class="nav-account-management">
+        <div class="right nav-courseware list-inline">
+          <div class="item nav-courseware-01">
+            % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+              % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+                <a class="btn btn-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
+              % else:
+                <a class="btn btn-login" href="/login${login_query()}">${_("Sign in")}</a>
+              % endif
+            % endif
+          </div>
+          % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+            % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+              <div class="item nav-courseware-02">
+                <a class="btn-neutral btn-register" href="${reverse('course-specific-register', args=[course.id.to_deprecated_string()])}">${_("Register")}</a>
+              </div>
+            % else:
+              <div class="item nav-courseware-02">
+                <a class="btn-neutral btn-register" href="/register">${_("Register")}</a>
+              </div>
+            % endif
+          % endif
+        </div>
+      </nav>
+    % endif
+  </div>
+</header>
+% if course:
+<!--[if lte IE 9]>
+<div class="ie-banner" aria-hidden="true">${Text(_('{begin_strong}Warning:{end_strong} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.')).format(
+    begin_strong=HTML('<strong>'),
+    end_strong=HTML('</strong>'),
+    chrome_link=HTML('<a href="https://www.google.com/chrome" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/firefox" target="_blank">Firefox</a>'),
+)}</div>
+<![endif]-->
+% endif
+
+<%include file="help_modal.html"/>

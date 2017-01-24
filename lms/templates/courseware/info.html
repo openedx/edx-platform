@@ -1,0 +1,145 @@
+<%page expression_filter="h"/>
+<%inherit file="../main.html" />
+<%def name="online_help_token()"><% return "courseinfo" %></%def>
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from datetime import datetime
+from pytz import timezone, utc
+
+from django.utils.translation import ugettext as _
+
+from courseware.courses import get_course_info_section, get_course_date_blocks
+from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
+from openedx.core.djangolib.markup import HTML, Text
+%>
+
+<%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+% if show_enroll_banner:
+<div class="wrapper-msg urgency-low" id="failed-verification-banner">
+  <div class="msg msg-reverify is-dismissable">
+    <div class="msg-content">
+      <h2 class="title">${_("You are not enrolled yet")}</h2>
+      <div class="copy">
+        <p class='enroll-message'>
+          ${Text(_("You are not currently enrolled in this course. {link_start}Sign up now!{link_end}")).format(
+                link_start=HTML("<a href={}>").format(url_to_enroll),
+                link_end=HTML("</a>")
+          )}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+% endif
+
+<%include file="/courseware/course_navigation.html" args="active_page='info'" />
+
+<%static:require_module_async module_name="js/courseware/toggle_element_visibility" class_name="ToggleElementVisibility">
+        ToggleElementVisibility();
+</%static:require_module_async>
+<%static:require_module_async module_name="js/courseware/course_home_events" class_name="CourseHomeEvents">
+        CourseHomeEvents();
+</%static:require_module_async>
+
+<%block name="js_extra">
+  ## CourseTalk widget js script
+  % if show_coursetalk_widget:
+      <script src="//d3q6qq2zt8nhwv.cloudfront.net/s/js/widgets/coursetalk-write-reviews.js"></script>
+  % endif
+</%block>
+
+<%block name="bodyclass">view-in-course view-course-info ${course.css_class or ''}</%block>
+
+<main id="main" aria-label="Content" tabindex="-1">
+    <div class="container">
+      <div class="home">
+        <div class="page-header-main">
+            <h3 class="page-title">${_("Welcome to {org}'s {course_name}!").format(org=course.display_org_with_default, course_name=course.display_number_with_default)}
+              <div class="page-subtitle">${course.display_name_with_default}</div>
+            </h3>
+        </div>
+        % if last_accessed_courseware_url:
+          <div class="page-header-secondary">
+              <a href="${last_accessed_courseware_url}" class="last-accessed-link">${_("Resume Course")}</a>
+          </div>
+        % endif
+      </div>
+      <div class="info-wrapper">
+      % if user.is_authenticated():
+        <section class="updates">
+          % if studio_url is not None and masquerade and masquerade.role == 'staff':
+            <div class="wrap-instructor-info studio-view">
+              <a class="instructor-info-action" href="${studio_url}">
+                ${_("View Updates in Studio")}
+              </a>
+            </div>
+          % endif
+
+          <h4>${_("Course Updates and News")}</h4>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'updates'))}
+
+          ## CourseTalk widget
+          % if show_coursetalk_widget:
+            <div class="coursetalk-write-reviews">
+              <div id="ct-custom-read-review-widget" data-provider="${platform_key}" data-course="${course_review_key}"></div>
+            </div>
+          % endif
+        </section>
+
+        <section aria-label="${_('Handout Navigation')}" class="handouts">
+
+          % if SelfPacedConfiguration.current().enable_course_home_improvements:
+                <h4 class="handouts-header">${_("Important Course Dates")}</h4>
+                ## Should be organized by date, last date appearing at the bottom
+
+                % for course_date in get_course_date_blocks(course, user):
+                    <div class="date-summary-container">
+                        <div class="date-summary date-summary-${course_date.css_class}">
+                            % if course_date.title:
+                                % if course_date.title == 'current_datetime':
+                                    <h3 class="heading localized-datetime" data-datetime="${course_date.date}" data-string="${_(u'Today is {date}')}" data-timezone="${user_timezone}" data-language="${user_language}"></h3>
+                                % else:
+                                    <h3 class="heading">${course_date.title}</h3>
+                                % endif
+                            % endif
+                            % if course_date.date and course_date.title != 'current_datetime':
+                                <h4 class="date localized-datetime" data-format="shortDate" data-datetime="${course_date.date}" data-timezone="${user_timezone}" data-language="${user_language}" data-string="${_(course_date.relative_datestring)}"></h4>
+                            % endif
+                            % if course_date.description:
+                              <p class="description">${course_date.description}</p>
+                            % endif
+                            % if course_date.link and course_date.link_text:
+                              <span class="date-summary-link">
+                                  <a href="${course_date.link}">${course_date.link_text}</a>
+                              </span>
+                            % endif
+                        </div>
+                    </div>
+                % endfor
+            % endif
+            <h4 class="handouts-header">${_(course.info_sidebar_name)}</h4>
+            ${HTML(get_course_info_section(request, masquerade_user, course, 'handouts'))}
+        </section>
+      % else:
+        <section class="updates">
+          <h4 class="handouts-header">${_("Course Updates and News")}</h4>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_updates'))}
+        </section>
+        <section aria-label="${_('Handout Navigation')}" class="handouts">
+          <h4 class="handouts-header">${_("Course Handouts")}</h4>
+          ${HTML(get_course_info_section(request, masquerade_user, course, 'guest_handouts'))}
+        </section>
+      % endif <!-- if course authenticated -->
+      </div>
+  </div>
+</main>
+
+<%static:require_module_async module_name="js/dateutil_factory" class_name="DateUtilFactory">
+    DateUtilFactory.transform(iterationKey=".localized-datetime");
+</%static:require_module_async>

@@ -1,0 +1,109 @@
+(function() {
+    'use strict';
+    var TooltipManager = function(element) {
+        this.element = $(element);
+        // If tooltip container already exist, use it.
+        this.tooltip = $('div.' + this.className.split(/\s+/).join('.'));
+        // Otherwise, create new one.
+        if (!this.tooltip.length) {
+            this.tooltip = $('<div />', {
+                'class': this.className
+            }).appendTo(this.element);
+        }
+
+        this.hide();
+        _.bindAll(this, 'show', 'hide', 'showTooltip', 'moveTooltip', 'hideTooltip', 'click');
+        this.bindEvents();
+    };
+
+    TooltipManager.prototype = {
+        // Space separated list of class names for the tooltip container.
+        className: 'tooltip',
+        SELECTOR: '[data-tooltip]',
+
+        bindEvents: function() {
+            this.element.on({
+                'mouseover.TooltipManager': this.showTooltip,
+                'mousemove.TooltipManager': this.moveTooltip,
+                'mouseout.TooltipManager': this.hideTooltip,
+                'click.TooltipManager': this.click
+            }, this.SELECTOR);
+        },
+
+        getCoords: function(pageX, pageY) {
+            return {
+                'left': pageX - 0.5 * this.tooltip.outerWidth(),
+                'top': pageY - (this.tooltip.outerHeight() + 15)
+            };
+        },
+
+        show: function() {
+            this.tooltip.show().css('opacity', 1);
+        },
+
+        hide: function() {
+            this.tooltip.hide().css('opacity', 0);
+        },
+
+        showTooltip: function(event) {
+            this.prepareTooltip(event.currentTarget, event.pageX, event.pageY);
+            if (this.tooltipTimer) {
+                clearTimeout(this.tooltipTimer);
+            }
+            this.tooltipTimer = setTimeout(this.show, 500);
+        },
+
+        prepareTooltip: function(element, pageX, pageY) {
+            pageX = typeof pageX !== 'undefined' ? pageX : element.offset().left + element.width() / 2;
+            pageY = typeof pageY !== 'undefined' ? pageY : element.offset().top + element.height() / 2;
+            var tooltipText = $(element).attr('data-tooltip');
+            this.tooltip
+                .html(tooltipText)
+                .css(this.getCoords(pageX, pageY));
+        },
+
+        // To manually trigger a tooltip to reveal, other than through user mouse movement:
+        openTooltip: function(element) {
+            this.prepareTooltip(element);
+            this.show();
+            if (this.tooltipTimer) {
+                clearTimeout(this.tooltipTimer);
+            }
+        },
+
+        moveTooltip: function(event) {
+            this.tooltip.css(this.getCoords(event.pageX, event.pageY));
+        },
+
+        hideTooltip: function() {
+            clearTimeout(this.tooltipTimer);
+            // Wait for a 50ms before hiding the tooltip to avoid blinking when
+            // the item contains nested elements.
+            this.tooltipTimer = setTimeout(this.hide, 50);
+        },
+
+        click: function(event) {
+            var showOnClick = !!$(event.currentTarget).data('tooltip-show-on-click'); // Default is false
+            if (showOnClick) {
+                this.show();
+                if (this.tooltipTimer) {
+                    clearTimeout(this.tooltipTimer);
+                }
+            } else {
+                this.hideTooltip(event);
+            }
+        },
+
+        destroy: function() {
+            this.tooltip.remove();
+            // Unbind all delegated event handlers in the ".TooltipManager"
+            // namespace.
+            this.element.off('.TooltipManager', this.SELECTOR);
+        }
+    };
+
+    window.TooltipManager = TooltipManager;
+    $(document).ready(function() {
+        window.globalTooltipManager = new TooltipManager(document.body);
+    });
+}());

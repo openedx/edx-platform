@@ -1,0 +1,228 @@
+// studio - views - course updates
+// ====================
+
+.view-updates {
+
+  .course-info-wrapper {
+    display: table;
+    width: 100%;
+    clear: both;
+  }
+
+  .main-column,
+  .course-handouts {
+    float: none;
+    display: table-cell;
+  }
+
+  .main-column {
+    border-radius: 3px 0 0 3px;
+    border-right-color: $mediumGrey;
+  }
+
+  .CodeMirror {
+    border: 1px solid #3c3c3c;
+    background: $white;
+    color: #3c3c3c;
+  }
+}
+
+.course-updates {
+  padding: 30px 40px;
+  margin: 0;
+
+  .update-list > li {
+    padding: 34px 0 42px;
+    border-top: 1px solid #cbd1db;
+
+    &:first-child {
+      padding-top: 0;
+      border: none;
+    }
+
+    &.editing {
+      @extend %ui-depth4;
+      position: relative;
+      padding: 0;
+      border-top: none;
+      border-radius: 3px;
+      background: $white;
+
+      .post-preview {
+        display: none;
+      }
+    }
+
+    h1 {
+      @extend %t-title4;
+      @extend %t-light;
+      float: none;
+    }
+
+    h2 {
+      @extend %t-title7;
+      @extend %t-strong;
+      margin-bottom: 18px;
+      line-height: 30px;
+      color: #646464;
+      letter-spacing: 1px;
+    }
+
+    h3 {
+      @extend %t-title6;
+      @extend %t-strong;
+      margin: 34px 0 11px;
+    }
+
+    .display-date {
+        padding-right: 15px;
+    }
+
+    .message-error {
+        display: inline-block;
+        font-weight: normal;
+        font-size: 1.2em;
+
+        &:before {
+            content: "\f06a";
+            font-family: FontAwesome;
+            color: #fdbc56;
+            padding: 5px;
+        }
+    }
+  }
+
+  .update-contents {
+    p {
+      @extend %t-copy-base;
+      line-height: 25px;
+    }
+
+    p + p {
+      margin-top: 25px;
+    }
+
+    .primary {
+      border: 1px solid #ddd;
+      background: $gray-l6;
+      padding: 20px;
+    }
+
+    ol, ul {
+      margin: 1em 0;
+      padding: 0 0 0 1em;
+      color: $baseFontColor;
+
+      li {
+        margin-bottom: 0.708em;
+      }
+    }
+
+    ol {
+      list-style: decimal outside none;
+    }
+
+    ul {
+      list-style: disc outside none;
+    }
+
+    pre {
+      @extend %t-copy-base;
+      margin: 1em 0;
+      color: $baseFontColor;
+      font-family: monospace, serif;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    code {
+      color: $baseFontColor;
+      font-family: monospace, serif;
+      background: none;
+      padding: 0;
+    }
+  }
+
+
+  .new-update-form {
+    @include edit-box;
+    margin-bottom: 24px;
+    padding: 30px;
+    border: none;
+
+    textarea {
+      height: 180px;
+    }
+  }
+
+  .post-actions {
+    float: right;
+
+    .edit-button,
+    .delete-button {
+      @include white-button();
+      @extend %t-action4;
+      @extend %t-regular;
+      float: left;
+      padding: 3px 10px 4px;
+      margin-left: 7px;
+
+      .edit-icon,
+      .delete-icon {
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+.course-handouts {
+	@extend %ui-window;
+	width: 30%;
+	padding: 20px 30px;
+	margin: 0;
+	@include border-radius(0, 3px, 3px, 0);
+	@include border-left(none);
+	background: $lightGrey;
+
+	.title {
+		@extend %t-title4;
+    @extend %t-light;
+    margin-bottom: 24px;
+	}
+
+	.edit-button {
+    @include white-button;
+    @extend %t-action4;
+    @extend %t-regular;
+		float: right;
+    padding: 3px 10px 4px;
+    margin-left: 7px;
+
+    .edit-icon,
+    .delete-icon {
+      @include margin-right($baseline/5);
+    }
+  }
+
+  .handouts-content {
+    @extend %t-copy-sub1;
+  }
+
+  .treeview-handoutsnav li {
+    margin-bottom: 12px;
+  }
+}
+
+.edit-handouts-form {
+  @extend %ui-depth4;
+  @include edit-box;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 800px;
+  padding: ($baseline*1.5);
+
+  textarea {
+    height: 300px;
+  }
+}

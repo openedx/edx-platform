@@ -1,0 +1,556 @@
+// studio - views - assets
+// ====================
+
+.view-uploads {
+
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+  }
+
+  .content-primary {
+    @extend .ui-col-wide;
+  }
+
+  .content-supplementary {
+    @extend .ui-col-narrow;
+  }
+
+  .nav-actions {
+
+    .fa-cloud-upload {
+      @extend %t-copy;
+      vertical-align: bottom;
+      margin-right: ($baseline/5);
+    }
+
+  }
+
+  .no-asset-content {
+    @extend %ui-well;
+    padding: ($baseline*2);
+    background-color: $gray-l4;
+    text-align: center;
+    color: $gray;
+
+    .new-button {
+      @extend %btn-primary-green;
+      @extend %t-action3;
+      @include margin-left($baseline);
+
+      .icon {
+        @include margin-right($baseline/2);
+      }
+    }
+  }
+
+  .assets-library {
+    @include clearfix;
+
+    .meta-wrap {
+      margin-bottom: $baseline;
+    }
+    .meta {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      vertical-align: top;
+      width: flex-grid(9, 12);
+      color: $gray-l1;
+
+      .count-current-shown,
+      .count-total,
+      .filter-column,
+      .sort-order {
+        @extend %t-strong;
+      }
+    }
+
+    .pagination {
+      @include clearfix;
+      display: inline-block;
+      width: flex-grid(3, 12);
+
+      &.pagination-compact {
+        @include text-align(right);
+      }
+
+      &.pagination-full {
+        display: block;
+        width: flex-grid(4, 12);
+        margin: $baseline auto;
+      }
+
+      .nav-item {
+        position: relative;
+        display: inline-block;
+      }
+
+      .nav-link {
+        @include transition(all $tmg-f2 ease-in-out 0s);
+        display: block;
+        padding: ($baseline/4) ($baseline*0.75);
+
+        &.previous {
+          margin-right: ($baseline/2);
+        }
+
+        &.next {
+          margin-left: ($baseline/2);
+        }
+
+        &:hover {
+          background-color: $blue;
+          border-radius: 3px;
+          color: $white;
+        }
+
+        &.is-disabled {
+          background-color: transparent;
+          color: $gray-l2;
+          pointer-events: none;
+        }
+      }
+
+      .nav-label {
+        @extend .sr;
+      }
+
+      .pagination-form,
+      .current-page,
+      .page-divider,
+      .total-pages {
+        display: inline-block;
+      }
+
+      .current-page,
+      .page-number-input,
+      .total-pages {
+        @extend %t-copy-base;
+        @extend %t-strong;
+        width: ($baseline*2.5);
+        margin: 0 ($baseline*0.75);
+        padding: ($baseline/4);
+        text-align: center;
+        color: $gray;
+      }
+
+      .current-page {
+        @extend %ui-depth1;
+        position: absolute;
+        @include left(-($baseline/4));
+      }
+
+      .page-divider {
+        @extend %t-title4;
+        @extend %t-regular;
+        vertical-align: middle;
+        color: $gray-l2;
+      }
+
+
+      .pagination-form {
+        @extend %ui-depth2;
+        position: relative;
+
+        .page-number-label,
+        .submit-pagination-form {
+          @extend .sr;
+        }
+
+        .page-number-input {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          border: 1px solid transparent;
+          border-bottom: 1px dotted $gray-l2;
+          border-radius: 0;
+          box-shadow: none;
+          background: none;
+
+          &:hover {
+            background-color: $white;
+            opacity: 0.6;
+          }
+
+          &:focus {
+            // borrowing the base input focus styles to match overall app
+            @include linear-gradient($paleYellow, tint($paleYellow, 90%));
+            opacity: 1.0;
+            box-shadow: 0 0 3px $shadow-d1 inset;
+            background-color: $white;
+            border: 1px solid transparent;
+            border-radius: 3px;
+          }
+        }
+
+
+      }
+    }
+
+
+
+
+
+    table {
+      width: 100%;
+      word-wrap: break-word;
+
+      th {
+        @extend %t-copy-sub2;
+        background-color: $gray-l5;
+        padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
+        vertical-align: middle;
+        text-align: left;
+        color: $gray;
+
+        .column-sort-link, .column-selected-link {
+          cursor: pointer;
+          color: $blue;
+        }
+
+        .current-sort {
+          @extend %t-strong;
+          border-bottom: 1px solid $gray-l3;
+        }
+
+        // CASE: embed column
+        &.embed-col {
+          padding-left: ($baseline*0.75);
+          padding-right: ($baseline*0.75);
+        }
+
+        &.nav-dd{
+          // basic layout - nav items
+          margin: 0 -($baseline/2);
+          color: $blue;
+          cursor: pointer;
+          .wrapper-nav-sub {
+            top: 35px;
+            @extend %ui-depth2;
+
+            > ol > .nav-item {
+              @extend %t-action3;
+              @extend %t-strong;
+              display: inline-block;
+              vertical-align: middle;
+
+              &:last-child {
+                margin-right: 0;
+              }
+            }
+            .nav-sub {
+              @include text-align(left);
+
+              // ui triangle/nub
+              &:after {
+                left: $baseline;
+                margin-left: -10px;
+              }
+
+              &:before {
+                left: $baseline;
+                margin-left: -11px;
+              }
+
+              .nav-item {
+                &.reset-filter{
+                  display:none;
+                }
+
+                a {
+                  color: $gray-d1;
+
+                  &:hover {
+                    color: $blue-s1;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      td {
+        padding: ($baseline/2);
+        vertical-align: middle;
+        text-align: left;
+      }
+
+      tbody {
+        box-shadow: 0 2px 2px $shadow-l1;
+        border: 1px solid $gray-l4;
+        background: $white;
+
+        tr {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          border-top: 1px solid $gray-l4;
+
+          &:first-child {
+            border-top: none;
+          }
+
+          &:nth-child(odd) {
+            background-color: $gray-l6;
+          }
+
+          a {
+            color: $gray-d1;
+
+            &:hover {
+              color: $blue;
+            }
+          }
+
+          &.is-locked {
+            background-image: url('#{$static-path}/images/bg-micro-stripes.png');
+            background-position: 0 0;
+            background-repeat: repeat;
+          }
+
+          &:hover {
+            background-color: $blue-l5;
+
+            .date-col,
+            .embed-col,
+            .embed-col .embeddable-xml-input {
+              color: $gray;
+            }
+          }
+        }
+
+      .thumb-col {
+        padding: ($baseline/2) $baseline;
+        @extend %t-copy-sub2;
+        color: $gray-l2;
+
+        .thumb {
+          width: 100px;
+        }
+
+          img {
+            width: 100%;
+          }
+        }
+
+
+        .name-col {
+
+          .title {
+            @extend %t-copy-sub1;
+            display: inline-block;
+            max-width: 200px;
+            overflow: hidden;
+          }
+        }
+
+        .type-col {
+          @extend %t-copy-sub2;
+          color: $gray-l2;
+        }
+
+        .date-col {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          @extend %t-copy-sub2;
+          color: $gray-l2;
+        }
+
+        .embed-col {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          @extend %t-copy-sub2;
+          padding-left: ($baseline*0.75);
+          color: $gray-l2;
+
+          .label {
+            display: inline-block;
+            width: ($baseline*2);
+          }
+
+          .embeddable-xml-input {
+            @include transition(all $tmg-f2 ease-in-out 0s);
+            @extend %t-copy-sub2;
+            box-shadow: none;
+            border: 1px solid transparent;
+            background: none;
+            padding: ($baseline/5);
+            color: $gray-l2;
+
+            &:focus {
+              background-color: $white;
+              box-shadow: 0 1px 5px $shadow-l1 inset;
+              border: 1px solid $gray-l3;
+              color: $black;
+            }
+          }
+        }
+
+        .actions-col {
+          padding: ($baseline/2);
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  // UI: assets - calls-to-action
+  .actions-list {
+    @extend %actions-list;
+
+    .action-item {
+
+      // special checkbox styling
+      &.action-lock {
+        position: relative;
+      }
+
+      &.action-lock label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 30px;
+        width: 30px;
+
+        &:hover {
+          background-color: $blue;
+        }
+      }
+
+      &.action-lock .lock-checkbox {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 30px;
+        width: 30px;
+        opacity: 0;
+      }
+
+      &.action-lock .lock-checkbox:hover ~ .action-button {
+        background-color: $blue;
+        color: $gray-l6;
+      }
+
+      &.action-lock .lock-checkbox ~ .action-button {
+        .fa-lock {
+          display: none;
+        }
+
+        .fa-unlock-alt {
+          display: inline-block;
+          pointer-events: none;
+        }
+      }
+
+      &.action-lock .lock-checkbox:checked ~ .action-button {
+        background-color: $gray;
+        color: $white;
+
+        .fa-lock {
+          display: inline-block;
+          pointer-events: none;
+        }
+
+       .fa-unlock-alt {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .show-xml {
+    @include blue-button;
+  }
+
+  .upload-modal {
+    display: none;
+    width: 640px !important;
+    margin-left: -320px !important;
+
+    .modal-body {
+      height: auto !important;
+      overflow-y: auto !important;
+      text-align: center;
+    }
+
+    .title {
+      @extend %t-title3;
+      @extend %t-light;
+      float: none;
+      margin: ($baseline*2) 0 ($baseline*1.5);
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .choose-file-button {
+      @include blue-button();
+      @extend %t-action2;
+      padding: 10px 82px 12px;
+    }
+
+    .progress-bar {
+      display: none;
+      width: ($baseline*15);
+      height: 35px;
+      margin: ($baseline) auto;
+      border: 1px solid $green;
+      border-radius: ($baseline*2);
+
+      &.loaded {
+        border-color: #66b93d;
+
+        .progress-fill {
+          background: #66b93d;
+        }
+      }
+    }
+
+    .progress-fill {
+      @extend %t-copy-sub1;
+      width: 0%;
+      height: ($baseline*1.5);
+      border-radius: ($baseline*2);
+      background: $green;
+      padding-top: ($baseline/4);
+      color: $white;
+    }
+
+    .close-button {
+      @include transition(color $tmg-f2 ease-in-out 0s);
+      position: absolute;
+      top: 0;
+      right: ($baseline*0.75);
+      border: none;
+      background: none;
+      padding: 0;
+
+      .icon {
+        @extend %t-action1;
+      }
+
+      &:hover {
+        background: none;
+        box-shadow: none;
+        color: $blue;
+      }
+    }
+
+    .embeddable {
+      display: none;
+      margin: ($baseline*1.5) 0 ($baseline*4);
+
+      label {
+        @extend %t-strong;
+        display: block;
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    .embeddable-xml-input {
+      box-shadow: none;
+      width: ($baseline*20);
+    }
+
+    .copy-button {
+      @include white-button;
+      display: none;
+      margin-bottom: ($baseline*5);
+    }
+  }
+}

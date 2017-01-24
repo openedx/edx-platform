@@ -1,0 +1,135 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+
+from openedx.core.djangolib.markup import HTML
+from openedx.core.djangolib.js_utils import (
+    dump_js_escaped_json, js_escaped_string
+)
+%>
+
+<%inherit file="main.html" />
+<%namespace name='static' file='static_content.html'/>
+<%block name="pagetitle">${_("{course_number} Textbook").format(course_number=course.display_number_with_default)}</%block>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
+<%static:js group='courseware'/>
+</%block>
+
+<%block name="js_extra">
+  <script type="text/javascript" src="${static.url('js/jquery.treeview.js')}"></script>
+<script>
+var page = ${page | n, dump_js_escaped_json};
+
+$(document).ready(function(){
+   if(!page) {
+     cookie_page = $.cookie("book_page");
+     if(cookie_page) {
+       goto_page(cookie_page);
+     }
+   }
+   $("#booknav").treeview({collapsed:true, unique:true/*, cookieId: "treeview-book-nav", persist: "cookie"*/});
+});
+
+function goto_page(n) {
+  Logger.log("book", {"type":"gotopage","old":page,"new":n});
+  page=n;
+  var prefix = "";
+  if(n<100) {
+    prefix="0";
+  }
+  if(n<10) {
+    prefix="00";
+  }
+  $("#bookpage").attr("src","${book_url | n, js_escaped_string}p"+prefix+n+".png");
+  $.cookie("book_page", n, {'expires':3650, 'path':'/'});
+};
+
+function prev_page() {
+  var newpage=page-1;
+  if(newpage < ${start_page | n, dump_js_escaped_json}) newpage=${start_page | n, dump_js_escaped_json};
+  goto_page(newpage);
+  Logger.log("book", {"type":"prevpage","new":page});
+}
+
+function next_page() {
+  var newpage=page+1;
+  if(newpage > ${end_page | n, dump_js_escaped_json}) newpage=${end_page | n, dump_js_escaped_json};
+  goto_page(newpage);
+  Logger.log("book", {"type":"nextpage","new":page});
+}
+
+$("#open_close_accordion a").click(function(){
+  if ($(".book-wrapper").hasClass("closed")){
+    $(".book-wrapper").removeClass("closed");
+  } else {
+    $(".book-wrapper").addClass("closed");
+  }
+});
+
+</script>
+</%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='textbook/{0}'.format(book_index)" />
+
+<section class="container">
+    <main id="main" aria-label="${_('Content')}" tabindex="-1">
+  <div class="book-wrapper">
+
+    <section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
+
+      <ul id="booknav" class="treeview-booknav">
+          <%def name="print_entry(entry)">
+              <li>
+                  <a href="javascript:goto_page(${entry.get('page')})">
+                      <span class="chapter">
+                        %if entry.get('chapter'):
+                          <span class="chapter-number">${entry.get('chapter')}.</span> ${entry.get('name')}
+                        %else:
+                          ${entry.get('name')}
+                        %endif
+                      </span>
+                      <span class="page-number">${entry.get('page_label')}</span>
+                  </a>
+                  % if len(entry) > 0:
+                      <ul>
+                          % for child in entry:
+                              ${HTML(print_entry(child))}
+                          % endfor
+                      </ul>
+                  % endif
+              </li>
+          </%def>
+
+          % for entry in table_of_contents:
+            ${HTML(print_entry(entry))}
+          % endfor
+
+        ## Don't delete this empty list item. Without it, Jquery.TreeView won't
+        ## render the last list item as expandable.
+        <li></li>
+      </ul>
+    </section>
+
+    <section class="book">
+      <section class="page">
+        <nav aria-label="${_('Page')}">
+          <ul>
+            <li class="last">
+              <a href="javascript:prev_page()">${_('Previous page')}</a>
+            </li>
+            <li class="next">
+              <a href="javascript:next_page()">${_('Next page')}</a>
+            </li>
+          </ul>
+        </nav>
+
+        <img id="bookpage" src="${book_url}p${"%03i"%(page)}.png">
+      </section>
+    </section>
+  </div>
+  </main>
+</section>

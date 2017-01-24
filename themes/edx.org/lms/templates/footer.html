@@ -1,0 +1,101 @@
+## mako
+<%!
+  import datetime
+
+  from django.utils.translation import ugettext as _
+  from branding.api import get_footer
+%>
+<% footer = get_footer(is_secure=is_secure) %>
+<%namespace name='static' file='static_content.html'/>
+
+## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
+<footer id="footer-edx-v3" role="contentinfo" aria-label="${_("Page Footer")}"
+  ## When rendering the footer through the branding API,
+  ## the direction may not be set on the parent element,
+  ## so we set it here.
+  % if bidi:
+    dir=${bidi}
+  % endif
+>
+    <h2 class="sr footer-about-title">${_("About edX")}</h2>
+    <div class="footer-content-wrapper">
+      <div class="footer-logo">
+          <a href="${marketing_link('ROOT')}">
+            <img alt="edX Home Page" src="${footer['logo_image']}">
+          </a>
+      </div>
+
+      <div class="site-details">
+          <nav class="site-nav" aria-label="${_("About edX")}">
+              % for link in footer["navigation_links"]:
+              <a href="${link['url']}">${link['title']}</a>
+              % endfor
+          </nav>
+          <nav class="legal-notices" aria-label="${_("Legal")}">
+              % for link in footer["legal_links"]:
+              <a href="${link['url']}">${link['title']}</a>
+              % endfor
+          </nav>
+          <p class="copyright">${_(
+          u"\u00A9 2012-{year} edX Inc.  All rights reserved except where noted.  "
+          u"EdX, Open edX and the edX and Open EdX logos are registered trademarks "
+          u"or trademarks of edX Inc."
+          ).format(year=datetime.datetime.now().year)}
+          </p>
+
+          ## The OpenEdX link may be hidden when this view is served
+          ## through an API to partner sites (such as marketing sites or blogs),
+          ## which are not technically powered by OpenEdX.
+          % if not hide_openedx_link:
+          <div class="openedx-link">
+            <a href="${footer['openedx_link']['url']}" title="${footer['openedx_link']['title']}">
+              <img alt="${footer['openedx_link']['title']}" src="${footer['openedx_link']['image']}" width="140">
+            </a>
+          </div>
+          % endif
+      </div>
+
+      <div class="external-links">
+        <ul class="social-media-links">
+            % for link in footer['social_links']:
+            <li class="list-item">
+                <a href="${link['url']}" class="sm-link external" title="${link['title']}" rel="noreferrer">
+                    <span class="icon fa ${link['icon-class']}" aria-hidden="true"></span>
+                    <span class="sr">${link['action']}</span>
+                </a>
+            </li>
+            % endfor
+        </ul>
+
+        <ul class="mobile-app-links">
+            % for link in footer['mobile_links']:
+            <li class="list-item">
+                <a href="${link['url']}" class="app-link external">
+                    <img alt="${link['title']}" src="${link['image']}">
+                </a>
+            </li>
+            % endfor
+        </ul>
+      </div>
+    </div>
+</footer>
+% if include_dependencies:
+  <%static:js group='base_vendor'/>
+  <%static:css group='style-vendor'/>
+  <%include file="widgets/segment-io.html" />
+  <%include file="widgets/segment-io-footer.html" />
+% endif
+% if bidi == 'rtl':
+<%static:css group='style-lms-footer-edx-rtl'/>
+% else:
+<%static:css group='style-lms-footer-edx'/>
+% endif
+
+% if footer_css_urls:
+  % for url in footer_css_urls:
+    <link rel="stylesheet" type="text/css" href="${url}"></link>
+  % endfor
+% endif
+% if footer_js_url:
+  <script type="text/javascript" src="${footer_js_url}"></script>
+% endif

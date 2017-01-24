@@ -1,0 +1,1 @@
+<option class="topic-title" data-discussion-id="<%- id %>" data-cohorted="<%- is_cohorted %>"><%- text %></option>

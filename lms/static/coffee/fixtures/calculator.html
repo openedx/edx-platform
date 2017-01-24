@@ -1,0 +1,30 @@
+<div class="calc-main">
+    <button title="Open Calculator" aria-controls="calculator_wrapper" aria-expanded="false" class="calc utility-control-button">
+        <span class="icon fa fa-calculator" aria-hidden="true"></span>
+    </button>
+    
+    <div id="calculator_wrapper">
+        <form id="calculator">
+            <div class="input-wrapper">
+                <input type="text" id="calculator_input" tabindex="-1" />
+                <div class="help-wrapper">
+                    <button type="button" id="calculator_hint" aria-haspopup="true">Hints</button>
+                    <ul id="calculator_input_help" class="help" data-calculator-hint="hint-integers" role="tooltip" aria-hidden="true">
+                        <li class="hint-item" id="hint-moreinfo" tabindex="-1">
+                            <p>
+                                <span class="bold">For detailed information, see
+                                <a id="hint-link-first" href="http://edx.readthedocs.io/projects/edx-guide-for-students/en/latest/completing_assignments/SFD_mathformatting.html#math-formatting">Entering Mathematical and Scientific Expressions</a> in the
+                                <a id="hint-link-second" href="http://edx-guide-for-students.readthedocs.io/en/latest/index.html">EdX Learner's Guide</a>.
+                                </span>
+                            </p>
+                        </li>
+                        <li class="hint-item" id="hint-integers" tabindex="-1"><p><span class="bold">Integers:</span> 2520</p></li>
+                        <li class="hint-item" id="hint-decimals" tabindex="-1"><p><span class="bold">Decimals:/span> 3.14 or .98</p></li>
+                    </ul>
+                </div>
+            </div>
+            <input id="calculator_button" type="submit" title="Calculate" value="=" />
+            <input type="text" id="calculator_output" tabindex="-1" readonly />
+        </form>
+    </div>
+</div>

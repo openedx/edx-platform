@@ -1,0 +1,6 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers %>
+
+${_("Activate Your {platform_name} Account").format(
+    platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME
+))}

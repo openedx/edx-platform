@@ -1,0 +1,24 @@
+// LMS base styles
+
+// removing the outline on any element that we make programmatically focusable
+[tabindex="-1"] {
+    outline: none;
+}
+
+.window-wrap {
+    background-color: $lms-background-color;
+}
+
+.content-wrapper {
+    @include span(12, none);
+    margin: 0 auto;
+
+    @media print {
+        padding-bottom: 0;
+    }
+}
+
+// Support .sr as well as .sr-only for backward compatibility
+.sr {
+    @extend .sr-only;
+}

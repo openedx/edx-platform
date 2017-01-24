@@ -1,0 +1,62 @@
+<div class="discussion-article view-discussion-home">
+  <section class="home-header">
+    <span class="label"><%- gettext("Discussion Home") %></span>
+    <% if (window.courseName) { %>
+      <h1 class="home-title"><%- window.courseName %></h1>
+    <% } %>
+  </section>
+
+  <% if (window.ENABLE_DISCUSSION_HOME_PANEL) { %>
+    <span class="label label-settings">
+      <%- interpolate(
+            gettext("How to use %(platform_name)s discussions"),
+            {platform_name: window.PLATFORM_NAME}, true
+          ) %>
+    </span>
+    <table class="home-helpgrid">
+      <tr class="helpgrid-row helpgrid-row-navigation">
+        <th scope="row" class="row-title"><%- gettext("Find discussions") %></td>
+        <td class="row-item">
+          <span class="icon fa fa-reorder" aria-hidden="true"></span>
+          <span class="row-description"><%- gettext("Use the All Topics menu to find specific topics.") %></span>
+        </td>
+        <td class="row-item">
+          <span class="icon fa fa-search" aria-hidden="true"></span>
+          <span class="row-description"><%- gettext("Search all posts") %></span>
+        </td>
+        <td class="row-item">
+          <span class="icon fa fa-sort" aria-hidden="true"></span>
+          <span class="row-description"><%- gettext("Filter and sort topics") %></span>
+        </td>
+      </tr>
+      <tr class="helpgrid-row helpgrid-row-participation">
+        <th scope="row" class="row-title"><%- gettext("Engage with posts") %></td>
+        <td class="row-item">
+          <span class="icon fa fa-plus" aria-hidden="true"></span>
+          <span class="row-description"><%- gettext("Vote for good posts and responses") %></span>
+        </td>
+        <td class="row-item">
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
+          <span class="row-description"><%- gettext("Report abuse, topics, and responses") %></span>
+        </td>
+        <td class="row-item">
+          <span class="icon fa fa-star" aria-hidden="true"></span>
+          <span class="row-description"><%- gettext("Follow or unfollow posts") %></span>
+        </td>
+      </tr>
+      <tr class="helpgrid-row helpgrid-row-notification">
+        <th scope="row" class="row-title"><%- gettext('Receive updates') %></td>
+        <td class="row-item-full" colspan="3">
+          <label for="email-setting-checkbox">
+            <span class="sr"><%- gettext("Toggle Notifications Setting") %></span>
+            <span class="notification-checkbox">
+              <input type="checkbox" id="email-setting-checkbox" class="email-setting" name="email-notification"/>
+              <span class="icon fa fa-envelope" aria-hidden="true"></span>
+            </span>
+          </label>
+          <span class="row-description"><%- gettext("Check this box to receive an email digest once a day notifying you about new, unread activity from posts you are following.") %></span>
+        </td>
+      </tr>
+    </table>
+  <% } %>
+</div>

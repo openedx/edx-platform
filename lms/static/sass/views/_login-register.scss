@@ -1,0 +1,608 @@
+// lms - views - login/register view
+// ====================
+@import '../base/grid-settings';
+@import "neat/neat"; // lib - Neat
+
+.login-register {
+    @include box-sizing(border-box);
+    @include outer-container;
+    $grid-columns: 12;
+    background: $white;
+    min-height: 100%;
+    width: 100%;
+    $third-party-button-height: ($baseline*1.75);
+
+    h2 {
+        @extend %t-title5;
+        margin: 0;
+        letter-spacing: normal;
+        font-family: $sans-serif;
+    }
+
+    .instructions {
+        @extend %t-copy-base;
+    }
+
+    /* Temp. fix until applied globally */
+    > {
+        @include box-sizing(border-box);
+    }
+
+
+    /* Remove autocomplete yellow background */
+    input:-webkit-autofill {
+        -webkit-box-shadow:0 0 0 50px white inset;
+        -webkit-text-fill-color: #333;
+    }
+
+    input:-webkit-autofill:focus {
+        -webkit-box-shadow: white, 0 0 0 50px white inset;
+        -webkit-text-fill-color: #333;
+    }
+
+    .header {
+        @include outer-container;
+        border-bottom: 1px solid $gray-l4;
+        width: 100%;
+        padding-top: 35px;
+        padding-bottom: 35px;
+        overflow: hidden;
+
+        .headline {
+            @include box-sizing(border-box);
+            @include font-size(35);
+            padding: 0 10px;
+            font-family: $sans-serif;
+            font-weight: $font-semibold;
+            text-align: left;
+            margin-bottom: 0;
+            color: $m-blue-d5;
+        }
+
+        .tagline {
+            @include box-sizing(border-box);
+            @include font-size(24);
+            padding: 0 10px;
+            font-family: $sans-serif;
+            font-weight: $font-regular;
+        }
+    }
+
+    form,
+    .wrapper-other-login {
+        border: 1px solid $gray-l4;
+        border-radius: ($baseline/4);
+        padding: 0 ($baseline*1.25) $baseline ($baseline*1.25);
+    }
+
+    .section-title {
+        position: relative;
+        margin: 20px 0 10px;
+
+        &.lines {
+            margin-bottom: 20px;
+
+            &:after {
+                position: absolute;
+                left: 0;
+                top: 12px;
+                width: 100%;
+                height: 1px;
+                background: $gray-l4;
+                content: '';
+                z-index: 5;
+            }
+
+            .text {
+                position: relative;
+                top: -2px; // Aligns center of text with center of line (CR)
+                z-index: 6;
+                padding: 0 $baseline;
+                background: $white;
+            }
+        }
+
+        h2 {
+            text-align: center;
+            text-transform: none;
+        }
+    }
+
+    %nav-btn-base {
+        @extend %btn-secondary-blue-outline;
+        width: 100%;
+        height: ($baseline*2);
+        text-transform: none;
+        text-shadow: none;
+        letter-spacing: normal;
+    }
+
+    .nav-btn {
+        @extend %nav-btn-base;
+        @extend %t-strong;
+    }
+
+    .form-type,
+    .toggle-form {
+        @include box-sizing(border-box);
+        max-width: 650px;
+        min-width: 250px;
+        margin: 0 auto;
+        padding: {
+            left: $baseline; // Don't want to override any top or bottom (CR)
+            right: $baseline; // Don't want to override any top or bottom (CR)
+            bottom: ($baseline/2);
+        }
+    }
+
+    .toggle-form {
+        text-align: center // Centers the text and buttons
+    }
+
+    .note {
+        @extend %t-copy-sub2;
+        display: block;
+        margin: ($baseline/2) ($baseline/2) 0 ($baseline/2);
+        color: $m-gray-l1;
+        text-align: center;
+    }
+
+    /** The forms **/
+    .form-wrapper {
+        padding-top: ($baseline + 5);
+
+        form {
+            @include clearfix();
+            clear: both;
+        }
+
+        .login-providers {
+            text-align: center;
+        }
+    }
+
+    .login-form {
+        margin-bottom: $baseline;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .password-reset-form {
+        padding-bottom: ($baseline + 5);
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .register-form {
+        &:focus {
+            outline: none;
+        }
+    }
+
+    %bold-label {
+        @include font-size(16);
+        font-family: $sans-serif;
+        font-weight: $font-semibold;
+    }
+
+    .form-label {
+        @extend %bold-label;
+        padding: 0 0 0 ($baseline/4);
+    }
+
+    .action-label {
+        @include font-size(13);
+        font-family: $sans-serif;
+    }
+
+    .form-field {
+        @include clearfix();
+        clear: both;
+        position: relative;
+        width: 100%;
+        margin: ($baseline/2) 0 ($baseline/4) 0;
+
+        &.select-year_of_birth {
+            @include margin-left(15px);
+        }
+
+        &.select-gender,
+        &.select-year_of_birth {
+            display: inline-block;
+            width: calc( 50% - 10px );
+        }
+
+        /** FROM _accounts.scss - start **/
+        label,
+        input,
+        textarea {
+            height: auto;
+            line-height: 1.5em;
+            border-radius: 0;
+            font-family: $sans-serif;
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        #login-remember {
+            line-height: 0;
+            height: auto;
+        }
+
+        label {
+            display: block;
+            margin: 0 0 6px 0;
+
+            &.inline {
+                display: inline;
+            }
+
+            &.error {
+                color: $red;
+            }
+            
+            &[for="register-data_sharing_consent"],
+            &[for="register-honor_code"],
+            &[for="register-terms_of_service"] {
+                display: inline-block;
+                margin: 5px 5px 0 0;
+                width: 90%;
+                vertical-align: top;
+            }
+
+            &[for="login-remember"] {
+                display: inline-block;
+            }
+        }
+
+        .field-link {
+            @extend %t-copy-sub2;
+            display: block;
+            margin-bottom: ($baseline/2);
+            margin-top: ($baseline/4);
+            border: none;
+            padding: 0;
+            background: transparent;
+            box-shadow: none;
+            text-transform: initial;
+            letter-spacing: normal;
+            color: $uxpl-blue-base;
+            font-weight: $font-regular;
+            text-decoration: none;
+            text-shadow: none;
+            font-family: $sans-serif;
+            
+            &:hover,
+            &:focus {
+                text-decoration: underline;
+            }
+        }
+
+        input,
+        select,
+        textarea {
+            display: block;
+            width: 100%;
+            margin: 0 0 ($baseline/4);
+            padding: 0 ($baseline/2);
+
+            &.long {
+                width: 100%;
+            }
+
+            &.short {
+                width: 25%;
+            }
+
+            &.checkbox {
+                display: inline;
+                width: auto;
+                margin-right: ($baseline/4);
+            }
+
+            &.error {
+                border-color: tint($red,50%);
+            }
+        }
+
+        input {
+            height: 32px;
+        }
+
+        textarea {
+            resize: none;
+
+            &.long {
+                height: ($baseline*5);
+            }
+        }
+
+        select {
+            width: 100%;
+
+            &.error {
+                border-color: tint($red,50%);
+            }
+        }
+
+        .tip {
+            @extend %t-copy-sub2;
+            display: block;
+            margin: 0 0 ($baseline/2) 0;
+            color: $base-font-color;
+        }
+        /** FROM _accounts.scss - end **/
+    }
+
+    .input-block {
+        width: 100%;
+    }
+
+    .input-inline {
+        display: inline;
+    }
+
+    .desc {
+        @include transition(color 0.15s ease-in-out 0s);
+        display: block;
+        margin-top: ($baseline/4);
+        color: $lighter-base-font-color;
+        font-size: em(13);
+    }
+
+    .action-primary {
+        @extend %btn-primary-blue;
+        width: 100%;
+        margin-top: 1em;
+        padding: ($baseline/2);
+        text-transform: none;
+        font-weight: 600;
+        letter-spacing: normal;
+
+        .icon {
+            @extend %sso-icon;
+        }
+    }
+
+    .login-provider {
+        @extend %btn-secondary-grey-outline;
+        @extend %t-action4;
+
+        @include padding(0, 0, 0, $baseline*2);
+        @include text-align(left);
+
+        position: relative;
+        margin-right: ($baseline/4);
+        margin-bottom: $baseline;
+        border-color: $lightGrey1;
+        width: $baseline*6.5;
+        height: $third-party-button-height;
+        text-shadow: none;
+        text-transform: none;
+
+        .icon {
+            @extend %sso-icon;
+            @include left(0);
+
+            position: absolute;
+            top: -1px;
+            width: 30px;
+            bottom: -1px;
+            background: $m-blue-d3;
+            line-height: $third-party-button-height;
+            text-align: center;
+            color: $white;
+        }
+
+        span {
+            color: inherit;
+        }
+
+        &:hover,
+        &:focus {
+            background-image: none;
+
+            .icon {
+                top: 0;
+                bottom: 0;
+                line-height: ($third-party-button-height - 2px);
+            }
+        }
+
+        &.button-oa2-google-oauth2 {
+            color: $google-red;
+
+            .icon {
+                background: $google-red;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $google-red;
+                border: 1px solid #A5382B;
+                color: $white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 #8D3024;
+            }
+        }
+
+        &.button-oa2-facebook {
+            color: $facebook-blue;
+
+            .icon {
+                background: $facebook-blue;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $facebook-blue;
+                border: 1px solid #263A62;
+                color: $white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 #30487C;
+            }
+        }
+
+        &.button-oa2-linkedin-oauth2 {
+            color: $linkedin-blue;
+
+            .icon {
+                background: $linkedin-blue;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $linkedin-blue;
+                border: 1px solid #06527D;
+                color: $white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 #005D8E;
+            }
+        }
+
+        &.button-oa2-azuread-oauth2 {
+            color: darken($microsoft-blue, 20%);
+
+            .icon {
+                background: $microsoft-blue;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $microsoft-blue;
+                border: 1px solid $microsoft-blue;
+                color: $white;
+            }
+
+            &:hover {
+                box-shadow: 0 2px 1px 0 darken($microsoft-blue, 10%);
+            }
+        }
+
+    }
+
+    .button-secondary-login {
+        @extend %nav-btn-base;
+        @extend %t-action4;
+        @extend %t-regular;
+        border-color: $lightGrey1;
+        padding: 0;
+        height: $third-party-button-height;
+
+        &:hover {
+            border-color: $m-blue-d3;
+        }
+    }
+
+    /** Error Container - from _account.scss **/
+    .status {
+        @include box-sizing(border-box);
+        margin: 0 0 25px 0;
+        border-bottom: 3px solid shade($yellow, 10%);
+        padding: 25px;
+        background: tint($yellow,20%);
+
+        .message-title {
+            @extend %t-title5;
+            font-family: $sans-serif;
+            margin: 0 0 ($baseline/4) 0;
+            font-weight: 600;
+        }
+
+        .message-copy,
+        .message-copy p {
+            @extend %t-copy-base;
+            font-family: $sans-serif;
+            margin: 0 !important;
+            padding: 0;
+
+            li {
+                margin: 0 0 ($baseline/4) $baseline;
+            }
+        }
+    }
+
+    .submission-error, .system-error {
+        box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
+        border-bottom: 3px solid shade($red, 10%);
+        background: tint($red,95%);
+
+        .message-title {
+            color: shade($red, 10%) !important;
+        }
+
+        .message-copy {
+
+        }
+    }
+
+    .submission-success {
+        box-shadow: inset 0 -1px 2px 0 tint($green, 85%);
+        border-bottom: 3px solid shade($green, 10%);
+        background: tint($green, 95%);
+
+        .message-title {
+            color: shade($green, 10%) !important;
+        }
+
+        .message-copy {
+
+        }
+    }
+
+    .institution-list {
+
+        .institution {
+            @extend %t-copy-base;
+        }
+    }
+
+    @include media( max-width 330px) {
+        .form-type {
+            width: 98%;
+            margin: 0 1%;
+        }
+
+        .login-provider {
+            width: 100%;
+            margin: 10px 0;
+        }
+    }
+}
+
+.finish-auth {
+    @include box-sizing(border-box);
+    @include outer-container;
+    $grid-columns: 12;
+    background: $white;
+    min-height: 100%;
+    width: 100%;
+
+    .finish-auth-inner {
+        @include box-sizing(border-box);
+        max-width: 650px;
+        margin: 1em auto;
+    }
+
+    #finish-auth-status {
+        padding-top: 30px; // Make room for the absolutely positioned loading animation
+    }
+
+    #finish-auth-status li:last-child {
+        font-weight: bold;
+    }
+}
+
+.supplemental-link {
+    margin: 1rem 0;
+}

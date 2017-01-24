@@ -1,0 +1,37 @@
+<article class="discussion-article" data-id="<%- id %>" tabindex="-1">
+    <div class="thread-wrapper">
+        <div class="thread-main-wrapper">
+            <div class="thread-content-wrapper"></div>
+            <div class="post-extended-content">
+                <ol class="responses js-marked-answer-list"></ol>
+            </div>
+        </div>
+        <div class="post-extended-content thread-responses-wrapper">
+            <div class="response-btn-count-wrapper">
+                <% if (!readOnly) { %>
+                <div class="add-response">
+                    <button class="btn btn-small add-response-btn">
+                        <%- gettext("Add a Response") %>
+                    </button>
+                </div>
+                <% } %>
+                <div class="response-count"></div>
+            </div>
+            <ol class="responses js-response-list"></ol>
+            <div class="response-pagination"></div>
+            <div class="post-status-closed bottom-post-status" style="display: none">
+              <%- gettext("This thread is closed.") %>
+            </div>
+            <% if (can_create_comment && !readOnly) { %>
+            <form class="discussion-reply-new" data-id="<%- id %>">
+                <h4><%- gettext("Add a response:") %></h4>
+                <ul class="discussion-errors"></ul>
+                <div class="reply-body" data-id="<%- id %>"></div>
+                <div class="reply-post-control">
+                    <button class="btn discussion-submit-post control-button"><%- gettext("Submit") %></button>
+                </div>
+            </form>
+            <% } %>
+        </div>
+    </div>
+</article>

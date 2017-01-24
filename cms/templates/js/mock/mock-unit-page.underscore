@@ -1,0 +1,47 @@
+<div id="content">
+
+    <div class="main-wrapper edit-state-draft" data-locator="unit_locator">
+        <div class="inner-wrapper">
+            <div class="alert editing-draft-alert">
+                <p class="alert-message"><strong>You are editing a draft.</strong></p>
+                <a href="#" target="_blank" class="alert-action secondary">View the Live Version</a>
+            </div>
+
+            <div class="main-column">
+                <article class="unit-body window">
+                    <p class="unit-name-input"><label for="unit-display-name-input">Display Name:</label><input type="text" value="Mock Unit" id="unit-display-name-input" class="unit-display-name-input"></p>
+                    <ol class="components ui-sortable">
+                        <li class="component" data-locator="loc_1"></li>
+                        <li class="component" data-locator="loc_2"></li>
+                        <li class="add-xblock-component new-component-item adding"></li>
+                    </ol>
+                </article>
+            </div>
+
+            <div class="sidebar">
+                <div class="unit-settings window">
+                    <h4 class="header">Unit Settings</h4>
+                    <div class="window-contents">
+                        <div class="row visibility">
+                            <label for="visibility-select" class="inline-label">Visibility:</label>
+                            <select name="visibility-select" id="visibility-select" class="visibility-select">
+                                <option value="public">Public</option>
+                                <option value="private">Private</option>
+                            </select>
+                        </div>
+                        <div class="row published-alert">
+                            <p class="edit-draft-message">This unit has been published. To make changes, you must <a href="#" class="create-draft">edit a draft</a>.</p>
+                            <p class="publish-draft-message">This is a draft of the published unit. To update the live version, you must <a href="#" class="publish-draft">replace it with this draft</a>.</p>
+                        </div>
+                        <div class="row status">
+                            <p>
+                                This unit is scheduled to be released to <strong>students</strong> on <strong>Jan 01, 2030 at 00:00 UTC</strong> with the subsection <a href="/subsection/AndyA.EBT1.EBT1/branch/draft/block/sequential544">Lesson 1</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

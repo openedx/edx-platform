@@ -1,0 +1,12 @@
+<li class="actions-item">
+    <button class="btn-link action-list-item action-report" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Report abuse") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Report") %></span>
+            <span class="label-checked"><%- gettext("Unreport") %></span>
+        </span>
+        <span class="action-icon">
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
+        </span>
+    </button>
+</li>

@@ -1,0 +1,123 @@
+<%inherit file="shopping_cart_flow.html" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="billing_details_highlight"><li class="active" >${_('Billing Details')}</li></%block>
+<%block name="confirmation_highlight"></%block>
+
+<%block name="custom_content">
+<div class="container">
+  % if shoppingcart_items:
+  <section class="confirm-enrollment shopping-cart billing-details-view">
+  <h3>${_('You can proceed to payment at any point in time. Any additional information you provide will be included in your receipt.')}</h3>
+    <div class="billing-data">
+      <div class="col-half">
+        <h3>${_('Purchasing Organizational Details')}</h3>
+        <div class="data-group"><label for="id_company_name">${_('Purchasing organization')}</label><input type="text" id="id_company_name" name="company_name"></div>
+      <div class="data-group"><label for="id_customer_reference_number">${_('Purchase order number (if any)')}</label><input type="text" id="id_customer_reference_number" maxlength="63" name="customer_reference_number"></div>
+      </div>
+      <div class="col-half">
+        <h3>${_('Organization Contact')}</h3>
+         <div class="data-group"><label for="id_company_contact_name">${_('Name')}</label><input type="text"id="id_company_contact_name" name="company_contact_name"></div>
+      <div class="data-group"><label for="id_company_contact_email">${_('Email Address')}</label><input type="email" placeholder="${_('email@example.com')}" id="id_company_contact_email" name="company_contact_email"><span id="company_contact_email_error" class="error-text"></span></div>
+      </div>
+      <div class="col-half">
+        <h3>${_('Additional Receipt Recipient')}</h3>
+        <div class="data-group">
+          <label for="id_recipient_name">${_('Name')}</label>
+       <input type="text" id="id_recipient_name" name="recipient_name">
+       </div>
+       <div class="data-group">
+         <label for="id_recipient_email">${_('Email Address')}</label>
+       <input type="email" id="id_recipient_email" placeholder="${_('email@example.com')}" name="recipient_email">
+         <span id="recipient_email_error" class="error-text"></span>
+       </div>
+      </div>
+    </div>
+    <div class="discount">
+      <div class="code-text">
+          <span class="pull-right">${_('Total')}: <b>${currency_symbol}${"{0:0.2f}".format(amount)} ${currency.upper()}</b></span>
+      </div>
+      </div>
+      <div class="col-two">
+
+          <div class="col-2">
+               ${form_html}
+                <p>
+                  ${_('If no additional billing details are populated the payment confirmation will be sent to the user making the purchase.')}
+               </p>
+          </div>
+      </div>
+      <div class="disclaimer">${_('Payment processing occurs on a separate secure site.')}</div>
+
+  </section>
+  %else:
+  <div class="empty-cart" >
+        <h2>${_('Your Shopping cart is currently empty.')}</h2>
+          <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
+  </div>
+  %endif
+</div>
+</%block>
+
+<script>
+  $(function() {
+    function validateEmail(sEmail) {
+      filter = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/
+      return filter.test(sEmail)
+     }
+    $('section.confirm-enrollment form button[type="submit"]').click(function(event) {
+      var is_valid_email = true;
+      var payment_form = $(this).parent('form');
+      var recipient_email = $('input[name="recipient_email"]').val();
+      var company_contact_email =  $('input[name="company_contact_email"]').val();
+      if ( recipient_email != '' && !(validateEmail(recipient_email))) {
+         $('span#recipient_email_error').html('Please enter valid email address');
+         $('input[name="recipient_email"]').addClass('error');
+        is_valid_email = false;
+      }
+      else {
+        $('input[name="recipient_email"]').removeClass('error');
+        $('span#recipient_email_error').html('');
+      }
+      if ( company_contact_email != '' && !(validateEmail(company_contact_email))) {
+         $('span#company_contact_email_error').html('Please enter valid email address');
+        $('input[name="company_contact_email"]').addClass('error');
+        is_valid_email = false;
+      }
+      else {
+        $('input[name="company_contact_email"]').removeClass('error');
+        $('span#company_contact_email_error').html('');
+      }
+      if (!is_valid_email) {
+        return false;
+      }
+      event.preventDefault();
+      // Disable the submit button to prevent duplicate submissions
+      $(this).addClass("disabled");
+      var post_url = "${reverse('billing_details')}";
+      var data = {
+               "company_name" : $('input[name="company_name"]').val(),
+               "company_contact_name" : $('input[name="company_contact_name"]').val(),
+               "company_contact_email" : company_contact_email,
+               "recipient_name" : $('input[name="recipient_name"]').val(),
+               "recipient_email" : recipient_email,
+               "customer_reference_number" : $('input[name="customer_reference_number"]').val()
+               };
+      $.post(post_url, data)
+      .success(function(data) {
+            if (data.is_course_enrollment_closed == true) {
+              location.href = "${reverse('shoppingcart.views.show_cart')}";
+            }
+            else {
+              payment_form.submit();
+            }
+          })
+      .error(function(data,status) {
+            $(this).removeClass("disabled");
+             })
+    });
+  });
+</script>

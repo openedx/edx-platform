@@ -1,0 +1,21 @@
+{
+    "name": "edx-monitoring-only",
+    "version": "0.0.1",
+    "dependencies": {
+        "annotator": "1.2.6",
+        "backbone-relational": "0.9.0",
+        "codemirror": "3.21.0",
+        "date": "1.0",
+        "domready": "2.0.1",
+        "draggabilly": "1.2.4",
+        "jquery-form": "3.18.0",
+        "jquery-watch": "2.0",
+        "mustache": "0.5.1",
+        "rangeslider": "1.0",
+        "slickgrid": "2.1",
+        "timeago": "0.11.4",
+        "tinymce": "4.0.20",
+        "urijs": "1.11.2",
+        "url": "1.8.4"
+    }
+}

@@ -1,0 +1,246 @@
+// JM MOSFET AMPLIFIER
+section.tool-wrapper {
+  @extend .clearfix;
+  background: #073642;
+  border-bottom: 1px solid darken(#002b36, 10%);
+  border-top: 1px solid darken(#002b36, 10%);
+  box-shadow: inset 0 0 0 4px darken(#094959, 2%);
+  color: #839496;
+  display: table;
+  margin: lh() (-(lh())) 0;
+
+  div#graph-container {
+    background: none;
+    @include box-sizing(border-box);
+    display: table-cell;
+    padding: lh();
+    vertical-align: top;
+    width: flex-grid(4.5, 9) + flex-gutter(9);
+
+    .ui-widget-content {
+      background: none;
+      border: none;
+      border-radius: 0;
+    }
+
+    canvas {
+      width: 100%;
+    }
+
+    ul.ui-tabs-nav {
+      background: darken(#073642, 2%);
+      border-bottom: 1px solid darken(#073642, 8%);
+      border-radius: 0;
+      margin: (-(lh())) (-(lh())) 0;
+      padding: 0;
+      position: relative;
+      width: 110%;
+
+      li {
+        background: none;
+        border: none;
+        border-radius: 0;
+        color: $white;
+        margin-bottom: 0;
+
+        &.ui-tabs-selected {
+          background-color: #073642;
+          border-left: 1px solid darken(#073642, 8%);
+          border-right: 1px solid darken(#073642, 8%);
+
+          &:first-child {
+            border-left: none;
+          }
+
+          a {
+            color: #eee8d5;
+          }
+        }
+
+        a {
+          border: none;
+          color: #839496;
+          font: bold 12px $body-font-family;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+
+          &:hover, &:focus {
+            color: #eee8d5;
+          }
+        }
+      }
+    }
+  }
+
+  div#controlls-container {
+    @extend .clearfix;
+    background: darken(#073642, 2%);
+    border-right: 1px solid darken(#002b36, 6%);
+    box-shadow: 1px 0 0 lighten(#002b36, 6%), inset 0 0 0 4px darken(#094959, 6%);
+    @include box-sizing(border-box);
+    display: table-cell;
+    padding: lh();
+    vertical-align: top;
+    width: flex-grid(4.5, 9);
+
+    div.graph-controls {
+
+      div.music-wrapper {
+        @extend .clearfix;
+        border-bottom: 1px solid darken(#073642, 10%);
+        box-shadow: 0 1px 0 lighten(#073642, 2%);
+        margin-bottom: lh();
+        padding: 0 0 lh();
+
+        input#playButton {
+          border-color: darken(#002b36, 6%);
+          @include button(simple, lighten( #586e75, 5% ));
+          display: block;
+          float: right;
+          font: bold 14px $body-font-family;
+          margin-top: 19px;
+
+          &:active {
+            box-shadow: none;
+          }
+
+          &[value="Stop"] {
+            @include button(simple, darken(#268bd2, 30%));
+            font: bold 14px $body-font-family;
+
+            &:active {
+              box-shadow: none;
+            }
+          }
+        }
+      }
+
+      div.inputs-wrapper {
+        @extend .clearfix;
+        border-bottom: 1px solid darken(#073642, 10%);
+        box-shadow: 0 1px 0 lighten(#073642, 2%);
+        @include clearfix();
+        margin-bottom: lh();
+        margin-bottom: lh();
+        padding: 0 0 lh();
+      }
+
+      p {
+        font-weight: bold;
+        display: inline-block;
+        margin: 0;
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+        -webkit-font-smoothing: antialiased;
+        color: #839496;
+      }
+
+      ul {
+        display: inline-block;
+        margin-bottom: 0;
+
+        li {
+          display: inline-block;
+          margin-bottom: 0;
+
+          input {
+            margin-right: ($baseline/4);
+          }
+        }
+      }
+
+      div#graph-listen {
+        display: block;
+        float: left;
+        margin-bottom: 0;
+        margin-right: $baseline;
+        margin-top: 8px;
+        text-align: right;
+      }
+    }
+
+    label {
+      border-radius: 2px;
+      color: $white;
+      font-weight: bold;
+      padding: 3px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    //MOSFET AMPLIFIER
+    label[for="vinCheckbox"], label[for="vinRadioButton"]{
+      color: desaturate(#00bfff, 50%);
+    }
+
+    label[for="voutCheckbox"], label[for="voutRadioButton"]{
+      color: darken(#ffcf48, 20%);
+    }
+
+    label[for="vrCheckbox"], label[for="vrRadioButton"]{
+      color: desaturate(#1df914, 40%);
+    }
+
+    //RC Filters
+    label[for="vcCheckbox"], label[for="vcRadioButton"]{
+      color: darken(#ffcf48, 20%);
+    }
+
+    //RLC Series
+    label[for="vlCheckbox"], label[for="vlRadioButton"]{
+      color: desaturate(#d33682, 40%);
+    }
+
+    div.schematic-sliders {
+      div.top-sliders {
+        @extend .clearfix;
+        border-bottom: 1px solid darken(#073642, 10%);
+        box-shadow: 0 1px 0 lighten(#073642, 2%);
+        margin-bottom: lh();
+        padding: 0 0 lh();
+
+        select#musicTypeSelect {
+          font: 16px $body-font-family;
+          display: inline-block;
+          margin-bottom: 0;
+        }
+
+        p {
+          font-weight: bold;
+          display: inline-block;
+          margin: 0 lh(0.5) lh() 0;
+          color: #839496;
+          text-shadow: 0 -1px 0 darken(#073642, 10%);
+          -webkit-font-smoothing: antialiased;
+        }
+      }
+
+      div.slider-label {
+        font-weight: bold;
+        margin-bottom: lh(0.5);
+        text-shadow: 0 -1px 0 darken(#073642, 10%);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      div.slider {
+        margin-bottom: lh(1);
+
+        &.ui-slider-horizontal {
+          background: darken(#002b36, 2%);
+          border: 1px solid darken(#002b36, 8%);
+          box-shadow: none;
+          height: 0.4em;
+        }
+
+        .ui-slider-handle {
+          background: lighten( #586e75, 5% ) url('#{$static-path}/images/amplifier-slider-handle.png') center no-repeat;
+          border: 1px solid darken(#002b36, 8%);
+          box-shadow: inset 0 1px 0 lighten( #586e75, 20% );
+          margin-top: -.3em;
+
+          &:hover, &:active, &:focus {
+            background-color: lighten( #586e75, 10% );
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,269 @@
+{% extends "wiki/article.html" %}
+{% load wiki_tags i18n sekizai_tags %}
+{% load url from future %}
+
+{% block pagetitle %}{% trans "History" %}: {{ article.current_revision.title }}{% endblock %}
+
+{% block wiki_contents_tab %}
+
+{% addtoblock "js" %}
+<script type="text/javascript" src="{{ STATIC_URL }}wiki/js/diffview.js"></script>
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('.accordion input[disabled!="disabled"][type="radio"]').first().attr('checked', 'true');
+
+        $('a.accordion-toggle').click(function(event) {
+            event.preventDefault();
+            var diffUrl = $(event.target).attr('href');
+            var accordionBody = $(this).parentsUntil('.accordion').find('.accordion-body');
+
+            jsonWrapper(diffUrl, function (data) {
+                if (!accordionBody.find('.diff-container tbody').length > 0) {
+                    accordionBody.parentsUntil('.accordion').find('.progress').show(0 , function() {
+                        tbody = pydifferviewer.as_tbody({differ_output: data.diff});
+                        accordionBody.find('.diff-container table').append(tbody);
+                        if (data.other_changes) {
+                            for (var i=0; i < data.other_changes.length; i++) {
+                                accordionBody.find('dl').append($('<dt>'+data.other_changes[i][0]+'</dt>' +
+                                                                  '<dd>'+data.other_changes[i][1]+'</dd>'  ));
+                            }
+                        }
+                        accordionBody.parentsUntil('.accordion').find('.progress').detach();
+                        accordionBody.removeClass('collapse');
+                        accordionBody.focus();
+                    });
+                } else {
+                    accordionBody.toggleClass('collapse');
+                    if (!accordionBody.hasClass('collapse')) {
+                        accordionBody.focus();
+                    }
+                }
+            });
+        });
+
+        $(".previewRevisionButton").each(function () {
+            accessible_modal("#"+this.id, "#previewRevisionModal .close-modal", "#previewRevisionModal", ".content-wrapper");
+        });
+        $("#previewRevisionModalBackToHistory").click(function (e) {
+            $("#previewRevisionModal .close-modal").click();
+            e.preventDefault();
+        });
+
+        accessible_modal("#mergeButton", "#mergeModal .close-modal", "#mergeModal", ".content-wrapper");
+        $("#mergeModalBackToHistory").click(function (e) {
+            $("#mergeModal .close-modal").click();
+            e.preventDefault();
+        });
+    });
+</script>
+{% endaddtoblock %}
+{% addtoblock "css" %}
+<style type="text/css">
+  td.linenumber {
+    width: 20px;
+  }
+  tr.insert td {
+    background-color: #DFC;
+  }
+  tr.delete td {
+    background-color: #FDC;
+  }
+  tr.equal td {
+    background-color: #F2F2F2;
+  }
+
+  .diff-container td {
+    white-space: pre; font-family: monospace;
+  }
+  .diff-container td,
+  .diff-container th {
+    padding: 2px 7px;
+    border-right: 1px solid #DDD;
+  }
+  .diff-container td:last-child,
+  .diff-container th:last-child {
+    border-right: none;
+  }
+  .diff-container table {
+    border-top: 1px solid #DDD;
+  }
+</style>
+{% endaddtoblock %}
+
+<p class="lead">
+  {% trans "Click each revision to see a list of edited lines. Click the Preview button to see how the article looked at this stage. At the bottom of this page, you can change to a particular revision or merge an old revision with the current one." %}
+</p>
+
+<form method="GET" name="revisions_form">
+  <div class="tab-content" style="overflow: visible;">
+    {% for revision in revisions %}
+      <div class="accordion" id="accordion{{ revision.revision_number }}">
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" style="float: left;" href="{% url 'wiki:diff' revision.id %}">
+              <span class="icon fa fa-plus" aria-hidden="true"></span>
+              {% include "wiki/includes/revision_info.html" with current_revision=article.current_revision %}
+              <div style="color: #CCC;">
+                <small>
+                {% if revision.user_message %}
+                  {{ revision.user_message }}
+                {% elif revision.automatic_log %}
+                  {{ revision.automatic_log }}
+                {% else %}
+                  {% trans "(no log message)" %}
+                {% endif %}
+                </small>
+              </div>
+            </a>
+            <div class="progress progress-striped active" style="display: none; width: 40px; float: left; margin-top: 7px; margin-bottom: -7px;">
+              <div class="bar" style="width: 100%;"></div>
+            </div>
+            <div class="pull-right" style="vertical-align: middle; margin: 8px 3px;">
+              {% if not revision == article.current_revision %}
+                <a class="btn previewRevisionButton"
+                    id="previewRevisionButton{{ revision.revision_number }}"
+                    href="#previewRevisionModal" rel="leanModal"
+                    onclick="
+                      document.revisions_form.target='previewWindow';
+                      document.revisions_form.r.value='{{ revision.id }}';
+                      document.revisions_form.action='{% url 'wiki:preview_revision' article.id %}';
+                      $('#previewRevisionModal .switch-to-revision').attr('href', '{% url 'wiki:change_revision' path=urlpath.path article_id=article.id revision_id=revision.id %}');
+                      document.revisions_form.submit();">
+                  <span class="icon fa fa-eye" aria-hidden="true"></span>
+                  {% trans "Preview this revision" %}
+                </a>
+
+                {% if article|can_write:user %}
+                  <input type="radio" style="margin: 0 10px;" value="{{ revision.id }}" name="revision_id"
+                    switch-button-href="{% url 'wiki:change_revision' path=urlpath.path revision_id=revision.id %}"
+                    merge-button-href="{% url 'wiki:merge_revision_preview' article_id=article.id revision_id=revision.id %}"
+                    merge-button-commit-href="{% url 'wiki:merge_revision' path=urlpath.path article_id=article.id revision_id=revision.id %}"
+                  />
+                {% endif %}
+
+              {% endif %}
+
+            </div>
+            <div style="clear: both"></div>
+          </div>
+          <div id="collapse{{ revision.revision_number }}" class="accordion-body collapse" tabindex="0">
+            <div class="accordion-inner diff-container" style="padding: 0;">
+              <dl class="dl-horizontal">
+                <dt>{% trans "Auto log:" %}</dt>
+                <dd>{{ revision.automatic_log|default:"-"|linebreaksbr }}</dd>
+              </dl>
+              <table class="table table-condensed" style="margin: 0; border-collapse: collapse;">
+                <thead>
+                  <tr>
+                    <th scope="col" class="linenumber">{% if revision.previous_revision %}#{{revision.previous_revision.revision_number}}{% endif %}</th>
+                    <th scope="col" class="linenumber">#{{revision.revision_number}}</th>
+                    <th scope="col">{% trans "Change" %}</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    {% include "wiki/includes/pagination.html" %}
+
+    {% if revisions.count > 1 %}
+    <div class="form-actions">
+      <div class="pull-right">
+        {% if article|can_write:user %}
+          <a class="btn btn-large" id="mergeButton" href="#mergeModal" rel="leanModal"
+            onclick="
+              document.revisions_form.target='mergeWindow';
+              document.revisions_form.action=$('input[type=radio]:checked').attr('merge-button-href');
+              $('.merge-revision-commit').attr('href', $('input[type=radio]:checked').attr('merge-button-commit-href'));
+              document.revisions_form.submit();">
+            <span class="icon fa fa-random" aria-hidden="true"></span>
+            {% trans "Merge selected with current..." %}
+          </a>
+        {% else %}
+          <button type="submit" disabled="true" name="preview" value="1" class="btn btn-large">
+            <span class="icon fa fa-lock" aria-hidden="true"></span>
+            {% trans "Merge selected with current..." %}
+          </button>
+        {% endif %}
+        <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.action=$('input[type=radio]:checked').attr('switch-button-href')">
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
+          {% trans "Switch to selected version" %}
+        </button>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+  <input type="hidden" name="r" value="" />
+  <section id="previewRevisionModal" class="modal" aria-hidden="true">
+    <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title">
+      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
+
+      <header>
+        <h2 id="preview-title">{% trans "Wiki Revision Preview" %}<span class="sr">, {% trans "window open" %}</span></h2>
+        <hr/>
+      </header>
+      <div class="modal-body">
+        <iframe name="previewWindow"></iframe>
+      </div>
+      <div class="modal-footer">
+      <a id="previewRevisionModalBackToHistory" href="#" class="btn btn-large" data-dismiss="modal">
+        <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
+        {% trans "Back to history view" %}
+      </a>
+      {% if article|can_write:user %}
+        <button type="button" class="btn btn-large btn-primary switch-to-revision">
+          <span class="icon fa fa-flag" aria-hidden="true"></span>
+          {% trans "Switch to this version" %}
+        </button>
+      {% else %}
+        <button type="button" class="btn btn-large btn-primary disabled">
+          <span class="icon fa fa-lock" aria-hidden="true"></span>
+          {% trans "Switch to this version" %}
+        </button>
+      {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section id="mergeModal" class="modal" aria-hidden="true">
+    <div class="inner-wrapper" role="dialog" aria-labelledby="merge-title">
+      <button class="close-modal"><span class="icon fa fa-remove" aria-hidden="true"></span> <span class="sr">{% trans 'Close' %}</span></button>
+
+      <header>
+        <h2 id="merge-title">{% trans "Merge Revision" %}<span class="sr">, {% trans "window open" %}</span></h2>
+        <hr/>
+      </header>
+      <div class="modal-header">
+        <h1>{% trans "Merge with current" %}</h1>
+        <p class="lead"><span class="icon fa fa-info-circle" aria-hidden="true"></span> {% trans "When you merge a revision with the current, all data will be retained from both versions and merged at its approximate location from each revision." %} <strong>{% trans "After this, it's important to do a manual review." %}</strong></p>
+      </div>
+      <div class="modal-body">
+        <iframe name="mergeWindow"></iframe>
+      </div>
+      <div class="modal-footer">
+        <a id="mergeModalBackToHistory" href="#" class="btn btn-large" data-dismiss="modal">
+          <span class="icon fa fa-circle-arrow-left" aria-hidden="true"></span>
+          {% trans "Back to history view" %}
+        </a>
+        {% if article|can_write:user %}
+        <button type="button" class="btn btn-large btn-primary merge-revision-commit">
+          <span class="icon fa fa-file" aria-hidden="true"></span>
+          {% trans "Create new merged version" %}
+        </button>
+        {% else %}
+          <button type="button" class="btn btn-large btn-primary disabled">
+            <span class="icon fa fa-lock" aria-hidden="true"></span>
+            {% trans "Create new merged version" %}
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

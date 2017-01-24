@@ -1,0 +1,5 @@
+<form class="section-name-edit">
+    <input type="text" value="<%= name %>" autocomplete="off"/>
+    <input type="submit" class="save-button" value="<%= gettext("Save") %>" />
+    <input type="button" class="cancel-button" value="<%= gettext("Cancel") %>" />
+</form>

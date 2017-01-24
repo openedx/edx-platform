@@ -1,0 +1,140 @@
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+
+<%block name="title"><title>${_("FAQ")}</title></%block>
+
+<section class="container about">
+  <nav>
+    <a href="${reverse('about_edx')}">${_("Vision")}</a>
+    <a href="${reverse('faq_edx')}" class="active">${_("Faq")}</a>
+    <a href="${reverse('press')}">${_("Press")}</a>
+    <a href="${reverse('contact')}">${_("Contact")}</a>
+  </nav>
+
+
+  <section class="faq">
+    <section class="responses">
+      <section id="the-organization" class="category">
+        <h2>${_("Organization")}</h2>
+        <article class="response">
+          <h3>${_("What is {edX}?").format(edX="edX")}</h3>
+          <p>${_('{EdX} is a not-for-profit enterprise of its founding partners, the {MIT_long} ({MIT}) and {harvard_u} that offers online learning to on-campus students and to millions of people around the world. To do so, {edX} is building an open-source online learning platform and hosts an online web portal at <a href=\"http://www.edx.org\">www.edx.org</a> for online education.').format(EdX="EdX", edX="edX", MIT_long="Massachusetts Institute of Technology", MIT="MIT", harvard_u="Harvard University")}</p>
+          <p>${_("{EdX} currently offers {HarvardX}, {MITx} and {BerkeleyX} classes online for free. Beginning in fall 2013, {edX} will offer {WellesleyX} , {GeorgetownX} and the {UTexas} classes online for free. The {UT} System includes nine universities and six health institutions. In 2014, {edX} will further expand its consortium, including several international schools, when it begins offering courses from {EPFL}, {McGill}, {Toronto}, {ANU}, {Delft}, and {Rice}.  The {edX} institutions aim to extend their collective reach to build a global community of online students. Along with offering online courses, the three universities undertake research on how students learn and how technology can transform learning both on-campus and online throughout the world.").format(
+              EdX="EdX",
+              edX="edX",
+              HarvardX="HarvardX",
+              MITx="MITx",
+              BerkeleyX="BerkeleyX",
+              WellesleyX="WellesleyX",
+              GeorgetownX="GeorgetownX",
+              UTexas="University of Texas System",
+              UT="UT",
+              EPFL=u"École Polytechnique Fédérale de Lausanne",
+              McGill="McGill University",
+              Toronto="University of Toronto",
+              ANU="Australian National University",
+              Delft="Delft University of Technology",
+              Rice="Rice University",
+            )}
+          </p>
+        </article>
+
+        <article class="response">
+          <h3>${_("Will {edX} be adding additional X Universities?").format(edX="edX")}</h3>
+          <p>${_("More than 200 institutions from around the world have expressed interest in collaborating with {edX} since {Harvard} and {MIT} announced its creation in May. {EdX} is focused above all on quality and developing the best not-for-profit model for online education. In addition to providing online courses on the {edX} platform, the {x_consortium} will be a forum in which members can share experiences around online learning. {Harvard}, {MIT}, {Berkeley}, the {UTexas} and the other {consortium} members will work collaboratively to establish the {x_consortium}, whose membership will expand to include additional \"{X_Universities}.\"  As noted above, {edX}'s newest {consortium} members include {Wellesley}, {Georgetown}, {EPFL}, {McGill}, {Toronto}, {ANU}, {Delft}, and {Rice}. Each member of the {consortium} will offer courses on the {edX} platform as an \"{X_University}\". The gathering of many universities' educational content together on one site will enable learners worldwide to access the offered course content of any participating university from a single website, and to use a set of online educational tools shared by all participating universities.").format(
+              EdX="EdX",
+              edX="edX",
+              Harvard="Harvard",
+              MIT="MIT",
+              x_consortium="\"X University\" Consortium",
+              consortium="consortium",
+              X_Universities="X Universities",
+              X_University="X University",
+              Berkeley="UC Berkeley",
+              Wellesley="Wellesley",
+              Georgetown="Georgetown",
+              UTexas="University of Texas System",
+              EPFL=u"École Polytechnique Fédérale de Lausanne",
+              McGill="McGill University",
+              Toronto="University of Toronto",
+              ANU="Australian National University",
+              Delft="Delft University of Technology",
+              Rice="Rice University",
+            )}</p>
+          <p>${_("{EdX} will actively explore the addition of other institutions from around the world to the {edX} platform, and looks forward to adding more \"{X_Universities}\".").format(EdX="EdX", edX="edX", X_Universities="X Universities")}
+          </p>
+        </article>
+      </section>
+
+      <section id="students" class="category">
+        <h2>${_("Students")}</h2>
+        <article class="response">
+          <h3>${_("Who can take {edX} courses? Will there be an admissions process?").format(edX="edX")}</h3>
+          <p>${_("{EdX} will be available to anyone in the world with an internet connection, and in general, there will not be an admissions process.").format(EdX="EdX")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("Will certificates be awarded?")}</h3>
+          <p>${_("Yes. Online learners who demonstrate mastery of subjects can earn a certificate "
+                 "of mastery. Certificates will be issued at the discretion of {edX} and the underlying "
+                 "\"{X_University}\" that offered the course under the name of the underlying \"{X_University}\" from where the course originated, i.e. {HarvardX}, {MITx} or {BerkeleyX}. "
+                 "For the courses in Fall 2012, those certificates will be free. There is a plan to "
+                 "charge a modest fee for certificates in the future. Note: At this time, {edX} is "
+                 "holding certificates for learners connected with Cuba, Iran, Syria and Sudan "
+                 "pending confirmation that the issuance is in compliance with U.S. embargoes.").format(edX="edX", X_University="X University", HarvardX="HarvardX", MITx="MITx", BerkeleyX="BerkeleyX")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("What will the scope of the online courses be? How many? Which faculty?")}</h3>
+          <p>${_('Our goal is to offer a wide variety of courses across disciplines. There are currently {link_start}fifteen{link_end} offered on the {edX} platform.').format(link_start='<a href="/courses">', link_end='</a>', edX="edX")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("Who is the learner? Domestic or international? Age range?")}</h3>
+          <p>${_("Improving teaching and learning for students on our campuses is one of our primary goals. Beyond that, we don't have a target group of potential learners, as the goal is to make these courses available to anyone in the world - from any demographic - who has interest in advancing their own knowledge. The only requirement is to have a computer with an internet connection. More than 150,000 students from over 160 countries registered for {MITx}'s first course, 6.002x: Circuits and Electronics. The age range of students certified in this course was from 14 to 74 years-old.").format(MITx="MITx")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("Will participating universities' standards apply to all courses offered on the edX platform?")}</h3>
+          <p>${_("Yes: the reach changes exponentially, but the rigor remains the same.")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("How do you intend to test whether this approach is improving learning?")}</h3>
+          <p>${_("{EdX} institutions have assembled faculty members who will collect and analyze data to assess results and the impact {edX} is having on learning.").format(EdX="EdX", edX="edX")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("How may I apply to study with {edX}?").format(edX="edX")}</h3>
+          <p>${_('Simply complete the online {link_start}signup form{link_end}.  Enrolling will create your unique student record in the {edX} database, allow you to register for classes, and to receive a certificate on successful completion.').format(link_start='<a href="#signup-modal" rel="leanModal">', link_end='</a>', edX="edX")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("How may another university participate in {edX}? ").format(edX="edX")}</h3>
+          <p>${_('If you are from a university interested in discussing {edX}, please email {email}').format(email='<a href="mailto:university@edx.org">university@edx.org</a>', edX="edX")}</p>
+        </article>
+      </section>
+
+      <section id="technology-platform" class="category">
+        <h2>${_("Technology Platform")}</h2>
+        <article class="response">
+          <h3>${_("What technology will {edX} use?").format(edX="edX")}</h3>
+          <p>${_("The {edX} open-source online learning platform will feature interactive learning designed specifically for the web. Features will include: self-paced learning, online discussion groups, wiki-based collaborative learning, assessment of learning as a student progresses through a course, and online laboratories and other interactive learning tools. The platform will also serve as a laboratory from which data will be gathered to better understand how students learn. Because it is open source, the platform will be continuously improved by a worldwide community of collaborators, with new features added as needs arise.").format(edX="edX")}</p>
+          <p>${_("The first version of the technology was used in the first <em>{MITx}</em> course, 6.002x Circuits and Electronics, which launched in Spring, 2012.").format(MITx="MITx")}</p>
+        </article>
+        <article class="response">
+          <h3>${_("How is this different from what other universities are doing online?")}</h3>
+          <p>${_("{EdX} is a not-for-profit enterprise built upon the shared educational missions of its founding partners, {Harvard_long} and {MIT}. The {edX} platform will be available as open source. Also, a primary goal of {edX} is to improve teaching and learning on campus by experimenting with blended models of learning and by supporting faculty in conducting significant research on how students learn.").format(edX="edX", EdX="EdX", Harvard_long="Harvard University", MIT="MIT")}</p>
+        </article>
+      </section>
+
+    </section>
+
+    <nav class="categories">
+      <a href="#organization">${_("Organization")}</a>
+      <a href="${reverse('help_edx')}">${_("Students")}</a>
+      <a href="#technology-platform">${_("Technology Platform")}</a>
+    </nav>
+  </section>
+</section>
+
+%if user.is_authenticated():
+<%include file="../signup_modal.html" />
+%endif

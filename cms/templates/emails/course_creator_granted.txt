@@ -1,0 +1,6 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+${_("Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n\n{url}").format(
+  studio_name=settings.STUDIO_NAME,
+  url="{scheme}://{site}".format(scheme="https" if is_secure else "http", site=site),
+)}

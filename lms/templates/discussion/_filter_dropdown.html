@@ -1,0 +1,59 @@
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from lms.djangoapps.django_comment_client.constants import TYPE_ENTRY
+from openedx.core.djangolib.markup import HTML
+%>
+
+<%def name="render_dropdown(map)">
+    % for child, c_type in map["children"]:
+        % if child in map["entries"] and c_type == TYPE_ENTRY:
+            ${HTML(render_entry(map["entries"], child))}
+        %else:
+            ${HTML(render_category(map["subcategories"], child))}
+        %endif
+    %endfor
+</%def>
+
+<%def name="render_entry(entries, entry)">
+    <li
+        class="forum-nav-browse-menu-item"
+        data-discussion-id='${entries[entry]["id"]}'
+        id='${entries[entry]["id"]}'
+        data-cohorted="${str(entries[entry]['is_cohorted']).lower()}"
+        role="option"
+    >
+        <span class="forum-nav-browse-title">${entry}</span>
+    </li>
+</%def>
+
+<%def name="render_category(categories, category)">
+    <li class="forum-nav-browse-menu-item"
+        id='${category | u}'
+    >
+        <span class="forum-nav-browse-title">${category}</span>
+        <ul class="forum-nav-browse-submenu">
+            ${HTML(render_dropdown(categories[category]))}
+        </ul>
+    </li>
+</%def>
+
+<div class="forum-nav-browse-menu-wrapper" style="display: none" aria-label="${_("Discussion topics list")}">
+    <form class="forum-nav-browse-filter" autocomplete="off">
+        <label>
+            <span class="sr">${_("Filter Topics")}</span>
+            <input type="text" id="forum-nav-browse-filter-input" role="combobox" aria-expanded="true" aria-owns="discussion_topics_listbox" aria-autocomplete="list" class="forum-nav-browse-filter-input" placeholder="${_("filter topics")}">
+            <span class="icon fa fa-filter" aria-hidden="true"></span>
+        </label>
+    </form>
+    <ul class="forum-nav-browse-menu" role="listbox" id="discussion_topics_listbox">
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-all" role="option" id="all_discussions">
+            <span class="forum-nav-browse-title">${_("All Discussions")}</span>
+        </li>
+        <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following" role="option" id="posts_following">
+            <span class="icon fa fa-star" aria-hidden="true"></span>
+            <span class="forum-nav-browse-title">${_("Posts I'm Following")}</span>
+        </li>
+        ${HTML(render_dropdown(category_map))}
+    </ul>
+</div>

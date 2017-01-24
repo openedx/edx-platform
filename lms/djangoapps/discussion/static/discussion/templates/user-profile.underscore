@@ -1,0 +1,11 @@
+<div class="inline-threads"></div>
+<div class="inline-thread is-hidden">
+    <div class="forum-nav-bar">
+        <button class="btn-link all-posts-btn">
+            <span class="icon fa fa-chevron-prev" aria-hidden="true"></span>
+            <span><%- gettext("All Posts") %></span>
+        </button>
+    </div>
+    <div class="forum-content">
+    </div>
+</div>

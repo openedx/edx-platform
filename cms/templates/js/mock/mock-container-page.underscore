@@ -1,0 +1,87 @@
+<div id="content">
+
+    <div class="wrapper-mast wrapper" data-location="" data-display-name="" data-category="">
+        <header class="mast has-actions has-navigation">
+            <div class="page-header">
+                <small class="navigation navigation-parents subtitle">
+                    <a href="/unit/TestCourse/branch/draft/block/vertical8eb" class="navigation-item navigation-link navigation-parent">Unit 1</a>
+                </small>
+                <div class="wrapper-xblock-field is-editable" data-field="display_name">
+                    <h1 class="page-header-title xblock-field-value">Test Container</h1>
+                </div>
+            </div>
+
+            <nav class="nav-actions">
+                <h3 class="sr">Page Actions</h3>
+                <ul>
+                    % if is_unit_page:
+                        <li class="action-item action-view nav-item">
+                            <a href="${published_preview_link}" class="button button-view action-button is-disabled" aria-disabled="true" title="Open the courseware in the LMS">
+                                <span class="action-button-text">View Live Version</span>
+                            </a>
+                        </li>
+                        <li class="action-item action-preview nav-item">
+                            <a href="${draft_preview_link}" class="button button-preview action-button" title="Preview the courseware in the LMS">
+                                <span class="action-button-text">Preview</span>
+                            </a>
+                        </li>
+                    % else:
+                        <li class="action-item action-edit nav-item">
+                            <a href="#" class="button edit-button action-button">
+                                <span class="icon fa fa-pencil" aria-hidden="true"></span>
+                                <span class="action-button-text">Edit</span>
+                            </a>
+                        </li>
+                % endif
+                    <li class="nav-item">
+                        <a href="#" class="button new-button new-component-button">
+                            <span class="icon fa fa-plus icon-inline" aria-hidden="true"></span>
+                            <span class="action-button-text">Add Component</span>
+                        </a>
+                   </li>
+                   <li class="action-item action-toggle-preview nav-item">
+                       <a href="#" class="button button-toggle-preview action-button toggle-preview-button is-hidden">
+                           <span class="icon fa fa-refresh" aria-hidden="true"></span>
+                           <span class="action-button-text preview-text"></span>
+                       </a>
+                   </li>
+                </ul>
+            </nav>
+        </header>
+    </div>
+
+    <div class="wrapper-content wrapper">
+        <div class="inner-wrapper">
+            <section class="content-area">
+
+                <article class="content-primary window">
+                    <div class="container-message wrapper-message"></div>
+                    <section class="wrapper-xblock level-page studio-xblock-wrapper" data-locator="locator-container">
+                    </section>
+                    <div class="ui-loading is-hidden">
+                        <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">Loading...</span></p>
+                    </div>
+                </article>
+                <aside class="content-supplementary" role="complementary">
+                    <div id="publish-unit" class="window"></div>
+                    <div id="publish-history"></div>
+                </aside>
+                <div class="unit-location">
+                        <h4 class="header">Unit Location</h4>
+                        <div class="wrapper-unit-id content-bit">
+                            <h5 class="title">Unit Location ID</h5>
+                            <p class="unit-id">
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
+                                <span class="tip"><span class="sr">Tip: </span>Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.</span>
+                            </p>
+                        </div>
+                        <div class="wrapper-unit-tree-location bar-mod-content">
+                            <h5 class="title">Location in Course Outline</h5>
+                            <div class="wrapper-unit-overview">
+                            </div>
+                        </div>
+                    </div>
+            </section>
+        </div>
+    </div>
+</div>

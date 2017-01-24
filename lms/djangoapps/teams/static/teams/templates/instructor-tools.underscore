@@ -1,0 +1,13 @@
+<div class="wrapper-msg">
+    <h3 class="left-floater">
+        <%- gettext("Instructor tools") %>
+    </h3>
+    <span class="right-floater">
+        <button class="action-delete">
+            <%- gettext("Delete Team") %>
+        </button>
+        <button class="action-edit-members">
+            <%- gettext("Edit Membership") %>
+        </button>
+    </span>
+</div>

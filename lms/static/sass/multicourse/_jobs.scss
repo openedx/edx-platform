@@ -1,0 +1,161 @@
+.container.jobs {
+  padding: 60px 30px 120px;
+
+  q {
+    display: block;
+    margin: ($baseline/2) 0;
+    font-style: italic;
+    text-align: justify;
+  }
+
+  small.author {
+    @include text-align(right);
+    display: block;
+    color: rgb(100, 100, 100);
+  }
+
+  h1 + hr {
+    margin-bottom: ($baseline*4);
+  }
+
+  .message {
+    @include clearfix();
+    margin-bottom: ($baseline*4);
+    position: relative;
+
+    .photo {
+      background: rgb(255,255,255);
+      border: 1px solid rgb(210,210,210);
+      @include float(left);
+      @include margin-right(flex-gutter());
+      padding: 1px;
+      width: flex-grid(4);
+
+      img {
+        background: rgb(245,245,245);
+        display: block;
+        max-width: 100%;
+      }
+    }
+
+    header {
+      @include float(left);
+      width: flex-grid(7);
+
+      blockquote {
+        @include margin-left(0);
+        margin-bottom: ($baseline*2);
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        p {
+          @include margin-left(0);
+          font-style: italic;
+          line-height: 1.6;
+          font-size: 1.1em;
+          color: #666;
+        }
+
+        cite {
+          margin-top: 12px;
+          display: block;
+          color: #a0a0a0;
+          font-weight: 300;
+        }
+      }
+    }
+  }
+
+  .jobs-wrapper {
+    @include clearfix();
+    @include float(left);
+    padding-top: 80px;
+    width: flex-grid(12);
+
+    > h2 {
+      display: none;
+      margin-bottom: ($baseline*3);
+      padding-bottom: $baseline;
+    }
+
+    .jobs-sidebar {
+      @include box-sizing(border-box);
+      border: 1px solid rgb(220,220,220);
+      @include float(left);
+      padding: 20px;
+      width: flex-grid(3);
+
+      nav {
+        margin-bottom: ($baseline*2);
+
+        a {
+          display: block;
+          letter-spacing: 1px;
+          margin: 0px -20px;
+          @include padding(12px, 0px, 12px, 20px);
+          @include text-align(left);
+
+          &:hover, &:focus {
+            background: rgb(245,245,245);
+            text-decoration: none;
+          }
+        }
+      }
+
+      p + h2 {
+        margin-top: ($baseline*2);
+      }
+    }
+
+    .jobs-listing {
+      @include float(left);
+      @include margin-right(flex-gutter());
+      width: flex-grid(9);
+
+      .job {
+        border-bottom: 1px solid rgb(220,220,220);
+        padding: 40px 0px;
+
+        &:first-child {
+          padding-top: 0px;
+        }
+
+        &:last-child {
+          border: none;
+          padding-bottom: 0px;
+        }
+
+        .inner-wrapper {
+        }
+
+        h3 {
+          font-family: $sans-serif;
+          font-weight: 700;
+          margin-bottom: ($baseline*0.75);
+        }
+
+        h4 {
+          font-size: 1.0em;
+          font-family: $sans-serif;
+          font-weight: 700;
+          margin-top: 25px;
+          margin-bottom: ($baseline/2);
+        }
+
+        ul {
+          @include padding-left(50px);
+        }
+
+        li {
+          font-family: $serif;
+          font-size: 1em;
+          line-height: 1.6em;
+          color: #3c3c3c;
+          margin-bottom: 0.2em;
+        }
+      }
+    }
+  }
+}

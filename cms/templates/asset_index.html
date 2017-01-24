@@ -1,0 +1,130 @@
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "files" %></%def>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+  from openedx.core.djangolib.markup import HTML, Text
+  from openedx.core.djangolib.js_utils import js_escaped_string, dump_js_escaped_json
+%>
+<%block name="title">${_("Files & Uploads")}</%block>
+<%block name="bodyclass">is-signedin course uploads view-uploads</%block>
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in ["asset"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+</%block>
+
+<%block name="requirejs">
+    require(["js/factories/asset_index"], function (AssetIndexFactory) {
+        AssetIndexFactory({
+          assetCallbackUrl: "${asset_callback_url|n, js_escaped_string}",
+          uploadChunkSizeInMBs: ${chunk_size_in_mbs|n, dump_js_escaped_json},
+          maxFileSizeInMBs: ${max_file_size_in_mbs|n, dump_js_escaped_json},
+          maxFileSizeRedirectUrl: "${max_file_size_redirect_url|n, js_escaped_string}"
+        });
+    });
+</%block>
+
+<%block name="content">
+
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+        <h1 class="page-header">
+            <small class="subtitle">${_("Content")}</small>
+            <span class="sr">&gt; </span>${_("Files & Uploads")}
+        </h1>
+
+        <nav class="nav-actions" aria-label="${_('Page Actions')}">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="button upload-button new-button"><span class="icon fa fa-plus" aria-hidden="true"></span> ${_("Upload New File")}</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <article class="content-primary" role="main">
+            <div class="wrapper-assets" />
+            <div class="ui-loading">
+                <p><span class="spin"><span class="icon fa fa-refresh" aria-hidden="true"></span></span> <span class="copy">${_("Loading")}</span></p>
+            </div>
+        </article>
+
+        <aside class="content-supplementary" role="complementary">
+            <div class="bit">
+                <h3 class="title-3">${_("Adding Files for Your Course")}</h3>
+
+                <p>${Text(_("To add files to use in your course, click {em_start}Upload New File{em_end}. Then follow the prompts to upload a file from your computer.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+
+                <p>${Text(_("{em_start}Caution{em_end}: {platform_name} recommends that you limit the file size to {em_start}10 MB{em_end}. In addition, do not upload video or audio files. You should use a third party service to host multimedia files.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"), platform_name=settings.PLATFORM_NAME)}</p>
+
+            	<p>${_("The course image, textbook chapters, and files that appear on your Course Handouts sidebar also appear in this list.")}</p>
+            </div>
+            <div class="bit">
+                <h3 class="title-3">${_("Using File URLs")}</h3>
+
+                <p>${Text(_("Use the {em_start}{studio_name} URL{em_end} value to link to the file or image from a component, a course update, or a course handout.")).format(studio_name=settings.STUDIO_SHORT_NAME, em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+
+                <p>${Text(_("Use the {em_start}Web URL{em_end} value to reference the file or image only from outside of your course. {em_start}Note:{em_end} If you lock a file, the Web URL no longer works for external access to a file.")).format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
+
+                <p>${_("To copy a URL, double click the value in the URL column, then copy the selected text.")}</p>
+            </div>
+            <div class="bit external-help">
+                <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing files")}</a>
+            </div>
+
+        </aside>
+    </section>
+</div>
+
+<div class="upload-modal modal">
+    <a href="#" class="close-button"><span class="icon fa fa-times-circle" aria-hidden="true"></span> <span class="sr">${_('close')}</span></a>
+    <div class="modal-body">
+        <h1 class="title">${_("Upload New File")}</h1>
+        <h2>${_("Max per-file size: {max_filesize}MB").format(max_filesize=max_file_size_in_mbs)}</h2>
+        <p class="file-name">
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="embeddable">
+            <label>${_('URL:')}</label>
+            <input type="text" class="embeddable-xml-input" value='' readonly>
+        </div>
+        <form class="file-chooser" action="${asset_callback_url}"
+              method="post" enctype="multipart/form-data">
+            <a href="#" class="choose-file-button">${_("Choose File")}</a>
+            <input type="file" class="file-input" name="file" multiple>
+        </form>
+    </div>
+</div>
+
+
+</%block>
+
+<%block name="view_alerts">
+<!-- alert: save confirmed with close -->
+<div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
+    <div class="alert confirmation">
+        <span class="icon fa fa-check" aria-hidden="true"></span>
+
+        <div class="copy">
+            <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
+        </div>
+
+        <a href="" rel="view" class="action action-alert-close">
+            <span class="icon fa fa-times-circle" aria-hidden="true"></span>
+            <span class="label">${_('close alert')}</span>
+        </a>
+    </div>
+</div>
+</%block>

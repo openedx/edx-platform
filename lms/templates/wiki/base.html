@@ -1,0 +1,84 @@
+{% extends "main_django.html" %}
+{% with online_help_token="wiki" %}
+{% load theme_pipeline %}{% load sekizai_tags i18n configuration %}{% load url from future %}{% load staticfiles %}
+
+{% block title %}
+  {% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}
+{% endblock %}
+
+{% block bodyclass %}view-in-course view-wiki{% endblock %}
+
+{% block headextra %}
+  {% stylesheet 'course' %}
+  {% stylesheet 'style-course-vendor' %}
+  {% stylesheet 'style-course' %}
+
+  <script type="text/javascript">
+    function ajaxError(){}
+
+    $.ajaxSetup({
+      timeout: 7000,
+      cache: false,
+      error: function(e, xhr, settings, exception) {
+          ajaxError();
+      }
+    });
+
+    function jsonWrapper(url, callback) {
+      $.getJSON(url, function(data) {
+        if (data == null) {
+          ajaxError();
+        } else {
+          callback(data);
+        }
+      });
+    }
+  </script>
+
+
+  {% addtoblock 'js' %}
+    {% comment %} These scripts load at the bottom of the body {% endcomment %}
+    <script src="{% static 'js/bootstrap-alert.js' %}"></script>
+    <script src="{% static 'js/bootstrap-collapse.js' %}"></script>
+    <script src="{% static 'js/bootstrap-modal.js' %}"></script>
+
+    {% with mathjax_mode='wiki' %}
+      {% include "mathjax_include.html" %}
+    {% endwith %}
+  {% endaddtoblock %}
+
+{% endblock %}
+
+{% block body %}
+  {% if request.course %}
+  {% with course=request.course %}
+    {% include "courseware/course_navigation.html" with active_page_context="wiki" %}
+  {% endwith %}
+  {% endif %}
+
+<main id="main" aria-label="Content" tabindex="-1">
+  <section class="container wiki {{ selected_tab }}" id="wiki-content">
+    <div class="wiki-wrapper">
+      {% block wiki_body %}
+
+        {% block wiki_breadcrumbs %}{% endblock %}
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              <a class="close" data-dismiss="alert" href="#">&times;</a>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        {% block wiki_contents %}{% endblock %}
+
+      {% endblock %}
+    </div>
+
+  </section>
+</main>
+
+{% endblock %}
+{% endwith %}

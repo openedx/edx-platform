@@ -1,0 +1,112 @@
+## mako
+<%page args="active_page=None" expression_filter="h" />
+<%namespace name='static' file='/static_content.html'/>
+<%!
+from django.utils.translation import ugettext as _
+from courseware.tabs import get_course_tab_list
+from django.core.urlresolvers import reverse
+from django.conf import settings
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
+from openedx.core.djangolib.js_utils import dump_js_escaped_json
+from openedx.core.djangolib.markup import HTML, Text
+from student.models import CourseEnrollment
+%>
+
+<%
+if active_page is None and active_page_context is not UNDEFINED:
+  # If active_page is not passed in as an argument, it may be in the context as active_page_context
+  active_page = active_page_context
+
+def selected(is_selected):
+  return "selected" if is_selected else ""
+
+show_preview_menu = not disable_preview_menu and staff_access and active_page in ["courseware", "info"]
+cohorted_user_partition = get_cohorted_user_partition(course)
+masquerade_user_name = masquerade.user_name if masquerade else None
+masquerade_group_id = masquerade.group_id if masquerade else None
+staff_selected = selected(not masquerade or masquerade.role != "student")
+specific_student_selected = selected(not staff_selected and masquerade.user_name)
+student_selected = selected(not staff_selected and not specific_student_selected and not masquerade_group_id)
+include_special_exams = settings.FEATURES.get('ENABLE_SPECIAL_EXAMS', False) and (course.enable_proctored_exams or course.enable_timed_exams)
+%>
+
+% if include_special_exams:
+    <%static:js group='proctoring'/>
+    % for template_name in ["proctored-exam-status"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="courseware/${template_name}.underscore" />
+        </script>
+    % endfor
+    <div class="proctored_exam_status"></div>
+% endif
+% if show_preview_menu:
+    <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
+        <div class="preview-menu">
+            <ol class="preview-actions">
+                <li class="action-preview">
+                    <form action="#" class="action-preview-form" method="post">
+                        <label for="action-preview-select" class="action-preview-label">${_("View this course as:")}</label>
+                        <select class="action-preview-select" id="action-preview-select" name="select">
+                            <option value="staff" ${staff_selected}>${_("Staff")}</option>
+                            <option value="student" ${student_selected}>${_("Student")}</option>
+                            <option value="specific student" ${specific_student_selected}>${_("Specific student")}</option>
+                            % if cohorted_user_partition:
+                                % for group in sorted(cohorted_user_partition.groups, key=lambda group: group.name):
+                                <option value="group.id" data-group-id="${group.id}" ${selected(masquerade_group_id == group.id)}>
+                                    ${_("Student in {content_group}").format(content_group=group.name)}
+                                </option>
+                                % endfor
+                            % endif
+                        </select>
+                        <div class="action-preview-username-container">
+                          <label for="action-preview-username" class="action-preview-label">${_("Username or email:")}</label>
+                          <input type="text" class="action-preview-username" id="action-preview-username">
+                        </div>
+                        <button type="submit" class="sr" name="submit" value="submit">${_("Set preview mode")}</button>
+                    </form>
+                </li>
+            </ol>
+            % if specific_student_selected:
+                <div class="preview-specific-student-notice">
+                    <p>
+                        ${Text(_("You are now viewing the course as {i_start}{user_name}{i_end}.")).format(
+                            user_name=masquerade_user_name,
+                            i_start=HTML(u'<i>'),
+                            i_end=HTML(u'</i>'),
+                        )}
+                    </p>
+                </div>
+            % endif
+        </div>
+    </nav>
+% endif
+
+% if disable_tabs is UNDEFINED or not disable_tabs:
+    <nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
+        <div class="course-material">
+            <%
+            tab_list = get_course_tab_list(request, course)
+            tabs_tmpl = static.get_template_path('/courseware/tabs.html')
+            %>
+            <ol class="tabs course-tabs">
+                <%include file="${tabs_tmpl}" args="tab_list=tab_list,active_page=active_page,default_tab=default_tab,tab_image=tab_image" />
+                <%block name="extratabs" />
+            </ol>
+        </div>
+    </nav>
+%endif
+
+% if show_preview_menu:
+    <%
+    preview_options = {
+        "courseId": course.id,
+        "disableStudentAccess": disable_student_access if disable_student_access is not UNDEFINED else False,
+        "specificStudentSelected": specific_student_selected,
+        "cohortedUserPartitionId": cohorted_user_partition.id if cohorted_user_partition else None,
+        "masqueradeUsername" : masquerade_user_name if masquerade_user_name is not UNDEFINED else None,
+    }
+    %>
+    <%static:require_module_async module_name="lms/js/preview/preview_factory" class_name="PreviewFactory">
+        PreviewFactory(${preview_options | n, dump_js_escaped_json});
+    </%static:require_module_async>
+% endif

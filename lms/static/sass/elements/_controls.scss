@@ -1,0 +1,475 @@
+// lms - elements - controls
+// ====================
+
+%btn {
+  @include box-sizing(border-box);
+  @include transition(color $tmg-f2 ease-in-out, background $tmg-f2 ease-in-out, box-shadow $tmg-f2 ease-in-out);
+  display: inline-block;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover, &:active, &:focus {
+    text-decoration: none;
+  }
+
+  &.disabled, &[disabled] {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+%btn-pill {
+  border-radius: $baseline/5;
+}
+
+%btn-rounded {
+  border-radius: ($baseline/2);
+}
+
+%btn-edged {
+  border-radius: ($baseline/10);
+}
+
+// ====================
+
+%btn-inherited {
+  @include transition(background-color 0.15s, box-shadow 0.15s);
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba($white, .3) inset, 0 0 0 rgba($black, 0);
+  padding: ($baseline/2) $baseline;
+
+  &:hover, &:active, &:focus {
+    text-decoration: none;
+  }
+
+  &.disabled, &.is-disabled, &[disabled="disabled"] {
+    box-shadow: none;
+  }
+}
+
+%btn-inherited-primary {
+  @extend %btn-inherited;
+  @include linear-gradient(top, rgba($white, .3), rgba($white, 0));
+  border: 1px solid shade($action-primary-bg, 10%);
+  background-color: $action-primary-bg;
+  color: $action-primary-fg;
+
+  &:hover, &:active, &:focus {
+    background-color: $action-primary-focused-bg;
+    color: $action-primary-focused-fg;
+  }
+
+  &.disabled, &.is-disabled, &[disabled="disabled"] {
+    border: 1px solid tint($action-primary-disabled-bg, 10%);
+    background: $action-primary-disabled-bg;
+    color: $action-prmary-disabled-fg;
+  }
+}
+
+// ====================
+
+// primary button
+%btn-primary {
+  @extend %t-weight3;
+  @extend %btn;
+  @extend %btn-edged;
+  border: none;
+  padding: ($baseline*0.75) $baseline;
+  text-align: center;
+
+  &:hover, &:active, &:focus {
+
+  }
+
+  &.current, &.active {
+
+    &:hover, &:active, &:focus {
+
+    }
+  }
+
+  &.disabled, &.is-disabled, &[disabled] {
+    background: $m-gray-l2;
+    color: $white-t3;
+  }
+}
+
+// blue primary gray
+%btn-primary-gray {
+  @extend %btn-primary;
+  box-shadow: 0 2px 1px 0 $m-gray-d2;
+  background: $m-gray;
+  color: $white;
+
+  &:hover, &:active, &:focus {
+    background: $m-gray-l1;
+    color: $white;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-gray-d2;
+    background: $m-gray;
+    color: $m-gray-l1;
+
+    &:hover, &:active, &:focus {
+      box-shadow: inset 0 2px 1px 1px $m-gray-d3;
+      color: $m-gray-d3;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// blue primary error color
+%btn-primary-error {
+  @extend %btn-primary;
+  box-shadow: 0 2px 1px 0 shade($error-color, 25%);
+  background: shade($error-color, 25%);
+  color: $white;
+
+  &:hover, &:active, &:focus {
+    background: $error-color;
+    color: $white;
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// blue primary button
+%btn-primary-blue {
+  @extend %btn-primary;
+  box-shadow: 0 2px 1px 0 $m-blue-d4;
+  background: $m-blue-d3;
+  color: $white;
+
+  &:hover, &:active, &:focus {
+    background: $m-blue-d1;
+    color: $white;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-blue-d2;
+    background: $m-blue;
+    color: $m-blue-d2;
+
+    &:hover, &:active, &:focus {
+      box-shadow: inset 0 2px 1px 1px $m-blue-d3;
+      color: $m-blue-d3;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// pink primary button
+%btn-primary-pink {
+  @extend %btn-primary;
+  box-shadow: 0 2px 1px 0 $m-pink-d2;
+  background: $m-pink;
+  color: $white;
+
+  &:hover, &:active, &:focus {
+    background: $m-pink-l3;
+    color: $white;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-pink-d1;
+    background: $m-pink-l2;
+    color: $m-pink-d1;
+
+    &:hover, &:active, &:focus {
+      box-shadow: inset 0 2px 1px 1px $m-pink-d2;
+      color: $m-pink-d3;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// green primary button
+%btn-primary-green {
+  @extend %btn-primary;
+  box-shadow: 0 2px 1px 0 $m-green-d2;
+  background: $m-green-d1;
+  color: $white;
+
+  &:hover, &:active, &:focus {
+    background: $m-green-s1;
+    color: $white;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-green;
+    background: $m-green-l2;
+    color: $m-green;
+
+    &:hover, &:active, &:focus {
+      box-shadow: inset 0 2px 1px 1px $m-green-d1;
+      color: $m-green-d1;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// disabled primary button - used for more manual approaches
+%btn-primary-disabled {
+  background: $m-gray-l2;
+  color: $white-t3;
+  pointer-events: none;
+  cursor: default;
+  pointer-events: none;
+  box-shadow: none;
+
+  &:hover, &:focus {
+    pointer-events: none;
+  }
+}
+
+// blue secondary button outline style
+%btn-secondary-blue-outline {
+  @extend %t-action2;
+  @extend %btn;
+  @extend %btn-edged;
+  box-shadow: none;
+  border: 1px solid $m-blue-d3;
+  padding: ($baseline/2) $baseline;
+  background: transparent;
+  color: $m-blue-d3;
+
+  &:hover, &:active, &:focus {
+    box-shadow: 0 2px 1px 0 $m-blue-d4;
+    background: $m-blue-d1;
+    color: $white;
+  }
+
+  &.current, &.active {
+    box-shadow: inset 0 2px 1px 1px $m-blue-d2;
+    background: $m-blue;
+    color: $m-blue-d2;
+
+    &:hover, &:active, &:focus {
+      box-shadow: inset 0 2px 1px 1px $m-blue-d3;
+      color: $m-blue-d3;
+    }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// grey secondary button outline style
+%btn-secondary-grey-outline {
+  @extend %btn-secondary-blue-outline;
+  border: 1px solid $gray-l4;
+
+  &:hover, &:active, &:focus {
+    box-shadow: none;
+    border: 1px solid $m-blue-d3;
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// imitating the pattern library
+// starts with overrides
+%btn-pl-default-base {
+  @include box-sizing(border-box);
+  @extend %t-copy-base;
+  letter-spacing: 0; // reset letterspacing from elsewhere
+  @extend %btn-primary;
+  border: 1px solid darken($action-primary-bg,10%);
+  border-radius: 3px;
+  padding: 8px $baseline;
+  background-color: transparent;
+  color: darken($action-primary-bg,10%);
+  text-align: center;
+
+  &:hover,
+  &:focus {
+    border: 1px solid transparent;
+    background-color: $action-primary-bg;
+    color: $action-primary-fg;
+    text-decoration: none;
+  }
+}
+
+%btn-pl-primary-base {
+  @extend %btn-pl-default-base;
+  background-color: darken($action-primary-bg,10%);
+  color: $action-primary-fg;
+}
+
+%btn-pl-white-base{
+  @extend %btn-pl-default-base;
+  background-color: $action-primary-fg;
+  color: $action-primary-bg;
+}
+
+%btn-pl-green-base {
+  @extend %btn-pl-default-base;
+  background-color: darken($green-d1,10%);
+  color: $action-primary-fg;
+
+  &:hover,
+  &:focus {
+    border: 1px solid transparent;
+    background-color: $green-d1;
+  }
+}
+
+%btn-pl-yellow-base {
+  @extend %btn-pl-default-base;
+  border: 1px solid transparent;
+  background-color: $credit-color-base;
+  color: $base-font-color;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($credit-color-base,10%);
+    background-color: lighten($credit-color-base,20%);
+  }
+}
+
+%btn-pl-black-border {
+  @extend %btn-pl-default-base;
+  border: 1px solid $m-gray-d4;
+  background-color: transparent;
+  color: $base-font-color;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($m-gray-d4,10%);
+    background-color: $m-gray-d4;
+  }
+}
+
+%btn-pl-black-base {
+  @extend %btn-pl-default-base;
+  border: 1px solid transparent;
+  background-color: $m-gray-d4;
+  color: $very-light-text;
+
+  &:hover,
+  &:focus {
+    border: 1px solid darken($m-gray-d4,10%);
+    background-color: transparent;
+    color: $base-font-color;
+  }
+}
+
+%btn-pl-secondary-base {
+  @extend %btn-pl-default-base;
+  @include transition(border $tmg-f2 ease-in-out);
+  border: 1px solid transparent;
+  color: $action-primary-bg;
+
+  &:hover {
+    border: 1px solid $gray-l2;
+    background-color: transparent;
+    color: $action-primary-bg;
+  }
+}
+
+%btn-pl-elevated-alt {
+  @extend %btn-pl-default-base;
+  box-shadow: 0 3px 0 0 $gray-l4;
+  border: 1px solid $gray-l4;
+
+  &:hover {
+    box-shadow: 0 3px 0 0 $action-primary-bg;
+    border: 1px solid $action-primary-bg;
+    background-color: lighten($action-primary-bg,20%);
+    color: $white;
+  }
+}
+
+// ====================
+
+  // application: canned actions
+  .btn {
+    font-family: $f-sans-serif;
+  }
+
+  .btn-large {
+    @extend %t-action1;
+    @extend %t-weight3;
+    display: block;
+    padding:($baseline*0.75) ($baseline*1.5);
+  }
+
+  .btn-avg {
+    @extend %t-action2;
+    @extend %t-weight3;
+  }
+
+  .btn-blue {
+    @extend %btn-primary-blue;
+    margin-bottom: $baseline;
+
+
+    &:last-child {
+      margin-bottom: none;
+    }
+  }
+
+  .btn-pink {
+    @extend %btn-primary-pink;
+    margin-bottom: $baseline;
+
+
+    &:last-child {
+      margin-bottom: none;
+    }
+  }
+
+  .btn-secondary {
+    @extend %btn-pl-secondary-base;
+
+    background-image: none;
+
+    &:focus,
+    &:hover {
+      background-image: none !important;
+      background-color: transparent !important;
+      color: $link-color;
+    }
+  }
+
+.btn-link {
+    @extend %shame-link-text;
+
+    // reset of inherited buttons
+    border-radius: 0;
+    border-color: $transparent;
+    padding: 1px;
+    background: $transparent;
+    background-image: none;
+    box-shadow: none;
+    text-shadow: none;
+    white-space: nowrap;
+
+    @extend %t-action3;
+    @extend %t-strong;
+
+    &:focus,
+    &:hover {
+        background-image: none !important;
+        background-color: $transparent !important;
+        box-shadow: none !important;
+    }
+}

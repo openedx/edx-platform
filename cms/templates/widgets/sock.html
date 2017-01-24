@@ -1,0 +1,66 @@
+<%page expression_filter="h" args="online_help_token" />
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+%>
+<div class="wrapper-sock wrapper">
+  <ul class="list-actions list-cta">
+    <li class="action-item">
+      <a href="#sock" class="cta cta-show-sock"><span class="icon fa fa-question-circle" aria-hidden="true"></span>
+        <span class="copy-show is-shown">${_("Looking for help with {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
+        <span class="copy-hide is-hidden">${_("Hide {studio_name} Help").format(studio_name=settings.STUDIO_SHORT_NAME)}</span>
+      </a>
+    </li>
+  </ul>
+
+  <div class="wrapper-inner wrapper">
+    <section class="sock" id="sock" aria-labelledby="sock-heading">
+        <h2 id="sock-heading" class="title sr-only">${_("{studio_name} Documentation").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <div class="support">
+        <%!
+        from django.conf import settings
+
+        partner_email = settings.PARTNER_SUPPORT_EMAIL
+
+        links = [{
+            'href': 'http://docs.edx.org',
+            'sr_mouseover_text': _('Access documentation on http://docs.edx.org'),
+            'text': _('edX Documentation'),
+            'condition': True
+        }, {
+            'href': 'https://open.edx.org',
+            'sr_mouseover_text': _('Access the Open edX Portal'),
+            'text': _('Open edX Portal'),
+            'condition': True
+        }, {
+            'href': 'https://www.edx.org/course/overview-creating-edx-course-edx-edx101#.VO4eaLPF-n1',
+            'sr_mouseover_text': _('Enroll in edX101: Overview of Creating an edX Course'),
+            'text': _('Enroll in edX101'),
+            'condition': True
+        }, {
+            'href': 'https://www.edx.org/course/creating-course-edx-studio-edx-studiox',
+            'sr_mouseover_text': _('Enroll in StudioX: Creating a Course with edX Studio'),
+            'text': _('Enroll in StudioX'),
+            'condition': True
+        }, {
+            'href': 'mailto:{email}'.format(email=partner_email),
+            'sr_mouseover_text': _('Send an email to {email}').format(email=partner_email),
+            'text': _('Contact Us'),
+            'condition': bool(partner_email)
+        }]
+        %>
+
+        <ul class="list-actions">
+          % for link in links:
+            % if link['condition']:
+              <li class="action-item">
+                <a href="${link['href']}" title="${link['sr_mouseover_text']}" rel="external" class="action action-primary">${link['text']}</a>
+                <span class="tip">${link['sr_mouseover_text']}</span>
+              </li>
+            %endif
+          % endfor
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>

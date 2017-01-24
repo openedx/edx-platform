@@ -1,0 +1,215 @@
+// Open edX: LMS footer
+// ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
+.wrapper-footer {
+  @extend %ui-print-excluded;
+  box-shadow: 0 -1px 5px 0 $shadow-l1;
+  border-top: 1px solid tint($m-gray, 50%);
+  padding: 25px ($baseline/2) ($baseline*1.5) ($baseline/2);
+  background: $footer-bg;
+  clear: both;
+
+  footer#footer-openedx {
+    @include clearfix();
+    @include box-sizing(border-box);
+    @include outer-container;
+    margin: 0 auto;
+
+    p, ol, ul {
+      font-family: $sans-serif;
+
+      // override needed for poorly scoped font-family styling on p a:link {}
+      a {
+        font-family: $sans-serif;
+      }
+    }
+
+    a {
+      @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
+      border-bottom: none;
+      color: $link-color;
+      text-decoration: none !important;
+
+      &:hover, &:focus, &:active {
+        border-bottom: 1px dotted $link-color;
+      }
+    }
+
+    // colophon
+    .colophon {
+      @include span-columns(8);
+
+      @include media($bp-small) {
+        @include fill-parent();
+      }
+
+      @include media($bp-tiny) {
+        @include fill-parent();
+      }
+
+
+      .nav-colophon {
+        @include clearfix();
+        margin: $footer_margin;
+
+        li {
+          @include float(left);
+          margin-right: ($baseline*0.75);
+
+          a {
+            color: tint($black, 20%);
+
+            &:hover, &:focus, &:active {
+              color: $link-color;
+            }
+          }
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+
+      .colophon-about {
+        @include clearfix();
+
+        img {
+          width: 68px;
+          height: 34px;
+          margin-right: 0;
+          float: left;
+        }
+
+        p {
+          float: left;
+          width: flex-grid(6,8);
+          margin-left: $baseline;
+          padding-left: $baseline;
+          font-size: em(13);
+          background: transparent url(/static/images/bg-footer-divider.jpg) 0 0 no-repeat;
+        }
+      }
+    }
+
+    // references
+    .references {
+      margin: -10px 0 0 0;
+      width: flex-grid(4,12);
+      display: inline-block;
+    }
+
+    .wrapper-logo {
+      margin: ($baseline*0.75) 0;
+
+      a {
+        display: inline-block;
+
+        &:hover {
+          border-bottom: 0;
+        }
+      }
+    }
+
+    .copyright {
+      margin: -2px 0 8px 0;
+      font-size: em(11);
+      color: $gray; // WCAG 2.0 AA requirements
+      @include text-align(left);
+    }
+
+    .nav-legal {
+      @include clearfix();
+      @include text-align(left);
+
+      li {
+        display: inline-block;
+        font-size: em(11);
+
+      }
+
+      .nav-legal-02 a {
+
+        &:before {
+          margin-right: ($baseline/4);
+          content: "-";
+        }
+      }
+    }
+
+    .nav-social {
+      margin: 0;
+      text-align: right;
+
+      li {
+        display: inline-block;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        a {
+          display: block;
+
+          &:hover, &:focus, &:active {
+            border: none;
+          }
+        }
+
+        img {
+          display: block;
+        }
+      }
+    }
+
+    // platform Open edX logo and link
+    .footer-about-openedx {
+      @include span-columns(4);
+      @include text-align(right);
+      vertical-align: bottom;
+
+      @include media($bp-small) {
+        @include fill-parent();
+      }
+
+      @include media($bp-tiny) {
+        @include fill-parent();
+      }
+
+      a {
+        @include float(right);
+        display: inline-block;
+
+        &:hover {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  // edx theme overrides
+  &.edx-footer {
+    footer {
+      .copyright {
+        text-align: right;
+      }
+
+      .nav-legal {
+        text-align: right;
+      }
+    }
+  }
+}
+
+// marketing site design syncing
+.view-register, .view-login, .view-passwordreset {
+
+  .wrapper-footer footer {
+    width: 960px;
+
+    .colophon-about img {
+      margin-top: ($baseline*1.5);
+    }
+  }
+}

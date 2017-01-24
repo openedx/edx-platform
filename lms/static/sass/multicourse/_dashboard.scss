@@ -1,0 +1,1393 @@
+// lms - views - user/student dashboard
+// ====================
+
+// Table of Contents
+// * +Dashboard - Sidebar
+// * +Dashboard - Course Listing
+// * +Dashboard - Course Item
+// * +Misc - Uncategorized
+// * +Dashboard - Banner
+
+
+// +Dashboard - Sidebar
+// ====================
+.dashboard {
+  @include clearfix();
+  padding: ($baseline*2) 0 $baseline 0;
+
+  .wrapper-find-courses {
+    @include float(right);
+    @include margin-left(flex-gutter());
+    width: flex-grid(3);
+
+    .course-advertise {
+      @include clearfix();
+      box-sizing: border-box;
+      padding: $baseline;
+      border: 1px solid $border-color-l3;
+      .advertise-message {
+        @include font-size(12);
+        color: $gray-d4;
+        margin-bottom: $baseline;
+      }
+      .ad-link {
+        @include text-align(center);
+        .btn-neutral {
+          padding-bottom: 12px;
+          padding-top: 12px;
+        }
+        a {
+          @include font-size(16);
+          @include line-height(17);
+          padding: $baseline * 0.5;
+          border: 1px solid $blue;
+          color: $blue;
+          text-decoration: none;
+          display: block;
+          &:hover,
+          &:focus,
+          &:active {
+            color: $white;
+            background-color: $blue;
+          }
+          span {
+            @include margin-left($baseline*0.25);
+          }
+          .icon {
+            @include margin-right($baseline*0.25);
+          }
+        }
+      }
+    }
+  }
+
+  .profile-sidebar {
+    background: transparent;
+    @include float(right);
+    @include margin-left(flex-gutter());
+    width: flex-grid(3);
+    margin-top: ($baseline*2);
+
+    .user-info {
+      @include clearfix();
+
+      > ul {
+        @include box-sizing(border-box);
+        @include clearfix();
+        margin: 0;
+        padding: 0;
+        width: flex-grid(12);
+
+        li {
+          @include clearfix();
+          border-bottom: 1px dotted $border-color-2;
+          list-style: none;
+          margin-bottom: ($baseline*0.75);
+          padding-bottom: 17px;
+
+          &:hover, &:focus {
+            .title .icon {
+              opacity: 1.0;
+            }
+          }
+
+          span {
+            display: block;
+            margin-bottom: ($baseline/4);
+          }
+
+          span.title {
+            @extend %t-title6;
+            @extend %t-strong;
+
+            a {
+              text-transform: none;
+            }
+          }
+
+          span.copy {
+            @extend %t-copy-sub1;
+          }
+
+          span.data {
+            color: $base-font-color;
+            font-weight: 600;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+
+            .third-party-auth {
+              color: inherit;
+              font-weight: inherit;
+            }
+
+          }
+        }
+
+        li.order-history {
+          span a {
+            font-size: 13px;
+            line-height: 20px;
+          }
+        }
+
+        .heads-up {
+          .title {
+            display: inline;
+          }
+
+          .copy {
+            @extend %t-copy-sub2;
+            display: inline;
+          }
+        }
+      }
+
+      .reverify-status-list {
+        padding: 0 0 0 ($baseline/2);
+        margin: ($baseline/4) 0;
+
+        .status-item {
+          @extend %t-copy-sub2;
+          margin-bottom: 7px;
+          border-bottom: 0;
+          padding: 0;
+
+          .icon {
+            display: inline-block;
+            vertical-align: top;
+            margin: ($baseline/10) ($baseline/4) 0 0;
+          }
+
+          &.is-open .icon {
+            color: $action-primary-bg;
+          }
+
+          &.is-pending .icon {
+            color: $warning-color;
+          }
+
+          &.is-approved .icon {
+            color: $success-color;
+          }
+
+          &.is-denied .icon {
+            color: $alert-color;
+          }
+
+          .label {
+            @extend %text-sr;
+          }
+
+          .course-name {
+            @include line-height(12);
+            display: inline-block;
+            vertical-align: top;
+            width: 80%;
+            color: inherit;
+          }
+        }
+      }
+
+      // status
+      .status {
+
+        @include clearfix();
+        box-sizing: border-box;
+        padding: $baseline;
+        border: 1px solid $border-color-l3;
+
+        .list--nav {
+          margin: ($baseline/2) 0 0 0;
+          padding: 0;
+        }
+
+        .nav__item {
+          @extend %t-weight4;
+          @include font-size(13);
+          margin-left: 26px;
+        }
+      }
+    }
+  }
+}
+
+// CASE: empty dashboard
+    .empty-dashboard-message {
+      border: 3px solid $gray-l4;
+      background: $gray-l6;
+      padding: ($baseline*2) 0;
+      text-align: center;
+
+      p {
+        @include font-size(24);
+        color: $lighter-base-font-color;
+        margin-bottom: $baseline;
+        text-shadow: 0 1px rgba(255,255,255, 0.6);
+      }
+
+      a {
+        background-color: $blue;
+        border: 1px solid $blue;
+        box-shadow: 0 1px 8px 0 $shadow-l1;
+        @include box-sizing(border-box);
+        color: $white;
+        font-family: $sans-serif;
+        display: inline-block;
+        letter-spacing: 1px;
+        margin-top: ($baseline/4);
+        margin-left: ($baseline/4);
+        padding: 15px 20px;
+
+        &:hover, &:focus {
+          background: $blue-l2;
+          text-decoration: none;
+        }
+      }
+    }
+
+// +Dashboard - Course Listing
+// ====================
+.dashboard {
+
+  .my-courses {
+    @include float(left);
+    margin: 0;
+    margin-bottom: $baseline * 2;
+    width: flex-grid(9);
+
+
+    .wrapper-header-courses {
+      border-bottom: 4px solid $border-color-l4;
+      margin-bottom: $baseline;
+
+      .header-courses {
+        @extend %t-title5;
+        @include padding-right($baseline/2);
+      }
+    }
+
+    // UI: course list
+    .listing-courses {
+      @extend %ui-no-list;
+
+      .course-item {
+        margin-bottom: $baseline;
+        padding-bottom: $baseline;
+
+        .course-container {
+          border: 2px solid $border-color-l4;
+          border-radius: 3px;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// +Dashboard - Course
+// ====================
+.dashboard .my-courses {
+
+  &:focus {
+    outline: none;
+  }
+
+  // UI: individual course item
+  .course {
+    @include box-sizing(box);
+    @include transition(all 0.15s linear 0s);
+    @include clearfix();
+    @extend %ui-depth2;
+    margin: ($baseline/2);
+
+    .details {
+      @include clearfix();
+
+      .wrapper-course-image {
+        @include float(left);
+        @include margin-right(flex-gutter());
+        width: flex-grid(3);
+
+        .cover {
+          @include box-sizing(border-box);
+          @include transition(all 0.15s linear 0s);
+          @include float(left);
+          overflow: hidden;
+          position: relative;
+          max-height: 120px;
+          border-radius: ($baseline/5);
+          border: 1px solid $dashboard-course-cover-border;
+          border-bottom: 4px solid $dashboard-course-cover-border;
+
+          .course-image {
+            width: 100%;
+          }
+        }
+
+        // "enrolled as" status
+        .sts-enrollment {
+          @include float(left);
+          width: 100%;
+          position: relative;
+          bottom: 15px;
+          display: inline-block;
+          text-align: center;
+
+          .label {
+            @extend %text-sr;
+          }
+
+          .deco-graphic {
+            position: absolute;
+            top: -5px;
+            @include right(0);
+          }
+
+          .sts-enrollment-value {
+            @extend %ui-depth1;
+            @extend %copy-badge;
+            @extend %t-demi-strong;
+            font-size: 0.6em;
+            line-height: 1.5em;
+            border-radius: 0;
+            padding: 1px ($baseline/4);
+            color: white;
+          }
+        }
+      }
+
+      .wrapper-course-details {
+        display: block;
+        @include float(left);
+        width: flex-grid(9);
+        padding: 0;
+      }
+
+      .course-title {
+
+        a, span {
+          @extend %t-title3;
+          @extend %t-light;
+          display: inline-block;
+          margin-bottom: ($baseline/2);
+
+          &:hover, &:focus {
+            text-decoration: none;
+          }
+        }
+      }
+
+      .course-info {
+        display: block;
+        @include float(left);
+        width: flex-grid(4);
+        padding: 0;
+        margin-top: ($baseline/2);
+
+        [class*="info-"] {
+          color: $gray-d1;
+          @extend %t-title6;
+          display: inline-block;
+        }
+
+        .info-date-block {
+          @extend %t-title7;
+          color: $gray; // WCAG 2.0 AA compliant
+          display: block;
+        }
+      }
+
+      .wrapper-course-actions {
+        display: block;
+        @include float(right);
+        width: flex-grid(8);
+        padding: 0;
+        margin-top: ($baseline/2);
+      }
+
+      .course-actions {
+
+        // UI: course item actions
+        .action {
+          @include box-sizing(border-box);
+          @include margin-right($baseline/2);
+          @include float(right);
+          min-width: ($baseline*2);
+          color: $gray-l1;
+          border-radius: 3px;
+          padding: 12px;
+          border: 1px solid $white;
+          text-align: center;
+
+          &:hover, &:focus {
+            color: $gray-d3;
+            border: 1px solid $gray-l4;
+          }
+
+          // STATE: is-disabled
+          &.is-disabled {
+            color: $gray-l4;
+          }
+
+          // TYPE: facebook share
+          &.action-facebook {
+            color: $facebook-blue;
+          }
+
+          // TYPE: twitter share
+          &.action-twitter {
+            color: $twitter-blue;
+          }
+        }
+
+        // UI: general actions dropdown layout
+        .wrapper-action-more {
+          display: inline-block;
+          position: relative;
+          @include float(right);
+
+          .action-more {
+            @include font-size(14);
+            box-shadow: none;
+            background: $white;
+            background-image: none;
+            color: $gray;
+            line-height: 16px;
+            text-shadow: none;
+          }
+
+          .actions-dropdown {
+            @extend %ui-no-list;
+            @extend %ui-depth1;
+            display: none;
+            position: absolute;
+            top: ($baseline*2);
+            @include right(19px);
+            pointer-events: none;
+            min-width: ($baseline*7);
+
+            &.is-visible {
+              display: block;
+              pointer-events: auto;
+            }
+
+            .actions-dropdown-list {
+              @extend %ui-no-list;
+              @include box-sizing(border-box);
+              display: table;
+              box-shadow: 0 1px 1px $shadow-l1;
+              position: relative;
+              width: 100%;
+              border-radius: 3px;
+              margin: ($baseline/4) 0 0 0;
+              border: 1px solid $gray-l3;
+              padding: ($baseline/4) ($baseline/2);
+              background: $white;
+
+              // ui triangle/nub
+              &:after,
+              &:before {
+                bottom: 100%;
+                @include right(6px);
+                border: solid transparent;
+                content: " ";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+              }
+
+              &:after {
+                border-color: $transparent;
+                border-bottom-color: $white;
+                border-width: 6px;
+                @include margin-right(1px);
+              }
+
+              &:before {
+                border-color: $transparent;
+                border-bottom-color: $gray-l3;
+                border-width: 7px;
+              }
+            }
+
+            .actions-item {
+              @extend %t-title7;
+              display: block;
+              margin: 0;
+
+              &.is-hidden {
+                display: none;
+              }
+
+              .action {
+                @include margin-right(0);
+
+                &:hover, &:focus {
+                  border: 1px solid transparent;
+                 }
+              }
+            }
+          }
+        }
+      }
+
+      .course-status {
+        background: $yellow;
+        border: 1px solid $border-color-2;
+        box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
+        margin-top: 17px;
+        @include margin-right(flex-gutter());
+        padding: ($baseline/4);
+        width: flex-grid(8);
+        @include float(left);
+        @include box-sizing(border-box);
+
+        p {
+          color: $lighter-base-font-color;
+          font-style: italic;
+          letter-spacing: 1px;
+          text-align: center;
+        }
+      }
+
+      .course-status-completed {
+        background: $gray-l3;
+        color: $very-light-text;
+
+        p {
+          color: $gray-d4;
+
+          span {
+            font-weight: bold;
+          }
+        }
+      }
+
+      .enter-course {
+        @extend %btn-pl-white-base;
+        @include float(right);
+
+        &.archived {
+          @extend %btn-pl-default-base;
+        }
+      }
+    }
+
+    // ====================
+
+    // UI: messages
+    .wrapper-messages-primary {
+      @include clearfix();
+
+      .messages-list {
+        margin: 0;
+        padding: 0;
+      }
+
+      .message {
+        @extend %ui-depth1;
+        border-radius: 3px;
+        display: none;
+        margin: $baseline 0 ($baseline/2) 0;
+        padding: ($baseline/2) $baseline;
+        border-top: 1px solid $gray-l4;
+        color: $base-font-color; // Overrides the normal white color in this one case
+
+        // STATE: shown
+        &.is-shown {
+          @include clearfix();
+          display: block;
+        }
+
+        a {
+          font-family: $sans-serif;
+        }
+
+        strong {
+          font-weight: 700;
+
+          a {
+            font-weight: 700;
+          }
+        }
+
+        .actions {
+          @include clearfix();
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .message-title,
+        .message-copy .title {
+          @extend %t-title6;
+          @extend %t-weight4;
+          line-height: 1em;
+          margin-bottom: ($baseline/4);
+        }
+
+        .message-copy,
+        .message-copy .copy {
+          @extend %t-copy-sub1;
+          margin: 2px 0 0 0;
+        }
+
+        // CASE: expandable
+        &.is-expandable {
+
+          .wrapper-tip {
+
+            .message-title, .message-copy {
+              margin-bottom: 0;
+              display: inline-block;
+            }
+
+            .message-title .value, .message-copy {
+              @include transition(color $tmg-f2 ease-in-out 0s);
+            }
+
+            // STATE: hover
+            &:hover {
+              cursor: pointer;
+
+              .message-title .value, .message-copy, .ui-toggle-expansion {
+                color: $link-color;
+              }
+            }
+          }
+
+          .wrapper-extended {
+            @include transition(opacity $tmg-f2 ease-in-out 0);
+            display: none;
+            opacity: 0.0;
+          }
+        }
+
+        // STATE: is expanded
+        &.is-expanded {
+
+          .ui-toggle-expansion {
+            @include rtl {
+              @include transform(rotate(-90deg));
+            }
+
+            @include ltr {
+              @include transform(rotate(90deg));
+            }
+            @include transform-origin(50% 50%);
+          }
+
+          .wrapper-extended {
+            display: block;
+            opacity: 1.0;
+          }
+        }
+
+        // TYPE: upsell
+        &.message-upsell {
+
+          .wrapper-tip {
+            @include clearfix();
+
+            .message-title {
+              @include float(left);
+            }
+
+            .ui-toggle-expansion {
+              @include transition(all $tmg-f2 ease-in-out 0s);
+              @include font-size(18);
+              display: inline-block;
+              vertical-align: middle;
+              @include margin-right($baseline/4);
+            }
+
+            .message-copy {
+              @include float(right);
+            }
+          }
+
+          .wrapper-extended {
+            padding: ($baseline/4) 0;
+
+            .message-copy {
+              width: flex-grid(9, 12);
+              display: inline-block;
+
+              .message-copy-bold{
+                font-weight: 600;
+              }
+            }
+          }
+
+          .action-upgrade-container{
+            @include float(right);
+            display: inline-block;
+            margin-top: ($baseline/2);
+          }
+          .action-upgrade {
+            @extend %btn-primary-green;
+            @include clearfix();
+            position: relative;
+            @include left($baseline/2);
+            @include padding(($baseline * 0.4), 0, ($baseline * 0.4), ($baseline * 0.75));
+
+            .action-upgrade-icon{
+              @include float(left);
+              display: inline;
+
+              @include margin-right($baseline*0.4);
+              margin-top: ($baseline/4);
+              background: url('#{$static-path}/images/icon-sm-verified.png') no-repeat;
+              background-position: -($baseline*0.3);
+              background-color: white;
+
+              width: ($baseline*0.8);
+              height: ($baseline*0.7);
+            }
+            .deco-graphic {
+              position: absolute;
+              top: -($baseline/4);
+              @include left(-($baseline*0.75));
+              width: ($baseline*2);
+            }
+
+            span {
+              color: $white; // nasty but needed override for poor <span> styling
+            }
+
+            .copy, .copy-sub {
+              display: inline-block;
+              vertical-align: middle;
+            }
+
+            .copy {
+              @extend %t-action3;
+              @extend %t-weight4;
+              @include margin-right($baseline);
+            }
+
+            .copy-sub {
+              @extend %t-action4;
+              opacity: 0.875;
+            }
+          }
+        }
+
+        // TYPE: status
+        &.message-status {
+          border-color: $gray-l4;
+
+          .wrapper-message-primary {
+            @include clearfix();
+          }
+
+          .message-copy {
+            @extend %t-copy-sub1;
+            margin: 0;
+          }
+
+          .credit-action {
+            .credit-btn {
+              @extend %btn-pl-yellow-base;
+              @include float(right);
+              @include margin-right(5px);
+              background-image: none ;
+              text-shadow: none;
+              box-shadow: none;
+              text-transform: none;
+            }
+          }
+
+          .actions {
+
+            .action {
+              @include float(left);
+              @include margin(0, 15px, 0, 0);
+
+              .btn {
+                display: inline-block;
+              }
+
+              .btn {
+                @include box-sizing(border-box);
+                @include float(left);
+                border-radius: 3px;
+                font: normal 0.8rem/1.2rem $sans-serif;
+                letter-spacing: 1px;
+                padding: 6px 12px;
+                text-align: center;
+
+                &.disabled {
+                  cursor: default !important;
+
+                  &:hover, &:focus {
+                    @include background-image(linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100% ));
+                    background: #eee;
+                  }
+                }
+              }
+
+              .btn {
+                @include float(left);
+                font: normal 0.8rem/1.2rem $sans-serif;
+                letter-spacing: 1px;
+                padding: 6px 12px;
+                text-align: center;
+              }
+            }
+          }
+
+          .exam-registration-number {
+            font-family: $sans-serif;
+            font-size: 18px;
+
+            a {
+              font-family: $sans-serif;
+            }
+          }
+
+          &.exam-register {
+
+            .message-copy {
+              margin-top: ($baseline/4);
+              width: 55%;
+            }
+          }
+
+          &.exam-schedule {
+            .exam-button {
+              margin-top: ($baseline/4);
+            }
+          }
+
+          .exam-button {
+            @include button(simple, $pink);
+            @include float(right);
+            margin-top: 0;
+          }
+
+          .contact-button {
+            @include button(simple, $pink);
+          }
+
+          .button {
+            display: inline-block;
+            margin-top: ($baseline/2);
+            padding: 9px 18px 10px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 0;
+
+            &:hover, &:focus {
+              text-decoration: none;
+            }
+          }
+
+
+          &.course-status-certrendering {
+
+            .btn {
+              margin-top: 2px;
+            }
+          }
+
+          &.course-status-certavailable {
+
+            .message-copy {
+              width: flex-grid(6, 12);
+              position: relative;
+              @include float(left);
+            }
+
+            .actions-primary {
+              @include float(right);
+
+              .action {
+                @include margin(0, 0, ($baseline/2), ($baseline*.75));
+                float: none;
+                text-align: center;
+
+                &:last-child {
+                  margin-bottom: 0;
+                }
+
+                .btn {
+                  float: none;
+                }
+              }
+
+              .action-certificate .btn {
+                @extend %btn-inherited-primary;
+                @include box-sizing(border-box);
+                float: none;
+                border-radius: 3px;
+                display: block;
+                @include padding(7px, ($baseline*.75), 7px, ($baseline*.75));
+                text-align: center;
+
+                a:link, a:visited {
+                  color: #fff;
+                }
+              }
+
+              .action-share .btn {
+                display: inline;
+                letter-spacing: 0;
+              }
+            }
+          }
+
+          .actions-secondary {
+            margin-top: ($baseline/2);
+            border-top: 1px solid $gray-l4;
+            padding-top: ($baseline/2);
+
+            .action-share {
+              @include float(right);
+              margin: 0;
+            }
+          }
+
+          .certificate-explanation {
+            @extend %t-copy-sub1;
+            margin-top: ($baseline/2);
+            border-top: 1px solid $gray-l4;
+            padding-top: ($baseline/2);
+          }
+
+          .verification-reminder {
+            width: flex-grid(8, 12);
+            @include float(left);
+            position: relative;
+          }
+
+          .verification-cta {
+            width: flex-grid(4, 12);
+            @include float(left);
+            position: relative;
+
+            .btn {
+              @extend %btn-pl-green-base;
+              @include float(right);
+            }
+          }
+        }
+
+        &.message-related-programs {
+          background: none;
+          border: none;
+          margin-top: ($baseline/4);
+          padding-bottom: 0;
+
+          .related-programs-preface {
+            @include float(left);
+            font-weight: bold;
+          }
+
+          ul {
+            display: inline;
+            padding: 0;
+            margin: 0;
+          }
+
+          li {
+            @include float(left);
+            display: inline;
+            padding: 0 0.5em;
+            border-right: 1px solid;
+
+            .category-icon {
+              @include float(left);
+              @include margin-right($baseline/4);
+              margin-top: ($baseline/10);
+              background-color: transparent;
+              background-size: 100%;
+              width: ($baseline*0.7);
+              height: ($baseline*0.7);
+            }
+          }
+
+          // Remove separator from last list item.
+          li:last-child {
+            border: 0;
+          }
+        }
+
+        // TYPE: pre-requisites
+        .prerequisites {
+          @include clearfix;
+
+          .tip {
+            font-family: $sans-serif;
+            font-size: 1em;
+            color: $lighter-base-font-color;
+            margin-top: ($baseline/2);
+          }
+        }
+      }
+    }
+
+    // ====================
+
+    // CASE: "enrolled as" status - professional ed
+    &.professional {
+
+      // changes to cover
+      .wrapper-course-image .cover {
+        border-color: $professional-color-lvl3;
+        padding: ($baseline/10);
+      }
+
+      // course enrollment status message
+      .sts-enrollment {
+        .label {
+          @extend %text-sr;
+        }
+
+        // status message
+        .sts-enrollment-value {
+          background: $professional-color-lvl3;
+        }
+      }
+    }
+
+    // CASE: "enrolled as" status - verified
+    &.verified {
+
+      // changes to cover
+      .wrapper-course-image .cover {
+        border-color: $verified-color-lvl1;
+        padding: ($baseline/10);
+      }
+
+      // course enrollment status message
+      .sts-enrollment {
+        .label {
+          @extend %text-sr;
+        }
+
+        .deco-graphic {
+          @extend %ui-depth3;
+          width: 40px;
+          position: absolute;
+          top: -5px;
+          @include right(0);
+        }
+
+        // status message
+        .sts-enrollment-value {
+          background: $verified-color-lvl1;
+        }
+      }
+    }
+
+    // CASE: "enrolled as" status - honor code
+    &.honor {
+
+      // changes to cover
+      .wrapper-course-image .cover {
+        border-color: $honorcode-color-lvl2;
+        padding: ($baseline/10);
+      }
+
+      // status message
+      .sts-enrollment-value {
+        background: $honorcode-color-lvl1;
+      }
+    }
+
+    // CASE: "enrolled as" status - auditing
+    &.audit {
+
+      // changes to cover
+      .wrapper-course-image .cover {
+        border-color: $audit-color-lvl2;
+        padding: ($baseline/10);
+      }
+
+      // status message
+      .sts-enrollment-value {
+        background: $audit-color-lvl1;
+      }
+    }
+  }
+}
+
+// +Misc - Uncategorized
+// ====================
+// status - language
+.status-language {
+
+  .icon {
+    @include font-size(17);
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+    color: $black;
+  }
+
+  .title .icon {
+    opacity: 0.75; // needed to overcome bad specificity elsewhere
+  }
+}
+
+// status - verification
+.status-verification {
+
+  .status-title {
+    margin: 0 0 ($baseline/4) 0;
+  }
+
+  .status-data {
+    margin: 0 0 ($baseline/2) 0;
+  }
+
+  .status-data-message {
+    @extend %t-copy-sub1;
+    @extend %t-weight4;
+    margin-bottom: ($baseline/2);
+  }
+
+  .list-actions {
+    @extend %ui-no-list;
+
+    .action {
+      @extend %t-weight4;
+      display: block;
+      @include font-size(14);
+    }
+  }
+
+  .status-note {
+    @extend %t-copy-sub2;
+    position: relative;
+    p {
+      @extend %t-copy-sub2;
+    }
+
+    .deco-arrow {
+      @include triangle(($baseline/2), $m-gray-d3, up);
+      position: absolute;
+      @include left(45%);
+      top: -6px;
+    }
+  }
+
+  // CASE: is denied
+  &.is-denied {
+    border-top: 3px solid $red !important;
+
+    .status-data-message {
+      color: $error-color;
+      border-bottom-color: rgba($error-color, 0.25);
+    }
+
+    .action-reverify {
+      @extend %btn-primary-error;
+      @extend %t-weight4;
+      display: block;
+      @include font-size(14);
+    }
+
+    .btn-reverify {
+      margin-top: ($baseline/2);
+    }
+
+    .deco-arrow {
+      @include triangle(($baseline/2), $error-color, up);
+    }
+  }
+
+  // CASE: is accepted
+  &.is-accepted {
+    border-top: 3px solid $green !important;
+
+    .status-data-message {
+      color: $verified-color-lvl1;
+      border-bottom-color: $verified-color-lvl4;
+    }
+
+    .deco-arrow {
+      @include triangle(($baseline/2), $verified-color-lvl4, up);
+    }
+  }
+
+  // CASE: is pending
+  &.is-pending {
+
+    .status-data-message {
+      color: $m-gray-d3;
+      border-bottom-color: $m-gray-l4;
+    }
+  }
+}
+
+// status - verification
+.status--verification {
+
+  .data {
+    white-space: normal !important;
+    text-overflow: no !important;
+    overflow: visible !important;
+  }
+
+  .list--nav {
+    @include margin-left(26px);
+  }
+
+  // STATE: is denied
+  &.is-denied {
+
+    .data {
+      color: $error-color !important;
+    }
+  }
+}
+
+// message
+.msg {
+  @include margin(($baseline/2), 0, ($baseline/2), 26px);
+}
+
+.msg__title {
+  @extend %hd-lv5;
+  color: $lighter-base-font-color;
+}
+
+.msg__copy {
+  @extend %copy-metadata;
+  color: $lighter-base-font-color;
+
+  p {
+    @extend %t-copy;
+  }
+}
+ p.course-block{
+  border-style: solid;
+  border-color: #E3DC86;
+  padding: ($baseline/4);
+  border-width: 1px;
+  background: #FDFBE4;
+
+}
+.enter-course-blocked{
+
+  @include box-sizing(border-box);
+  @include float(left);
+  display: block;
+  font: normal 15px/1.6rem $sans-serif;
+  letter-spacing: 0;
+  padding: 6px 32px 7px;
+  text-align: center;
+  margin-top: 16px;
+  opacity:0.5;
+  background:#808080;
+  border:0;
+  color:white;
+  box-shadow:none;
+
+  &.archived {
+    @include button(simple, $button-archive-color);
+    font: normal 15px/1.6rem $sans-serif;
+    padding: 6px 32px 7px;
+
+    &:hover, &:focus {
+      text-decoration: none;
+    }
+  }
+}
+
+a.disable-look{
+  color: #808080;
+}
+
+a.fade-cover{
+  @extend .cover;
+  opacity: 0.5;
+}
+
+
+// +Dashboard - Banner
+// ====================
+.dashboard-banner {
+
+  &:empty {
+    display: none;
+  }
+
+  .wrapper-msg {
+    padding-bottom: 0;
+
+    .msg {
+      @include clearfix();
+      font-family: $sans-serif;
+      padding-bottom: $baseline;
+      border-bottom: thin solid $gray;
+
+      &.title {
+        @extend %t-title5;
+        @extend %t-weight4;
+        font-family: $f-sans-serif;
+
+        // Overriding Platform h2 styles
+        text-transform: none;
+        letter-spacing: 0;
+      }
+
+      &.has-actions {
+
+        .donate-content {
+          width: flex-grid(8, 12);
+        }
+
+        .donate-actions {
+          width: flex-grid(4, 12);
+          vertical-align: bottom;
+          display: inline-block;
+
+          .monetary-symbol {
+            vertical-align: middle;
+            color: $white;
+            font-weight: 600;
+          }
+
+          .amount {
+            height: 40px;
+            width: 80px;
+            vertical-align: middle;
+            text-align: left;
+            border: 2px solid $white;
+
+            &.validation-error {
+              border: 2px solid $error-color;
+            }
+          }
+
+          .action-donate {
+            @extend %btn-primary-blue;
+            vertical-align: middle;
+            padding-top: ($baseline/2);
+            padding-bottom: ($baseline/2);
+            text-shadow: none;
+            text-transform: none;
+            letter-spacing: 0;
+            color: $white;
+            font-weight: 600;
+          }
+
+          .donation-error-msg {
+            padding: ($baseline/2) 0;
+          }
+        }
+      }
+    }
+  }
+}
+

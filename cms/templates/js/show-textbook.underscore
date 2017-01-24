@@ -1,0 +1,49 @@
+<div class="view-textbook">
+
+<div class="wrap-textbook">
+    <header>
+        <h3 class="textbook-title"><%- name %></h3>
+    </header>
+
+<% if(chapters.length > 1) {%>
+    <p><a href="#" class="chapter-toggle
+        <% if(showChapters){ print('hide'); } else { print('show'); } %>-chapters">
+        <span class="ui-toggle-expansion icon fa fa-caret-<% if(showChapters){ print('down'); } else { print('right'); } %>" aria-hidden="true"></span>
+        <%- chapters.length %> PDF Chapters
+    </a></p>
+<% } else if(chapters.length === 1) { %>
+    <p dir="ltr">
+        <%- chapters.at(0).get("asset_path") %>
+    </p>
+<% } %>
+
+
+<% if(showChapters) { %>
+<ol class="chapters">
+  <% chapters.each(function(chapter) { %>
+    <li class="chapter">
+        <span class="chapter-name"><%- chapter.get('name') %></span>
+        <span class="chapter-asset-path"><%- chapter.get('asset_path') %></span>
+    </li>
+  <% }) %>
+</ol>
+<% } %>
+
+</div>
+
+
+<ul  class="actions textbook-actions">
+    <li class="action action-view">
+        <a href="//<%- CMS.URL.LMS_BASE %>/courses/<%- course.id %>/pdfbook/<%- bookindex %>/" class="view"><%- gettext("View Live") %></a>
+    </li>
+    <li class="action action-edit">
+        <button class="edit"><%- gettext("Edit") %></button>
+    </li>
+    <li class="action action-delete">
+        <button class="delete action-icon" title="<%- gettext('Delete') %>"><span class="icon fa fa-trash-o" aria-hidden="true" ></span></button>
+    </li>
+</ul>
+
+
+
+</div>

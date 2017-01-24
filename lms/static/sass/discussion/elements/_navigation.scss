@@ -1,0 +1,387 @@
+// discussion - elements - navigation
+// ====================
+
+@import '../../edx-pattern-library-shims/base/variables';
+
+.forum-nav {
+    border: 1px solid #aaa;
+    border-radius: $forum-border-radius;
+}
+
+// ------
+// Discussion Forums Page Header
+// ------
+.discussion-board > .page-header {
+    $searchBoxPadding: rem($baseline / 2 + 2);
+    $searchBoxHeight: (rem($baseline) + ($searchBoxPadding * 2));
+
+    div {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .page-header-main {
+        line-height: $searchBoxHeight;
+    }
+
+    .page-header-secondary > .form-actions > button {
+        // Overrides base size set in lms/static/sass/shared-v2/_layouts.scss
+        // Done to match size of UXPL's search box. This is bad, I know.
+        height: $searchBoxHeight !important;
+    }
+}
+
+// -----------
+// Browse menu
+// -----------
+.forum-nav-browse-menu-wrapper {
+    border-bottom: 1px solid $forum-color-border;
+    background: $gray-l5;
+}
+
+.forum-nav-browse-filter {
+    position: relative;
+    border-bottom: 1px solid $forum-color-border;
+    padding: ($baseline/4);
+}
+
+.forum-nav-browse-filter .icon {
+    @include right($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+    font-size: $forum-small-font-size;
+    position: absolute;
+    margin-top: -6px;
+    top: 50%;
+}
+
+.forum-nav-browse-filter-input {
+    width: 100%;
+}
+
+.forum-nav-browse-menu-following {
+    .icon {
+        @include float(left);
+        @include left($baseline / 2);
+        position: relative;
+        top: 13px;
+    }
+    .forum-nav-browse-title {
+        @include padding-left($baseline * 1.5);
+    }
+}
+
+.forum-nav-browse-menu-item {
+  margin-bottom: 0;
+}
+
+.forum-nav-browse-title {
+    @include text-align(left);
+    display: block;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 1px solid $forum-color-border;
+    padding: ($baseline/2);
+    background: transparent;
+    box-shadow: none;
+    background-image: none;
+    cursor: pointer;
+
+    &:hover,
+    &:focus,
+    &.is-focused {
+        // switched from a to button;
+        // need to override button styles
+        background-image: none !important;
+        box-shadow: none !important;
+        background: $forum-color-background !important;
+    }
+}
+
+.forum-nav-browse-title .icon {
+    @include margin-right($baseline/2);
+}
+
+.forum-nav-browse-menu {
+    font-size: $forum-base-font-size;
+    overflow-y: scroll;
+    list-style: none;
+}
+
+.forum-nav-browse-submenu {
+    list-style: none;
+    padding: 0;
+
+    li {
+
+        .forum-nav-browse-title {
+            @include padding-left($baseline);
+        }
+    }
+}
+
+// -------------------
+// Sort and filter bar
+// -------------------
+
+.forum-nav-refine-bar {
+    @include clearfix();
+    @include border-radius($forum-border-radius, $forum-border-radius, 0, 0);
+    font-size: $forum-small-font-size;
+    border-bottom: 1px solid $forum-color-border;
+    background-color: $gray-l5;
+    padding: ($baseline/4) ($baseline/2);
+    color: $black;
+}
+
+.forum-nav-filter-main {
+    @include text-align(left);
+    @include float(left);
+    box-sizing: border-box;
+    width: 50%;
+}
+
+.forum-nav-filter-cohort, .forum-nav-sort {
+    @include text-align(right);
+    box-sizing: border-box;
+}
+
+.forum-nav-filter-cohort {
+    .discussion-board & {
+        @include float(right);
+        @include text-align(right);
+        width: 50%;
+    }
+}
+
+.forum-nav-sort {
+    @include float(right);
+}
+
+%forum-nav-select {
+    border: none;
+    max-width: 100%;
+    background-color: transparent;
+}
+
+.forum-nav-filter-main-control {
+    @extend %forum-nav-select;
+}
+
+.forum-nav-filter-cohort-control {
+    @extend %forum-nav-select;
+    max-width: 60%;
+}
+
+.forum-nav-sort-control {
+    @extend %forum-nav-select;
+}
+
+// -----------
+// Thread list
+// -----------
+.forum-nav-thread-list {
+    padding-left: 0 !important; // should *not* be RTLed, see below for explanation
+    min-height: 60px;  // @TODO: Remove this when we have a real empty state for the discussion thread list
+    margin: 0;
+    overflow-y: auto;
+    list-style: none;
+    border-radius: 0 0 3px 3px;
+
+    .forum-nav-thread-labels {
+        margin: 5px 0 0;
+        // Overrides overspecific courseware CSS from:
+        // https://github.com/edx/edx-platform/blob/master/lms/static/sass/course/courseware/_courseware.scss#L470
+        // note this should *not* be RTLed, as the rule it overrides is not RTLed
+        padding-left: 0 !important;
+    }
+
+    .thread-preview-body {
+        margin-top: $baseline / 4;
+        color: $forum-color-response-count;
+        font-size: $forum-small-font-size;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        @include rtl {
+            // This is counterintuitive, but when showing a preview of the first part of RTL text, using direction: rtl
+            // will actually show the _last_ part of that text.
+            direction: ltr;
+        }
+    }
+}
+
+// Overrides underspecific styles from courseware css
+.course-wrapper .course-content .forum-nav-thread-list-wrapper .forum-nav-thread-list {
+    @include padding-left(0);
+    list-style: none;
+
+    .forum-nav-thread {
+        margin: 0;
+    }
+}
+
+.forum-nav-thread {
+    border-bottom: 1px solid $forum-color-border;
+    background-color: $forum-color-background;
+    margin-bottom: 0;
+
+    &:last-child {
+        // Overrides pattern library default li:last-child style
+        border-bottom: 1px solid $forum-color-border;
+    }
+
+    .forum-nav-thread-link {
+        @include border-left(3px solid transparent);
+        display: flex;
+        padding: $baseline / 2;
+        transition: none;
+        align-items: center;
+        justify-content: space-between;
+        color: $forum-color-read-post;
+
+        &:hover,
+        &:active,
+        &:focus {
+            text-decoration: none;
+        }
+
+        &:hover {
+            background-color: $forum-color-hover-thread;
+        }
+
+        &.is-active {
+            background-color: $forum-color-reading-thread;
+        }
+
+        .forum-nav-thread-unread-comments-count {
+            display: inline-block;
+            font-size: $forum-small-font-size;
+            white-space: nowrap;
+        }
+    }
+
+    &.never-read {
+        .forum-nav-thread-link {
+            @include border-left(3px solid $forum-color-never-read-post);
+            color: $forum-color-never-read-post;
+        }
+    }
+}
+
+%forum-nav-thread-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.forum-nav-thread-wrapper-0 {
+    @extend %forum-nav-thread-wrapper;
+    @include margin-right($baseline/5);
+    align-self: flex-start;
+
+    .icon {
+        font-size: $forum-base-font-size;
+        width: 18px;
+        text-align: center;
+
+        &:before {
+
+            @include rtl {
+                @include transform(scale(-1, 1)); // RTL for font awesome question mark
+            }
+        }
+    }
+}
+
+.forum-nav-thread-wrapper-1 {
+    @extend %forum-nav-thread-wrapper;
+    margin: 0 ($baseline / 4);
+      // 125 is the width we need to save for the "X new" comments indicator - and we want to clip the preview
+      // at the same length whether there are unread comments for this story or not.
+    max-width: calc(100% - 125px);
+    flex-grow: 1;  // This column should consume all the available space
+}
+
+.forum-nav-thread-wrapper-2 {
+    @extend %forum-nav-thread-wrapper;
+    @include text-align(right);
+    min-width: 90px;
+    white-space: nowrap;
+}
+
+.forum-nav-thread-title {
+    @include margin-left(0);
+    font-size: $forum-base-font-size;
+    display: block;
+}
+
+%forum-nav-thread-wrapper-2-content {
+    @include margin-right($baseline/4);
+    font-size: $forum-small-font-size;
+    display: inline-block;
+    text-align: center;
+    color: $black;
+
+    &:last-child {
+        @include margin-right(0);
+    }
+}
+
+.forum-nav-thread-votes-count {
+    @extend %forum-nav-thread-wrapper-2-content;
+}
+
+.forum-nav-thread-comments-count {
+    @extend %forum-nav-thread-wrapper-2-content;
+    @extend %t-weight4;
+    position: relative;
+    @include margin-left($baseline/4);
+    margin-bottom: ($baseline/4); // Because tail is position: absolute
+    border-radius: $forum-border-radius;
+    padding: ($baseline/10) ($baseline/5);
+    min-width: 2em; // Fit most comment counts but allow expansion if necessary
+    background-color: $gray-l4;
+
+    // Speech bubble tail
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        bottom: (-$baseline/4);
+        @include right($baseline/4);
+        width: 0;
+        height: 0;
+        border-style: solid;
+        @include border-width(0, ($baseline/4), ($baseline/4), 0);
+        @include border-color(transparent, $gray-l4, transparent, transparent);
+    }
+}
+
+.forum-nav-load-more {
+    border-bottom: 1px solid $forum-color-border;
+    background-color: $gray-l5;
+}
+
+%forum-nav-load-more-content {
+    display: block;
+    padding: $baseline 0;
+    text-align: center;
+}
+
+.forum-nav-load-more-link {
+    @extend %forum-nav-load-more-content;
+    color: $link-color;
+    width: 100%;
+
+    &:hover,
+    &:focus {
+        color: $forum-color-active-text;
+        // !important overrides the one set here:
+        // https://github.com/edx/edx-platform/blob/master/lms/static/sass/elements/_controls.scss#L472
+        background-color: $forum-color-active-thread !important;
+    }
+}
+
+.forum-nav-loading {
+    @extend %forum-nav-load-more-content;
+}

@@ -1,0 +1,689 @@
+<%page args="section_data" expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from datetime import datetime, timedelta
+from openedx.core.djangolib.js_utils import js_escaped_string
+from openedx.core.djangolib.markup import HTML, Text
+import pytz
+%>
+<%include file="add_coupon_modal.html" args="section_data=section_data" />
+<%include file="edit_coupon_modal.html" args="section_data=section_data" />
+<%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
+<%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
+<%include file="invalidate_registration_code_modal.html" args="section_data=section_data" />
+<div class="ecommerce-wrapper">
+   <div class="error-msgs" id="error-msg"></div>
+   <div id = "accordion">
+      <div class="wrap">
+         <h3 class="hd hd-3">${_('Enrollment Codes')}</h3>
+         <div>
+            %if section_data['sales_admin']:
+            <span class="code_tip">
+                <p>${_('Create one or more pre-paid course enrollment codes. Students can use these codes to enroll in the course.')}</p>
+                <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Create Enrollment Codes')}</a>
+                <p></p>
+                <p>${_('Cancel, restore, or mark an enrollment code as unused.')}</p>
+                <a id="query_registration_code_link" href="#invalidate_registration_code_modal" rel="leanModal" class="add blue-button">${_('Change Enrollment Code Status')}</a>
+            </span>
+            %endif
+            <p>${_('Download a .csv file of all enrollment codes for this course.')}</p>
+            <p>
+            <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
+               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+               <input type="text" name="download_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="list-registration-codes-csv" value="${_("Download All Enrollment Codes")}" data-csv="true">
+            </form>
+            </p>
+            <p>${_('Download a .csv file of all unused enrollment codes for this course.')}</p>
+            <p>
+            <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
+               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+               <input type="text" name="active_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="active-registration-codes-csv" value="${_("Download Unused Enrollment Codes")}" data-csv="true">
+            </form>
+            </p>
+            <p>${_('Download a .csv file of all used enrollment codes for this course.')}</p>
+            <p>
+            <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
+               <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+               <input type="text" name="spent_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="spent-registration-codes-csv" value="${_("Download Used Enrollment Codes")}" data-csv="true">
+            </form>
+            </p>
+           <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
+         </div>
+      </div>
+      <!-- end wrap -->
+      %if section_data['coupons_enabled']:
+      <div class="wrap">
+         <h3 class="hd hd-3">${_("Course Price")}</h3>
+         <div>
+            <span class="tip">${_("Course price per seat: ")}<span>${section_data['currency_symbol']}${section_data['course_price']}</span>
+            %if section_data['access']['finance_admin'] is True:
+            <a id="course_price_link" href="#set-course-mode-price-modal" rel="leanModal" class="add blue-button">+ ${_('Edit Price')}</a>
+            %endif
+            </span>
+         </div>
+      </div>
+      %endif
+      <!-- end wrap -->
+      %if section_data['access']['finance_admin']:
+      <div class="wrap">
+         <h3 class="hd hd-3">${_("Course Seat Purchases")}</h3>
+         <div>
+            %if section_data['total_amount'] is not None:
+              <span><strong>${_("Total Credit Card Purchases: ")}</strong></span><span>${section_data['currency_symbol']}${section_data['total_amount']}</span>
+            %endif
+            <span class="csv_tip">
+              <div>
+                <p>${_("Download a .csv file for all credit card purchases or for all invoices, regardless of status.")}</p>
+                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoices")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
+                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Credit Card Purchases")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
+              </div>
+            </span>
+             <hr>
+             <p>${_("To cancel or resubmit an invoice, enter the invoice number below.")}</p>
+            <span class="invalid_sale">
+               <input type="number" id="invoice_number" placeholder= "${_("Invoice Number")}"/>
+               <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Cancel Invoice")}">
+               <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Resubmit Invoice")}">
+            </span>
+
+         </div>
+      </div><!-- end wrap -->
+      %endif
+      %if section_data['reports_enabled']:
+      <div class="reports wrap">
+        <h3 class="hd hd-3">${_("Reports")}</h3>
+        <div>
+          <span class="csv_tip">
+            <div>
+              <p>${_("Create a .csv file that contains enrollment information for your course.")}</p>
+              <input type="button" class="add blue-button" name="user-enrollment-report" value="${_("Create Enrollment Report")}" data-endpoint="${ section_data['enrollment_report_url'] }">
+            </div>
+            <div class="request-response msg msg-confirm copy" id="enrollment-report-request-response"></div>
+            <div class="request-response-error msg msg-warning copy" id="enrollment-report-request-response-error"></div>
+            <br>
+          </span>
+          <span class="csv_tip">
+            <div>
+              <p>${_("Create an HTML file that contains an executive summary for this course.")}</p>
+              <input type="button" class="add blue-button" name="exec-summary-report" value="${_("Create Executive Summary")}" data-endpoint="${ section_data['exec_summary_report_url'] }">
+            </div>
+            <div class="request-response msg msg-confirm copy" id="exec-summary-report-request-response"></div>
+            <div class="request-response-error msg msg-warning copy" id="exec-summary-report-request-response-error"></div>
+            <br>
+          </span>
+          <div class="reports-download-container action-type-container">
+            <p><b>${_("Available Reports")}</b></p>
+            <p>${_("The following reports are available for download. Reports are not deleted. A link to every report remains available on this page, identified by the date and time (in UTC) that the report was generated.")}</p>
+
+            ## Translators: a table of URL links to report files appears after this sentence.
+            <p>
+                ${Text(_("{strong_start}Note{strong_end}: To help protect learner data, links to these reports that you save outside of this page or that you send or receive in email expire after five minutes.")).format(
+                    strong_start=HTML("<strong>"),
+                    strong_end=HTML("</strong>"),
+                )}
+            </p><br>
+
+            <div class="report-downloads-table" id="report-downloads-table"
+                data-endpoint="${ section_data['list_financial_report_downloads_url'] }"></div>
+          </div>
+
+          %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+          <div class="running-tasks-container action-type-container">
+            <hr>
+            <h3 class="hd hd-3">${_("Pending Tasks")}</h3>
+            <div class="running-tasks-section">
+              <p>${_("The status for any active tasks appears in a table below.")} </p>
+              <br/>
+              <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+            </div>
+            <div class="no-pending-tasks-message"></div>
+          </div>
+         %endif
+        </div>
+      </div><!-- end wrap -->
+      %endif
+      %if section_data['coupons_enabled']:
+      <div class="wrap">
+         <h3 class="hd hd-3">${_("Coupon Code List")}</h3>
+         <div>
+
+            <span class="csv_tip">${_("Download a .csv file of all coupon codes for this course.")}
+                <input class="add blue-button" type="button" name="download-coupon-codes-csv" value="${_("Download Coupon Codes")}" data-endpoint="${ section_data['download_coupon_codes_url'] }" data-csv="true">
+            </span>
+
+            <span class="tip">${_("Coupon Codes")} <a id="add_coupon_link" href="#add-coupon-modal" rel="leanModal"
+               class="add blue-button">+ ${_("Add Coupon Code")}</a></span>
+            <div class="wrapper-content wrapper">
+               <section class="content">
+                  %if len(section_data['coupons']):
+                  <table class="coupons-table">
+                     <thead>
+                        <tr class="coupons-headings">
+                           <th class="c_code">${_("Coupon Code")}</th>
+                           <th class="c_dsc">${_("Description")}</th>
+                           <th class="c_expiry">${_("Expiration Date")}</th>
+                           <th class="c_discount">${_("Coupon (%)")}</th>
+                           <th class="c_count">${_("Number Redeemed")}</th>
+                           <th class="c_action">${_("Actions")}</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        %for coupon in section_data['coupons']:
+                        <% current_date = datetime.now(pytz.UTC) %>
+                        <% coupon_expiry_date = coupon.expiration_date %>
+                        %if coupon.is_active == False:
+                        <tr class="coupons-items inactive_coupon">
+                        %elif coupon_expiry_date is not None and current_date >= coupon_expiry_date:
+                        <tr class="coupons-items expired_coupon">
+                        %else:
+                        <tr class="coupons-items">
+                           %endif
+                            <td>${_('{code}').format(code=coupon.code)}</td>
+                            <td>${_('{description}').format(description=coupon.description)}</td>
+                            <td>
+                                ${coupon.display_expiry_date}
+                            </td>
+                            <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
+                           <td>${ coupon.couponredemption_set.filter(order__status='purchased').count() }</td>
+                           <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">${_('Edit')}</a></td>
+                        </tr>
+                        %endfor
+                     </tbody>
+                  </table>
+                  <a id="edit-modal-trigger" href="#edit-coupon-modal" rel="leanModal"></a>
+                  %endif
+               </section>
+            </div>
+         </div>
+      </div>
+      %endif
+      <!-- end wrap -->
+   </div>
+</div>
+<script>
+
+   $(function () {
+       var icons = {
+           header: "ui-icon-carat-1-e",
+           activeHeader: "ui-icon-carat-1-s"
+       };
+       var act = 0;
+       $("#accordion").accordion(
+               {
+                   heightStyle: 'content',
+                   activate: function(event, ui) {
+                    var active = jQuery("#accordion").accordion('option', 'active');
+                    $.cookie('saved_index', null);
+                    $.cookie('saved_index', active);
+                    $('#error-msg').val('');
+                    $("#error-msg").fadeOut(2000 , function(){
+                        $('#error-msg').hide()
+                    });
+                   },
+                   animate: 400,
+                   header: "> div.wrap >h2",
+                   icons:icons,
+                   active:isNaN(parseInt($.cookie('saved_index'))) ? 0 : parseInt($.cookie('saved_index')),
+                   collapsible: true
+               });
+
+     $('a[rel*=leanModal]').leanModal({ top : -70, position: "absolute", closeButton: ".modal_close" });
+     $.each($("a.edit-right"), function () {
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+         $(this).removeAttr('href')
+       }
+     });
+     $.each($("a.remove_coupon"), function () {
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+         $(this).removeAttr('href')
+       }
+     });
+     $('#registration_code_generation_link').click(function(event){
+         event.preventDefault();
+
+         $.ajax({
+         type: "POST",
+         url: "${section_data['get_user_invoice_preference_url'] | n, js_escaped_string}",
+         success: function (data) {
+             $('#invoice-copy').prop('checked', data.invoice_copy);
+             $('#registration_code_generation_link-trigger').click();
+           }
+       });
+
+     });
+     $('#invalidate_invoice, #re_validate_invoice').click(function (event) {
+         event.preventDefault();
+         var event_type = "re_validate"
+         if($(event.target).attr('id')=='invalidate_invoice'){
+             event_type = "invalidate"
+         }
+         if($('#invoice_number').val() == "") {
+                     $('#error-msg').attr('class','error-msgs')
+                    $('#error-msg').text("${_('The Invoice Number field cannot be empty.') | n, js_escaped_string}").show();
+                     return
+         }
+         $.ajax({
+             type: "POST",
+             data: {invoice_number: $('#invoice_number').val(), event_type:event_type},
+             url: "${section_data['sale_validation_url'] | n, js_escaped_string}",
+             success: function (data) {
+                 $('#error-msg').attr('class','success-msgs')
+                 edx.HtmlUtils.setHtml($('#error-msg'), data.message);
+                 $('#error-msg').show();
+                 $('#invoice_number').val('');
+             },
+             error: function(jqXHR, textStatus, errorThrown) {
+                 $('#error-msg').attr('class','error-msgs')
+                 edx.HtmlUtils.setHtml($('#error-msg'), jqXHR.responseText);
+                 $('#error-msg').show();
+             }
+         });
+     });
+
+     $('a.edit-right').click(function (event) {
+       $('#edit_coupon_form #coupon_form_error').attr('style', 'display: none');
+       $('#edit_coupon_form #coupon_form_error').text();
+       event.preventDefault();
+       event.stopPropagation();
+       var coupon_id = $(this).data('item-id');
+       $('#coupon_id').val(coupon_id);
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+         return false;
+       }
+       $.ajax({
+         type: "POST",
+         data: {id: coupon_id},
+         url: "${section_data['ajax_get_coupon_info'] | n, js_escaped_string}",
+         success: function (data) {
+             $('#error-msg').val('');
+             $('#error-msg').hide()
+             $('input#edit_coupon_code').val(data.coupon_code);
+             $('input#edit_coupon_discount').val(data.coupon_discount);
+             $('textarea#edit_coupon_description').val(data.coupon_description);
+             $('input#edit_coupon_course_id').val(data.coupon_course_id);
+             if (data.expiry_date) {
+                 $('input#edit_coupon_expiration_date').val(data.expiry_date);
+             }
+             else {
+                $('input#edit_coupon_expiration_date').val("${_('No Expiration Date') | n, js_escaped_string}");
+             }
+             $('#edit-modal-trigger').click();
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+           var data = $.parseJSON(jqXHR.responseText);
+           $('#error-msg').attr('class','error-msgs')
+           edx.HtmlUtils.setHtml($('#error-msg'), data.message);
+           $('#error-msg').show();
+         }
+       });
+     });
+     $('a.remove_coupon').click(function (event) {
+       var anchor = $(this);
+       if (anchor.data("disabled")) {
+         return false;
+       }
+       anchor.data("disabled", "disabled");
+       event.preventDefault();
+       if ($(this).parent().parent('tr').hasClass('inactive_coupon')) {
+           return false;
+       }
+       $.ajax({
+         type: "POST",
+         data: {id: $(this).data('item-id')},
+         url: "${section_data['ajax_remove_coupon_url'] | n, js_escaped_string}",
+         success: function (data) {
+             anchor.removeData("disabled");
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+           var data = $.parseJSON(jqXHR.responseText);
+           $('#error-msg').attr('class','error-msgs')
+           edx.HtmlUtils.setHtml($('#error-msg'), data.message);
+           $('#error-msg').show();
+           anchor.removeData("disabled");
+         }
+       });
+     });
+     var generate_registration_code_form = $("form#generate_codes");
+     var generate_registration_button = $('input[name="generate-registration-codes-csv"]');
+     var registration_code_error = $('#generate_codes #registration_code_form_error');
+
+     function validateEmail(sEmail) {
+      filter = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/
+      return filter.test(sEmail)
+     }
+     generate_registration_code_form.submit(function () {
+      registration_code_error.attr('style', 'display: none');
+      generate_registration_button.attr('disabled', true);
+      var total_registration_codes = $('input[name="total_registration_codes"]').val();
+      var recipient_name = $('input[name="recipient_name"]').val();
+      var recipient_email = $('input[name="recipient_email"]').val();
+      var unit_price = $('input[name="unit_price"]').val();
+      var company_name = $('input[name="company_name"]').val();
+      var company_contact_name = $('input[name="company_contact_name"]').val();
+      var company_contact_email = $('input[name="company_contact_email"]').val();
+
+      var address_line = $('input[name="address_line_1"]').val();
+
+      if (company_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the company name.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(company_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('The company name cannot be a number.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (company_contact_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the company contact name.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(company_contact_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('The company contact name cannot be a number.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (company_contact_email == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the email address for the company contact.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (!(validateEmail(company_contact_email))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter a valid email address.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (recipient_name == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the recipient name.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (($.isNumeric(recipient_name))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('The recipient name cannot be a number.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (recipient_email == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the recipient email address.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (!(validateEmail(recipient_email))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter a valid email address.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (address_line == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the billing address.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      if (unit_price == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the price per course seat.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(unit_price))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter a numeric value for the price per course seat. Do not include currency symbols.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (total_registration_codes == '') {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter the number of enrollment codes.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false
+      }
+      if (!($.isNumeric(total_registration_codes))) {
+        registration_code_error.attr('style', 'display: block !important');
+        registration_code_error.text("${_('Enter a numeric value for the number of enrollment codes.') | n, js_escaped_string}");
+        generate_registration_button.removeAttr('disabled');
+        return false;
+      }
+      var modal_overLay = $('#lean_overlay');
+      var registration_code_modal = $('#registration_code_generation_modal');
+      registration_code_modal.hide();
+      modal_overLay.hide();
+     });
+
+     $('#update_coupon_button').click(function () {
+       $("#update_coupon_button").attr('disabled', true);
+       var coupon_id = $.trim($('#coupon_id').val());
+       var description = $.trim($('#edit_coupon_description').val());
+
+       $.ajax({
+         type: "POST",
+         data: {
+           "coupon_id"  : coupon_id,
+           "description": description
+         },
+         url: "${section_data['ajax_update_coupon'] | n, js_escaped_string}",
+         success: function (data) {
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+            var data = $.parseJSON(jqXHR.responseText);
+            $("#update_coupon_button").removeAttr('disabled');
+            $('#edit_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+            $('#edit_coupon_form #coupon_form_error').text(data.message);
+         }
+       });
+     });
+     $('#course_price_link').click(function () {
+       reset_input_fields();
+     });
+     $('#query_registration_code_link').click(function () {
+       reset_input_fields();
+     });
+     $('#add_coupon_link').click(function () {
+       reset_input_fields();
+     });
+      $('#registration_code_generation_link').click(function () {
+        reset_input_fields();
+        $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
+     });
+     $('#set_course_button').click(function () {
+       $("#set_course_button").attr('disabled', true);
+       // Get the Code and Discount value and trim it
+       var course_price = $.trim($('#mode_price').val());
+       var currency = $.trim($('#course_mode_currency').val());
+
+       // Check if empty of not
+       if (course_price === '') {
+         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+         $('#set_price_form #course_form_error').text("${_('Enter the price per course seat.') | n, js_escaped_string}");
+         $("#set_course_button").removeAttr('disabled');
+         return false;
+       }
+       if (!$.isNumeric(course_price)) {
+         $("#set_course_button").removeAttr('disabled');
+         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+         $('#set_price_form #course_form_error').text("${_('Enter a numeric value for the price per course seat. Do not include currency symbols.') | n, js_escaped_string}");
+         return false;
+       }
+       if (currency == '') {
+         $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+         $('#set_price_form #course_form_error').text("${_('Select a currency.') | n, js_escaped_string}");
+         $("#set_course_button").removeAttr('disabled');
+         return false;
+       }
+       $.ajax({
+         type: "POST",
+         data: {
+           "course_price"  : course_price,
+           "currency": currency
+         },
+         url: "${section_data['set_course_mode_url'] | n, js_escaped_string}",
+         success: function (data) {
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+            var data = $.parseJSON(jqXHR.responseText);
+            $("#set_course_button").removeAttr('disabled');
+            $('#set_price_form #course_form_error').attr('style', 'display: block !important');
+            $('#set_price_form #course_form_error').text(data.message);
+         }
+       });
+     });
+     $('#add_coupon_button').click(function () {
+       $("#add_coupon_button").attr('disabled', true);
+       // Get the Code and Discount value and trim it
+       var code = $.trim($('#coupon_code').val());
+       var coupon_discount = $.trim($('#coupon_discount').val());
+       var course_id = $.trim($('#coupon_course_id').val());
+       var description = $.trim($('#coupon_description').val());
+       var expiration_date = $.trim($('#coupon_expiration_date').val());
+
+       // Check if empty of not
+       if (code === '') {
+         $("#add_coupon_button").removeAttr('disabled');
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text("${_('Enter a coupon code.') | n, js_escaped_string}");
+         return false;
+       }
+       if (parseInt(coupon_discount) > 100) {
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text("${_('The discount percentage must be less than or equal to 100.') | n, js_escaped_string}");
+         $("#add_coupon_button").removeAttr('disabled');
+         return false;
+       }
+       if (!$.isNumeric(coupon_discount)) {
+         $("#add_coupon_button").removeAttr('disabled');
+         $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+         $('#add_coupon_form #coupon_form_error').text("${_('Enter a numeric value for the discount amount. Do not include the percent sign.') | n, js_escaped_string}");
+         return false;
+       }
+       $.ajax({
+         type: "POST",
+         data: {
+           "code"  : code,
+           "discount": coupon_discount,
+           "course_id": course_id,
+           "description": description,
+           "expiration_date": expiration_date
+         },
+         url: "${section_data['ajax_add_coupon'] | n, js_escaped_string}",
+         success: function (data) {
+             location.reload(true);
+           },
+         error: function(jqXHR, textStatus, errorThrown) {
+            var data = $.parseJSON(jqXHR.responseText);
+            $('#add_coupon_form #coupon_form_error').attr('style', 'display: block !important');
+            $('#add_coupon_form #coupon_form_error').text(data.message);
+            $("#add_coupon_button").removeAttr('disabled');
+         }
+       });
+     });
+     // removing close link's default behavior
+     $('.close-modal').click(function (e) {
+       $("#update_coupon_button").removeAttr('disabled');
+       $("#add_coupon_button").removeAttr('disabled');
+       $("#set_course_button").removeAttr('disabled');
+       $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
+       reset_input_fields();
+       e.preventDefault();
+     });
+
+     var onModalClose = function () {
+       $("#add-coupon-modal").attr("aria-hidden", "true");
+       $(".remove_coupon").focus();
+       $("#edit-coupon-modal").attr("aria-hidden", "true");
+       $(".edit-right").focus();
+       $("#set-course-mode-price-modal").attr("aria-hidden", "true");
+       $("#invalidate_registration_code_modal").attr("aria-hidden", "true");
+
+       $("#registration_code_generation_modal").attr("aria-hidden", "true");
+       $("#add_coupon_button").removeAttr('disabled');
+       $("#set_course_button").removeAttr('disabled');
+       $("#update_coupon_button").removeAttr('disabled');
+       $('input[name="generate-registration-codes-csv"]').removeAttr('disabled');
+       reset_input_fields();
+     };
+
+     var cycle_modal_tab = function (from_element_name, to_element_name) {
+       $(from_element_name).on('keydown', function (e) {
+         var keyCode = e.keyCode || e.which;
+         var TAB_KEY = 9;  // 9 corresponds to the tab key
+         if (keyCode === TAB_KEY) {
+           e.preventDefault();
+           $(to_element_name).focus();
+         }
+       });
+     };
+
+     $("#add-coupon-modal .close-modal").click(onModalClose);
+     $("#edit-coupon-modal .close-modal").click(onModalClose);
+     $('#registration_code_generation_modal .close-modal').click(onModalClose);
+     $("#set-course-mode-price-modal .close-modal").click(reset_input_fields);
+     $("#invalidate_registration_code_modal .close-modal").click(reset_input_fields);
+
+
+     // Hitting the ESC key will exit the modal
+     $("#add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #invalidate_registration_code_modal, #registration_code_generation_modal").on("keydown", function (e) {
+       var keyCode = e.keyCode || e.which;
+       // 27 is the ESC key
+       if (keyCode === 27) {
+         e.preventDefault();
+         $("#add-coupon-modal .close-modal").click();
+         $("#set-course-mode-price-modal .close-modal").click();
+         $("#edit-coupon-modal .close-modal").click();
+         $("#invalidate_registration_code_modal .close-modal").click();
+
+         $('#registration_code_generation_modal .close-modal').click();
+       }
+     });
+   });
+   var reset_input_fields = function () {
+     $('#error-msg').val('');
+     $('#error-msg').hide();
+     $('#add_coupon_form #coupon_form_error').attr('style', 'display: none');
+     $("form#set_regcode_status_form").next().remove();
+     $('#set_regcode_status_form #regcode_status_form_error').attr('style', 'display: none');
+     $('#set_regcode_status_form #regcode_status_form_success').attr('style', 'display: none');
+     $('#set_regcode_status_form input#lookup_regcode').removeAttr('disabled');
+     $('#set_price_form #course_form_error').attr('style', 'display: none');
+     $('#generate_codes #registration_code_form_error').attr('style', 'display: none');
+     $('#add_coupon_form #coupon_form_error').text();
+     $('input#mode_price').val('');
+     $('input#coupon_code').val('');
+     $('input#coupon_discount').val('');
+     $('textarea#coupon_description').val('');
+     $('input[name="company_name"]').val('');
+     $('input[name="regcode_code"]').val('');
+     $('input[name="total_registration_codes"]').val('');
+     $('input[name="address_line_1"]').val('');
+     $('input[name="address_line_2"]').val('');
+     $('input[name="address_line_3"]').val('');
+     $('input[name="city"]').val('');
+     $('input[name="state"]').val('');
+     $('input[name="zip"]').val('');
+     $('input[name="country"]').val('');
+     $('input[name="customer_reference_number"]').val('');
+     $('input[name="recipient_name"]').val('');
+     $('input[name="unit_price"]').val('');
+     $('input[name="recipient_email"]').val('');
+     $('input[name="company_contact_name"]').val('');
+     $('input[name="company_contact_email"]').val('');
+     $('input[name="invoice"]').attr('checked', 'checked');
+     $('input[name="company_reference"]').val('');
+     $('input[name="internal_reference"]').val('');
+   }
+</script>

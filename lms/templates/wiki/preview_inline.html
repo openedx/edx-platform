@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% load wiki_tags i18n %}{% load theme_pipeline %}
+<html lang="{{LANGUAGE_CODE}}">
+<head>
+  {% stylesheet 'course' %}
+  {% javascript 'main_vendor' %}
+</head>
+<body class="modal-preview">
+  <section class="container wiki view">
+    <div class="main-article">
+      {% if revision %}
+        <div class="alert alert-info">
+          <strong>{% trans "Previewing revision:" %}</strong>
+          {% include "wiki/includes/revision_info.html" %}
+        </div>
+      {% endif %}
+
+      {% if merge %}
+        <div class="alert alert-info">
+          <strong>{% trans "Previewing a merge between two revisions:" %}</strong>
+          <ol>
+            <li>{% include "wiki/includes/revision_info.html" with revision=merge1 %}</li>
+            <li>{% include "wiki/includes/revision_info.html" with revision=merge2 %}</li>
+          </ol>
+        </div>
+      {% endif %}
+
+      <h1 class="page-header">{{ title }}</h1>
+
+      {% if revision and revision.deleted %}
+        <div class="warning">
+          <strong>{% trans "This revision has been deleted." %}</strong> 
+          <p>{% trans "Restoring to this revision will mark the article as deleted." %}</p>
+        </div>
+      {% else %}
+        {% wiki_render article content %}
+      {% endif %}
+      
+    </div>
+  </section>
+  
+  {% javascript 'application' %}
+  {% javascript 'module-js' %}
+  {% with mathjax_mode='wiki' %}
+    {% include "mathjax_include.html" %}
+  {% endwith %}
+  
+</body>
+</html>
+
+
+
+

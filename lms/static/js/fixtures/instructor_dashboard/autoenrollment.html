@@ -1,0 +1,20 @@
+<div class="auto_enroll auto_enroll_csv">
+  <h3 class="hd hd-3">Register/Enroll Students</h3>
+
+  <p>
+    To register and enroll a list of users in this course, choose a CSV file that contains the following columns in this exact order: email, username, name, and country. Please include one student per row and do not include any headers, footers, or blank lines.
+  </p>
+
+  <form id="student-auto-enroll-form">
+    <div class="customBrowseBtn">
+        <label for="browseBtn-auto-enroll">Upload a CSV for bulk enrollment</label>
+        <span id="browseFile" class="enhanced-input-file"></span>
+        <div class="file-browse btn btn-primary" aria-hidden="true">
+            <span class="browse">Browse</span>
+            <input class="file_field" id="browseBtn-auto-enroll" name="students_list" type="file" accept=".csv"/>
+        </div>
+    </div>
+    <button type="submit" class="btn-blue" id="submitBtn-auto_enroll_csv" name="enrollment_signup_button">Upload CSV</button>
+  </form>
+  <div class="results"></div>
+</div>

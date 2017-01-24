@@ -1,0 +1,85 @@
+<div class="discussion-post">
+    <header class="post-header">
+        <% if (!readOnly) { %>
+            <div class="post-header-actions">
+                <%=
+                _.template(
+                    $('#forum-actions').html())(
+                    {
+                        contentId: cid,
+                        contentType: 'post',
+                        primaryActions: ['vote', 'follow'],
+                        secondaryActions: ['pin', 'edit', 'delete', 'report', 'close'],
+                        readOnly: readOnly
+                    }
+                )
+                %>
+            </div>
+        <% } %>
+        <div class="post-header-content">
+            <h4 class="post-title"><%- title %></h4>
+            <p class="posted-details">
+            <%
+            var timeAgoHtml = interpolate(
+                '<span class="timeago" title="%(created_at)s">%(created_at)s</span>',
+                {created_at: created_at},
+                true
+            );
+            %>
+            <%=
+            interpolate(
+                // Translators: post_type describes the kind of post this is (e.g. "question" or "discussion");
+                // time_ago is how much time has passed since the post was created (e.g. "4 hours ago")
+                _.escape(gettext('%(post_type)s posted %(time_ago)s by %(author)s')),
+                {post_type: thread_type, time_ago: timeAgoHtml, author: author_display},
+                true
+            )
+            %>
+            </p>
+            <div class="post-labels">
+                <span class="post-label post-label-pinned">
+                    <span class="icon fa fa-thumb-tack" aria-hidden="true"></span><%- gettext("Pinned") %>
+                </span>
+                <span class="post-label post-label-reported">
+                    <span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %>
+                </span>
+                <span class="post-label post-label-closed">
+                    <span class="icon fa fa-lock" aria-hidden="true"></span><%- gettext("Closed") %>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <div class="post-body"><%- body %></div>
+    <div class="post-context">
+        <% if (mode === "tab" && obj.courseware_url) { %>
+            <%
+            var courseware_title_linked = interpolate(
+                '<a href="%(courseware_url)s">%(courseware_title)s</a>',
+                {courseware_url: courseware_url, courseware_title: _.escape(courseware_title)},
+                true
+            );
+            %>
+            <%=
+            interpolate(
+                _.escape(gettext('Related to: %(courseware_title_linked)s')),
+                {courseware_title_linked: courseware_title_linked},
+                true
+            )
+            %>
+        <% } %>
+        <div class="group-visibility-label">
+            <% if (obj.group_name) { %>
+                <%-
+                interpolate(
+                    gettext('This post is visible only to %(group_name)s.'),
+                    {group_name: obj.group_name},
+                    true
+                )
+                %>
+            <% } else { %>
+                <%- gettext('This post is visible to everyone.') %>
+            <% } %>
+        </div>
+    </div>
+</div>

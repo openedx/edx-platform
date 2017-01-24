@@ -1,0 +1,25 @@
+<html>
+<head><title>Payment Form</title>
+</head>
+<body>
+<p>Payment page</p>
+
+<form name="input" action="${callback_url}" method="post">
+    % for name, value in post_params_success.items():
+        <input type="hidden" name="${name}" value="${value}">
+    % endfor
+    <input type="submit" value="Submit">
+</form>
+
+<form name="frm_decline" action="${callback_url}" method="post">
+    % for name, value in post_params_decline.items():
+        <input type="hidden" name="${name}" value="${value}">
+    % endfor
+    <input type="submit" value="Decline" id="decline">
+</form>
+
+
+</body>
+</html>
+
+

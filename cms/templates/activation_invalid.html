@@ -1,0 +1,42 @@
+<%!
+from openedx.core.djangolib.markup import HTML, Text
+from django.utils.translation import ugettext as _
+%>
+<%page expression_filter="h"/>
+<%inherit file="base.html" />
+
+<%block name="content">
+<div class="wrapper-mast wrapper sr">
+  <header class="mast">
+    <h1 class="page-header">
+      ${Text(_("{studio_name} Account Activation")).format(
+        studio_name=Text(settings.STUDIO_SHORT_NAME)
+      )}
+    </h1>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content activation is-invalid">
+    <article class="content-primary" role="main">
+    </article>
+
+    <div class="notice notice-incontext notice-instruction has-actions">
+      <div class="msg">
+        <h1 class="title">${_("Your account activation is invalid")}</h1>
+        <div class="copy">
+          <p>${_("We're sorry. Something went wrong with your activation. Check to make sure the URL you went to was correct, as e-mail programs will sometimes split it into two lines.")}</p>
+          <p>
+            ${Text(_("If you still have issues, contact {platform_name} Support. In the meantime, you can also return to {link_start}the {studio_name} homepage.{link_end}")).format(
+              platform_name=Text(settings.PLATFORM_NAME),
+              studio_name=Text(settings.STUDIO_NAME),
+              link_start=HTML('<a href="/">'),
+              link_end=HTML('</a>')
+            )}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</%block>
