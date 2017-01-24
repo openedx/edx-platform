@@ -59,10 +59,10 @@
                     success: callback
                 });
             };
-            $.postJSON = function(url, data, callback) {
+            $.postJSON = function(url, data, callback) {  // eslint-disable-line no-param-reassign
                 return sendJSON(url, data, callback, 'POST');
             };
-            $.patchJSON = function(url, data, callback) {
+            $.patchJSON = function(url, data, callback) {  // eslint-disable-line no-param-reassign
                 return sendJSON(url, data, callback, 'PATCH');
             };
             return domReady(function() {

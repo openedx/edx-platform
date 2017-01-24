@@ -63,6 +63,7 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
                 )
             );
             Backbone.trigger('move:childrenRendered', this.breadcrumbInfo());
+            Backbone.trigger('move:enableMoveOperation', this.parentInfo.parent);
             return this;
         },
 
