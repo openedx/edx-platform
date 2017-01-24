@@ -160,7 +160,7 @@ def python_prereqs_installation():
 
 def pip_install_req_file(req_file):
     """Pip install the requirements file."""
-    pip_cmd = 'pip install --disable-pip-version-check --exists-action w'
+    pip_cmd = 'pip install -vvv --disable-pip-version-check --exists-action w'
     sh("{pip_cmd} -r {req_file}".format(pip_cmd=pip_cmd, req_file=req_file))
 
 
