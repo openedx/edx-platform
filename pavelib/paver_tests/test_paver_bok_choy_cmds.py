@@ -203,7 +203,7 @@ class TestPaverPa11yCrawlerCmd(unittest.TestCase):
         )
         ignore = (
             "pa11y_ignore_rules_url="
-            "https://raw.githubusercontent.com/singingwolfboy/"
+            "https://raw.githubusercontent.com/edx/"
             "pa11ycrawler-ignore/master/ignore.yaml"
         )
         expected_cmd = [
