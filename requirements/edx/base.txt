@@ -85,12 +85,7 @@ pyparsing==2.0.1
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
-
-# This module gets monkey-patched in third_party_auth.py to fix a Django 1.8 incompatibility.
-# When this dependency gets upgraded, the monkey patch should be removed, if possible.
-# We can also remove the fix to auth_url in third_party_auth/saml.py when that fix is included upstream.
-python-social-auth==0.2.12
-
+python-social-auth==0.2.21
 pytz==2016.7
 pysrt==0.4.7
 PyYAML==3.10
