@@ -15,8 +15,16 @@ class RedirectMiddleware(object):
         with the current request URL as the old_path field.
         """
         site = request.site
-        if (site.id == settings.SITE_ID) and ("api" not in request.path):
-            return redirect(settings.AMC_APP_URL)
+        try:
+            in_whitelist = any(map(
+                lambda p: p in request.path,
+                settings.MAIN_SITE_REDIRECT_WHITELIST))
+            if (site.id == settings.SITE_ID) and not in_whitelist:
+                return redirect(settings.AMC_APP_URL)
+        except Exception:
+            # I'm not entirely sure this middleware get's called only in LMS or in other apps as well.
+            # Soooo just in case
+            pass
         cache_key = '{prefix}-{site}'.format(prefix=settings.REDIRECT_CACHE_KEY_PREFIX, site=site.domain)
         redirects = cache.get(cache_key)
         if redirects is None:

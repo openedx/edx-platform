@@ -84,3 +84,7 @@ if SENTRY_DSN:
 
     INSTALLED_APPS += ('raven.contrib.django.raven_compat',)
 
+# This is used in the appsembler_sites.middleware.RedirectMiddleware to exclude certain paths
+# from the redirect mechanics.
+MAIN_SITE_REDIRECT_WHITELIST = ['api', 'admin']
+
