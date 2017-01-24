@@ -395,13 +395,15 @@ class GetBatchEnrollmentDataView(APIView):
                 'course_id': str(enrollment.course_id),
                 'date_enrolled': enrollment.created,
             }
-            cert = GeneratedCertificate.objects.filter(course_id=course_id).filter(user=enrollment.user)
-            if cert:
-                enrollment['certificate'] = {
+            try:
+                cert = GeneratedCertificate.objects.get(course_id=enrollment.course_id, user=enrollment.user)
+                enrollment_data['certificate'] = {
                     'completion_date': str(cert.created_date),
                     'grade': cert.grade,
-                    'url': cert.download_url
+                    'url': cert.download_url,
                 }
+            except GeneratedCertificate.DoesNotExist:
+                pass
 
             enrollment_list.append(enrollment_data)
 
