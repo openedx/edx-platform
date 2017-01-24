@@ -24,26 +24,28 @@ NO_RETRY_TASKS = (XMLSyntaxError, LoncapaProblemError, UnicodeEncodeError)
 @task(
     default_retry_delay=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY'],
     max_retries=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_TASK_MAX_RETRIES'],
+    bind=True,
 )
-def update_course_in_cache(course_id):
+def update_course_in_cache(self, course_id):
     """
     Updates the course blocks (in the database) for the specified course.
     """
-    _call_and_retry_if_needed(course_id, api.update_course_in_cache, update_course_in_cache)
+    _call_and_retry_if_needed(course_id, api.update_course_in_cache, update_course_in_cache, self.request.id)
 
 
 @task(
     default_retry_delay=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_TASK_DEFAULT_RETRY_DELAY'],
     max_retries=settings.BLOCK_STRUCTURES_SETTINGS['BLOCK_STRUCTURES_TASK_MAX_RETRIES'],
+    bind=True,
 )
-def get_course_in_cache(course_id):
+def get_course_in_cache(self, course_id):
     """
     Gets the course blocks for the specified course, updating the cache if needed.
     """
-    _call_and_retry_if_needed(course_id, api.get_course_in_cache, get_course_in_cache)
+    _call_and_retry_if_needed(course_id, api.get_course_in_cache, get_course_in_cache, self.request.id)
 
 
-def _call_and_retry_if_needed(course_id, api_method, task_method):
+def _call_and_retry_if_needed(course_id, api_method, task_method, task_id):
     """
     Calls the given api_method with the given course_id, retrying task_method upon failure.
     """
@@ -52,6 +54,12 @@ def _call_and_retry_if_needed(course_id, api_method, task_method):
         api_method(course_key)
     except NO_RETRY_TASKS as exc:
         # Known unrecoverable errors
+        log.exception(
+            "update_course_in_cache encountered unrecoverable error in course {}, task_id {}".format(
+                course_id,
+                task_id
+            )
+        )
         raise
     except RETRY_TASKS as exc:
         log.exception("%s encountered expected error, retrying.", task_method.__name__)
