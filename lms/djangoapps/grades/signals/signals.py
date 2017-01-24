@@ -22,6 +22,7 @@ PROBLEM_RAW_SCORE_CHANGED = Signal(
                             # made only if the new score is higher than previous.
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
+        'score_db_table',  # The database table that houses the score that changed.
     ]
 )
 
@@ -35,6 +36,7 @@ PROBLEM_RAW_SCORE_CHANGED = Signal(
 PROBLEM_WEIGHTED_SCORE_CHANGED = Signal(
     providing_args=[
         'user_id',  # Integer User ID
+        'anonymous_user_id',  # Anonymous User ID
         'course_id',  # Unicode string representing the course
         'usage_id',  # Unicode string indicating the courseware instance
         'weighted_earned',   # Score obtained by the user
@@ -43,6 +45,7 @@ PROBLEM_WEIGHTED_SCORE_CHANGED = Signal(
                             # made only if the new score is higher than previous.
         'modified',  # A datetime indicating when the database representation of
                      # this the problem score was saved.
+        'score_db_table',  # The database table that houses the score that changed.
     ]
 )
 
@@ -59,6 +62,7 @@ SCORE_PUBLISHED = Signal(
         'raw_possible',  # Maximum score available for the exercise
         'only_if_higher',   # Boolean indicating whether updates should be
                             # made only if the new score is higher than previous.
+        'score_db_table',  # The database table that houses the score that changed.
     ]
 )
 

@@ -24,9 +24,10 @@ from .signals import (
     SUBSECTION_SCORE_CHANGED,
     SCORE_PUBLISHED,
 )
+from ..constants import ScoreDatabaseTableEnum
 from ..new.course_grade import CourseGradeFactory
 from ..scores import weighted_score
-from ..tasks import recalculate_subsection_grade_v2
+from ..tasks import recalculate_subsection_grade_v3
 
 log = getLogger(__name__)
 
@@ -62,9 +63,11 @@ def submissions_score_set_handler(sender, **kwargs):  # pylint: disable=unused-a
         weighted_earned=points_earned,
         weighted_possible=points_possible,
         user_id=user.id,
+        anonymous_user_id=kwargs['anonymous_user_id'],
         course_id=course_id,
         usage_id=usage_id,
         modified=kwargs['created_at'],
+        score_db_table=ScoreDatabaseTableEnum.submissions,
     )
 
 
@@ -93,9 +96,11 @@ def submissions_score_reset_handler(sender, **kwargs):  # pylint: disable=unused
         weighted_earned=0,
         weighted_possible=0,
         user_id=user.id,
+        anonymous_user_id=kwargs['anonymous_user_id'],
         course_id=course_id,
         usage_id=usage_id,
         modified=kwargs['created_at'],
+        score_db_table=ScoreDatabaseTableEnum.submissions,
     )
 
 
@@ -133,6 +138,7 @@ def score_published_handler(sender, block, user, raw_earned, raw_possible, only_
             usage_id=unicode(block.location),
             only_if_higher=only_if_higher,
             modified=score_modified_time,
+            score_db_table=ScoreDatabaseTableEnum.courseware_student_module,
         )
     return update_score
 
@@ -162,6 +168,7 @@ def problem_raw_score_changed_handler(sender, **kwargs):  # pylint: disable=unus
         only_if_higher=kwargs['only_if_higher'],
         score_deleted=kwargs.get('score_deleted', False),
         modified=kwargs['modified'],
+        score_db_table=kwargs['score_db_table'],
     )
 
 
@@ -172,9 +179,10 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
     enqueueing a subsection update operation to occur asynchronously.
     """
     _emit_problem_submitted_event(kwargs)
-    result = recalculate_subsection_grade_v2.apply_async(
+    result = recalculate_subsection_grade_v3.apply_async(
         kwargs=dict(
             user_id=kwargs['user_id'],
+            anonymous_user_id=kwargs.get('anonymous_user_id'),
             course_id=kwargs['course_id'],
             usage_id=kwargs['usage_id'],
             only_if_higher=kwargs.get('only_if_higher'),
@@ -182,6 +190,7 @@ def enqueue_subsection_update(sender, **kwargs):  # pylint: disable=unused-argum
             score_deleted=kwargs.get('score_deleted', False),
             event_transaction_id=unicode(get_event_transaction_id()),
             event_transaction_type=unicode(get_event_transaction_type()),
+            score_db_table=kwargs['score_db_table'],
         )
     )
     log.info(
