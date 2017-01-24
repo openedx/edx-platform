@@ -141,8 +141,18 @@ USE_I18N = True
 
 FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = False
 
-# Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
-INSTALLED_APPS += ('lettuce.django',)
+INSTALLED_APPS += (
+    'lettuce.django',  # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
+    'nplusone.ext.django',  # nplus one helps us find inefficient queries
+)
+
+MIDDLEWARE_CLASSES += (
+    'nplusone.ext.django.NPlusOneMiddleware',
+)
+
+NPLUSONE_LOGGER = logging.getLogger('nplusone')
+NPLUSONE_LOG_LEVEL = logging.INFO
+
 LETTUCE_APPS = ('courseware', 'instructor')
 
 # Lettuce appears to have a bug that causes it to search
