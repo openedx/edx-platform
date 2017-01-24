@@ -1,14 +1,20 @@
 define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
-        'common/js/spec_helpers/template_helpers', 'js/views/move_xblock_list',
-        'js/views/move_xblock_breadcrumb', 'js/models/xblock_info'],
-    function($, _, AjaxHelpers, TemplateHelpers, MoveXBlockListView, MoveXBlockBreadcrumbView,
-             XBlockInfoModel) {
+        'common/js/spec_helpers/template_helpers', 'common/js/spec_helpers/view_helpers',
+        'js/views/modals/move_xblock_modal', 'edx-ui-toolkit/js/utils/html-utils',
+        'edx-ui-toolkit/js/utils/string-utils', 'js/models/xblock_info'],
+    function($, _, AjaxHelpers, TemplateHelpers, ViewHelpers, MoveXBlockModal, HtmlUtils, StringUtils, XBlockInfo) {
         'use strict';
         describe('MoveXBlock', function() {
-            var renderViews, createXBlockInfo, createCourseOutline, moveXBlockBreadcrumbView,
-                moveXBlockListView, parentChildMap, categoryMap, createChildXBlockInfo,
+            var modal, showModal, renderViews, createXBlockInfo, createCourseOutline, courseOutlineOptions,
+                parentChildMap, categoryMap, createChildXBlockInfo, xblockAncestorInfo, courseOutline,
                 verifyBreadcrumbViewInfo, verifyListViewInfo, getDisplayedInfo, clickForwardButton,
-                clickBreadcrumbButton, verifyXBlockInfo, nextCategory;
+                clickBreadcrumbButton, verifyXBlockInfo, nextCategory, verifyMoveEnabled, getSentRequests,
+                verifyNotificationStatus, sendMoveXBlockRequest, moveXBlockWithSuccess,
+                verifyConfirmationFeedbackTitleHtml, verifyConfirmationFeedbackRedirectLinkHtml,
+                verifyUndoConfirmationFeedbackTitleHtml, verifyConfirmationFeedbackUndoMoveActionHtml,
+                sourceDisplayName = 'component_display_name_0',
+                sourceLocator = 'component_ID_0',
+                sourceParentLocator = 'unit_ID_0';
 
             parentChildMap = {
                 course: 'section',
@@ -24,20 +30,70 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 component: 'component'
             };
 
+            courseOutlineOptions = {
+                section: 2,
+                subsection: 2,
+                unit: 2,
+                component: 2
+            };
+
+            xblockAncestorInfo = {
+                ancestors: [
+                    {
+                        category: 'vertical',
+                        display_name: 'unit_display_name_0',
+                        id: 'unit_ID_0'
+                    },
+                    {
+                        category: 'sequential',
+                        display_name: 'subsection_display_name_0',
+                        id: 'subsection_ID_0'
+                    },
+                    {
+                        category: 'chapter',
+                        display_name: 'section_display_name_0',
+                        id: 'section_ID_0'
+                    },
+                    {
+                        category: 'course',
+                        display_name: 'Demo Course',
+                        id: 'COURSE_ID_101'
+                    }
+                ]
+            };
+
             beforeEach(function() {
-                setFixtures(
-                    "<div class='breadcrumb-container'></div><div class='xblock-list-container'></div>"
-                );
+                setFixtures("<div id='page-alert'></div>");
                 TemplateHelpers.installTemplates([
-                    'move-xblock-list',
-                    'move-xblock-breadcrumb'
+                    'basic-modal',
+                    'modal-button',
+                    'move-xblock-modal'
                 ]);
+                courseOutline = createCourseOutline(courseOutlineOptions);
+                showModal();
             });
 
             afterEach(function() {
-                moveXBlockBreadcrumbView.remove();
-                moveXBlockListView.remove();
+                modal.hide();
+                courseOutline = null;
             });
+
+            showModal = function() {
+                modal = new MoveXBlockModal({
+                    sourceXBlockInfo: new XBlockInfo({
+                        id: sourceLocator,
+                        display_name: sourceDisplayName,
+                        category: 'component'
+                    }),
+                    sourceParentXBlockInfo: new XBlockInfo({
+                        id: sourceParentLocator,
+                        display_name: 'unit_display_name_0',
+                        category: 'vertical'
+                    }),
+                    XBlockUrlRoot: '/xblock'
+                });
+                modal.show();
+            };
 
             /**
              * Create child XBlock info.
@@ -51,7 +107,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 var childInfo = {
                     category: categoryMap[category],
                     display_name: category + '_display_name_' + xblockIndex,
-                    id: category + '_ID'
+                    id: category + '_ID_' + xblockIndex
                 };
                 return createXBlockInfo(parentChildMap[category], outlineOptions, childInfo);
             };
@@ -93,12 +149,12 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
              * @returns {Object}
              */
             createCourseOutline = function(outlineOptions) {
-                var courseOutline = {
+                var courseXBlockInfo = {
                     category: 'course',
                     display_name: 'Demo Course',
                     id: 'COURSE_ID_101'
                 };
-                return createXBlockInfo('section', outlineOptions, courseOutline);
+                return createXBlockInfo('section', outlineOptions, courseXBlockInfo);
             };
 
             /**
@@ -108,13 +164,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
              * @param {any} ancestorInfo           ancestors info
              */
             renderViews = function(courseOutlineInfo, ancestorInfo) {
-                moveXBlockBreadcrumbView = new MoveXBlockBreadcrumbView({});
-                moveXBlockListView = new MoveXBlockListView(
-                    {
-                        model: new XBlockInfoModel(courseOutlineInfo, {parse: true}),
-                        ancestorInfo: ancestorInfo || {ancestors: []}
-                    }
-                );
+                var ancestorInfo = ancestorInfo || {ancestors: []};  // eslint-disable-line no-redeclare
+                modal.renderViews(courseOutlineInfo, ancestorInfo);
             };
 
             /**
@@ -123,7 +174,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
              * @returns {Object}
              */
             getDisplayedInfo = function() {
-                var viewEl = moveXBlockListView.$el;
+                var viewEl = modal.moveXBlockListView.$el;
                 return {
                     categoryText: viewEl.find('.category-text').text().trim(),
                     currentLocationText: viewEl.find('.current-location').text().trim(),
@@ -147,7 +198,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
              */
             verifyListViewInfo = function(category, expectedXBlocksCount, hasCurrentLocation) {
                 var displayedInfo = getDisplayedInfo();
-                expect(displayedInfo.categoryText).toEqual(moveXBlockListView.categoriesText[category] + ':');
+                expect(displayedInfo.categoryText).toEqual(modal.moveXBlockListView.categoriesText[category] + ':');
                 expect(displayedInfo.xblockCount).toEqual(expectedXBlocksCount);
                 expect(displayedInfo.xblockDisplayNames).toEqual(
                     _.map(_.range(expectedXBlocksCount), function(xblockIndex) {
@@ -174,7 +225,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
              * @param {any} xblockIndex     XBlock index
              */
             verifyBreadcrumbViewInfo = function(category, xblockIndex) {
-                var displayedBreadcrumbs = moveXBlockBreadcrumbView.$el.find('.breadcrumbs .bc-container').map(
+                var displayedBreadcrumbs = modal.moveXBlockBreadcrumbView.$el.find('.breadcrumbs .bc-container').map(
                     function() { return $(this).text().trim(); }
                 ).get(),
                     categories = _.keys(parentChildMap).concat(['component']),
@@ -195,14 +246,14 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
              */
             clickForwardButton = function(buttonIndex) {
                 buttonIndex = buttonIndex || 0;  // eslint-disable-line no-param-reassign
-                moveXBlockListView.$el.find('[data-item-index="' + buttonIndex + '"] button').click();
+                modal.moveXBlockListView.$el.find('[data-item-index="' + buttonIndex + '"] button').click();
             };
 
             /**
              * Click on last clickable breadcrumb button.
              */
             clickBreadcrumbButton = function() {
-                moveXBlockBreadcrumbView.$el.find('.bc-container button').last().click();
+                modal.moveXBlockBreadcrumbView.$el.find('.bc-container button').last().click();
             };
 
             /**
@@ -231,6 +282,7 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
 
                 verifyListViewInfo(category, expectedXBlocksCount, hasCurrentLocation);
                 verifyBreadcrumbViewInfo(category, buttonIndex);
+                verifyMoveEnabled(category, hasCurrentLocation);
 
                 if (direction === 'forward') {
                     if (category === 'component') {
@@ -248,13 +300,162 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 verifyXBlockInfo(outlineOptions, category, buttonIndex, direction, hasCurrentLocation);
             };
 
+            /**
+             * Verify move button is enabled.
+             *
+             * @param {String} category             XBlock category
+             * @param {String} hasCurrentLocation   do we need to check current location
+             */
+            verifyMoveEnabled = function(category, hasCurrentLocation) {
+                var isMoveEnabled = !modal.$el.find('.modal-actions .action-move').hasClass('is-disabled');
+                if (category === 'component' && !hasCurrentLocation) {
+                    expect(isMoveEnabled).toBeTruthy();
+                } else {
+                    expect(isMoveEnabled).toBeFalsy();
+                }
+            };
+
+            /**
+             * Verify notification status.
+             *
+             * @param {Object} requests             requests object
+             * @param {Object} notificationSpy      notification spy
+             * @param {String} notificationText     notification text to be verified
+             * @param {Integer} sourceIndex         source index of the xblock
+             */
+            verifyNotificationStatus = function(requests, notificationSpy, notificationText, sourceIndex) {
+                var sourceIndex = sourceIndex || 0;  // eslint-disable-line no-redeclare
+                ViewHelpers.verifyNotificationShowing(notificationSpy, notificationText);
+                AjaxHelpers.respondWithJson(requests, {
+                    move_source_locator: sourceLocator,
+                    parent_locator: sourceParentLocator,
+                    target_index: sourceIndex
+                });
+                ViewHelpers.verifyNotificationHidden(notificationSpy);
+            };
+
+            /**
+             * Send move xblock request.
+             *
+             * @param {Object} requests             requests object
+             * @param {Object} xblockLocator        Xblock id location
+             * @param {Integer} targetIndex         target index of the xblock
+             * @param {Integer} sourceIndex         source index of the xblock
+             */
+            sendMoveXBlockRequest = function(requests, xblockLocator, targetIndex, sourceIndex) {
+                var responseData,
+                    expectedData,
+                    sourceIndex = sourceIndex || 0; // eslint-disable-line no-redeclare
+
+                responseData = expectedData = {
+                    move_source_locator: xblockLocator,
+                    parent_locator: modal.targetParentXBlockInfo.id
+                };
+
+                if (targetIndex !== undefined) {
+                    expectedData = _.extend(expectedData, {
+                        targetIndex: targetIndex
+                    });
+                }
+
+                // verify content of request
+                AjaxHelpers.expectJsonRequest(requests, 'PATCH', '/xblock/', expectedData);
+
+                // send the response
+                AjaxHelpers.respondWithJson(requests, _.extend(responseData, {
+                    source_index: sourceIndex
+                }));
+            };
+
+            /**
+             * Move xblock with success.
+             *
+             * @param {Object} requests             requests object
+             */
+            moveXBlockWithSuccess = function(requests) {
+                // select a target item and click
+                renderViews(courseOutline);
+                _.each(_.range(3), function() {
+                    clickForwardButton(1);
+                });
+                modal.$el.find('.modal-actions .action-move').click();
+                sendMoveXBlockRequest(requests, sourceLocator);
+                expect(modal.movedAlertView).toBeDefined();
+                verifyConfirmationFeedbackTitleHtml(sourceDisplayName);
+                verifyConfirmationFeedbackRedirectLinkHtml();
+                verifyConfirmationFeedbackUndoMoveActionHtml();
+            };
+
+            /**
+             * Verify success banner message html has correct title html.
+             *
+             * @param {String} displayName             XBlock display name
+             */
+            verifyConfirmationFeedbackTitleHtml = function(displayName) {
+                expect(modal.movedAlertView.$el.find('.title').html().trim())
+                .toEqual(StringUtils.interpolate('Success! "{displayName}" has been moved.',
+                    {
+                        displayName: displayName
+                    })
+                );
+            };
+
+            /**
+             * Verify undo success banner message html has correct title html.
+             *
+             * @param {String} displayName             XBlock display name
+             */
+            verifyUndoConfirmationFeedbackTitleHtml = function(displayName) {
+                expect(modal.movedAlertView.$el.find('.title').html()).toEqual(
+                    StringUtils.interpolate(
+                        'Move cancelled. "{sourceDisplayName}" has been moved back to its original location.',
+                        {
+                            sourceDisplayName: displayName
+                        }
+                    )
+                );
+            };
+
+            /**
+             * Verify success banner message html has correct redirect link html.
+             */
+            verifyConfirmationFeedbackRedirectLinkHtml = function() {
+                expect(modal.movedAlertView.$el.find('.copy').html().indexOf(
+                    HtmlUtils.HTML(
+                        '<button class="action-secondary action-cancel">Take me to the new location</button>'
+                    ) !== -1
+                )).toBeTruthy();
+            };
+
+            /**
+             * Verify success banner message html has correct undo move button html.
+             */
+            verifyConfirmationFeedbackUndoMoveActionHtml = function() {
+                expect(modal.movedAlertView.$el.find('.copy').html().indexOf(
+                    HtmlUtils.HTML(
+                        '<button class="action-primary action-save">Undo Move</button>'
+                    ) !== -1
+                )).toBeTruthy();
+            };
+
+            /**
+             * Get sent requests.
+             *
+             * @returns {Object}
+             */
+            getSentRequests = function() {
+                return jasmine.Ajax.requests.filter(function(request) {
+                    return request.readyState > 0;
+                });
+            };
+
             it('renders views with correct information', function() {
                 var outlineOptions = {section: 1, subsection: 1, unit: 1, component: 1},
                     outline = createCourseOutline(outlineOptions);
 
-                renderViews(outline);
-                verifyXBlockInfo(outlineOptions, 'section', 0, 'forward', false);
-                verifyXBlockInfo(outlineOptions, 'component', 0, 'backward', false);
+                renderViews(outline, xblockAncestorInfo);
+                verifyXBlockInfo(outlineOptions, 'section', 0, 'forward', true);
+                verifyXBlockInfo(outlineOptions, 'component', 0, 'backward', true);
             });
 
             it('shows correct behavior on breadcrumb navigation', function() {
@@ -268,43 +469,18 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 _.each(['component', 'unit', 'subsection', 'section'], function(category) {
                     verifyListViewInfo(category, 1);
                     if (category !== 'section') {
-                        moveXBlockBreadcrumbView.$el.find('.bc-container button').last().click();
+                        modal.moveXBlockBreadcrumbView.$el.find('.bc-container button').last().click();
                     }
                 });
             });
 
             it('shows the correct current location', function() {
                 var outlineOptions = {section: 2, subsection: 2, unit: 2, component: 2},
-                    outline = createCourseOutline(outlineOptions),
-                    ancestorInfo = {
-                        ancestors: [
-                            {
-                                category: 'vertical',
-                                display_name: 'unit_display_name_0',
-                                id: 'unit_ID'
-                            },
-                            {
-                                category: 'sequential',
-                                display_name: 'subsection_display_name_0',
-                                id: 'subsection_ID'
-                            },
-                            {
-                                category: 'chapter',
-                                display_name: 'section_display_name_0',
-                                id: 'section_ID'
-                            },
-                            {
-                                category: 'course',
-                                display_name: 'Demo Course',
-                                id: 'COURSE_ID_101'
-                            }
-                        ]
-                    };
-
-                renderViews(outline, ancestorInfo);
+                    outline = createCourseOutline(outlineOptions);
+                renderViews(outline, xblockAncestorInfo);
                 verifyXBlockInfo(outlineOptions, 'section', 0, 'forward', true);
                 // click the outline breadcrumb to render sections
-                moveXBlockBreadcrumbView.$el.find('.bc-container button').first().click();
+                modal.moveXBlockBreadcrumbView.$el.find('.bc-container button').first().click();
                 verifyXBlockInfo(outlineOptions, 'section', 1, 'forward', false);
             });
 
@@ -336,9 +512,114 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     _.each(_.range(info.forwardClicks), function() {
                         clickForwardButton();
                     });
-                    expect(moveXBlockListView.$el.find('.xblock-no-child-message').text().trim()).toEqual(info.message);
-                    moveXBlockListView.undelegateEvents();
-                    moveXBlockBreadcrumbView.undelegateEvents();
+                    expect(modal.moveXBlockListView.$el.find('.xblock-no-child-message').text().trim())
+                        .toEqual(info.message);
+                    modal.moveXBlockListView.undelegateEvents();
+                    modal.moveXBlockBreadcrumbView.undelegateEvents();
+                });
+            });
+
+            describe('Move an xblock', function() {
+                it('can not move in a disabled state', function() {
+                    verifyMoveEnabled(false);
+                    modal.$el.find('.modal-actions .action-move').click();
+                    expect(modal.movedAlertView).toBeNull();
+                    expect(getSentRequests().length).toEqual(0);
+                });
+
+                it('move button is disabled when navigating to same parent', function() {
+                    // select a target parent as the same as source parent and click
+                    renderViews(courseOutline);
+                    _.each(_.range(3), function() {
+                        clickForwardButton(0);
+                    });
+                    verifyMoveEnabled('component', true);
+                });
+
+                it('move button is enabled when navigating to different parent', function() {
+                    // select a target parent as the different as source parent and click
+                    renderViews(courseOutline);
+                    _.each(_.range(3), function() {
+                        clickForwardButton(1);
+                    });
+                    verifyMoveEnabled('component', false);
+                });
+
+                it('verify move state while navigating', function() {
+                    renderViews(courseOutline, xblockAncestorInfo);
+                    verifyXBlockInfo(courseOutlineOptions, 'section', 0, 'forward', true);
+                    // start from course outline again
+                    modal.moveXBlockBreadcrumbView.$el.find('.bc-container button').first().click();
+                    verifyXBlockInfo(courseOutlineOptions, 'section', 1, 'forward', false);
+                });
+
+                it('move an xblock when move button is clicked', function() {
+                    var requests = AjaxHelpers.requests(this);
+                    moveXBlockWithSuccess(requests);
+                });
+
+                it('do not move an xblock when cancel button is clicked', function() {
+                    modal.$el.find('.modal-actions .action-cancel').click();
+                    expect(modal.movedAlertView).toBeNull();
+                    expect(getSentRequests().length).toEqual(0);
+                });
+
+                it('undo move an xblock when undo move link is clicked', function() {
+                    var sourceIndex = 0,
+                        requests = AjaxHelpers.requests(this);
+                    moveXBlockWithSuccess(requests);
+                    modal.movedAlertView.$el.find('.action-save').click();
+                    AjaxHelpers.respondWithJson(requests, {
+                        move_source_locator: sourceLocator,
+                        parent_locator: sourceParentLocator,
+                        target_index: sourceIndex
+                    });
+                    verifyUndoConfirmationFeedbackTitleHtml(sourceDisplayName);
+                });
+            });
+
+            describe('shows a notification', function() {
+                it('mini operation message when moving an xblock', function() {
+                    var requests = AjaxHelpers.requests(this),
+                        notificationSpy = ViewHelpers.createNotificationSpy();
+                    // navigate to a target parent and click
+                    renderViews(courseOutline);
+                    _.each(_.range(3), function() {
+                        clickForwardButton(1);
+                    });
+                    modal.$el.find('.modal-actions .action-move').click();
+                    verifyNotificationStatus(requests, notificationSpy, 'Moving');
+                });
+
+                it('mini operation message when undo moving an xblock', function() {
+                    var notificationSpy,
+                        requests = AjaxHelpers.requests(this);
+                    moveXBlockWithSuccess(requests);
+                    notificationSpy = ViewHelpers.createNotificationSpy();
+                    modal.movedAlertView.$el.find('.action-save').click();
+                    verifyNotificationStatus(requests, notificationSpy, 'Undo moving');
+                });
+
+                it('error message when move request fails', function() {
+                    var requests = AjaxHelpers.requests(this),
+                        notificationSpy = ViewHelpers.createNotificationSpy('Error');
+                    // select a target item and click
+                    renderViews(courseOutline);
+                    _.each(_.range(3), function() {
+                        clickForwardButton(1);
+                    });
+                    modal.$el.find('.modal-actions .action-move').click();
+                    AjaxHelpers.respondWithError(requests);
+                    ViewHelpers.verifyNotificationShowing(notificationSpy, "Studio's having trouble saving your work");
+                });
+
+                it('error message when undo move request fails', function() {
+                    var requests = AjaxHelpers.requests(this),
+                        notificationSpy = ViewHelpers.createNotificationSpy('Error');
+                    moveXBlockWithSuccess(requests);
+                    modal.movedAlertView.$el.find('.action-save').click();
+                    AjaxHelpers.respondWithError(requests);
+                    ViewHelpers.verifyNotificationShowing(notificationSpy, "Studio's having trouble saving your work");
                 });
             });
         });

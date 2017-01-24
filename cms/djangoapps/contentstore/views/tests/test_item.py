@@ -735,6 +735,7 @@ class TestDuplicateItem(ItemTest, DuplicateHelper):
         verify_name(self.seq_usage_key, self.chapter_usage_key, "customized name", display_name="customized name")
 
 
+@ddt.ddt
 class TestMoveItem(ItemTest):
     """
     Tests for move item.
@@ -744,7 +745,16 @@ class TestMoveItem(ItemTest):
         Creates the test course structure to build course outline tree.
         """
         super(TestMoveItem, self).setUp()
+        self.setup_course()
 
+    def setup_course(self, default_store=None):
+        """
+        Helper method to create the course.
+        """
+        if not default_store:
+            default_store = self.store.default_modulestore.get_modulestore_type()
+
+        self.course = CourseFactory.create(default_store=default_store)
         # Create a parent chapter
         chap1 = self.create_xblock(parent_usage_key=self.course.location, display_name='chapter1', category='chapter')
         self.chapter_usage_key = self.response_usage_key(chap1)
@@ -821,10 +831,15 @@ class TestMoveItem(ItemTest):
         self.assertEqual(new_parent_loc, target_usage_key)
         self.assertNotEqual(parent_loc, new_parent_loc)
 
-    def test_move_component(self):
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_move_component(self, store_type):
         """
         Test move component with different xblock types.
+
+        Arguments:
+            store_type (ModuleStoreEnum.Type): Type of modulestore to create test course in.
         """
+        self.setup_course(default_store=store_type)
         for source_usage_key, target_usage_key in [
                 (self.html_usage_key, self.vert2_usage_key),
                 (self.vert_usage_key, self.seq2_usage_key),
