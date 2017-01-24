@@ -94,10 +94,10 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
 
         /**
          * Moves the specified xblock in a new parent xblock.
-         * @param {String}  sourceLocator  The xblock element to be moved.
-         * @param {String}  targetParentLocator  Target parent xblock locator of the xblock to be moved,
-         *      new moved xblock would be placed under this xblock.
-         * @param {String}  targetIndex  Intended index position of the xblock in parent xblock. If provided,
+         * @param {String}  sourceLocator  Locator of xblock element to be moved.
+         * @param {String}  targetParentLocator  Locator of the target parent xblock, moved xblock would be placed
+         *      under this xblock.
+         * @param {Integer}  targetIndex  Intended index position of the xblock in parent xblock. If provided,
          *      xblock would be placed at the particular index in the parent xblock.
          * @returns {jQuery promise} A promise representing the moving of the xblock.
          */
@@ -110,8 +110,8 @@ define(['jquery', 'underscore', 'gettext', 'common/js/components/utils/view_util
                         move_source_locator: sourceLocator,
                         parent_locator: targetParentLocator,
                         target_index: targetIndex
-                    }, function(data) {
-                        moveOperation.resolve(data);
+                    }, function(response) {
+                        moveOperation.resolve(response);
                     })
                     .fail(function() {
                         moveOperation.reject();

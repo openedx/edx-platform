@@ -297,6 +297,11 @@
     .ui-loading {
       box-shadow: none;
     }
+
+    .modal-actions .action-move.is-disabled {
+      border: 1px solid $gray-l1 !important;
+      background: $gray-l1 !important;
+    }
   }
 
   // upload modal
