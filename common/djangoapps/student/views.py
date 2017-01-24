@@ -13,7 +13,6 @@ from django.views.generic import TemplateView
 from pytz import UTC
 from requests import HTTPError
 from ipware.ip import get_ip
-import waffle
 
 import edx_oauth2_provider
 from django.conf import settings
@@ -123,12 +122,13 @@ from notification_prefs.views import enable_notifications
 
 from openedx.core.djangoapps.credit.email_utils import get_credit_provider_display_names, make_providers_strings
 from openedx.core.djangoapps.lang_pref import LANGUAGE_KEY
-from openedx.core.djangoapps.programs import utils as programs_utils
+from openedx.core.djangoapps.catalog.utils import munge_catalog_program
 from openedx.core.djangoapps.programs.models import ProgramsApiConfig
+from openedx.core.djangoapps.programs.utils import ProgramProgressMeter
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.djangoapps.theming import helpers as theming_helpers
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
-from openedx.core.djangoapps.catalog.utils import get_programs_data
+from openedx.core.djangoapps.catalog.utils import get_programs_with_type_logo
 
 
 log = logging.getLogger("edx.student")
@@ -215,7 +215,7 @@ def index(request, extra_context=None, user=AnonymousUser()):
     # for edx-pattern-library is added.
     if configuration_helpers.get_value("DISPLAY_PROGRAMS_ON_MARKETING_PAGES",
                                        settings.FEATURES.get("DISPLAY_PROGRAMS_ON_MARKETING_PAGES")):
-        programs_list = get_programs_data(user)
+        programs_list = get_programs_with_type_logo()
 
     context["programs_list"] = programs_list
 
@@ -658,12 +658,14 @@ def dashboard(request):
         and has_access(request.user, 'view_courseware_with_prerequisites', enrollment.course_overview)
     )
 
-    # Find programs associated with courses being displayed. This information
+    # Find programs associated with course runs being displayed. This information
     # is passed in the template context to allow rendering of program-related
     # information on the dashboard.
-    use_catalog = waffle.switch_is_active('get_programs_from_catalog')
-    meter = programs_utils.ProgramProgressMeter(user, enrollments=course_enrollments, use_catalog=use_catalog)
-    programs_by_run = meter.engaged_programs(by_run=True)
+    meter = ProgramProgressMeter(user, enrollments=course_enrollments)
+    inverted_programs = meter.invert_programs()
+
+    for program_list in inverted_programs.itervalues():
+        program_list[:] = [munge_catalog_program(program) for program in program_list]
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -787,7 +789,7 @@ def dashboard(request):
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
-        'programs_by_run': programs_by_run,
+        'programs_by_run': inverted_programs,
         'show_program_listing': ProgramsApiConfig.current().show_program_listing,
         'disable_courseware_js': True,
         'display_course_modes_on_dashboard': enable_verified_certificates and display_course_modes_on_dashboard,

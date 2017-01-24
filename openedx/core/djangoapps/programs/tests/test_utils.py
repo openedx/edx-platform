@@ -1,5 +1,4 @@
 """Tests covering Programs utilities."""
-import copy
 import datetime
 import json
 import uuid
@@ -9,630 +8,413 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.text import slugify
-import httpretty
 import mock
 from nose.plugins.attrib import attr
 from opaque_keys.edx.keys import CourseKey
-from edx_oauth2_provider.tests.factories import ClientFactory
-from provider.constants import CONFIDENTIAL
 from pytz import utc
 
 from lms.djangoapps.certificates.api import MODES
 from lms.djangoapps.commerce.tests.test_utils import update_commerce_config
+from openedx.core.djangoapps.catalog.utils import munge_catalog_program
+from openedx.core.djangoapps.catalog.tests.factories import (
+    generate_course_run_key,
+    ProgramFactory,
+    CourseFactory,
+    CourseRunFactory,
+    OrganizationFactory,
+)
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
 from openedx.core.djangoapps.credentials.tests.mixins import CredentialsApiConfigMixin, CredentialsDataMixin
-from openedx.core.djangoapps.programs import utils
-from openedx.core.djangoapps.programs.models import ProgramsApiConfig
-from openedx.core.djangoapps.programs.tests import factories
-from openedx.core.djangoapps.programs.tests.mixins import ProgramsApiConfigMixin, ProgramsDataMixin
+from openedx.core.djangoapps.programs.tests.factories import ProgressFactory
+from openedx.core.djangoapps.programs.utils import (
+    DEFAULT_ENROLLMENT_START_DATE, ProgramProgressMeter, ProgramDataExtender
+)
 from openedx.core.djangolib.testing.utils import CacheIsolationTestCase, skip_unless_lms
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.date_utils import strftime_localized
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory as ModuleStoreCourseFactory
 
 
 UTILS_MODULE = 'openedx.core.djangoapps.programs.utils'
 CERTIFICATES_API_MODULE = 'lms.djangoapps.certificates.api'
 ECOMMERCE_URL_ROOT = 'https://example-ecommerce.com'
-MARKETING_URL = 'https://www.example.com/marketing/path'
-
-
-@ddt.ddt
-@attr(shard=2)
-@httpretty.activate
-@skip_unless_lms
-class TestProgramRetrieval(ProgramsApiConfigMixin, ProgramsDataMixin, CredentialsDataMixin,
-                           CredentialsApiConfigMixin, CacheIsolationTestCase):
-    """Tests covering the retrieval of programs from the Programs service."""
-
-    ENABLED_CACHES = ['default']
-
-    def setUp(self):
-        super(TestProgramRetrieval, self).setUp()
-
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-        self.user = UserFactory()
-
-        cache.clear()
-
-    def test_get_programs(self):
-        """Verify programs data can be retrieved."""
-        self.create_programs_config()
-        self.mock_programs_api()
-
-        actual = utils.get_programs(self.user)
-        self.assertEqual(
-            actual,
-            self.PROGRAMS_API_RESPONSE['results']
-        )
-
-        # Verify the API was actually hit (not the cache).
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
-
-    def test_get_programs_caching(self):
-        """Verify that when enabled, the cache is used for non-staff users."""
-        self.create_programs_config(cache_ttl=1)
-        self.mock_programs_api()
-
-        # Warm up the cache.
-        utils.get_programs(self.user)
-
-        # Hit the cache.
-        utils.get_programs(self.user)
-
-        # Verify only one request was made.
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 1)
-
-        staff_user = UserFactory(is_staff=True)
-
-        # Hit the Programs API twice.
-        for _ in range(2):
-            utils.get_programs(staff_user)
-
-        # Verify that three requests have been made (one for student, two for staff).
-        self.assertEqual(len(httpretty.httpretty.latest_requests), 3)
-
-    def test_get_programs_programs_disabled(self):
-        """Verify behavior when programs is disabled."""
-        self.create_programs_config(enabled=False)
-
-        actual = utils.get_programs(self.user)
-        self.assertEqual(actual, [])
-
-    @mock.patch('edx_rest_api_client.client.EdxRestApiClient.__init__')
-    def test_get_programs_client_initialization_failure(self, mock_init):
-        """Verify behavior when API client fails to initialize."""
-        self.create_programs_config()
-        mock_init.side_effect = Exception
-
-        actual = utils.get_programs(self.user)
-        self.assertEqual(actual, [])
-        self.assertTrue(mock_init.called)
-
-    def test_get_programs_data_retrieval_failure(self):
-        """Verify behavior when data can't be retrieved from Programs."""
-        self.create_programs_config()
-        self.mock_programs_api(status_code=500)
-
-        actual = utils.get_programs(self.user)
-        self.assertEqual(actual, [])
-
-
-@skip_unless_lms
-class GetProgramsByRunTests(TestCase):
-    """Tests verifying that programs are inverted correctly."""
-    maxDiff = None
-
-    @classmethod
-    def setUpClass(cls):
-        super(GetProgramsByRunTests, cls).setUpClass()
-
-        cls.user = UserFactory()
-
-        course_keys = [
-            CourseKey.from_string('some/course/run'),
-            CourseKey.from_string('some/other/run'),
-        ]
-
-        cls.enrollments = [CourseEnrollmentFactory(user=cls.user, course_id=c) for c in course_keys]
-        cls.course_ids = [unicode(c) for c in course_keys]
-
-        organization = factories.Organization()
-        joint_programs = sorted([
-            factories.Program(
-                organizations=[organization],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=cls.course_ids[0]),
-                    ]),
-                ]
-            ) for __ in range(2)
-        ], key=lambda p: p['name'])
-
-        cls.programs = joint_programs + [
-            factories.Program(
-                organizations=[organization],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=cls.course_ids[1]),
-                    ]),
-                ]
-            ),
-            factories.Program(
-                organizations=[organization],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key='yet/another/run'),
-                    ]),
-                ]
-            ),
-        ]
-
-    def test_get_programs_by_run(self):
-        """Verify that programs are organized by run ID."""
-        programs_by_run, course_ids = utils.get_programs_by_run(self.programs, self.enrollments)
-
-        self.assertEqual(programs_by_run[self.course_ids[0]], self.programs[:2])
-        self.assertEqual(programs_by_run[self.course_ids[1]], self.programs[2:3])
-
-        self.assertEqual(course_ids, self.course_ids)
-
-    def test_no_programs(self):
-        """Verify that the utility can cope with missing programs data."""
-        programs_by_run, course_ids = utils.get_programs_by_run([], self.enrollments)
-        self.assertEqual(programs_by_run, {})
-        self.assertEqual(course_ids, self.course_ids)
-
-    def test_no_enrollments(self):
-        """Verify that the utility can cope with missing enrollment data."""
-        programs_by_run, course_ids = utils.get_programs_by_run(self.programs, [])
-        self.assertEqual(programs_by_run, {})
-        self.assertEqual(course_ids, [])
-
-
-@skip_unless_lms
-class GetCompletedCoursesTestCase(TestCase):
-    """
-    Test the get_completed_courses function
-    """
-
-    def make_cert_result(self, **kwargs):
-        """
-        Helper to create dummy results from the certificates API
-        """
-        result = {
-            'username': 'dummy-username',
-            'course_key': 'dummy-course',
-            'type': 'dummy-type',
-            'status': 'dummy-status',
-            'download_url': 'http://www.example.com/cert.pdf',
-            'grade': '0.98',
-            'created': '2015-07-31T00:00:00Z',
-            'modified': '2015-07-31T00:00:00Z',
-        }
-        result.update(**kwargs)
-        return result
-
-    @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
-    def test_get_completed_courses(self, mock_get_certs_for_user):
-        """
-        Ensure the function correctly calls to and handles results from the
-        certificates API
-        """
-        student = UserFactory(username='test-username')
-        mock_get_certs_for_user.return_value = [
-            self.make_cert_result(status='downloadable', type='verified', course_key='downloadable-course'),
-            self.make_cert_result(status='generating', type='professional', course_key='generating-course'),
-            self.make_cert_result(status='unknown', type='honor', course_key='unknown-course'),
-        ]
-
-        result = utils.get_completed_courses(student)
-        self.assertEqual(mock_get_certs_for_user.call_args[0], (student.username, ))
-        self.assertEqual(result, [
-            {'course_id': 'downloadable-course', 'mode': 'verified'},
-            {'course_id': 'generating-course', 'mode': 'professional'},
-        ])
 
 
 @attr(shard=2)
-@httpretty.activate
 @skip_unless_lms
-class TestProgramProgressMeter(ProgramsApiConfigMixin, TestCase):
+@mock.patch(UTILS_MODULE + '.get_programs')
+class TestProgramProgressMeter(TestCase):
     """Tests of the program progress utility class."""
     def setUp(self):
         super(TestProgramProgressMeter, self).setUp()
 
         self.user = UserFactory()
-        self.create_programs_config()
 
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-    def _mock_programs_api(self, data):
-        """Helper for mocking out Programs API URLs."""
-        self.assertTrue(httpretty.is_enabled(), msg='httpretty must be enabled to mock Programs API calls.')
-
-        url = ProgramsApiConfig.current().internal_api_url.strip('/') + '/programs/'
-        body = json.dumps({'results': data})
-
-        httpretty.register_uri(httpretty.GET, url, body=body, content_type='application/json')
-
-    def _create_enrollments(self, *course_ids):
-        """Variadic helper used to create course enrollments."""
-        for course_id in course_ids:
-            CourseEnrollmentFactory(user=self.user, course_id=course_id)
+    def _create_enrollments(self, *course_run_ids):
+        """Variadic helper used to create course run enrollments."""
+        for course_run_id in course_run_ids:
+            CourseEnrollmentFactory(user=self.user, course_id=course_run_id)
 
     def _assert_progress(self, meter, *progresses):
         """Variadic helper used to verify progress calculations."""
         self.assertEqual(meter.progress, list(progresses))
 
-    def _extract_names(self, program, *course_codes):
-        """Construct a list containing the display names of the indicated course codes."""
-        return [program['course_codes'][cc]['display_name'] for cc in course_codes]
+    def _extract_titles(self, program, *indices):
+        """Construct a list containing the titles of the indicated courses."""
+        return [program['courses'][index]['title'] for index in indices]
 
     def _attach_detail_url(self, programs):
         """Add expected detail URLs to a list of program dicts."""
         for program in programs:
-            base = reverse('program_details_view', kwargs={'program_id': program['id']}).rstrip('/')
-            slug = slugify(program['name'])
+            program['detail_url'] = reverse('program_details_view', kwargs={'program_uuid': program['uuid']})
 
-            program['detail_url'] = '{base}/{slug}'.format(base=base, slug=slug)
-
-    def test_no_enrollments(self):
+    def test_no_enrollments(self, mock_get_programs):
         """Verify behavior when programs exist, but no relevant enrollments do."""
-        data = [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[factories.RunMode()]),
-                ]
-            ),
-        ]
-        self._mock_programs_api(data)
+        data = [ProgramFactory()]
+        mock_get_programs.return_value = data
 
-        meter = utils.ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.user)
 
-        self.assertEqual(meter.engaged_programs(), [])
+        self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
-    def test_no_programs(self):
+    def test_no_programs(self, mock_get_programs):
         """Verify behavior when enrollments exist, but no matching programs do."""
-        self._mock_programs_api([])
+        mock_get_programs.return_value = []
 
-        self._create_enrollments('org/course/run')
-        meter = utils.ProgramProgressMeter(self.user)
+        course_run_id = generate_course_run_key()
+        self._create_enrollments(course_run_id)
+        meter = ProgramProgressMeter(self.user)
 
-        self.assertEqual(meter.engaged_programs(), [])
+        self.assertEqual(meter.engaged_programs, [])
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
-    def test_single_program_engagement(self):
+    def test_single_program_engagement(self, mock_get_programs):
         """
-        Verify that correct program is returned when the user has a single enrollment
-        appearing in one program.
+        Verify that correct program is returned when the user is enrolled in a
+        course run appearing in one program.
         """
-        course_id = 'org/course/run'
+        course_run_key = generate_course_run_key()
         data = [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=course_id),
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key),
                     ]),
                 ]
             ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[factories.RunMode()]),
-                ]
-            ),
+            ProgramFactory(),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
-        self._create_enrollments(course_id)
-        meter = utils.ProgramProgressMeter(self.user)
+        self._create_enrollments(course_run_key)
+        meter = ProgramProgressMeter(self.user)
 
         self._attach_detail_url(data)
         program = data[0]
-        self.assertEqual(meter.engaged_programs(), [program])
+        self.assertEqual(meter.engaged_programs, [program])
         self._assert_progress(
             meter,
-            factories.Progress(
-                id=program['id'],
-                in_progress=self._extract_names(program, 0)
+            ProgressFactory(
+                uuid=program['uuid'],
+                in_progress=self._extract_titles(program, 0)
             )
         )
         self.assertEqual(meter.completed_programs, [])
 
-    def test_mutiple_program_engagement(self):
+    def test_mutiple_program_engagement(self, mock_get_programs):
         """
-        Verify that correct programs are returned in the correct order when the user
-        has multiple enrollments.
+        Verify that correct programs are returned in the correct order when the
+        user is enrolled in course runs appearing in programs.
         """
-        first_course_id, second_course_id = 'org/first-course/run', 'org/second-course/run'
+        newer_course_run_key, older_course_run_key = (generate_course_run_key() for __ in range(2))
         data = [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=first_course_id),
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=newer_course_run_key),
                     ]),
                 ]
             ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=second_course_id),
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=older_course_run_key),
                     ]),
                 ]
             ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[factories.RunMode()]),
-                ]
-            ),
+            ProgramFactory(),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
-        self._create_enrollments(second_course_id, first_course_id)
-        meter = utils.ProgramProgressMeter(self.user)
+        # The creation time of the enrollments matters to the test. We want
+        # the first_course_run_key to represent the newest enrollment.
+        self._create_enrollments(older_course_run_key, newer_course_run_key)
+        meter = ProgramProgressMeter(self.user)
 
         self._attach_detail_url(data)
         programs = data[:2]
-        self.assertEqual(meter.engaged_programs(), programs)
+        self.assertEqual(meter.engaged_programs, programs)
         self._assert_progress(
             meter,
-            factories.Progress(id=programs[0]['id'], in_progress=self._extract_names(programs[0], 0)),
-            factories.Progress(id=programs[1]['id'], in_progress=self._extract_names(programs[1], 0))
+            *(
+                ProgressFactory(uuid=program['uuid'], in_progress=self._extract_titles(program, 0))
+                for program in programs
+            )
         )
         self.assertEqual(meter.completed_programs, [])
 
-    def test_shared_enrollment_engagement(self):
+    def test_shared_enrollment_engagement(self, mock_get_programs):
         """
-        Verify that correct programs are returned when the user has a single enrollment
-        appearing in multiple programs.
+        Verify that correct programs are returned when the user is enrolled in a
+        single course run appearing in multiple programs.
         """
-        shared_course_id, solo_course_id = 'org/shared-course/run', 'org/solo-course/run'
+        shared_course_run_key, solo_course_run_key = (generate_course_run_key() for __ in range(2))
 
-        joint_programs = sorted([
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=shared_course_id),
+        batch = [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=shared_course_run_key),
                     ]),
                 ]
-            ) for __ in range(2)
-        ], key=lambda p: p['name'])
-
-        data = joint_programs + [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=solo_course_id),
-                    ]),
-                ]
-            ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[factories.RunMode()]),
-                ]
-            ),
+            )
+            for __ in range(2)
         ]
 
-        self._mock_programs_api(data)
+        joint_programs = sorted(batch, key=lambda program: program['title'])
+        data = joint_programs + [
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=solo_course_run_key),
+                    ]),
+                ]
+            ),
+            ProgramFactory(),
+        ]
 
-        # Enrollment for the shared course ID created last (most recently).
-        self._create_enrollments(solo_course_id, shared_course_id)
-        meter = utils.ProgramProgressMeter(self.user)
+        mock_get_programs.return_value = data
+
+        # Enrollment for the shared course run created last (most recently).
+        self._create_enrollments(solo_course_run_key, shared_course_run_key)
+        meter = ProgramProgressMeter(self.user)
 
         self._attach_detail_url(data)
         programs = data[:3]
-        self.assertEqual(meter.engaged_programs(), programs)
+        self.assertEqual(meter.engaged_programs, programs)
         self._assert_progress(
             meter,
-            factories.Progress(id=programs[0]['id'], in_progress=self._extract_names(programs[0], 0)),
-            factories.Progress(id=programs[1]['id'], in_progress=self._extract_names(programs[1], 0)),
-            factories.Progress(id=programs[2]['id'], in_progress=self._extract_names(programs[2], 0))
+            *(
+                ProgressFactory(uuid=program['uuid'], in_progress=self._extract_titles(program, 0))
+                for program in programs
+            )
         )
         self.assertEqual(meter.completed_programs, [])
 
-    @mock.patch(UTILS_MODULE + '.get_completed_courses')
-    def test_simulate_progress(self, mock_get_completed_courses):
+    @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
+    def test_simulate_progress(self, mock_completed_course_runs, mock_get_programs):
         """Simulate the entirety of a user's progress through a program."""
-        first_course_id, second_course_id = 'org/first-course/run', 'org/second-course/run'
+        first_course_run_key, second_course_run_key = (generate_course_run_key() for __ in range(2))
         data = [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=first_course_id),
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=first_course_run_key),
                     ]),
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(course_key=second_course_id),
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=second_course_run_key),
                     ]),
                 ]
             ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[factories.RunMode()]),
-                ]
-            ),
+            ProgramFactory(),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
-        # No enrollments, no program engaged.
-        meter = utils.ProgramProgressMeter(self.user)
+        # No enrollments, no programs in progress.
+        meter = ProgramProgressMeter(self.user)
         self._assert_progress(meter)
         self.assertEqual(meter.completed_programs, [])
 
-        # One enrollment, program engaged.
-        self._create_enrollments(first_course_id)
-        meter = utils.ProgramProgressMeter(self.user)
-        program, program_id = data[0], data[0]['id']
+        # One enrollment, one program in progress.
+        self._create_enrollments(first_course_run_key)
+        meter = ProgramProgressMeter(self.user)
+        program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            factories.Progress(
-                id=program_id,
-                in_progress=self._extract_names(program, 0),
-                not_started=self._extract_names(program, 1)
+            ProgressFactory(
+                uuid=program_uuid,
+                in_progress=self._extract_titles(program, 0),
+                not_started=self._extract_titles(program, 1)
             )
         )
         self.assertEqual(meter.completed_programs, [])
 
-        # Two enrollments, program in progress.
-        self._create_enrollments(second_course_id)
-        meter = utils.ProgramProgressMeter(self.user)
+        # Two enrollments, all courses in progress.
+        self._create_enrollments(second_course_run_key)
+        meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            factories.Progress(
-                id=program_id,
-                in_progress=self._extract_names(program, 0, 1)
+            ProgressFactory(
+                uuid=program_uuid,
+                in_progress=self._extract_titles(program, 0, 1)
             )
         )
         self.assertEqual(meter.completed_programs, [])
 
-        # One valid certificate earned, one course code complete.
-        mock_get_completed_courses.return_value = [
-            {'course_id': first_course_id, 'mode': MODES.verified},
+        # One valid certificate earned, one course complete.
+        mock_completed_course_runs.return_value = [
+            {'course_run_id': first_course_run_key, 'type': MODES.verified},
         ]
-        meter = utils.ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            factories.Progress(
-                id=program_id,
-                completed=self._extract_names(program, 0),
-                in_progress=self._extract_names(program, 1)
+            ProgressFactory(
+                uuid=program_uuid,
+                completed=self._extract_titles(program, 0),
+                in_progress=self._extract_titles(program, 1)
             )
         )
         self.assertEqual(meter.completed_programs, [])
 
-        # Invalid certificate earned, still one course code to complete.
-        mock_get_completed_courses.return_value = [
-            {'course_id': first_course_id, 'mode': MODES.verified},
-            {'course_id': second_course_id, 'mode': MODES.honor},
+        # Invalid certificate earned, still one course to complete.
+        mock_completed_course_runs.return_value = [
+            {'course_run_id': first_course_run_key, 'type': MODES.verified},
+            {'course_run_id': second_course_run_key, 'type': MODES.honor},
         ]
-        meter = utils.ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            factories.Progress(
-                id=program_id,
-                completed=self._extract_names(program, 0),
-                in_progress=self._extract_names(program, 1)
+            ProgressFactory(
+                uuid=program_uuid,
+                completed=self._extract_titles(program, 0),
+                in_progress=self._extract_titles(program, 1)
             )
         )
         self.assertEqual(meter.completed_programs, [])
 
-        # Second valid certificate obtained, all course codes complete.
-        mock_get_completed_courses.return_value = [
-            {'course_id': first_course_id, 'mode': MODES.verified},
-            {'course_id': second_course_id, 'mode': MODES.verified},
+        # Second valid certificate obtained, all courses complete.
+        mock_completed_course_runs.return_value = [
+            {'course_run_id': first_course_run_key, 'type': MODES.verified},
+            {'course_run_id': second_course_run_key, 'type': MODES.verified},
         ]
-        meter = utils.ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.user)
         self._assert_progress(
             meter,
-            factories.Progress(
-                id=program_id,
-                completed=self._extract_names(program, 0, 1)
+            ProgressFactory(
+                uuid=program_uuid,
+                completed=self._extract_titles(program, 0, 1)
             )
         )
-        self.assertEqual(meter.completed_programs, [program_id])
+        self.assertEqual(meter.completed_programs, [program_uuid])
 
-    @mock.patch(UTILS_MODULE + '.get_completed_courses')
-    def test_nonstandard_run_mode_completion(self, mock_get_completed_courses):
+    @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
+    def test_nonverified_course_run_completion(self, mock_completed_course_runs, mock_get_programs):
         """
-        A valid run mode isn't necessarily verified. Verify that a program can
+        Course runs aren't necessarily of type verified. Verify that a program can
         still be completed when this is the case.
         """
-        course_id = 'org/course/run'
+        course_run_key = generate_course_run_key()
         data = [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[
-                        factories.RunMode(
-                            course_key=course_id,
-                            mode_slug=MODES.honor
-                        ),
-                        factories.RunMode(),
+            ProgramFactory(
+                courses=[
+                    CourseFactory(course_runs=[
+                        CourseRunFactory(key=course_run_key, type='honor'),
+                        CourseRunFactory(),
                     ]),
                 ]
             ),
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[factories.RunMode()]),
-                ]
-            ),
+            ProgramFactory(),
         ]
-        self._mock_programs_api(data)
+        mock_get_programs.return_value = data
 
-        self._create_enrollments(course_id)
-        mock_get_completed_courses.return_value = [
-            {'course_id': course_id, 'mode': MODES.honor},
+        self._create_enrollments(course_run_key)
+        mock_completed_course_runs.return_value = [
+            {'course_run_id': course_run_key, 'type': MODES.honor},
         ]
-        meter = utils.ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.user)
 
-        program, program_id = data[0], data[0]['id']
+        program, program_uuid = data[0], data[0]['uuid']
         self._assert_progress(
             meter,
-            factories.Progress(id=program_id, completed=self._extract_names(program, 0))
+            ProgressFactory(uuid=program_uuid, completed=self._extract_titles(program, 0))
         )
-        self.assertEqual(meter.completed_programs, [program_id])
+        self.assertEqual(meter.completed_programs, [program_uuid])
 
-    @mock.patch(UTILS_MODULE + '.get_completed_courses')
-    def test_completed_programs(self, mock_get_completed_courses):
+    @mock.patch(UTILS_MODULE + '.ProgramProgressMeter.completed_course_runs', new_callable=mock.PropertyMock)
+    def test_completed_programs(self, mock_completed_course_runs, mock_get_programs):
         """Verify that completed programs are correctly identified."""
-        program_count, course_code_count, run_mode_count = 3, 2, 2
-        data = [
-            factories.Program(
-                organizations=[factories.Organization()],
-                course_codes=[
-                    factories.CourseCode(run_modes=[factories.RunMode() for _ in range(run_mode_count)])
-                    for _ in range(course_code_count)
-                ]
-            )
-            for _ in range(program_count)
-        ]
-        self._mock_programs_api(data)
+        data = ProgramFactory.create_batch(3)
+        mock_get_programs.return_value = data
 
-        program_ids = []
-        course_ids = []
+        program_uuids = []
+        course_run_keys = []
         for program in data:
-            program_ids.append(program['id'])
+            program_uuids.append(program['uuid'])
 
-            for course_code in program['course_codes']:
-                for run_mode in course_code['run_modes']:
-                    course_ids.append(run_mode['course_key'])
+            for course in program['courses']:
+                for course_run in course['course_runs']:
+                    course_run_keys.append(course_run['key'])
 
         # Verify that no programs are complete.
-        meter = utils.ProgramProgressMeter(self.user)
+        meter = ProgramProgressMeter(self.user)
         self.assertEqual(meter.completed_programs, [])
 
-        # "Complete" all programs.
-        self._create_enrollments(*course_ids)
-        mock_get_completed_courses.return_value = [
-            {'course_id': course_id, 'mode': MODES.verified} for course_id in course_ids
+        # Complete all programs.
+        self._create_enrollments(*course_run_keys)
+        mock_completed_course_runs.return_value = [
+            {'course_run_id': course_run_key, 'type': MODES.verified}
+            for course_run_key in course_run_keys
         ]
 
         # Verify that all programs are complete.
-        meter = utils.ProgramProgressMeter(self.user)
-        self.assertEqual(meter.completed_programs, program_ids)
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(meter.completed_programs, program_uuids)
+
+    @mock.patch(UTILS_MODULE + '.certificate_api.get_certificates_for_user')
+    def test_completed_course_runs(self, mock_get_certificates_for_user, _mock_get_programs):
+        """
+        Verify that the method can find course run certificates when not mocked out.
+        """
+        def make_certificate_result(**kwargs):
+            """Helper to create dummy results from the certificates API."""
+            result = {
+                'username': 'dummy-username',
+                'course_key': 'dummy-course',
+                'type': 'dummy-type',
+                'status': 'dummy-status',
+                'download_url': 'http://www.example.com/cert.pdf',
+                'grade': '0.98',
+                'created': '2015-07-31T00:00:00Z',
+                'modified': '2015-07-31T00:00:00Z',
+            }
+            result.update(**kwargs)
+            return result
+
+        mock_get_certificates_for_user.return_value = [
+            make_certificate_result(status='downloadable', type='verified', course_key='downloadable-course'),
+            make_certificate_result(status='generating', type='honor', course_key='generating-course'),
+            make_certificate_result(status='unknown', course_key='unknown-course'),
+        ]
+
+        meter = ProgramProgressMeter(self.user)
+        self.assertEqual(
+            meter.completed_course_runs,
+            [
+                {'course_run_id': 'downloadable-course', 'type': 'verified'},
+                {'course_run_id': 'generating-course', 'type': 'honor'},
+            ]
+        )
+        mock_get_certificates_for_user.assert_called_with(self.user.username)
 
 
 @ddt.ddt
 @override_settings(ECOMMERCE_PUBLIC_URL_ROOT=ECOMMERCE_URL_ROOT)
 @skip_unless_lms
-@mock.patch(UTILS_MODULE + '.get_run_marketing_url', mock.Mock(return_value=MARKETING_URL))
-class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
+class TestProgramDataExtender(ModuleStoreTestCase):
     """Tests of the program data extender utility class."""
     maxDiff = None
     sku = 'abc123'
@@ -645,47 +427,47 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
         self.user = UserFactory()
         self.client.login(username=self.user.username, password=self.password)
 
-        ClientFactory(name=ProgramsApiConfig.OAUTH2_CLIENT_NAME, client_type=CONFIDENTIAL)
-
-        self.course = CourseFactory()
+        self.course = ModuleStoreCourseFactory()
         self.course.start = datetime.datetime.now(utc) - datetime.timedelta(days=1)
         self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        self.organization = factories.Organization()
-        self.run_mode = factories.RunMode(course_key=unicode(self.course.id))  # pylint: disable=no-member
-        self.course_code = factories.CourseCode(run_modes=[self.run_mode])
-        self.program = factories.Program(
-            organizations=[self.organization],
-            course_codes=[self.course_code]
-        )
+        organization = OrganizationFactory()
+        course_run = CourseRunFactory(key=unicode(self.course.id))  # pylint: disable=no-member
+        course = CourseFactory(course_runs=[course_run])
+        program = ProgramFactory(authoring_organizations=[organization], courses=[course])
+
+        self.program = munge_catalog_program(program)
+        self.course_code = self.program['course_codes'][0]
+        self.run_mode = self.course_code['run_modes'][0]
 
     def _assert_supplemented(self, actual, **kwargs):
         """DRY helper used to verify that program data is extended correctly."""
         course_overview = CourseOverview.get_from_id(self.course.id)  # pylint: disable=no-member
         run_mode = dict(
-            factories.RunMode(
-                certificate_url=None,
-                course_image_url=course_overview.course_image_url,
-                course_key=unicode(self.course.id),  # pylint: disable=no-member
-                course_url=reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
-                end_date=self.course.end.replace(tzinfo=utc),
-                enrollment_open_date=strftime_localized(utils.DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
-                is_course_ended=self.course.end < datetime.datetime.now(utc),
-                is_enrolled=False,
-                is_enrollment_open=True,
-                marketing_url=MARKETING_URL,
-                start_date=self.course.start.replace(tzinfo=utc),
-                upgrade_url=None,
-                advertised_start=None
-            ),
+            {
+                'certificate_url': None,
+                'course_image_url': course_overview.course_image_url,
+                'course_key': unicode(self.course.id),  # pylint: disable=no-member
+                'course_url': reverse('course_root', args=[self.course.id]),  # pylint: disable=no-member
+                'end_date': self.course.end.replace(tzinfo=utc),
+                'enrollment_open_date': strftime_localized(DEFAULT_ENROLLMENT_START_DATE, 'SHORT_DATE'),
+                'is_course_ended': self.course.end < datetime.datetime.now(utc),
+                'is_enrolled': False,
+                'is_enrollment_open': True,
+                'marketing_url': self.run_mode['marketing_url'],
+                'mode_slug': 'verified',
+                'start_date': self.course.start.replace(tzinfo=utc),
+                'upgrade_url': None,
+                'advertised_start': None,
+            },
             **kwargs
         )
-        course_code = factories.CourseCode(display_name=self.course_code['display_name'], run_modes=[run_mode])
-        expected = copy.deepcopy(self.program)
-        expected['course_codes'] = [course_code]
 
-        self.assertEqual(actual, expected)
+        self.course_code['run_modes'] = [run_mode]
+        self.program['course_codes'] = [self.course_code]
+
+        self.assertEqual(actual, self.program)
 
     @ddt.data(
         (False, None, False),
@@ -711,7 +493,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
         if is_enrolled:
             CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=enrolled_mode)  # pylint: disable=no-member
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(
             data,
@@ -731,7 +513,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
             is_active=False,
         )
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data)
 
@@ -746,7 +528,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
         CourseEnrollmentFactory(user=self.user, course_id=self.course.id, mode=MODES.audit)  # pylint: disable=no-member
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data, is_enrolled=True, upgrade_url=None)
 
@@ -764,7 +546,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
 
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(
             data,
@@ -780,7 +562,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
         self.course.enrollment_end = datetime.datetime.now(utc) - datetime.timedelta(days=1)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(
             data,
@@ -796,7 +578,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
         mock_get_cert_data.return_value = {'uuid': test_uuid} if is_uuid_available else {}
         mock_html_certs_enabled.return_value = True
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
 
         expected_url = reverse(
             'certificates:render_cert_by_uuid',
@@ -810,7 +592,7 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
         self.course.end = datetime.datetime.now(utc) + datetime.timedelta(days=days_offset)
         self.course = self.update_course(self.course, self.user.id)  # pylint: disable=no-member
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
 
         self._assert_supplemented(data)
 
@@ -824,14 +606,14 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
             'logo': mock_image
         }
 
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), mock_logo_url)
 
     @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
     def test_organization_missing(self, mock_get_organization_by_short_name):
         """ Verify the logo image is not set if the organizations api returns None """
         mock_get_organization_by_short_name.return_value = None
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), None)
 
     @mock.patch(UTILS_MODULE + '.get_organization_by_short_name')
@@ -841,5 +623,5 @@ class TestProgramDataExtender(ProgramsApiConfigMixin, ModuleStoreTestCase):
         but the logo is not available
         """
         mock_get_organization_by_short_name.return_value = {'logo': None}
-        data = utils.ProgramDataExtender(self.program, self.user).extend()
+        data = ProgramDataExtender(self.program, self.user).extend()
         self.assertEqual(data['organizations'][0].get('img'), None)
