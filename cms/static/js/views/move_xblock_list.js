@@ -104,8 +104,13 @@ function($, Backbone, _, gettext, HtmlUtils, StringUtils, XBlockUtils, MoveXBloc
                 this.childs_info.childs = [];
             }
 
+            this.validateMoveOperation();
             this.setDisplayedXBlocksCategories();
             this.render();
+        },
+
+        validateMoveOperation: function() {
+            Backbone.trigger('move:validateMoveOperation', this.parent_info.parent);
         },
 
         setDisplayedXBlocksCategories: function() {

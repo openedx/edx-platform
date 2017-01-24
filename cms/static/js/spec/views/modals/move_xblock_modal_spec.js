@@ -8,6 +8,8 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
         var modal,
             showModal,
             verifyNotificationStatus,
+            isMoveEnabled,
+            enableMove,
             selectTargetParent,
             getConfirmationFeedbackTitle,
             getUndoConfirmationFeedbackTitle,
@@ -65,6 +67,16 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                 outlineURL: outlineUrl
             });
             modal.show();
+        };
+
+        isMoveEnabled = function(sourceIndex) {
+            var moveButton = modal.$el.find('.modal-actions .action-move')[sourceIndex];
+            return !$(moveButton).hasClass('is-disabled');
+        };
+
+        enableMove = function(sourceIndex) {
+            var moveButton = modal.$el.find('.modal-actions .action-move')[sourceIndex];
+            $(moveButton).removeClass('is-disabled');
         };
 
         selectTargetParent = function(parentLocator) {
@@ -156,32 +168,35 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     sourceIndex = sourceIndex || 0, // eslint-disable-line no-redeclare
                     moveButton = modal.$el.find('.modal-actions .action-move')[sourceIndex];
 
-                // select a target item and click
-                selectTargetParent(parentLocator);
-                moveButton.click();
+                if(isMoveEnabled(sourceIndex)) {
+                    // select a target item and click
+                    selectTargetParent(parentLocator);
+                    moveButton.click();
 
-                responseData = expectedData = {
-                    move_source_locator: xblockLocator,
-                    parent_locator: parentLocator
-                };
+                    responseData = expectedData = {
+                        move_source_locator: xblockLocator,
+                        parent_locator: parentLocator
+                    };
 
-                if (targetIndex !== undefined) {
-                    expectedData = _.extend(expectedData, {
-                        targetIndex: targetIndex
-                    });
+                    if (targetIndex !== undefined) {
+                        expectedData = _.extend(expectedData, {
+                            targetIndex: targetIndex
+                        });
+                    }
+
+                    // verify content of request
+                    AjaxHelpers.expectJsonRequest(requests, 'PATCH', '/xblock/', expectedData);
+
+                    // send the response
+                    AjaxHelpers.respondWithJson(requests, _.extend(responseData, {
+                        source_index: sourceIndex
+                    }));
                 }
-
-                // verify content of request
-                AjaxHelpers.expectJsonRequest(requests, 'PATCH', '/xblock/', expectedData);
-
-                // send the response
-                AjaxHelpers.respondWithJson(requests, _.extend(responseData, {
-                    source_index: sourceIndex
-                }));
             };
 
             moveXBlockWithSuccess = function(requests) {
                 var sourceIndex = 0;
+                enableMove(sourceIndex);
                 sendMoveXBlockRequest(requests, sourceLocator, targetParentLocator);
                 expect(modal.movedAlertView).toBeDefined();
                 expect(modal.movedAlertView.options.title).toEqual(getConfirmationFeedbackTitle(sourceDisplayName));
@@ -197,6 +212,17 @@ define(['jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpe
                     )
                 );
             };
+
+            it('disabled by default', function() {
+                expect(isMoveEnabled(0)).toBeFalsy();
+            });
+
+            it('can not move is disabled state', function() {
+                var requests = AjaxHelpers.requests(this);
+                expect(isMoveEnabled(0)).toBeFalsy();
+                sendMoveXBlockRequest(requests, sourceLocator, targetParentLocator);
+                expect(modal.movedAlertView).toBeNull();
+            });
 
             it('moves an xblock when move button is clicked', function() {
                 var requests = AjaxHelpers.requests(this);
