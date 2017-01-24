@@ -15,7 +15,7 @@ class RedirectMiddleware(object):
         with the current request URL as the old_path field.
         """
         site = request.site
-        if site.id == settings.SITE_ID:
+        if (site.id == settings.SITE_ID) and ("api" not in request.path):
             return redirect(settings.AMC_APP_URL)
         cache_key = '{prefix}-{site}'.format(prefix=settings.REDIRECT_CACHE_KEY_PREFIX, site=site.domain)
         redirects = cache.get(cache_key)
