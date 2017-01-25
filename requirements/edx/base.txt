@@ -80,7 +80,7 @@ pygments==2.0.1
 pygraphviz==1.1
 PyJWT==1.4.0
 pymongo==2.9.1
-pyparsing==2.0.1
+pyparsing==2.0.7
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
