@@ -52,7 +52,7 @@ edx-enterprise==0.9.0
 edx-oauth2-provider==1.2.0
 edx-opaque-keys==0.4.0
 edx-organizations==0.4.2
-edx-rest-api-client==1.6.0
+edx-rest-api-client==1.7.1
 edx-search==0.1.2
 facebook-sdk==0.4.0
 feedparser==5.1.3
