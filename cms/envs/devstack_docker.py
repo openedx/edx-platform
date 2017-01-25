@@ -11,7 +11,7 @@ LOGGING['loggers']['tracking']['handlers'] = ['console']
 
 HOST = 'edx.devstack.edxapp:18000'
 SITE_NAME = HOST
-LMS_ROOT_URL = 'http://{}:18000'.format(HOST)
+LMS_ROOT_URL = 'http://{}'.format(HOST)
 
 # This is the public-facing host used for previews
 LMS_BASE = 'localhost:18000'

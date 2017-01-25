@@ -11,7 +11,7 @@ LOGGING['loggers']['tracking']['handlers'] = ['console']
 
 HOST = 'edx.devstack.edxapp:18000'
 SITE_NAME = HOST
-LMS_ROOT_URL = 'http://{}:18000'.format(HOST)
+LMS_ROOT_URL = 'http://{}'.format(HOST)
 
 ECOMMERCE_PUBLIC_URL_ROOT = "http://edx.devstack.ecommerce:18130"
 
