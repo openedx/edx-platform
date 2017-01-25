@@ -55,14 +55,14 @@ git+https://github.com/edx/nltk.git@2.0.6#egg=nltk==2.0.6
 -e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 -e git+https://github.com/jazkarta/edx-jsme.git@690dbf75441fa91c7c4899df0b83d77f7deb5458#egg=edx-jsme
 git+https://github.com/edx/django-pyfs.git@1.0.3#egg=django-pyfs==1.0.3
-git+https://github.com/mitodl/django-cas.git@v2.1.1#egg=django-cas
+git+https://github.com/mitodl/django-cas.git@v2.1.1#egg=django-cas==2.1.1
 -e git+https://github.com/dgrtwo/ParsePy.git@7949b9f754d1445eff8e8f20d0e967b9a6420639#egg=parse_rest
 # Master pyfs has a bug working with VPC auth. This is a fix. We should switch
 # back to master when and if this fix is merged back.
 # fs==0.4.0
-git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b
+git+https://github.com/pmitros/pyfs.git@96e1922348bfe6d99201b9512a9ed946c87b7e0b#egg=fs==0.4.0
 # The officially released version of django-debug-toolbar-mongo doesn't support DJDT 1.x. This commit does.
-git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808
+git+https://github.com/hmarr/django-debug-toolbar-mongo.git@b0686a76f1ce3532088c4aee6e76b9abe61cc808#egg=django-debug-toolbar-mongo==0.1.10
 
 # NOTE (CCB): This must remain. There is one commit on the upstream repo that has not been released to PyPI.
 git+https://github.com/edx/rfc6266.git@v0.0.5-edx#egg=rfc6266==0.0.5-edx
