@@ -1,0 +1,74 @@
+[
+  {
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+      "username": "test_instructor",
+      "email":"test_instructor@example.com",
+      "password": "password",
+      "is_staff": true,
+      "is_active": true
+    }
+  },
+  {
+    "pk": 1,
+    "model": "student.userprofile",
+    "fields": {
+      "user": 1,
+      "name": "test instructor",
+      "courseware": "course.xml"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "student.registration",
+    "fields": {
+      "user": 1,
+      "activation_key": "52bfac10384d49219385dcd4cc17177q"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "student.courseaccessrole",
+    "fields": {
+      "id": "1",
+      "org": "test_org",
+      "course_id": "course-v1:test_org+34039497242734583224814321005482849780+test_run",
+      "role": "finance_admin",
+      "user_id": "1"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "student.courseaccessrole",
+    "fields": {
+      "id": "2",
+      "org": "test_org",
+      "course_id": "course-v1:test_org+34039497242734583224814321005482849781+test_run",
+      "role": "finance_admin",
+      "user_id": "1"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "student.courseaccessrole",
+    "fields": {
+      "id": "3",
+      "org": "test_org",
+      "course_id": "course-v1:test_org+34039497242734583224814321005482849782+test_run",
+      "role": "finance_admin",
+      "user_id": "1"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "student.courseaccessrole",
+    "fields": {
+      "id": "4",
+      "org": "test_org",
+      "course_id": "course-v1:test_org+34039497242734583224814321005482849783+test_run",
+      "role": "finance_admin",
+      "user_id": "1"
+    }
+  }
+]

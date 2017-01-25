@@ -92,6 +92,15 @@ class InstructorDashboardPage(CoursePage):
         email_section.wait_for_page()
         return email_section
 
+    def select_ecommerce_tab(self):
+        """
+        Selects the E-commerce tab and returns an EcommercePage.
+        """
+        self.q(css='[data-section="e-commerce"]').first.click()
+        ecommerce_section = EcommercePage(self.browser)
+        ecommerce_section.wait_for_page()
+        return ecommerce_section
+
     @staticmethod
     def get_asset_path(file_name):
         """
@@ -1416,3 +1425,19 @@ class CertificatesPage(PageObject):
         Returns the message (error/success) in "Certificate Invalidation" section.
         """
         return self.get_selector('.certificate-invalidation-container div.message')
+
+
+class EcommercePage(PageObject):
+    """
+    E-commerce section of the Instructor dashboard.
+    """
+    url = None
+
+    def is_browser_on_page(self):
+        return self.q(css='[data-section="e-commerce"].active-section').present
+
+    def get_sections_header_values(self):
+        """
+        Returns a list of the headings text under div.
+        """
+        return self.q(css="div.wrap h3").text
