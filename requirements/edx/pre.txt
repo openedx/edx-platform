@@ -4,7 +4,7 @@
 #   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 
-# Use a modern setuptools instead of distribute
+# This is an old version of setuptools, and we should upgrade when it is safe.
 setuptools==18.0.1
 
 # Numpy and scipy can't be installed in the same pip run.
