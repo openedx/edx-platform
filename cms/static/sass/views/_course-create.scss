@@ -66,6 +66,11 @@
       width: 100%;
     }
 
+    .rerun-course-number,
+    .rerun-course-number-label {
+      color: #a0a0a0;
+    }
+
     .rerun-course-name {
       @extend %t-title5;
       font-weight: 300;

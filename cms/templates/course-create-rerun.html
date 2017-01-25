@@ -91,12 +91,11 @@ from openedx.core.djangolib.js_utils import js_escaped_string
                     </li>
 
                     <li class="row">
-                      <div class="column field text required" id="field-course-number">
-                        <label for="rerun-course-number">${_("Course Number")}</label>
-                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" aria-required="true" value="${source_course_key.course}" placeholder="${_('e.g. CS101')}" />
+                      <div class="column field text" id="field-course-number">
+                        <label class="rerun-course-number-label" for="rerun-course-number">${_("Course Number")}</label>
+                        <input class="rerun-course-number" id="rerun-course-number" type="text" name="rerun-course-number" value="${source_course_key.course}" placeholder="${_('e.g. CS101')}" readonly="readonly"/>
                         <span class="tip">
-                          ${_("The unique number that identifies the new course within the organization.  (This number is often the same as the original course number.)")}
-                          <strong class="tip-note" class="tip-note">${_("Note: No spaces or special characters are allowed.")}</strong>
+                          ${_("The unique number that identifies the new course within the organization.  (This number will be the same as the original course number and cannot be changed.)")}
                         </span>
                         <span class="tip tip-error is-hidden"></span>
                       </div>
