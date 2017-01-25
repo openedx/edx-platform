@@ -84,6 +84,9 @@ from lms.envs.common import (
     # django-debug-toolbar
     DEBUG_TOOLBAR_PATCH_SETTINGS,
     BLOCK_STRUCTURES_SETTINGS,
+
+    # Default currency for paid course modes
+    PAID_COURSE_REGISTRATION_CURRENCY
 )
 from path import Path as path
 from warnings import simplefilter

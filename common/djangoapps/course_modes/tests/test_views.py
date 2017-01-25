@@ -12,6 +12,7 @@ from nose.plugins.attrib import attr
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from lms.djangoapps.commerce.tests import test_utils as ecomm_test_utils
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -308,6 +309,20 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEquals(response.status_code, 200)
 
         expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None, None, None)]
+        course_mode = CourseMode.modes_for_course(self.course.id)
+
+        self.assertEquals(course_mode, expected_mode)
+
+    @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['gbp', '&pound;'])
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    def test_default_mode_creation_with_variable_currency(self):
+        # Hit the mode creation endpoint with no querystring params, to create an honor mode
+        url = reverse('create_mode', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+
+        self.assertEquals(response.status_code, 200)
+
+        expected_mode = [Mode(u'honor', u'Honor Code Certificate', 0, u'', u'gbp', None, None, None, None)]
         course_mode = CourseMode.modes_for_course(self.course.id)
 
         self.assertEquals(course_mode, expected_mode)

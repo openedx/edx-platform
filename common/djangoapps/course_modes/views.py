@@ -8,6 +8,7 @@ import urllib
 from babel.dates import format_datetime
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
@@ -155,6 +156,10 @@ class ChooseModeView(View):
                 for x in verified_mode.suggested_prices.split(",")
                 if x.strip()
             ]
+
+            default_currency = settings.PAID_COURSE_REGISTRATION_CURRENCY
+            context["currency_code"] = default_currency[0].upper()
+            context["currency_symbol"] = default_currency[1]
             context["currency"] = verified_mode.currency.upper()
             context["min_price"] = verified_mode.min_price
             context["verified_name"] = verified_mode.name
@@ -274,7 +279,7 @@ def create_mode(request, course_id):
         `currency` (str): The currency in which to list prices.
 
     By default, this endpoint will create an 'honor' mode for the given course with display name
-    'Honor Code', a minimum price of 0, no suggested prices, and using USD as the currency.
+    'Honor Code', a minimum price of 0, no suggested prices, and using the default currency.
 
     Args:
         request (`Request`): The Django Request object.
@@ -288,7 +293,7 @@ def create_mode(request, course_id):
         'mode_display_name': u'Honor Code Certificate',
         'min_price': 0,
         'suggested_prices': u'',
-        'currency': u'usd',
+        'currency': unicode(settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
     }
 
     # Try pulling querystring parameters out of the request

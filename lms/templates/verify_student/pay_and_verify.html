@@ -72,6 +72,8 @@ from lms.djangoapps.verify_student.views import PayAndVerifyView
       data-course-mode-sku='${course_mode.sku or ''}'
       data-course-mode-suggested-prices='${course_mode.suggested_prices}'
       data-course-mode-currency='${course_mode.currency}'
+      data-default-currency-code='${default_currency[0]}'
+      data-default-currency-symbol='${default_currency[1]}'
       data-contribution-amount='${contribution_amount}'
       data-processors='${json.dumps(processors)}'
       data-verification-deadline='${verification_deadline}'
