@@ -50,7 +50,6 @@ class TestGetPrograms(mixins.CatalogIntegrationMixin, TestCase):
         querystring = {
             'marketable': 1,
             'exclude_utm': 1,
-            'published_course_runs_only': 1,
         }
         if type:
             querystring['type'] = type
