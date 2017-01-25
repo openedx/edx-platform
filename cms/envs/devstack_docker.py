@@ -13,6 +13,9 @@ HOST = 'edx.devstack.edxapp:18000'
 SITE_NAME = HOST
 LMS_ROOT_URL = 'http://{}:18000'.format(HOST)
 
+# This is the public-facing host used for previews
+LMS_BASE = 'localhost:18000'
+
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
 JWT_AUTH.update({
