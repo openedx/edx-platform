@@ -20,6 +20,7 @@ from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 import branding.api as branding_api
+from branding.decorators import courses_login_required
 from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
@@ -90,6 +91,7 @@ def index(request):
     return student.views.index(request, user=request.user)
 
 
+@courses_login_required
 @ensure_csrf_cookie
 @cache_if_anonymous()
 def courses(request):
