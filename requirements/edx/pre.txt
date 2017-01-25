@@ -5,6 +5,7 @@
 #   * @edx/devops - to check system requirements
 
 # Packaging pre-requisites.
+pyparsing==2.0.7
 setuptools==34.0.2
 pip==9.0.1
 
