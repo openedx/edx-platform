@@ -73,6 +73,11 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         locale = claims['locale']
         self.assertEqual(language, locale)
 
+    def test_user_tracking_id_claim(self):
+        scopes, claims = self.get_id_token_values('openid profile')
+        self.assertIn('profile', scopes)
+        self.assertEqual(claims['user_tracking_id'], self.user.id)
+
     def test_no_special_course_access(self):
         with check_mongo_calls(0):
             scopes, claims = self.get_id_token_values('openid course_instructor course_staff')
@@ -232,3 +237,8 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         self.user.save()
         claims = self.get_with_scope('permissions')
         self.assertTrue(claims['administrator'])
+
+    def test_profile_scope(self):
+        claims = self.get_with_scope('profile')
+        self.assertEqual(claims['name'], UserProfile.objects.get(user=self.user).name)
+        self.assertEqual(claims['user_tracking_id'], self.user.id)
