@@ -11,7 +11,7 @@ LOGGING['loggers']['tracking']['handlers'] = ['console']
 
 HOST = 'edx.devstack.edxapp:18000'
 SITE_NAME = HOST
-LMS_ROOT_URL = 'http://{}:18000'.format(HOST)
+LMS_ROOT_URL = 'http://{}'.format(HOST)
 
 OAUTH_OIDC_ISSUER = '{}/oauth2'.format(LMS_ROOT_URL)
 
