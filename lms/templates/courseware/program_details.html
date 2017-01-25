@@ -111,6 +111,76 @@ from openedx.core.djangolib.markup import HTML, Text
         return false;
     });
 
+
+    // Listen for click events on element tagged with the 'register' class
+    // Submit the hidden enrolllment form, and include information about which
+    // purchasing workflow is being executed (based on which button is clicked)
+    $(".register").click(function(event) {
+      var purchase_workflow = "single";
+      if (event.currentTarget.id.includes("bulk")) {
+        purchase_workflow = "bulk";
+      }
+      var event_target_input = $("<input>")
+               .attr("type", "hidden")
+               .attr("id", "purchase_workflow")
+               .attr("name", "purchase_workflow").val(purchase_workflow);
+      //var enroll_form = $("#class_enroll_form");
+        var enroll_form = $(this).parent().siblings(".enroll-form:eq(0)").find(".class_enroll_form");
+      enroll_form.append($(event_target_input));
+      enroll_form.submit();
+      event.preventDefault();
+    });
+
+    ## making the conditional around this entire JS block for sanity
+    %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+      <%
+        perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
+                        'You may need to {start_logout_tag}log out{end_tag} then try the enroll button again. '
+                        'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
+                          start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
+                          start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
+                          )
+      %>
+    $('.class_enroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        location.href = "${reverse('dashboard')}";
+      } else if (xhr.status == 403) {
+          var course_id = $(this).find("#course_id").val();
+          location.href = "${reverse('course-specific-register', args=[course_id])}?course_id=" + course_id + "&enrollment_action=enroll";
+      } else if (xhr.status == 400) { //This means the user did not have permission
+        $('#register_error').html("${perms_error}").css("display", "block");
+      } else {
+        $('#register_error').html(
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
+        ).css("display", "block");
+      }
+    });
+
+    %else:
+    $('.class_enroll_form').on('ajax:complete', function(event, xhr) {
+      if(xhr.status == 200) {
+        if (xhr.responseText == "") {
+          location.href = "${reverse('dashboard')}";
+        }
+        else {
+          location.href = xhr.responseText;
+        }
+      } else if (xhr.status == 403) {
+          // If the form submission receives a Forbidden response, the user is not currently authenticated
+          // Include the purchase workflow context along with the regular user registration location information
+          var course_id = $(this).find("#course_id").val();
+          var purchase_workflow = "&purchase_workflow=" + $("input#purchase_workflow").val();
+          location.href = "${reverse('register_user')}?course_id=" + course_id + "&enrollment_action=enroll" + purchase_workflow;
+      } else {
+        $('#register_error').html(
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
+        ).css("display", "block");
+      }
+    });
+
+    %endif
+
+
 </script>
 
 <script type="text/javascript">
@@ -357,7 +427,7 @@ from openedx.core.djangolib.markup import HTML, Text
                         <div class="tbl-view">
                             <div class="tbl-col col-full-sm">
                                 <h4 class="hd title">
-                                    ${course['title']}
+                                    <a href="/courses/${course['course_runs'][0]['key']}/about"> ${course['title']}</a>
                                     <small>
                                         <span>
                                             <i class="fa fa-clock-o" aria-hidden="true"></i>
@@ -377,8 +447,25 @@ from openedx.core.djangolib.markup import HTML, Text
                                 </p>
                             </div>
                             <div class="tbl-col col-full-sm">
-                                <button type="button" class="btn-brand btn-enroll-now">Enroll Now</button>
+                                <%include file="_enroll_button.html" />
                             </div>
+
+                             ## Need to put this hidden form on the page so that the registration button works.
+                             ## Since it's no harm to display a hidden form, we display it with the most permissive conditional
+                             ## which is when the student is not registered.
+                             <div class="enroll-form" style="display: none;">
+                                <form class="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+                                  <fieldset class="enroll_fieldset">
+                                    <legend class="sr">${_("Enroll")}</legend>
+                                    <input name="course_id" id="course_id" type="hidden" value="${course['course_runs'][0]['key'] | h}">
+                                    <input name="enrollment_action" id="enrollment_action" type="hidden" value="enroll">
+                                  </fieldset>
+                                  <div class="submit">
+                                    <input name="submit" type="submit" value="${_('enroll')}">
+                                  </div>
+                                </form>
+                             </div>
+
                         </div>
                     </div>
                 %endfor
@@ -388,6 +475,4 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
 
     </div> <!-- Program Details Page end -->
-
-
 

@@ -1,0 +1,45 @@
+## mako
+<%!
+from django.utils.translation import ugettext as _
+%>
+
+<%
+  btn_text = _("Enroll Now")
+  btn_href = ecommerce_checkout_link or "#"
+  btn_class = "register"
+%>
+% if user.is_authenticated() and registered:
+  % if show_courseware_link:
+    <%
+      btn_text = _("Go to Course")
+      btn_href = course_target
+      btn_class = ""
+    %>
+  % else:
+    <%
+      btn_text = _("You are enrolled in this course")
+      btn_class = "disabled"
+    %>
+  % endif
+% elif is_course_full:
+  <%
+    btn_text = _("Course is full")
+    btn_class = "disabled"
+  %>
+% elif invitation_only and not can_enroll:
+  <%
+    btn_text = _("Enrollment in this course is by invitation only")
+    btn_class = "disabled"
+  %>
+% elif not is_shib_course and not can_enroll:
+  <%
+    btn_text = _("Enrollment is Closed")
+    btn_class = "disabled"
+  %>
+% elif user.is_authenticated() and professional_mode:
+  <% btn_class = "" %>
+% endif
+
+<button type="button" class="btn-brand btn-enroll-now ${btn_class}">
+  ${btn_text}
+</button>
