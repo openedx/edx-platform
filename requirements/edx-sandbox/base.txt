@@ -5,8 +5,9 @@
 #   * @edx/devops - to check system requirements
 
 # Pin packaging tools the same as edxapp.  Keep them in sync for our sanity.
-setuptools==18.0.1
-pip==7.1.2
+setuptools==34.0.2
+pip==9.0.1
+
 
 numpy==1.6.2
 networkx==1.7

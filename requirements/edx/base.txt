@@ -43,6 +43,7 @@ djangorestframework-jwt==1.8.0
 djangorestframework-oauth==1.1.0
 edx-ccx-keys==0.2.1
 edx-drf-extensions==1.2.2
+edx-i18n-tools==0.3.7
 edx-lint==0.4.3
 edx-django-oauth2-provider==1.1.4
 edx-django-sites-extensions==2.1.1
@@ -80,7 +81,6 @@ pygments==2.0.1
 pygraphviz==1.1
 PyJWT==1.4.0
 pymongo==2.9.1
-pyparsing==2.0.7
 python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
