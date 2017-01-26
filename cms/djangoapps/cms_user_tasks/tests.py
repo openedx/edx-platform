@@ -182,8 +182,6 @@ class TestUserTaskStopped(APITestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         msg = mail.outbox[0]
-        print(msg.body)
-        print("==========================")
         self.assertEqual(msg.subject, subject)
 
         for fragment in fragments:
