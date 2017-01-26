@@ -113,6 +113,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
             'invitation_only',
             'max_student_enrollments_allowed',
             'catalog_visibility',
+            'instructor_info'
         ]
         for attribute_name in fields_to_test:
             course_value = getattr(course, attribute_name)
@@ -203,6 +204,24 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 ],
                 "static_asset_path": "/my/abs/path",        # Absolute path
                 "certificates_show_before_end": True,
+                "instructor_info": {                        # Instructor info provided
+                    "instructors": [
+                        {
+                            "bio": "dummy-instructor-bio.",
+                            "image": "",
+                            "organization": "edx",
+                            "name": "dummy-name",
+                            "title": "dummy-title"
+                        },
+                        {
+                            "bio": "dummy-instructor-bio2.",
+                            "image": "",
+                            "organization": "edx",
+                            "name": "dummy-name2",
+                            "title": "dummy-title2"
+                        }
+                    ]
+                }
             },
             {
                 "display_name": "",                         # Empty display name
@@ -213,6 +232,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "static_asset_path": "my/relative/path",    # Relative asset path
                 "certificates_show_before_end": False,
                 "catalog_visibility": CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
+                "instructor_info": {},                      # Empty Instructor info
             },
             {
                 "display_name": "",                         # Empty display name
@@ -223,6 +243,7 @@ class CourseOverviewTestCase(ModuleStoreTestCase):
                 "static_asset_path": "",                    # Empty asset path
                 "certificates_show_before_end": False,
                 "catalog_visibility": CATALOG_VISIBILITY_ABOUT,
+                "instructor_info": None,
             },
             {
                 #                                           # Don't set display name
