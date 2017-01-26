@@ -543,7 +543,7 @@ DENIED_COUNTRIES = ['Sudan',
 SUB_SPECIALTY_CHOICES = {}
 SUB_AFFILIATION_CHOICES = {}
 
-SUB_SPECIALTY_CHOICES['Cardiology'] = (('Cardiopulmonary', 'Cardiopulmonary'),
+SUB_SPECIALTY_CHOICES['Cardiology'] = [('Cardiopulmonary', 'Cardiopulmonary'),
                                        ('Cardiothoracic', 'Cardiothoracic'),
                                        ('Cardiovascular_Disease', 'Cardiovascular Disease'),
                                        ('Cath_Angio_Lab', 'Cath Angio/Lab'),
@@ -551,9 +551,9 @@ SUB_SPECIALTY_CHOICES['Cardiology'] = (('Cardiopulmonary', 'Cardiopulmonary'),
                                        ('Interventional_Cardiology', 'Interventional Cardiology'),
                                        ('Surgery', 'Surgery'),
                                        ('Vascular', 'Vascular'),
-                                       ('Other', 'Other, please enter:'))
+                                       ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Internal_Medicine'] = (('Cardiology', 'Cardiology'),
+SUB_SPECIALTY_CHOICES['Internal_Medicine'] = [('Cardiology', 'Cardiology'),
                                               ('Dermatology', 'Dermatology'),
                                               ('Endocrinology_Gerontology_&_Metabolism', 'Endocrinology, Gerontology & Metabolism'),
                                               ('Gastroenterology_&_Hepatology', 'Gastroenterology & Hepatology'),
@@ -563,15 +563,15 @@ SUB_SPECIALTY_CHOICES['Internal_Medicine'] = (('Cardiology', 'Cardiology'),
                                               ('Nephrology', 'Nephrology'),
                                               ('Preventative_Medicine', 'Preventative Medicine'),
                                               ('Pulmonary', 'Pulmonary'),
-                                              ('Other', 'Other, please enter:'))
+                                              ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Obstetrics_Gynecology'] = (('Gynecology', 'Gynecology'),
+SUB_SPECIALTY_CHOICES['Obstetrics_Gynecology'] = [('Gynecology', 'Gynecology'),
                                                   ('Obstetrics', 'Obstetrics'),
                                                   ('Maternal_&_Fetal_Medicine', 'Maternal & Fetal Medicine'),
                                                   ('Women_Health', 'Women\'s Health'),
-                                                  ('Other', 'Other, please enter:'))
+                                                  ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Oncology'] = (('Breast', 'Breast'),
+SUB_SPECIALTY_CHOICES['Oncology'] = [('Breast', 'Breast'),
                                      ('Gastroenterology', 'Gastroenterology'),
                                      ('Gynecology', 'Gynecology'),
                                      ('Hematology', 'Hematology'),
@@ -579,12 +579,12 @@ SUB_SPECIALTY_CHOICES['Oncology'] = (('Breast', 'Breast'),
                                      ('Radiation', 'Radiation'),
                                      ('Surgical', 'Surgical'),
                                      ('Urology', 'Urology'),
-                                     ('Other', 'Other, please enter:'))
+                                     ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Palliative_Care'] = (('Hospice', 'Hospice'),
-                                            ('Other', 'Other, please enter:'))
+SUB_SPECIALTY_CHOICES['Palliative_Care'] = [('Hospice', 'Hospice'),
+                                            ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Pediatrics'] = (('Adolescent_Medicine', 'Adolescent Medicine'),
+SUB_SPECIALTY_CHOICES['Pediatrics'] = [('Adolescent_Medicine', 'Adolescent Medicine'),
                                        ('Allergy', 'Allergy'),
                                        ('Anesthesiology', 'Anesthesiology'),
                                        ('Cardiac_Surgery', 'Cardiac Surgery'),
@@ -616,13 +616,13 @@ SUB_SPECIALTY_CHOICES['Pediatrics'] = (('Adolescent_Medicine', 'Adolescent Medic
                                        ('Radiology', 'Radiology'),
                                        ('Surgery', 'Surgery'),
                                        ('Urology', 'Urology'),
-                                       ('Other', 'Other, please enter:'))
+                                       ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Pulmonology'] = (('Critical_Care', 'Critical Care'),
+SUB_SPECIALTY_CHOICES['Pulmonology'] = [('Critical_Care', 'Critical Care'),
                                         ('Respiratory', 'Respiratory'),
-                                        ('Other', 'Other, please enter:'))
+                                        ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Surgery'] = (('Bariatric_Surgery', 'Bariatric Surgery'),
+SUB_SPECIALTY_CHOICES['Surgery'] = [('Bariatric_Surgery', 'Bariatric Surgery'),
                                     ('Cardiac_Surgery', 'Cardiac Surgery'),
                                     ('Cardiothoracic_Surgery', 'Cardiothoracic Surgery'),
                                     ('Colon_&_Rectal_Surgery', 'Colon & Rectal Surgery'),
@@ -638,11 +638,11 @@ SUB_SPECIALTY_CHOICES['Surgery'] = (('Bariatric_Surgery', 'Bariatric Surgery'),
                                     ('Trauma_Surgery', 'Trauma Surgery'),
                                     ('Upper_Extremity_Hand_Surgery', 'Upper Extremity/ Hand Surgery'),
                                     ('Vascular_Surgery', 'Vascular Surgery'),
-                                    ('Other', 'Other, please enter:'))
+                                    ('Other', 'Other, please enter:')]
 
-SUB_SPECIALTY_CHOICES['Transplant'] = (('Solid_Organ', 'Solid Organ'),
+SUB_SPECIALTY_CHOICES['Transplant'] = [('Solid_Organ', 'Solid Organ'),
                                        ('Blood_and_Bone_Marrow', 'Blood and Bone Marrow'),
-                                       ('Other', 'Other, please enter:'))
+                                       ('Other', 'Other, please enter:')]
 
 SUB_AFFILIATION_CHOICES['Packard_Childrens_Health_Alliance'] = (('Bayside_Medical_Group', 'Bayside Medical Group'),
                                                                 ('Diablo_Valley_Child_Neurology', 'Diablo Valley Child Neurology'),
