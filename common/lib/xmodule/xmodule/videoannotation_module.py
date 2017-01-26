@@ -128,7 +128,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
         context = {
             'course_key': self.runtime.course_id,
-            'display_name': self.display_name_with_default,
+            'display_name': self.display_name_with_default_escaped,
             'instructions_html': self.instructions,
             'sourceUrl': self.sourceurl,
             'typeSource': extension,
@@ -154,6 +154,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Video annotation descriptor '''
     module_class = VideoAnnotationModule
+    resources_dir = None
     mako_template = "widgets/raw-edit.html"
 
     @property

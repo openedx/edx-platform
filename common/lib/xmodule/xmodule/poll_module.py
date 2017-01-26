@@ -145,6 +145,7 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
     _child_tag_name = 'answer'
 
     module_class = PollModule
+    resources_dir = None
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

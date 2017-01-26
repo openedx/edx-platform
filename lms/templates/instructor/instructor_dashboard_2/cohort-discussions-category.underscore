@@ -6,5 +6,5 @@
     </label>
     </div>
 
-    <ul class="wrapper-tabs subcategories"><%= entries %></ul>
+    <ul class="wrapper-tabs subcategories"><%= HtmlUtils.ensureHtml(entriesHtml) %></ul>
 </li>

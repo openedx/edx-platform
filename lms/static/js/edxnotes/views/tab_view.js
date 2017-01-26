@@ -1,8 +1,12 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'underscore', 'backbone', 'js/edxnotes/models/tab'
-], function ($, _, Backbone, TabModel) {
+    'jquery',
+    'underscore',
+    'backbone',
+    'edx-ui-toolkit/js/utils/html-utils',
+    'js/edxnotes/models/tab'
+], function ($, _, Backbone, HtmlUtils, TabModel) {
     var TabView = Backbone.View.extend({
         PanelConstructor: null,
 
@@ -14,7 +18,8 @@ define([
         initialize: function (options) {
             _.bindAll(this, 'showLoadingIndicator', 'hideLoadingIndicator');
             this.options = _.defaults(options || {}, {
-                createTabOnInitialization: true
+                createTabOnInitialization: true,
+                createHeaderFooter: true
             });
 
             if (this.options.createTabOnInitialization) {
@@ -64,7 +69,13 @@ define([
 
         getSubView: function () {
             var collection = this.getCollection();
-            return new this.PanelConstructor({collection: collection, scrollToTag: this.options.scrollToTag});
+            return new this.PanelConstructor(
+                {
+                    collection: collection,
+                    scrollToTag: this.options.scrollToTag,
+                    createHeaderFooter: this.options.createHeaderFooter
+                }
+            );
         },
 
         destroySubView: function () {
@@ -114,11 +125,11 @@ define([
         /**
          * Shows error message.
          */
-        showErrorMessage: function (message) {
-            this.$('.wrapper-msg')
-                .removeClass('is-hidden')
-                .find('.msg-content .copy').html(message);
+        showErrorMessageHtml: function (htmlMessage) {
+            var $wrapper = this.$('.wrapper-msg');
+            $wrapper.removeClass('is-hidden');
 
+            HtmlUtils.setHtml($wrapper.find('.msg-content .copy'), htmlMessage);
             return this;
         },
 

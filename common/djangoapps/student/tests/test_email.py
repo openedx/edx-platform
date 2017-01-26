@@ -1,6 +1,5 @@
 
 import json
-import django.db
 import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
@@ -19,9 +18,10 @@ from mock import Mock, patch
 from django.http import HttpResponse
 from django.conf import settings
 from edxmako.shortcuts import render_to_string
-from edxmako.tests import mako_middleware_process_request
 from util.request import safe_get_host
 from util.testing import EventTestMixin
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+from openedx.core.djangoapps.theming.tests.test_util import with_comprehensive_theme
 
 
 class TestException(Exception):
@@ -57,7 +57,7 @@ class EmailTestMixin(object):
         email_user.assert_called_with(
             mock_render_to_string(subject_template, subject_context),
             mock_render_to_string(body_template, body_context),
-            settings.DEFAULT_FROM_EMAIL
+            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
         )
 
     def append_allowed_hosts(self, hostname):
@@ -75,10 +75,10 @@ class ActivationEmailTests(TestCase):
     # Text fragments we expect in the body of an email
     # sent from an OpenEdX installation.
     OPENEDX_FRAGMENTS = [
-        "Thank you for signing up for {platform}.".format(platform=settings.PLATFORM_NAME),
+        "Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         (
-            "if you require assistance, check the help section of the "
+            "Check the help section of the "
             "{platform} website".format(platform=settings.PLATFORM_NAME)
         )
     ]
@@ -86,10 +86,10 @@ class ActivationEmailTests(TestCase):
     # Text fragments we expect in the body of an email
     # sent from an EdX-controlled domain.
     EDX_DOMAIN_FRAGMENTS = [
-        "Thank you for signing up for {platform}".format(platform=settings.PLATFORM_NAME),
+        "Thank you for creating an account with {platform}!".format(platform=settings.PLATFORM_NAME),
         "http://edx.org/activate/",
         "https://www.edx.org/contact-us",
-        "This email was automatically sent by edx.org"
+        "This email message was automatically sent by edx.org"
     ]
 
     def setUp(self):
@@ -99,7 +99,7 @@ class ActivationEmailTests(TestCase):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.OPENEDX_FRAGMENTS)
 
-    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    @with_comprehensive_theme("edx.org")
     def test_activation_email_edx_domain(self):
         self._create_account()
         self._assert_activation_email(self.ACTIVATION_SUBJECT, self.EDX_DOMAIN_FRAGMENTS)
@@ -172,9 +172,9 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         request.META['HTTP_HOST'] = "aGenericValidHostName"
         self.append_allowed_hosts("aGenericValidHostName")
 
-        mako_middleware_process_request(request)
-        body = render_to_string('emails/activation_email.txt', context)
-        host = safe_get_host(request)
+        with patch('edxmako.request_context.get_current_request', return_value=request):
+            body = render_to_string('emails/activation_email.txt', context)
+            host = safe_get_host(request)
 
         self.assertIn(host, body)
 
@@ -298,7 +298,7 @@ class EmailChangeRequestTests(EventTestMixin, TestCase):
         send_mail.assert_called_with(
             mock_render_to_string('emails/email_change_subject.txt', context),
             mock_render_to_string('emails/email_change.txt', context),
-            settings.DEFAULT_FROM_EMAIL,
+            configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL),
             [new_email]
         )
         self.assert_event_emitted(
@@ -367,9 +367,9 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
         request.META['HTTP_HOST'] = "aGenericValidHostName"
         self.append_allowed_hosts("aGenericValidHostName")
 
-        mako_middleware_process_request(request)
-        body = render_to_string('emails/confirm_email_change.txt', context)
-        url = safe_get_host(request)
+        with patch('edxmako.request_context.get_current_request', return_value=request):
+            body = render_to_string('emails/confirm_email_change.txt', context)
+            url = safe_get_host(request)
 
         self.assertIn(url, body)
 

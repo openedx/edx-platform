@@ -179,7 +179,7 @@ class ContainerPage(PageObject):
     @property
     def is_staff_locked(self):
         """ Returns True if staff lock is currently enabled, False otherwise """
-        for attr in self.q(css='a.action-staff-lock>i').attrs('class'):
+        for attr in self.q(css='a.action-staff-lock>.fa').attrs('class'):
             if 'fa-check-square-o' in attr:
                 return True
         return False

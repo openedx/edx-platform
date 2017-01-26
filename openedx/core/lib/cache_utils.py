@@ -1,6 +1,7 @@
 """
 Utilities related to caching.
 """
+import collections
 import cPickle as pickle
 import functools
 import zlib
@@ -38,6 +39,48 @@ def memoize_in_request_cache(request_cache_attr_name=None):
                 return func(self, *args, **kwargs)
         return _wrapper
     return _decorator
+
+
+class memoized(object):  # pylint: disable=invalid-name
+    """
+    Decorator. Caches a function's return value each time it is called.
+    If called later with the same arguments, the cached value is returned
+    (not reevaluated).
+    https://wiki.python.org/moin/PythonDecoratorLibrary#Memoize
+
+    WARNING: Only use this memoized decorator for caching data that
+    is constant throughout the lifetime of a gunicorn worker process,
+    is costly to compute, and is required often.  Otherwise, it can lead to
+    unwanted memory leakage.
+    """
+
+    def __init__(self, func):
+        self.func = func
+        self.cache = {}
+
+    def __call__(self, *args):
+        if not isinstance(args, collections.Hashable):
+            # uncacheable. a list, for instance.
+            # better to not cache than blow up.
+            return self.func(*args)
+        if args in self.cache:
+            return self.cache[args]
+        else:
+            value = self.func(*args)
+            self.cache[args] = value
+            return value
+
+    def __repr__(self):
+        """
+        Return the function's docstring.
+        """
+        return self.func.__doc__
+
+    def __get__(self, obj, objtype):
+        """
+        Support instance methods.
+        """
+        return functools.partial(self.__call__, obj)
 
 
 def hashvalue(arg):

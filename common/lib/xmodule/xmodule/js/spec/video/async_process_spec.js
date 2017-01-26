@@ -15,82 +15,66 @@ function (AsyncProcess) {
         items = getArrayNthLength(1000);
 
     describe('AsyncProcess', function () {
-        it ('Array is processed successfully', function () {
+        it ('Array is processed successfully', function (done) {
             var processedArray,
                 expectedArray = getArrayNthLength(1000, 2),
                 process = function (item) {
                     return 2 * item;
                 };
 
-            runs(function () {
-                AsyncProcess.array(items, process).done(function (result) {
-                    processedArray = result;
-                });
+            AsyncProcess.array(items, process).done(function (result) {
+                processedArray = result;
             });
 
-            waitsFor(function () {
+            jasmine.waitUntil(function () {
                 return processedArray;
-            }, 'Array processing takes too much time', WAIT_TIMEOUT);
-
-            runs(function () {
+            }).then(function () {
                 expect(processedArray).toEqual(expectedArray);
-            });
+            }).always(done);
         });
 
-        it ('If non-array is passed, error callback is called', function () {
+        it ('If non-array is passed, error callback is called', function (done) {
             var isError,
                 process = function () {};
 
-            runs(function () {
-                AsyncProcess.array('string', process).fail(function () {
-                    isError = true;
-                });
+            AsyncProcess.array('string', process).fail(function () {
+                isError = true;
             });
 
-            waitsFor(function () {
+            jasmine.waitUntil(function () {
                 return isError;
-            }, 'Error callback wasn\'t called', WAIT_TIMEOUT);
-
-            runs(function () {
+            }).then(function () {
                 expect(isError).toBeTruthy();
-            });
+            }).always(done);
         });
 
-        it ('If an empty array is passed, returns initial array', function () {
+        it ('If an empty array is passed, returns initial array', function (done) {
             var processedArray,
                 process = function () {};
 
-            runs(function () {
-                AsyncProcess.array([], process).done(function (result) {
-                    processedArray = result;
-                });
+            AsyncProcess.array([], process).done(function (result) {
+                processedArray = result;
             });
 
-            waitsFor(function () {
+            jasmine.waitUntil(function () {
                 return processedArray;
-            }, 'Array processing takes too much time', WAIT_TIMEOUT);
-
-            runs(function () {
+            }).then(function () {
                 expect(processedArray).toEqual([]);
-            });
+            }).always(done);
         });
 
-        it ('If no process function passed, returns initial array', function () {
+        it ('If no process function passed, returns initial array', function (done) {
             var processedArray;
 
-            runs(function () {
-                AsyncProcess.array(items).done(function (result) {
-                    processedArray = result;
-                });
+            AsyncProcess.array(items).done(function (result) {
+                processedArray = result;
             });
 
-            waitsFor(function () {
+            jasmine.waitUntil(function () {
                 return processedArray;
-            }, 'Array processing takes too much time', WAIT_TIMEOUT);
-
-            runs(function () {
+            }).then(function () {
                 expect(processedArray).toEqual(items);
-            });
+            }).always(done);
         });
     });
 });

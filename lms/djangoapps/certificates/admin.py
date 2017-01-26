@@ -8,7 +8,6 @@ from util.organizations_helpers import get_organizations
 from certificates.models import (
     CertificateGenerationConfiguration,
     CertificateHtmlViewConfiguration,
-    BadgeImageConfiguration,
     CertificateTemplate,
     CertificateTemplateAsset,
     GeneratedCertificate,
@@ -45,7 +44,8 @@ class CertificateTemplateAssetAdmin(admin.ModelAdmin):
     """
     Django admin customizations for CertificateTemplateAsset model
     """
-    list_display = ('description', '__unicode__')
+    list_display = ('description', 'asset_slug',)
+    prepopulated_fields = {"asset_slug": ("description",)}
 
 
 class GeneratedCertificateAdmin(admin.ModelAdmin):
@@ -53,13 +53,13 @@ class GeneratedCertificateAdmin(admin.ModelAdmin):
     Django admin customizations for GeneratedCertificate model
     """
     raw_id_fields = ('user',)
+    show_full_result_count = False
     search_fields = ('course_id', 'user__username')
     list_display = ('id', 'course_id', 'mode', 'user')
 
 
 admin.site.register(CertificateGenerationConfiguration)
 admin.site.register(CertificateHtmlViewConfiguration, ConfigurationModelAdmin)
-admin.site.register(BadgeImageConfiguration)
 admin.site.register(CertificateTemplate, CertificateTemplateAdmin)
 admin.site.register(CertificateTemplateAsset, CertificateTemplateAssetAdmin)
 admin.site.register(GeneratedCertificate, GeneratedCertificateAdmin)

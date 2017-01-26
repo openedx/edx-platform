@@ -1,11 +1,13 @@
 define([
-    "jquery",
-    "common/js/spec_helpers/ajax_helpers",
-    "URI",
-    "js/views/paging",
-    "js/views/paging_header",
-    "common/js/components/collections/paging_collection"
-], function ($, AjaxHelpers, URI, PagingView, PagingHeader, PagingCollection) {
+        "jquery",
+        "URI",
+        "edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers",
+        "edx-ui-toolkit/js/pagination/paging-collection",
+        "js/views/paging",
+        "js/views/paging_header"
+    ],
+    function ($, URI, AjaxHelpers, PagingCollection, PagingView, PagingHeader) {
+        'use strict';
 
         var createPageableItem = function(index) {
             var id = 'item_' + index;
@@ -24,7 +26,6 @@ define([
             ],
             num_pages: 2,
             page_size: 3,
-            current_page: 0,
             count: 4,
             page: 0,
             start: 0
@@ -35,16 +36,14 @@ define([
             ],
             num_pages: 2,
             page_size: 3,
-            current_page: 1,
-            count: 4,
             page: 1,
+            count: 4,
             start: 3
         };
         var mockEmptyPage = {
             results: [],
             num_pages: 1,
             page_size: 3,
-            current_page: 0,
             count: 0,
             page: 0,
             start: 0
@@ -69,11 +68,18 @@ define([
         });
 
         describe("Paging", function() {
-            var pagingView;
+            var pagingView,
+                TestPagingCollection = PagingCollection.extend({
+                    state: {
+                        firstPage: 0,
+                        currentPage: null,
+                        pageSize: 3
+                    }
+                });
 
             beforeEach(function () {
-                var collection = new PagingCollection();
-                collection.isZeroIndexed = true;
+                var collection = new TestPagingCollection();
+                collection.url = '/dummy/';
                 pagingView = new MockPagingView({collection: collection});
             });
 
@@ -83,10 +89,10 @@ define([
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(1);
                         respondWithMockItems(requests);
-                        expect(pagingView.collection.currentPage).toBe(0);
+                        expect(pagingView.collection.getPageNumber()).toBe(1);
                         pagingView.setPage(2);
                         respondWithMockItems(requests);
-                        expect(pagingView.collection.currentPage).toBe(1);
+                        expect(pagingView.collection.getPageNumber()).toBe(2);
                     });
 
                     it('should not change page after a server error', function () {
@@ -95,7 +101,9 @@ define([
                         respondWithMockItems(requests);
                         pagingView.setPage(2);
                         requests[1].respond(500);
-                        expect(pagingView.collection.currentPage).toBe(0);
+
+                        /* PagingCollection sets the currentPage to the old page in case of failure */
+                        expect(pagingView.collection.getPageNumber()).toBe(1);
                     });
                 });
 
@@ -106,7 +114,7 @@ define([
                         respondWithMockItems(requests);
                         pagingView.nextPage();
                         requests[1].respond(500);
-                        expect(pagingView.collection.currentPage).toBe(0);
+                        expect(pagingView.collection.getPageNumber()).toBe(1);
                     });
 
                     it('can move to the next page', function () {
@@ -115,7 +123,9 @@ define([
                         respondWithMockItems(requests);
                         pagingView.nextPage();
                         respondWithMockItems(requests);
-                        expect(pagingView.collection.currentPage).toBe(1);
+
+                        /* PagingCollection now returns the normalized page number; adds one if zero indexed */
+                        expect(pagingView.collection.getPageNumber()).toBe(2);
                     });
 
                     it('can not move forward from the final page', function () {
@@ -128,14 +138,13 @@ define([
                 });
 
                 describe("previousPage", function () {
-
                     it('can move back a page', function () {
                         var requests = AjaxHelpers.requests(this);
                         pagingView.setPage(2);
                         respondWithMockItems(requests);
                         pagingView.previousPage();
                         respondWithMockItems(requests);
-                        expect(pagingView.collection.currentPage).toBe(0);
+                        expect(pagingView.collection.getPageNumber()).toBe(1);
                     });
 
                     it('can not move back from the first page', function () {
@@ -152,12 +161,11 @@ define([
                         respondWithMockItems(requests);
                         pagingView.previousPage();
                         requests[1].respond(500);
-                        expect(pagingView.collection.currentPage).toBe(1);
+                        expect(pagingView.collection.getPageNumber()).toBe(2);
                     });
                 });
 
                 describe("toggleSortOrder", function () {
-
                     it('can toggle direction of the current sort', function () {
                         var requests = AjaxHelpers.requests(this);
                         expect(pagingView.collection.sortDirection).toBe('desc');
@@ -220,7 +228,8 @@ define([
                         respondWithMockItems(requests);
                         pagingHeader.$('.next-page-link').click();
                         requests[1].respond(500);
-                        expect(pagingView.collection.currentPage).toBe(0);
+                        expect(pagingView.collection.state.currentPage).toBe(0);
+                        expect(pagingView.collection.getPageNumber()).toBe(1);
                     });
 
                     it('can move to the next page', function () {
@@ -229,7 +238,7 @@ define([
                         respondWithMockItems(requests);
                         pagingHeader.$('.next-page-link').click();
                         respondWithMockItems(requests);
-                        expect(pagingView.collection.currentPage).toBe(1);
+                        expect(pagingView.collection.getPageNumber()).toBe(2);
                     });
 
                     it('should be enabled when there is at least one more page', function () {
@@ -248,7 +257,7 @@ define([
 
                     it('should be disabled on an empty page', function () {
                         var requests = AjaxHelpers.requests(this);
-                        pagingView.setPage(0);
+                        pagingView.setPage(1);
                         AjaxHelpers.respondWithJson(requests, mockEmptyPage);
                         expect(pagingHeader.$('.next-page-link')).toHaveClass('is-disabled');
                     });
@@ -267,7 +276,7 @@ define([
                         respondWithMockItems(requests);
                         pagingHeader.$('.previous-page-link').click();
                         requests[1].respond(500);
-                        expect(pagingView.collection.currentPage).toBe(1);
+                        expect(pagingView.collection.getPageNumber()).toBe(2);
                     });
 
                     it('can go back a page', function () {
@@ -276,7 +285,7 @@ define([
                         respondWithMockItems(requests);
                         pagingHeader.$('.previous-page-link').click();
                         respondWithMockItems(requests);
-                        expect(pagingView.collection.currentPage).toBe(0);
+                        expect(pagingView.collection.getPageNumber()).toBe(1);
                     });
 
                     it('should be disabled on the first page', function () {

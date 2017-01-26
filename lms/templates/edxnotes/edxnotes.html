@@ -1,8 +1,12 @@
+<%page expression_filter="h"/>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+
 <%!
 from django.utils.translation import ugettext as _
-import json
+from edxnotes.helpers import NoteJSONEncoder
+from openedx.core.djangolib.markup import HTML, Text
+from openedx.core.djangolib.js_utils import dump_js_escaped_json, js_escaped_string
 %>
 
 <%block name="bodyclass">view-student-notes is-in-course course</%block>
@@ -12,10 +16,11 @@ import json
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='edxnotes'" />
+
 <section class="container">
   <div class="wrapper-student-notes">
     <div class="student-notes">
-
+    <main id="main" aria-label="Content" tabindex="-1">
       <div class="title-search-container">
         <div class="wrapper-title">
           <h1 class="page-title">
@@ -24,13 +29,13 @@ import json
           </h1>
         </div>
 
-        % if notes:
+        % if has_notes:
         <div class="wrapper-notes-search">
-          <form role="search" action="${search_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
+          <form role="search" action="${notes_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
             <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
             <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search notes for...')}" required>
             <button type="submit" class="search-notes-submit">
-              <i class="icon fa fa-search"></i>
+              <span class="icon fa fa-search" aria-hidden="true"></span>
               <span class="sr">${_('Search')}</span>
             </button>
           </form>
@@ -51,10 +56,10 @@ import json
           <h2 id="tab-view" class="tabs-label">${_('View notes by:')}</h2>
         </div>
 
-        % if notes:
+        % if has_notes:
         <div class="ui-loading" tabindex="-1">
           <span class="spin">
-            <i class="icon fa fa-refresh"></i>
+            <span class="icon fa fa-refresh" aria-hidden="true"></span>
           </span>
           <span class="copy">${_("Loading")}</span>
         </div>
@@ -74,8 +79,8 @@ import json
 
               % if position is not None:
               <div class="placeholder-cta student-notes-cta">
-                <p class="placeholder-cta-copy">${_('Get started by making a note in something you just read, like {section_link}.').format(
-                  section_link='<a href="{url}">{section_name}</a>'.format(
+                <p class="placeholder-cta-copy">${Text(_('Get started by making a note in something you just read, like {section_link}.')).format(
+                  section_link=HTML('<a href="{url}">{section_name}</a>').format(
                     url=position['url'],
                     section_name=position['display_name'],
                     )
@@ -88,7 +93,7 @@ import json
         </section>
         % endif
       </section>
-
+    </main>
     </div>
   </div>
 </section>
@@ -103,12 +108,15 @@ import json
 % endfor
 </%block>
 
-% if notes:
+% if has_notes:
     <%block name="js_extra">
     <%static:require_module module_name="js/edxnotes/views/page_factory" class_name="NotesPageFactory">
         NotesPageFactory({
-            notesList: ${notes if notes is not None else []},
-            debugMode: ${debug}
+            disabledTabs: ${disabled_tabs | n, dump_js_escaped_json},
+            notes: ${dump_js_escaped_json(notes, NoteJSONEncoder) | n, decode.utf8},
+            notesEndpoint: ${notes_endpoint | n, dump_js_escaped_json},
+            pageSize: ${page_size | n, dump_js_escaped_json},
+            debugMode: ${debug | n, dump_js_escaped_json}
         });
     </%static:require_module>
     </%block>

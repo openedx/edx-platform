@@ -1,6 +1,6 @@
 define([
     'backbone', 'underscore', 'teams/js/collections/topic', 'teams/js/views/topics',
-    'teams/js/spec_helpers/team_spec_helpers', 'common/js/spec_helpers/ajax_helpers'
+    'teams/js/spec_helpers/team_spec_helpers', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers'
 ], function (Backbone, _, TopicCollection, TopicsView, TeamSpecHelpers, AjaxHelpers) {
     'use strict';
     describe('TopicsView', function () {

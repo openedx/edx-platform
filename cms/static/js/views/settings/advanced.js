@@ -1,5 +1,11 @@
-define(["js/views/validation", "jquery", "underscore", "gettext", "codemirror", "js/views/modals/validation_error_modal"],
-    function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal) {
+define(["js/views/validation",
+        "jquery",
+        "underscore",
+        "gettext",
+        "codemirror",
+        "js/views/modals/validation_error_modal",
+        'edx-ui-toolkit/js/utils/html-utils'],
+    function(ValidatingView, $, _, gettext, CodeMirror, ValidationErrorModal, HtmlUtils) {
 
 var AdvancedView = ValidatingView.extend({
     error_saving : "error_saving",
@@ -13,7 +19,9 @@ var AdvancedView = ValidatingView.extend({
         // TODO enable/disable save based on validation (currently enabled whenever there are changes)
     },
     initialize : function() {
-        this.template = _.template($("#advanced_entry-tpl").text());
+        this.template = HtmlUtils.template(
+            $("#advanced_entry-tpl").text()
+        );
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.render();
     },
@@ -33,7 +41,7 @@ var AdvancedView = ValidatingView.extend({
         _.each(_.sortBy(_.keys(this.model.attributes), function(key) { return self.model.get(key).display_name; }),
             function(key) {
                 if (self.render_deprecated || !self.model.get(key).deprecated) {
-                    listEle$.append(self.renderTemplate(key, self.model.get(key)));
+                    HtmlUtils.append(listEle$, self.renderTemplate(key, self.model.get(key)));
                 }
             });
 
@@ -109,7 +117,7 @@ var AdvancedView = ValidatingView.extend({
             success : function() {
                 self.render();
                 var title = gettext("Your policy changes have been saved.");
-                var message = gettext("Please note that validation of your policy key and value pairs is not currently in place yet. If you are having difficulties, please review your policy pairs.");
+                var message = gettext("No validation is performed on policy keys or value pairs. If you are having difficulties, check your formatting.");  // jshint ignore:line
                 self.showSavedBar(title, message);
                 analytics.track('Saved Advanced Settings', {
                     'course': course_location_analytics

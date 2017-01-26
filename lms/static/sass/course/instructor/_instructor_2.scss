@@ -84,11 +84,11 @@
 
   // TYPE: confirm
   .msg-error {
-    border-top: 2px solid $error-color;
-    background: tint($error-color,95%);
+    border-top: 2px solid $red1;
+    background: tint($red1, 90%);
 
     .copy {
-      color: $error-color;
+      color: $red1;
     }
   }
 
@@ -140,6 +140,7 @@
 // ====================
 .instructor-dashboard-content-2 {
   @extend .content;
+  display: block; // override the table-cell display set in .content
   width: 100%;
   padding: 40px;
 
@@ -159,9 +160,13 @@
     color: $error-color;
   }
 
+  .submit-email-warning {
+    margin-top: ($baseline);
+  }
+
   .slickgrid {
     @include margin-left(1px);
-    @include font-size(12px);
+    @include font-size(14);
     font-family: verdana,arial,sans-serif;
     color: #333333;
 
@@ -247,11 +252,11 @@
 
   // type - error
   .message-error {
-    border-top: 2px solid $error-color;
-    background: tint($error-color,95%);
+    border-top: 2px solid $red1;
+    background: tint($red1, 90%);
 
     .message-title {
-      color: $error-color;
+      color: $red1;
     }
 
     .message-copy {
@@ -262,7 +267,7 @@
   // type - confirmation
   .message-confirmation {
     border-top: 2px solid $confirm-color;
-    background: tint($confirm-color,95%);
+    background: tint($confirm-color, 95%);
 
     .message-title {
       color: $confirm-color;
@@ -303,7 +308,7 @@
     display: none;
 
     p {
-      color: #a2a2a2;
+      color: $gray-d2;
       font-style: italic;
     }
   }
@@ -411,6 +416,60 @@
       margin-bottom: $baseline;
       padding: 0;
 
+      ul {
+        list-style-type: none;
+      }
+
+      .send_to_list {
+        line-height: 1.3em;
+      }
+
+      input[name="send_to"] {
+        float: left;
+        margin-top: .3em;
+        margin-left: .1em;
+      }
+
+      input[name="send_to"]+label {
+        display: block;
+        padding-left: 1.3em;
+        margin-bottom: 0;
+      }
+
+      input[name="send_to"]:checked+label {
+        // "bolds" the text without causing a width recalculation
+        text-shadow: 1px 0px 0px;
+      }
+
+      input[name="send_to"]:focus+label, input[name="send_to"]:hover:not([disabled])+label {
+        background-color: #EFEFEF;
+
+        * {
+          background-color: #EFEFEF;
+        }
+      }
+
+      input[name="send_to"]:disabled+label {
+        font-weight: lighter;
+        background-color: $light-gray3
+      }
+
+      .email-targets-primary {
+        display: table-cell;
+        margin: 0;
+        width: 20%;
+      }
+
+      .email-targets-secondary {
+        display: table-cell;
+        margin: 0;
+        @include columns(2);
+
+        .subheading {
+          font-size: .9em;
+        }
+      }
+
       &:last-child {
         margin-bottom: 0;
       }
@@ -418,7 +477,7 @@
         display: block;
         margin-top: ($baseline/4);
         @include font-size(12);
-        color: tint(rgb(127,127,127),50%);
+        color: $gray-d1;
       }
     }
   }
@@ -433,6 +492,12 @@
 
     &:last-child {
       margin-bottom: 0;
+    }
+        
+    legend {
+        // use the same styles as H3s
+        font-size: 1.2em;
+        margin-bottom: 15px;
     }
   }
 
@@ -477,19 +542,15 @@
     margin: ($baseline/2) 0;
     position: relative;
 
-      label {
-        border-bottom: 1px dotted $base-font-color;
-      }
-
     .hint {
       @extend %t-copy-sub2;
-      display: none;
+      display: block;
       position: absolute;
-      top: 15px;
-      @include left($baseline*10);
+      top: ($baseline/2);
+      left: -9999em;
       padding: ($baseline/2);
       width: 50%;
-      background-color: $light-gray;
+      background-color: $light-gray3;
       box-shadow: 2px 2px 3px $shadow;
 
       .hint-caret {
@@ -497,30 +558,24 @@
         position: absolute;
         top: 0;
         @include left(-15px);
-        @include border-right(8px solid $light-gray);
+        @include border-right(8px solid $light-gray3);
         @include border-left(8px solid transparent);
-        border-top: 8px solid $light-gray;
+        border-top: 8px solid $light-gray3;
         border-bottom: 8px solid transparent;
       }
     }
-  }
-
-  label[for="auto-enroll"]:hover + .auto-enroll-hint {
-    display: block;
-  }
-
-  label[for="auto-enroll-beta"]:hover + .auto-enroll-beta-hint {
-    width: 30%;
-    display: block;
-  }
-
-  label[for="email-students"]:hover + .email-students-hint {
-    display: block;
-  }
-
-  label[for="email-students-beta"]:hover + .email-students-beta-hint {
-    width: 30%;
-    display: block;
+    
+    /* ***
+     * Ideally we want to handle functionality with JS.
+     * This functionality should eventually be moved into CS/JS, and out of here. */ 
+    .has-hint:hover > .hint {    
+        @include left($baseline*10);
+    }
+    
+    .has-hint input:focus ~ .hint {
+        @include left($baseline*10);
+    }
+    /* *** */
   }
 
   .enroll-actions {
@@ -594,6 +649,7 @@
             border-bottom: 1px solid $light-gray;
           }
 
+          th,
           td {
             @extend %t-copy-sub1;
             vertical-align: middle;
@@ -671,6 +727,12 @@
         // needed to reset poor input styling
         input[type="text"] {
           height: auto;
+          &.readonly {
+            background-color: transparent;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+          }
         }
 
         .input {
@@ -1712,7 +1774,7 @@ input[name="subject"] {
           height: 40px;
           border-radius: 3px;
         }
-    #coupon-content, #course-content, #registration-content, #regcode-content {
+    #coupon-content, #course-content, #content, #registration-content, #regcode-content {
       padding: $baseline;
       header {
         margin: 0;
@@ -2159,16 +2221,18 @@ input[name="subject"] {
     }
   }
 
+  .student-username-or-email {
+      width: 300px;
+      margin-bottom: 10px;
+    }
+    .notes-field {
+      width: 400px;
+    }
+
+
   #certificate-white-list-editor {
     padding-top: 5px;
     .certificate-exception-inputs {
-      .student-username-or-email {
-        width: 300px;
-        margin-bottom: 10px;
-      }
-      .notes-field {
-        width: 400px;
-      }
       p + p {
         margin-top: 5px;
       }
@@ -2178,7 +2242,7 @@ input[name="subject"] {
     }
   }
 
-  .white-listed-students {
+  .white-listed-students, .invalidation-history {
     margin-top: 10px;
     padding-top: 5px;
     table {

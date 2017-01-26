@@ -8,7 +8,7 @@
                 name: '',
                 user_count: 0,
                 /**
-                * Indicates how students are added to the cohort. Will be "none" (signifying manual assignment) or
+                * Indicates how students are added to the cohort. Will be "manual" (signifying manual assignment) or
                 * "random" (indicating students are randomly assigned).
                 */
                 assignment_type: '',

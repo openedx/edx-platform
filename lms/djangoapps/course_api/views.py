@@ -2,23 +2,22 @@
 Course API Views
 """
 
-from django.http import Http404
+from django.core.exceptions import ValidationError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
-
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
-
+from openedx.core.lib.api.view_utils import view_auth_classes, DeveloperErrorViewMixin
 from .api import course_detail, list_courses
-from .serializers import CourseSerializer
+from .forms import CourseDetailGetForm, CourseListGetForm
+from .serializers import CourseSerializer, CourseDetailSerializer
 
 
-class CourseDetailView(RetrieveAPIView):
+@view_auth_classes(is_authenticated=False)
+class CourseDetailView(DeveloperErrorViewMixin, RetrieveAPIView):
     """
     **Use Cases**
 
-        Request information on a course
+        Request details for a course
 
     **Example Requests**
 
@@ -28,38 +27,49 @@ class CourseDetailView(RetrieveAPIView):
 
         Body consists of the following fields:
 
-        * blocks_url: used to fetch the course blocks
+        * effort: A textual description of the weekly hours of effort expected
+            in the course.
+        * end: Date the course ends, in ISO 8601 notation
+        * enrollment_end: Date enrollment ends, in ISO 8601 notation
+        * enrollment_start: Date enrollment begins, in ISO 8601 notation
+        * id: A unique identifier of the course; a serialized representation
+            of the opaque key identifying the course.
         * media: An object that contains named media items.  Included here:
             * course_image: An image to show for the course.  Represented
               as an object with the following fields:
                 * uri: The location of the image
-                * name:
-                * description:
-                * type:
-        * end: Date the course ends
-        * enrollment_end: Date enrollment ends
-        * enrollment_start: Date enrollment begins
-        * course_id: Course key
         * name: Name of the course
         * number: Catalog number of the course
         * org: Name of the organization that owns the course
-        * description: A textual description of the course
-        * start: Date the course begins
+        * overview: A possibly verbose HTML textual description of the course.
+            Note: this field is only included in the Course Detail view, not
+            the Course List view.
+        * short_description: A textual description of the course
+        * start: Date the course begins, in ISO 8601 notation
         * start_display: Readably formatted start of the course
         * start_type: Hint describing how `start_display` is set. One of:
-            * `"string"`: manually set
-            * `"timestamp"`: generated form `start` timestamp
-            * `"empty"`: the start date should not be shown
+            * `"string"`: manually set by the course author
+            * `"timestamp"`: generated from the `start` timestamp
+            * `"empty"`: no start date is specified
+        * pacing: Course pacing. Possible values: instructor, self
+
+        Deprecated fields:
+
+        * blocks_url: Used to fetch the course blocks
+        * course_id: Course key (use 'id' instead)
 
     **Parameters:**
 
         username (optional):
-            The username of the specified user whose visible courses we
-            want to see.  Defaults to the current user.
+            The username of the specified user for whom the course data
+            is being accessed. The username is not only required if the API is
+            requested by an Anonymous user.
 
     **Returns**
 
         * 200 on success with above fields.
+        * 400 if an invalid parameter was sent or the username was not provided
+          for an authenticated request.
         * 403 if a user who does not have permission to masquerade as
           another user specifies a username other than their own.
         * 404 if the course is not available or cannot be seen.
@@ -78,36 +88,40 @@ class CourseDetailView(RetrieveAPIView):
                 "end": "2015-09-19T18:00:00Z",
                 "enrollment_end": "2015-07-15T00:00:00Z",
                 "enrollment_start": "2015-06-15T00:00:00Z",
-                "id": "edX/example/2012_Fall",
+                "course_id": "edX/example/2012_Fall",
                 "name": "Example Course",
                 "number": "example",
                 "org": "edX",
+                "overview: "<p>A verbose description of the course.</p>"
                 "start": "2015-07-17T12:00:00Z",
                 "start_display": "July 17, 2015",
-                "start_type": "timestamp"
+                "start_type": "timestamp",
+                "pacing": "instructor"
             }
     """
 
-    serializer_class = CourseSerializer
-    lookup_url_kwarg = 'course_key_string'
+    serializer_class = CourseDetailSerializer
 
     def get_object(self):
         """
         Return the requested course object, if the user has appropriate
         permissions.
         """
+        requested_params = self.request.query_params.copy()
+        requested_params.update({'course_key': self.kwargs['course_key_string']})
+        form = CourseDetailGetForm(requested_params, initial={'requesting_user': self.request.user})
+        if not form.is_valid():
+            raise ValidationError(form.errors)
 
-        username = self.request.query_params.get('username', self.request.user.username)
-        course_key_string = self.kwargs[self.lookup_url_kwarg]
-        try:
-            course_key = CourseKey.from_string(course_key_string)
-        except InvalidKeyError:
-            raise Http404()
-
-        return course_detail(self.request, username, course_key)
+        return course_detail(
+            self.request,
+            form.cleaned_data['username'],
+            form.cleaned_data['course_key'],
+        )
 
 
-class CourseListView(ListAPIView):
+@view_auth_classes(is_authenticated=False)
+class CourseListView(DeveloperErrorViewMixin, ListAPIView):
     """
     **Use Cases**
 
@@ -125,12 +139,25 @@ class CourseListView(ListAPIView):
 
         username (optional):
             The username of the specified user whose visible courses we
-            want to see.  Defaults to the current user.
+            want to see. The username is not required only if the API is
+            requested by an Anonymous user.
+
+        org (optional):
+            If specified, visible `CourseOverview` objects are filtered
+            such that only those belonging to the organization with the
+            provided org code (e.g., "HarvardX") are returned.
+            Case-insensitive.
+
+        mobile (optional):
+            If specified, only visible `CourseOverview` objects that are
+            designated as mobile_available are returned.
 
     **Returns**
 
         * 200 on success, with a list of course discovery objects as returned
           by `CourseDetailView`.
+        * 400 if an invalid parameter was sent or the username was not provided
+          for an authenticated request.
         * 403 if a user who does not have permission to masquerade as
           another user specifies a username other than their own.
         * 404 if the specified user does not exist, or the requesting user does
@@ -151,7 +178,7 @@ class CourseListView(ListAPIView):
                 "end": "2015-09-19T18:00:00Z",
                 "enrollment_end": "2015-07-15T00:00:00Z",
                 "enrollment_start": "2015-06-15T00:00:00Z",
-                "id": "edX/example/2012_Fall",
+                "course_id": "edX/example/2012_Fall",
                 "name": "Example Course",
                 "number": "example",
                 "org": "edX",
@@ -169,5 +196,13 @@ class CourseListView(ListAPIView):
         """
         Return a list of courses visible to the user.
         """
-        username = self.request.query_params.get('username', self.request.user.username)
-        return list_courses(self.request, username)
+        form = CourseListGetForm(self.request.query_params, initial={'requesting_user': self.request.user})
+        if not form.is_valid():
+            raise ValidationError(form.errors)
+
+        return list_courses(
+            self.request,
+            form.cleaned_data['username'],
+            org=form.cleaned_data['org'],
+            filter_=form.cleaned_data['filter_'],
+        )

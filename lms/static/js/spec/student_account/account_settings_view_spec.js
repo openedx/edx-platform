@@ -1,4 +1,8 @@
-define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'common/js/spec_helpers/template_helpers',
+define(['backbone',
+        'jquery',
+        'underscore',
+        'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers',
+        'common/js/spec_helpers/template_helpers',
         'js/spec/student_account/helpers',
         'js/views/fields',
         'js/student_account/models/user_account_model',
@@ -15,7 +19,7 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var model = new UserAccountModel();
                 model.set(Helpers.createAccountSettingsData());
 
-                var sectionsData = [
+                var aboutSectionsData = [
                     {
                         title: "Basic Account Information",
                         fields: [
@@ -53,7 +57,9 @@ define(['backbone', 'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers
                 var accountSettingsView = new AccountSettingsView({
                     el: $('.wrapper-account-settings'),
                     model: model,
-                    sectionsData : sectionsData
+                    tabSections: {
+                        aboutTabSections: aboutSectionsData
+                    }
                 });
 
                 return accountSettingsView;

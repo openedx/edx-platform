@@ -1,15 +1,19 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%page expression_filter="h"/>
+<%!
+from django.utils.translation import ugettext as _
+from openedx.core.djangolib.markup import HTML
+%>
 
 <%namespace name='static' file='static_content.html'/>
-<h2 class="problem-header">
+<h3 class="hd hd-2 problem-header">
   ${ problem['name'] }
-</h2>
+</h3>
 
 <div class="problem-progress"></div>
 
 <div class="problem">
     <div aria-live="polite">
-        ${ problem['html'] }
+        ${ HTML(problem['html']) }
     </div>
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
@@ -29,7 +33,7 @@
     <button class="save" data-value="${_('Save')}">${_('Save')}<span class="sr"> ${_("your answer")}</span></button>
     % endif
     % if answer_available:
-    <button class="show"><span class="show-label">${_('Show Answer')}</span> </button>
+    <button class="show"><span class='sr'>${_('Toggle Answer Visibility')}</span><span class="show-label">${_('Show Answer')}</span></button>
     % endif
     % if attempts_allowed :
     <div class="submission_feedback" aria-live="polite">

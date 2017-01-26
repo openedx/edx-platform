@@ -33,7 +33,7 @@ class CourseModeSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = CourseMode
-        fields = ('name', 'currency', 'price', 'sku', 'expires')
+        fields = ('name', 'currency', 'price', 'sku', 'bulk_sku', 'expires')
 
 
 def validate_course_id(course_id):

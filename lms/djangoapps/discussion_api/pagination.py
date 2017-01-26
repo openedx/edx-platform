@@ -2,6 +2,7 @@
 Discussion API pagination support
 """
 from rest_framework.utils.urls import replace_query_param
+from openedx.core.lib.api.paginators import NamespacedPageNumberPagination
 
 
 class _Page(object):
@@ -9,12 +10,11 @@ class _Page(object):
     Implements just enough of the django.core.paginator.Page interface to allow
     PaginationSerializer to work.
     """
-    def __init__(self, object_list, page_num, num_pages):
+    def __init__(self, page_num, num_pages):
         """
         Create a new page containing the given objects, with the given page
         number and number of pages
         """
-        self.object_list = object_list
         self.page_num = page_num
         self.num_pages = num_pages
 
@@ -35,33 +35,50 @@ class _Page(object):
         return self.page_num - 1
 
 
-def get_paginated_data(request, results, page_num, per_page):
+class DiscussionAPIPagination(NamespacedPageNumberPagination):
     """
-    Return a dict with the following values:
-
-    next: The URL for the next page
-    previous: The URL for the previous page
-    results: The results on this page
+    Subclasses NamespacedPageNumberPagination to provide custom implementation of pagination metadata
+    by overriding it's methods
     """
-    # Note: Previous versions of this function used Django Rest Framework's
-    # paginated serializer.  With the upgrade to DRF 3.1, paginated serializers
-    # have been removed.  We *could* use DRF's paginator classes, but there are
-    # some slight differences between how DRF does pagination and how we're doing
-    # pagination here.  (For example, we respond with a next_url param even if
-    # there is only one result on the current page.)  To maintain backwards
-    # compatability, we simulate the behavior that DRF used to provide.
-    page = _Page(results, page_num, per_page)
-    next_url, previous_url = None, None
-    base_url = request.build_absolute_uri()
+    def __init__(self, request, page_num, num_pages, result_count=0):
+        """
+        Overrides parent constructor to take information from discussion api
+        essential for the parent method
+        """
+        self.page = _Page(page_num, num_pages)
+        self.base_url = request.build_absolute_uri()
+        self.count = result_count
 
-    if page.has_next():
-        next_url = replace_query_param(base_url, "page", page.next_page_number())
+        super(DiscussionAPIPagination, self).__init__()
 
-    if page.has_previous():
-        previous_url = replace_query_param(base_url, "page", page.previous_page_number())
+    def get_result_count(self):
+        """
+        Returns total number of results
+        """
+        return self.count
 
-    return {
-        "next": next_url,
-        "previous": previous_url,
-        "results": results,
-    }
+    def get_num_pages(self):
+        """
+        Returns total number of pages the response is divided into
+        """
+        return self.page.num_pages
+
+    def get_next_link(self):
+        """
+        Returns absolute url of the next page if there's a next page available
+        otherwise returns None
+        """
+        next_url = None
+        if self.page.has_next():
+            next_url = replace_query_param(self.base_url, "page", self.page.next_page_number())
+        return next_url
+
+    def get_previous_link(self):
+        """
+        Returns absolute url of the previous page if there's a previous page available
+        otherwise returns None
+        """
+        previous_url = None
+        if self.page.has_previous():
+            previous_url = replace_query_param(self.base_url, "page", self.page.previous_page_number())
+        return previous_url

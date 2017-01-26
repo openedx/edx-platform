@@ -189,6 +189,10 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
               background: transparent;
             }
 
+            .note-comment-p {
+              word-wrap: break-word;
+            }
+
             .note-comment-ul,
             .note-comment-ol {
               padding: auto;
@@ -233,29 +237,29 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
             color: $m-gray-d2;
           }
 
-          // CASE: tag matches a search query
-          .reference-meta.reference-tags .note-highlight {
-            // needed because .note-highlight is a span, which overrides the color
-            @extend %shame-link-text;
-            background-color: $result-highlight-color-base;
-          }
 
+          .reference-meta.reference-tags {
+            word-wrap: break-word;
+            // CASE: tag matches a search query
+            .note-highlight {
+              background-color: $result-highlight-color-base;
+            }
+          }
           // Put commas between tags.
-          a.reference-meta.reference-tags:after {
+          span.reference-meta.reference-tags:after {
             content: ",";
             color: $m-gray-d2;
           }
 
           // But not after the last tag.
-          a.reference-meta.reference-tags:last-child:after {
+          span.reference-meta.reference-tags:last-child:after {
               content: "";
           }
 
           // needed for poor base LMS styling scope
           a.reference-meta {
-            @extend %shame-link-text;
+             @extend %shame-link-text;
           }
-
         }
       }
 
@@ -285,6 +289,15 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
     .tab-panel, .inline-error, .ui-loading {
       @extend %no-outline;
+      border-top: $divider-visual-primary;
+
+      .listing-tools {
+        @include margin($baseline $baseline (-$baseline/2) 0);
+      }
+
+      .note-group:first-of-type {
+        border-top: none;
+      }
     }
 
     .tab-panel.note-group {

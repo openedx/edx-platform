@@ -4,10 +4,11 @@
     define(['backbone',
             'underscore',
             'gettext',
+            'edx-ui-toolkit/js/utils/string-utils',
             'teams/js/views/team_utils',
             'common/js/components/utils/view_utils',
             'text!teams/templates/instructor-tools.underscore'],
-        function (Backbone, _, gettext, TeamUtils, ViewUtils, instructorToolbarTemplate) {
+        function (Backbone, _, gettext, StringUtils, TeamUtils, ViewUtils, instructorToolbarTemplate) {
             return Backbone.View.extend({
 
                 events: {
@@ -53,8 +54,8 @@
                             });
                             Backbone.history.navigate('topics/' + self.team.get('topic_id'), {trigger: true});
                             TeamUtils.showMessage(
-                                interpolate(
-                                    gettext('Team "%(team)s" successfully deleted.'),
+                                StringUtils.interpolate(
+                                    gettext('Team "{team}" successfully deleted.'),
                                     {team: self.team.get('name')},
                                     true
                                 ),

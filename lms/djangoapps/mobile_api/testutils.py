@@ -10,15 +10,16 @@ Test utilities for mobile API tests:
      MobileCourseAccessTestMixin - tests for APIs with mobile_course_access.
 """
 # pylint: disable=no-member
+from datetime import timedelta
+
+from django.utils import timezone
 import ddt
 from mock import patch
-from unittest import skip
-
 from django.core.urlresolvers import reverse
-
 from rest_framework.test import APITestCase
-
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 from courseware.access_response import (
     MobileAvailabilityError,
@@ -28,10 +29,7 @@ from courseware.access_response import (
 from courseware.tests.factories import UserFactory
 from student import auth
 from student.models import CourseEnrollment
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
-
-from mobile_api.test_milestones import MobileAPIMilestonesMixin
+from mobile_api.tests.test_milestones import MobileAPIMilestonesMixin
 
 
 class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
@@ -168,9 +166,13 @@ class MobileCourseAccessTestMixin(MobileAPIMilestonesMixin):
         response = self.api_response(expected_response_code=None, course_id=non_existent_course_id)
         self.verify_failure(response)  # allow subclasses to override verification
 
-    @skip  # TODO fix this, see MA-1038
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_unreleased_course(self):
+        # ensure the course always starts in the future
+        # pylint: disable=attribute-defined-outside-init
+        self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
+        # pylint: disable=attribute-defined-outside-init
+        self.course.start = timezone.now() + timedelta(days=365)
         self.init_course_access()
         self._verify_response(self.ALLOW_ACCESS_TO_UNRELEASED_COURSE, StartDateError(self.course.start))
 

@@ -4,13 +4,14 @@
 Group Configuration Tests.
 """
 import json
+import ddt
 from mock import patch
+
 from contentstore.utils import reverse_course_url, reverse_usage_url
-from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from contentstore.course_group_config import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
@@ -87,7 +88,7 @@ class HelperMethods(object):
         self.save_course()
         return (vertical, split_test)
 
-    def _create_problem_with_content_group(self, cid, group_id, name_suffix='', special_characters=''):
+    def _create_problem_with_content_group(self, cid, group_id, name_suffix='', special_characters='', orphan=False):
         """
         Create a problem
         Assign content group to the problem.
@@ -111,6 +112,8 @@ class HelperMethods(object):
             data={'metadata': group_access_content}
         )
 
+        if not orphan:
+            self.course.children.append(vertical.location)
         self.save_course()
 
         return vertical, problem
@@ -229,8 +232,8 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         ]
         self.save_course()
 
-        if SPLIT_TEST_COMPONENT_TYPE not in self.course.advanced_modules:
-            self.course.advanced_modules.append(SPLIT_TEST_COMPONENT_TYPE)
+        if 'split_test' not in self.course.advanced_modules:
+            self.course.advanced_modules.append('split_test')
             self.store.update_item(self.course, self.user.id)
 
         response = self.client.get(self._url())
@@ -601,6 +604,7 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(user_partititons[0].name, 'Name 0')
 
 
+@ddt.ddt
 class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
     """
     Tests for usage information of configurations and content groups.
@@ -676,6 +680,37 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         self.assertEqual(actual, expected)
 
+    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
+    def test_can_get_correct_usage_info_with_orphan(self, module_store_type):
+        """
+        Test if content group json updated successfully with usage information
+        even if there is an orphan in content group.
+        """
+        self.course = CourseFactory.create(default_store=module_store_type)
+        self._add_user_partitions(count=1, scheme_id='cohort')
+        vertical, __ = self._create_problem_with_content_group(cid=0, group_id=1, name_suffix='0', orphan=True)
+
+        # Assert that there is an orphan in the course, and that it's the vertical
+        self.assertEqual(len(self.store.get_orphans(self.course.id)), 1)
+        self.assertIn(vertical.location, self.store.get_orphans(self.course.id))
+
+        # Get the expected content group information based on module store.
+        if module_store_type == ModuleStoreEnum.Type.mongo:
+            expected = self._get_expected_content_group(usage_for_group=[
+                {
+                    'url': '/container/{}'.format(vertical.location),
+                    'label': 'Test Unit 0 / Test Problem 0'
+                }
+            ])
+        else:
+            expected = self._get_expected_content_group(usage_for_group=[])
+
+        # Get the actual content group information
+        actual = GroupConfiguration.get_or_create_content_group(self.store, self.course)
+
+        # Assert that actual content group information is same as expected one.
+        self.assertEqual(actual, expected)
+
     def test_can_use_one_content_group_in_multiple_problems(self):
         """
         Test if multiple problems are present in usage info when they use same
@@ -689,12 +724,12 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         expected = self._get_expected_content_group(usage_for_group=[
             {
-                'url': '/container/{}'.format(vertical.location),
-                'label': 'Test Unit 0 / Test Problem 0'
-            },
-            {
                 'url': '/container/{}'.format(vertical1.location),
                 'label': 'Test Unit 1 / Test Problem 1'
+            },
+            {
+                'url': '/container/{}'.format(vertical.location),
+                'label': 'Test Unit 0 / Test Problem 0'
             }
         ])
 

@@ -13,10 +13,10 @@ class ECommerce
     #  this object to call event handlers like 'onClickTitle'
     @$section.data 'wrapper', @
     # gather elements
-    @$list_sale_csv_btn = @$section.find("input[name='list-sale-csv']'")
-    @$list_order_sale_csv_btn = @$section.find("input[name='list-order-sale-csv']'")
-    @$download_company_name = @$section.find("input[name='download_company_name']'")
-    @$active_company_name = @$section.find("input[name='active_company_name']'")
+    @$list_sale_csv_btn = @$section.find("input[name='list-sale-csv']")
+    @$list_order_sale_csv_btn = @$section.find("input[name='list-order-sale-csv']")
+    @$download_company_name = @$section.find("input[name='download_company_name']")
+    @$active_company_name = @$section.find("input[name='active_company_name']")
     @$spent_company_name = @$section.find('input[name="spent_company_name"]')
     @$download_coupon_codes = @$section.find('input[name="download-coupon-codes-csv"]')
     

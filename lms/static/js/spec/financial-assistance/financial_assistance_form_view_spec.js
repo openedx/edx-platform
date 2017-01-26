@@ -32,13 +32,19 @@ define([
                             instructions: 'Specify your annual income in USD.',
                             label: 'Annual Income',
                             name: 'income',
-                            placeholder: 'income in USD ($)',
+                            options: [
+                                {'name': 'Less than $5,000', 'value': 'Less than $5,000'},
+                                {'name': '$5,000 - $10,000', 'value': '$5,000 - $10,000'},
+                                {'name': '$10,000 - $15,000', 'value': '$10,000 - $15,000'},
+                                {'name': '$15,000 - $20,000', 'value': '$15,000 - $20,000'},
+                                {'name': '$20,000 - $25,000', 'value': '$20,000 - $25,000'}
+                            ],
+                            placeholder: '',
                             required: true,
-                            restrictions: {},
-                            type: 'text'
+                            type: 'select'
                         }, {
                             defaultValue: '',
-                            instructions: 'Use between 250 and 500 words or so in your response.',
+                            instructions: 'Your response should contain approximately 250 - 500 words.',
                             label: 'Tell us about your current financial situation, including any unusual circumstances.',
                             name: 'reason_for_applying',
                             placeholder: '',
@@ -103,12 +109,14 @@ define([
                 validCountry;
 
             completeForm = function() {
-                var options = context.fields[0].options,
-                    selectValue = options[options.length - 1].value;
+                var courseOptions = context.fields[0].options,
+                    courseSelectValue = courseOptions[courseOptions.length - 1].value;
+                var incomeOptions = context.fields[1].options,
+                    incomeSelectValue = incomeOptions[incomeOptions.length - 1].value;
 
-                view.$('#financial-assistance-course').val(selectValue);
-                view.$('#financial-assistance-income').val(1312);
-                view.$('textarea').html('w'.repeat(801));
+                view.$('#financial-assistance-course').val(courseSelectValue);
+                view.$('#financial-assistance-income').val(incomeSelectValue);
+                view.$('textarea').html(Array(802).join("w"));
             };
 
             validSubmission = function() {
@@ -170,8 +178,8 @@ define([
             it('should load the form based on passed in context', function() {
                 var $form = view.$('.financial-assistance-form');
 
-                expect($form.find('select').attr('name')).toEqual(context.fields[0].name);
-                expect($form.find('input[type=text]').first().attr('name')).toEqual(context.fields[1].name);
+                expect($form.find('select').first().attr('name')).toEqual(context.fields[0].name);
+                expect($form.find('select').last().attr('name')).toEqual(context.fields[1].name);
                 expect($form.find('textarea').first().attr('name')).toEqual(context.fields[2].name);
                 expect($form.find('input[type=checkbox]').attr('name')).toEqual(context.fields[5].name);
             });

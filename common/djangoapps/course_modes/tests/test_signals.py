@@ -60,7 +60,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
     @ddt.data(1, 14, 30)
     def test_verified_mode(self, verification_window):
         """ Verify signal updates expiration to configured time period before course end for verified mode. """
-        course_mode, __ = self.create_mode('verified', 'verified')
+        course_mode, __ = self.create_mode('verified', 'verified', 10)
         self.assertIsNone(course_mode.expiration_datetime)
 
         with patch('course_modes.models.CourseModeExpirationConfig.current') as config:
@@ -75,7 +75,7 @@ class CourseModeSignalTest(ModuleStoreTestCase):
     @ddt.data(1, 14, 30)
     def test_verified_mode_explicitly_set(self, verification_window):
         """ Verify signal does not update expiration for verified mode with explicitly set expiration. """
-        course_mode, __ = self.create_mode('verified', 'verified')
+        course_mode, __ = self.create_mode('verified', 'verified', 10)
         course_mode.expiration_datetime_is_explicit = True
         self.assertIsNone(course_mode.expiration_datetime)
 

@@ -15,27 +15,26 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from edxmako.shortcuts import render_to_response
 import student.views
 from student.models import CourseEnrollment
-import courseware.views
-from microsite_configuration import microsite
+import courseware.views.views
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 from util.json_request import JsonResponse
 import branding.api as branding_api
-
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 log = logging.getLogger(__name__)
 
 
 def get_course_enrollments(user):
     """
-    Returns the course enrollments for the passed in user within the context of a microsite, that
+    Returns the course enrollments for the passed in user within the context of current org, that
     is filtered by course_org_filter
     """
     enrollments = CourseEnrollment.enrollments_for_user(user)
-    microsite_org = microsite.get_value('course_org_filter')
-    if microsite_org:
+    course_org = configuration_helpers.get_value('course_org_filter')
+    if course_org:
         site_enrollments = [
-            enrollment for enrollment in enrollments if enrollment.course_id.org == microsite_org
+            enrollment for enrollment in enrollments if enrollment.course_id.org == course_org
         ]
     else:
         site_enrollments = [
@@ -52,11 +51,11 @@ def index(request):
     '''
 
     if request.user.is_authenticated():
-        # For microsites, only redirect to dashboard if user has
+        # Only redirect to dashboard if user has
         # courses in his/her dashboard. Otherwise UX is a bit cryptic.
         # In this case, we want to have the user stay on a course catalog
         # page to make it easier to browse for courses (and register)
-        if microsite.get_value(
+        if configuration_helpers.get_value(
                 'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
                 settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)):
             return redirect(reverse('dashboard'))
@@ -71,7 +70,7 @@ def index(request):
             request.GET = req_new
         return ssl_login(request)
 
-    enable_mktg_site = microsite.get_value(
+    enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
@@ -82,7 +81,7 @@ def index(request):
     domain = request.META.get('HTTP_HOST')
 
     # keep specialized logic for Edge until we can migrate over Edge to fully use
-    # microsite definitions
+    # configuration.
     if domain and 'edge.edx.org' in domain:
         return redirect(reverse("signin_user"))
 
@@ -97,9 +96,9 @@ def courses(request):
     """
     Render the "find courses" page. If the marketing site is enabled, redirect
     to that. Otherwise, if subdomain branding is on, this is the university
-    profile page. Otherwise, it's the edX courseware.views.courses page
+    profile page. Otherwise, it's the edX courseware.views.views.courses page
     """
-    enable_mktg_site = microsite.get_value(
+    enable_mktg_site = configuration_helpers.get_value(
         'ENABLE_MKTG_SITE',
         settings.FEATURES.get('ENABLE_MKTG_SITE', False)
     )
@@ -111,7 +110,7 @@ def courses(request):
 
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
-    return courseware.views.courses(request)
+    return courseware.views.views.courses(request)
 
 
 def _footer_static_url(request, name):
@@ -147,8 +146,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
 
     """
     bidi = 'rtl' if translation.get_language_bidi() else 'ltr'
-    version = 'edx' if settings.FEATURES.get('IS_EDX_DOMAIN') else 'openedx'
-    css_name = settings.FOOTER_CSS[version][bidi]
+    css_name = settings.FOOTER_CSS['openedx'][bidi]
 
     context = {
         'hide_openedx_link': not show_openedx_logo,
@@ -158,11 +156,7 @@ def _render_footer_html(request, show_openedx_logo, include_dependencies):
         'include_dependencies': include_dependencies,
     }
 
-    return (
-        render_to_response("footer-edx-v3.html", context)
-        if settings.FEATURES.get("IS_EDX_DOMAIN", False)
-        else render_to_response("footer.html", context)
-    )
+    return render_to_response("footer.html", context)
 
 
 @cache_control(must_revalidate=True, max_age=settings.FOOTER_BROWSER_CACHE_MAX_AGE)

@@ -1,0 +1,12 @@
+<div class="message col-12 md-col-8">
+    <% // safe-lint: disable=underscore-not-escaped %>
+    <span class="certificate-icon green-certificate-icon" aria-hidden="true"><%= certificateSvg %></span>
+    <span class="card-msg"><%- gettext('Congratulations! You have earned a certificate for this course.') %></span>
+</div>
+<div class="action col-12 md-col-4"> 
+    <a href="<%- certificate_url %>" class="btn-brand cta-secondary">
+        <% // safe-lint: disable=underscore-not-escaped %>
+        <span class="certificate-icon blue-certificate-icon" aria-hidden="true"><%= certificateSvg %></span>
+        <%- gettext('View/Share Certificate') %>
+    </a>
+</div>

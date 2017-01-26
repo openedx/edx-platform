@@ -9,7 +9,6 @@ import random
 import pytz
 import io
 import json
-import requests
 import shutil
 import tempfile
 from urllib import quote
@@ -30,7 +29,9 @@ from nose.tools import raises
 from nose.plugins.attrib import attr
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import UsageKey
+from xmodule.modulestore import ModuleStoreEnum
 
+from bulk_email.models import BulkEmailFlag
 from course_modes.models import CourseMode
 from courseware.models import StudentModule
 from courseware.tests.factories import (
@@ -39,7 +40,6 @@ from courseware.tests.factories import (
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
 from django_comment_common.utils import seed_permissions_roles
-from microsite_configuration import microsite
 from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem,
@@ -53,9 +53,7 @@ from student.models import (
 )
 from student.tests.factories import UserFactory, CourseModeFactory, AdminFactory
 from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import SharedModuleStoreTestCase, ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.fields import Date
 
@@ -71,6 +69,8 @@ from certificates.tests.factories import GeneratedCertificateFactory
 from certificates.models import CertificateStatuses
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+from openedx.core.lib.xblock_utils import grade_histogram
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 
 from .test_tools import msk_from_problem_urlname
 
@@ -146,6 +146,7 @@ INSTRUCTOR_POST_ENDPOINTS = set([
     'bulk_beta_modify_access',
     'calculate_grades_csv',
     'change_due_date',
+    'export_ora2_data',
     'generate_registration_codes',
     'get_enrollment_report',
     'get_exec_summary_report',
@@ -325,7 +326,6 @@ class TestEndpointHttpMethods(SharedModuleStoreTestCase, LoginEnrollmentTestCase
 
 @attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Ensure that users cannot access endpoints they shouldn't be able to.
@@ -340,6 +340,12 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             'robot-some-problem-urlname'
         )
         cls.problem_urlname = cls.problem_location.to_deprecated_string()
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestInstructorAPIDenyLevels, cls).tearDownClass()
+        BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
         super(TestInstructorAPIDenyLevels, self).setUp()
@@ -365,7 +371,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('update_forum_role_membership',
              {'unique_student_identifier': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
             ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
-            ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
+            ('send_email', {'send_to': '["staff"]', 'subject': 'test', 'message': 'asdf'}),
             ('list_instructor_tasks', {}),
             ('list_background_email_tasks', {}),
             ('list_report_downloads', {}),
@@ -377,6 +383,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             ('get_exec_summary_report', {}),
             ('get_proctored_exam_results', {}),
             ('get_problem_responses', {}),
+            ('export_ora2_data', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
@@ -455,6 +462,8 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
 
         for endpoint, args in self.staff_level_endpoints:
+            expected_status = 200
+
             # TODO: make these work
             if endpoint in ['update_forum_role_membership', 'list_forum_members']:
                 continue
@@ -466,7 +475,7 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Staff member should be allowed to access endpoint " + endpoint
             )
 
@@ -489,6 +498,8 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
         self.client.login(username=inst.username, password='test')
 
         for endpoint, args in self.staff_level_endpoints:
+            expected_status = 200
+
             # TODO: make these work
             if endpoint in ['update_forum_role_membership']:
                 continue
@@ -500,18 +511,20 @@ class TestInstructorAPIDenyLevels(SharedModuleStoreTestCase, LoginEnrollmentTest
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Instructor should be allowed to access endpoint " + endpoint
             )
 
         for endpoint, args in self.instructor_level_endpoints:
+            expected_status = 200
+
             # TODO: make this work
             if endpoint in ['rescore_problem']:
                 continue
             self._access_endpoint(
                 endpoint,
                 args,
-                200,
+                expected_status,
                 "Instructor should be allowed to access endpoint " + endpoint
             )
 
@@ -526,13 +539,39 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
     def setUpClass(cls):
         super(TestInstructorAPIBulkAccountCreationAndEnrollment, cls).setUpClass()
         cls.course = CourseFactory.create()
-        cls.url = reverse('register_and_enroll_students', kwargs={'course_id': cls.course.id.to_deprecated_string()})
+
+        # Create a course with mode 'audit'
+        cls.audit_course = CourseFactory.create()
+        CourseModeFactory.create(course_id=cls.audit_course.id, mode_slug=CourseMode.AUDIT)
+
+        cls.url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': unicode(cls.course.id)}
+        )
+        cls.audit_course_url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': unicode(cls.audit_course.id)}
+        )
 
     def setUp(self):
         super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()
 
+        # Create a course with mode 'honor' and with price
+        self.white_label_course = CourseFactory.create()
+        self.white_label_course_mode = CourseModeFactory.create(
+            course_id=self.white_label_course.id,
+            mode_slug=CourseMode.HONOR,
+            min_price=10,
+            suggested_prices='10',
+        )
+
+        self.white_label_course_url = reverse(
+            'register_and_enroll_students', kwargs={'course_id': unicode(self.white_label_course.id)}
+        )
+
         self.request = RequestFactory().request()
         self.instructor = InstructorFactory(course_key=self.course.id)
+        self.audit_course_instructor = InstructorFactory(course_key=self.audit_course.id)
+        self.white_label_course_instructor = InstructorFactory(course_key=self.white_label_course.id)
+
         self.client.login(username=self.instructor.username, password='test')
 
         self.not_enrolled_student = UserFactory(
@@ -759,7 +798,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
                       "test_student2@example.com,test_student_1,tester2,US"
 
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
-        with patch('instructor.views.api.create_and_enroll_user') as mock:
+        with patch('instructor.views.api.create_manual_course_enrollment') as mock:
             mock.side_effect = NonExistentCourseError()
             response = self.client.post(self.url, {'students_list': uploaded_file})
 
@@ -819,6 +858,89 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(SharedModuleStoreTestCas
         manual_enrollments = ManualEnrollmentAudit.objects.all()
         self.assertEqual(manual_enrollments.count(), 0)
 
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_audit_enrollment_mode(self):
+        """
+        Test that enrollment mode for audit courses (paid courses) is 'audit'.
+        """
+        # Login Audit Course instructor
+        self.client.login(username=self.audit_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.audit_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be 'audit'
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.AUDIT)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_honor_enrollment_mode(self):
+        """
+        Test that enrollment mode for unpaid honor courses is 'honor'.
+        """
+        # Remove white label course price
+        self.white_label_course_mode.min_price = 0
+        self.white_label_course_mode.suggested_prices = ''
+        self.white_label_course_mode.save()  # pylint: disable=no-member
+
+        # Login Audit Course instructor
+        self.client.login(username=self.white_label_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be 'honor'
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.HONOR)
+
+    @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
+    def test_default_shopping_cart_enrollment_mode_for_white_label(self):
+        """
+        Test that enrollment mode for white label courses (paid courses) is DEFAULT_SHOPPINGCART_MODE_SLUG.
+        """
+        # Login white label course instructor
+        self.client.login(username=self.white_label_course_instructor.username, password='test')
+
+        csv_content = "test_student_wl@example.com,test_student_wl,Test Student,USA"
+        uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
+        response = self.client.post(self.white_label_course_url, {'students_list': uploaded_file})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEquals(len(data['row_errors']), 0)
+        self.assertEquals(len(data['warnings']), 0)
+        self.assertEquals(len(data['general_errors']), 0)
+
+        manual_enrollments = ManualEnrollmentAudit.objects.all()
+        self.assertEqual(manual_enrollments.count(), 1)
+        self.assertEqual(manual_enrollments[0].state_transition, UNENROLLED_TO_ENROLLED)
+
+        # Verify enrollment modes to be CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG
+        for enrollment in manual_enrollments:
+            self.assertEqual(enrollment.enrollment.mode, CourseMode.DEFAULT_SHOPPINGCART_MODE_SLUG)
+
 
 @attr('shard_1')
 @ddt.ddt
@@ -836,7 +958,7 @@ class TestInstructorAPIEnrollment(SharedModuleStoreTestCase, LoginEnrollmentTest
         cls.course = CourseFactory.create()
 
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -1587,7 +1709,7 @@ class TestInstructorAPIBulkBetaEnrollment(SharedModuleStoreTestCase, LoginEnroll
         super(TestInstructorAPIBulkBetaEnrollment, cls).setUpClass()
         cls.course = CourseFactory.create()
         # Email URL values
-        cls.site_name = microsite.get_value(
+        cls.site_name = configuration_helpers.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -2549,6 +2671,9 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
         Test that some minimum of information is formatted
         correctly in the response to get_students_features.
         """
+        for student in self.students:
+            student.profile.city = "Mos Eisley {}".format(student.id)
+            student.profile.save()
         url = reverse('get_students_features', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {})
         res_json = json.loads(response.content)
@@ -2560,6 +2685,8 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             ][0]
             self.assertEqual(student_json['username'], student.username)
             self.assertEqual(student_json['email'], student.email)
+            self.assertEqual(student_json['city'], student.profile.city)
+            self.assertEqual(student_json['country'], "")
 
     @ddt.data(True, False)
     def test_get_students_features_cohorted(self, is_cohorted):
@@ -2848,7 +2975,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
 
     def test_list_report_downloads(self):
         url = reverse('list_report_downloads', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        with patch('instructor_task.models.LocalFSReportStore.links_for') as mock_links_for:
+        with patch('instructor_task.models.DjangoStorageReportStore.links_for') as mock_links_for:
             mock_links_for.return_value = [
                 ('mock_file_name_1', 'https://1.mock.url'),
                 ('mock_file_name_2', 'https://2.mock.url'),
@@ -2908,8 +3035,7 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             response = self.client.post(url, {})
         success_status = "The {report_type} report is being created." \
                          " To view the status of the report, see Pending" \
-                         " Instructor Tasks" \
-                         " below".format(report_type=report_type)
+                         " Tasks below".format(report_type=report_type)
         self.assertIn(success_status, response.content)
 
     @ddt.data(*EXECUTIVE_SUMMARY_DATA)
@@ -2930,10 +3056,28 @@ class TestInstructorAPILevelsDataDump(SharedModuleStoreTestCase, LoginEnrollment
             mock.side_effect = AlreadyRunningError()
             response = self.client.post(url, {})
         already_running_status = "The {report_type} report is currently being created." \
-                                 " To view the status of the report, see Pending Instructor Tasks below." \
+                                 " To view the status of the report, see Pending Tasks below." \
                                  " You will be able to download the report" \
                                  " when it is" \
                                  " complete.".format(report_type=report_type)
+        self.assertIn(already_running_status, response.content)
+
+    def test_get_ora2_responses_success(self):
+        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
+
+        with patch('instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
+            mock_submit_ora2_task.return_value = True
+            response = self.client.post(url, {})
+        success_status = "The ORA data report is being generated."
+        self.assertIn(success_status, response.content)
+
+    def test_get_ora2_responses_already_running(self):
+        url = reverse('export_ora2_data', kwargs={'course_id': unicode(self.course.id)})
+
+        with patch('instructor_task.api.submit_export_ora2_data') as mock_submit_ora2_task:
+            mock_submit_ora2_task.side_effect = AlreadyRunningError()
+            response = self.client.post(url, {})
+        already_running_status = "An ORA data report generation task is already in progress."
         self.assertIn(already_running_status, response.content)
 
     def test_get_student_progress_url(self):
@@ -3132,6 +3276,7 @@ class TestInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTes
 
 @attr('shard_1')
 @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+@ddt.ddt
 class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can rescore student grades,
@@ -3199,6 +3344,29 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
             state=json.dumps({'attempts': 10, 'done': True}),
         )
         self.ee_modules = [ee_module_to_reset1.module_state_key, ee_module_to_reset2.module_state_key]
+
+    @ddt.data(ModuleStoreEnum.Type.split, ModuleStoreEnum.Type.mongo)
+    def test_grade_histogram(self, store):
+        """
+        Verify that a histogram has been created.
+        """
+        course = CourseFactory.create(default_store=store)
+
+        usage_key = course.id.make_usage_key('problem', 'first_problem')
+        StudentModule.objects.create(
+            student_id=1,
+            grade=100,
+            module_state_key=usage_key
+        )
+        StudentModule.objects.create(
+            student_id=2,
+            grade=50,
+            module_state_key=usage_key
+        )
+
+        grades = grade_histogram(usage_key)
+        self.assertEqual(grades[0], (50.0, 1))
+        self.assertEqual(grades[1], (100.0, 1))
 
     def test_reset_entrance_exam_student_attempts_deletall(self):
         """ Make sure no one can delete all students state on entrance exam. """
@@ -3381,7 +3549,6 @@ class TestEntranceExamInstructorAPIRegradeTask(SharedModuleStoreTestCase, LoginE
 
 @attr('shard_1')
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message', autospec=True))
-@patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Checks that only instructors have access to email endpoints, and that
@@ -3395,10 +3562,16 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
         cls.full_test_message = {
-            'send_to': 'staff',
+            'send_to': '["myself", "staff"]',
             'subject': test_subject,
             'message': test_message,
         }
+        BulkEmailFlag.objects.create(enabled=True, require_course_email_auth=False)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestInstructorSendEmail, cls).tearDownClass()
+        BulkEmailFlag.objects.all().delete()
 
     def setUp(self):
         super(TestInstructorSendEmail, self).setUp()
@@ -3438,10 +3611,19 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
         })
         self.assertEqual(response.status_code, 400)
 
+    def test_send_email_invalid_sendto(self):
+        url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, {
+            'send_to': '["invalid_target", "staff"]',
+            'subject': 'test subject',
+            'message': 'test message',
+        })
+        self.assertEqual(response.status_code, 400)
+
     def test_send_email_no_subject(self):
         url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {
-            'send_to': 'staff',
+            'send_to': '["staff"]',
             'message': 'test message',
         })
         self.assertEqual(response.status_code, 400)
@@ -3449,7 +3631,7 @@ class TestInstructorSendEmail(SharedModuleStoreTestCase, LoginEnrollmentTestCase
     def test_send_email_no_message(self):
         url = reverse('send_email', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {
-            'send_to': 'staff',
+            'send_to': '["staff"]',
             'subject': 'test subject',
         })
         self.assertEqual(response.status_code, 400)
@@ -3958,27 +4140,6 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         })
         self.assertEqual(response.status_code, 400, response.content)
 
-    @SharedModuleStoreTestCase.modifies_courseware
-    def test_reset_extension_to_deleted_date(self):
-        """
-        Test that we can delete a due date extension after deleting the normal
-        due date, without causing an error.
-        """
-        self.test_change_due_date()
-        self.week1.due = None
-        self.week1 = self.store.update_item(self.week1, self.user1.id)
-        # Now, week1's normal due date is deleted but the extension still exists.
-        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.post(url, {
-            'student': self.user1.username,
-            'url': self.week1.location.to_deprecated_string(),
-        })
-        self.assertEqual(response.status_code, 200, response.content)
-        self.assertEqual(
-            None,
-            get_extended_due(self.course, self.week1, self.user1)
-        )
-
     def test_show_unit_extensions(self):
         self.test_change_due_date()
         url = reverse('show_unit_extensions',
@@ -4005,6 +4166,114 @@ class TestDueDateExtensions(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
             u'header': [u'Unit', u'Extended Due Date'],
             u'title': u'Due date extensions for %s (%s)' % (
                 self.user1.profile.name, self.user1.username)})
+
+
+@attr('shard_1')
+class TestDueDateExtensionsDeletedDate(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        super(TestDueDateExtensionsDeletedDate, self).setUp()
+
+        self.course = CourseFactory.create()
+        self.due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+
+        with self.store.bulk_operations(self.course.id, emit_signals=False):
+            self.week1 = ItemFactory.create(due=self.due)
+            self.week2 = ItemFactory.create(due=self.due)
+            self.week3 = ItemFactory.create()  # No due date
+            self.course.children = [
+                self.week1.location.to_deprecated_string(),
+                self.week2.location.to_deprecated_string(),
+                self.week3.location.to_deprecated_string()
+            ]
+            self.homework = ItemFactory.create(
+                parent_location=self.week1.location,
+                due=self.due
+            )
+            self.week1.children = [self.homework.location.to_deprecated_string()]
+
+        user1 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week2.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.week3.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        user2 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        user3 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=self.course.id,
+            module_state_key=self.week1.location).save()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=self.course.id,
+            module_state_key=self.homework.location).save()
+
+        self.user1 = user1
+        self.user2 = user2
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+    def test_reset_extension_to_deleted_date(self):
+        """
+        Test that we can delete a due date extension after deleting the normal
+        due date, without causing an error.
+        """
+
+        url = reverse('change_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+            'due_datetime': '12/30/2013 00:00'
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(datetime.datetime(2013, 12, 30, 0, 0, tzinfo=utc),
+                         get_extended_due(self.course, self.week1, self.user1))
+
+        self.week1.due = None
+        self.week1 = self.store.update_item(self.week1, self.user1.id)
+        # Now, week1's normal due date is deleted but the extension still exists.
+        url = reverse('reset_due_date', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.post(url, {
+            'student': self.user1.username,
+            'url': self.week1.location.to_deprecated_string(),
+        })
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(
+            None,
+            get_extended_due(self.course, self.week1, self.user1)
+        )
 
 
 @attr('shard_1')

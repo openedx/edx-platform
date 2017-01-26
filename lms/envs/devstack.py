@@ -36,9 +36,6 @@ for log_name, log_level in LOG_OVERRIDES:
 ################################ EMAIL ########################################
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
-FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
-
 
 ########################## ANALYTICS TESTING ########################
 
@@ -49,6 +46,14 @@ ANALYTICS_API_KEY = ""
 # dashboard to the Analytics Dashboard.
 ANALYTICS_DASHBOARD_URL = None
 
+############################ PYFS XBLOCKS SERVICE #############################
+# Set configuration for Django pyfilesystem
+
+DJFS = {
+    'type': 'osfs',
+    'directory_root': 'lms/static/djpyfs',
+    'url_root': '/static/djpyfs',
+}
 
 ################################ DEBUG TOOLBAR ################################
 
@@ -91,6 +96,7 @@ STATICFILES_STORAGE = 'openedx.core.storage.DevelopmentStorage'
 
 # Revert to the default set of finders as we don't want the production pipeline
 STATICFILES_FINDERS = [
+    'openedx.core.djangoapps.theming.finders.ThemeFilesFinder',
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
@@ -101,7 +107,7 @@ PIPELINE_JS_COMPRESSOR = None
 # Whether to run django-require in debug mode.
 REQUIRE_DEBUG = DEBUG
 
-PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+PIPELINE_SASS_ARGUMENTS = '--debug-info'
 
 ########################### VERIFIED CERTIFICATES #################################
 
@@ -161,17 +167,16 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 
 ########################## Course Discovery #######################
-_ = lambda s: s
-LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': _('Language')}
+LANGUAGE_MAP = {'terms': {lang: display for lang, display in ALL_LANGUAGES}, 'name': 'Language'}
 COURSE_DISCOVERY_MEANINGS = {
     'org': {
-        'name': _('Organization'),
+        'name': 'Organization',
     },
     'modes': {
-        'name': _('Course Type'),
+        'name': 'Course Type',
         'terms': {
-            'honor': _('Honor'),
-            'verified': _('Verified'),
+            'honor': 'Honor',
+            'verified': 'Verified',
         },
     },
     'language': LANGUAGE_MAP,
@@ -216,6 +221,54 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_WHITELIST = ()
 CORS_ORIGIN_ALLOW_ALL = True
 
+# JWT settings for devstack
+PUBLIC_RSA_KEY = """\
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApCujf5oZBGK4MafMRGY9
++zdRRI9YDm1r+81coDCysSrwkhTkFIwP2dmS6lYvJuQ5wifuQa3WFv1Kh9Nr2XRJ
+1m9OL3/JpmMyTi/YuwD7tIf65tab1SOSRYkoxOKRuuvZuXQG9nWbXrGDncnwuWxf
+eymwWaIrAhALUS5+nDa7dauj8VngsWauMrEA/MWShEzsR53wGKlciEZA1r/AfQ55
+XS42GvBobhhy9SeZ3B6LHiaAEywpwFmKPssuoHSNhbPa49LW3gXJ6CsFGRDcBFKd
+xJ/l8O847Q7kg1lvckpLsKyu5167NK9Qj1X/O3SwVBL3cxx1HpQ6+q3SGLZ4ngow
+hwIDAQAB
+-----END PUBLIC KEY-----"""
+
+PRIVATE_RSA_KEY = """\
+-----BEGIN PRIVATE KEY-----
+MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCkK6N/mhkEYrgx
+p8xEZj37N1FEj1gObWv7zVygMLKxKvCSFOQUjA/Z2ZLqVi8m5DnCJ+5BrdYW/UqH
+02vZdEnWb04vf8mmYzJOL9i7APu0h/rm1pvVI5JFiSjE4pG669m5dAb2dZtesYOd
+yfC5bF97KbBZoisCEAtRLn6cNrt1q6PxWeCxZq4ysQD8xZKETOxHnfAYqVyIRkDW
+v8B9DnldLjYa8GhuGHL1J5ncHoseJoATLCnAWYo+yy6gdI2Fs9rj0tbeBcnoKwUZ
+ENwEUp3En+Xw7zjtDuSDWW9ySkuwrK7nXrs0r1CPVf87dLBUEvdzHHUelDr6rdIY
+tnieCjCHAgMBAAECggEBAJvTiAdQPzq4cVlAilTKLz7KTOsknFJlbj+9t5OdZZ9g
+wKQIDE2sfEcti5O+Zlcl/eTaff39gN6lYR73gMEQ7h0J3U6cnsy+DzvDkpY94qyC
+/ZYqUhPHBcnW3Mm0vNqNj0XGae15yBXjrKgSy9lUknSXJ3qMwQHeNL/DwA2KrfiL
+g0iVjk32dvSSHWcBh0M+Qy1WyZU0cf9VWzx+Q1YLj9eUCHteStVubB610XV3JUZt
+UTWiUCffpo2okHsTBuKPVXK/5BL+BpGplcxRSlnSbMaI611kN3iKlO8KGISXHBz7
+nOPdkfZC9poEXt5SshtINuGGCCc8hDxpg1otYqCLaYECgYEA1MSCPs3pBkEagchV
+g0rxYmDUC8QkeIOBuZFjhkdoUgZ6rFntyRZd1NbCUi3YBbV1YC12ZGohqWUWom1S
+AtNbQ2ZTbqEnDKWbNvLBRwkdp/9cKBce85lCCD6+U2o2Ha8C0+hKeLBn8un1y0zY
+1AQTqLAz9ItNr0aDPb89cs5voWcCgYEAxYdC8vR3t8iYMUnK6LWYDrKSt7YiorvF
+qXIMANcXQrnO0ptC0B56qrUCgKHNrtPi5bGpNBJ0oKMfbmGfwX+ca8sCUlLvq/O8
+S2WZwSJuaHH4lEBi8ErtY++8F4B4l3ENCT84Hyy5jiMpbpkHEnh/1GNcvvmyI8ud
+3jzovCNZ4+ECgYEA0r+Oz0zAOzyzV8gqw7Cw5iRJBRqUkXaZQUj8jt4eO9lFG4C8
+IolwCclrk2Drb8Qsbka51X62twZ1ZA/qwve9l0Y88ADaIBHNa6EKxyUFZglvrBoy
+w1GT8XzMou06iy52G5YkZeU+IYOSvnvw7hjXrChUXi65lRrAFqJd6GEIe5MCgYA/
+0LxDa9HFsWvh+JoyZoCytuSJr7Eu7AUnAi54kwTzzL3R8tE6Fa7BuesODbg6tD/I
+v4YPyaqePzUnXyjSxdyOQq8EU8EUx5Dctv1elTYgTjnmA4szYLGjKM+WtC3Bl4eD
+pkYGZFeqYRfAoHXVdNKvlk5fcKIpyF2/b+Qs7CrdYQKBgQCc/t+JxC9OpI+LhQtB
+tEtwvklxuaBtoEEKJ76P9vrK1semHQ34M1XyNmvPCXUyKEI38MWtgCCXcdmg5syO
+PBXdDINx+wKlW7LPgaiRL0Mi9G2aBpdFNI99CWVgCr88xqgSE24KsOxViMwmi0XB
+Ld/IRK0DgpGP5EJRwpKsDYe/UQ==
+-----END PRIVATE KEY-----"""
+
+JWT_AUTH.update({
+    'JWT_ALGORITHM': 'HS256',
+    'JWT_SECRET_KEY': 'lms-secret',
+    'JWT_ISSUER': 'http://127.0.0.1:8000/oauth2',
+    'JWT_AUDIENCE': 'lms-key',
+})
 
 #####################################################################
 # See if the developer has any local overrides.

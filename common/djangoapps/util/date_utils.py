@@ -5,8 +5,8 @@ Convenience methods for working with datetime objects
 from datetime import datetime, timedelta
 import re
 
-from pytz import timezone, UTC, UnknownTimeZoneError
 from django.utils.translation import pgettext, ugettext
+from pytz import timezone, utc, UnknownTimeZoneError
 
 
 def get_default_time_display(dtime):
@@ -52,7 +52,7 @@ def get_time_display(dtime, format_string=None, coerce_tz=None):
         try:
             to_tz = timezone(coerce_tz)
         except UnknownTimeZoneError:
-            to_tz = UTC
+            to_tz = utc
         dtime = to_tz.normalize(dtime.astimezone(to_tz))
     if dtime is None or format_string is None:
         return get_default_time_display(dtime)
@@ -78,7 +78,7 @@ def to_timestamp(datetime_value):
     Convert a datetime into a timestamp, represented as the number
     of seconds since January 1, 1970 UTC.
     """
-    return int((datetime_value - datetime(1970, 1, 1, tzinfo=UTC)).total_seconds())
+    return int((datetime_value - datetime(1970, 1, 1, tzinfo=utc)).total_seconds())
 
 
 def from_timestamp(timestamp):
@@ -89,7 +89,7 @@ def from_timestamp(timestamp):
     If the timestamp cannot be converted, returns None instead.
     """
     try:
-        return datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=UTC)
+        return datetime.utcfromtimestamp(int(timestamp)).replace(tzinfo=utc)
     except (ValueError, TypeError):
         return None
 

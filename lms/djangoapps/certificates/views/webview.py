@@ -13,16 +13,17 @@ from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django.utils.encoding import smart_str
-from django.core.urlresolvers import reverse
 
+from badges.events.course_complete import get_completion_badge
+from badges.utils import badges_enabled
 from courseware.access import has_access
 from edxmako.shortcuts import render_to_response
 from edxmako.template import Template
 from eventtracking import tracker
-from microsite_configuration import microsite
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.courses import course_image_url
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from student.models import LinkedInAddToProfileConfiguration
 from util import organizations_helpers as organization_api
 from util.views import handle_500
@@ -34,15 +35,15 @@ from certificates.api import (
     get_certificate_url,
     emit_certificate_event,
     has_html_certificates_enabled,
-    get_certificate_template
+    get_certificate_template,
+    get_certificate_header_context,
+    get_certificate_footer_context,
 )
 from certificates.models import (
     GeneratedCertificate,
     CertificateStatuses,
     CertificateHtmlViewConfiguration,
-    CertificateSocialNetworks,
-    BadgeAssertion
-)
+    CertificateSocialNetworks)
 
 log = logging.getLogger(__name__)
 
@@ -248,9 +249,9 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     """
     Updates context dictionary with info required for social sharing.
     """
-    share_settings = getattr(settings, 'SOCIAL_SHARING_SETTINGS', {})
+    share_settings = configuration_helpers.get_value("SOCIAL_SHARING_SETTINGS", settings.SOCIAL_SHARING_SETTINGS)
     context['facebook_share_enabled'] = share_settings.get('CERTIFICATE_FACEBOOK', False)
-    context['facebook_app_id'] = getattr(settings, "FACEBOOK_APP_ID", None)
+    context['facebook_app_id'] = configuration_helpers.get_value("FACEBOOK_APP_ID", settings.FACEBOOK_APP_ID)
     context['facebook_share_text'] = share_settings.get(
         'CERTIFICATE_FACEBOOK_TEXT',
         _("I completed the {course_title} course on {platform_name}.").format(
@@ -280,10 +281,8 @@ def _update_social_context(request, context, course, user, user_certificate, pla
     # Clicking this button sends the user to LinkedIn where they
     # can add the certificate information to their profile.
     linkedin_config = LinkedInAddToProfileConfiguration.current()
-
-    # posting certificates to LinkedIn is not currently
-    # supported in microsites/White Labels
-    if linkedin_config.enabled and not microsite.is_request_in_microsite():
+    linkedin_share_enabled = share_settings.get('CERTIFICATE_LINKEDIN', linkedin_config.enabled)
+    if linkedin_share_enabled:
         context['linked_in_url'] = linkedin_config.add_to_profile_url(
             course.id,
             course.display_name,
@@ -355,21 +354,41 @@ def _track_certificate_events(request, context, course, user, user_certificate):
     """
     Tracks web certificate view related events.
     """
-    badge = context['badge']
     # Badge Request Event Tracking Logic
-    if 'evidence_visit' in request.GET and badge:
-        tracker.emit(
-            'edx.badge.assertion.evidence_visited',
-            {
-                'user_id': user.id,
-                'course_id': unicode(course.id),
-                'enrollment_mode': badge.mode,
-                'assertion_id': badge.id,
-                'assertion_image_url': badge.data['image'],
-                'assertion_json_url': badge.data['json']['id'],
-                'issuer': badge.data['issuer'],
-            }
-        )
+    course_key = course.location.course_key
+
+    if 'evidence_visit' in request.GET:
+        badge_class = get_completion_badge(course_key, user)
+        if not badge_class:
+            log.warning('Visit to evidence URL for badge, but badges not configured for course "%s"', course_key)
+            badges = []
+        else:
+            badges = badge_class.get_for_user(user)
+        if badges:
+            # There should only ever be one of these.
+            badge = badges[0]
+            tracker.emit(
+                'edx.badge.assertion.evidence_visited',
+                {
+                    'badge_name': badge.badge_class.display_name,
+                    'badge_slug': badge.badge_class.slug,
+                    'badge_generator': badge.backend,
+                    'issuing_component': badge.badge_class.issuing_component,
+                    'user_id': user.id,
+                    'course_id': unicode(course_key),
+                    'enrollment_mode': badge.badge_class.mode,
+                    'assertion_id': badge.id,
+                    'assertion_image_url': badge.image_url,
+                    'assertion_json_url': badge.assertion_url,
+                    'issuer': badge.data.get('issuer'),
+                }
+            )
+        else:
+            log.warn(
+                "Could not find badge for %s on course %s.",
+                user.id,
+                course_key,
+            )
 
     # track certificate evidence_visited event for analytics when certificate_user and accessing_user are different
     if request.user and request.user.id != user.id:
@@ -400,14 +419,13 @@ def _render_certificate_template(request, context, course, user_certificate):
     return render_to_response("certificates/valid.html", context)
 
 
-def _update_microsite_context(context, configuration):
+def _update_configuration_context(context, configuration):
     """
-    Updates context with microsites data.
-    Microsites will need to be able to override any hard coded
+    Site Configuration will need to be able to override any hard coded
     content that was put into the context in the
     _update_certificate_context() call above. For example the
     'company_about_description' talks about edX, which we most likely
-    do not want to keep in a microsite
+    do not want to keep in configurations.
     So we need to re-apply any configuration/content that
     we are sourcing from the database. This is somewhat duplicative of
     the code at the beginning of this method, but we
@@ -415,20 +433,21 @@ def _update_microsite_context(context, configuration):
     require that to be set up early on in the pipeline
     """
 
-    microsite_config_key = microsite.get_value('domain_prefix')
-    microsites_config = configuration.get("microsites", {})
-    if microsite_config_key and microsites_config:
-        context.update(microsites_config.get(microsite_config_key, {}))
+    config_key = configuration_helpers.get_value('domain_prefix')
+    config = configuration.get("microsites", {})
+    if config_key and config:
+        context.update(config.get(config_key, {}))
 
 
 def _update_badge_context(context, course, user):
     """
     Updates context with badge info.
     """
-    try:
-        badge = BadgeAssertion.objects.get(user=user, course_id=course.location.course_key)
-    except BadgeAssertion.DoesNotExist:
-        badge = None
+    badge = None
+    if badges_enabled() and course.issue_badges:
+        badges = get_completion_badge(course.location.course_key, user).get_for_user(user)
+        if badges:
+            badge = badges[0]
     context['badge'] = badge
 
 
@@ -475,8 +494,13 @@ def render_html_view(request, user_id, course_id):
     This public view generates an HTML representation of the specified user and course
     If a certificate is not available, we display a "Sorry!" screen instead
     """
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        raise Http404
+
     preview_mode = request.GET.get('preview', None)
-    platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME)
+    platform_name = configuration_helpers.get_value("platform_name", settings.PLATFORM_NAME)
     configuration = CertificateHtmlViewConfiguration.get_config()
     # Create the initial view context, bootstrapping with Django settings and passed-in values
     context = {}
@@ -485,6 +509,11 @@ def render_html_view(request, user_id, course_id):
 
     # Kick the user back to the "Invalid" screen if the feature is disabled
     if not has_html_certificates_enabled(course_id):
+        log.info(
+            "Invalid cert: HTML certificates disabled for %s. User id: %d",
+            course_id,
+            user_id,
+        )
         return render_to_response(invalid_template_path, context)
 
     # Load the course and user objects
@@ -494,12 +523,22 @@ def render_html_view(request, user_id, course_id):
         course = modulestore().get_course(course_key)
 
     # For any other expected exceptions, kick the user back to the "Invalid" screen
-    except (InvalidKeyError, ItemNotFoundError, User.DoesNotExist):
+    except (InvalidKeyError, ItemNotFoundError, User.DoesNotExist) as exception:
+        error_str = (
+            "Invalid cert: error finding course %s or user with id "
+            "%d. Specific error: %s"
+        )
+        log.info(error_str, course_id, user_id, str(exception))
         return render_to_response(invalid_template_path, context)
 
     # Load user's certificate
     user_certificate = _get_user_certificate(request, user, course_key, course, preview_mode)
     if not user_certificate:
+        log.info(
+            "Invalid cert: User %d does not have eligible cert for %s.",
+            user_id,
+            course_id,
+        )
         return render_to_response(invalid_template_path, context)
 
     # Get the active certificate configuration for this course
@@ -507,7 +546,13 @@ def render_html_view(request, user_id, course_id):
     # Passing in the 'preview' parameter, if specified, will return a configuration, if defined
     active_configuration = get_active_web_certificate(course, preview_mode)
     if active_configuration is None:
+        log.info(
+            "Invalid cert: course %s does not have an active configuration. User id: %d",
+            course_id,
+            user_id,
+        )
         return render_to_response(invalid_template_path, context)
+
     context['certificate_data'] = active_configuration
 
     # Append/Override the existing view context values with any mode-specific ConfigurationModel values
@@ -531,8 +576,12 @@ def render_html_view(request, user_id, course_id):
     # Append badge info
     _update_badge_context(context, course, user)
 
-    # Append microsite overrides
-    _update_microsite_context(context, configuration)
+    # Append site configuration overrides
+    _update_configuration_context(context, configuration)
+
+    # Add certificate header/footer data to current context
+    context.update(get_certificate_header_context(is_secure=request.is_secure()))
+    context.update(get_certificate_footer_context())
 
     # Append/Override the existing view context values with any course-specific static values from Advanced Settings
     context.update(course.cert_html_view_overrides)

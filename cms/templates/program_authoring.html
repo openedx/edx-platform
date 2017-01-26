@@ -1,9 +1,11 @@
+<%namespace name='static' file='static_content.html'/>
 <%! from django.utils.translation import ugettext as _ %>
 
 <%inherit file="base.html" />
 <%block name="title">${_("Program Administration")}</%block>
 
 <%block name="header_extras">
+<%static:css group='style-edx-icons'/>
 <link rel="stylesheet" href=${authoring_app_config.css_url}>
 </%block>
 
@@ -12,5 +14,5 @@
 </%block>
 
 <%block name="content">
-<div class="js-program-admin program-app layout-1q3q layout-reversed" data-api-url=${programs_api_url} data-auth-url=${programs_token_url} data-home-url=${studio_home_url}></div>
+    <div class="js-program-admin program-app layout-1q3q layout-reversed" data-home-url="${studio_home_url}" data-lms-base-url="${lms_base_url}" data-programs-api-url="${programs_api_url}" data-auth-url="${programs_token_url}" data-username="${request.user.username}"></div>
 </%block>

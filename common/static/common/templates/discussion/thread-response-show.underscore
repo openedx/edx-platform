@@ -3,7 +3,7 @@
     <%= author_display %>
     <p class="posted-details">
         <span class="timeago" title="<%= created_at %>"><%= created_at %></span>
-        <% if (obj.endorsement) { %>
+        <% if (obj.endorsement && obj.endorsed) { %>
             -
             <%
             var fmt = null;
@@ -38,13 +38,13 @@
         <% } %>
       </p>
       <div class="post-labels">
-          <span class="post-label-reported"><i class="icon fa fa-flag"></i><%- gettext("Reported") %></span>
+          <span class="post-label-reported"><span class="icon fa fa-flag" aria-hidden="true"></span><%- gettext("Reported") %></span>
       </div>
       </div>
       <div class="response-header-actions">
         <%=
             _.template(
-                $('#forum-actions').html(),
+                $('#forum-actions').html())(
                 {
                     contentId: cid,
                     contentType: 'response',

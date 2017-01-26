@@ -5,6 +5,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.contrib.staticfiles import finders
 from django.conf import settings
 
+from static_replace.models import AssetBaseUrlConfig, AssetExcludedExtensionsConfig
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.contentstore.content import StaticContent
@@ -12,6 +13,7 @@ from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.locator import AssetLocator
 
 log = logging.getLogger(__name__)
+XBLOCK_STATIC_RESOURCE_PREFIX = '/static/xblock'
 
 
 def _url_replace_regex(prefix):
@@ -108,6 +110,13 @@ def process_static_urls(text, replacement_function, data_dir=None):
         prefix = match.group('prefix')
         quote = match.group('quote')
         rest = match.group('rest')
+
+        # Don't rewrite XBlock resource links.  Probably wasn't a good idea that /static
+        # works for actual static assets and for magical course asset URLs....
+        full_url = prefix + rest
+        if full_url.startswith(XBLOCK_STATIC_RESOURCE_PREFIX):
+            return original
+
         return replacement_function(original, prefix, quote, rest)
 
     return re.sub(
@@ -162,9 +171,7 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
         if settings.DEBUG and finders.find(rest, True):
             return original
         # if we're running with a MongoBacked store course_namespace is not None, then use studio style urls
-        elif (not static_asset_path) \
-                and course_id \
-                and modulestore().get_modulestore_type(course_id) != ModuleStoreEnum.Type.xml:
+        elif (not static_asset_path) and course_id:
             # first look in the static file pipeline and see if we are trying to reference
             # a piece of static content which is in the edx-platform repo (e.g. JS associated with an xmodule)
 
@@ -180,7 +187,9 @@ def replace_static_urls(text, data_directory=None, course_id=None, static_asset_
             else:
                 # if not, then assume it's courseware specific content and then look in the
                 # Mongo-backed database
-                url = StaticContent.convert_legacy_static_url_with_course_id(rest, course_id)
+                base_url = AssetBaseUrlConfig.get_base_url()
+                excluded_exts = AssetExcludedExtensionsConfig.get_excluded_extensions()
+                url = StaticContent.get_canonicalized_asset_path(course_id, rest, base_url, excluded_exts)
 
                 if AssetLocator.CANONICAL_NAMESPACE in url:
                     url = url.replace('block@', 'block/', 1)

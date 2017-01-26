@@ -34,13 +34,25 @@
             </p>
 
             <p>
-              ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your {platform_name} course! {link_start}Get your credit now.{link_end}").format(
-                link_start=u'<a href="{dashboard_url}">'.format(
-                    dashboard_url=dashboard_link
-                ),
-                link_end=u'</a>',
-                platform_name=settings.PLATFORM_NAME
-              )}
+
+              % if providers:
+                  ${_(u"Congratulations! You are eligible to receive course credit from {providers} for successfully completing your {platform_name} course! {link_start}Get your credit now.{link_end}").format(
+                    link_start=u'<a href="{dashboard_url}">'.format(
+                        dashboard_url=dashboard_link
+                    ),
+                    link_end=u'</a>',
+                    platform_name=settings.PLATFORM_NAME,
+                    providers=providers
+                  )}
+              % else:
+                  ${_(u"Congratulations! You are eligible to receive course credit for successfully completing your {platform_name} course! {link_start}Get your credit now.{link_end}").format(
+                    link_start=u'<a href="{dashboard_url}">'.format(
+                        dashboard_url=dashboard_link
+                    ),
+                    link_end=u'</a>',
+                    platform_name=settings.PLATFORM_NAME
+                  )}
+              % endif
             </p>
 
             <p>

@@ -4,10 +4,10 @@ from django.utils.translation import ugettext as _
 ask_to_send_username = ask_to_send_email = False
 %>
 
-<h2 class="problem-header">
+<h3 class="hd hd-2 problem-header">
     ## Translators:  "External resource" means that this learning module is hosted on a platform external to the edX LMS
     ${display_name} (${_('External resource')})
-</h2>
+</h3>
 
 % if has_score and weight:
     <div class="problem-progress">
@@ -36,7 +36,7 @@ ask_to_send_username = ask_to_send_email = False
             % endif
             <p class="lti-link external"><a target="_blank" class="link_lti_new_window" href="${form_url}">
                 ${button_text or _('View resource in a new window')}
-                 <i class="icon fa fa-external-link"></i>
+                 <span class="icon fa fa-external-link" aria-hidden="true"></span>
             </a></p>
         </div>
     % else:
@@ -52,13 +52,13 @@ ask_to_send_username = ask_to_send_email = False
         ></iframe>
     % endif
 % elif not hide_launch:
-    <h3 class="error_message">
+    <h4 class="hd hd-4 error_message">
         ${_('Please provide launch_url. Click "Edit", and fill in the required fields.')}
-    </h3>
+    </h4>
 % endif
 
 % if has_score and comment:
-    <h4 class="problem-feedback-label">${_("Feedback on your work from the grader:")}</h4>
+    <h4 class="hd hd-4 problem-feedback-label">${_("Feedback on your work from the grader:")}</h4>
     <div class="problem-feedback">
         ## sanitized with bleach in view
         ${comment}

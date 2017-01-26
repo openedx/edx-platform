@@ -116,26 +116,46 @@ find_and_assert = ($root, selector) ->
   table_data = tasks_data
 
   $table_placeholder = $ '<div/>', class: 'slickgrid'
-  $table_tasks.append $table_placeholder
+  $table_tasks.append($table_placeholder)
   grid = new Slick.Grid($table_placeholder, table_data, columns, options)
 
 # Formats the subject field for email content history table
 subject_formatter = (row, cell, value, columnDef, dataContext) ->
   if value is null then return gettext("An error occurred retrieving your email. Please try again later, and contact technical support if the problem persists.")
   subject_text = $('<span>').text(value['subject']).html()
-  return '<p><a href="#email_message_' + value['id']+ '" id="email_message_' + value['id'] + '_trig">' + subject_text + '</a></p>'
+  return edx.HtmlUtils.joinHtml(
+    edx.HtmlUtils.HTML('<p><a href="#email_message_'),
+    value['id'],
+    edx.HtmlUtils.HTML('" id="email_message_'),
+    value['id'],
+    edx.HtmlUtils.HTML('_trig">'),
+    subject_text,
+    edx.HtmlUtils.HTML('</a></p>'),
+  )
 
-# Formats the author field for the email content history table
-sent_by_formatter = (row, cell, value, columnDef, dataContext) ->
-  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+p_wrapper = (value) ->
+  edx.HtmlUtils.joinHtml(
+    edx.HtmlUtils.HTML('<p>'),
+    value,
+    edx.HtmlUtils.HTML('</p>'),
+  )
 
-# Formats the created field for the email content history table
-created_formatter = (row, cell, value, columnDef, dataContext) ->
-  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+unknown_p = () ->
+  p_wrapper(gettext('Unknown'))
 
-# Formats the number sent field for the email content history table
-number_sent_formatter = (row, cell, value, columndDef, dataContext) ->
-  if value is null then return "<p>" + gettext("Unknown") + "</p>" else return '<p>' + value + '</p>'
+# Since sent_to is a json array, it needs some extra attention
+sent_to_formatter = (row, cell, value, columnDef, dataContext) ->
+  if value is null
+    return unknown_p()
+  else
+    return p_wrapper(value.join(", "))
+
+# Formats the author, created, and number sent fields for the email content history table
+unknown_if_null_formatter = (row, cell, value, columnDef, dataContext) ->
+  if value is null
+    return unknown_p()
+  else
+    return p_wrapper(value)
 
 # Creates a table to display the content of bulk course emails
 # sent in the past
@@ -164,14 +184,22 @@ create_email_content_table = ($table_emails, $table_emails_inner, email_data) ->
       minWidth: 80
       maxWidth: 100
       cssClass: "email-content-cell"
-      formatter: sent_by_formatter
+      formatter: unknown_if_null_formatter
+    ,
+      id: 'sent_to'
+      field: 'sent_to'
+      name: gettext('Sent To')
+      minWidth: 80
+      maxWidth: 100
+      cssClass: "email-content-cell"
+      formatter: sent_to_formatter
     ,
       id: 'created'
       field: 'created'
       name: gettext('Time Sent')
       minWidth: 80
       cssClass: "email-content-cell"
-      formatter: created_formatter
+      formatter: unknown_if_null_formatter
     ,
       id: 'number_sent'
       field: 'number_sent'
@@ -179,16 +207,16 @@ create_email_content_table = ($table_emails, $table_emails_inner, email_data) ->
       minwidth: 100
       maxWidth: 150
       cssClass: "email-content-cell"
-      formatter: number_sent_formatter
+      formatter: unknown_if_null_formatter
     ,
     ]
 
     table_data = email_data
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
-    $table_emails_inner.append $table_placeholder
+    $table_emails_inner.append($table_placeholder)
     grid = new Slick.Grid($table_placeholder, table_data, columns, options)
-    $table_emails.append $ '<br/>'
+    $table_emails.append($('<br/>'))
 
 # Creates the modal windows linked to each email in the email history
 # Displayed when instructor clicks an email's subject in the content history table
@@ -206,31 +234,55 @@ create_email_message_views = ($messages_wrapper, emails) ->
     $email_header = $ '<div>', class: 'email-content-header'
 
     # Add copy email body button
-    $email_header.append $('<input>', type: "button", name: "copy-email-body-text", value: gettext("Copy Email To Editor"), id: "copy_email_" + email_id)
+    $email_header.append($('<input>', type: "button", name: "copy-email-body-text", value: gettext("Copy Email To Editor"), id: "copy_email_" + email_id))
 
     $close_button = $ '<a>', href: '#', class: "close-modal"
-    $close_button.append $ '<i>', class: 'icon fa fa-times'
-    $email_header.append $close_button
+    $close_button.append($('<i>', class: 'icon fa fa-times'))
+    $email_header.append($close_button)
 
-    # HTML escape the subject line
-    subject_text = $('<span>').text(email_info.email['subject']).html()
-    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Subject:') + '</em> ' + subject_text)
-    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent By:') + '</em> ' + email_info.requester)
-    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Time Sent:') + '</em> ' + email_info.created)
-    $email_header.append $('<h2>', class: "message-bold").html('<em>' + gettext('Sent To:') + '</em> ' + email_info.sent_to)
-    $email_wrapper.append $email_header
+    # HTML escape things
+    interpolate_header = (title, value) ->
+      edx.HtmlUtils.setHtml(
+        $('<h2>', class: 'message-bold'),
+        edx.HtmlUtils.joinHtml(
+          edx.HtmlUtils.HTML('<em>'),
+          title
+          edx.HtmlUtils.HTML('</em>'),
+          value,
+        )
+      )
+    $subject = interpolate_header(gettext('Subject:'), email_info.email['subject'])
+    $requester = interpolate_header(gettext('Sent By:'), email_info.requester)
+    $created = interpolate_header(gettext('Time Sent:'), email_info.created)
+    $sent_to = interpolate_header(gettext('Sent To:'), email_info.sent_to.join(", "))
+    $email_header.append($subject)
+    $email_header.append($requester)
+    $email_header.append($created)
+    $email_header.append($sent_to)
+    $email_wrapper.append($email_header)
 
-    $email_wrapper.append $ '<hr>'
+    $email_wrapper.append($('<hr>'))
 
     # Last, add email content section
     $email_content = $ '<div>', class: 'email-content-message'
-    $email_content.append $('<h2>', class: "message-bold").html("<em>" + gettext("Message:") + "</em>")
-    $message = $('<div>').html(email_info.email['html_message'])
-    $email_content.append $message
-    $email_wrapper.append $email_content
+    $email_content_header = edx.HtmlUtils.setHtml(
+      $('<h2>', class: "message-bold"),
+      edx.HtmlUtils.joinHtml(
+        edx.HtmlUtils.HTML('<em>'),
+        gettext("Message:"),
+        edx.HtmlUtils.HTML('</em>'),
+      )
+    )
+    $email_content.append($email_content_header)
+    $message = edx.HtmlUtils.setHtml(
+      $('<div>'),
+      edx.HtmlUtils.HTML(email_info.email['html_message'])
+    )
+    $email_content.append($message)
+    $email_wrapper.append($email_content)
 
-    $message_content.append $email_wrapper
-    $messages_wrapper.append $message_content
+    $message_content.append($email_wrapper)
+    $messages_wrapper.append($message_content)
 
     # Setup buttons to open modal window and copy an email message
     $('#email_message_' + email_info.email['id'] + '_trig').leanModal({closeButton: ".close-modal", copyEmailButton: "#copy_email_" + email_id})
@@ -296,7 +348,7 @@ class @PendingInstructorTasks
           console.log "No pending tasks to display"
           @$running_tasks_section.hide()
           @$no_tasks_message.empty()
-          @$no_tasks_message.append $('<p>').text gettext("No tasks currently running.")
+          @$no_tasks_message.append($('<p>').text(gettext("No tasks currently running.")))
           @$no_tasks_message.show()
       error: std_ajax_err => console.error "Error finding pending tasks to display"
     ### /Pending Instructor Tasks Section ####
@@ -369,11 +421,17 @@ class ReportDownloads
       minWidth: 150
       cssClass: "file-download-link"
       formatter: (row, cell, value, columnDef, dataContext) ->
-        '<a target="_blank" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
+        edx.HtmlUtils.joinHtml(
+          edx.HtmlUtils.HTML('<a target="_blank" href="'),
+          dataContext['url'],
+          edx.HtmlUtils.HTML('">'),
+          dataContext['name'],
+          edx.HtmlUtils.HTML('</a>')
+        )
     ]
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
-    @$report_downloads_table.append $table_placeholder
+    @$report_downloads_table.append($table_placeholder)
     grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
     grid.onClick.subscribe(
         (event) =>

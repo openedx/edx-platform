@@ -316,6 +316,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         fragment.add_content(self.system.render_template('vert_module.html', {
             'items': contents,
             'xblock_context': context,
+            'show_bookmark_button': False,
         }))
         return fragment
 
@@ -366,6 +367,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     """
     Descriptor class for LibraryContentModule XBlock.
     """
+
+    resources_dir = 'assets/library_content'
+
     module_class = LibraryContentModule
     mako_template = 'widgets/metadata-edit.html'
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
@@ -572,12 +576,10 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         lib_tools = self.runtime.service(self, 'library_tools')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        all_libraries = lib_tools.list_available_libraries()
-        if user_perms:
-            all_libraries = [
-                (key, name) for key, name in all_libraries
-                if user_perms.can_read(key) or self.source_library_id == unicode(key)
-            ]
+        all_libraries = [
+            (key, name) for key, name in lib_tools.list_available_libraries()
+            if user_perms.can_read(key) or self.source_library_id == unicode(key)
+        ]
         all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
         if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
             all_libraries.append((self.source_library_id, _(u"Invalid Library")))

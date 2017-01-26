@@ -12,6 +12,10 @@ var CourseDetails = Backbone.Model.extend({
         enrollment_start: null,
         enrollment_end: null,
         syllabus: null,
+        title: "",
+        subtitle: "",
+        duration: "",
+        description: "",
         short_description: "",
         overview: "",
         intro_video: null,
@@ -19,9 +23,15 @@ var CourseDetails = Backbone.Model.extend({
         license: null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
+        banner_image_name: '',
+        banner_image_asset_path: '',
+        video_thumbnail_image_name: '',
+        video_thumbnail_image_asset_path: '',
         pre_requisite_courses: [],
         entrance_exam_enabled : '',
-        entrance_exam_minimum_score_pct: '50'
+        entrance_exam_minimum_score_pct: '50',
+        learning_info: [],
+        instructor_info: {}
     },
 
     validate: function(newattrs) {
@@ -35,6 +45,7 @@ var CourseDetails = Backbone.Model.extend({
         if (newattrs.start_date === null) {
             errors.start_date = gettext("The course must have an assigned start date.");
         }
+
         if (newattrs.start_date && newattrs.end_date && newattrs.start_date >= newattrs.end_date) {
             errors.end_date = gettext("The course end date must be later than the course start date.");
         }

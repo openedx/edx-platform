@@ -44,14 +44,15 @@ from instructor_task.tasks_helper import (
     upload_exec_summary_report,
     upload_course_survey_report,
     generate_students_certificates,
-    upload_proctored_exam_results_report
+    upload_proctored_exam_results_report,
+    upload_ora2_data,
 )
 
 
 TASK_LOG = logging.getLogger('edx.celery.task')
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def rescore_problem(entry_id, xmodule_instance_args):
     """Rescores a problem in a course, for all students or one specific student.
 
@@ -82,7 +83,7 @@ def rescore_problem(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def reset_problem_attempts(entry_id, xmodule_instance_args):
     """Resets problem attempts to zero for a particular problem for all students in a course.
 
@@ -104,7 +105,7 @@ def reset_problem_attempts(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def delete_problem_state(entry_id, xmodule_instance_args):
     """Deletes problem state entirely for all students on a particular problem in a course.
 
@@ -126,7 +127,7 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
@@ -147,7 +148,7 @@ def send_bulk_course_email(entry_id, _xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     """
     Compute student answers to a given problem and upload the CSV to
@@ -159,7 +160,7 @@ def calculate_problem_responses_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_grades_csv(entry_id, xmodule_instance_args):
     """
     Grade a course and push the results to an S3 bucket for download.
@@ -175,7 +176,7 @@ def calculate_grades_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     """
     Generate a CSV for a course containing all students' problem
@@ -192,7 +193,7 @@ def calculate_problem_grade_report(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_students_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -204,7 +205,7 @@ def calculate_students_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     """
     Compute student profile information for a course and upload the
@@ -216,7 +217,7 @@ def enrollment_report_features_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def exec_summary_report_csv(entry_id, xmodule_instance_args):
     """
     Compute executive summary report for a course and upload the
@@ -228,7 +229,7 @@ def exec_summary_report_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def course_survey_report_csv(entry_id, xmodule_instance_args):
     """
     Compute the survey report for a course and upload the
@@ -240,7 +241,7 @@ def course_survey_report_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     """
     Compute proctored exam results report for a course and upload the
@@ -251,7 +252,7 @@ def proctored_exam_results_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     """
     Compute information about invited students who have not enrolled
@@ -264,7 +265,7 @@ def calculate_may_enroll_csv(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
 def generate_certificates(entry_id, xmodule_instance_args):
     """
     Grade students and generate certificates.
@@ -280,7 +281,7 @@ def generate_certificates(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, task_fn, action_name)
 
 
-@task(base=BaseInstructorTask)
+@task(base=BaseInstructorTask)  # pylint: disable=not-callable
 def cohort_students(entry_id, xmodule_instance_args):
     """
     Cohort students in bulk, and upload the results.
@@ -289,4 +290,14 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=not-callable
+def export_ora2_data(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV of ora2 responses and push it to S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(upload_ora2_data, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)

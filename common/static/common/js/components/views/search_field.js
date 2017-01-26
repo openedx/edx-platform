@@ -6,8 +6,14 @@
 ;(function (define) {
     'use strict';
 
-    define(['backbone', 'jquery', 'underscore', 'text!common/templates/components/search-field.underscore'],
-        function (Backbone, $, _, searchFieldTemplate) {
+    define([
+            'backbone',
+            'jquery',
+            'underscore',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'text!common/templates/components/search-field.underscore'
+        ],
+        function (Backbone, $, _, HtmlUtils, searchFieldTemplate) {
             return Backbone.View.extend({
 
                 events: {
@@ -16,7 +22,7 @@
                     'keyup .search-field': 'refreshState',
                     'click .action-clear': 'clearSearch',
                     'mouseover .action-clear': 'setMouseOverState',
-                    'mouseout .action-clear': 'setMouseOutState',
+                    'mouseout .action-clear': 'setMouseOutState'
                 },
 
                 initialize: function(options) {
@@ -29,6 +35,7 @@
                     var searchField = this.$('.search-field'),
                         clearButton = this.$('.action-clear'),
                         searchString = $.trim(searchField.val());
+
                     if (searchString) {
                         clearButton.removeClass('is-hidden');
                     } else {
@@ -37,11 +44,14 @@
                 },
 
                 render: function() {
-                    this.$el.html(_.template(searchFieldTemplate, {
-                        type: this.type,
-                        searchString: this.collection.searchString,
-                        searchLabel: this.label
-                    }));
+                    HtmlUtils.setHtml(
+                        this.$el,
+                        HtmlUtils.template(searchFieldTemplate)({
+                            type: this.type,
+                            searchString: this.collection.searchString,
+                            searchLabel: this.label
+                        })
+                    );
                     this.refreshState();
                     return this;
                 },

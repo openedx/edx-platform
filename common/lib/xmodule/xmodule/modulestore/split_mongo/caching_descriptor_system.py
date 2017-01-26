@@ -1,12 +1,14 @@
 import sys
 import logging
+
 from contracts import contract, new_contract
 from fs.osfs import OSFS
 from lazy import lazy
-from xblock.runtime import KvsFieldData
+from xblock.runtime import KvsFieldData, KeyValueStore
 from xblock.fields import ScopeIds
 from xblock.core import XBlock
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, LibraryLocator, DefinitionLocator
+
 from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
@@ -19,6 +21,7 @@ from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 from xmodule.modulestore.split_mongo.id_manager import SplitMongoIdManager
 from xmodule.modulestore.split_mongo.definition_lazy_loader import DefinitionLazyLoader
 from xmodule.modulestore.split_mongo.split_mongo_kvs import SplitMongoKVS
+from xmodule.x_module import XModuleMixin
 
 log = logging.getLogger(__name__)
 
@@ -209,20 +212,34 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             parent = course_key.make_usage_key(parent_key.type, parent_key.id)
         else:
             parent = None
-        kvs = SplitMongoKVS(
-            definition_loader,
-            converted_fields,
-            converted_defaults,
-            parent=parent,
-            field_decorator=kwargs.get('field_decorator')
-        )
 
-        if InheritanceMixin in self.modulestore.xblock_mixins:
-            field_data = inheriting_field_data(kvs)
-        else:
-            field_data = KvsFieldData(kvs)
+        aside_fields = None
+
+        # for the situation if block_data has no asides attribute
+        # (in case it was taken from memcache)
+        try:
+            if block_data.asides:
+                aside_fields = {block_key.type: {}}
+                for aside in block_data.asides:
+                    aside_fields[block_key.type].update(aside['fields'])
+        except AttributeError:
+            pass
 
         try:
+            kvs = SplitMongoKVS(
+                definition_loader,
+                converted_fields,
+                converted_defaults,
+                parent=parent,
+                aside_fields=aside_fields,
+                field_decorator=kwargs.get('field_decorator')
+            )
+
+            if InheritanceMixin in self.modulestore.xblock_mixins:
+                field_data = inheriting_field_data(kvs)
+            else:
+                field_data = KvsFieldData(kvs)
+
             module = self.construct_xblock_from_class(
                 class_,
                 ScopeIds(None, block_key.type, definition_id, block_locator),
@@ -248,6 +265,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         module.update_version = edit_info.update_version
         module.source_version = edit_info.source_version
         module.definition_locator = DefinitionLocator(block_key.type, definition_id)
+
+        for wrapper in self.modulestore.xblock_field_data_wrappers:
+            module._field_data = wrapper(module, module._field_data)  # pylint: disable=protected-access
+
         # decache any pending field settings
         module.save()
 
@@ -338,3 +359,30 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
         block_data.edit_info._subtree_edited_on = max_date
         block_data.edit_info._subtree_edited_by = max_date_by
+
+    def get_aside_of_type(self, block, aside_type):
+        """
+        See `runtime.Runtime.get_aside_of_type`
+
+        This override adds the field data from the block to the aside
+        """
+        asides_cached = block.get_asides() if isinstance(block, XModuleMixin) else None
+        if asides_cached:
+            for aside in asides_cached:
+                if aside.scope_ids.block_type == aside_type:
+                    return aside
+
+        new_aside = super(CachingDescriptorSystem, self).get_aside_of_type(block, aside_type)
+        new_aside._field_data = block._field_data  # pylint: disable=protected-access
+
+        for key, _ in new_aside.fields.iteritems():
+            if isinstance(key, KeyValueStore.Key) and block._field_data.has(new_aside, key):  # pylint: disable=protected-access
+                try:
+                    value = block._field_data.get(new_aside, key)  # pylint: disable=protected-access
+                except KeyError:
+                    pass
+                else:
+                    setattr(new_aside, key, value)
+
+        block.add_aside(new_aside)
+        return new_aside

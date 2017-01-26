@@ -1,9 +1,9 @@
-(function(define) {
+(function (define) {
 'use strict';
 // VideoVolumeControl module.
 define(
-'video/07_video_volume_control.js', [],
-function() {
+'video/07_video_volume_control.js', ['edx-ui-toolkit/js/utils/html-utils'],
+function (HtmlUtils) {
     /**
      * Video volume control module.
      * @exports video/07_video_volume_control.js
@@ -37,29 +37,38 @@ function() {
         /** Step to increase/decrease volume level via keyboard. */
         step: 20,
 
-        template: [
+        videoVolumeControlHtml: HtmlUtils.interpolateHtml(
+            HtmlUtils.HTML([
             '<div class="volume" role="application">',
-                '<button class="control" aria-disabled="false" aria-label="',
-                    gettext('Volume: Click on this button to mute or unmute this video or press UP or ' +
-                        'DOWN buttons to increase or decrease volume level.'),
-                    '" aria-expanded="false">',
-                    '<span class="icon-fallback-img">',
-                        '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
-                        '<span class="sr control-text">',
-                            gettext('Volume'),
-                        '</span>',
-                    '</span>',
+                '<p class="sr instructions" id="volume-instructions">',
+                    '{volumeInstructions}',
+                '</p>',
+                '<button class="control" aria-disabled="false" aria-describedby="volume-instructions"',
+                    '" aria-expanded="false" title="',
+                        '{adjustVideoVolume}',
+                    '">',
+                    '<span class="icon fa fa-volume-up" aria-hidden="true"></span>',
                 '</button>',
-                '<div class="volume-slider-container" aria-hidden="true">',
+                '<div class="volume-slider-container" aria-hidden="true" title="',
+                    '{adjustVideoVolume}',
+                    '">',
                     '<div class="volume-slider" ',
                         'role="slider"',
                         'aria-orientation="vertical" ',
                         'aria-valuemin="0" ',
                         'aria-valuemax="100" ',
-                        'aria-valuenow=""></div>',
+                        'aria-valuenow="" ',
+                        'aria-label="',
+                        '{volumeText}',
+                        '"></div>',
                 '</div>',
-            '</div>'
-        ].join(''),
+            '</div>'].join('')),
+            {
+                volumeInstructions: gettext('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.'), // jshint ignore: line
+                adjustVideoVolume: gettext('Adjust video volume'),
+                volumeText: gettext('Volume')
+            }
+        ),
 
         destroy: function () {
             this.volumeSlider.slider('destroy');
@@ -97,7 +106,7 @@ function() {
                 return false;
             }
 
-            this.el = $(this.template);
+            this.el = $(this.videoVolumeControlHtml.toString());
             // Youtube iframe react on key buttons and has his own handlers.
             // So, we disallow focusing on iframe.
             this.state.el.find('iframe').attr('tabindex', -1);
@@ -121,6 +130,8 @@ function() {
          */
         render: function() {
             var container = this.el.find('.volume-slider');
+            
+            HtmlUtils.append(container, HtmlUtils.HTML('<div class="ui-slider-handle volume-handle"></div>'));
 
             this.volumeSlider = container.slider({
                 orientation: 'vertical',
@@ -133,7 +144,7 @@ function() {
             // We provide an independent behavior to adjust volume level.
             // Therefore, we do not need redundant focusing on slider in TAB
             // order.
-            container.find('a').attr('tabindex', -1);
+            container.find('.volume-handle').attr('tabindex', -1);
             this.state.el.find('.secondary-controls').append(this.el);
         },
 
@@ -444,7 +455,7 @@ function() {
                 'aria-live': 'polite'
             });
 
-            this.button.after(this.liveRegion);
+            this.button.after(HtmlUtils.HTML(this.liveRegion).toString());
         },
 
         /**

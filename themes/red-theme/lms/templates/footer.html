@@ -3,7 +3,6 @@
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
-from microsite_configuration.templatetags.microsite import platform_name
 %>
 
 <div class="wrapper wrapper-footer">
@@ -54,7 +53,7 @@ from microsite_configuration.templatetags.microsite import platform_name
         </p>
       </div>
 
-      <p class="copyright">&copy; ${settings.COPYRIGHT_YEAR} ${settings.PLATFORM_NAME}.</p>
+      <p class="copyright">&copy; ${settings.COPYRIGHT_YEAR} ${static.get_platform_name()}.</p>
 
       ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
       <p class="copyright">
@@ -73,7 +72,8 @@ from microsite_configuration.templatetags.microsite import platform_name
               honor_link = u"<a href='{}'>".format(marketing_link('HONOR'))
             %>
             ${
-              _("{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor Code{honor_link_end}").format(
+              _(
+                "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor Code{honor_link_end}").format(
                 tos_link_start=tos_link,
                 tos_link_end="</a>",
                 honor_link_start=honor_link,

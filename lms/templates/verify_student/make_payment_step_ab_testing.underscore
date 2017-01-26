@@ -6,17 +6,25 @@
         </h2>
     <% } else if ( !upgrade ) { %>
       <h2 class="page-title">
-        <%= _.sprintf(
-            gettext( "You are enrolling in %(courseName)s"),
-            { courseName: '<span class="course-title">' + courseName + '</span>' }
-          ) %>
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "You are enrolling in: {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
       </h2>
     <% } else { %>
       <h2 class="page-title">
-        <%= _.sprintf(
-            gettext( "Upgrade to a Verified Certificate for %(courseName)s"),
-            { courseName: '<span class="course-title">' + courseName + '</span>' }
-          ) %>
+        <%= HtmlUtils.interpolateHtml(
+            gettext( "Upgrade to a Verified Certificate for {courseName}"),
+            { courseName: HtmlUtils.joinHtml(
+                HtmlUtils.HTML('<span class="course-title">'),
+                courseName,
+                HtmlUtils.HTML('</span>')
+            ) }
+        ) %>
       </h2>
     <% } %>
 
@@ -33,12 +41,12 @@
             </div>
             <p>
                 <% if ( courseModeSlug === 'no-id-professional' || courseModeSlug === 'professional') { %>
-                    <%= _.sprintf(
-                        gettext( "Professional Certificate for %(courseName)s"),{  courseName: courseName }
+                    <%- StringUtils.interpolate(
+                        gettext( "Professional Certificate for {courseName}"),{  courseName: courseName }
                      )%>
                 <% } else { %>
-                    <%= _.sprintf(
-                        gettext( "Verified Certificate for %(courseName)s"),{  courseName: courseName }
+                    <%- StringUtils.interpolate(
+                        gettext( "Verified Certificate for {courseName}"),{  courseName: courseName }
                      )%>
                 <% } %>
             </p>
@@ -77,7 +85,7 @@
                 </p>
                 <% if ( requirements['photo-id-required'] ) { %>
                     <div class="photo-requirement user_icon">
-                        <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                        <span class="fa fa-user fa-2x" aria-hidden="true"></span>
                         <h6>
                             <%- gettext("Photo ID") %>
                         </h6>
@@ -89,7 +97,7 @@
 
                 <% if ( requirements['webcam-required'] ) { %>
                     <div class="photo-requirement cam_icon">
-                        <i class="fa fa-video-camera fa-2x" aria-hidden="true"></i>
+                        <span class="fa fa-video-camera fa-2x" aria-hidden="true"></span>
                         <h6>
                             <%- gettext("Webcam") %>
                         </h6>

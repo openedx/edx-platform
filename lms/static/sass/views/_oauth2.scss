@@ -1,0 +1,17 @@
+@import 'neat/neat'; // lib - Neat
+
+.oauth2 {
+
+  @include outer-container();
+
+  .authorization-confirmation {
+
+    @include span-columns(6);
+    @include shift(3);
+
+    float: unset !important;  // fixes issues with oauth page and edx-theme footer
+    line-height: 1.5em;
+    padding: 50px 0;
+
+  }
+}

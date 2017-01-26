@@ -2,14 +2,18 @@
 Class used for defining and running Bok Choy acceptance test suite
 """
 from time import sleep
+from urllib import urlencode
 
 from common.test.acceptance.fixtures.course import CourseFixture, FixtureError
 
+from path import Path as path
 from paver.easy import sh, BuildFailure
 from pavelib.utils.test.suites.suite import TestSuite
 from pavelib.utils.envs import Env
 from pavelib.utils.test import bokchoy_utils
 from pavelib.utils.test import utils as test_utils
+
+import os
 
 try:
     from pygments.console import colorize
@@ -37,6 +41,7 @@ class BokChoyTestSuite(TestSuite):
       default_store - modulestore to use when running tests (split or draft)
       num_processes - number of processes or threads to use in tests. Recommendation is that this
       is less than or equal to the number of available processors.
+      verify_xss - when set, check for XSS vulnerabilities in the page HTML.
       See nosetest documentation: http://nose.readthedocs.org/en/latest/usage.html
     """
     def __init__(self, *args, **kwargs):
@@ -53,11 +58,13 @@ class BokChoyTestSuite(TestSuite):
         self.default_store = kwargs.get('default_store', None)
         self.verbosity = kwargs.get('verbosity', DEFAULT_VERBOSITY)
         self.num_processes = kwargs.get('num_processes', DEFAULT_NUM_PROCESSES)
+        self.verify_xss = kwargs.get('verify_xss', os.environ.get('VERIFY_XSS', True))
         self.extra_args = kwargs.get('extra_args', '')
         self.har_dir = self.log_dir / 'hars'
         self.a11y_file = Env.BOK_CHOY_A11Y_CUSTOM_RULES_FILE
         self.imports_dir = kwargs.get('imports_dir', None)
         self.coveragerc = kwargs.get('coveragerc', None)
+        self.save_screenshots = kwargs.get('save_screenshots', False)
 
     def __enter__(self):
         super(BokChoyTestSuite, self).__enter__()
@@ -68,7 +75,7 @@ class BokChoyTestSuite(TestSuite):
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()      # pylint: disable=no-value-for-parameter
 
-        if not (self.fasttest or self.skip_clean):
+        if not (self.fasttest or self.skip_clean or self.testsonly):
             test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
@@ -77,6 +84,9 @@ class BokChoyTestSuite(TestSuite):
 
         if not self.testsonly:
             self.prepare_bokchoy_run()
+        else:
+            # load data in db_fixtures
+            self.load_data()
 
         msg = colorize('green', "Confirming servers have started...")
         print msg
@@ -97,40 +107,45 @@ class BokChoyTestSuite(TestSuite):
     def __exit__(self, exc_type, exc_value, traceback):
         super(BokChoyTestSuite, self).__exit__(exc_type, exc_value, traceback)
 
-        msg = colorize('green', "Cleaning up databases...")
-        print msg
+        # Using testsonly will leave all fixtures in place (Note: the db will also be dirtier.)
+        if self.testsonly:
+            msg = colorize('green', 'Running in testsonly mode... SKIPPING database cleanup.')
+            print msg
+        else:
+            # Clean up data we created in the databases
+            msg = colorize('green', "Cleaning up databases...")
+            print msg
+            sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
+            bokchoy_utils.clear_mongo()
 
-        # Clean up data we created in the databases
-        sh("./manage.py lms --settings bok_choy flush --traceback --noinput")
-        bokchoy_utils.clear_mongo()
-
-    def verbosity_processes_string(self):
+    @property
+    def verbosity_processes_command(self):
         """
         Multiprocessing, xunit, color, and verbosity do not work well together. We need to construct
         the proper combination for use with nosetests.
         """
-        substring = []
+        command = []
 
         if self.verbosity != DEFAULT_VERBOSITY and self.num_processes != DEFAULT_NUM_PROCESSES:
             msg = 'Cannot pass in both num_processors and verbosity. Quitting'
             raise BuildFailure(msg)
 
         if self.num_processes != 1:
-            # Construct "multiprocess" nosetest substring
-            substring = [
-                "--with-xunitmp --xunitmp-file={}".format(self.xunit_report),
+            # Construct "multiprocess" nosetest command
+            command = [
+                "--xunitmp-file={}".format(self.xunit_report),
                 "--processes={}".format(self.num_processes),
-                "--no-color --process-timeout=1200"
+                "--no-color",
+                "--process-timeout=1200",
             ]
 
         else:
-            substring = [
-                "--with-xunit",
+            command = [
                 "--xunit-file={}".format(self.xunit_report),
                 "--verbosity={}".format(self.verbosity),
             ]
 
-        return " ".join(substring)
+        return command
 
     def prepare_bokchoy_run(self):
         """
@@ -140,20 +155,35 @@ class BokChoyTestSuite(TestSuite):
         sh("{}/scripts/reset-test-db.sh".format(Env.REPO_ROOT))
 
         if not self.fasttest:
-            self.generate_optimized_static_assets()
+            self.generate_optimized_static_assets(log_dir=self.log_dir)
 
         # Clear any test data already in Mongo or MySQLand invalidate
         # the cache
         bokchoy_utils.clear_mongo()
         self.cache.flush_all()
 
-        sh(
-            "DEFAULT_STORE={default_store}"
-            " ./manage.py lms --settings bok_choy loaddata --traceback"
-            " common/test/db_fixtures/*.json".format(
-                default_store=self.default_store,
-            )
-        )
+        # load data in db_fixtures
+        self.load_data()
+
+        # load courses if self.imports_dir is set
+        self.load_courses()
+
+        # Ensure the test servers are available
+        msg = colorize('green', "Confirming servers are running...")
+        print msg
+        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
+
+    def load_courses(self):
+        """
+        Loads courses from self.imports_dir.
+
+        Note: self.imports_dir is the directory that contains the directories
+        that have courses in them. For example, if the course is located in
+        `test_root/courses/test-example-course/`, self.imports_dir should be
+        `test_root/courses/`.
+        """
+        msg = colorize('green', "Importing courses from {}...".format(self.imports_dir))
+        print msg
 
         if self.imports_dir:
             sh(
@@ -164,10 +194,18 @@ class BokChoyTestSuite(TestSuite):
                 )
             )
 
-        # Ensure the test servers are available
-        msg = colorize('green', "Confirming servers are running...")
-        print msg
-        bokchoy_utils.start_servers(self.default_store, self.coveragerc)
+    def load_data(self):
+        """
+        Loads data into database from db_fixtures
+        """
+        print 'Loading data from json fixtures in db_fixtures directory'
+        sh(
+            "DEFAULT_STORE={default_store}"
+            " ./manage.py lms --settings bok_choy loaddata --traceback"
+            " common/test/db_fixtures/*.json".format(
+                default_store=self.default_store,
+            )
+        )
 
     def run_servers_continuously(self):
         """
@@ -187,7 +225,7 @@ class BokChoyTestSuite(TestSuite):
     def cmd(self):
         """
         This method composes the nosetests command to send to the terminal. If nosetests aren't being run,
-         the command returns an empty string.
+         the command returns None.
         """
         # Default to running all tests if no specific test is specified
         if not self.test_spec:
@@ -198,7 +236,7 @@ class BokChoyTestSuite(TestSuite):
         # Skip any additional commands (such as nosetests) if running in
         # servers only mode
         if self.serversonly:
-            return ""
+            return None
 
         # Construct the nosetests command, specifying where to save
         # screenshots and XUnit XML reports
@@ -208,13 +246,119 @@ class BokChoyTestSuite(TestSuite):
             "BOK_CHOY_HAR_DIR='{}'".format(self.har_dir),
             "BOKCHOY_A11Y_CUSTOM_RULES_FILE='{}'".format(self.a11y_file),
             "SELENIUM_DRIVER_LOG_DIR='{}'".format(self.log_dir),
+            "VERIFY_XSS='{}'".format(self.verify_xss),
             "nosetests",
             test_spec,
-            "{}".format(self.verbosity_processes_string())
-        ]
-        if self.pdb:
-            cmd.append("--pdb")
-        cmd.append(self.extra_args)
+        ] + self.verbosity_processes_command
+        if self.save_screenshots:
+            cmd.append("--with-save-baseline")
+        if self.extra_args:
+            cmd.append(self.extra_args)
+        cmd.extend(self.passthrough_options)
 
-        cmd = (" ").join(cmd)
+        return cmd
+
+
+class Pa11yCrawler(BokChoyTestSuite):
+    """
+    Sets up test environment with mega-course loaded, and runs pa11ycralwer
+    against it.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(Pa11yCrawler, self).__init__(*args, **kwargs)
+        self.course_key = kwargs.get('course_key')
+        if self.imports_dir:
+            # If imports_dir has been specified, assume the files are
+            # already there -- no need to fetch them from github. This
+            # allows someome to crawl a different course. They are responsible
+            # for putting it, un-archived, in the directory.
+            self.should_fetch_course = False
+        else:
+            # Otherwise, obey `--skip-fetch` command and use the default
+            # test course.  Note that the fetch will also be skipped when
+            # using `--fast`.
+            self.should_fetch_course = kwargs.get('should_fetch_course')
+            self.imports_dir = path('test_root/courses/')
+
+        self.pa11y_report_dir = os.path.join(self.report_dir, 'pa11ycrawler_reports')
+        self.tar_gz_file = "https://github.com/edx/demo-test-course/archive/master.tar.gz"
+
+        self.start_urls = []
+        auto_auth_params = {
+            "redirect": 'true',
+            "staff": 'true',
+            "course_id": self.course_key,
+        }
+        cms_params = urlencode(auto_auth_params)
+        self.start_urls.append("\"http://localhost:8031/auto_auth?{}\"".format(cms_params))
+
+        sequence_url = "/api/courses/v1/blocks/?{}".format(
+            urlencode({
+                "course_id": self.course_key,
+                "depth": "all",
+                "all_blocks": "true",
+            })
+        )
+        auto_auth_params.update({'redirect_to': sequence_url})
+        lms_params = urlencode(auto_auth_params)
+        self.start_urls.append("\"http://localhost:8003/auto_auth?{}\"".format(lms_params))
+
+    def __enter__(self):
+        if self.should_fetch_course:
+            self.get_test_course()
+        super(Pa11yCrawler, self).__enter__()
+
+    def get_test_course(self):
+        """
+        Fetches the test course.
+        """
+        self.imports_dir.makedirs_p()
+        zipped_course = self.imports_dir + 'demo_course.tar.gz'
+
+        msg = colorize('green', "Fetching the test course from github...")
+        print msg
+
+        sh(
+            'wget {tar_gz_file} -O {zipped_course}'.format(
+                tar_gz_file=self.tar_gz_file,
+                zipped_course=zipped_course,
+            )
+        )
+
+        msg = colorize('green', "Uncompressing the test course...")
+        print msg
+
+        sh(
+            'tar zxf {zipped_course} -C {courses_dir}'.format(
+                zipped_course=zipped_course,
+                courses_dir=self.imports_dir,
+            )
+        )
+
+    def generate_html_reports(self):
+        """
+        Runs pa11ycrawler json-to-html
+        """
+        cmd_str = (
+            'pa11ycrawler json-to-html --pa11ycrawler-reports-dir={report_dir}'
+        ).format(report_dir=self.pa11y_report_dir)
+
+        sh(cmd_str)
+
+    @property
+    def cmd(self):
+        """
+        Runs pa11ycrawler as staff user against the test course.
+        """
+        cmd = [
+            'pa11ycrawler',
+            'run',
+        ] + self.start_urls + [
+            '--pa11ycrawler-allowed-domains=localhost',
+            '--pa11ycrawler-reports-dir={}'.format(self.pa11y_report_dir),
+            '--pa11ycrawler-deny-url-matcher=logout',
+            '--pa11y-reporter="1.0-json"',
+            '--depth-limit=6',
+        ]
         return cmd

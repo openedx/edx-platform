@@ -82,11 +82,11 @@ def _cohort_membership_changed(sender, **kwargs):
 
 
 # A 'default cohort' is an auto-cohort that is automatically created for a course if no cohort with automatic
-# assignment have been specified. It is intended to be used in a cohorted-course for users who have yet to be assigned
-# to a cohort.
-# Translation Note: We are NOT translating this string since it is the constant identifier for the "default group"
-#                   and needed across product boundaries.
-DEFAULT_COHORT_NAME = "Default Group"
+# assignment have been specified. It is intended to be used in a cohorted course for users who have yet to be assigned
+# to a cohort, if the course staff have not explicitly created a cohort of type "RANDOM".
+# Note that course staff have the ability to change the name of this cohort after creation via the cohort
+# management UI in the instructor dashboard.
+DEFAULT_COHORT_NAME = _("Default Group")
 
 
 # tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
@@ -196,14 +196,17 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     # Otherwise assign the user a cohort.
     membership = CohortMembership.objects.create(
         user=user,
-        course_user_group=_get_default_cohort(course_key)
+        course_user_group=get_random_cohort(course_key)
     )
     return request_cache.data.setdefault(cache_key, membership.course_user_group)
 
 
-def _get_default_cohort(course_key):
+def get_random_cohort(course_key):
     """
-    Helper method to get a default cohort for assignment in get_cohort
+    Helper method to get a cohort for random assignment.
+
+    If there are multiple cohorts of type RANDOM in the course, one of them will be randomly selected.
+    If there are no existing cohorts of type RANDOM in the course, one will be created.
     """
     course = courses.get_course(course_key)
     cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
@@ -427,7 +430,7 @@ def set_assignment_type(user_group, assignment_type):
     """
     course_cohort = user_group.cohort
 
-    if is_default_cohort(user_group) and course_cohort.assignment_type != assignment_type:
+    if is_last_random_cohort(user_group) and course_cohort.assignment_type != assignment_type:
         raise ValueError(_("There must be one cohort to which students can automatically be assigned."))
 
     course_cohort.assignment_type = assignment_type
@@ -442,9 +445,9 @@ def get_assignment_type(user_group):
     return course_cohort.assignment_type
 
 
-def is_default_cohort(user_group):
+def is_last_random_cohort(user_group):
     """
-    Check if a cohort is default.
+    Check if this cohort is the only random cohort in the course.
     """
     random_cohorts = CourseUserGroup.objects.filter(
         course_id=user_group.course_id,

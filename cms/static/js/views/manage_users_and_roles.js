@@ -54,8 +54,8 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 title: messages.alreadyMember.title,
                 message: _.template(
                     messages.alreadyMember.messageTpl,
-                    {email: email, container: containerName},
-                    {interpolate: /\{(.+?)}/g}
+                    {interpolate: /\{(.+?)}/g})(
+                    {email: email, container: containerName}
                 ),
                 actions: {
                     primary: {
@@ -100,8 +100,8 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                 };
                 var roleEvents = {};
                 var self = this;
-                for (var i = 0; i < self.roles.length; i++) {
-                    var role_name = self.roles[i].key;
+                for (var i = 0; i < self.options.roles.length; i++) {
+                    var role_name = self.options.roles[i].key;
                     var role_selector = 'click .user-actions .make-' + role_name;
 
                     (function (role) {
@@ -140,7 +140,9 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                     roles = _.object(_.pluck(this.roles, 'key'), _.pluck(this.roles, "name")),
                     adminRoleCount = this.getAdminRoleCount(),
                     viewHelpers = {
-                        format: function (template, data) { return _.template(template, data, {interpolate: /\{(.+?)}/g}); }
+                        format: function (template, data) {
+                            return _.template(template, {interpolate: /\{(.+?)}/g})(data);
+                        }
                     };
                 for (var i = 0; i < this.users.length; i++) {
                     var user = this.users[i],
@@ -284,8 +286,8 @@ define(['jquery', 'underscore', 'gettext', "js/views/baseview",
                     title: self.messages.deleteUser.title,
                     message: _.template(
                         self.messages.deleteUser.messageTpl,
-                        {email: email, container: self.containerName},
-                        {interpolate: /\{(.+?)}/g}
+                        {interpolate: /\{(.+?)}/g})(
+                        {email: email, container: self.containerName}
                     ),
                     actions: {
                         primary: {

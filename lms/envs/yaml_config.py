@@ -161,7 +161,7 @@ if os.environ.get('QUEUE') == 'high_mem':
 #
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.yaml") as env_file:
-    ENV_TOKENS = yaml.load(env_file)
+    ENV_TOKENS = yaml.safe_load(env_file)
 
 # Works around an Ansible bug
 ENV_TOKENS = convert_tokens(ENV_TOKENS)
@@ -266,7 +266,7 @@ STATIC_ROOT = path(STATIC_ROOT_BASE)
 #
 
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.yaml") as auth_file:
-    AUTH_TOKENS = yaml.load(auth_file)
+    AUTH_TOKENS = yaml.safe_load(auth_file)
 
 # Works around an Ansible bug
 AUTH_TOKENS = convert_tokens(AUTH_TOKENS)
@@ -298,8 +298,8 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 ##### Custom Courses for EdX #####
 if FEATURES.get('CUSTOM_COURSES_EDX'):
-    INSTALLED_APPS += ('lms.djangoapps.ccx',)
-    FIELD_OVERRIDE_PROVIDERS += (
+    INSTALLED_APPS += ('lms.djangoapps.ccx', 'openedx.core.djangoapps.ccxcon')
+    MODULESTORE_FIELD_OVERRIDE_PROVIDERS += (
         'lms.djangoapps.ccx.overrides.CustomCoursesForEdxOverrideProvider',
     )
 
@@ -313,3 +313,7 @@ if FEATURES.get('INDIVIDUAL_DUE_DATES'):
 if FEATURES.get('ENABLE_LTI_PROVIDER'):
     INSTALLED_APPS += ('lti_provider',)
     AUTHENTICATION_BACKENDS += ('lti_provider.users.LtiBackend', )
+
+################################ Settings for Credentials Service ################################
+
+CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE

@@ -1,13 +1,24 @@
 ## coding=utf-8
+
+## This is the main Mako template that all page templates should include.
+## Note: there are a handful of pages that use Django Templates and which
+## instead include main_django.html. It is important that these two files
+## remain in sync, so changes made in one should be applied to the other.
+
+## Pages currently use v1 styling by default. Once the Pattern Library
+## rollout has been completed, this default can be switched to v2.
+<%! main_css = "style-main-v1" %>
+
+
 <%namespace name='static' file='static_content.html'/>
+<% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
 <%!
 from django.core.urlresolvers import reverse
 from django.utils.http import urlquote_plus
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language_bidi
-from microsite_configuration import microsite
-from microsite_configuration import page_title_breadcrumbs
 from branding import api as branding_api
+from pipeline_mako import render_require_js_path_overrides
 %>
 <!DOCTYPE html>
 <!--[if lte IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
@@ -21,27 +32,12 @@ from branding import api as branding_api
 ## embedding theme conditionals into templates. All inheriting
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
-<%def name="theme_enabled()">
-  <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
-</%def>
-<%def name="is_microsite()">
-  <% return microsite.is_request_in_microsite() %>
-</%def>
-
-<%def name="stanford_theme_enabled()">
-  <%
-    if not theme_enabled():
-      return False
-
-    return getattr(settings, "THEME_NAME", None) == "stanford"
-  %>
-</%def>
 
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
 <%def name="pagetitle()" />
   <%block name="title">
       <title>
-       ${page_title_breadcrumbs(self.pagetitle())}
+       ${static.get_page_title_breadcrumbs(self.pagetitle())}
       </title>
   </%block>
 
@@ -56,29 +52,30 @@ from branding import api as branding_api
       </script>
   % endif
 
-  <script type="text/javascript" src="/i18n.js"></script>
+  <%
+    jsi18n_path = "js/i18n/{language}/djangojs.js".format(language=LANGUAGE_CODE)
+  %>
 
-  <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
+  <script type="text/javascript" src="${static.url(jsi18n_path)}"></script>
+
+  <link rel="icon" type="image/x-icon" href="${static.url(static.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
-  ## We could do <%static:css group='style-main'/>, but that's only useful
-  ## if the group contains multiple files, and the 'style-main' group doesn't.
-  ## Instead, we'll construct this <link> element manually, to improve clarity.
-  ## When nothing in the system is referencing the 'style-main' group, it can
-  ## be removed from the environment file.
-  <%
-  application_css_path = "css/lms-main{rtl}.css".format(
-    rtl="-rtl" if get_language_bidi() else "",
-  )
-  %>
-  <link rel="stylesheet" href="${static.url(application_css_path)}" type="text/css" media="all" />
+  <%static:css group='${self.attr.main_css}'/>
 
-  % if disable_courseware_js:
+  % if not uses_pattern_library:
+    % if disable_courseware_js:
+      <%static:js group='base_vendor'/>
+      <%static:js group='base_application'/>
+    % else:
+      <%static:js group='main_vendor'/>
+      <%static:js group='application'/>
+    % endif
+  % else:
+    ## TODO: Update to only bring in RequireJS
+    ## https://openedx.atlassian.net/browse/FEDX-140
     <%static:js group='base_vendor'/>
     <%static:js group='base_application'/>
-  % else:
-    <%static:js group='main_vendor'/>
-    <%static:js group='application'/>
   % endif
 
   <script>
@@ -90,6 +87,9 @@ from branding import api as branding_api
     }).call(this, require || RequireJS.require);
   </script>
   <script type="text/javascript" src="${static.url("lms/js/require-config.js")}"></script>
+  <%block name="js_overrides">
+    ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
+  </%block>
 
   % if not disable_courseware_js:
     <%static:js group='module-js'/>
@@ -97,7 +97,7 @@ from branding import api as branding_api
 
   <%block name="headextra"/>
 
-  <%static:optional_include_mako file="head-extra.html" with_microsite="True" />
+  <%static:optional_include_mako file="head-extra.html" is_theming_enabled="True" />
 
   <%include file="widgets/optimizely.html" />
   <%include file="widgets/segment-io.html" />
@@ -105,7 +105,7 @@ from branding import api as branding_api
   <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
-<% ga_acct = microsite.get_value("GOOGLE_ANALYTICS_ACCOUNT", settings.GOOGLE_ANALYTICS_ACCOUNT) %>
+<% ga_acct = static.get_value("GOOGLE_ANALYTICS_ACCOUNT", settings.GOOGLE_ANALYTICS_ACCOUNT) %>
 % if ga_acct:
     <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -123,15 +123,16 @@ from branding import api as branding_api
 </head>
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-<%static:optional_include_mako file="body-initial.html" with_microsite="True" />
+
+<%static:optional_include_mako file="body-initial.html" is_theming_enabled="True" />
 <div id="page-prompt"></div>
 % if not disable_window_wrap:
   <div class="window-wrap" dir="${static.dir_rtl()}">
 % endif
-    <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to main content")}</a>
+    <a class="nav-skip" href="#main">${_("Skip to main content")}</a>
 
     % if not disable_header:
-        <%include file="${microsite.get_template_path('header.html')}" />
+        <%include file="${static.get_template_path('header.html')}" args="online_help_token=online_help_token" />
     % endif
 
     <div class="content-wrapper" id="content">
@@ -148,10 +149,11 @@ from branding import api as branding_api
 % endif
 
   <%block name="js_extra"/>
+
   <%include file="widgets/segment-io-footer.html" />
   <script type="text/javascript" src="${static.url('js/vendor/noreferrer.js')}" charset="utf-8"></script>
   <script type="text/javascript" src="${static.url('js/utils/navigation.js')}" charset="utf-8"></script>
-  <%static:optional_include_mako file="body-extra.html" with_microsite="True" />
+  <%static:optional_include_mako file="body-extra.html" is_theming_enabled="True" />
 </body>
 </html>
 

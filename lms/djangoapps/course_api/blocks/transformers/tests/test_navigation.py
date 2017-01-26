@@ -7,9 +7,9 @@ from unittest import TestCase
 
 from lms.djangoapps.course_api.blocks.transformers.block_depth import BlockDepthTransformer
 from lms.djangoapps.course_api.blocks.transformers.navigation import BlockNavigationTransformer
-from openedx.core.lib.block_cache.tests.test_utils import ChildrenMapTestMixin
-from openedx.core.lib.block_cache.block_structure import BlockStructureModulestoreData
-from openedx.core.lib.block_cache.block_structure_factory import BlockStructureFactory
+from openedx.core.lib.block_structure.tests.helpers import ChildrenMapTestMixin
+from openedx.core.lib.block_structure.block_structure import BlockStructureModulestoreData
+from openedx.core.lib.block_structure.factory import BlockStructureFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import SampleCourseFactory
 from xmodule.modulestore import ModuleStoreEnum
@@ -46,7 +46,7 @@ class BlockNavigationTransformerTestCase(TestCase, ChildrenMapTestMixin):
     @ddt.unpack
     def test_navigation(self, depth, nav_depth, children_map, expected_nav_map):
 
-        block_structure = self.create_block_structure(BlockStructureModulestoreData, children_map)
+        block_structure = self.create_block_structure(children_map, BlockStructureModulestoreData)
         BlockDepthTransformer(depth).transform(usage_info=None, block_structure=block_structure)
         BlockNavigationTransformer(nav_depth).transform(usage_info=None, block_structure=block_structure)
         block_structure._prune_unreachable()
@@ -88,14 +88,14 @@ class BlockNavigationTransformerCourseTestCase(ModuleStoreTestCase):
         BlockNavigationTransformer.collect(block_structure)
         block_structure._collect_requested_xblock_fields()
 
-        self.assertTrue(block_structure.has_block(chapter_x_key))
+        self.assertIn(chapter_x_key, block_structure)
 
         # transform phase
         BlockDepthTransformer().transform(usage_info=None, block_structure=block_structure)
         BlockNavigationTransformer(0).transform(usage_info=None, block_structure=block_structure)
         block_structure._prune_unreachable()
 
-        self.assertTrue(block_structure.has_block(chapter_x_key))
+        self.assertIn(chapter_x_key, block_structure)
 
         course_descendants = block_structure.get_transformer_block_field(
             course_usage_key,

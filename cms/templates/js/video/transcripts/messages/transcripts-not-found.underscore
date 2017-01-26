@@ -1,4 +1,4 @@
-<div class="transcripts-message-status status-error"><i class="icon fa fa-remove"></i><%= gettext("No Timed Transcript") %></div>
+<div class="transcripts-message-status status-error"><span class="icon fa fa-remove" aria-hidden="true"></span><%= gettext("No Timed Transcript") %></div>
 <p class="transcripts-message">
 <%= gettext("EdX doesn\'t have a timed transcript for this video. Please upload an .srt file.") %>
 </p>

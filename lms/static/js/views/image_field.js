@@ -23,9 +23,9 @@
             titleImageAlt: '',
             screenReaderTitle: gettext("Image"),
 
-            iconUpload: '<i class="icon fa fa-camera" aria-hidden="true"></i>',
-            iconRemove: '<i class="icon fa fa-remove" aria-hidden="true"></i>',
-            iconProgress: '<i class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></i>',
+            iconUpload: '<span class="icon fa fa-camera" aria-hidden="true"></span>',
+            iconRemove: '<span class="icon fa fa-remove" aria-hidden="true"></span>',
+            iconProgress: '<span class="icon fa fa-spinner fa-pulse fa-spin" aria-hidden="true"></span>',
 
             errorMessage: gettext("An error has occurred. Refresh the page, and then try again."),
 
@@ -38,6 +38,7 @@
             },
 
             initialize: function (options) {
+                this.options = _.extend({}, options);
                 this._super(options);
                 _.bindAll(this, 'render', 'imageChangeSucceeded', 'imageChangeFailed', 'fileSelected',
                           'watchForPageUnload', 'onBeforeUnload');

@@ -13,7 +13,7 @@ $(function() {
                 $.cookie('saved_index', active);
             },
             animate: 400,
-            header: "> div.wrap >h2",
+            header: "> .wrap > .hd",
            icons: icons,
            active: isNaN(parseInt($.cookie('saved_index'))) ? 0 : parseInt($.cookie('saved_index')),
            collapsible: true

@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
+
 from opaque_keys import InvalidKeyError
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -24,8 +25,10 @@ from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 import third_party_auth
 from django_comment_common.models import Role
 from edxmako.shortcuts import marketing_link
+from student.forms import get_registration_extension_form
 from student.views import create_account_with_params
 from student.cookies import set_logged_in_cookies
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from openedx.core.lib.api.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from .preferences.api import update_email_opt_in
@@ -74,7 +77,7 @@ class LoginSessionView(APIView):
         # Translators: These instructions appear on the login form, immediately
         # below a field meant to hold the user's email address.
         email_instructions = _("The email address you used to register with {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -157,11 +160,16 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
+        "first_name",
+        "last_name",
         "city",
+        "state",
         "country",
         "gender",
         "year_of_birth",
         "level_of_education",
+        "company",
+        "title",
         "mailing_address",
         "goals",
         "honor_code",
@@ -185,7 +193,9 @@ class RegistrationView(APIView):
 
         # Backwards compatibility: Honor code is required by default, unless
         # explicitly set to "optional" in Django settings.
-        self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
+        self._extra_fields_setting = copy.deepcopy(configuration_helpers.get_value('REGISTRATION_EXTRA_FIELDS'))
+        if not self._extra_fields_setting:
+            self._extra_fields_setting = copy.deepcopy(settings.REGISTRATION_EXTRA_FIELDS)
         self._extra_fields_setting["honor_code"] = self._extra_fields_setting.get("honor_code", "required")
 
         # Check that the setting is configured correctly
@@ -228,6 +238,37 @@ class RegistrationView(APIView):
         # Default fields are always required
         for field_name in self.DEFAULT_FIELDS:
             self.field_handlers[field_name](form_desc, required=True)
+
+        # Custom form fields can be added via the form set in settings.REGISTRATION_EXTENSION_FORM
+        custom_form = get_registration_extension_form()
+
+        if custom_form:
+            for field_name, field in custom_form.fields.items():
+                restrictions = {}
+                if getattr(field, 'max_length', None):
+                    restrictions['max_length'] = field.max_length
+                if getattr(field, 'min_length', None):
+                    restrictions['min_length'] = field.min_length
+                field_options = getattr(
+                    getattr(custom_form, 'Meta', None), 'serialization_options', {}
+                ).get(field_name, {})
+                field_type = field_options.get('field_type', FormDescription.FIELD_TYPE_MAP.get(field.__class__))
+                if not field_type:
+                    raise ImproperlyConfigured(
+                        "Field type '{}' not recognized for registration extension field '{}'.".format(
+                            field_type,
+                            field_name
+                        )
+                    )
+                form_desc.add_field(
+                    field_name, label=field.label,
+                    default=field_options.get('default'),
+                    field_type=field_options.get('field_type', FormDescription.FIELD_TYPE_MAP.get(field.__class__)),
+                    placeholder=field.initial, instructions=field.help_text, required=field.required,
+                    restrictions=restrictions,
+                    options=getattr(field, 'choices', None), error_messages=field.error_messages,
+                    include_default_option=field_options.get('include_default_option'),
+                )
 
         # Extra fields configured in Django settings
         # may be required, optional, or hidden
@@ -545,7 +586,7 @@ class RegistrationView(APIView):
         # Translators: This phrase appears above a field on the registration form
         # meant to hold the user's reasons for registering with edX.
         goals_label = _(u"Tell us why you're interested in {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(
@@ -572,6 +613,106 @@ class RegistrationView(APIView):
         form_desc.add_field(
             "city",
             label=city_label,
+            required=required
+        )
+
+    def _add_state_field(self, form_desc, required=False):
+        """Add a State/Province/Region field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the State/Province/Region in which they live.
+        state_label = _(u"State/Province/Region")
+
+        form_desc.add_field(
+            "state",
+            label=state_label,
+            required=required
+        )
+
+    def _add_company_field(self, form_desc, required=False):
+        """Add a Company field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Company
+        company_label = _(u"Company")
+
+        form_desc.add_field(
+            "company",
+            label=company_label,
+            required=required
+        )
+
+    def _add_title_field(self, form_desc, required=False):
+        """Add a Title field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the Title
+        title_label = _(u"Title")
+
+        form_desc.add_field(
+            "title",
+            label=title_label,
+            required=required
+        )
+
+    def _add_first_name_field(self, form_desc, required=False):
+        """Add a First Name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the First Name
+        first_name_label = _(u"First Name")
+
+        form_desc.add_field(
+            "first_name",
+            label=first_name_label,
+            required=required
+        )
+
+    def _add_last_name_field(self, form_desc, required=False):
+        """Add a Last Name field to a form description.
+
+        Arguments:
+            form_desc: A form description
+
+        Keyword Arguments:
+            required (bool): Whether this field is required; defaults to False
+
+        """
+        # Translators: This label appears above a field on the registration form
+        # which allows the user to input the First Name
+        last_name_label = _(u"Last Name")
+
+        form_desc.add_field(
+            "last_name",
+            label=last_name_label,
             required=required
         )
 
@@ -630,14 +771,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of Service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
@@ -673,14 +814,14 @@ class RegistrationView(APIView):
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         label = _(u"I agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
         # Translators: "Terms of service" is a legal document users must agree to
         # in order to register a new account.
         error_msg = _(u"You must agree to the {platform_name} {terms_of_service}.").format(
-            platform_name=settings.PLATFORM_NAME,
+            platform_name=configuration_helpers.get_value("PLATFORM_NAME", settings.PLATFORM_NAME),
             terms_of_service=terms_link
         )
 
@@ -779,7 +920,7 @@ class PasswordResetView(APIView):
         # Translators: These instructions appear on the password reset form,
         # immediately below a field meant to hold the user's email address.
         email_instructions = _(u"The email address you used to register with {platform_name}").format(
-            platform_name=settings.PLATFORM_NAME
+            platform_name=configuration_helpers.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
         )
 
         form_desc.add_field(

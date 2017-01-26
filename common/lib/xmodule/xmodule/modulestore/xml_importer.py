@@ -607,6 +607,7 @@ class LibraryImportManager(ImportManager):
                     org=self.target_id.org,
                     library=self.target_id.library,
                     user_id=self.user_id,
+                    fields={"display_name": ""},
                 )
                 runtime = library.runtime
             except DuplicateCourseError:
@@ -736,10 +737,11 @@ def _update_and_import_module(
         )
 
     fields = _update_module_references(module, source_course_id, dest_course_id)
+    asides = module.get_asides() if isinstance(module, XModuleMixin) else None
 
     return store.import_xblock(
         user_id, dest_course_id, module.location.category,
-        module.location.block_id, fields, runtime
+        module.location.block_id, fields, runtime, asides=asides
     )
 
 

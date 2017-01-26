@@ -14,11 +14,13 @@ class OrganizationsHelpersTestCase(ModuleStoreTestCase):
     Main test suite for Organizations API client library
     """
 
+    CREATE_USER = False
+
     def setUp(self):
         """
         Test case scaffolding
         """
-        super(OrganizationsHelpersTestCase, self).setUp(create_user=False)
+        super(OrganizationsHelpersTestCase, self).setUp()
         self.course = CourseFactory.create()
 
         self.organization = {

@@ -4,6 +4,7 @@ from collections import namedtuple
 
 import ddt
 from mock import Mock, MagicMock
+from nose.plugins.attrib import attr
 from unittest import TestCase
 from django.http import Http404
 from django.test import RequestFactory
@@ -12,6 +13,7 @@ from rest_framework import serializers
 from openedx.core.lib.api.paginators import NamespacedPageNumberPagination, paginate_search_results
 
 
+@attr('shard_2')
 @ddt.ddt
 class PaginateSearchResultsTestCase(TestCase):
     """Test cases for paginate_search_results method"""
@@ -107,8 +109,7 @@ class PaginateSearchResultsTestCase(TestCase):
         id_range = get_object_range(page_number, page_size)
         db_objects = [build_mock_object(obj_id) for obj_id in id_range]
         self.mock_model.objects.filter = MagicMock(return_value=db_objects)
-
-        page = paginate_search_results(self.mock_model, self.search_results, self.default_size, 'last')
+        page = paginate_search_results(self.mock_model, self.search_results, page_size, 'last')
 
         self.mock_model.objects.filter.assert_called_with(pk__in=id_range)
         self.assertEquals(db_objects, page.object_list)
@@ -123,6 +124,7 @@ class PaginateSearchResultsTestCase(TestCase):
             paginate_search_results(self.mock_model, self.search_results, self.default_size, page_num)
 
 
+@attr('shard_2')
 class NamespacedPaginationTestCase(TestCase):
     """
     Test behavior of `NamespacedPageNumberPagination`

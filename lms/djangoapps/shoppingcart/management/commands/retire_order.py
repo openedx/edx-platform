@@ -3,7 +3,7 @@ Script for retiring order that went through cybersource but weren't
 marked as "purchased" in the db
 """
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from shoppingcart.models import Order
 from shoppingcart.exceptions import UnexpectedOrderItemStatus, InvalidStatusToRetire
 

@@ -5,11 +5,13 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
+from nose.plugins.attrib import attr
 from openedx.core.djangoapps.credit import serializers
 from openedx.core.djangoapps.credit.tests.factories import CreditProviderFactory, CreditEligibilityFactory
 from student.tests.factories import UserFactory
 
 
+@attr('shard_2')
 class CreditProviderSerializerTests(TestCase):
     """ CreditProviderSerializer tests. """
 
@@ -30,6 +32,7 @@ class CreditProviderSerializerTests(TestCase):
         self.assertDictEqual(serializer.data, expected)
 
 
+@attr('shard_2')
 class CreditEligibilitySerializerTests(TestCase):
     """ CreditEligibilitySerializer tests. """
 

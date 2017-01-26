@@ -1,3 +1,6 @@
+<%page expression_filter="h"/>
+<%! from openedx.core.djangolib.js_utils import js_escaped_string %>
+
 % if settings.CMS_SEGMENT_KEY:
     <!-- begin segment footer -->
     <script type="text/javascript">
@@ -5,10 +8,21 @@
         // We can't use JQuery's on load method because it
         // screws up RequireJS' JQuery initialization.
         var onLoadCallback = function() {
-            analytics.identify("${user.id}", {
-              email: "${user.email}",
-              username: "${user.username}"
-            });
+            analytics.identify(
+                "${ user.id | n, js_escaped_string }",
+                {
+                    email: "${ user.email | n, js_escaped_string }",
+                    username: "${ user.username | n, js_escaped_string }"
+                },
+                {
+                    integrations: {
+                        // Disable MailChimp because we don't want to update the user's email
+                        // and username in MailChimp on every page load. We only need to capture
+                        // this data on registration/activation.
+                        MailChimp: false
+                    }
+                }
+            );
         };
         if (window.addEventListener) {
             window.addEventListener("load", onLoadCallback, false);

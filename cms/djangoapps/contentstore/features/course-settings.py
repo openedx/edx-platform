@@ -132,37 +132,6 @@ def test_change_course_overview(_step):
     type_in_codemirror(0, "<h1>Overview</h1>")
 
 
-@step('I click the "Upload Course Image" button')
-def click_upload_button(_step):
-    button_css = '.action-upload-image'
-    world.css_click(button_css)
-
-
-@step('I upload a new course image$')
-def upload_new_course_image(_step):
-    upload_file('image.jpg', sub_path="uploads")
-
-
-@step('I should see the new course image$')
-def i_see_new_course_image(_step):
-    img_css = '#course-image'
-    images = world.css_find(img_css)
-    assert len(images) == 1
-    img = images[0]
-    expected_src = 'image.jpg'
-
-    # Don't worry about the domain in the URL
-    success_func = lambda _: img['src'].endswith(expected_src)
-    world.wait_for(success_func)
-
-
-@step('the image URL should be present in the field')
-def image_url_present(_step):
-    field_css = '#course-image-url'
-    expected_value = 'image.jpg'
-    assert world.css_value(field_css).endswith(expected_value)
-
-
 ############### HELPER METHODS ####################
 def set_date_or_time(css, date_or_time):
     """

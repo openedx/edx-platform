@@ -1,4 +1,4 @@
-<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_wrapper;_wrapper_l1_poll" data-type="VerticalDescriptor" tabindex="0">
+<div class="xblock xblock-studio_view xmodule_edit xmodule_WrapperDescriptor" data-runtime-class="StudioRuntime" data-init="XBlockToXModuleShim" data-runtime-version="1" data-usage-id="i4x:;_;_AndyA;_ABT101;_wrapper;_wrapper_l1_poll" data-type="MockDescriptor" tabindex="0">
     <section class="sequence-edit">
         <script id="metadata-editor-tpl" type="text/template">
             <ul class="list-input settings-list">
@@ -15,7 +15,7 @@
                 \t<label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name') %></label>
                 \t<input class="input setting-input" type="text" id="<%= uniqueId %>" value='<%= model.get("value") %>'/>
                 \t<button class="action setting-clear inactive" type="button" name="setting-clear" value="Clear" data-tooltip="Clear">
-                <i class="icon fa fa-undo"></i><span class="sr">"Clear Value"</span>
+                <span class="icon fa fa-undo" aria-hidden="true"></span><span class="sr">"Clear Value"</span>
                 </button>
             </div>
             <span class="tip setting-help"><%= model.get('help') %></span>

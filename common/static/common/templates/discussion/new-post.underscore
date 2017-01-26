@@ -30,7 +30,7 @@
     <div class="post-options">
         <label class="post-option is-enabled">
             <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
-            <i class="icon fa fa-star"></i><%- gettext("follow this post") %>
+            <span class="icon fa fa-star" aria-hidden="true"></span><%- gettext("follow this post") %>
         </label>
         <% if (allow_anonymous) { %>
         <label class="post-option">
@@ -47,6 +47,6 @@
     </div>
     <div>
         <input type="submit" class="submit" value="<%- gettext('Add Post') %>">
-        <a href="#" class="cancel"><%- gettext('Cancel') %></a>
+        <button type="button" class="cancel"><%- gettext('Cancel') %></button>
     </div>
 </form>

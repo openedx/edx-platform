@@ -15,7 +15,7 @@ from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.util.misc import escape_invalid_characters
-from xmodule.mongo_connection import connect_to_mongodb
+from xmodule.mongo_utils import connect_to_mongodb, create_collection_index
 from .content import StaticContent, ContentStore, StaticContentStream
 
 
@@ -45,6 +45,7 @@ class MongoContentStore(ContentStore):
         self.fs = gridfs.GridFS(mongo_db, bucket)  # pylint: disable=invalid-name
 
         self.fs_files = mongo_db[bucket + ".files"]  # the underlying collection GridFS uses
+        self.chunks = mongo_db[bucket + ".chunks"]
 
     def close_connections(self):
         """
@@ -52,13 +53,31 @@ class MongoContentStore(ContentStore):
         """
         self.fs_files.database.connection.close()
 
-    def _drop_database(self):
+    def _drop_database(self, database=True, collections=True, connections=True):
         """
         A destructive operation to drop the underlying database and close all connections.
         Intended to be used by test code for cleanup.
+
+        If database is True, then this should drop the entire database.
+        Otherwise, if collections is True, then this should drop all of the collections used
+        by this modulestore.
+        Otherwise, the modulestore should remove all data from the collections.
+
+        If connections is True, then close the connection to the database as well.
         """
-        self.close_connections()
-        self.fs_files.database.connection.drop_database(self.fs_files.database)
+        connection = self.fs_files.database.connection
+
+        if database:
+            connection.drop_database(self.fs_files.database)
+        elif collections:
+            self.fs_files.drop()
+            self.chunks.drop()
+        else:
+            self.fs_files.remove({})
+            self.chunks.remove({})
+
+        if connections:
+            self.close_connections()
 
     def save(self, content):
         content_id, content_son = self.asset_db_key(content.location)
@@ -109,7 +128,8 @@ class MongoContentStore(ContentStore):
                     location, fp.displayname, fp.content_type, fp, last_modified_at=fp.uploadDate,
                     thumbnail_location=thumbnail_location,
                     import_path=getattr(fp, 'import_path', None),
-                    length=fp.length, locked=getattr(fp, 'locked', False)
+                    length=fp.length, locked=getattr(fp, 'locked', False),
+                    content_digest=getattr(fp, 'md5', None),
                 )
             else:
                 with self.fs.get(content_id) as fp:
@@ -123,7 +143,8 @@ class MongoContentStore(ContentStore):
                         location, fp.displayname, fp.content_type, fp.read(), last_modified_at=fp.uploadDate,
                         thumbnail_location=thumbnail_location,
                         import_path=getattr(fp, 'import_path', None),
-                        length=fp.length, locked=getattr(fp, 'locked', False)
+                        length=fp.length, locked=getattr(fp, 'locked', False),
+                        content_digest=getattr(fp, 'md5', None),
                     )
         except NoFile:
             if throw_on_not_found:
@@ -399,7 +420,8 @@ class MongoContentStore(ContentStore):
     def ensure_indexes(self):
         # Index needed thru 'category' by `_get_all_content_for_course` and others. That query also takes a sort
         # which can be `uploadDate`, `display_name`,
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.tag', pymongo.ASCENDING),
                 ('_id.org', pymongo.ASCENDING),
@@ -409,7 +431,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
@@ -418,7 +441,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
@@ -427,7 +451,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
@@ -436,7 +461,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
@@ -445,7 +471,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('_id.org', pymongo.ASCENDING),
                 ('_id.course', pymongo.ASCENDING),
@@ -454,7 +481,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),
@@ -463,7 +491,8 @@ class MongoContentStore(ContentStore):
             sparse=True,
             background=True
         )
-        self.fs_files.create_index(
+        create_collection_index(
+            self.fs_files,
             [
                 ('content_son.org', pymongo.ASCENDING),
                 ('content_son.course', pymongo.ASCENDING),

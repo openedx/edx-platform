@@ -3,18 +3,17 @@
  * It is expected to be backed by a Group model.
  */
 define([
-    'js/views/baseview', 'underscore', 'underscore.string', 'gettext'
+    'js/views/baseview', 'underscore', 'underscore.string', 'gettext', 'text!templates/group-edit.underscore'
 ],
-function(BaseView, _, str, gettext) {
+function(BaseView, _, str, gettext, groupEditTemplate) {
     'use strict';
-    _.str = str; // used in template
     var ExperimentGroupEditView = BaseView.extend({
         tagName: 'li',
         events: {
             'click .action-close': 'removeGroup',
             'change .group-name': 'changeName',
-            'focus .groups-fields input': 'onFocus',
-            'blur .groups-fields input': 'onBlur'
+            'focus .group-name': 'onFocus',
+            'blur .group-name': 'onBlur'
         },
 
         className: function() {
@@ -23,7 +22,6 @@ function(BaseView, _, str, gettext) {
         },
 
         initialize: function() {
-            this.template = this.loadTemplate('group-edit');
             this.listenTo(this.model, 'change', this.render);
         },
 
@@ -31,8 +29,8 @@ function(BaseView, _, str, gettext) {
             var collection = this.model.collection,
                 index = collection.indexOf(this.model);
 
-            this.$el.html(this.template({
-                name: this.model.escape('name'),
+            this.$el.html(_.template(groupEditTemplate)({
+                name: this.model.get('name'),
                 allocation: this.getAllocation(),
                 index: index,
                 error: this.model.validationError

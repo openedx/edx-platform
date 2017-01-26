@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'common/js/spec_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
+    'jquery', 'underscore', 'edx-ui-toolkit/js/utils/spec-helpers/ajax-helpers', 'js/spec/edxnotes/helpers',
     'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory'
 ], function($, _, AjaxHelpers, Helpers, Annotator, Logger, NotesFactory) {
     'use strict';
@@ -31,7 +31,9 @@ define([
         });
 
         afterEach(function () {
-            _.invoke(Annotator._instances, 'destroy');
+            while (Annotator._instances.length > 0) {
+                Annotator._instances[0].destroy();
+            }
         });
 
         it('should log edx.course.student_notes.viewed event properly', function() {

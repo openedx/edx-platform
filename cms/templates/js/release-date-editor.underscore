@@ -19,7 +19,7 @@
       <ul class="list-actions">
           <li class="action-item">
               <a href="#" data-tooltip="<%= gettext('Clear Release Date/Time') %>" class="clear-date action-button action-clear">
-                  <i class="icon fa fa-undo"></i>
+                  <span class="icon fa fa-undo" aria-hidden="true"></span>
                   <span class="sr"><%= gettext('Clear Release Date/Time') %></span>
               </a>
           </li>

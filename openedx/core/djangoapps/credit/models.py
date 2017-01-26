@@ -6,23 +6,22 @@ Credit courses allow students to receive university credit for
 successful completion of a course on EdX
 """
 
-import datetime
 from collections import defaultdict
+import datetime
 import logging
 
-import pytz
-
+from config_models.models import ConfigurationModel
 from django.conf import settings
 from django.core.cache import cache
-from django.dispatch import receiver
-from django.db import models, transaction, IntegrityError
 from django.core.validators import RegexValidator
-from simple_history.models import HistoricalRecords
-
+from django.db import models, transaction, IntegrityError
+from django.dispatch import receiver
+from django.utils.translation import ugettext_lazy, ugettext as _
 from jsonfield.fields import JSONField
 from model_utils.models import TimeStampedModel
+import pytz
+from simple_history.models import HistoricalRecords
 from xmodule_django.models import CourseKeyField
-from django.utils.translation import ugettext_lazy
 
 
 CREDIT_PROVIDER_ID_REGEX = r"[a-z,A-Z,0-9,\-]+"
@@ -295,6 +294,9 @@ class CreditRequirement(TimeStampedModel):
         unique_together = ('namespace', 'name', 'course')
         ordering = ["order"]
 
+    def __unicode__(self):
+        return '{course_id} - {name}'.format(course_id=self.course.course_key, name=self.display_name)
+
     @classmethod
     def add_or_update_course_requirement(cls, credit_course, requirement, order):
         """
@@ -428,6 +430,7 @@ class CreditRequirementStatus(TimeStampedModel):
 
     class Meta(object):
         unique_together = ('username', 'requirement')
+        verbose_name_plural = _('Credit requirement statuses')
 
     @classmethod
     def get_statuses(cls, requirements, username):
@@ -709,3 +712,25 @@ class CreditRequest(TimeStampedModel):
             provider=self.provider.provider_id,
             status=self.status,
         )
+
+
+class CreditConfig(ConfigurationModel):
+    """ Manage credit configuration """
+    CACHE_KEY = 'credit.providers.api.data'
+
+    cache_ttl = models.PositiveIntegerField(
+        verbose_name=_("Cache Time To Live"),
+        default=0,
+        help_text=_(
+            "Specified in seconds. Enable caching by setting this to a value greater than 0."
+        )
+    )
+
+    @property
+    def is_cache_enabled(self):
+        """Whether responses from the commerce API will be cached."""
+        return self.enabled and self.cache_ttl > 0
+
+    def __unicode__(self):
+        """Unicode representation of the config. """
+        return 'Credit Configuration'

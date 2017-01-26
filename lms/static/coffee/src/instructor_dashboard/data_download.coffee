@@ -15,8 +15,8 @@ ReportDownloads = -> window.InstructorDashboard.util.ReportDownloads
 class @DataDownload_Certificate
   constructor: (@$container) ->
     # gather elements
-    @$list_issued_certificate_table_btn = @$container.find("input[name='issued-certificates-list']'")
-    @$list_issued_certificate_csv_btn = @$container.find("input[name='issued-certificates-csv']'")
+    @$list_issued_certificate_table_btn = @$container.find("input[name='issued-certificates-list']")
+    @$list_issued_certificate_csv_btn = @$container.find("input[name='issued-certificates-csv']")
     @$certificate_display_table       = @$container.find '.certificate-data-display-table'
     @$certificates_request_response_error  = @$container.find '.issued-certificates-error.request-response-error'
 
@@ -72,17 +72,18 @@ class DataDownload
     new DataDownload_Certificate @$section.find '.issued_certificates'
 
     # gather elements
-    @$list_studs_btn = @$section.find("input[name='list-profiles']'")
-    @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']'")
-    @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']'")
-    @$survey_results_csv_btn = @$section.find("input[name='survey-results-report']'")
+    @$list_studs_btn = @$section.find("input[name='list-profiles']")
+    @$list_studs_csv_btn = @$section.find("input[name='list-profiles-csv']")
+    @$list_proctored_exam_results_csv_btn = @$section.find("input[name='proctored-exam-results-report']")
+    @$survey_results_csv_btn = @$section.find("input[name='survey-results-report']")
     @$list_may_enroll_csv_btn = @$section.find("input[name='list-may-enroll-csv']")
     @$list_problem_responses_csv_input = @$section.find("input[name='problem-location']")
     @$list_problem_responses_csv_btn = @$section.find("input[name='list-problem-responses-csv']")
-    @$list_anon_btn = @$section.find("input[name='list-anon-ids']'")
-    @$grade_config_btn = @$section.find("input[name='dump-gradeconf']'")
-    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']'")
-    @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']'")
+    @$list_anon_btn = @$section.find("input[name='list-anon-ids']")
+    @$grade_config_btn = @$section.find("input[name='dump-gradeconf']")
+    @$calculate_grades_csv_btn = @$section.find("input[name='calculate-grades-csv']")
+    @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']")
+    @$async_report_btn = @$section.find("input[class='async-report-btn']")
 
     # response areas
     @$download                        = @$section.find '.data-download-container'
@@ -243,28 +244,27 @@ class DataDownload
           @clear_display()
           @$download_display_text.html data['grading_config_summary']
 
-    @$calculate_grades_csv_btn.click (e) =>
-      @onClickGradeDownload @$calculate_grades_csv_btn, gettext("Error generating grades. Please try again.")
-
-    @$problem_grade_report_csv_btn.click (e) =>
-      @onClickGradeDownload @$problem_grade_report_csv_btn, gettext("Error generating problem grade report. Please try again.")
-
-  onClickGradeDownload: (button, errorMessage) ->
-      # Clear any CSS styling from the request-response areas
-      #$(".msg-confirm").css({"display":"none"})
-      #$(".msg-error").css({"display":"none"})
-      @clear_display()
-      url = button.data 'endpoint'
-      $.ajax
-        type: 'POST'
-        dataType: 'json'
-        url: url
-        error: (std_ajax_err) =>
-          @$reports_request_response_error.text errorMessage
-          $(".msg-error").css({"display":"block"})
-        success: (data) =>
-          @$reports_request_response.text data['status']
-          $(".msg-confirm").css({"display":"block"})
+    @$async_report_btn.click (e) =>
+        # Clear any CSS styling from the request-response areas
+        #$(".msg-confirm").css({"display":"none"})
+        #$(".msg-error").css({"display":"none"})
+        @clear_display()
+        url = $(e.target).data 'endpoint'
+        $.ajax
+          type: 'POST'
+          dataType: 'json'
+          url: url
+          error: std_ajax_err =>
+            if e.target.name == 'calculate-grades-csv'
+              @$grades_request_response_error.text gettext("Error generating grades. Please try again.")
+            else if e.target.name == 'problem-grade-report'
+              @$grades_request_response_error.text gettext("Error generating problem grade report. Please try again.")
+            else if e.target.name == 'export-ora2-data'
+              @$grades_request_response_error.text gettext("Error generating ORA data report. Please try again.")
+            $(".msg-error").css({"display":"block"})
+          success: (data) =>
+            @$reports_request_response.text data['status']
+            $(".msg-confirm").css({"display":"block"})
 
   # handler for when the section title is clicked.
   onClickTitle: ->

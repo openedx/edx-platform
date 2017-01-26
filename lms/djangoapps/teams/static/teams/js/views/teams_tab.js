@@ -5,6 +5,8 @@
             'jquery',
             'underscore',
             'gettext',
+            'edx-ui-toolkit/js/utils/html-utils',
+            'edx-ui-toolkit/js/utils/string-utils',
             'common/js/components/views/search_field',
             'js/components/header/views/header',
             'js/components/header/models/header',
@@ -25,7 +27,7 @@
             'teams/js/views/team_utils',
             'teams/js/views/instructor_tools',
             'text!teams/templates/teams_tab.underscore'],
-        function (Backbone, $, _, gettext, SearchFieldView, HeaderView, HeaderModel,
+        function (Backbone, $, _, gettext, HtmlUtils, StringUtils, SearchFieldView, HeaderView, HeaderModel,
                   TopicModel, TopicCollection, TeamModel, TeamCollection, MyTeamsCollection, TeamAnalytics,
                   TeamsTabbedView, TopicsView, TeamProfileView, MyTeamsView, TopicTeamsView, TeamEditView,
                   TeamMembersEditView, TeamProfileHeaderActionsView, TeamUtils, InstructorToolsView, teamsTemplate) {
@@ -44,7 +46,7 @@
                 },
 
                 render: function () {
-                    this.$el.html(_.template(teamsTemplate));
+                    HtmlUtils.setHtml(this.$el, HtmlUtils.template(teamsTemplate)({}));
                     this.$('p.error').hide();
                     this.header.setElement(this.$('.teams-header')).render();
                     if (this.instructorTools) {
@@ -101,7 +103,7 @@
                             teamEvents: this.teamEvents,
                             course_id: this.context.courseID,
                             username: this.context.userInfo.username,
-                            per_page: 2,
+                            perPage: 2,
                             parse: true,
                             url: this.context.myTeamsUrl
                         }
@@ -121,7 +123,7 @@
                             course_id: this.context.courseID,
                             parse: true
                         }
-                    ).bootstrap();
+                    );
 
                     this.topicsView = new TopicsView({
                         router: this.router,
@@ -138,12 +140,15 @@
                                 url: 'my-teams',
                                 view: this.myTeamsView
                             }, {
-                                title: interpolate(
+                                title: HtmlUtils.interpolateHtml(
                                     // Translators: sr_start and sr_end surround text meant only for screen readers.
                                     // The whole string will be shown to users as "Browse teams" if they are using a
                                     // screenreader, and "Browse" otherwise.
-                                    gettext("Browse %(sr_start)s teams %(sr_end)s"),
-                                    {"sr_start": '<span class="sr">', "sr_end": '</span>'}, true
+                                    gettext('Browse {sr_start} teams {sr_end}'),
+                                    {
+                                        sr_start: HtmlUtils.HTML('<span class="sr">'),
+                                        sr_end: HtmlUtils.HTML('</span>')
+                                    }
                                 ),
                                 url: 'browse',
                                 view: this.topicsView
@@ -159,14 +164,7 @@
                 start: function() {
                     Backbone.history.start();
 
-                    $(document).ajaxError(function (event, xhr) {
-                        if (xhr.status === 401) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed. Reload the page and try again."));
-                        }
-                        else if (xhr.status === 500) {
-                            TeamUtils.showMessage(gettext("Your request could not be completed due to a server problem. Reload the page and try again. If the issue persists, click the Help tab to report the problem."));
-                        }
-                    });
+                    $(document).ajaxError(this.errorHandler);
 
                     // Navigate to the default page if there is no history:
                     // 1. If the user belongs to at least one team, jump to the "My Teams" page
@@ -177,6 +175,20 @@
                         } else {
                             this.router.navigate('browse', {trigger: true});
                         }
+                    }
+                },
+
+                errorHandler: function(event, xhr) {
+                    if (xhr.status === 401) {
+                        TeamUtils.showMessage(gettext(
+                            "Your request could not be completed. Reload the page and try again."
+                        ));
+                    }
+                    else if (xhr.status === 500) {
+                        TeamUtils.showMessage(gettext(
+                            "Your request could not be completed due to a server problem. Reload the page" +
+                            " and try again. If the issue persists, click the Help tab to report the problem."
+                        ));
                     }
                 },
 
@@ -212,10 +224,9 @@
                                 collection: view.teamsCollection,
                                 breadcrumbs: view.createBreadcrumbs(topic),
                                 title: gettext('Team Search'),
-                                description: interpolate(
-                                    gettext('Showing results for "%(searchString)s"'),
-                                    { searchString: view.teamsCollection.searchString },
-                                    true
+                                description: StringUtils.interpolate(
+                                    gettext('Showing results for "{searchString}"'),
+                                    {searchString: view.teamsCollection.getSearchString()}
                                 ),
                                 showSortControls: false
                             });
@@ -326,19 +337,18 @@
                                     course_id: view.context.courseID,
                                     topic_id: topicID,
                                     url: view.context.teamsUrl,
-                                    per_page: 10
+                                    perPage: 10
                                 });
                                 view.teamsCollection = collection;
-                                collection.goTo(1)
-                                    .done(function() {
-                                        var teamsView = view.createTeamsListView({
-                                            topic: topic,
-                                            collection: collection,
-                                            breadcrumbs: view.createBreadcrumbs(),
-                                            showSortControls: true
-                                        });
-                                        deferred.resolve(teamsView);
+                                collection.getPage(1).then(function () {
+                                    var teamsView = view.createTeamsListView({
+                                        topic: topic,
+                                        collection: collection,
+                                        breadcrumbs: view.createBreadcrumbs(),
+                                        showSortControls: true
                                     });
+                                    deferred.resolve(teamsView);
+                                });
                             });
                     }
                     return deferred.promise();
@@ -347,7 +357,6 @@
                 createTeamsListView: function(options) {
                     var topic = options.topic,
                         collection = options.collection,
-                        self = this,
                         teamsView = new TopicTeamsView({
                             router: this.router,
                             context: this.context,
@@ -382,7 +391,7 @@
                         // that the collection doesn't unnecessarily get refreshed again.
                         collection.isStale = false;
 
-                        if (collection.searchString) {
+                        if (collection.getSearchString()) {
                             Backbone.history.navigate(searchUrl, {trigger: true});
                         } else if (Backbone.history.getFragment() === searchUrl) {
                             Backbone.history.navigate('topics/' + topic.get('id'), {trigger: true});
@@ -584,30 +593,27 @@
 
                 routeNotFound: function (route) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The page "%(route)s" could not be found.'),
-                            {route: route},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The page "{route}" could not be found.'),
+                            {route: route}
                         )
                     );
                 },
 
                 topicNotFound: function (topicID) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The topic "%(topic)s" could not be found.'),
-                            {topic: topicID},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The topic "{topic}" could not be found.'),
+                            {topic: topicID}
                         )
                     );
                 },
 
                 teamNotFound: function (teamID) {
                     this.notFoundError(
-                        interpolate(
-                            gettext('The team "%(team)s" could not be found.'),
-                            {team: teamID},
-                            true
+                        StringUtils.interpolate(
+                            gettext('The team "{team}" could not be found.'),
+                            {team: teamID}
                         )
                     );
                 },

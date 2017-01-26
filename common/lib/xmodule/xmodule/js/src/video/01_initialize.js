@@ -132,7 +132,6 @@ function (VideoPlayer, i18n, moment) {
 
             onYTApiReady = function () {
                 console.log('[Video info]: YouTube API is available and is loaded.');
-
                 if (state.htmlPlayerLoaded) { return; }
 
                 console.log('[Video info]: Starting YouTube player.');
@@ -140,7 +139,6 @@ function (VideoPlayer, i18n, moment) {
 
                 state.modules.push(video);
                 state.__dfd__.resolve();
-
                 state.youtubeApiAvailable = true;
             };
 
@@ -211,7 +209,6 @@ function (VideoPlayer, i18n, moment) {
 
     function _waitForYoutubeApi(state) {
         console.log('[Video info]: Starting to wait for YouTube API to load.');
-
         window.setTimeout(function () {
             // If YouTube API will load OK, it will run `onYouTubeIframeAPIReady`
             // callback, which will set `state.youtubeApiAvailable` to `true`.
@@ -293,10 +290,10 @@ function (VideoPlayer, i18n, moment) {
             _hideWaitPlaceholder(state);
             state.el
                 .find('.video-player div')
-                    .addClass('hidden')
-                .end()
-                .find('.video-player h3')
-                    .removeClass('hidden');
+                    .addClass('hidden');
+            state.el
+                .find('.video-player .video-error')
+                    .removeClass('is-hidden');
 
             return false;
         }
@@ -497,8 +494,8 @@ function (VideoPlayer, i18n, moment) {
 
             this.el.find('.video-player div')
                 .removeClass('hidden');
-            this.el.find('.video-player h3')
-                .addClass('hidden');
+            this.el.find('.video-player .video-error')
+                .addClass('is-hidden');
 
             // If in reality the timeout was to short, try to
             // continue loading the YouTube video anyways.
@@ -510,7 +507,7 @@ function (VideoPlayer, i18n, moment) {
 
             // In-browser HTML5 player does not support quality
             // control.
-            this.el.find('a.quality_control').hide();
+            this.el.find('.quality_control').hide();
             _renderElements(this);
         }
     }
