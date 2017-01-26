@@ -699,6 +699,13 @@ def program_detail(request, program_id):
     else:
         context['program'] = program[0]
 
+    # TODO: put these keys dynamically
+    for course in context['program']['courses']:
+        course_runs = course['course_runs'][0]
+        course_runs['registered'] = False
+        course_runs['can_enroll'] = True
+        course_runs['is_shib_course'] = False
+
     return render_to_response('courseware/program_details.html', context)
 
 

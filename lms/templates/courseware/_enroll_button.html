@@ -2,13 +2,13 @@
 <%!
 from django.utils.translation import ugettext as _
 %>
-
+<%page args="course" expression_filter="h"/>
 <%
   btn_text = _("Enroll Now")
   btn_href = ecommerce_checkout_link or "#"
   btn_class = "register"
 %>
-% if user.is_authenticated() and registered:
+% if user.is_authenticated() and course['registered']:
   % if show_courseware_link:
     <%
       btn_text = _("Go to Course")
@@ -31,7 +31,7 @@ from django.utils.translation import ugettext as _
     btn_text = _("Enrollment in this course is by invitation only")
     btn_class = "disabled"
   %>
-% elif not is_shib_course and not can_enroll:
+% elif not course['is_shib_course'] and not course['can_enroll']:
   <%
     btn_text = _("Enrollment is Closed")
     btn_class = "disabled"

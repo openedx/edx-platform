@@ -447,7 +447,7 @@ from openedx.core.djangolib.markup import HTML, Text
                                 </p>
                             </div>
                             <div class="tbl-col col-full-sm">
-                                <%include file="_enroll_button.html" />
+                                <%include file="_enroll_button.html" args="course=course['course_runs'][0]" />
                             </div>
 
                              ## Need to put this hidden form on the page so that the registration button works.
