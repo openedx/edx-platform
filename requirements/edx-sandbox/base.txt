@@ -4,10 +4,15 @@
 #   * @edx/ospr - to check licensing
 #   * @edx/devops - to check system requirements
 
+# Pin packaging tools the same as edxapp.  Keep them in sync for our sanity.
+setuptools==34.0.2
+pip==9.0.1
+
+
 numpy==1.6.2
 networkx==1.7
 sympy==0.7.1
-pyparsing==2.0.1
+pyparsing==2.0.7
 matplotlib==1.3.1
 
 # We forked NLTK just to make it work with setuptools instead of distribute
