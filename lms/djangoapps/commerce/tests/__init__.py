@@ -72,6 +72,7 @@ class EdxRestApiClientTest(TestCase):
             'full_name': self.user.profile.name,
             'email': self.user.email,
             'iss': settings.JWT_AUTH['JWT_ISSUER'],
+            'iat': datetime.datetime.utcnow(),
             'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=settings.JWT_AUTH['JWT_EXPIRATION']),
             'tracking_context': {
                 'lms_user_id': self.user.id,  # pylint: disable=no-member
