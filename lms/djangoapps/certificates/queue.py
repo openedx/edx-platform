@@ -284,8 +284,6 @@ class XQueueCertInterface(object):
         if forced_grade:
             grade['grade'] = forced_grade
 
-<<<<<<< HEAD
-=======
         LOGGER.info(
             (
                 u"Certificate generated for student %s in the course: %s with template: %s. "
@@ -301,7 +299,6 @@ class XQueueCertInterface(object):
             mode_is_verified
         )
 
->>>>>>> open-release/eucalyptus.master
         cert, created = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)  # pylint: disable=no-member
 
         cert.mode = cert_mode
@@ -373,7 +370,6 @@ class XQueueCertInterface(object):
                 cert.status
             )
             return cert
-<<<<<<< HEAD
 
         # Check to see whether the student is on the the embargoed
         # country restricted list. If so, they should not receive a
@@ -382,16 +378,6 @@ class XQueueCertInterface(object):
             cert.status = status.restricted
             cert.save()
 
-=======
-
-        # Check to see whether the student is on the the embargoed
-        # country restricted list. If so, they should not receive a
-        # certificate -- set their status to restricted and log it.
-        if self.restricted.filter(user=student).exists():
-            cert.status = status.restricted
-            cert.save()
-
->>>>>>> open-release/eucalyptus.master
             LOGGER.info(
                 (
                     u"Student %s is in the embargoed country restricted "
@@ -405,8 +391,6 @@ class XQueueCertInterface(object):
             )
             return cert
 
-<<<<<<< HEAD
-=======
         if unverified:
             cert.status = status.unverified
             cert.save()
@@ -421,7 +405,6 @@ class XQueueCertInterface(object):
             )
             return cert
 
->>>>>>> open-release/eucalyptus.master
         # Finally, generate the certificate and send it off.
         return self._generate_cert(cert, course, student, grade_contents, template_pdf, generate_pdf)
 
